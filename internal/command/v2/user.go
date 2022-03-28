@@ -2,8 +2,11 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/user"
 )
@@ -37,4 +40,8 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 	}
 
 	return exists, nil
+}
+
+func newUserCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
+	return newCryptoCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
 }

@@ -1,11 +1,12 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/ttacon/libphonenumber"
-	"time"
 )
 
 const (
@@ -32,7 +33,7 @@ func (p *Phone) IsValid() bool {
 }
 
 func (p *Phone) formatPhone() error {
-	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, defaultRegion)
+	phoneNr, err := libphonenumber.Parse(p.PhoneNumber, libphonenumber.UNKNOWN_REGION)
 	if err != nil {
 		return caos_errs.ThrowInvalidArgument(nil, "EVENT-so0wa", "Errors.User.Phone.Invalid")
 	}

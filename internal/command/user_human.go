@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"strings"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -185,74 +184,74 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 }
 
 func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, selfregister, passwordless bool, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
-	if err := human.CheckDomainPolicy(domainPolicy); err != nil {
-		return nil, nil, err
-	}
-	if !domainPolicy.UserLoginMustBeDomain {
-		usernameSplit := strings.Split(human.Username, "@")
-		if len(usernameSplit) != 2 {
-			return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
-		}
-		domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit[1])
-		if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-			return nil, nil, err
-		}
-		if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-			return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
-		}
-	}
-	userID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, nil, err
-	}
-	human.AggregateID = userID
-	human.SetNamesAsDisplayname()
-	if human.Password != nil {
-		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.ChangeRequired); err != nil {
-			return nil, nil, err
-		}
-	}
+	// if err := human.CheckDomainPolicy(domainPolicy); err != nil {
+	// 	return nil, nil, err
+	// }
+	// if !domainPolicy.UserLoginMustBeDomain {
+	// 	usernameSplit := strings.Split(human.Username, "@")
+	// 	if len(usernameSplit) != 2 {
+	// 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
+	// 	}
+	// 	domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit[1])
+	// 	if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
+	// 		return nil, nil, err
+	// 	}
+	// 	if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
+	// 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+	// 	}
+	// }
+	// userID, err := c.idGenerator.Next()
+	// if err != nil {
+	// 	return nil, nil, err
+	// }
+	// human.AggregateID = userID
+	// human.SetNamesAsDisplayname()
+	// if human.Password != nil {
+	// 	if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.ChangeRequired); err != nil {
+	// 		return nil, nil, err
+	// 	}
+	// }
 
-	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
-	//TODO: adlerhurst maybe we could simplify the code below
-	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
-	var events []eventstore.Command
+	// addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
+	// //TODO: adlerhurst maybe we could simplify the code below
+	// userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
+	// var events []eventstore.Command
 
-	if selfregister {
-		events = append(events, createRegisterHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain))
-	} else {
-		events = append(events, createAddHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain))
-	}
+	// if selfregister {
+	// 	events = append(events, createRegisterHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain))
+	// } else {
+	// 	events = append(events, createAddHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain))
+	// }
 
-	if link != nil {
-		event, err := c.addUserIDPLink(ctx, userAgg, link)
-		if err != nil {
-			return nil, nil, err
-		}
-		events = append(events, event)
-	}
+	// if link != nil {
+	// 	event, err := c.addUserIDPLink(ctx, userAgg, link)
+	// 	if err != nil {
+	// 		return nil, nil, err
+	// 	}
+	// 	events = append(events, event)
+	// }
 
-	if human.IsInitialState(passwordless, link != nil) {
-		initCode, err := domain.NewInitUserCode(initCodeGenerator)
-		if err != nil {
-			return nil, nil, err
-		}
-		events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry))
-	}
+	// if human.IsInitialState(passwordless, link != nil) {
+	// 	initCode, err := domain.NewInitUserCode(initCodeGenerator)
+	// 	if err != nil {
+	// 		return nil, nil, err
+	// 	}
+	// 	events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry))
+	// }
 
-	if human.Email != nil && human.EmailAddress != "" && human.IsEmailVerified {
-		events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
-	}
+	// if human.Email != nil && human.EmailAddress != "" && human.IsEmailVerified {
+	// 	events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
+	// }
 
-	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
-		phoneCode, err := domain.NewPhoneCode(phoneCodeGenerator)
-		if err != nil {
-			return nil, nil, err
-		}
-		events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
-	} else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {
-		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
-	}
+	// if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
+	// 	phoneCode, err := domain.NewPhoneCode(phoneCodeGenerator)
+	// 	if err != nil {
+	// 		return nil, nil, err
+	// 	}
+	// 	events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
+	// } else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {
+	// 	events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
+	// }
 
 	return events, addedHuman, nil
 }
