@@ -53,7 +53,7 @@ func initDB(db *sql.DB) error {
 	return initialise.VerifyZitadel(db)
 }
 
-func fillUniqueData(unique_type, field string) error {
-	_, err := testCRDBClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field) VALUES ($1, $2)", unique_type, field)
+func fillUniqueData(unique_type, field, instanceID string) error {
+	_, err := testCRDBClient.Exec("INSERT INTO eventstore.unique_constraints (unique_type, unique_field, instance_id) VALUES ($1, $2, $3)", unique_type, field, instanceID)
 	return err
 }

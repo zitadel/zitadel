@@ -32,3 +32,11 @@ func IsPreconditionFailed(err error) bool {
 	_, ok := err.(PreconditionFailed)
 	return ok
 }
+
+func (err *PreconditionFailedError) Is(target error) bool {
+	t, ok := target.(*PreconditionFailedError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}

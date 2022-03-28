@@ -12,7 +12,7 @@ import (
 	errs "github.com/caos/zitadel/internal/errors"
 )
 
-func Test_OrgIAMPolicyPrepares(t *testing.T) {
+func Test_DomainPolicyPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -24,19 +24,19 @@ func Test_OrgIAMPolicyPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareOrgIAMPolicyQuery no result",
-			prepare: prepareOrgIAMPolicyQuery,
+			name:    "prepareDomainPolicyQuery no result",
+			prepare: prepareDomainPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.org_iam_policies.id,`+
-						` projections.org_iam_policies.sequence,`+
-						` projections.org_iam_policies.creation_date,`+
-						` projections.org_iam_policies.change_date,`+
-						` projections.org_iam_policies.resource_owner,`+
-						` projections.org_iam_policies.user_login_must_be_domain,`+
-						` projections.org_iam_policies.is_default,`+
-						` projections.org_iam_policies.state`+
-						` FROM projections.org_iam_policies`),
+					regexp.QuoteMeta(`SELECT projections.domain_policies.id,`+
+						` projections.domain_policies.sequence,`+
+						` projections.domain_policies.creation_date,`+
+						` projections.domain_policies.change_date,`+
+						` projections.domain_policies.resource_owner,`+
+						` projections.domain_policies.user_login_must_be_domain,`+
+						` projections.domain_policies.is_default,`+
+						` projections.domain_policies.state`+
+						` FROM projections.domain_policies`),
 					nil,
 					nil,
 				),
@@ -47,22 +47,22 @@ func Test_OrgIAMPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*OrgIAMPolicy)(nil),
+			object: (*DomainPolicy)(nil),
 		},
 		{
-			name:    "prepareOrgIAMPolicyQuery found",
-			prepare: prepareOrgIAMPolicyQuery,
+			name:    "prepareDomainPolicyQuery found",
+			prepare: prepareDomainPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.org_iam_policies.id,`+
-						` projections.org_iam_policies.sequence,`+
-						` projections.org_iam_policies.creation_date,`+
-						` projections.org_iam_policies.change_date,`+
-						` projections.org_iam_policies.resource_owner,`+
-						` projections.org_iam_policies.user_login_must_be_domain,`+
-						` projections.org_iam_policies.is_default,`+
-						` projections.org_iam_policies.state`+
-						` FROM projections.org_iam_policies`),
+					regexp.QuoteMeta(`SELECT projections.domain_policies.id,`+
+						` projections.domain_policies.sequence,`+
+						` projections.domain_policies.creation_date,`+
+						` projections.domain_policies.change_date,`+
+						` projections.domain_policies.resource_owner,`+
+						` projections.domain_policies.user_login_must_be_domain,`+
+						` projections.domain_policies.is_default,`+
+						` projections.domain_policies.state`+
+						` FROM projections.domain_policies`),
 					[]string{
 						"id",
 						"sequence",
@@ -85,7 +85,7 @@ func Test_OrgIAMPolicyPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &OrgIAMPolicy{
+			object: &DomainPolicy{
 				ID:                    "pol-id",
 				CreationDate:          testNow,
 				ChangeDate:            testNow,
@@ -97,19 +97,19 @@ func Test_OrgIAMPolicyPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareOrgIAMPolicyQuery sql err",
-			prepare: prepareOrgIAMPolicyQuery,
+			name:    "prepareDomainPolicyQuery sql err",
+			prepare: prepareDomainPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.org_iam_policies.id,`+
-						` projections.org_iam_policies.sequence,`+
-						` projections.org_iam_policies.creation_date,`+
-						` projections.org_iam_policies.change_date,`+
-						` projections.org_iam_policies.resource_owner,`+
-						` projections.org_iam_policies.user_login_must_be_domain,`+
-						` projections.org_iam_policies.is_default,`+
-						` projections.org_iam_policies.state`+
-						` FROM projections.org_iam_policies`),
+					regexp.QuoteMeta(`SELECT projections.domain_policies.id,`+
+						` projections.domain_policies.sequence,`+
+						` projections.domain_policies.creation_date,`+
+						` projections.domain_policies.change_date,`+
+						` projections.domain_policies.resource_owner,`+
+						` projections.domain_policies.user_login_must_be_domain,`+
+						` projections.domain_policies.is_default,`+
+						` projections.domain_policies.state`+
+						` FROM projections.domain_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

@@ -25,10 +25,10 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 		logging.Log("COMMAND-Cm0ds").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-55M9f", "Errors.Org.NotFound")
 	}
-	orgPolicy, err := c.getOrgIAMPolicy(ctx, org.AggregateID)
+	orgPolicy, err := c.getOrgDomainPolicy(ctx, org.AggregateID)
 	if err != nil {
 		logging.Log("COMMAND-y5zv9").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.OrgIAM.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")
 	}
 	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {

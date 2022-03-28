@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
@@ -61,11 +61,11 @@ func (p *OIDCSettingsProjection) reducers() []handler.AggregateReducer {
 			Aggregate: project.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.OIDCSettingsAddedEventType,
+					Event:  instance.OIDCSettingsAddedEventType,
 					Reduce: p.reduceOIDCSettingsAdded,
 				},
 				{
-					Event:  iam.OIDCSettingsChangedEventType,
+					Event:  instance.OIDCSettingsChangedEventType,
 					Reduce: p.reduceOIDCSettingsChanged,
 				},
 			},
@@ -74,9 +74,9 @@ func (p *OIDCSettingsProjection) reducers() []handler.AggregateReducer {
 }
 
 func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.OIDCSettingsAddedEvent)
+	e, ok := event.(*instance.OIDCSettingsAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-f9nwf", "reduce.wrong.event.type %s", iam.OIDCSettingsAddedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-f9nwf", "reduce.wrong.event.type %s", instance.OIDCSettingsAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -96,9 +96,9 @@ func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 }
 
 func (p *OIDCSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.OIDCSettingsChangedEvent)
+	e, ok := event.(*instance.OIDCSettingsChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-8JJ2d", "reduce.wrong.event.type %s", iam.OIDCSettingsChangedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-8JJ2d", "reduce.wrong.event.type %s", instance.OIDCSettingsChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 6)

@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -45,9 +45,9 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(iam.NewSMSConfigTwilioAddedEvent(
+							eventFromEventPusher(instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
 								"senderName",
@@ -159,9 +159,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
 								"senderName",
@@ -196,9 +196,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
 								"token",
@@ -315,9 +315,9 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
 								"sender-name",
@@ -328,9 +328,9 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigTwilioActivatedEvent(
+								instance.NewSMSConfigTwilioActivatedEvent(
 									context.Background(),
-									&iam.NewAggregate().Aggregate,
+									&instance.NewAggregate().Aggregate,
 									"providerid",
 								),
 							),
@@ -423,9 +423,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
 								"sender-name",
@@ -433,9 +433,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioActivatedEvent(
+							instance.NewSMSConfigTwilioActivatedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								"providerid",
 							),
 						),
@@ -443,9 +443,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigDeactivatedEvent(
+								instance.NewSMSConfigDeactivatedEvent(
 									context.Background(),
-									&iam.NewAggregate().Aggregate,
+									&instance.NewAggregate().Aggregate,
 									"providerid",
 								),
 							),
@@ -538,9 +538,9 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
 								"sender-name",
@@ -551,9 +551,9 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigRemovedEvent(
+								instance.NewSMSConfigRemovedEvent(
 									context.Background(),
-									&iam.NewAggregate().Aggregate,
+									&instance.NewAggregate().Aggregate,
 									"providerid",
 								),
 							),
@@ -591,13 +591,13 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 	}
 }
 
-func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, senderName string) *iam.SMSConfigTwilioChangedEvent {
-	changes := []iam.SMSConfigTwilioChanges{
-		iam.ChangeSMSConfigTwilioSID(sid),
-		iam.ChangeSMSConfigTwilioSenderNumber(senderName),
+func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, senderName string) *instance.SMSConfigTwilioChangedEvent {
+	changes := []instance.SMSConfigTwilioChanges{
+		instance.ChangeSMSConfigTwilioSID(sid),
+		instance.ChangeSMSConfigTwilioSenderNumber(senderName),
 	}
-	event, _ := iam.NewSMSConfigTwilioChangedEvent(ctx,
-		&iam.NewAggregate().Aggregate,
+	event, _ := instance.NewSMSConfigTwilioChangedEvent(ctx,
+		&instance.NewAggregate().Aggregate,
 		id,
 		changes,
 	)

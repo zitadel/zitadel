@@ -32,19 +32,20 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
-	orgIAMPolicy, err := c.getDefaultOrgIAMPolicy(ctx)
+func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, initCodeGenerator, phoneCodeGenerator crypto.Generator, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
+	domainPolicy, err := c.getDefaultDomainPolicy(ctx)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.IAM.OrgIAMPolicy.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Instance.DomainPolicy.NotFound")
 	}
 	pwPolicy, err := c.getDefaultPasswordComplexityPolicy(ctx)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.IAM.PasswordComplexity.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Instance.PasswordComplexity.NotFound")
 	}
-	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, claimedUserIDs, selfregistered)
+	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, domainPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, claimedUserIDs, selfregistered)
 	if err != nil {
 		return nil, err
 	}
+
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
@@ -167,7 +168,7 @@ func (c *Commands) setUpOrg(
 	ctx context.Context,
 	organisation *domain.Org,
 	admin *domain.Human,
-	loginPolicy *domain.OrgIAMPolicy,
+	loginPolicy *domain.DomainPolicy,
 	pwPolicy *domain.PasswordComplexityPolicy,
 	initCodeGenerator crypto.Generator,
 	phoneCodeGenerator crypto.Generator,
@@ -201,7 +202,7 @@ func (c *Commands) setUpOrg(
 }
 
 func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimedUserIDs []string) (_ *eventstore.Aggregate, _ *OrgWriteModel, _ []eventstore.Command, err error) {
-	if organisation == nil || !organisation.IsValid() {
+	if !organisation.IsValid() {
 		return nil, nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMM-deLSk", "Errors.Org.Invalid")
 	}
 
@@ -220,9 +221,8 @@ func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimed
 		orgDomainEvents, err := c.addOrgDomain(ctx, orgAgg, NewOrgDomainWriteModel(orgAgg.ID, orgDomain.Domain), orgDomain, claimedUserIDs)
 		if err != nil {
 			return nil, nil, nil, err
-		} else {
-			events = append(events, orgDomainEvents...)
 		}
+		events = append(events, orgDomainEvents...)
 	}
 	return orgAgg, addedOrg, events, nil
 }

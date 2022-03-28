@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -26,17 +26,17 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			name: "iam.reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyIDPProviderAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyIDPProviderAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), iam.IdentityProviderAddedEventMapper),
+				), instance.IdentityProviderAddedEventMapper),
 			},
 			reduce: (&IDPLoginPolicyLinkProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPLoginPolicyLinkTable,
@@ -63,17 +63,17 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			name: "iam.reduceRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyIDPProviderRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyIDPProviderRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), iam.IdentityProviderRemovedEventMapper),
+				), instance.IdentityProviderRemovedEventMapper),
 			},
 			reduce: (&IDPLoginPolicyLinkProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPLoginPolicyLinkTable,
@@ -94,17 +94,17 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			name: "iam.reduceCascadeRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyIDPProviderCascadeRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyIDPProviderCascadeRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
     "idpProviderType": 1
 }`),
-				), iam.IdentityProviderCascadeRemovedEventMapper),
+				), instance.IdentityProviderCascadeRemovedEventMapper),
 			},
 			reduce: (&IDPLoginPolicyLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPLoginPolicyLinkTable,
@@ -281,16 +281,16 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			name: "iam.IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"idpConfigId": "idp-config-id"
 					}`),
-				), iam.IDPConfigRemovedEventMapper),
+				), instance.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&IDPLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPLoginPolicyLinkTable,

@@ -1750,10 +1750,22 @@ service ManagementService {
         };
     }
 
-    // Returns the org iam policy (this policy is managed by the iam administrator)
+    //deprecated: please use DomainPolicy instead
+    // Returns the domain policy (this policy is managed by the iam administrator)
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the domain policy (this policy is managed by the iam administrator)
+    rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/domain"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2133,6 +2145,7 @@ service ManagementService {
 
     // Add a custom privacy policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc AddCustomPrivacyPolicy(AddCustomPrivacyPolicyRequest) returns (AddCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/privacy"
@@ -2147,6 +2160,7 @@ service ManagementService {
 
     // Update the privacy complexity policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy"
@@ -4376,6 +4390,12 @@ message GetOrgIAMPolicyResponse {
     zitadel.policy.v1.OrgIAMPolicy policy = 1;
 }
 
+message GetDomainPolicyRequest {}
+
+message GetDomainPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
+}
+
 message GetLoginPolicyRequest {}
 
 message GetLoginPolicyResponse {
@@ -4646,6 +4666,7 @@ message GetDefaultPrivacyPolicyResponse {
 message AddCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -4655,6 +4676,7 @@ message AddCustomPrivacyPolicyResponse {
 message UpdateCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdateCustomPrivacyPolicyResponse {

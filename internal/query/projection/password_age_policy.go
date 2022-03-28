@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -76,14 +76,14 @@ func (p *PasswordAgeProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.PasswordAgePolicyAddedEventType,
+					Event:  instance.PasswordAgePolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.PasswordAgePolicyChangedEventType,
+					Event:  instance.PasswordAgePolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -98,11 +98,11 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 	case *org.PasswordAgePolicyAddedEvent:
 		policyEvent = e.PasswordAgePolicyAddedEvent
 		isDefault = false
-	case *iam.PasswordAgePolicyAddedEvent:
+	case *instance.PasswordAgePolicyAddedEvent:
 		policyEvent = e.PasswordAgePolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, instance.PasswordAgePolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -125,10 +125,10 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 	switch e := event.(type) {
 	case *org.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
-	case *iam.PasswordAgePolicyChangedEvent:
+	case *instance.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, iam.PasswordAgePolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, instance.PasswordAgePolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(AgePolicyChangeDateCol, policyEvent.CreationDate()),

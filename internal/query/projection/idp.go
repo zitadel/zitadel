@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/idpconfig"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -77,7 +77,8 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
-			crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol}),
+			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{IDPIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
@@ -111,42 +112,42 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 func (p *IDPProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.IDPConfigAddedEventType,
+					Event:  instance.IDPConfigAddedEventType,
 					Reduce: p.reduceIDPAdded,
 				},
 				{
-					Event:  iam.IDPConfigChangedEventType,
+					Event:  instance.IDPConfigChangedEventType,
 					Reduce: p.reduceIDPChanged,
 				},
 				{
-					Event:  iam.IDPConfigDeactivatedEventType,
+					Event:  instance.IDPConfigDeactivatedEventType,
 					Reduce: p.reduceIDPDeactivated,
 				},
 				{
-					Event:  iam.IDPConfigReactivatedEventType,
+					Event:  instance.IDPConfigReactivatedEventType,
 					Reduce: p.reduceIDPReactivated,
 				},
 				{
-					Event:  iam.IDPConfigRemovedEventType,
+					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
 				{
-					Event:  iam.IDPOIDCConfigAddedEventType,
+					Event:  instance.IDPOIDCConfigAddedEventType,
 					Reduce: p.reduceOIDCConfigAdded,
 				},
 				{
-					Event:  iam.IDPOIDCConfigChangedEventType,
+					Event:  instance.IDPOIDCConfigChangedEventType,
 					Reduce: p.reduceOIDCConfigChanged,
 				},
 				{
-					Event:  iam.IDPJWTConfigAddedEventType,
+					Event:  instance.IDPJWTConfigAddedEventType,
 					Reduce: p.reduceJWTConfigAdded,
 				},
 				{
-					Event:  iam.IDPJWTConfigChangedEventType,
+					Event:  instance.IDPJWTConfigChangedEventType,
 					Reduce: p.reduceJWTConfigChanged,
 				},
 			},
@@ -202,11 +203,11 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.Event) (*handler.Stateme
 	case *org.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeOrg
-	case *iam.IDPConfigAddedEvent:
+	case *instance.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fcUdQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, iam.IDPConfigAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fcUdQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(
@@ -232,10 +233,10 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.Event) (*handler.State
 	switch e := event.(type) {
 	case *org.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
-	case *iam.IDPConfigChangedEvent:
+	case *instance.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-NVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, iam.IDPConfigChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-NVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
 	}
 
 	cols := make([]handler.Column, 0, 5)
@@ -271,10 +272,10 @@ func (p *IDPProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.S
 	switch e := event.(type) {
 	case *org.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
-	case *iam.IDPConfigDeactivatedEvent:
+	case *instance.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-94O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, iam.IDPConfigDeactivatedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-94O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -295,10 +296,10 @@ func (p *IDPProjection) reduceIDPReactivated(event eventstore.Event) (*handler.S
 	switch e := event.(type) {
 	case *org.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
-	case *iam.IDPConfigReactivatedEvent:
+	case *instance.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-I8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, iam.IDPConfigReactivatedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-I8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -319,10 +320,10 @@ func (p *IDPProjection) reduceIDPRemoved(event eventstore.Event) (*handler.State
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
-	case *iam.IDPConfigRemovedEvent:
+	case *instance.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-B4zy8", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-B4zy8", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(
@@ -338,10 +339,10 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
-	case *iam.IDPOIDCConfigAddedEvent:
+	case *instance.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2FuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, iam.IDPOIDCConfigAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2FuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
 
 	return crdb.NewMultiStatement(&idpEvent,
@@ -377,10 +378,10 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
-	case *iam.IDPOIDCConfigChangedEvent:
+	case *instance.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, iam.IDPOIDCConfigChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType})
 	}
 
 	cols := make([]handler.Column, 0, 8)
@@ -439,10 +440,10 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 	switch e := event.(type) {
 	case *org.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
-	case *iam.IDPJWTConfigAddedEvent:
+	case *instance.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-qvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, iam.IDPJWTConfigAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-qvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
 
 	return crdb.NewMultiStatement(&idpEvent,
@@ -475,10 +476,10 @@ func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler
 	switch e := event.(type) {
 	case *org.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
-	case *iam.IDPJWTConfigChangedEvent:
+	case *instance.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, iam.IDPJWTConfigChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType})
 	}
 
 	cols := make([]handler.Column, 0, 4)

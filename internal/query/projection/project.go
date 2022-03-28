@@ -54,7 +54,7 @@ func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(ProjectColumnCreator, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(ProjectColumnInstanceID, ProjectColumnID),
-			crdb.NewIndex("ro_idx", []string{ProjectColumnResourceOwner}),
+			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ProjectColumnResourceOwner})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

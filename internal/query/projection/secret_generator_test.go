@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func TestSecretGeneratorProjection_reduces(t *testing.T) {
@@ -26,15 +26,15 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			name: "reduceSecretGeneratorRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SecretGeneratorRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SecretGeneratorRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{"generatorType": 1}`),
-				), iam.SecretGeneratorRemovedEventMapper),
+				), instance.SecretGeneratorRemovedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -54,15 +54,15 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			name: "reduceSecretGeneratorChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SecretGeneratorChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SecretGeneratorChangedEventType),
+					instance.AggregateType,
 					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
-				), iam.SecretGeneratorChangedEventMapper),
+				), instance.SecretGeneratorChangedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -90,15 +90,15 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			name: "reduceSecretGeneratorAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SecretGeneratorAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SecretGeneratorAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
-				), iam.SecretGeneratorAddedEventMapper),
+				), instance.SecretGeneratorAddedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{

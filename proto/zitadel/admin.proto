@@ -27,7 +27,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Administration API aka Admin";
         version: "1.0";
-        description: "This API is intended to configure and manage the IAM itself.";
+        description: "This API is intended to configure and manage the IAM instance itself.";
         contact:{
             name: "CAOS developers of ZITADEL"
             url: "https://zitadel.ch"
@@ -494,7 +494,7 @@ service AdminService {
         };
     }
 
-    // Returns a identity provider configuration of the IAM
+    // Returns a identity provider configuration of the IAM instance
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}";
@@ -530,7 +530,7 @@ service AdminService {
         };
     }
 
-    // Returns all identity provider configurations of the IAM
+    // Returns all identity provider configurations of the IAM instance
     rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
         option (google.api.http) = {
             post: "/idps/_search";
@@ -567,7 +567,7 @@ service AdminService {
         };
     }
 
-    // Adds a new oidc identity provider configuration the IAM
+    // Adds a new oidc identity provider configuration the IAM instance
     rpc AddOIDCIDP(AddOIDCIDPRequest) returns (AddOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/idps/oidc";
@@ -606,7 +606,7 @@ service AdminService {
         };
     }
 
-    // Adds a new jwt identity provider configuration the IAM
+    // Adds a new jwt identity provider configuration the IAM instance
     rpc AddJWTIDP(AddJWTIDPRequest) returns (AddJWTIDPResponse) {
         option (google.api.http) = {
             post: "/idps/jwt";
@@ -937,7 +937,8 @@ service AdminService {
         };
     }
 
-    //Returns the IAM policy defined by the administrators of ZITADEL
+    //deprecated: please use DomainPolicy instead
+    //Returns the Org IAM policy defined by the administrators of ZITADEL
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/orgiam";
@@ -948,22 +949,23 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
                 url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "default org iam policy";
+                    description: "default domain policy";
                 };
             };
         };
     }
 
-    //Updates the default IAM policy.
+    //deprecated: please use DomainPolicy instead
+    //Updates the default OrgIAM policy.
     // it impacts all organisations without a customised policy
     rpc UpdateOrgIAMPolicy(UpdateOrgIAMPolicyRequest) returns (UpdateOrgIAMPolicyResponse) {
         option (google.api.http) = {
@@ -976,21 +978,22 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
                 url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "default org iam policy updated";
+                    description: "default domain policy updated";
                 };
             };
         };
     }
 
+    //deprecated: please use DomainPolicy instead
     //Returns the customised policy or the default if not customised
     rpc GetCustomOrgIAMPolicy(GetCustomOrgIAMPolicyRequest) returns (GetCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
@@ -1002,22 +1005,23 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
                 url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "org iam policy of the org or the default policy if not customized";
+                    description: "domain policy of the org or the default policy if not customized";
                 };
             };
         };
     }
 
-    //Defines a custom ORGIAM policy as specified
+    //deprecated: please use DomainPolicy instead
+    //Defines a custom OrgIAM policy as specified
     rpc AddCustomOrgIAMPolicy(AddCustomOrgIAMPolicyRequest) returns (AddCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/policies/orgiam";
@@ -1029,22 +1033,23 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
                 url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "org iam policy created";
+                    description: "domain policy created";
                 };
             };
         };
     }
 
-    //Updates a custom ORGIAM policy as specified
+    //deprecated: please use DomainPolicy instead
+    //Updates a custom OrgIAM policy as specified
     rpc UpdateCustomOrgIAMPolicy(UpdateCustomOrgIAMPolicyRequest) returns (UpdateCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
             put: "/orgs/{org_id}/policies/orgiam";
@@ -1056,21 +1061,22 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
                 url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "org iam policy updated";
+                    description: "domain policy updated";
                 };
             };
         };
     }
 
+    //deprecated: please use DomainPolicy instead
     //Resets the org iam policy of the organisation to default
     // ZITADEL will fallback to the default policy defined by the ZITADEL administrators
     rpc ResetCustomOrgIAMPolicyToDefault(ResetCustomOrgIAMPolicyToDefaultRequest) returns (ResetCustomOrgIAMPolicyToDefaultResponse) {
@@ -1083,16 +1089,177 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "orgiam";
             tags: "policy";
             external_docs: {
                 url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                description: "detailed information about the orgiam";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "resets the custom org iam policy to the default policy";
+                    description: "resets the custom orgiam to the default policy";
+                };
+            };
+        };
+    }
+
+    //Returns the Domain policy defined by the administrators of ZITADEL
+    rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/domain";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "default domain policy";
+                };
+            };
+        };
+    }
+
+    //Updates the default Domain policy.
+    // it impacts all organisations without a customised policy
+    rpc UpdateDomainPolicy(UpdateDomainPolicyRequest) returns (UpdateDomainPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/domain";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "default domain policy updated";
+                };
+            };
+        };
+    }
+
+    //Returns the customised policy or the default if not customised
+    rpc GetCustomDomainPolicy(GetCustomDomainPolicyRequest) returns (GetCustomDomainPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{org_id}/policies/domain";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "domain policy of the org or the default policy if not customized";
+                };
+            };
+        };
+    }
+
+    //Defines a custom Domain policy as specified
+    rpc AddCustomDomainPolicy(AddCustomDomainPolicyRequest) returns (AddCustomDomainPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/{org_id}/policies/domain";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "domain policy created";
+                };
+            };
+        };
+    }
+
+    //Updates a custom Domain policy as specified
+    rpc UpdateCustomDomainPolicy(UpdateCustomDomainPolicyRequest) returns (UpdateCustomDomainPolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/{org_id}/policies/domain";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "domain policy updated";
+                };
+            };
+        };
+    }
+
+    //Resets the org iam policy of the organisation to default
+    // ZITADEL will fallback to the default policy defined by the ZITADEL administrators
+    rpc ResetCustomDomainPolicyToDefault(ResetCustomDomainPolicyToDefaultRequest) returns (ResetCustomDomainPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}/policies/domain";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domainpolicy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                description: "detailed information about the domainpolicy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "resets the custom domainpolicy to the default policy";
                 };
             };
         };
@@ -1771,6 +1938,7 @@ service AdminService {
 
     //Updates the default privacy policy of ZITADEL
     // it impacts all organisations without a customised policy
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdatePrivacyPolicy(UpdatePrivacyPolicyRequest) returns (UpdatePrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy";
@@ -3320,10 +3488,10 @@ message UpdateOrgIAMPolicyResponse {
 
 message GetCustomOrgIAMPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3342,11 +3510,11 @@ message GetCustomOrgIAMPolicyResponse {
 
 message AddCustomOrgIAMPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
-    
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3368,10 +3536,10 @@ message AddCustomOrgIAMPolicyResponse {
 
 message UpdateCustomOrgIAMPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
 
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -3394,6 +3562,115 @@ message UpdateCustomOrgIAMPolicyResponse {
 
 message ResetCustomOrgIAMPolicyToDefaultRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message ResetCustomOrgIAMPolicyToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDomainPolicyRequest {}
+
+message GetDomainPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
+}
+
+message UpdateDomainPolicyRequest {
+    bool user_login_must_be_domain = 1;
+}
+
+message UpdateDomainPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetCustomDomainPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"#69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message GetCustomDomainPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.DomainPolicy
+    bool is_default = 2;
+}
+
+message AddCustomDomainPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+    
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"#69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ]; // the username has to end with the domain of it's organisation (uniqueness is organisation based)
+}
+
+message AddCustomDomainPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateCustomDomainPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ];
+}
+
+message UpdateCustomDomainPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomDomainPolicyToDefaultRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
 			required: ["org_id"]
 		};
@@ -3409,7 +3686,7 @@ message ResetCustomOrgIAMPolicyToDefaultRequest {
     ];
 }
 
-message ResetCustomOrgIAMPolicyToDefaultResponse {
+message ResetCustomDomainPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3765,6 +4042,7 @@ message GetPrivacyPolicyResponse {
 message UpdatePrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdatePrivacyPolicyResponse {

@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/action"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	instance_repo "github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
 	proj_repo "github.com/caos/zitadel/internal/repository/project"
@@ -82,7 +82,7 @@ func StartCommands(es *eventstore.Eventstore,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
 	}
-	iam_repo.RegisterEventMappers(repo.eventstore)
+	instance_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 	usr_grant_repo.RegisterEventMappers(repo.eventstore)

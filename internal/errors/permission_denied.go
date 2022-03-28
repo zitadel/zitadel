@@ -32,3 +32,11 @@ func IsPermissionDenied(err error) bool {
 	_, ok := err.(PermissionDenied)
 	return ok
 }
+
+func (err *PermissionDeniedError) Is(target error) bool {
+	t, ok := target.(*PermissionDeniedError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}

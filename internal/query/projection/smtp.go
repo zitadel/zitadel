@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
@@ -64,15 +64,15 @@ func (p *SMTPConfigProjection) reducers() []handler.AggregateReducer {
 			Aggregate: project.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.SMTPConfigAddedEventType,
+					Event:  instance.SMTPConfigAddedEventType,
 					Reduce: p.reduceSMTPConfigAdded,
 				},
 				{
-					Event:  iam.SMTPConfigChangedEventType,
+					Event:  instance.SMTPConfigChangedEventType,
 					Reduce: p.reduceSMTPConfigChanged,
 				},
 				{
-					Event:  iam.SMTPConfigPasswordChangedEventType,
+					Event:  instance.SMTPConfigPasswordChangedEventType,
 					Reduce: p.reduceSMTPConfigPasswordChanged,
 				},
 			},
@@ -81,9 +81,9 @@ func (p *SMTPConfigProjection) reducers() []handler.AggregateReducer {
 }
 
 func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.SMTPConfigAddedEvent)
+	e, ok := event.(*instance.SMTPConfigAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", iam.SMTPConfigAddedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SMTPConfigAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -105,9 +105,9 @@ func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 }
 
 func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.SMTPConfigChangedEvent)
+	e, ok := event.(*instance.SMTPConfigChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-wl0wd", "reduce.wrong.event.type %s", iam.SMTPConfigChangedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-wl0wd", "reduce.wrong.event.type %s", instance.SMTPConfigChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 7)
@@ -138,9 +138,9 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 }
 
 func (p *SMTPConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.SMTPConfigPasswordChangedEvent)
+	e, ok := event.(*instance.SMTPConfigPasswordChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fk02f", "reduce.wrong.event.type %s", iam.SMTPConfigChangedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fk02f", "reduce.wrong.event.type %s", instance.SMTPConfigChangedEventType)
 	}
 
 	return crdb.NewUpdateStatement(

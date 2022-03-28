@@ -35,7 +35,7 @@ type encryptionKeys struct {
 func ensureEncryptionKeys(keyConfig *encryptionKeyConfig, keyStorage crypto.KeyStorage) (*encryptionKeys, error) {
 	keys, err := keyStorage.ReadKeys()
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	if len(keys) == 0 {
 		if err := createDefaultKeys(keyStorage); err != nil {

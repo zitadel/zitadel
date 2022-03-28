@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 )
@@ -53,8 +54,21 @@ func (err *CaosError) GetID() string {
 }
 
 func (err *CaosError) Is(target error) bool {
-	_, ok := target.(*CaosError)
-	return ok
+	t, ok := target.(*CaosError)
+	if !ok {
+		return false
+	}
+	if t.ID != "" && t.ID != err.ID {
+		return false
+	}
+	if t.Message != "" && t.Message != err.Message {
+		return false
+	}
+	if t.Parent != nil && !errors.Is(err.Parent, t.Parent) {
+		return false
+	}
+
+	return true
 }
 
 func (err *CaosError) As(target interface{}) bool {

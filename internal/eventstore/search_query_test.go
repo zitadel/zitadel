@@ -774,3 +774,236 @@ func assertFilters(t *testing.T, i int, want, got *repository.Filter) {
 		t.Errorf("wrong value in filter %d : got: %v want: %v", i, got.Value, want.Value)
 	}
 }
+
+func TestSearchQuery_matches(t *testing.T) {
+	type args struct {
+		event Event
+	}
+	tests := []struct {
+		name  string
+		query *SearchQuery
+		event Event
+		want  bool
+	}{
+		{
+			name:  "sequence too low",
+			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceLess(10),
+			event: &BaseEvent{
+				sequence: 10,
+			},
+			want: false,
+		},
+		{
+			name:  "sequence too high",
+			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceGreater(60),
+			event: &BaseEvent{
+				sequence: 60,
+			},
+			want: false,
+		},
+		{
+			name:  "wrong aggregate type",
+			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateTypes("searched"),
+			event: &BaseEvent{
+				aggregate: Aggregate{
+					Type: "found",
+				},
+			},
+			want: false,
+		},
+		{
+			name:  "wrong aggregate id",
+			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateIDs("1", "10", "100"),
+			event: &BaseEvent{
+				aggregate: Aggregate{
+					ID: "2",
+				},
+			},
+			want: false,
+		},
+		{
+			name:  "wrong event type",
+			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().EventTypes("event.searched.type"),
+			event: &BaseEvent{
+				EventType: "event.actual.type",
+			},
+			want: false,
+		},
+		{
+			name: "matching",
+			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().
+				SequenceLess(100).SequenceGreater(50).AggregateIDs("2").AggregateTypes("actual").EventTypes("event.actual.type"),
+			event: &BaseEvent{
+				sequence: 55,
+				aggregate: Aggregate{
+					ID:   "2",
+					Type: "actual",
+				},
+				EventType: "event.actual.type",
+			},
+			want: true,
+		},
+		{
+			name:  "matching empty query",
+			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery(),
+			event: &BaseEvent{
+				sequence: 55,
+				aggregate: Aggregate{
+					ID:   "2",
+					Type: "actual",
+				},
+				EventType: "event.actual.type",
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query := &SearchQuery{
+				aggregateTypes:       tt.query.aggregateTypes,
+				aggregateIDs:         tt.query.aggregateIDs,
+				eventSequenceGreater: tt.query.eventSequenceGreater,
+				eventSequenceLess:    tt.query.eventSequenceLess,
+				eventTypes:           tt.query.eventTypes,
+				eventData:            tt.query.eventData,
+			}
+			if got := query.matches(tt.event); got != tt.want {
+				t.Errorf("SearchQuery.matches() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSearchQueryBuilder_Matches(t *testing.T) {
+	type args struct {
+		event       Event
+		existingLen int
+	}
+	tests := []struct {
+		name    string
+		builder *SearchQueryBuilder
+		args    args
+		want    bool
+	}{
+		{
+			name:    "limit exeeded",
+			builder: NewSearchQueryBuilder(ColumnsEvent).Limit(100),
+			args: args{
+				event:       &BaseEvent{},
+				existingLen: 100,
+			},
+			want: false,
+		},
+		{
+			name:    "wrong resource owner",
+			builder: NewSearchQueryBuilder(ColumnsEvent).ResourceOwner("query"),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						ResourceOwner: "ro",
+					},
+				},
+				existingLen: 0,
+			},
+			want: false,
+		},
+		{
+			name:    "wrong instance",
+			builder: NewSearchQueryBuilder(ColumnsEvent).InstanceID("instance"),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						InstanceID: "different instance",
+					},
+				},
+				existingLen: 0,
+			},
+			want: false,
+		},
+		{
+			name: "query failed",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				AddQuery().
+				SequenceGreater(1000).
+				Builder(),
+			args: args{
+				event: &BaseEvent{
+					sequence: 999,
+				},
+				existingLen: 0,
+			},
+			want: false,
+		},
+		{
+			name: "matching",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				Limit(1000).
+				ResourceOwner("ro").
+				InstanceID("instance").
+				AddQuery().
+				SequenceGreater(1000).
+				Builder(),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						ResourceOwner: "ro",
+						InstanceID:    "instance",
+					},
+					sequence: 1001,
+				},
+				existingLen: 999,
+			},
+			want: true,
+		},
+		{
+			name:    "matching builder resourceOwner and Instance",
+			builder: NewSearchQueryBuilder(ColumnsEvent),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						ResourceOwner: "ro",
+						InstanceID:    "instance",
+					},
+					sequence: 1001,
+				},
+				existingLen: 999,
+			},
+			want: true,
+		},
+		{
+			name:    "matching builder resourceOwner only",
+			builder: NewSearchQueryBuilder(ColumnsEvent),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						ResourceOwner: "ro",
+					},
+					sequence: 1001,
+				},
+				existingLen: 999,
+			},
+			want: true,
+		},
+		{
+			name:    "matching builder instanceID only",
+			builder: NewSearchQueryBuilder(ColumnsEvent),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						InstanceID: "instance",
+					},
+					sequence: 1001,
+				},
+				existingLen: 999,
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.builder.Matches(tt.args.event, tt.args.existingLen); got != tt.want {
+				t.Errorf("SearchQueryBuilder.Matches() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

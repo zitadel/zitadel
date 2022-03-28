@@ -15,17 +15,21 @@ import (
 )
 
 type Table struct {
-	columns    []*Column
-	primaryKey PrimaryKey
-	indices    []*Index
+	columns     []*Column
+	primaryKey  PrimaryKey
+	indices     []*Index
+	constraints []*Constraint
 }
 
-func NewTable(columns []*Column, key PrimaryKey, indices ...*Index) *Table {
-	return &Table{
+func NewTable(columns []*Column, key PrimaryKey, opts ...TableOption) *Table {
+	t := &Table{
 		columns:    columns,
 		primaryKey: key,
-		indices:    indices,
 	}
+	for _, opt := range opts {
+		opt(t)
+	}
+	return t
 }
 
 type SuffixedTable struct {
@@ -33,14 +37,24 @@ type SuffixedTable struct {
 	suffix string
 }
 
-func NewSuffixedTable(columns []*Column, key PrimaryKey, suffix string, indices ...*Index) *SuffixedTable {
+func NewSuffixedTable(columns []*Column, key PrimaryKey, suffix string, opts ...TableOption) *SuffixedTable {
 	return &SuffixedTable{
-		Table: Table{
-			columns:    columns,
-			primaryKey: key,
-			indices:    indices,
-		},
+		Table:  *NewTable(columns, key, opts...),
 		suffix: suffix,
+	}
+}
+
+type TableOption func(*Table)
+
+func WithIndex(index *Index) TableOption {
+	return func(table *Table) {
+		table.indices = append(table.indices, index)
+	}
+}
+
+func WithConstraint(constraint *Constraint) TableOption {
+	return func(table *Table) {
+		table.constraints = append(table.constraints, constraint)
 	}
 }
 
@@ -129,6 +143,19 @@ func Hash(bucketsCount uint16) indexOpts {
 	return func(i *Index) {
 		i.bucketCount = bucketsCount
 	}
+}
+
+func NewConstraint(name string, columns []string) *Constraint {
+	i := &Constraint{
+		Name:    name,
+		Columns: columns,
+	}
+	return i
+}
+
+type Constraint struct {
+	Name    string
+	Columns []string
 }
 
 //Init implements handler.Init
@@ -241,6 +268,9 @@ func createTableStatement(table *Table, tableName string, suffix string) string 
 	for _, index := range table.indices {
 		stmt += fmt.Sprintf(", INDEX %s (%s)", index.Name, strings.Join(index.Columns, ","))
 	}
+	for _, constraint := range table.constraints {
+		stmt += fmt.Sprintf(", CONSTRAINT %s UNIQUE (%s)", constraint.Name, strings.Join(constraint.Columns, ","))
+	}
 	return stmt + ");"
 }
 
@@ -276,7 +306,7 @@ func createColumnsStatement(cols []*Column, tableName string) string {
 		if col.defaultValue != nil {
 			column += " DEFAULT " + defaultValue(col.defaultValue)
 		}
-		if col.deleteCascade != "" {
+		if len(col.deleteCascade) != 0 {
 			column += fmt.Sprintf(" REFERENCES %s (%s) ON DELETE CASCADE", tableName, col.deleteCascade)
 		}
 		columns[i] = column

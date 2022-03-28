@@ -13,7 +13,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func TestCommandSide_AddSMTPConfig(t *testing.T) {
@@ -42,8 +42,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewSMTPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								true,
 								"from",
 								"name",
@@ -73,9 +73,9 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(iam.NewSMTPConfigAddedEvent(
+							eventFromEventPusher(instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								true,
 								"from",
 								"name",
@@ -176,9 +176,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(
+							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								true,
 								"from",
 								"name",
@@ -213,9 +213,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(
+							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								true,
 								"from",
 								"name",
@@ -321,9 +321,9 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(
+							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								true,
 								"from",
 								"name",
@@ -335,9 +335,9 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(iam.NewSMTPConfigPasswordChangedEvent(
+							eventFromEventPusher(instance.NewSMTPConfigPasswordChangedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -382,16 +382,16 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 	}
 }
 
-func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, host, user string) *iam.SMTPConfigChangedEvent {
-	changes := []iam.SMTPConfigChanges{
-		iam.ChangeSMTPConfigTLS(tls),
-		iam.ChangeSMTPConfigFromAddress(fromAddress),
-		iam.ChangeSMTPConfigFromName(fromName),
-		iam.ChangeSMTPConfigSMTPHost(host),
-		iam.ChangeSMTPConfigSMTPUser(user),
+func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, host, user string) *instance.SMTPConfigChangedEvent {
+	changes := []instance.SMTPConfigChanges{
+		instance.ChangeSMTPConfigTLS(tls),
+		instance.ChangeSMTPConfigFromAddress(fromAddress),
+		instance.ChangeSMTPConfigFromName(fromName),
+		instance.ChangeSMTPConfigSMTPHost(host),
+		instance.ChangeSMTPConfigSMTPUser(user),
 	}
-	event, _ := iam.NewSMTPConfigChangeEvent(ctx,
-		&iam.NewAggregate().Aggregate,
+	event, _ := instance.NewSMTPConfigChangeEvent(ctx,
+		&instance.NewAggregate().Aggregate,
 		changes,
 	)
 	return event

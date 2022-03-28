@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -86,18 +86,18 @@ func (p *MessageTextProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.CustomTextSetEventType,
+					Event:  instance.CustomTextSetEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.CustomTextRemovedEventType,
+					Event:  instance.CustomTextRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 				{
-					Event:  iam.CustomTextTemplateRemovedEventType,
+					Event:  instance.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
 				},
 			},
@@ -110,10 +110,10 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	switch e := event.(type) {
 	case *org.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
-	case *iam.CustomTextSetEvent:
+	case *instance.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil
@@ -160,10 +160,10 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	switch e := event.(type) {
 	case *org.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
-	case *iam.CustomTextRemovedEvent:
+	case *instance.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil
@@ -209,7 +209,7 @@ func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 	switch e := event.(type) {
 	case *org.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
-	case *iam.CustomTextTemplateRemovedEvent:
+	case *instance.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n9rs", "reduce.wrong.event.type %s", org.CustomTextTemplateRemovedEventType)

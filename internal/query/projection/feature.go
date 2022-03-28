@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/features"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -107,10 +107,10 @@ func (p *FeatureProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.FeaturesSetEventType,
+					Event:  instance.FeaturesSetEventType,
 					Reduce: p.reduceFeatureSet,
 				},
 			},
@@ -122,14 +122,14 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 	var featureEvent features.FeaturesSetEvent
 	var isDefault bool
 	switch e := event.(type) {
-	case *iam.FeaturesSetEvent:
+	case *instance.FeaturesSetEvent:
 		featureEvent = e.FeaturesSetEvent
 		isDefault = true
 	case *org.FeaturesSetEvent:
 		featureEvent = e.FeaturesSetEvent
 		isDefault = false
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-K0erf", "reduce.wrong.event.type %v", []eventstore.EventType{org.FeaturesSetEventType, iam.FeaturesSetEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-K0erf", "reduce.wrong.event.type %v", []eventstore.EventType{org.FeaturesSetEventType, instance.FeaturesSetEventType})
 	}
 
 	cols := []handler.Column{

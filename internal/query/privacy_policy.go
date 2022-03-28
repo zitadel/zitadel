@@ -24,6 +24,7 @@ type PrivacyPolicy struct {
 
 	TOSLink     string
 	PrivacyLink string
+	HelpLink    string
 
 	IsDefault bool
 }
@@ -62,6 +63,10 @@ var (
 	}
 	PrivacyColTOSLink = Column{
 		name:  projection.PrivacyPolicyTOSLinkCol,
+		table: privacyTable,
+	}
+	PrivacyColHelpLink = Column{
+		name:  projection.PrivacyPolicyHelpLinkCol,
 		table: privacyTable,
 	}
 	PrivacyColIsDefault = Column{
@@ -125,6 +130,7 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 			PrivacyColResourceOwner.identifier(),
 			PrivacyColPrivacyLink.identifier(),
 			PrivacyColTOSLink.identifier(),
+			PrivacyColHelpLink.identifier(),
 			PrivacyColIsDefault.identifier(),
 			PrivacyColState.identifier(),
 		).
@@ -139,6 +145,7 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 				&policy.ResourceOwner,
 				&policy.PrivacyLink,
 				&policy.TOSLink,
+				&policy.HelpLink,
 				&policy.IsDefault,
 				&policy.State,
 			)
@@ -150,4 +157,13 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 			}
 			return policy, nil
 		}
+}
+
+func (p *PrivacyPolicy) ToDomain() *domain.PrivacyPolicy {
+	return &domain.PrivacyPolicy{
+		TOSLink:     p.TOSLink,
+		PrivacyLink: p.PrivacyLink,
+		HelpLink:    p.HelpLink,
+		Default:     p.IsDefault,
+	}
 }

@@ -32,7 +32,7 @@ func (q *Queries) GetOrgMemberRoles(isGlobal bool) []string {
 }
 
 func (q *Queries) GetProjectMemberRoles(ctx context.Context) ([]string, error) {
-	iam, err := q.IAM(ctx)
+	iam, err := q.Instance(ctx)
 	if err != nil {
 		return nil, err
 	}

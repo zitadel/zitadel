@@ -32,3 +32,11 @@ func IsUnavailable(err error) bool {
 	_, ok := err.(Unavailable)
 	return ok
 }
+
+func (err *UnavailableError) Is(target error) bool {
+	t, ok := target.(*UnavailableError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}

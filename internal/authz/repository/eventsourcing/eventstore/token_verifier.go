@@ -236,7 +236,7 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	iam, err := repo.Query.IAM(ctx)
+	iam, err := repo.Query.Instance(ctx)
 	if err != nil {
 		return "", "", err
 	}

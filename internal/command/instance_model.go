@@ -3,7 +3,8 @@ package command
 import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"golang.org/x/text/language"
 )
 
 type InstanceWriteModel struct {
@@ -12,7 +13,15 @@ type InstanceWriteModel struct {
 	Name            string
 	State           domain.InstanceState
 	GeneratedDomain string
+
+	SetUpStarted domain.Step
+	SetUpDone    domain.Step
+
+	GlobalOrgID     string
+	ProjectID       string
+	DefaultLanguage language.Tag
 }
+
 
 func NewInstanceWriteModel(instanceID string) *InstanceWriteModel {
 	return &InstanceWriteModel{
@@ -33,6 +42,23 @@ func (wm *InstanceWriteModel) Reduce() error {
 			wm.Name = e.Name
 		case *iam.InstanceRemovedEvent:
 			wm.State = domain.InstanceStateRemoved
+		case *iam.DomainAddedEvent:
+			if !e.Generated {
+				continue
+			}
+			wm.GeneratedDomain = e.Domain
+		case *iam.ProjectSetEvent:
+			wm.ProjectID = e.ProjectID
+		case *instance.GlobalOrgSetEvent:
+			wm.GlobalOrgID = e.OrgID
+		case *instance.DefaultLanguageSetEvent:
+			wm.DefaultLanguage = e.Language
+		case *instance.SetupStepEvent:
+			if e.Done {
+				wm.SetUpDone = e.Step
+			} else {
+				wm.SetUpStarted = e.Step
+			}
 		}
 	}
 	return nil
@@ -42,15 +68,27 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(iam.AggregateType).
+		AggregateTypes(instance.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			instance.ProjectSetEventType,
+			instance.GlobalOrgSetEventType,
+			instance.DefaultLanguageSetEventType,
+			instance.SetupStartedEventType,
+			instance.SetupDoneEventType).
 			iam.InstanceAddedEventType,
 			iam.InstanceChangedEventType,
-			iam.InstanceRemovedEventType).
+			iam.InstanceRemovedEventType,
+			iam.InstanceDomainAddedEventType,
+			iam.InstanceDomainRemovedEventType,
+			iam.ProjectSetEventType,
+			iam.GlobalOrgSetEventType,
+			iam.DefaultLanguageSetEventType,
+			iam.SetupStartedEventType,
+			iam.SetupDoneEventType).
 		Builder()
 }
 
 func InstanceAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
-	return eventstore.AggregateFromWriteModel(wm, iam.AggregateType, iam.AggregateVersion)
+	return eventstore.AggregateFromWriteModel(wm, instance.AggregateType, instance.AggregateVersion)
 }

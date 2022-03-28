@@ -88,7 +88,7 @@ func OrgToPb(org *query.Org) *org_pb.Org {
 		Id:            org.ID,
 		Name:          org.Name,
 		PrimaryDomain: org.Domain,
-		Details:       object.AddToDetailsPb(org.Sequence, org.CreationDate, org.ResourceOwner),
+		Details:       object.ToViewDetailsPb(org.Sequence, org.CreationDate, org.ChangeDate, org.ResourceOwner),
 		State:         OrgStateToPb(org.State),
 	}
 }

@@ -75,8 +75,9 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
-			crdb.NewIndex("username_idx", []string{UserUsernameCol}),
-			crdb.NewIndex("ro_idx", []string{UserResourceOwnerCol}),
+			crdb.WithIndex(crdb.NewIndex("username_idx", []string{UserUsernameCol})),
+			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{UserIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),

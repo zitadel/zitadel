@@ -32,3 +32,11 @@ func IsDeadlineExceeded(err error) bool {
 	_, ok := err.(DeadlineExceeded)
 	return ok
 }
+
+func (err *DeadlineExceededError) Is(target error) bool {
+	t, ok := target.(*DeadlineExceededError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}

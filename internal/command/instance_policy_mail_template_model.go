@@ -1,0 +1,73 @@
+package command
+
+import (
+	"context"
+	"reflect"
+
+	"github.com/caos/zitadel/internal/eventstore"
+
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/policy"
+)
+
+type InstanceMailTemplateWriteModel struct {
+	MailTemplateWriteModel
+}
+
+func NewInstanceMailTemplateWriteModel() *InstanceMailTemplateWriteModel {
+	return &InstanceMailTemplateWriteModel{
+		MailTemplateWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   domain.IAMID,
+				ResourceOwner: domain.IAMID,
+			},
+		},
+	}
+}
+
+func (wm *InstanceMailTemplateWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.MailTemplateAddedEvent:
+			wm.MailTemplateWriteModel.AppendEvents(&e.MailTemplateAddedEvent)
+		case *instance.MailTemplateChangedEvent:
+			wm.MailTemplateWriteModel.AppendEvents(&e.MailTemplateChangedEvent)
+		}
+	}
+}
+
+func (wm *InstanceMailTemplateWriteModel) Reduce() error {
+	return wm.MailTemplateWriteModel.Reduce()
+}
+
+func (wm *InstanceMailTemplateWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.MailTemplateWriteModel.AggregateID).
+		EventTypes(
+			instance.MailTemplateAddedEventType,
+			instance.MailTemplateChangedEventType).
+		Builder()
+}
+
+func (wm *InstanceMailTemplateWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	template []byte,
+) (*instance.MailTemplateChangedEvent, bool) {
+	changes := make([]policy.MailTemplateChanges, 0)
+	if !reflect.DeepEqual(wm.Template, template) {
+		changes = append(changes, policy.ChangeTemplate(template))
+	}
+	if len(changes) == 0 {
+		return nil, false
+	}
+	changedEvent, err := instance.NewMailTemplateChangedEvent(ctx, aggregate, changes)
+	if err != nil {
+		return nil, false
+	}
+	return changedEvent, true
+}

@@ -681,6 +681,11 @@ message UserGrant {
             example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
+    string preferred_login_name = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi@caos.ch\"";
+        }
+    ];
 }
 
 enum UserGrantState {
