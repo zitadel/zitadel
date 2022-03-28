@@ -14,7 +14,7 @@ type InstanceDomain struct {
 }
 
 func (i *InstanceDomain) IsValid() bool {
-	return i.Domain != ""
+	return i.AggregateID != "" && i.Domain != ""
 }
 
 type InstanceDomainState int32

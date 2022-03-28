@@ -3,7 +3,7 @@ package command
 import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 type InstanceDomainWriteModel struct {
@@ -27,12 +27,12 @@ func NewInstanceDomainWriteModel(instanceID, instanceDomain string) *InstanceDom
 func (wm *InstanceDomainWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.DomainAddedEvent:
+		case *instance.DomainAddedEvent:
 			if e.Domain != wm.Domain {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *iam.DomainRemovedEvent:
+		case *instance.DomainRemovedEvent:
 			if e.Domain != wm.Domain {
 				continue
 			}
@@ -44,11 +44,11 @@ func (wm *InstanceDomainWriteModel) AppendEvents(events ...eventstore.Event) {
 func (wm *InstanceDomainWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *iam.DomainAddedEvent:
+		case *instance.DomainAddedEvent:
 			wm.Domain = e.Domain
 			wm.Generated = e.Generated
 			wm.State = domain.InstanceDomainStateActive
-		case *iam.DomainRemovedEvent:
+		case *instance.DomainRemovedEvent:
 			wm.State = domain.InstanceDomainStateRemoved
 		}
 	}
@@ -59,10 +59,10 @@ func (wm *InstanceDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(domain.IAMID).
 		AddQuery().
-		AggregateTypes(iam.AggregateType).
+		AggregateTypes(instance.AggregateType).
 		AggregateIDs(domain.IAMID).
 		EventTypes(
-			iam.InstanceDomainAddedEventType,
-			iam.InstanceDomainRemovedEventType).
+			instance.InstanceDomainAddedEventType,
+			instance.InstanceDomainRemovedEventType).
 		Builder()
 }

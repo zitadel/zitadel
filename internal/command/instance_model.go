@@ -22,7 +22,6 @@ type InstanceWriteModel struct {
 	DefaultLanguage language.Tag
 }
 
-
 func NewInstanceWriteModel(instanceID string) *InstanceWriteModel {
 	return &InstanceWriteModel{
 		WriteModel: eventstore.WriteModel{
@@ -75,17 +74,17 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GlobalOrgSetEventType,
 			instance.DefaultLanguageSetEventType,
 			instance.SetupStartedEventType,
+			instance.SetupDoneEventType,
+			instance.InstanceAddedEventType,
+			instance.InstanceChangedEventType,
+			instance.InstanceRemovedEventType,
+			instance.InstanceDomainAddedEventType,
+			instance.InstanceDomainRemovedEventType,
+			instance.ProjectSetEventType,
+			instance.GlobalOrgSetEventType,
+			instance.DefaultLanguageSetEventType,
+			instance.SetupStartedEventType,
 			instance.SetupDoneEventType).
-			iam.InstanceAddedEventType,
-			iam.InstanceChangedEventType,
-			iam.InstanceRemovedEventType,
-			iam.InstanceDomainAddedEventType,
-			iam.InstanceDomainRemovedEventType,
-			iam.ProjectSetEventType,
-			iam.GlobalOrgSetEventType,
-			iam.DefaultLanguageSetEventType,
-			iam.SetupStartedEventType,
-			iam.SetupDoneEventType).
 		Builder()
 }
 

@@ -2,75 +2,93 @@ package command
 
 import (
 	"context"
+	"strings"
 
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/repository/instance"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-func (c *Commands) AddInstanceDomain(ctx context.Context, domain *domain.InstanceDomain) (*domain.InstanceDomain, error) {
-	if !domain.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-R24hb", "Errors.Instance.Domain.Invalid")
-	}
-	domainWriteModel := NewInstanceDomainWriteModel(domain.Domain)
-	instanceAgg := IAMAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	event, err := c.addInstanceDomain(ctx, instanceAgg, domainWriteModel, domain)
+func (c *Commands) AddInstanceDomain(ctx context.Context, instanceID, instanceDomain string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(instanceID)
+	validation := c.addInstanceDomain(instanceAgg, instanceDomain, false)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(domainWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return instanceDomainWriteModelToInstanceDomain(domainWriteModel), nil
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: instanceID,
+	}, nil
 }
 
-func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain *domain.InstanceDomain) (*domain.ObjectDetails, error) {
-	if instanceDomain == nil || !instanceDomain.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-SJsK3", "Errors.Instance.Domain.Invalid")
-	}
-	domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, instanceDomain.Domain)
+func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceID, instanceDomain string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(instanceID)
+	validation := c.removeInstanceDomain(instanceAgg, instanceDomain)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
 	}
-	if domainWriteModel.State != domain.InstanceDomainStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-8ls9f", "Errors.Instance.Domain.NotFound")
-	}
-	if domainWriteModel.Generated {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9hn3n", "Errors.Instance.Domain.GeneratedNotRemovable")
-	}
-	instanceAgg := IAMAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewDomainRemovedEvent(ctx, instanceAgg, instanceDomain.Domain))
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(domainWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&domainWriteModel.WriteModel), nil
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: instanceID,
+	}, nil
 }
 
-func (c *Commands) addInstanceDomain(ctx context.Context, instanceAgg *eventstore.Aggregate, addedDomain *InstanceDomainWriteModel, instanceDomain *domain.InstanceDomain) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, addedDomain)
-	if err != nil {
-		return nil, err
+func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, a.ID, instanceDomain)
+			if err != nil {
+				return nil, err
+			}
+			if domainWriteModel.State == domain.InstanceDomainStateActive {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-i2nl", "Errors.Instance.Domain.AlreadyExists")
+			}
+			return []eventstore.Command{instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated)}, nil
+		}, nil
 	}
-	if addedDomain.State == domain.InstanceDomainStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMA-nfske", "Errors.Instance.Domain.AlreadyExists")
-	}
-
-	return iam.NewDomainAddedEvent(ctx, instanceAgg, instanceDomain.Domain, instanceDomain.Generated), nil
 }
 
-func (c *Commands) getInstanceDomainWriteModel(ctx context.Context, domain string) (*InstanceDomainWriteModel, error) {
-	domainWriteModel := NewInstanceDomainWriteModel(domain)
+func (c *Commands) removeInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-39nls", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, a.ID, instanceDomain)
+			if err != nil {
+				return nil, err
+			}
+			if domainWriteModel.State != domain.InstanceDomainStateActive {
+				return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-8ls9f", "Errors.Instance.Domain.NotFound")
+			}
+			if domainWriteModel.Generated {
+				return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9hn3n", "Errors.Instance.Domain.GeneratedNotRemovable")
+			}
+			return []eventstore.Command{instance.NewDomainRemovedEvent(ctx, &a.Aggregate, instanceDomain)}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) getInstanceDomainWriteModel(ctx context.Context, instanceID, domain string) (*InstanceDomainWriteModel, error) {
+	domainWriteModel := NewInstanceDomainWriteModel(instanceID, domain)
 	err := c.eventstore.FilterToQueryReducer(ctx, domainWriteModel)
 	if err != nil {
 		return nil, err
