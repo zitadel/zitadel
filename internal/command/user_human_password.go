@@ -196,7 +196,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 	return err
 }
 
-func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
+func (c *Commands) HumanCheckPassword(ctx context.Context, instanceID, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -207,7 +207,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
 	}
 
-	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
+	loginPolicy, err := c.getOrgLoginPolicy(ctx, instanceID, orgID)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
 	}

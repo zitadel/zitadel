@@ -1096,6 +1096,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
+		instanceID    string
 		userID        string
 		resourceOwner string
 		password      string
@@ -1120,6 +1121,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				password:      "password",
 				resourceOwner: "org1",
 			},
@@ -1136,6 +1138,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -1154,6 +1157,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
@@ -1189,6 +1193,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
@@ -1225,6 +1230,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
@@ -1277,6 +1283,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				password:      "password",
 				resourceOwner: "org1",
@@ -1358,6 +1365,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				password:      "password1",
 				resourceOwner: "org1",
@@ -1449,6 +1457,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				password:      "password1",
 				resourceOwner: "org1",
@@ -1537,6 +1546,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
@@ -1554,7 +1564,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq, tt.args.lockoutPolicy)
+			err := r.HumanCheckPassword(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq, tt.args.lockoutPolicy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

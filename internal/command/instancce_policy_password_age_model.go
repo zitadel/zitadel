@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -14,12 +13,12 @@ type InstancePasswordAgePolicyWriteModel struct {
 	PasswordAgePolicyWriteModel
 }
 
-func NewInstancePasswordAgePolicyWriteModel() *InstancePasswordAgePolicyWriteModel {
+func NewInstancePasswordAgePolicyWriteModel(instanceID string) *InstancePasswordAgePolicyWriteModel {
 	return &InstancePasswordAgePolicyWriteModel{
 		PasswordAgePolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 		},
 	}

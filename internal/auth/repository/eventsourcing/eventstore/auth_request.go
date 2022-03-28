@@ -299,10 +299,10 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, resourceOwner, password, userAgentID, instanceID string, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, userID, resourceOwner, password, userAgentID, instanceID string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequestEnsureUser(ctx, id, userAgentID, userID, instanceID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authReqID, userAgentID, userID, instanceID)
 	if err != nil {
 		return err
 	}
@@ -310,7 +310,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, res
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+	return repo.Command.HumanCheckPassword(ctx, instanceID, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
 }
 
 func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {

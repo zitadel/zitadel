@@ -10,12 +10,12 @@ type InstanceSecondFactorWriteModel struct {
 	SecondFactorWriteModel
 }
 
-func NewInstanceSecondFactorWriteModel(factorType domain.SecondFactorType) *InstanceSecondFactorWriteModel {
+func NewInstanceSecondFactorWriteModel(instanceID string, factorType domain.SecondFactorType) *InstanceSecondFactorWriteModel {
 	return &InstanceSecondFactorWriteModel{
 		SecondFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			MFAType: factorType,
 		},
@@ -57,12 +57,12 @@ type InstanceMultiFactorWriteModel struct {
 	MultiFactorWriteModel
 }
 
-func NewInstanceMultiFactorWriteModel(factorType domain.MultiFactorType) *InstanceMultiFactorWriteModel {
+func NewInstanceMultiFactorWriteModel(instanceID string, factorType domain.MultiFactorType) *InstanceMultiFactorWriteModel {
 	return &InstanceMultiFactorWriteModel{
 		MultiFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			MFAType: factorType,
 		},

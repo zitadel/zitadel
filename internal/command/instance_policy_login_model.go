@@ -15,12 +15,12 @@ type InstanceLoginPolicyWriteModel struct {
 	LoginPolicyWriteModel
 }
 
-func NewInstanceLoginPolicyWriteModel() *InstanceLoginPolicyWriteModel {
+func NewInstanceLoginPolicyWriteModel(instanceID string) *InstanceLoginPolicyWriteModel {
 	return &InstanceLoginPolicyWriteModel{
 		LoginPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 		},
 	}

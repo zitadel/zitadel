@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, features *domain.Features) (*domain.ObjectDetails, error) {
+func (c *Commands) SetOrgFeatures(ctx context.Context, instanceID, resourceOwner string, features *domain.Features) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
 	}
@@ -52,7 +52,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
 	}
 
-	events, err := c.ensureOrgSettingsToFeatures(ctx, resourceOwner, features)
+	events, err := c.ensureOrgSettingsToFeatures(ctx, instanceID, resourceOwner, features)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 	return writeModelToObjectDetails(&existingFeatures.WriteModel), nil
 }
 
-func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveOrgFeatures(ctx context.Context, instanceID, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
 	}
@@ -87,7 +87,7 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.ensureOrgSettingsToFeatures(ctx, orgID, features)
+	events, err := c.ensureOrgSettingsToFeatures(ctx, instanceID, orgID, features)
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +104,8 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain
 	return writeModelToObjectDetails(&existingFeatures.WriteModel), nil
 }
 
-func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
-	events, err := c.setAllowedLoginPolicy(ctx, orgID, features)
+func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, instanceID, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+	events, err := c.setAllowedLoginPolicy(ctx, instanceID, orgID, features)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 	return events, nil
 }
 
-func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+func (c *Commands) setAllowedLoginPolicy(ctx context.Context, instanceID, orgID string, features *domain.Features) ([]eventstore.Command, error) {
 	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -208,7 +208,7 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, nil
 	}
-	defaultPolicy, err := c.getDefaultLoginPolicy(ctx)
+	defaultPolicy, err := c.getDefaultLoginPolicy(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}

@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	features_grpc "github.com/caos/zitadel/internal/api/grpc/features"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
@@ -40,7 +41,7 @@ func (s *Server) GetOrgFeatures(ctx context.Context, req *admin_pb.GetOrgFeature
 }
 
 func (s *Server) SetOrgFeatures(ctx context.Context, req *admin_pb.SetOrgFeaturesRequest) (*admin_pb.SetOrgFeaturesResponse, error) {
-	details, err := s.command.SetOrgFeatures(ctx, req.OrgId, setOrgFeaturesRequestToDomain(req))
+	details, err := s.command.SetOrgFeatures(ctx, authz.GetInstance(ctx).ID, req.OrgId, setOrgFeaturesRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func (s *Server) SetOrgFeatures(ctx context.Context, req *admin_pb.SetOrgFeature
 }
 
 func (s *Server) ResetOrgFeatures(ctx context.Context, req *admin_pb.ResetOrgFeaturesRequest) (*admin_pb.ResetOrgFeaturesResponse, error) {
-	details, err := s.command.RemoveOrgFeatures(ctx, req.OrgId)
+	details, err := s.command.RemoveOrgFeatures(ctx, authz.GetInstance(ctx).ID, req.OrgId)
 	if err != nil {
 		return nil, err
 	}

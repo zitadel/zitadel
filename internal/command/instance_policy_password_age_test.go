@@ -19,8 +19,9 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.PasswordAgePolicy
+		ctx        context.Context
+		instanceID string
+		policy     *domain.PasswordAgePolicy
 	}
 	type res struct {
 		want *domain.PasswordAgePolicy
@@ -49,7 +50,8 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PasswordAgePolicy{
 					MaxAgeDays:     365,
 					ExpireWarnDays: 10,
@@ -79,7 +81,8 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PasswordAgePolicy{
 					ExpireWarnDays: 365,
 					MaxAgeDays:     10,
@@ -88,8 +91,8 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 			res: res{
 				want: &domain.PasswordAgePolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					ExpireWarnDays: 365,
 					MaxAgeDays:     10,
@@ -102,7 +105,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPasswordAgePolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultPasswordAgePolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -121,8 +124,9 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.PasswordAgePolicy
+		ctx        context.Context
+		instanceID string
+		policy     *domain.PasswordAgePolicy
 	}
 	type res struct {
 		want *domain.PasswordAgePolicy
@@ -143,7 +147,8 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PasswordAgePolicy{
 					MaxAgeDays:     365,
 					ExpireWarnDays: 10,
@@ -170,7 +175,8 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PasswordAgePolicy{
 					ExpireWarnDays: 365,
 					MaxAgeDays:     10,
@@ -204,7 +210,8 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PasswordAgePolicy{
 					MaxAgeDays:     125,
 					ExpireWarnDays: 5,
@@ -213,8 +220,8 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 			res: res{
 				want: &domain.PasswordAgePolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					MaxAgeDays:     125,
 					ExpireWarnDays: 5,
@@ -227,7 +234,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultPasswordAgePolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.ChangeDefaultPasswordAgePolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

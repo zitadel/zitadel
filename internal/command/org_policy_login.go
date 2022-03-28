@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+func (c *Commands) AddLoginPolicy(ctx context.Context, instanceID, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Fn8ds", "Errors.ResourceOwnerMissing")
 	}
@@ -26,7 +26,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
 	}
 
-	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, policy)
+	err = c.checkLoginPolicyAllowed(ctx, instanceID, resourceOwner, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *Commands) orgLoginPolicyWriteModelByID(ctx context.Context, orgID strin
 	return policyWriteModel, nil
 }
 
-func (c *Commands) getOrgLoginPolicy(ctx context.Context, orgID string) (*domain.LoginPolicy, error) {
+func (c *Commands) getOrgLoginPolicy(ctx context.Context, instanceID, orgID string) (*domain.LoginPolicy, error) {
 	policy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -75,10 +75,10 @@ func (c *Commands) getOrgLoginPolicy(ctx context.Context, orgID string) (*domain
 	if policy.State == domain.PolicyStateActive {
 		return writeModelToLoginPolicy(&policy.LoginPolicyWriteModel), nil
 	}
-	return c.getDefaultLoginPolicy(ctx)
+	return c.getDefaultLoginPolicy(ctx, instanceID)
 }
 
-func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+func (c *Commands) ChangeLoginPolicy(ctx context.Context, instanceID, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
 	}
@@ -91,7 +91,7 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 		return nil, caos_errs.ThrowNotFound(nil, "Org-M0sif", "Errors.Org.LoginPolicy.NotFound")
 	}
 
-	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, policy)
+	err = c.checkLoginPolicyAllowed(ctx, instanceID, resourceOwner, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +127,8 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
 }
 
-func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) error {
-	defaultPolicy, err := c.getDefaultLoginPolicy(ctx)
+func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, instanceID, resourceOwner string, policy *domain.LoginPolicy) error {
+	defaultPolicy, err := c.getDefaultLoginPolicy(ctx, instanceID)
 	if err != nil {
 		return err
 	}

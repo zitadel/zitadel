@@ -31,7 +31,7 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, req *mgmt_pb.GetDefa
 }
 
 func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCustomLoginPolicyRequest) (*mgmt_pb.AddCustomLoginPolicyResponse, error) {
-	policy, err := s.command.AddLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, addLoginPolicyToDomain(req))
+	policy, err := s.command.AddLoginPolicy(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, addLoginPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 }
 
 func (s *Server) UpdateCustomLoginPolicy(ctx context.Context, req *mgmt_pb.UpdateCustomLoginPolicyRequest) (*mgmt_pb.UpdateCustomLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, updateLoginPolicyToDomain(req))
+	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, updateLoginPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

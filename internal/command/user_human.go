@@ -130,7 +130,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, instanceID, orgID string, 
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
-	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
+	loginPolicy, err := c.getOrgLoginPolicy(ctx, instanceID, orgID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-Dfg3g", "Errors.Org.LoginPolicy.NotFound")
 	}

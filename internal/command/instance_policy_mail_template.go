@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
-	addedPolicy := NewInstanceMailTemplateWriteModel()
+func (c *Commands) AddDefaultMailTemplate(ctx context.Context, instanceID string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+	addedPolicy := NewInstanceMailTemplateWriteModel(instanceID)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
 	event, err := c.addDefaultMailTemplate(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -44,8 +44,8 @@ func (c *Commands) addDefaultMailTemplate(ctx context.Context, instanceAgg *even
 	return instance.NewMailTemplateAddedEvent(ctx, instanceAgg, policy.Template), nil
 }
 
-func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
-	existingPolicy, changedEvent, err := c.changeDefaultMailTemplate(ctx, policy)
+func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, instanceID string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
+	existingPolicy, changedEvent, err := c.changeDefaultMailTemplate(ctx, instanceID, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -60,11 +60,11 @@ func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain
 	return writeModelToMailTemplatePolicy(&existingPolicy.MailTemplateWriteModel), nil
 }
 
-func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*InstanceMailTemplateWriteModel, eventstore.Command, error) {
+func (c *Commands) changeDefaultMailTemplate(ctx context.Context, instanceID string, policy *domain.MailTemplate) (*InstanceMailTemplateWriteModel, eventstore.Command, error) {
 	if !policy.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-4m9ds", "Errors.IAM.MailTemplate.Invalid")
 	}
-	existingPolicy, err := c.defaultMailTemplateWriteModelByID(ctx)
+	existingPolicy, err := c.defaultMailTemplateWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -82,11 +82,11 @@ func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain
 	return existingPolicy, changedEvent, nil
 }
 
-func (c *Commands) defaultMailTemplateWriteModelByID(ctx context.Context) (policy *InstanceMailTemplateWriteModel, err error) {
+func (c *Commands) defaultMailTemplateWriteModelByID(ctx context.Context, instanceID string) (policy *InstanceMailTemplateWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceMailTemplateWriteModel()
+	writeModel := NewInstanceMailTemplateWriteModel(instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
