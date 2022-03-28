@@ -70,10 +70,10 @@ func (l *labelPolicyLogoUploader) BucketName(ctxData authz.CtxData) string {
 func (l *labelPolicyLogoUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, info.Key)
+			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID, info.Key)
 			return err
 		}
-		_, err := commands.AddLogoDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddLogoDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID, info.Key)
 		return err
 	}
 	if l.darkMode {
@@ -197,10 +197,10 @@ func (l *labelPolicyIconUploader) BucketName(ctxData authz.CtxData) string {
 func (l *labelPolicyIconUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, info.Key)
+			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID, info.Key)
 			return err
 		}
-		_, err := commands.AddIconDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddIconDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID, info.Key)
 		return err
 	}
 
@@ -312,7 +312,7 @@ func (l *labelPolicyFontUploader) BucketName(ctxData authz.CtxData) string {
 
 func (l *labelPolicyFontUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
 	if l.defaultPolicy {
-		_, err := commands.AddFontDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddFontDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID, info.Key)
 		return err
 	}
 	_, err := commands.AddFontLabelPolicy(ctx, orgID, info.Key)

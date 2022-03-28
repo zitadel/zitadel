@@ -25,9 +25,10 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
-		ctx    context.Context
-		orgID  string
-		policy *domain.LabelPolicy
+		ctx        context.Context
+		instanceID string
+		orgID      string
+		policy     *domain.LabelPolicy
 	}
 	type res struct {
 		want *domain.LabelPolicy
@@ -47,7 +48,8 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:    "",
 					BackgroundColor: "#ffffff",
@@ -83,8 +85,9 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -131,8 +134,9 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -199,8 +203,9 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -242,7 +247,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				eventstore:    tt.fields.eventstore,
 				tokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := r.AddLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
+			got, err := r.AddLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -262,9 +267,10 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
-		ctx    context.Context
-		orgID  string
-		policy *domain.LabelPolicy
+		ctx        context.Context
+		instanceID string
+		orgID      string
+		policy     *domain.LabelPolicy
 	}
 	type res struct {
 		want *domain.LabelPolicy
@@ -284,7 +290,8 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:    "#ffffff",
 					BackgroundColor: "#ffffff",
@@ -303,8 +310,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:    "#ffffff",
 					BackgroundColor: "#ffffff",
@@ -360,8 +368,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#000000",
 					BackgroundColor:     "#000000",
@@ -425,8 +434,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -510,8 +520,9 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#000000",
 					BackgroundColor:     "#000000",
@@ -553,7 +564,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				eventstore:    tt.fields.eventstore,
 				tokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := r.ChangeLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
+			got, err := r.ChangeLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

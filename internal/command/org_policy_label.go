@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+func (c *Commands) AddLabelPolicy(ctx context.Context, instanceID, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Fn8ds", "Errors.ResourceOwnerMissing")
 	}
@@ -24,7 +24,7 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LabelPolicy.AlreadyExists")
 	}
 
-	err = c.checkLabelPolicyAllowed(ctx, resourceOwner, policy)
+	err = c.checkLabelPolicyAllowed(ctx, instanceID, resourceOwner, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 	return writeModelToLabelPolicy(&addedPolicy.LabelPolicyWriteModel), nil
 }
 
-func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+func (c *Commands) ChangeLabelPolicy(ctx context.Context, instanceID, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3N9fs", "Errors.ResourceOwnerMissing")
 	}
@@ -69,7 +69,7 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 		return nil, caos_errs.ThrowNotFound(nil, "Org-0K9dq", "Errors.Org.LabelPolicy.NotFound")
 	}
 
-	err = c.checkLabelPolicyAllowed(ctx, resourceOwner, policy)
+	err = c.checkLabelPolicyAllowed(ctx, instanceID, resourceOwner, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +104,8 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
 }
 
-func (c *Commands) checkLabelPolicyAllowed(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) error {
-	defaultPolicy, err := c.getDefaultLabelPolicy(ctx)
+func (c *Commands) checkLabelPolicyAllowed(ctx context.Context, instanceID, resourceOwner string, policy *domain.LabelPolicy) error {
+	defaultPolicy, err := c.getDefaultLabelPolicy(ctx, instanceID)
 	if err != nil {
 		return err
 	}

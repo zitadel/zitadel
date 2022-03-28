@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	addedPolicy := NewInstanceLabelPolicyWriteModel()
+func (c *Commands) AddDefaultLabelPolicy(ctx context.Context, instanceID string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+	addedPolicy := NewInstanceLabelPolicyWriteModel(instanceID)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
 	event, err := c.addDefaultLabelPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -58,11 +58,11 @@ func (c *Commands) addDefaultLabelPolicy(ctx context.Context, instanceAgg *event
 
 }
 
-func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, instanceID string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +100,8 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
 }
 
-func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -123,11 +123,11 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, instanceID, storageKey string) (*domain.ObjectDetails, error) {
 	if storageKey == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-3m20c", "Errors.Assets.EmptyKey")
 	}
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey str
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -173,11 +173,11 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, instanceID, storageKey string) (*domain.ObjectDetails, error) {
 	if storageKey == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-yxE4f", "Errors.Assets.EmptyKey")
 	}
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -197,8 +197,8 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey str
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -222,11 +222,11 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, instanceID, storageKey string) (*domain.ObjectDetails, error) {
 	if storageKey == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-4fMs9", "Errors.Assets.EmptyKey")
 	}
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -246,8 +246,8 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -271,11 +271,11 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, instanceID, storageKey string) (*domain.ObjectDetails, error) {
 	if storageKey == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-1cxM3", "Errors.Assets.EmptyKey")
 	}
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -295,8 +295,8 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -320,11 +320,11 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, instanceID, storageKey string) (*domain.ObjectDetails, error) {
 	if storageKey == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-1N8fs", "Errors.Assets.EmptyKey")
 	}
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -344,8 +344,8 @@ func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, storageKey str
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
+	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -369,11 +369,11 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy *InstanceLabelPolicyWriteModel, err error) {
+func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context, instanceID string) (policy *InstanceLabelPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceLabelPolicyWriteModel()
+	writeModel := NewInstanceLabelPolicyWriteModel(instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
@@ -381,8 +381,8 @@ func (c *Commands) defaultLabelPolicyWriteModelByID(ctx context.Context) (policy
 	return writeModel, nil
 }
 
-func (c *Commands) getDefaultLabelPolicy(ctx context.Context) (*domain.LabelPolicy, error) {
-	policyWriteModel, err := c.defaultLabelPolicyWriteModelByID(ctx)
+func (c *Commands) getDefaultLabelPolicy(ctx context.Context, instanceID string) (*domain.LabelPolicy, error) {
+	policyWriteModel, err := c.defaultLabelPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}

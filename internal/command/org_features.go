@@ -118,7 +118,7 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, instanceID, 
 			events = append(events, removePasswordComplexityEvent)
 		}
 	}
-	labelPolicyEvents, err := c.setAllowedLabelPolicy(ctx, orgID, features)
+	labelPolicyEvents, err := c.setAllowedLabelPolicy(ctx, instanceID, orgID, features)
 	if err != nil {
 		return nil, err
 	}
@@ -318,7 +318,7 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 	return events, nil
 }
 
-func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+func (c *Commands) setAllowedLabelPolicy(ctx context.Context, instanceID, orgID string, features *domain.Features) ([]eventstore.Command, error) {
 	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -334,7 +334,7 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 		}
 		return append(events, removeEvent), nil
 	}
-	defaultPolicy, err := c.getDefaultLabelPolicy(ctx)
+	defaultPolicy, err := c.getDefaultLabelPolicy(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
