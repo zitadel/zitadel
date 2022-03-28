@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/api/ui/console"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -209,6 +210,8 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 
+		SetIAMProject(instanceAgg, projectAgg.ID),
+
 		AddAPIApp(
 			*projectAgg,
 			setup.Zitadel.mgmtID,
@@ -273,4 +276,15 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
 	}, nil
+}
+
+//SetIAMProject defines the commands to set the id of the IAM project onto the instance
+func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				instance.NewIAMProjectSetEvent(ctx, &a.Aggregate, projectID),
+			}, nil
+		}, nil
+	}
 }
