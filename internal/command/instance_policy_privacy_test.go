@@ -41,7 +41,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -72,7 +72,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewPrivacyPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"TOSLink",
 									"PrivacyLink",
 									"HelpLink",
@@ -112,7 +112,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewPrivacyPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"",
 									"",
 									"",
@@ -208,7 +208,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -237,7 +237,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -299,7 +299,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 
 func newDefaultPrivacyPolicyChangedEvent(ctx context.Context, tosLink, privacyLink, helpLink string) *instance.PrivacyPolicyChangedEvent {
 	event, _ := instance.NewPrivacyPolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.PrivacyPolicyChanges{
 			policy.ChangeTOSLink(tosLink),
 			policy.ChangePrivacyLink(privacyLink),

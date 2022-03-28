@@ -40,7 +40,7 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								10,
 								true,
 							),
@@ -69,7 +69,7 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLockoutPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									10,
 									true,
 								),
@@ -161,7 +161,7 @@ func TestCommandSide_ChangeDefaultLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								10,
 								true,
 							),
@@ -188,7 +188,7 @@ func TestCommandSide_ChangeDefaultLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								10,
 								true,
 							),
@@ -243,7 +243,7 @@ func TestCommandSide_ChangeDefaultLockoutPolicy(t *testing.T) {
 
 func newDefaultLockoutPolicyChangedEvent(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) *instance.LockoutPolicyChangedEvent {
 	event, _ := instance.NewLockoutPolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.LockoutPolicyChanges{
 			policy.ChangeMaxAttempts(maxAttempts),
 			policy.ChangeShowLockOutFailures(showLockoutFailure),

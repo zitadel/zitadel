@@ -1165,7 +1165,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewMemberCascadeRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"user1",
 								),
 							),

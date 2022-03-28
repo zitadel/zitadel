@@ -58,7 +58,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -97,7 +97,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -210,7 +210,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -222,7 +222,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewSecretGeneratorRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode),
 						),
 					),
@@ -245,7 +245,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -283,7 +283,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -406,7 +406,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -418,7 +418,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewSecretGeneratorRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode),
 						),
 					),
@@ -441,7 +441,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -456,7 +456,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewSecretGeneratorRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.SecretGeneratorTypeInitCode),
 							),
 						},
@@ -504,7 +504,7 @@ func newSecretGeneratorChangedEvent(ctx context.Context, generatorType domain.Se
 		instance.ChangeSecretGeneratorIncludeSymbols(symbols),
 	}
 	event, _ := instance.NewSecretGeneratorChangeEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		generatorType,
 		changes,
 	)

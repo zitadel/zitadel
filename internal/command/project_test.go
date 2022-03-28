@@ -63,7 +63,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewGlobalOrgSetEventEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"globalorg",
 							),
 						),
@@ -115,7 +115,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewGlobalOrgSetEventEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"globalorg",
 							),
 						),
@@ -177,7 +177,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewGlobalOrgSetEventEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"globalorg",
 							),
 						),

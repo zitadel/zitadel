@@ -43,7 +43,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								false,
@@ -82,7 +82,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLoginPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 									true,
 									true,
@@ -201,7 +201,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -246,7 +246,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -396,7 +396,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -432,7 +432,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -450,7 +450,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
@@ -462,7 +462,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIdentityProviderAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 							),
 						),
@@ -487,7 +487,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -505,7 +505,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
@@ -519,7 +519,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewIdentityProviderAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1"),
 							),
 						},
@@ -622,7 +622,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -658,7 +658,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -676,13 +676,13 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIdentityProviderAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 							),
 						),
 						eventFromEventPusher(
 							instance.NewIdentityProviderRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 							),
 						),
@@ -707,7 +707,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -725,7 +725,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIdentityProviderAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 							),
 						),
@@ -734,7 +734,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewIdentityProviderRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1"),
 							),
 						},
@@ -761,7 +761,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -779,7 +779,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIdentityProviderAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 							),
 						),
@@ -788,7 +788,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewIdentityProviderRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1"),
 							),
 						},
@@ -823,7 +823,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -841,7 +841,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIdentityProviderAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 							),
 						),
@@ -857,7 +857,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewIdentityProviderRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1"),
 							),
 							eventFromEventPusher(
@@ -951,7 +951,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
@@ -976,7 +976,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.SecondFactorTypeOTP),
 							),
 						},
@@ -1070,13 +1070,13 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
@@ -1099,7 +1099,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
@@ -1108,7 +1108,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.SecondFactorTypeOTP),
 							),
 						},
@@ -1186,7 +1186,7 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
@@ -1211,7 +1211,7 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.MultiFactorTypeU2FWithPIN),
 							),
 						},
@@ -1305,13 +1305,13 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
 						eventFromEventPusher(
 							instance.NewLoginPolicyMultiFactorRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
@@ -1334,7 +1334,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
@@ -1343,7 +1343,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLoginPolicyMultiFactorRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.MultiFactorTypeU2FWithPIN),
 							),
 						},
@@ -1384,7 +1384,7 @@ func newDefaultLoginPolicyChangedEvent(ctx context.Context, allowRegister, allow
 	passwordlessType domain.PasswordlessType,
 	passwordLifetime, externalLoginLifetime, mfaInitSkipLifetime, secondFactorLifetime, multiFactorLifetime time.Duration) *instance.LoginPolicyChangedEvent {
 	event, _ := instance.NewLoginPolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.LoginPolicyChanges{
 			policy.ChangeAllowRegister(allowRegister),
 			policy.ChangeAllowExternalIDP(allowExternalIDP),

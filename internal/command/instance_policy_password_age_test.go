@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"testing"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -10,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/policy"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
@@ -39,7 +40,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPasswordAgePolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								365,
 								10,
 							),
@@ -68,7 +69,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewPasswordAgePolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									365,
 									10,
 								),
@@ -160,7 +161,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPasswordAgePolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								365,
 								10,
 							),
@@ -187,7 +188,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPasswordAgePolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								365,
 								10,
 							),
@@ -242,7 +243,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 
 func newDefaultPasswordAgePolicyChangedEvent(ctx context.Context, maxAgeDays, expiryWarnDays uint64) *instance.PasswordAgePolicyChangedEvent {
 	event, _ := instance.NewPasswordAgePolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.PasswordAgePolicyChanges{
 			policy.ChangeExpireWarnDays(expiryWarnDays),
 			policy.ChangeMaxAgeDays(maxAgeDays),
