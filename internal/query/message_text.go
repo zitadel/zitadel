@@ -122,7 +122,7 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				MessageTextColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				MessageTextColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Or{
 				sq.Eq{
@@ -147,7 +147,7 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) 
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		MessageTextColAggregateID.identifier(): domain.IAMID,
-		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
+		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).
 		Limit(1).ToSql()
 	if err != nil {
@@ -177,7 +177,7 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 			MessageTextColLanguage.identifier():    language,
 			MessageTextColType.identifier():        messageType,
 			MessageTextColAggregateID.identifier(): aggregateID,
-			MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
+			MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 		},
 	).
 		OrderBy(MessageTextColAggregateID.identifier()).

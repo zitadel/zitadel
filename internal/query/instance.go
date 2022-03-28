@@ -81,7 +81,7 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 	stmt, scan := prepareIAMQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		InstanceColumnID.identifier(): authz.GetInstance(ctx).ID,
+		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")

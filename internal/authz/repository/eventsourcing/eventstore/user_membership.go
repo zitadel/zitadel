@@ -44,7 +44,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 			{
 				Key:    user_model.UserMembershipSearchKeyInstanceID,
 				Method: domain.SearchMethodEquals,
-				Value:  instance.ID,
+				Value:  instance.InstanceID(),
 			},
 		},
 	})
@@ -66,7 +66,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 			{
 				Key:    user_model.UserMembershipSearchKeyInstanceID,
 				Method: domain.SearchMethodEquals,
-				Value:  instance.ID,
+				Value:  instance.InstanceID(),
 			},
 		},
 	})

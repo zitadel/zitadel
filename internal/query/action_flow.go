@@ -68,7 +68,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 		sq.Eq{
 			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
-			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).ID,
+			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-HBRh3", "Errors.Query.InvalidRequest")
@@ -88,7 +88,7 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnTriggerType.identifier():   triggerType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
-			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).ID,
+			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 			ActionColumnState.identifier():                domain.ActionStateActive,
 		},
 	).ToSql()
@@ -108,7 +108,7 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) (
 	query, args, err := stmt.Where(
 		sq.Eq{
 			FlowsTriggersColumnActionID.identifier():   actionID,
-			FlowsTriggersColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			FlowsTriggersColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {

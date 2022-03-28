@@ -80,7 +80,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, userID, key string, 
 		sq.Eq{
 			UserMetadataUserIDCol.identifier():     userID,
 			UserMetadataKeyCol.identifier():        key,
-			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatment")
@@ -95,7 +95,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, userID string, queries
 	stmt, args, err := queries.toQuery(query).Where(
 		sq.Eq{
 			UserMetadataUserIDCol.identifier():     userID,
-			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).
 		ToSql()
 	if err != nil {

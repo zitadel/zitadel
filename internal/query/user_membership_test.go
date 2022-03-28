@@ -20,7 +20,7 @@ var (
 			", memberships.sequence" +
 			", memberships.resource_owner" +
 			", memberships.org_id" +
-			", memberships.instance_id" +
+			", memberships.id" +
 			", memberships.project_id" +
 			", memberships.grant_id" +
 			", projections.projects.name" +
@@ -33,8 +33,9 @@ var (
 			", members.change_date" +
 			", members.sequence" +
 			", members.resource_owner" +
+			", members.instance_id" +
 			", members.org_id" +
-			", NULL::STRING AS instance_id" +
+			", NULL::STRING AS id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
 			" FROM projections.org_members as members" +
@@ -45,8 +46,9 @@ var (
 			", members.change_date" +
 			", members.sequence" +
 			", members.resource_owner" +
-			", NULL::STRING AS org_id" +
 			", members.instance_id" +
+			", NULL::STRING AS org_id" +
+			", members.id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
 			" FROM projections.instance_members as members" +
@@ -57,8 +59,9 @@ var (
 			", members.change_date" +
 			", members.sequence" +
 			", members.resource_owner" +
+			", members.instance_id" +
 			", NULL::STRING AS org_id" +
-			", NULL::STRING AS instance_id" +
+			", NULL::STRING AS id" +
 			", members.project_id" +
 			", NULL::STRING AS grant_id" +
 			" FROM projections.project_members as members" +
@@ -69,8 +72,9 @@ var (
 			", members.change_date" +
 			", members.sequence" +
 			", members.resource_owner" +
+			", members.instance_id" +
 			", NULL::STRING AS org_id" +
-			", NULL::STRING AS instance_id" +
+			", NULL::STRING AS id" +
 			", members.project_id" +
 			", members.grant_id" +
 			" FROM projections.project_grant_members as members" +

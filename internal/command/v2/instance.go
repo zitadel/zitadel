@@ -134,7 +134,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 	// if err != nil {
 	// 	return nil, err
 	// }
-	ctx = authz.SetCtxData(authz.WithInstance(ctx, authz.Instance{ID: "system"}), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
+	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, "system"), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -278,7 +278,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 	}, nil
 }
 
-//SetIAMProject defines the commands to set the id of the IAM project onto the instance
+//SetIAMProject defines the command to set the id of the IAM project onto the instance
 func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

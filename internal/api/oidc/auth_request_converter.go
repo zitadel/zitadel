@@ -133,7 +133,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		SelectedIDPConfigID: GetSelectedIDPIDFromScopes(authReq.Scopes),
 		MaxAuthAge:          MaxAgeToBusiness(authReq.MaxAge),
 		UserID:              userID,
-		InstanceID:          authz.GetInstance(ctx).ID,
+		InstanceID:          authz.GetInstance(ctx).InstanceID(),
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),

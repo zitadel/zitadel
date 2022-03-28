@@ -89,7 +89,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID, instanceID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -142,7 +142,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -202,7 +202,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, userAgentID, instanceID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -329,7 +329,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		return
 	} else if data.ResetLinking {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		instanceID := authz.GetInstance(r.Context()).ID
+		instanceID := authz.GetInstance(r.Context()).InstanceID()
 		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID, instanceID)
 		if err != nil {
 			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
@@ -368,7 +368,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	if len(authReq.LinkingUsers) == 0 {
 		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return

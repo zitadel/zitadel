@@ -90,7 +90,7 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnID.identifier():         id,
-		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
@@ -104,7 +104,7 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.identifier():     domain,
-		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
@@ -119,7 +119,7 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
-				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Or{
 				sq.Eq{
@@ -147,7 +147,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 	query, scan := prepareOrgsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.Query.InvalidRequest")

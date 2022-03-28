@@ -31,10 +31,6 @@ func (ctxData CtxData) IsZero() bool {
 	return ctxData.UserID == "" || ctxData.OrgID == ""
 }
 
-type Instance struct {
-	ID string
-}
-
 type Grants []*Grant
 
 type Grant struct {
@@ -114,15 +110,6 @@ func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {
 func GetCtxData(ctx context.Context) CtxData {
 	ctxData, _ := ctx.Value(dataKey).(CtxData)
 	return ctxData
-}
-
-func GetInstance(ctx context.Context) Instance {
-	instance, _ := ctx.Value(instanceKey).(Instance)
-	return instance
-}
-
-func WithInstance(ctx context.Context, instance Instance) context.Context {
-	return context.WithValue(ctx, instanceKey, instance)
 }
 
 func GetRequestPermissionsFromCtx(ctx context.Context) []string {

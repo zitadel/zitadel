@@ -103,7 +103,7 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	stmt, args, err := query.Where(
 		sq.Eq{
 			AuthNKeyColumnEnabled.identifier():    true,
-			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -131,7 +131,7 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, id string, queries ...Sea
 		sq.Eq{
 			AuthNKeyColumnID.identifier():         id,
 			AuthNKeyColumnEnabled.identifier():    true,
-			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AGhg4", "Errors.Query.SQLStatement")
@@ -149,7 +149,7 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 				AuthNKeyColumnID.identifier():         id,
 				AuthNKeyColumnIdentifier.identifier(): identifier,
 				AuthNKeyColumnEnabled.identifier():    true,
-				AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Gt{
 				AuthNKeyColumnExpiration.identifier(): time.Now(),
