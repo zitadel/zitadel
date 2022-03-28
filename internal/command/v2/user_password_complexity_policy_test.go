@@ -93,7 +93,8 @@ func Test_customPasswordComplexityPolicy(t *testing.T) {
 
 func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 	type args struct {
-		filter preparation.FilterToQueryReducer
+		instanceID string
+		filter     preparation.FilterToQueryReducer
 	}
 	tests := []struct {
 		name    string
@@ -124,6 +125,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 		{
 			name: "policy found",
 			args: args{
+				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
 						instance.NewPasswordComplexityPolicyAddedEvent(
@@ -140,8 +142,8 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 			},
 			want: &command.PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
-					AggregateID:   "IAM",
-					ResourceOwner: "IAM",
+					AggregateID:   "INSTANCE",
+					ResourceOwner: "INSTANCE",
 					Events:        []eventstore.Event{},
 				},
 				MinLength:    8,
@@ -156,7 +158,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := defaultPasswordComplexityPolicy(context.Background(), tt.args.filter)
+			got, err := defaultPasswordComplexityPolicy(context.Background(), tt.args.instanceID, tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultPasswordComplexityPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -170,7 +172,8 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 
 func Test_passwordComplexityPolicy(t *testing.T) {
 	type args struct {
-		filter preparation.FilterToQueryReducer
+		instanceID string
+		filter     preparation.FilterToQueryReducer
 	}
 	tests := []struct {
 		name    string
@@ -191,6 +194,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 		{
 			name: "custom found",
 			args: args{
+				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
 						org.NewPasswordComplexityPolicyAddedEvent(
@@ -259,8 +263,8 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 			},
 			want: &command.PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
-					AggregateID:   "IAM",
-					ResourceOwner: "IAM",
+					AggregateID:   "INSTANCE",
+					ResourceOwner: "INSTANCE",
 					Events:        []eventstore.Event{},
 				},
 				MinLength:    8,
@@ -285,7 +289,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := passwordComplexityPolicyWriteModel(context.Background(), tt.args.filter)
+			got, err := passwordComplexityPolicyWriteModel(context.Background(), tt.args.instanceID, tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultPasswordComplexityPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return

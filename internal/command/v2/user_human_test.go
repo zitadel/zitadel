@@ -17,6 +17,7 @@ import (
 
 func TestAddHumanCommand(t *testing.T) {
 	type args struct {
+		instanceID  string
 		a           *user.Aggregate
 		human       *AddHuman
 		passwordAlg crypto.HashAlgorithm
@@ -31,7 +32,8 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "invalid email",
 			args: args{
-				a: agg,
+				instanceID: "INSTANCE",
+				a:          agg,
 				human: &AddHuman{
 					Email: "invalid",
 				},
@@ -43,7 +45,8 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "invalid first name",
 			args: args{
-				a: agg,
+				instanceID: "INSTANCE",
+				a:          agg,
 				human: &AddHuman{
 					Email: "support@zitadel.ch",
 				},
@@ -55,7 +58,8 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "invalid last name",
 			args: args{
-				a: agg,
+				instanceID: "INSTANCE",
+				a:          agg,
 				human: &AddHuman{
 					Email:     "support@zitadel.ch",
 					FirstName: "hurst",
@@ -68,7 +72,8 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "invalid password",
 			args: args{
-				a: agg,
+				instanceID: "INSTANCE",
+				a:          agg,
 				human: &AddHuman{
 					Email:     "support@zitadel.ch",
 					FirstName: "gigi",
@@ -108,7 +113,8 @@ func TestAddHumanCommand(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				a: agg,
+				instanceID: "INSTANCE",
+				a:          agg,
 				human: &AddHuman{
 					Email:     "support@zitadel.ch",
 					FirstName: "gigi",
@@ -163,7 +169,7 @@ func TestAddHumanCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg), tt.args.filter, tt.want)
+			AssertValidation(t, AddHumanCommand(tt.args.instanceID, tt.args.a, tt.args.human, tt.args.passwordAlg), tt.args.filter, tt.want)
 		})
 	}
 }

@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/policy"
@@ -13,12 +12,12 @@ type InstancePrivacyPolicyWriteModel struct {
 	PrivacyPolicyWriteModel
 }
 
-func NewInstancePrivacyPolicyWriteModel() *InstancePrivacyPolicyWriteModel {
+func NewInstancePrivacyPolicyWriteModel(instanceID string) *InstancePrivacyPolicyWriteModel {
 	return &InstancePrivacyPolicyWriteModel{
 		PrivacyPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 		},
 	}

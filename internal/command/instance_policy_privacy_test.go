@@ -20,8 +20,9 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.PrivacyPolicy
+		ctx        context.Context
+		instanceID string
+		policy     *domain.PrivacyPolicy
 	}
 	type res struct {
 		want *domain.PrivacyPolicy
@@ -51,7 +52,8 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
@@ -83,7 +85,8 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
@@ -93,8 +96,8 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 			res: res{
 				want: &domain.PrivacyPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
@@ -123,7 +126,8 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "",
 					PrivacyLink: "",
@@ -133,8 +137,8 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 			res: res{
 				want: &domain.PrivacyPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					TOSLink:     "",
 					PrivacyLink: "",
@@ -148,7 +152,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPrivacyPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultPrivacyPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -167,8 +171,9 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.PrivacyPolicy
+		ctx        context.Context
+		instanceID string
+		policy     *domain.PrivacyPolicy
 	}
 	type res struct {
 		want *domain.PrivacyPolicy
@@ -189,7 +194,8 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
@@ -218,7 +224,8 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
@@ -258,7 +265,8 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLinkChanged",
 					PrivacyLink: "PrivacyLinkChanged",
@@ -268,8 +276,8 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 			res: res{
 				want: &domain.PrivacyPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					TOSLink:     "TOSLinkChanged",
 					PrivacyLink: "PrivacyLinkChanged",
@@ -283,7 +291,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultPrivacyPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.ChangeDefaultPrivacyPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

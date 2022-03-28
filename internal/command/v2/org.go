@@ -18,7 +18,7 @@ type OrgSetup struct {
 	Human AddHuman
 }
 
-func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDetails, error) {
+func (command *Command) SetUpOrg(ctx context.Context, instanceID string, o *OrgSetup) (*domain.ObjectDetails, error) {
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.Obje
 
 	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter,
 		AddOrg(orgAgg, o.Name, command.iamDomain),
-		AddHumanCommand(userAgg, &o.Human, command.userPasswordAlg),
+		AddHumanCommand(instanceID, userAgg, &o.Human, command.userPasswordAlg),
 		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 	)
 	if err != nil {

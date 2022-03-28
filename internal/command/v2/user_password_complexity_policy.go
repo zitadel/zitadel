@@ -9,12 +9,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-func passwordComplexityPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PasswordComplexityPolicyWriteModel, error) {
+func passwordComplexityPolicyWriteModel(ctx context.Context, instanceID string, filter preparation.FilterToQueryReducer) (*command.PasswordComplexityPolicyWriteModel, error) {
 	wm, err := customPasswordComplexityPolicy(ctx, filter)
 	if err != nil || wm != nil && wm.State.Exists() {
 		return wm, err
 	}
-	wm, err = defaultPasswordComplexityPolicy(ctx, filter)
+	wm, err = defaultPasswordComplexityPolicy(ctx, instanceID, filter)
 	if err != nil || wm != nil {
 		return wm, err
 	}
@@ -35,8 +35,8 @@ func customPasswordComplexityPolicy(ctx context.Context, filter preparation.Filt
 	return &policy.PasswordComplexityPolicyWriteModel, err
 }
 
-func defaultPasswordComplexityPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PasswordComplexityPolicyWriteModel, error) {
-	policy := command.NewInstancePasswordComplexityPolicyWriteModel()
+func defaultPasswordComplexityPolicy(ctx context.Context, instanceID string, filter preparation.FilterToQueryReducer) (*command.PasswordComplexityPolicyWriteModel, error) {
+	policy := command.NewInstancePasswordComplexityPolicyWriteModel(instanceID)
 	events, err := filter(ctx, policy.Query())
 	if err != nil {
 		return nil, err

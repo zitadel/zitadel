@@ -22,11 +22,11 @@ type InstanceSecretGeneratorConfigWriteModel struct {
 	State               domain.SecretGeneratorState
 }
 
-func NewInstanceSecretGeneratorConfigWriteModel(GeneratorType domain.SecretGeneratorType) *InstanceSecretGeneratorConfigWriteModel {
+func NewInstanceSecretGeneratorConfigWriteModel(instanceID string, GeneratorType domain.SecretGeneratorType) *InstanceSecretGeneratorConfigWriteModel {
 	return &InstanceSecretGeneratorConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
 		},
 		GeneratorType: GeneratorType,
 	}

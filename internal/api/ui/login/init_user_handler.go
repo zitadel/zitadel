@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -78,7 +79,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return
 	}
-	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, initCodeGenerator)
+	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), authz.GetInstance(r.Context()).ID, data.UserID, userOrgID, data.Code, data.Password, initCodeGenerator)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return

@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
-	addedPolicy := NewInstanceLockoutPolicyWriteModel()
+func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, instanceID string, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
+	addedPolicy := NewInstanceLockoutPolicyWriteModel(instanceID)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	event, err := c.addDefaultLockoutPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -41,8 +41,8 @@ func (c *Commands) addDefaultLockoutPolicy(ctx context.Context, instanceAgg *eve
 	return instance.NewLockoutPolicyAddedEvent(ctx, instanceAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures), nil
 }
 
-func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
-	existingPolicy, err := c.defaultLockoutPolicyWriteModelByID(ctx)
+func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, instanceID string, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
+	existingPolicy, err := c.defaultLockoutPolicyWriteModelByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -67,11 +67,11 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 	return writeModelToLockoutPolicy(&existingPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context) (policy *InstanceLockoutPolicyWriteModel, err error) {
+func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context, instanceID string) (policy *InstanceLockoutPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceLockoutPolicyWriteModel()
+	writeModel := NewInstanceLockoutPolicyWriteModel(instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

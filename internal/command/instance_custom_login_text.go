@@ -28,11 +28,11 @@ func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, instanceID st
 	return writeModelToObjectDetails(&existingMailText.WriteModel), nil
 }
 
-func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang language.Tag) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, instanceID string, lang language.Tag) (*domain.ObjectDetails, error) {
 	if lang == language.Und {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-Gfbg3", "Errors.CustomText.Invalid")
 	}
-	customText, err := c.defaultLoginTextWriteModelByID(ctx, lang)
+	customText, err := c.defaultLoginTextWriteModelByID(ctx, instanceID, lang)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "Instance-kd9fs", "Errors.CustomText.Invalid")
 	}
 
-	existingLoginText, err := c.defaultLoginTextWriteModelByID(ctx, text.Language)
+	existingLoginText, err := c.defaultLoginTextWriteModelByID(ctx, instanceAgg.ID, text.Language)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -61,8 +61,8 @@ func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *
 	return events, existingLoginText, nil
 }
 
-func (c *Commands) defaultLoginTextWriteModelByID(ctx context.Context, lang language.Tag) (*InstanceCustomLoginTextReadModel, error) {
-	writeModel := NewInstanceCustomLoginTextReadModel(lang)
+func (c *Commands) defaultLoginTextWriteModelByID(ctx context.Context, instanceID string, lang language.Tag) (*InstanceCustomLoginTextReadModel, error) {
+	writeModel := NewInstanceCustomLoginTextReadModel(instanceID, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

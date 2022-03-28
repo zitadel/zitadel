@@ -9,12 +9,12 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, instanceID string, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
 	if generatorType == domain.SecretGeneratorTypeUnspecified {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0pkwf", "Errors.SecretGenerator.TypeMissing")
 	}
 
-	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
+	generatorWriteModel, err := c.getSecretConfig(ctx, instanceID, generatorType)
 	if err != nil {
 		return nil, err
 	}
@@ -42,12 +42,12 @@ func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, generatorType d
 	return writeModelToObjectDetails(&generatorWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, instanceID string, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
 	if generatorType == domain.SecretGeneratorTypeUnspecified {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-33k9f", "Errors.SecretGenerator.TypeMissing")
 	}
 
-	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
+	generatorWriteModel, err := c.getSecretConfig(ctx, instanceID, generatorType)
 	if err != nil {
 		return nil, err
 	}
@@ -83,12 +83,12 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 	return writeModelToObjectDetails(&generatorWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, instanceID string, generatorType domain.SecretGeneratorType) (*domain.ObjectDetails, error) {
 	if generatorType == domain.SecretGeneratorTypeUnspecified {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2j9lw", "Errors.SecretGenerator.TypeMissing")
 	}
 
-	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
+	generatorWriteModel, err := c.getSecretConfig(ctx, instanceID, generatorType)
 	if err != nil {
 		return nil, err
 	}
@@ -107,8 +107,8 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 	return writeModelToObjectDetails(&generatorWriteModel.WriteModel), nil
 }
 
-func (c *Commands) getSecretConfig(ctx context.Context, generatorType domain.SecretGeneratorType) (_ *InstanceSecretGeneratorConfigWriteModel, err error) {
-	writeModel := NewInstanceSecretGeneratorConfigWriteModel(generatorType)
+func (c *Commands) getSecretConfig(ctx context.Context, instanceID string, generatorType domain.SecretGeneratorType) (_ *InstanceSecretGeneratorConfigWriteModel, err error) {
+	writeModel := NewInstanceSecretGeneratorConfigWriteModel(instanceID, generatorType)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) getOrgPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
+func (c *Commands) getOrgPrivacyPolicy(ctx context.Context, instanceID, orgID string) (*domain.PrivacyPolicy, error) {
 	policy, err := c.orgPrivacyPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -16,7 +16,7 @@ func (c *Commands) getOrgPrivacyPolicy(ctx context.Context, orgID string) (*doma
 	if policy.State == domain.PolicyStateActive {
 		return orgWriteModelToPrivacyPolicy(policy), nil
 	}
-	return c.getDefaultPrivacyPolicy(ctx)
+	return c.getDefaultPrivacyPolicy(ctx, instanceID)
 }
 
 func (c *Commands) orgPrivacyPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgPrivacyPolicyWriteModel, error) {

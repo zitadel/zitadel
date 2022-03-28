@@ -25,6 +25,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
+		instanceID    string
 		userID        string
 		resourceOwner string
 		password      string
@@ -49,6 +50,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res: res{
@@ -65,6 +67,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -132,6 +135,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
@@ -203,6 +207,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
@@ -221,7 +226,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.SetPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.oneTime)
+			got, err := r.SetPassword(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.oneTime)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -242,6 +247,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 	}
 	type args struct {
 		ctx             context.Context
+		instanceID      string
 		userID          string
 		code            string
 		resourceOwner   string
@@ -268,6 +274,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res: res{
@@ -283,6 +290,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -300,6 +308,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				password:      "password",
@@ -333,6 +342,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				code:          "aa",
 				resourceOwner: "org1",
@@ -380,6 +390,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:             context.Background(),
+				instanceID:      "INSTANCE",
 				userID:          "user1",
 				code:            "test",
 				resourceOwner:   "org1",
@@ -463,6 +474,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:             context.Background(),
+				instanceID:      "INSTANCE",
 				userID:          "user1",
 				resourceOwner:   "org1",
 				password:        "password",
@@ -482,7 +494,7 @@ func TestCommandSide_SetPassword(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID, tt.args.secretGenerator)
+			err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -500,6 +512,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
+		instanceID    string
 		userID        string
 		resourceOwner string
 		oldPassword   string
@@ -525,6 +538,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				oldPassword:   "password",
 				newPassword:   "password1",
 				resourceOwner: "org1",
@@ -542,6 +556,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				newPassword:   "password1",
 				resourceOwner: "org1",
@@ -559,6 +574,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				oldPassword:   "password",
 				resourceOwner: "org1",
@@ -577,6 +593,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				oldPassword:   "password",
@@ -612,6 +629,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				oldPassword:   "password",
 				newPassword:   "password1",
@@ -663,6 +681,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				oldPassword:   "password-old",
 				newPassword:   "password1",
@@ -743,6 +762,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				oldPassword:   "password",
@@ -761,7 +781,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)
+			got, err := r.ChangePassword(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

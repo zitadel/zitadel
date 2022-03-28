@@ -22,8 +22,9 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		alg        crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx  context.Context
-		smtp *smtp.EmailConfig
+		ctx        context.Context
+		instanceID string
+		smtp       *smtp.EmailConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -43,7 +44,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -56,7 +57,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				smtp: &smtp.EmailConfig{
 					Tls: true,
 				},
@@ -75,7 +77,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -95,7 +97,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				smtp: &smtp.EmailConfig{
 					Tls:      true,
 					From:     "from",
@@ -109,7 +112,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -120,7 +123,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				eventstore:         tt.fields.eventstore,
 				smtpPasswordCrypto: tt.fields.alg,
 			}
-			got, err := r.AddSMTPConfig(tt.args.ctx, tt.args.smtp)
+			got, err := r.AddSMTPConfig(tt.args.ctx, tt.args.instanceID, tt.args.smtp)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -139,8 +142,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx  context.Context
-		smtp *smtp.EmailConfig
+		ctx        context.Context
+		instanceID string
+		smtp       *smtp.EmailConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -178,7 +182,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -191,7 +195,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				smtp: &smtp.EmailConfig{
 					Tls:      true,
 					From:     "from",
@@ -215,7 +220,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -255,7 +260,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -265,7 +270,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeSMTPConfig(tt.args.ctx, tt.args.smtp)
+			got, err := r.ChangeSMTPConfig(tt.args.ctx, tt.args.instanceID, tt.args.smtp)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -285,8 +290,9 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 		alg        crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx      context.Context
-		password string
+		ctx        context.Context
+		instanceID string
+		password   string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -323,7 +329,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -337,7 +343,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewSMTPConfigPasswordChangedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -352,12 +358,13 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:      context.Background(),
-				password: "password",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				password:   "password",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -368,7 +375,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 				eventstore:         tt.fields.eventstore,
 				smtpPasswordCrypto: tt.fields.alg,
 			}
-			got, err := r.ChangeSMTPConfigPassword(tt.args.ctx, tt.args.password)
+			got, err := r.ChangeSMTPConfigPassword(tt.args.ctx, tt.args.instanceID, tt.args.password)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -391,7 +398,7 @@ func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromN
 		instance.ChangeSMTPConfigSMTPUser(user),
 	}
 	event, _ := instance.NewSMTPConfigChangeEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		changes,
 	)
 	return event

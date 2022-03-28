@@ -3,6 +3,7 @@ package login
 import (
 	"net/http"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -75,7 +76,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
 	}
-	err = l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID, passwordCodeGenerator)
+	err = l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), authz.GetInstance(r.Context()).ID, userOrg, data.UserID, data.Code, data.Password, userAgentID, passwordCodeGenerator)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return

@@ -21,11 +21,11 @@ type InstanceSMTPConfigWriteModel struct {
 	State         domain.SMTPConfigState
 }
 
-func NewInstanceSMTPConfigWriteModel() *InstanceSMTPConfigWriteModel {
+func NewInstanceSMTPConfigWriteModel(instanceID string) *InstanceSMTPConfigWriteModel {
 	return &InstanceSMTPConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
 		},
 	}
 }

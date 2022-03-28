@@ -29,6 +29,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	}
 	type args struct {
 		ctx             context.Context
+		instanceID      string
 		orgID           string
 		human           *domain.Human
 		secretGenerator crypto.Generator
@@ -51,8 +52,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -78,8 +80,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -113,8 +116,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -158,8 +162,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -231,8 +236,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -315,8 +321,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Password: &domain.Password{
@@ -394,8 +401,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Password: &domain.Password{
@@ -492,8 +500,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -585,8 +594,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -634,7 +644,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.secretGenerator, tt.args.secretGenerator)
+			got, err := r.AddHuman(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.human, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -656,6 +666,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 	}
 	type args struct {
 		ctx                  context.Context
+		instanceID           string
 		orgID                string
 		human                *domain.Human
 		passwordless         bool
@@ -681,8 +692,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -708,8 +720,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -743,8 +756,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -788,8 +802,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -851,8 +866,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Password: &domain.Password{
@@ -931,8 +947,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Password: &domain.Password{
@@ -1027,8 +1044,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1131,8 +1149,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Password: &domain.Password{
@@ -1243,8 +1262,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1341,8 +1361,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1394,7 +1415,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
+			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1417,6 +1438,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	}
 	type args struct {
 		ctx             context.Context
+		instanceID      string
 		orgID           string
 		human           *domain.Human
 		link            *domain.UserIDPLink
@@ -1441,8 +1463,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1468,8 +1491,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1506,8 +1530,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1556,8 +1581,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1618,8 +1644,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1680,8 +1707,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -1756,8 +1784,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Password: &domain.Password{
 						SecretString: "password",
@@ -1876,8 +1905,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Password: &domain.Password{
 						SecretString: "password",
@@ -1980,8 +2010,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Password: &domain.Password{
@@ -2077,8 +2108,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Password: &domain.Password{
@@ -2194,8 +2226,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -2309,8 +2342,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
@@ -2361,7 +2395,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator)
+			got, err := r.RegisterHuman(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

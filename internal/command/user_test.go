@@ -5,6 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/repository/member"
+	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -15,9 +18,6 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"github.com/caos/zitadel/internal/repository/member"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
@@ -1190,7 +1190,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
-						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint(domain.IAMID, "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("INSTANCE", "user1")),
 						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("org1", "user1")),
 						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("project1", "user1")),
 						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantMemberUniqueConstraint("project1", "user1", "grant1")),
@@ -1204,7 +1204,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				cascadeUserMemberships: []*query.Membership{
 					{
 						IAM: &query.IAMMembership{
-							IAMID: "IAM",
+							IAMID: "INSTANCE",
 						},
 						UserID:        "user1",
 						ResourceOwner: "org1",

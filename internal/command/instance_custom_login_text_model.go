@@ -3,7 +3,6 @@ package command
 import (
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
@@ -12,12 +11,12 @@ type InstanceCustomLoginTextReadModel struct {
 	CustomLoginTextReadModel
 }
 
-func NewInstanceCustomLoginTextReadModel(lang language.Tag) *InstanceCustomLoginTextReadModel {
+func NewInstanceCustomLoginTextReadModel(instanceID string, lang language.Tag) *InstanceCustomLoginTextReadModel {
 	return &InstanceCustomLoginTextReadModel{
 		CustomLoginTextReadModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			Language: lang,
 		},

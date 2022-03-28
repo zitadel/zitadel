@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, orgID string) (*domain.PasswordComplexityPolicy, error) {
+func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, instanceID, orgID string) (*domain.PasswordComplexityPolicy, error) {
 	policy, err := c.orgPasswordComplexityPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -16,7 +16,7 @@ func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, orgID str
 	if policy.State == domain.PolicyStateActive {
 		return orgWriteModelToPasswordComplexityPolicy(policy), nil
 	}
-	return c.getDefaultPasswordComplexityPolicy(ctx)
+	return c.getDefaultPasswordComplexityPolicy(ctx, instanceID)
 }
 
 func (c *Commands) orgPasswordComplexityPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgPasswordComplexityPolicyWriteModel, error) {

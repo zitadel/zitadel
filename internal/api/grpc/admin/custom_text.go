@@ -334,7 +334,7 @@ func (s *Server) SetCustomLoginText(ctx context.Context, req *admin_pb.SetCustom
 }
 
 func (s *Server) ResetCustomLoginTextToDefault(ctx context.Context, req *admin_pb.ResetCustomLoginTextsToDefaultRequest) (*admin_pb.ResetCustomLoginTextsToDefaultResponse, error) {
-	result, err := s.command.RemoveCustomInstanceLoginTexts(ctx, language.Make(req.Language))
+	result, err := s.command.RemoveCustomInstanceLoginTexts(ctx, authz.GetInstance(ctx).ID, language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}

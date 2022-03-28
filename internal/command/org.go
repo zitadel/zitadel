@@ -32,12 +32,12 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, initCodeGenerator, phoneCodeGenerator crypto.Generator, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, instanceID string, organisation *domain.Org, admin *domain.Human, initCodeGenerator, phoneCodeGenerator crypto.Generator, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
 	domainPolicy, err := c.getDefaultDomainPolicy(ctx)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Instance.DomainPolicy.NotFound")
 	}
-	pwPolicy, err := c.getDefaultPasswordComplexityPolicy(ctx)
+	pwPolicy, err := c.getDefaultPasswordComplexityPolicy(ctx, instanceID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Instance.PasswordComplexity.NotFound")
 	}

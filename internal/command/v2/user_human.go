@@ -39,7 +39,7 @@ type AddHuman struct {
 	PasswordChangeRequired bool
 }
 
-func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm) preparation.Validation {
+func AddHumanCommand(instanceID string, a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if !domain.EmailRegex.MatchString(human.Email) {
 			return nil, errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument")
@@ -75,7 +75,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				cmd.AddPhoneData(human.Phone) //TODO: pass if verified
 			}
 			if human.Password != "" {
-				passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
+				passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, instanceID, filter)
 				if err != nil {
 					return nil, err
 				}

@@ -200,7 +200,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 	if err != nil {
 		return nil, err
 	}
-	human, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req), initCodeGenerator, phoneCodeGenerator)
+	human, err := s.command.AddHuman(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req), initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -527,7 +527,7 @@ func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHuman
 }
 
 func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHumanInitialPasswordRequest) (*mgmt_pb.SetHumanInitialPasswordResponse, error) {
-	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
 	if err != nil {
 		return nil, err
 	}
@@ -537,7 +537,7 @@ func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHu
 }
 
 func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPasswordRequest) (*mgmt_pb.SetHumanPasswordResponse, error) {
-	objectDetails, err := s.command.SetPassword(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired)
 	if err != nil {
 		return nil, err
 	}

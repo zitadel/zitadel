@@ -49,7 +49,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
-func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string, initCodeGenerator crypto.Generator) error {
+func (c *Commands) HumanVerifyInitCode(ctx context.Context, instanceID, userID, resourceOwner, code, passwordString string, initCodeGenerator crypto.Generator) error {
 	if userID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
@@ -69,7 +69,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, initCodeGenerator)
 	if err != nil {
 		_, err = c.eventstore.Push(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
-		logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")
+		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")
 		return caos_errs.ThrowInvalidArgument(err, "COMMAND-11v6G", "Errors.User.Code.Invalid")
 	}
 	events := []eventstore.Command{
@@ -85,7 +85,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 			SecretString:   passwordString,
 			ChangeRequired: false,
 		}
-		passwordEvent, err := c.changePassword(ctx, "", password, userAgg, passwordWriteModel)
+		passwordEvent, err := c.changePassword(ctx, instanceID, "", password, userAgg, passwordWriteModel)
 		if err != nil {
 			return err
 		}

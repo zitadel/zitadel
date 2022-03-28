@@ -310,6 +310,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 	}
 	type args struct {
 		ctx             context.Context
+		instanceID      string
 		userID          string
 		code            string
 		resourceOwner   string
@@ -368,6 +369,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				code:          "aa",
 				resourceOwner: "org1",
@@ -401,6 +403,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				userID:        "user1",
 				code:          "aa",
 				resourceOwner: "org1",
@@ -455,6 +458,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 			},
 			args: args{
 				ctx:             context.Background(),
+				instanceID:      "INSTANCE",
 				userID:          "user1",
 				code:            "test",
 				resourceOwner:   "org1",
@@ -515,6 +519,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 			},
 			args: args{
 				ctx:             context.Background(),
+				instanceID:      "INSTANCE",
 				userID:          "user1",
 				code:            "a",
 				resourceOwner:   "org1",
@@ -599,6 +604,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 			},
 			args: args{
 				ctx:             context.Background(),
+				instanceID:      "INSTANCE",
 				userID:          "user1",
 				code:            "a",
 				resourceOwner:   "org1",
@@ -618,7 +624,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.secretGenerator)
+			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.instanceID, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
