@@ -579,7 +579,8 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	}
 	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
 	if err != nil {
-		return err
+		logging.New().WithError(err).Error("can not set login policy")
+		//return err
 	}
 	request.LabelPolicy = labelPolicy
 	defaultLoginTranslations, err := repo.getLoginTexts(ctx, domain.IAMID)
@@ -1145,7 +1146,7 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
-	org, err := queries.OrgByID(context.TODO(), user.ResourceOwner)
+	org, err := queries.OrgByID(ctx, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
