@@ -1,4 +1,4 @@
-package iam
+package instance
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 const (
 	UniqueInstanceDomain           = "instance_domain"
-	domainEventPrefix              = iamEventTypePrefix + "domain."
+	domainEventPrefix              = instanceEventTypePrefix + "domain."
 	InstanceDomainAddedEventType   = domainEventPrefix + "added"
 	InstanceDomainRemovedEventType = domainEventPrefix + "removed"
 )

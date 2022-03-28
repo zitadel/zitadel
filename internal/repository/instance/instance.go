@@ -1,4 +1,4 @@
-package iam
+package instance
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	instanceEventTypePrefix  = "instance."
 	InstanceAddedEventType   = instanceEventTypePrefix + "added"
 	InstanceChangedEventType = instanceEventTypePrefix + "changed"
 	InstanceRemovedEventType = instanceEventTypePrefix + "removed"

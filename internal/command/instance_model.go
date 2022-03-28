@@ -35,19 +35,19 @@ func NewInstanceWriteModel(instanceID string) *InstanceWriteModel {
 func (wm *InstanceWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *iam.InstanceAddedEvent:
+		case *instance.InstanceAddedEvent:
 			wm.Name = e.Name
 			wm.State = domain.InstanceStateActive
-		case *iam.InstanceChangedEvent:
+		case *instance.InstanceChangedEvent:
 			wm.Name = e.Name
-		case *iam.InstanceRemovedEvent:
+		case *instance.InstanceRemovedEvent:
 			wm.State = domain.InstanceStateRemoved
-		case *iam.DomainAddedEvent:
+		case *instance.DomainAddedEvent:
 			if !e.Generated {
 				continue
 			}
 			wm.GeneratedDomain = e.Domain
-		case *iam.ProjectSetEvent:
+		case *instance.ProjectSetEvent:
 			wm.ProjectID = e.ProjectID
 		case *instance.GlobalOrgSetEvent:
 			wm.GlobalOrgID = e.OrgID
