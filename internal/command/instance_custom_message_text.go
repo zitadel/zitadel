@@ -10,8 +10,8 @@ import (
 	"golang.org/x/text/language"
 )
 
-func (c *Commands) SetDefaultMessageText(ctx context.Context, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate()
+func (c *Commands) SetDefaultMessageText(ctx context.Context, instanceID string, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(instanceID)
 	events, existingMessageText, err := c.setDefaultMessageText(ctx, &instanceAgg.Aggregate, messageText)
 	if err != nil {
 		return nil, err

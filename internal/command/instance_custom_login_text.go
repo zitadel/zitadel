@@ -11,8 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
-	iamAgg := instance.NewAggregate()
+func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, instanceID string, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
+	iamAgg := instance.NewAggregate(instanceID)
 	events, existingMailText, err := c.setCustomInstanceLoginText(ctx, &iamAgg.Aggregate, loginText)
 	if err != nil {
 		return nil, err

@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -32,14 +32,14 @@ func NewInstanceDomainProjection(ctx context.Context, config crdb.StatementHandl
 func (p *InstanceDomainProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.InstanceDomainAddedEventType,
+					Event:  instance.InstanceDomainAddedEventType,
 					Reduce: p.reduceDomainAdded,
 				},
 				{
-					Event:  iam.InstanceDomainRemovedEventType,
+					Event:  instance.InstanceDomainRemovedEventType,
 					Reduce: p.reduceDomainRemoved,
 				},
 			},
@@ -59,7 +59,7 @@ const (
 func (p *InstanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainAddedEvent)
 	if !ok {
-		logging.WithFields("seq", event.Sequence(), "expectedType", iam.InstanceDomainAddedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
+		logging.WithFields("seq", event.Sequence(), "expectedType", instance.InstanceDomainAddedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-DM2DI", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -77,7 +77,7 @@ func (p *InstanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*h
 func (p *InstanceDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
-		logging.WithFields("seq", event.Sequence(), "expectedType", iam.InstanceDomainRemovedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
+		logging.WithFields("seq", event.Sequence(), "expectedType", instance.InstanceDomainRemovedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-gh1Mx", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(

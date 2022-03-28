@@ -28,11 +28,11 @@ type Instance struct {
 	DefaultPasswordLockoutPolicy    *LockoutPolicy
 }
 
-func (i *IAM) IsValid() bool {
+func (i *Instance) IsValid() bool {
 	return i.Name != ""
 }
 
-func (i *IAM) AddGeneratedDomain(iamDomain string) {
+func (i *Instance) AddGeneratedDomain(iamDomain string) {
 	i.GeneratedDomain = &InstanceDomain{Domain: NewIAMDomainName(i.Name, iamDomain), Generated: true}
 }
 
