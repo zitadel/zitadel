@@ -579,8 +579,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	}
 	labelPolicy, err := repo.getLabelPolicy(ctx, privateLabelingOrgID)
 	if err != nil {
-		logging.New().WithError(err).Error("can not set login policy")
-		//return err
+		return err
 	}
 	request.LabelPolicy = labelPolicy
 	defaultLoginTranslations, err := repo.getLoginTexts(ctx, domain.IAMID)

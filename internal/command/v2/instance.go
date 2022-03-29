@@ -61,6 +61,19 @@ type InstanceSetup struct {
 		PrivacyLink string
 		HelpLink    string
 	}
+	LabelPolicy struct {
+		PrimaryColor        string
+		BackgroundColor     string
+		WarnColor           string
+		FontColor           string
+		PrimaryColorDark    string
+		BackgroundColorDark string
+		WarnColorDark       string
+		FontColorDark       string
+		HideLoginNameSuffix bool
+		ErrorMsgPopup       bool
+		DisableWatermark    bool
+	}
 	LockoutPolicy struct {
 		MaxAttempts              uint64
 		ShouldShowLockoutFailure bool
@@ -195,6 +208,22 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 		AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
 		AddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+
+		AddDefaultLabelPolicy(
+			instanceAgg,
+			setup.LabelPolicy.PrimaryColor,
+			setup.LabelPolicy.BackgroundColor,
+			setup.LabelPolicy.WarnColor,
+			setup.LabelPolicy.FontColor,
+			setup.LabelPolicy.PrimaryColorDark,
+			setup.LabelPolicy.BackgroundColorDark,
+			setup.LabelPolicy.WarnColorDark,
+			setup.LabelPolicy.FontColorDark,
+			setup.LabelPolicy.HideLoginNameSuffix,
+			setup.LabelPolicy.ErrorMsgPopup,
+			setup.LabelPolicy.DisableWatermark,
+		),
+		ActivateDefaultLabelPolicy(instanceAgg),
 
 		AddEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
