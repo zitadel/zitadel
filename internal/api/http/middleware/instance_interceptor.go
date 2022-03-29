@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -36,7 +37,7 @@ func (a *instanceInterceptor) HandlerFunc(next http.HandlerFunc) http.HandlerFun
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, err := setInstance(r, a.verifier, a.headerName)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		}
 		r = r.WithContext(ctx)
@@ -50,7 +51,12 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	instance, err := verifier.InstanceByHost(authCtx, r.Header.Get(headerName))
+	host := r.Header.Get(headerName)
+	if host == "" {
+		return nil, fmt.Errorf("host header %s not found", headerName)
+	}
+
+	instance, err := verifier.InstanceByHost(authCtx, host)
 	if err != nil {
 		return nil, err
 	}
