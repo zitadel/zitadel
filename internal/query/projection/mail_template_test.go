@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -42,9 +42,10 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.mail_templates (aggregate_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.mail_templates (aggregate_id, instance_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -77,7 +78,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -107,7 +108,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.mail_templates WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.mail_templates WHERE (aggregate_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -117,28 +118,29 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&MailTemplateProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MailTemplateAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MailTemplateAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"template": "PHRhYmxlPjwvdGFibGU+"
 					}`),
-				), iam.MailTemplateAddedEventMapper),
+				), instance.MailTemplateAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       MailTemplateTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.mail_templates (aggregate_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.mail_templates (aggregate_id, instance_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -152,26 +154,26 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&MailTemplateProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MailTemplateChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MailTemplateChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"template": "PHRhYmxlPjwvdGFibGU+"
 					}`),
-				), iam.MailTemplateChangedEventMapper),
+				), instance.MailTemplateChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       MailTemplateTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

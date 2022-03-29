@@ -2,12 +2,14 @@ package model
 
 import (
 	"encoding/json"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
+
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
@@ -32,7 +34,8 @@ type IDPProviderView struct {
 	IDPProviderType int32  `json:"idpProviderType" gorm:"column:idp_provider_type"`
 	IDPState        int32  `json:"-" gorm:"column:idp_state"`
 
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
+	Sequence   uint64 `json:"-" gorm:"column:sequence"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func IDPProviderViewFromModel(provider *model.IDPProviderView) *IDPProviderView {
@@ -87,6 +90,7 @@ func (i *IDPProviderView) AppendEvent(event *models.Event) (err error) {
 
 func (r *IDPProviderView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
+	r.InstanceID = event.InstanceID
 }
 
 func (r *IDPProviderView) SetData(event *models.Event) error {

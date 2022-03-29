@@ -15,6 +15,7 @@ const (
 	requestPermissionsKey key = 1
 	dataKey               key = 2
 	allPermissionsKey     key = 3
+	instanceKey           key = 4
 )
 
 type CtxData struct {
@@ -30,6 +31,10 @@ func (ctxData CtxData) IsZero() bool {
 	return ctxData.UserID == "" || ctxData.OrgID == ""
 }
 
+type Instance struct {
+	ID string
+}
+
 type Grants []*Grant
 
 type Grant struct {
@@ -42,7 +47,7 @@ type Memberships []*Membership
 type Membership struct {
 	MemberType  MemberType
 	AggregateID string
-	//ObjectID differs from aggregate id if obejct is sub of an aggregate
+	//ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
 	Roles []string
@@ -109,6 +114,15 @@ func SetCtxData(ctx context.Context, ctxData CtxData) context.Context {
 func GetCtxData(ctx context.Context) CtxData {
 	ctxData, _ := ctx.Value(dataKey).(CtxData)
 	return ctxData
+}
+
+func GetInstance(ctx context.Context) Instance {
+	instance, _ := ctx.Value(instanceKey).(Instance)
+	return instance
+}
+
+func WithInstance(ctx context.Context, instance Instance) context.Context {
+	return context.WithValue(ctx, instanceKey, instance)
 }
 
 func GetRequestPermissionsFromCtx(ctx context.Context) []string {

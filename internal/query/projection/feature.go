@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -12,55 +10,15 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/features"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-type FeatureProjection struct {
-	crdb.StatementHandler
-}
-
 const (
-	FeatureTable = "zitadel.projections.features"
-)
+	FeatureTable = "projections.features"
 
-func NewFeatureProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FeatureProjection {
-	p := new(FeatureProjection)
-	config.ProjectionName = FeatureTable
-	config.Reducers = p.reducers()
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
-}
-
-func (p *FeatureProjection) reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  org.FeaturesSetEventType,
-					Reduce: p.reduceFeatureSet,
-				},
-				{
-					Event:  org.FeaturesRemovedEventType,
-					Reduce: p.reduceFeatureRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: iam.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  iam.FeaturesSetEventType,
-					Reduce: p.reduceFeatureSet,
-				},
-			},
-		},
-	}
-}
-
-const (
 	FeatureAggregateIDCol              = "aggregate_id"
+	FeatureInstanceIDCol               = "instance_id"
 	FeatureChangeDateCol               = "change_date"
 	FeatureSequenceCol                 = "sequence"
 	FeatureIsDefaultCol                = "is_default"
@@ -88,23 +46,95 @@ const (
 	FeatureMaxActionsCol               = "max_actions"
 )
 
+type FeatureProjection struct {
+	crdb.StatementHandler
+}
+
+func NewFeatureProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FeatureProjection {
+	p := new(FeatureProjection)
+	config.ProjectionName = FeatureTable
+	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(FeatureAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FeatureInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FeatureChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(FeatureSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(FeatureIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureTierNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FeatureTierDescriptionCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FeatureStateCol, crdb.ColumnTypeEnum, crdb.Default(0)),
+			crdb.NewColumn(FeatureStateDescriptionCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FeatureAuditLogRetentionCol, crdb.ColumnTypeInt64, crdb.Default(0)),
+			crdb.NewColumn(FeatureLoginPolicyFactorsCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLoginPolicyIDPCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLoginPolicyPasswordlessCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLoginPolicyRegistrationCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLoginPolicyUsernameLoginCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLoginPolicyPasswordResetCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeaturePasswordComplexityPolicyCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLabelPolicyPrivateLabelCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLabelPolicyWatermarkCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureCustomDomainCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeaturePrivacyPolicyCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureMetadataUserCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureCustomTextMessageCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureCustomTextLoginCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureLockoutPolicyCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(FeatureActionsAllowedCol, crdb.ColumnTypeEnum, crdb.Default(0)),
+			crdb.NewColumn(FeatureMaxActionsCol, crdb.ColumnTypeInt64, crdb.Default(0)),
+		},
+			crdb.NewPrimaryKey(FeatureInstanceIDCol, FeatureAggregateIDCol),
+		),
+	)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	return p
+}
+
+func (p *FeatureProjection) reducers() []handler.AggregateReducer {
+	return []handler.AggregateReducer{
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.FeaturesSetEventType,
+					Reduce: p.reduceFeatureSet,
+				},
+				{
+					Event:  org.FeaturesRemovedEventType,
+					Reduce: p.reduceFeatureRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.FeaturesSetEventType,
+					Reduce: p.reduceFeatureSet,
+				},
+			},
+		},
+	}
+}
+
 func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.Statement, error) {
 	var featureEvent features.FeaturesSetEvent
 	var isDefault bool
 	switch e := event.(type) {
-	case *iam.FeaturesSetEvent:
+	case *instance.FeaturesSetEvent:
 		featureEvent = e.FeaturesSetEvent
 		isDefault = true
 	case *org.FeaturesSetEvent:
 		featureEvent = e.FeaturesSetEvent
 		isDefault = false
 	default:
-		logging.LogWithFields("HANDL-M9ets", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.FeaturesSetEventType, iam.FeaturesSetEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-K0erf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-K0erf", "reduce.wrong.event.type %v", []eventstore.EventType{org.FeaturesSetEventType, instance.FeaturesSetEventType})
 	}
 
 	cols := []handler.Column{
 		handler.NewCol(FeatureAggregateIDCol, featureEvent.Aggregate().ID),
+		handler.NewCol(FeatureInstanceIDCol, featureEvent.Aggregate().InstanceID),
 		handler.NewCol(FeatureChangeDateCol, featureEvent.CreationDate()),
 		handler.NewCol(FeatureSequenceCol, featureEvent.Sequence()),
 		handler.NewCol(FeatureIsDefaultCol, isDefault),
@@ -196,8 +226,7 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 func (p *FeatureProjection) reduceFeatureRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FeaturesRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-fN903", "seq", event.Sequence(), "expectedType", org.FeaturesRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-0p4rf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0p4rf", "reduce.wrong.event.type %s", org.FeaturesRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

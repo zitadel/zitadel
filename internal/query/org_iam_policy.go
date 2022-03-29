@@ -7,12 +7,15 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
-type OrgIAMPolicy struct {
+type DomainPolicy struct {
 	ID            string
 	Sequence      uint64
 	CreationDate  time.Time
@@ -26,55 +29,64 @@ type OrgIAMPolicy struct {
 }
 
 var (
-	orgIAMTable = table{
-		name: projection.OrgIAMPolicyTable,
+	domainPolicyTable = table{
+		name: projection.DomainPolicyTable,
 	}
-	OrgIAMColID = Column{
-		name:  projection.OrgIAMPolicyIDCol,
-		table: orgIAMTable,
+	DomainPolicyColID = Column{
+		name:  projection.DomainPolicyIDCol,
+		table: domainPolicyTable,
 	}
-	OrgIAMColSequence = Column{
-		name:  projection.OrgIAMPolicySequenceCol,
-		table: orgIAMTable,
+	DomainPolicyColSequence = Column{
+		name:  projection.DomainPolicySequenceCol,
+		table: domainPolicyTable,
 	}
-	OrgIAMColCreationDate = Column{
-		name:  projection.OrgIAMPolicyCreationDateCol,
-		table: orgIAMTable,
+	DomainPolicyColCreationDate = Column{
+		name:  projection.DomainPolicyCreationDateCol,
+		table: domainPolicyTable,
 	}
-	OrgIAMColChangeDate = Column{
-		name:  projection.OrgIAMPolicyChangeDateCol,
-		table: orgIAMTable,
+	DomainPolicyColChangeDate = Column{
+		name:  projection.DomainPolicyChangeDateCol,
+		table: domainPolicyTable,
 	}
-	OrgIAMColResourceOwner = Column{
-		name:  projection.OrgIAMPolicyResourceOwnerCol,
-		table: orgIAMTable,
+	DomainPolicyColResourceOwner = Column{
+		name:  projection.DomainPolicyResourceOwnerCol,
+		table: domainPolicyTable,
 	}
-	OrgIAMColUserLoginMustBeDomain = Column{
-		name:  projection.OrgIAMPolicyUserLoginMustBeDomainCol,
-		table: orgIAMTable,
+	DomainPolicyColInstanceID = Column{
+		name:  projection.DomainPolicyInstanceIDCol,
+		table: domainPolicyTable,
 	}
-	OrgIAMColIsDefault = Column{
-		name:  projection.OrgIAMPolicyIsDefaultCol,
-		table: orgIAMTable,
+	DomainPolicyColUserLoginMustBeDomain = Column{
+		name:  projection.DomainPolicyUserLoginMustBeDomainCol,
+		table: domainPolicyTable,
 	}
-	OrgIAMColState = Column{
-		name:  projection.OrgIAMPolicyStateCol,
-		table: orgIAMTable,
+	DomainPolicyColIsDefault = Column{
+		name:  projection.DomainPolicyIsDefaultCol,
+		table: domainPolicyTable,
+	}
+	DomainPolicyColState = Column{
+		name:  projection.DomainPolicyStateCol,
+		table: domainPolicyTable,
 	}
 )
 
-func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
-	stmt, scan := prepareOrgIAMPolicyQuery()
+func (q *Queries) DomainPolicyByOrg(ctx context.Context, orgID string) (*DomainPolicy, error) {
+	stmt, scan := prepareDomainPolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				OrgIAMColID.identifier(): orgID,
+				DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
-			sq.Eq{
-				OrgIAMColID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					DomainPolicyColID.identifier(): orgID,
+				},
+				sq.Eq{
+					DomainPolicyColID.identifier(): domain.IAMID,
+				},
 			},
 		}).
-		OrderBy(OrgIAMColIsDefault.identifier()).
+		OrderBy(DomainPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-D3CqT", "Errors.Query.SQLStatement")
@@ -84,12 +96,13 @@ func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMP
 	return scan(row)
 }
 
-func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error) {
-	stmt, scan := prepareOrgIAMPolicyQuery()
+func (q *Queries) DefaultDomainPolicy(ctx context.Context) (*DomainPolicy, error) {
+	stmt, scan := prepareDomainPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgIAMColID.identifier(): domain.IAMID,
+		DomainPolicyColID.identifier():         domain.IAMID,
+		DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).
-		OrderBy(OrgIAMColIsDefault.identifier()).
+		OrderBy(DomainPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-pM7lP", "Errors.Query.SQLStatement")
@@ -99,20 +112,20 @@ func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error
 	return scan(row)
 }
 
-func prepareOrgIAMPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgIAMPolicy, error)) {
+func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy, error)) {
 	return sq.Select(
-			OrgIAMColID.identifier(),
-			OrgIAMColSequence.identifier(),
-			OrgIAMColCreationDate.identifier(),
-			OrgIAMColChangeDate.identifier(),
-			OrgIAMColResourceOwner.identifier(),
-			OrgIAMColUserLoginMustBeDomain.identifier(),
-			OrgIAMColIsDefault.identifier(),
-			OrgIAMColState.identifier(),
+			DomainPolicyColID.identifier(),
+			DomainPolicyColSequence.identifier(),
+			DomainPolicyColCreationDate.identifier(),
+			DomainPolicyColChangeDate.identifier(),
+			DomainPolicyColResourceOwner.identifier(),
+			DomainPolicyColUserLoginMustBeDomain.identifier(),
+			DomainPolicyColIsDefault.identifier(),
+			DomainPolicyColState.identifier(),
 		).
-			From(orgIAMTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*OrgIAMPolicy, error) {
-			policy := new(OrgIAMPolicy)
+			From(domainPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*DomainPolicy, error) {
+			policy := new(DomainPolicy)
 			err := row.Scan(
 				&policy.ID,
 				&policy.Sequence,
@@ -125,7 +138,7 @@ func prepareOrgIAMPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgIAMPolicy
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-K0Jr5", "Errors.OrgIAMPolicy.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-K0Jr5", "Errors.DomainPolicy.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-rIy6j", "Errors.Internal")
 			}

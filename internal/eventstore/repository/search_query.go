@@ -66,6 +66,8 @@ const (
 	FieldSequence
 	//FieldResourceOwner represents the resource owner field
 	FieldResourceOwner
+	//FieldInstanceID represents the instance id field
+	FieldInstanceID
 	//FieldEditorService represents the editor service field
 	FieldEditorService
 	//FieldEditorUser represents the editor user field

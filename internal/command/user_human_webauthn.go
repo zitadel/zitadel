@@ -149,7 +149,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner s
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	orgPolicy, err := c.getOrgIAMPolicy(ctx, org.AggregateID)
+	orgPolicy, err := c.getOrgDomainPolicy(ctx, org.AggregateID)
 	if err != nil {
 		return nil, nil, nil, err
 	}

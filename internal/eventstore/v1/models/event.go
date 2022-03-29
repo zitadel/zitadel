@@ -28,6 +28,7 @@ type Event struct {
 	EditorService    string
 	EditorUser       string
 	ResourceOwner    string
+	InstanceID       string
 }
 
 func eventData(i interface{}) ([]byte, error) {

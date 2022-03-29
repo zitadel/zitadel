@@ -12,6 +12,7 @@ import (
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -44,7 +45,8 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -82,13 +84,13 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		return
 	}
 	metadata := externalUser.Metadatas
-	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, authReq.InstanceID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.jwtExtractionUserNotFound(w, r, authReq, idpConfig, tokens, err)
 		return
 	}
 	if len(metadata) > 0 {
-		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, authReq.InstanceID)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
@@ -115,13 +117,13 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		return
 	}
-	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, authReq.InstanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
 	resourceOwner := l.getOrgID(authReq)
-	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -133,12 +135,12 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, authReq.InstanceID, metadata, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, authReq.InstanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -207,7 +209,8 @@ func (l *Login) handleJWTCallback(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

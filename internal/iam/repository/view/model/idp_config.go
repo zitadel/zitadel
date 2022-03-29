@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -24,6 +24,7 @@ const (
 	IDPConfigKeyAggregateID  = "aggregate_id"
 	IDPConfigKeyName         = "name"
 	IDPConfigKeyProviderType = "idp_provider_type"
+	IDPConfigKeyInstanceID   = "instance_id"
 )
 
 type IDPConfigView struct {
@@ -50,7 +51,8 @@ type IDPConfigView struct {
 	JWTKeysEndpoint            string              `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
 	JWTHeaderName              string              `json:"headerName" gorm:"jwt_header_name"`
 
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
+	Sequence   uint64 `json:"-" gorm:"column:sequence"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
@@ -107,8 +109,8 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 		err = i.SetData(event)
 	case es_model.OIDCIDPConfigChanged, org_es_model.OIDCIDPConfigChanged,
 		es_model.IDPConfigChanged, org_es_model.IDPConfigChanged,
-		models.EventType(org.IDPJWTConfigAddedEventType), models.EventType(iam.IDPJWTConfigAddedEventType),
-		models.EventType(org.IDPJWTConfigChangedEventType), models.EventType(iam.IDPJWTConfigChangedEventType):
+		models.EventType(org.IDPJWTConfigAddedEventType), models.EventType(instance.IDPJWTConfigAddedEventType),
+		models.EventType(org.IDPJWTConfigChangedEventType), models.EventType(instance.IDPJWTConfigChangedEventType):
 		err = i.SetData(event)
 	case es_model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated:
 		i.IDPState = int32(model.IDPConfigStateInactive)
@@ -120,6 +122,7 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 
 func (r *IDPConfigView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
+	r.InstanceID = event.InstanceID
 }
 
 func (r *IDPConfigView) SetData(event *models.Event) error {

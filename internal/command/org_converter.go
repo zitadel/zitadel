@@ -13,9 +13,9 @@ func orgWriteModelToOrg(wm *OrgWriteModel) *domain.Org {
 	}
 }
 
-func orgWriteModelToOrgIAMPolicy(wm *ORGOrgIAMPolicyWriteModel) *domain.OrgIAMPolicy {
-	return &domain.OrgIAMPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.PolicyOrgIAMWriteModel.WriteModel),
+func orgWriteModelToDomainPolicy(wm *OrgDomainPolicyWriteModel) *domain.DomainPolicy {
+	return &domain.DomainPolicy{
+		ObjectRoot:            writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
 		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
 	}
 }

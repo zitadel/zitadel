@@ -69,6 +69,10 @@ func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
 	return q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
 }
 
+func (q *SearchQuery) InstanceIDFilter(instanceID string) *SearchQuery {
+	return q.setFilter(NewFilter(Field_InstanceID, instanceID, Operation_Equals))
+}
+
 func (q *SearchQuery) CreationDateNewerFilter(time time.Time) *SearchQuery {
 	return q.setFilter(NewFilter(Field_CreationDate, time, Operation_Greater))
 }

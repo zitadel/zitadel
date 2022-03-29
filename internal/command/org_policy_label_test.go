@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 	"github.com/caos/zitadel/internal/static"
@@ -112,8 +112,8 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -160,8 +160,8 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -341,8 +341,8 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -406,8 +406,8 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -471,8 +471,8 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",

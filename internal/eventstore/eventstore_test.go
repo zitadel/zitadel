@@ -29,8 +29,8 @@ func newTestEvent(id, description string, data func() interface{}, checkPrevious
 		data:                data,
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
-			service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
-			NewAggregate(authz.NewMockContext("caos", "adlerhurst"), id, "test.aggregate", "v1"),
+			service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
+			NewAggregate(authz.NewMockContext("zitadel", "caos", "adlerhurst"), id, "test.aggregate", "v1"),
 			"test.event",
 		),
 	}
@@ -344,7 +344,8 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		events []Command
+		instanceID string
+		events     []Command
 	}
 	type res struct {
 		wantErr bool
@@ -358,6 +359,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
+				instanceID: "instanceID",
 				events: []Command{
 					newTestEvent(
 						"1",
@@ -378,6 +380,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
 						ResourceOwner: sql.NullString{String: "caos", Valid: true},
+						InstanceID:    sql.NullString{String: "instanceID", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -387,6 +390,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
+				instanceID: "instanceID",
 				events: []Command{
 					newTestEvent(
 						"1",
@@ -414,6 +418,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
 						ResourceOwner: sql.NullString{String: "caos", Valid: true},
+						InstanceID:    sql.NullString{String: "instanceID", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -424,6 +429,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
 						ResourceOwner: sql.NullString{String: "caos", Valid: true},
+						InstanceID:    sql.NullString{String: "instanceID", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -433,6 +439,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "invalid data",
 			args: args{
+				instanceID: "instanceID",
 				events: []Command{
 					newTestEvent(
 						"1",
@@ -453,9 +460,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 				events: []Command{
 					&testEvent{
 						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
 							NewAggregate(
-								authz.NewMockContext("caos", "adlerhurst"),
+								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
 								"",
 								"test.aggregate",
 								"v1",
@@ -478,9 +485,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 				events: []Command{
 					&testEvent{
 						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
 							NewAggregate(
-								authz.NewMockContext("caos", "adlerhurst"),
+								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
 								"id",
 								"",
 								"v1",
@@ -503,9 +510,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 				events: []Command{
 					&testEvent{
 						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
 							NewAggregate(
-								authz.NewMockContext("caos", "adlerhurst"),
+								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
 								"id",
 								"test.aggregate",
 								"",
@@ -528,9 +535,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 				events: []Command{
 					&testEvent{
 						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
 							NewAggregate(
-								authz.NewMockContext("caos", "adlerhurst"),
+								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
 								"id",
 								"test.aggregate",
 								"v1",
@@ -553,9 +560,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 				events: []Command{
 					&testEvent{
 						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("", "editorUser"), "editorService"),
+							service.WithService(authz.NewMockContext("instanceID", "", "editorUser"), "editorService"),
 							NewAggregate(
-								authz.NewMockContext("", "adlerhurst"),
+								authz.NewMockContext("zitadel", "", "adlerhurst"),
 								"id",
 								"test.aggregate",
 								"v1",
@@ -578,6 +585,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
 						ResourceOwner: sql.NullString{String: "", Valid: false},
+						InstanceID:    sql.NullString{String: "zitadel"},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -622,6 +630,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
 							ResourceOwner: sql.NullString{String: "caos", Valid: true},
+							InstanceID:    sql.NullString{String: "zitadel"},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -632,6 +641,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
 							ResourceOwner: sql.NullString{String: "caos", Valid: true},
+							InstanceID:    sql.NullString{String: "zitadel"},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -644,6 +654,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
 							ResourceOwner: sql.NullString{String: "caos", Valid: true},
+							InstanceID:    sql.NullString{String: "zitadel"},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -654,7 +665,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			events, _, err := commandsToRepository(tt.args.events)
+			events, _, err := commandsToRepository(tt.args.instanceID, tt.args.events)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
@@ -761,6 +772,7 @@ func TestEventstore_Push(t *testing.T) {
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
 							ResourceOwner: sql.NullString{String: "caos", Valid: true},
+							InstanceID:    sql.NullString{String: "zitadel"},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -804,6 +816,7 @@ func TestEventstore_Push(t *testing.T) {
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
 							ResourceOwner: sql.NullString{String: "caos", Valid: true},
+							InstanceID:    sql.NullString{String: "zitadel"},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -814,6 +827,7 @@ func TestEventstore_Push(t *testing.T) {
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
 							ResourceOwner: sql.NullString{String: "caos", Valid: true},
+							InstanceID:    sql.NullString{String: "zitadel"},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -868,6 +882,7 @@ func TestEventstore_Push(t *testing.T) {
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
 								ResourceOwner: sql.NullString{String: "caos", Valid: true},
+								InstanceID:    sql.NullString{String: "zitadel"},
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -878,6 +893,7 @@ func TestEventstore_Push(t *testing.T) {
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
 								ResourceOwner: sql.NullString{String: "caos", Valid: true},
+								InstanceID:    sql.NullString{String: "zitadel"},
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -890,6 +906,7 @@ func TestEventstore_Push(t *testing.T) {
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
 								ResourceOwner: sql.NullString{String: "caos", Valid: true},
+								InstanceID:    sql.NullString{String: "zitadel"},
 								Type:          "test.event",
 								Version:       "v1",
 							},

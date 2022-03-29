@@ -27,19 +27,22 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.flows_triggers.trigger_type,`+
-						` zitadel.projections.flows_triggers.trigger_sequence,`+
-						` zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.flows_triggers.trigger_type,`+
+						` projections.flows_triggers.trigger_sequence,`+
+						` projections.flows_triggers.flow_type,`+
+						` projections.flows_triggers.change_date,`+
+						` projections.flows_triggers.sequence,`+
+						` projections.flows_triggers.resource_owner`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					nil,
 					nil,
 				),
@@ -51,19 +54,22 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.flows_triggers.trigger_type,`+
-						` zitadel.projections.flows_triggers.trigger_sequence,`+
-						` zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.flows_triggers.trigger_type,`+
+						` projections.flows_triggers.trigger_sequence,`+
+						` projections.flows_triggers.flow_type,`+
+						` projections.flows_triggers.change_date,`+
+						` projections.flows_triggers.sequence,`+
+						` projections.flows_triggers.resource_owner`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -73,9 +79,13 @@ func Test_FlowPrepares(t *testing.T) {
 						"sequence",
 						"name",
 						"script",
+						//flow
 						"trigger_type",
 						"trigger_sequence",
 						"flow_type",
+						"change_date",
+						"sequence",
+						"resource_owner",
 					},
 					[][]driver.Value{
 						{
@@ -90,12 +100,18 @@ func Test_FlowPrepares(t *testing.T) {
 							domain.TriggerTypePreCreation,
 							uint64(20211109),
 							domain.FlowTypeExternalAuthentication,
+							testNow,
+							uint64(20211115),
+							"owner",
 						},
 					},
 				),
 			},
 			object: &Flow{
-				Type: domain.FlowTypeExternalAuthentication,
+				ChangeDate:    testNow,
+				ResourceOwner: "owner",
+				Sequence:      20211115,
+				Type:          domain.FlowTypeExternalAuthentication,
 				TriggerActions: map[domain.TriggerType][]*Action{
 					domain.TriggerTypePreCreation: {
 						{
@@ -117,19 +133,22 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.flows_triggers.trigger_type,`+
-						` zitadel.projections.flows_triggers.trigger_sequence,`+
-						` zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.flows_triggers.trigger_type,`+
+						` projections.flows_triggers.trigger_sequence,`+
+						` projections.flows_triggers.flow_type,`+
+						` projections.flows_triggers.change_date,`+
+						` projections.flows_triggers.sequence,`+
+						` projections.flows_triggers.resource_owner`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -139,9 +158,13 @@ func Test_FlowPrepares(t *testing.T) {
 						"sequence",
 						"name",
 						"script",
+						//flow
 						"trigger_type",
 						"trigger_sequence",
 						"flow_type",
+						"change_date",
+						"sequence",
+						"resource_owner",
 					},
 					[][]driver.Value{
 						{
@@ -156,6 +179,9 @@ func Test_FlowPrepares(t *testing.T) {
 							domain.TriggerTypePreCreation,
 							uint64(20211109),
 							domain.FlowTypeExternalAuthentication,
+							testNow,
+							uint64(20211115),
+							"owner",
 						},
 						{
 							"action-id-post",
@@ -169,12 +195,18 @@ func Test_FlowPrepares(t *testing.T) {
 							domain.TriggerTypePostCreation,
 							uint64(20211109),
 							domain.FlowTypeExternalAuthentication,
+							testNow,
+							uint64(20211115),
+							"owner",
 						},
 					},
 				),
 			},
 			object: &Flow{
-				Type: domain.FlowTypeExternalAuthentication,
+				ChangeDate:    testNow,
+				ResourceOwner: "owner",
+				Sequence:      20211115,
+				Type:          domain.FlowTypeExternalAuthentication,
 				TriggerActions: map[domain.TriggerType][]*Action{
 					domain.TriggerTypePreCreation: {
 						{
@@ -208,19 +240,22 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.flows_triggers.trigger_type,`+
-						` zitadel.projections.flows_triggers.trigger_sequence,`+
-						` zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.flows_triggers.trigger_type,`+
+						` projections.flows_triggers.trigger_sequence,`+
+						` projections.flows_triggers.flow_type,`+
+						` projections.flows_triggers.change_date,`+
+						` projections.flows_triggers.sequence,`+
+						` projections.flows_triggers.resource_owner`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -230,9 +265,13 @@ func Test_FlowPrepares(t *testing.T) {
 						"sequence",
 						"name",
 						"script",
+						//flow
 						"trigger_type",
 						"trigger_sequence",
 						"flow_type",
+						"change_date",
+						"sequence",
+						"resource_owner",
 					},
 					[][]driver.Value{
 						{
@@ -247,11 +286,17 @@ func Test_FlowPrepares(t *testing.T) {
 							domain.TriggerTypePostCreation,
 							uint64(20211109),
 							domain.FlowTypeExternalAuthentication,
+							testNow,
+							uint64(20211115),
+							"owner",
 						},
 					},
 				),
 			},
 			object: &Flow{
+				ChangeDate:     testNow,
+				ResourceOwner:  "owner",
+				Sequence:       20211115,
 				Type:           domain.FlowTypeExternalAuthentication,
 				TriggerActions: map[domain.TriggerType][]*Action{},
 			},
@@ -261,19 +306,22 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.flows_triggers.trigger_type,`+
-						` zitadel.projections.flows_triggers.trigger_sequence,`+
-						` zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.flows_triggers.trigger_type,`+
+						` projections.flows_triggers.trigger_sequence,`+
+						` projections.flows_triggers.flow_type,`+
+						` projections.flows_triggers.change_date,`+
+						` projections.flows_triggers.sequence,`+
+						` projections.flows_triggers.resource_owner`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -290,16 +338,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					nil,
 					nil,
 				),
@@ -311,16 +359,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -363,16 +411,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -435,16 +483,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script`+
-						` FROM zitadel.projections.flows_triggers`+
-						` LEFT JOIN zitadel.projections.actions ON zitadel.projections.flows_triggers.action_id = zitadel.projections.actions.id`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.action_state,`+
+						` projections.actions.sequence,`+
+						` projections.actions.name,`+
+						` projections.actions.script`+
+						` FROM projections.flows_triggers`+
+						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -461,8 +509,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
+						` FROM projections.flows_triggers`),
 					nil,
 					nil,
 				),
@@ -474,8 +522,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
+						` FROM projections.flows_triggers`),
 					[]string{
 						"flow_type",
 					},
@@ -495,8 +543,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
+						` FROM projections.flows_triggers`),
 					[]string{
 						"flow_type",
 					},
@@ -520,8 +568,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.flows_triggers.flow_type`+
-						` FROM zitadel.projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
+						` FROM projections.flows_triggers`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

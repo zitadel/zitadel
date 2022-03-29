@@ -374,6 +374,7 @@ UserTypeQuery is always equals
 | project_name |  string | - |  |
 | project_grant_id |  string | - |  |
 | avatar_url |  string | - |  |
+| preferred_login_name |  string | - |  |
 
 
 

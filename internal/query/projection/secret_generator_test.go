@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func TestSecretGeneratorProjection_reduces(t *testing.T) {
@@ -26,21 +26,21 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			name: "reduceSecretGeneratorRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SecretGeneratorRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SecretGeneratorRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{"generatorType": 1}`),
-				), iam.SecretGeneratorRemovedEventMapper),
+				), instance.SecretGeneratorRemovedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.secret_generators WHERE (aggregate_id = $1) AND (generator_type = $2)",
+							expectedStmt: "DELETE FROM projections.secret_generators WHERE (aggregate_id = $1) AND (generator_type = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.SecretGeneratorTypeInitCode,
@@ -54,21 +54,21 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			name: "reduceSecretGeneratorChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SecretGeneratorChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SecretGeneratorChangedEventType),
+					instance.AggregateType,
 					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
-				), iam.SecretGeneratorChangedEventMapper),
+				), instance.SecretGeneratorChangedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.secret_generators SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10)",
+							expectedStmt: "UPDATE projections.secret_generators SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -90,27 +90,28 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			name: "reduceSecretGeneratorAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SecretGeneratorAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SecretGeneratorAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
-				), iam.SecretGeneratorAddedEventMapper),
+				), instance.SecretGeneratorAddedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.secret_generators (aggregate_id, generator_type, creation_date, change_date, resource_owner, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.secret_generators (aggregate_id, generator_type, creation_date, change_date, resource_owner, instance_id, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.SecretGeneratorTypeInitCode,
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								uint64(15),
 								uint(4),
 								time.Millisecond * 10,

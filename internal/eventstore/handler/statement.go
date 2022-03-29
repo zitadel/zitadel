@@ -27,6 +27,7 @@ type Statement struct {
 	AggregateType    eventstore.AggregateType
 	Sequence         uint64
 	PreviousSequence uint64
+	InstanceID       string
 
 	Execute func(ex Executer, projectionName string) error
 }
@@ -55,7 +56,7 @@ func NewCol(name string, value interface{}) Column {
 func NewJSONCol(name string, value interface{}) Column {
 	marshalled, err := json.Marshal(value)
 	if err != nil {
-		logging.LogWithFields("HANDL-oFvsl", "column", name).WithError(err).Panic("unable to marshal column")
+		logging.WithFields("column", name).WithError(err).Panic("unable to marshal column")
 	}
 
 	return NewCol(name, marshalled)

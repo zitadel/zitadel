@@ -317,8 +317,7 @@ type HumanU2FLoginReadModel struct {
 	Challenge            string
 	AllowedCredentialIDs [][]byte
 	UserVerification     domain.UserVerificationRequirement
-	User
-	State domain.UserState
+	State                domain.UserState
 }
 
 func NewHumanU2FLoginReadModel(userID, authReqID, resourceOwner string) *HumanU2FLoginReadModel {

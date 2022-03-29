@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 var (
@@ -28,11 +28,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam.reduceSMSTwilioAdded",
+			name: "instance.reduceSMSTwilioAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigTwilioAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigTwilioAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id",
 						"sid": "sid",
@@ -43,30 +43,31 @@ func TestSMSProjection_reduces(t *testing.T) {
 						},
 						"senderNumber": "sender-number"
 					}`),
-				), iam.SMSConfigTwilioAddedEventMapper),
+				), instance.SMSConfigTwilioAddedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.sms_configs (id, aggregate_id, creation_date, change_date, resource_owner, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.sms_configs (id, aggregate_id, creation_date, change_date, resource_owner, instance_id, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"id",
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								domain.SMSConfigStateInactive,
 								uint64(15),
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.sms_configs_twilio (sms_id, sid, token, sender_number) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.sms_configs_twilio (sms_id, sid, token, sender_number) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"id",
 								"sid",
@@ -79,28 +80,28 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigTwilioChanged",
+			name: "instance.reduceSMSConfigTwilioChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigTwilioChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigTwilioChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id",
 						"sid": "sid",
 						"senderNumber": "sender-number"
 					}`),
-				), iam.SMSConfigTwilioChangedEventMapper),
+				), instance.SMSConfigTwilioChangedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3)",
 							expectedArgs: []interface{}{
 								&sid,
 								&senderNumber,
@@ -108,7 +109,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -120,26 +121,26 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigActivated",
+			name: "instance.reduceSMSConfigActivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigActivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigActivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id"
 					}`),
-				), iam.SMSConfigActivatedEventMapper),
+				), instance.SMSConfigActivatedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigActivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateActive,
 								anyArg{},
@@ -152,26 +153,26 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigDeactivated",
+			name: "instance.reduceSMSConfigDeactivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigDeactivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigDeactivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id"
 					}`),
-				), iam.SMSConfigDeactivatedEventMapper),
+				), instance.SMSConfigDeactivatedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateInactive,
 								anyArg{},
@@ -184,26 +185,26 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigRemoved",
+			name: "instance.reduceSMSConfigRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id"
 					}`),
-				), iam.SMSConfigRemovedEventMapper),
+				), instance.SMSConfigRemovedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.sms_configs WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.sms_configs WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"id",
 							},

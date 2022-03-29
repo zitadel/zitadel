@@ -30,3 +30,11 @@ func IsErrorInvalidArgument(err error) bool {
 	_, ok := err.(InvalidArgument)
 	return ok
 }
+
+func (err *InvalidArgumentError) Is(target error) bool {
+	t, ok := target.(*InvalidArgumentError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}

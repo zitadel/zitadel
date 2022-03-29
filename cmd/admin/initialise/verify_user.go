@@ -5,7 +5,6 @@ import (
 	_ "embed"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/database"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -30,22 +29,21 @@ The user provided by flags needs priviledge to
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			config := Config{}
-			if err := viper.Unmarshal(&config); err != nil {
-				return err
-			}
-			return initialise(config, verifyUser(config.Database))
+		Run: func(cmd *cobra.Command, args []string) {
+			config := MustNewConfig(viper.New())
+
+			err := initialise(config, VerifyUser(config.Database.Username, config.Database.Password))
+			logging.OnError(err).Fatal("unable to init user")
 		},
 	}
 }
 
-func verifyUser(config database.Config) func(*sql.DB) error {
+func VerifyUser(username, password string) func(*sql.DB) error {
 	return func(db *sql.DB) error {
-		logging.WithFields("username", config.Username).Info("verify user")
+		logging.WithFields("username", username).Info("verify user")
 		return verify(db,
-			exists(searchUser, config.Username),
-			exec(createUserStmt, config.Username, &sql.NullString{String: config.Password, Valid: config.Password != ""}),
+			exists(searchUser, username),
+			exec(createUserStmt, username, &sql.NullString{String: password, Valid: password != ""}),
 		)
 	}
 }

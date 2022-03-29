@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -46,7 +46,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -59,6 +59,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 								false,
 							},
 						},
@@ -90,7 +91,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -124,7 +125,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.password_complexity_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.password_complexity_policies WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -134,12 +135,12 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&PasswordComplexityProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordComplexityPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordComplexityPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"minLength": 10,
 			"hasLowercase": true,
@@ -147,17 +148,17 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			"HasNumber": true,
 			"HasSymbol": true
 					}`),
-				), iam.PasswordComplexityPolicyAddedEventMapper),
+				), instance.PasswordComplexityPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PasswordComplexityTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -170,6 +171,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 								true,
 							},
 						},
@@ -178,12 +180,12 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&PasswordComplexityProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordComplexityPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordComplexityPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"minLength": 10,
 			"hasLowercase": true,
@@ -191,17 +193,17 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			"HasNumber": true,
 			"HasSymbol": true
 					}`),
-				), iam.PasswordComplexityPolicyChangedEventMapper),
+				), instance.PasswordComplexityPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PasswordComplexityTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

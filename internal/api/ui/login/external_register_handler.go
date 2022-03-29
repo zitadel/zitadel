@@ -8,6 +8,7 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -67,7 +68,8 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID, instanceID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -87,7 +89,8 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -111,7 +114,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+	iam, err := l.query.Instance(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -120,7 +123,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	if authReq.RequestedOrgID != "" {
 		resourceOwner = authReq.RequestedOrgID
 	}
-	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -137,7 +140,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
 }
 
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.Instance, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := iam.GlobalOrgID
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
@@ -163,7 +166,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.OrgIAMPolicy, human *domain.Human, idp *domain.UserIDPLink, err error) {
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idp *domain.UserIDPLink, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -204,7 +207,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+	iam, err := l.query.Instance(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -244,7 +247,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink) {
+func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.DomainPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink) {
 	username := tokens.IDTokenClaims.GetPreferredUsername()
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:

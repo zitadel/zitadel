@@ -2508,10 +2508,6 @@ func (wm *CustomLoginTextReadModel) handleFooterTextSetEvent(e *policy.CustomTex
 		wm.FooterHelp = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyFooterHelpLink {
-		wm.FooterHelpLink = e.Text
-		return
-	}
 }
 
 func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -2525,10 +2521,6 @@ func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.Custom
 	}
 	if e.Key == domain.LoginKeyFooterHelp {
 		wm.FooterHelp = ""
-		return
-	}
-	if e.Key == domain.LoginKeyFooterHelpLink {
-		wm.FooterHelpLink = ""
 		return
 	}
 }

@@ -71,7 +71,6 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
 
   const r3 = new FooterText();
   r3.setHelp(map.footerText?.help ?? '');
-  r3.setHelpLink(map.footerText?.helpLink ?? '');
   r3.setPrivacyPolicy(map.footerText?.privacyPolicy ?? '');
   r3.setTos(map.footerText?.tos ?? '');
   req.setFooterText(r3);
@@ -102,7 +101,6 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r6.setU2fOption(map.initMfaPromptText?.otpOption ?? '');
   req.setInitMfaPromptText(r6);
 
-
   const r7 = new InitMFAU2FScreenText();
   r7.setDescription(map.initMfaU2fText?.description ?? '');
   r7.setErrorRetry(map.initMfaU2fText?.errorRetry ?? '');
@@ -111,7 +109,6 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r7.setTitle(map.initMfaU2fText?.title ?? '');
   r7.setTokenNameLabel(map.initMfaU2fText?.tokenNameLabel ?? '');
   req.setInitMfaU2fText(r7);
-
 
   const r8 = new InitPasswordDoneScreenText();
   r8.setCancelButtonText(map.initPasswordDoneText?.cancelButtonText ?? '');
@@ -347,7 +344,6 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r32.setTitle(map.passwordlessRegistrationText?.title ?? '');
   r32.setTokenNameLabel(map.passwordlessRegistrationText?.tokenNameLabel ?? '');
   req.setPasswordlessRegistrationText(r32);
-
 
   const r33 = new PasswordlessScreenText();
   r33.setDescription(map.passwordlessText?.description ?? '');

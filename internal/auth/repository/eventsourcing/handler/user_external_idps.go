@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -137,9 +138,9 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 			return err
 		}
 		if event.AggregateType == iam_es_model.IAMAggregate {
-			config, err = i.getDefaultIDPConfig(context.Background(), configView.IDPConfigID)
+			config, err = i.getDefaultIDPConfig(event.InstanceID, configView.IDPConfigID)
 		} else {
-			config, err = i.getOrgIDPConfig(context.Background(), event.AggregateID, configView.IDPConfigID)
+			config, err = i.getOrgIDPConfig(event.InstanceID, event.AggregateID, configView.IDPConfigID)
 		}
 		if err != nil {
 			return err
@@ -155,9 +156,9 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 }
 
 func (i *ExternalIDP) fillData(externalIDP *usr_view_model.ExternalIDPView) error {
-	config, err := i.getOrgIDPConfig(context.Background(), externalIDP.ResourceOwner, externalIDP.IDPConfigID)
+	config, err := i.getOrgIDPConfig(externalIDP.InstanceID, externalIDP.ResourceOwner, externalIDP.IDPConfigID)
 	if caos_errs.IsNotFound(err) {
-		config, err = i.getDefaultIDPConfig(context.Background(), externalIDP.IDPConfigID)
+		config, err = i.getDefaultIDPConfig(externalIDP.InstanceID, externalIDP.IDPConfigID)
 	}
 	if err != nil {
 		return err
@@ -179,10 +180,10 @@ func (i *ExternalIDP) OnSuccess() error {
 	return spooler.HandleSuccess(i.view.UpdateExternalIDPSpoolerRunTimestamp)
 }
 
-func (i *ExternalIDP) getOrgIDPConfig(ctx context.Context, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, aggregateID)
+func (i *ExternalIDP) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, aggregateID)
 }
 
-func (i *ExternalIDP) getDefaultIDPConfig(ctx context.Context, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, domain.IAMID)
+func (i *ExternalIDP) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, domain.IAMID)
 }

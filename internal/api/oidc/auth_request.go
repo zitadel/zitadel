@@ -10,6 +10,7 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
@@ -45,7 +46,8 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
 	}
-	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
+	instanceID := authz.GetInstance(ctx).ID
+	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +57,9 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	resp, err := o.repo.AuthRequestByCode(ctx, code)
+
+	instanceID := authz.GetInstance(ctx).ID
+	resp, err := o.repo.AuthRequestByCode(ctx, code, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,13 +73,16 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
 	}
-	return o.repo.SaveAuthCode(ctx, id, code, userAgentID)
+	instanceID := authz.GetInstance(ctx).ID
+	return o.repo.SaveAuthCode(ctx, id, code, userAgentID, instanceID)
 }
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return o.repo.DeleteAuthRequest(ctx, id)
+
+	instanceID := authz.GetInstance(ctx).ID
+	return o.repo.DeleteAuthRequest(ctx, id, instanceID)
 }
 
 func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
@@ -88,7 +95,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
 	}
-	resp, err := o.command.AddUserToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -116,7 +123,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	if request, ok := req.(op.RefreshTokenRequest); ok {
 		request.SetCurrentScopes(scopes)
 	}
-	resp, token, err := o.command.AddAccessAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
+	resp, token, err := o.command.AddAccessAndRefreshToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(),
 		refreshToken, req.GetAudience(), scopes, authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
@@ -164,7 +171,10 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	if len(userIDs) == 0 {
 		return nil
 	}
-	err = o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	data := authz.CtxData{
+		UserID: userID,
+	}
+	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, userIDs)
 	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
 	return err
 }
@@ -247,4 +257,11 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 		token.Scopes = append(token.Scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return nil
+}
+
+func setContextUserSystem(ctx context.Context) context.Context {
+	data := authz.CtxData{
+		UserID: "SYSTEM",
+	}
+	return authz.SetCtxData(ctx, data)
 }

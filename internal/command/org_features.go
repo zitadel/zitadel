@@ -384,7 +384,7 @@ func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, orgID string) (*
 		return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
 	}
 
-	existingIAMFeatures := NewIAMFeaturesWriteModel()
+	existingIAMFeatures := NewInstanceFeaturesWriteModel()
 	err = c.eventstore.FilterToQueryReducer(ctx, existingIAMFeatures)
 	if err != nil {
 		return nil, err

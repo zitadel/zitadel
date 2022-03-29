@@ -12,16 +12,19 @@ import (
 )
 
 const (
-	eventstoreSchema    = "eventstore"
-	eventsTable         = "events"
-	projectionsSchema   = "projections"
-	systemSchema        = "system"
-	encryptionKeysTable = "encryption_key"
+	eventstoreSchema       = "eventstore"
+	eventsTable            = "events"
+	uniqueConstraintsTable = "unique_constraints"
+	projectionsSchema      = "projections"
+	systemSchema           = "system"
+	encryptionKeysTable    = "encryption_keys"
 )
 
 var (
-	searchTable  = "SELECT table_name FROM [SHOW TABLES] WHERE table_name = $1"
-	searchSchema = "SELECT schema_name FROM [SHOW SCHEMAS] WHERE schema_name = $1"
+	searchSchema         = "SELECT schema_name FROM [SHOW SCHEMAS] WHERE schema_name = $1"
+	searchTable          = "SELECT table_name FROM [SHOW TABLES] WHERE table_name = $1"
+	searchSystemSequence = "SELECT sequence_name FROM [SHOW SEQUENCES] WHERE sequence_name = 'system_seq'"
+
 	//go:embed sql/04_eventstore.sql
 	createEventstoreStmt string
 	//go:embed sql/05_projections.sql
@@ -34,6 +37,10 @@ var (
 	enableHashShardedIdx string
 	//go:embed sql/09_events_table.sql
 	createEventsStmt string
+	//go:embed sql/10_system_sequence.sql
+	createSystemSequenceStmt string
+	//go:embed sql/11_unique_constraints_table.sql
+	createUniqueConstraints string
 )
 
 func newZitadel() *cobra.Command {
@@ -55,13 +62,7 @@ Prereqesits:
 	}
 }
 
-func verifyZitadel(config database.Config) error {
-	logging.WithFields("database", config.Database).Info("verify database")
-	db, err := database.Connect(config)
-	if err != nil {
-		return err
-	}
-
+func VerifyZitadel(db *sql.DB) error {
 	if err := verify(db, exists(searchSchema, systemSchema), exec(createSystemStmt)); err != nil {
 		return err
 	}
@@ -80,6 +81,26 @@ func verifyZitadel(config database.Config) error {
 
 	if err := verify(db, exists(searchTable, eventsTable), createEvents); err != nil {
 		return err
+	}
+
+	if err := verify(db, exists(searchSystemSequence), exec(createSystemSequenceStmt)); err != nil {
+		return err
+	}
+
+	if err := verify(db, exists(searchTable, uniqueConstraintsTable), exec(createUniqueConstraints)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func verifyZitadel(config database.Config) error {
+	logging.WithFields("database", config.Database).Info("verify zitadel")
+	db, err := database.Connect(config)
+	if err != nil {
+		return err
+	}
+	if err := VerifyZitadel(db); err != nil {
+		return nil
 	}
 
 	return db.Close()

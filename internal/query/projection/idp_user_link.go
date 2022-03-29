@@ -3,14 +3,26 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
+)
+
+const (
+	IDPUserLinkTable             = "projections.idp_user_links"
+	IDPUserLinkIDPIDCol          = "idp_id"
+	IDPUserLinkUserIDCol         = "user_id"
+	IDPUserLinkExternalUserIDCol = "external_user_id"
+	IDPUserLinkCreationDateCol   = "creation_date"
+	IDPUserLinkChangeDateCol     = "change_date"
+	IDPUserLinkSequenceCol       = "sequence"
+	IDPUserLinkResourceOwnerCol  = "resource_owner"
+	IDPUserLinkInstanceIDCol     = "instance_id"
+	IDPUserLinkDisplayNameCol    = "display_name"
 )
 
 type IDPUserLinkProjection struct {
@@ -21,6 +33,22 @@ func NewIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 	p := new(IDPUserLinkProjection)
 	config.ProjectionName = IDPUserLinkTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(IDPUserLinkIDPIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkExternalUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPUserLinkChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPUserLinkSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(IDPUserLinkResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(IDPUserLinkInstanceIDCol, IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
+			crdb.WithIndex(crdb.NewIndex("user_idx", []string{IDPUserLinkUserIDCol})),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -62,10 +90,10 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.IDPConfigRemovedEventType,
+					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
 			},
@@ -73,23 +101,10 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	IDPUserLinkTable             = "zitadel.projections.idp_user_links"
-	IDPUserLinkIDPIDCol          = "idp_id"
-	IDPUserLinkUserIDCol         = "user_id"
-	IDPUserLinkExternalUserIDCol = "external_user_id"
-	IDPUserLinkCreationDateCol   = "creation_date"
-	IDPUserLinkChangeDateCol     = "change_date"
-	IDPUserLinkSequenceCol       = "sequence"
-	IDPUserLinkResourceOwnerCol  = "resource_owner"
-	IDPUserLinkDisplayNameCol    = "display_name"
-)
-
 func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-v2qC3", "seq", event.Sequence(), "expectedType", user.UserIDPLinkAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DpmXq", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DpmXq", "reduce.wrong.event.type %s", user.UserIDPLinkAddedType)
 	}
 
 	return crdb.NewCreateStatement(e,
@@ -101,6 +116,7 @@ func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.St
 			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
 			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
 			handler.NewCol(IDPUserLinkResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCol(IDPUserLinkDisplayNameCol, e.DisplayName),
 		},
 	), nil
@@ -109,8 +125,7 @@ func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.St
 func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", user.UserIDPLinkRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AZmfJ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", user.UserIDPLinkRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -125,8 +140,7 @@ func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.
 func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkCascadeRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-I0s2H", "seq", event.Sequence(), "expectedType", user.UserIDPLinkCascadeRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-jQpv9", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jQpv9", "reduce.wrong.event.type %s", user.UserIDPLinkCascadeRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -141,8 +155,7 @@ func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*h
 func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AZmfJ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -155,8 +168,7 @@ func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handl
 func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-yM6u6", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uwlWE", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uwlWE", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -172,11 +184,10 @@ func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
-	case *iam.IDPConfigRemovedEvent:
+	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		logging.LogWithFields("HANDL-7lZaf", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-iCKSj", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(event,

@@ -56,6 +56,9 @@ type Event struct {
 	// an aggregate can only be managed by one organisation
 	// use the ID of the org
 	ResourceOwner sql.NullString
+	//InstanceID is the instance where this event belongs to
+	// use the ID of the instance
+	InstanceID sql.NullString
 }
 
 //EventType is the description of the change

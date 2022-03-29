@@ -12,13 +12,13 @@ import (
 )
 
 var (
-	userMetadataQuery = `SELECT zitadel.projections.user_metadata.creation_date,` +
-		` zitadel.projections.user_metadata.change_date,` +
-		` zitadel.projections.user_metadata.resource_owner,` +
-		` zitadel.projections.user_metadata.sequence,` +
-		` zitadel.projections.user_metadata.key,` +
-		` zitadel.projections.user_metadata.value` +
-		` FROM zitadel.projections.user_metadata`
+	userMetadataQuery = `SELECT projections.user_metadata.creation_date,` +
+		` projections.user_metadata.change_date,` +
+		` projections.user_metadata.resource_owner,` +
+		` projections.user_metadata.sequence,` +
+		` projections.user_metadata.key,` +
+		` projections.user_metadata.value` +
+		` FROM projections.user_metadata`
 	userMetadataCols = []string{
 		"creation_date",
 		"change_date",
@@ -27,14 +27,14 @@ var (
 		"key",
 		"value",
 	}
-	userMetadataListQuery = `SELECT zitadel.projections.user_metadata.creation_date,` +
-		` zitadel.projections.user_metadata.change_date,` +
-		` zitadel.projections.user_metadata.resource_owner,` +
-		` zitadel.projections.user_metadata.sequence,` +
-		` zitadel.projections.user_metadata.key,` +
-		` zitadel.projections.user_metadata.value,` +
+	userMetadataListQuery = `SELECT projections.user_metadata.creation_date,` +
+		` projections.user_metadata.change_date,` +
+		` projections.user_metadata.resource_owner,` +
+		` projections.user_metadata.sequence,` +
+		` projections.user_metadata.key,` +
+		` projections.user_metadata.value,` +
 		` COUNT(*) OVER ()` +
-		` FROM zitadel.projections.user_metadata`
+		` FROM projections.user_metadata`
 	userMetadataListCols = []string{
 		"creation_date",
 		"change_date",

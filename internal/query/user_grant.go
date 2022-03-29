@@ -9,6 +9,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -23,15 +25,16 @@ type UserGrant struct {
 	GrantID      string
 	State        domain.UserGrantState
 
-	UserID            string
-	Username          string
-	UserType          domain.UserType
-	UserResourceOwner string
-	FirstName         string
-	LastName          string
-	Email             string
-	DisplayName       string
-	AvatarURL         string
+	UserID             string
+	Username           string
+	UserType           domain.UserType
+	UserResourceOwner  string
+	FirstName          string
+	LastName           string
+	Email              string
+	DisplayName        string
+	AvatarURL          string
+	PreferredLoginName string
 
 	ResourceOwner    string
 	OrgName          string
@@ -151,6 +154,10 @@ var (
 		name:  projection.UserGrantResourceOwner,
 		table: userGrantTable,
 	}
+	UserGrantInstanceID = Column{
+		name:  projection.UserGrantInstanceID,
+		table: userGrantTable,
+	}
 	UserGrantCreationDate = Column{
 		name:  projection.UserGrantCreationDate,
 		table: userGrantTable,
@@ -190,7 +197,10 @@ func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserG
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.ToSql()
+	stmt, args, err := query.
+		Where(sq.Eq{
+			UserGrantInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
 	}
@@ -201,7 +211,10 @@ func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserG
 
 func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries) (*UserGrants, error) {
 	query, scan := prepareUserGrantsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			UserGrantInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}
@@ -243,6 +256,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			HumanEmailCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
+			LoginNameNameCol.identifier(),
 
 			UserGrantResourceOwner.identifier(),
 			OrgColumnName.identifier(),
@@ -256,20 +270,24 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			Where(
+				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
+			).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*UserGrant, error) {
 			g := new(UserGrant)
 
 			var (
-				roles       = pq.StringArray{}
-				username    sql.NullString
-				firstName   sql.NullString
-				userType    sql.NullInt32
-				userOwner   sql.NullString
-				lastName    sql.NullString
-				email       sql.NullString
-				displayName sql.NullString
-				avatarURL   sql.NullString
+				roles              = pq.StringArray{}
+				username           sql.NullString
+				firstName          sql.NullString
+				userType           sql.NullInt32
+				userOwner          sql.NullString
+				lastName           sql.NullString
+				email              sql.NullString
+				displayName        sql.NullString
+				avatarURL          sql.NullString
+				preferredLoginName sql.NullString
 
 				orgName   sql.NullString
 				orgDomain sql.NullString
@@ -295,6 +313,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				&email,
 				&displayName,
 				&avatarURL,
+				&preferredLoginName,
 
 				&g.ResourceOwner,
 				&orgName,
@@ -319,6 +338,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			g.Email = email.String
 			g.DisplayName = displayName.String
 			g.AvatarURL = avatarURL.String
+			g.PreferredLoginName = preferredLoginName.String
 			g.OrgName = orgName.String
 			g.OrgPrimaryDomain = orgDomain.String
 			g.ProjectName = projectName.String
@@ -346,6 +366,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			HumanEmailCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
+			LoginNameNameCol.identifier(),
 
 			UserGrantResourceOwner.identifier(),
 			OrgColumnName.identifier(),
@@ -361,7 +382,10 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			Where(
+				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
+			).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*UserGrants, error) {
 			userGrants := make([]*UserGrant, 0)
 			var count uint64
@@ -369,15 +393,16 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				g := new(UserGrant)
 
 				var (
-					roles       = pq.StringArray{}
-					username    sql.NullString
-					userType    sql.NullInt32
-					userOwner   sql.NullString
-					firstName   sql.NullString
-					lastName    sql.NullString
-					email       sql.NullString
-					displayName sql.NullString
-					avatarURL   sql.NullString
+					roles              = pq.StringArray{}
+					username           sql.NullString
+					userType           sql.NullInt32
+					userOwner          sql.NullString
+					firstName          sql.NullString
+					lastName           sql.NullString
+					email              sql.NullString
+					displayName        sql.NullString
+					avatarURL          sql.NullString
+					preferredLoginName sql.NullString
 
 					orgName   sql.NullString
 					orgDomain sql.NullString
@@ -403,6 +428,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					&email,
 					&displayName,
 					&avatarURL,
+					&preferredLoginName,
 
 					&g.ResourceOwner,
 					&orgName,
@@ -426,6 +452,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				g.Email = email.String
 				g.DisplayName = displayName.String
 				g.AvatarURL = avatarURL.String
+				g.PreferredLoginName = preferredLoginName.String
 				g.OrgName = orgName.String
 				g.OrgPrimaryDomain = orgDomain.String
 				g.ProjectName = projectName.String

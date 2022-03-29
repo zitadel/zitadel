@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/zitadel/internal/query"
-
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
@@ -42,6 +40,7 @@ type NotifyUser struct {
 	PasswordSet        bool           `json:"-" gorm:"column:password_set"`
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	State              int32          `json:"-" gorm:"-"`
+	InstanceID         string         `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
@@ -99,14 +98,14 @@ func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string 
 	return u.UserName + "@" + domain
 }
 
-func (u *NotifyUser) SetLoginNames(policy *query.OrgIAMPolicy, domains []*org_model.OrgDomain) {
+func (u *NotifyUser) SetLoginNames(userLoginMustBeDomain bool, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
 			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
 		}
 	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		loginNames = append(loginNames, u.UserName)
 	}
 	u.LoginNames = loginNames
@@ -158,6 +157,7 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 func (u *NotifyUser) setRootData(event *models.Event) {
 	u.ID = event.AggregateID
 	u.ResourceOwner = event.ResourceOwner
+	u.InstanceID = event.InstanceID
 }
 
 func (u *NotifyUser) setData(event *models.Event) error {

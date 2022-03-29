@@ -47,7 +47,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
 				},
@@ -90,7 +90,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
@@ -138,7 +138,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
@@ -180,7 +180,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
@@ -223,7 +223,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:         "user1",
 					ProjectID:      "project1",
@@ -283,7 +283,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:         "user1",
 					ProjectID:      "project1",
@@ -348,7 +348,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "usergrant1"),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
@@ -429,7 +429,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "usergrant1"),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:         "user1",
 					ProjectID:      "project1",
@@ -500,7 +500,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
 				},
@@ -549,7 +549,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -573,7 +573,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -605,7 +605,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -662,7 +662,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -722,7 +722,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -776,7 +776,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -831,7 +831,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -903,7 +903,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("org", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -983,7 +983,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -1079,7 +1079,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "usergrant1",
@@ -1183,7 +1183,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1215,7 +1215,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1303,7 +1303,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1391,7 +1391,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1423,7 +1423,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1515,7 +1515,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1588,7 +1588,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1620,7 +1620,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1687,7 +1687,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1727,7 +1727,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
 			},
@@ -1800,7 +1800,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantIDs:  []string{"usergrant1", "usergrant2"},
 				resourceOwner: "org1",
 			},
@@ -1832,7 +1832,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantIDs:  []string{"usergrant1", "usergrant2"},
 				resourceOwner: "org1",
 			},
@@ -1913,7 +1913,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantIDs:  []string{"usergrant1", "usergrant2"},
 				resourceOwner: "org1",
 			},
@@ -1967,7 +1967,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContextWithPermissions("", "", []string{domain.RoleProjectOwner}),
+				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantIDs:  []string{"usergrant1", "usergrant2"},
 				resourceOwner: "org1",
 			},

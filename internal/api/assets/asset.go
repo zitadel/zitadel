@@ -1,8 +1,11 @@
 package assets
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,6 +14,7 @@ import (
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
+	"github.com/superseriousbusiness/exifremove/pkg/exifremove"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
@@ -200,4 +204,26 @@ func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName 
 	_, err = w.Write(data)
 	logging.New().OnError(err).Error("error writing response for asset")
 	return nil
+}
+
+func removeExif(file io.Reader, size int64, contentType string) (io.Reader, int64, error) {
+	if !isAllowedContentType(contentType) {
+		return file, size, nil
+	}
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(file)
+	if err != nil {
+		return file, 0, err
+	}
+	data, err := exifremove.Remove(buf.Bytes())
+	if err != nil {
+		return nil, 0, err
+	}
+	return bytes.NewReader(data), int64(len(data)), nil
+}
+
+func isAllowedContentType(contentType string) bool {
+	return strings.HasSuffix(contentType, "png") ||
+		strings.HasSuffix(contentType, "jpg") ||
+		strings.HasSuffix(contentType, "jpeg")
 }

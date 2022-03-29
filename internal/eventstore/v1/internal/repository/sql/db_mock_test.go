@@ -7,15 +7,16 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 const (
-	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_type = \$1`
+	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_type = \$1`
 )
 
 var (
-	eventColumns                             = []string{"creation_date", "event_type", "event_sequence", "previous_aggregate_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "aggregate_type", "aggregate_id", "aggregate_version"}
+	eventColumns                             = []string{"creation_date", "event_type", "event_sequence", "previous_aggregate_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "instance_id", "aggregate_type", "aggregate_id", "aggregate_version"}
 	expectedFilterEventsLimitFormat          = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence LIMIT \$2`).String()
 	expectedFilterEventsDescFormat           = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence DESC`).String()
 	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(selectEscaped + ` AND aggregate_id = \$2 ORDER BY event_sequence LIMIT \$3`).String()
@@ -23,10 +24,10 @@ var (
 	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence`).String()
 
 	expectedInsertStatement = regexp.MustCompile(`INSERT INTO eventstore\.events ` +
-		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, previous_aggregate_sequence, previous_aggregate_type_sequence\) ` +
-		`SELECT \$1, \$2, \$3, \$4, COALESCE\(\$5, now\(\)\), \$6, \$7, \$8, \$9, \$10 ` +
+		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, instance_id, previous_aggregate_sequence, previous_aggregate_type_sequence\) ` +
+		`SELECT \$1, \$2, \$3, \$4, COALESCE\(\$5, now\(\)\), \$6, \$7, \$8, \$9, \$10, \$11 ` +
 		`WHERE EXISTS \(` +
-		`SELECT 1 FROM eventstore\.events WHERE aggregate_type = \$11 AND aggregate_id = \$12 HAVING MAX\(event_sequence\) = \$13 OR \(\$14::BIGINT IS NULL AND COUNT\(\*\) = 0\)\) ` +
+		`SELECT 1 FROM eventstore\.events WHERE aggregate_type = \$12 AND aggregate_id = \$13 HAVING MAX\(event_sequence\) = \$14 OR \(\$14::BIGINT IS NULL AND COUNT\(\*\) = 0\)\) ` +
 		`RETURNING event_sequence, creation_date`).String()
 )
 
@@ -99,7 +100,7 @@ func (db *dbMock) expectRollback(err error) *dbMock {
 func (db *dbMock) expectInsertEvent(e *models.Event, returnedSequence uint64) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, Sequence(e.PreviousSequence),
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, e.InstanceID, Sequence(e.PreviousSequence),
 			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
 		).
 		WillReturnRows(
@@ -113,7 +114,7 @@ func (db *dbMock) expectInsertEvent(e *models.Event, returnedSequence uint64) *d
 func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 	db.mock.ExpectQuery(expectedInsertStatement).
 		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, Sequence(e.PreviousSequence),
+			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, e.InstanceID, Sequence(e.PreviousSequence),
 			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
 		).
 		WillReturnError(sql.ErrTxDone)
@@ -124,7 +125,7 @@ func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
 func (db *dbMock) expectFilterEventsLimit(aggregateType string, limit uint64, eventCount int) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := 0; i < eventCount; i++ {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsLimitFormat).
 		WithArgs(aggregateType, limit).
@@ -135,7 +136,7 @@ func (db *dbMock) expectFilterEventsLimit(aggregateType string, limit uint64, ev
 func (db *dbMock) expectFilterEventsDesc(aggregateType string, eventCount int) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := eventCount; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsDescFormat).
 		WillReturnRows(rows)
@@ -145,7 +146,7 @@ func (db *dbMock) expectFilterEventsDesc(aggregateType string, eventCount int) *
 func (db *dbMock) expectFilterEventsAggregateIDLimit(aggregateType, aggregateID string, limit uint64) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := limit; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDLimit).
 		WithArgs(aggregateType, aggregateID, limit).
@@ -156,7 +157,7 @@ func (db *dbMock) expectFilterEventsAggregateIDLimit(aggregateType, aggregateID 
 func (db *dbMock) expectFilterEventsAggregateIDTypeLimit(aggregateType, aggregateID string, limit uint64) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := limit; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "instanceID", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDTypeLimit).
 		WithArgs(aggregateType, aggregateID, limit).

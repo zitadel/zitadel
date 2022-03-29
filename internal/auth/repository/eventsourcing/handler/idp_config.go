@@ -10,7 +10,7 @@ import (
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -91,8 +91,8 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 	case model.IDPConfigChanged, iam_es_model.IDPConfigChanged,
 		model.OIDCIDPConfigAdded, iam_es_model.OIDCIDPConfigAdded,
 		model.OIDCIDPConfigChanged, iam_es_model.OIDCIDPConfigChanged,
-		es_models.EventType(org.IDPJWTConfigAddedEventType), es_models.EventType(iam.IDPJWTConfigAddedEventType),
-		es_models.EventType(org.IDPJWTConfigChangedEventType), es_models.EventType(iam.IDPJWTConfigChangedEventType):
+		es_models.EventType(org.IDPJWTConfigAddedEventType), es_models.EventType(instance.IDPJWTConfigAddedEventType),
+		es_models.EventType(org.IDPJWTConfigChangedEventType), es_models.EventType(instance.IDPJWTConfigChangedEventType):
 		err = idp.SetData(event)
 		if err != nil {
 			return err

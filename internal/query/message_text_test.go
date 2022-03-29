@@ -8,9 +8,10 @@ import (
 	"regexp"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
-	"golang.org/x/text/language"
 )
 
 func Test_MessageTextPrepares(t *testing.T) {
@@ -29,21 +30,21 @@ func Test_MessageTextPrepares(t *testing.T) {
 			prepare: prepareMessageTextQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.message_texts.aggregate_id,`+
-						` zitadel.projections.message_texts.sequence,`+
-						` zitadel.projections.message_texts.creation_date,`+
-						` zitadel.projections.message_texts.change_date,`+
-						` zitadel.projections.message_texts.state,`+
-						` zitadel.projections.message_texts.type,`+
-						` zitadel.projections.message_texts.language,`+
-						` zitadel.projections.message_texts.title,`+
-						` zitadel.projections.message_texts.pre_header,`+
-						` zitadel.projections.message_texts.subject,`+
-						` zitadel.projections.message_texts.greeting,`+
-						` zitadel.projections.message_texts.text,`+
-						` zitadel.projections.message_texts.button_text,`+
-						` zitadel.projections.message_texts.footer_text`+
-						` FROM zitadel.projections.message_texts`),
+					regexp.QuoteMeta(`SELECT projections.message_texts.aggregate_id,`+
+						` projections.message_texts.sequence,`+
+						` projections.message_texts.creation_date,`+
+						` projections.message_texts.change_date,`+
+						` projections.message_texts.state,`+
+						` projections.message_texts.type,`+
+						` projections.message_texts.language,`+
+						` projections.message_texts.title,`+
+						` projections.message_texts.pre_header,`+
+						` projections.message_texts.subject,`+
+						` projections.message_texts.greeting,`+
+						` projections.message_texts.text,`+
+						` projections.message_texts.button_text,`+
+						` projections.message_texts.footer_text`+
+						` FROM projections.message_texts`),
 					nil,
 					nil,
 				),
@@ -61,21 +62,21 @@ func Test_MessageTextPrepares(t *testing.T) {
 			prepare: prepareMessageTextQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.message_texts.aggregate_id,`+
-						` zitadel.projections.message_texts.sequence,`+
-						` zitadel.projections.message_texts.creation_date,`+
-						` zitadel.projections.message_texts.change_date,`+
-						` zitadel.projections.message_texts.state,`+
-						` zitadel.projections.message_texts.type,`+
-						` zitadel.projections.message_texts.language,`+
-						` zitadel.projections.message_texts.title,`+
-						` zitadel.projections.message_texts.pre_header,`+
-						` zitadel.projections.message_texts.subject,`+
-						` zitadel.projections.message_texts.greeting,`+
-						` zitadel.projections.message_texts.text,`+
-						` zitadel.projections.message_texts.button_text,`+
-						` zitadel.projections.message_texts.footer_text`+
-						` FROM zitadel.projections.message_texts`),
+					regexp.QuoteMeta(`SELECT projections.message_texts.aggregate_id,`+
+						` projections.message_texts.sequence,`+
+						` projections.message_texts.creation_date,`+
+						` projections.message_texts.change_date,`+
+						` projections.message_texts.state,`+
+						` projections.message_texts.type,`+
+						` projections.message_texts.language,`+
+						` projections.message_texts.title,`+
+						` projections.message_texts.pre_header,`+
+						` projections.message_texts.subject,`+
+						` projections.message_texts.greeting,`+
+						` projections.message_texts.text,`+
+						` projections.message_texts.button_text,`+
+						` projections.message_texts.footer_text`+
+						` FROM projections.message_texts`),
 					[]string{
 						"aggregate_id",
 						"sequence",
@@ -132,21 +133,21 @@ func Test_MessageTextPrepares(t *testing.T) {
 			prepare: prepareMessageTextQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.message_texts.aggregate_id,`+
-						` zitadel.projections.message_texts.sequence,`+
-						` zitadel.projections.message_texts.creation_date,`+
-						` zitadel.projections.message_texts.change_date,`+
-						` zitadel.projections.message_texts.state,`+
-						` zitadel.projections.message_texts.type,`+
-						` zitadel.projections.message_texts.language,`+
-						` zitadel.projections.message_texts.title,`+
-						` zitadel.projections.message_texts.pre_header,`+
-						` zitadel.projections.message_texts.subject,`+
-						` zitadel.projections.message_texts.greeting,`+
-						` zitadel.projections.message_texts.text,`+
-						` zitadel.projections.message_texts.button_text,`+
-						` zitadel.projections.message_texts.footer_text`+
-						` FROM zitadel.projections.message_texts`),
+					regexp.QuoteMeta(`SELECT projections.message_texts.aggregate_id,`+
+						` projections.message_texts.sequence,`+
+						` projections.message_texts.creation_date,`+
+						` projections.message_texts.change_date,`+
+						` projections.message_texts.state,`+
+						` projections.message_texts.type,`+
+						` projections.message_texts.language,`+
+						` projections.message_texts.title,`+
+						` projections.message_texts.pre_header,`+
+						` projections.message_texts.subject,`+
+						` projections.message_texts.greeting,`+
+						` projections.message_texts.text,`+
+						` projections.message_texts.button_text,`+
+						` projections.message_texts.footer_text`+
+						` FROM projections.message_texts`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

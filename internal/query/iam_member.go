@@ -7,42 +7,48 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
 var (
-	iamMemberTable = table{
-		name:  projection.IAMMemberProjectionTable,
+	instanceMemberTable = table{
+		name:  projection.InstanceMemberProjectionTable,
 		alias: "members",
 	}
-	IAMMemberUserID = Column{
+	InstanceMemberUserID = Column{
 		name:  projection.MemberUserIDCol,
-		table: iamMemberTable,
+		table: instanceMemberTable,
 	}
-	IAMMemberRoles = Column{
+	InstanceMemberRoles = Column{
 		name:  projection.MemberRolesCol,
-		table: iamMemberTable,
+		table: instanceMemberTable,
 	}
-	IAMMemberCreationDate = Column{
+	InstanceMemberCreationDate = Column{
 		name:  projection.MemberCreationDate,
-		table: iamMemberTable,
+		table: instanceMemberTable,
 	}
-	IAMMemberChangeDate = Column{
+	InstanceMemberChangeDate = Column{
 		name:  projection.MemberChangeDate,
-		table: iamMemberTable,
+		table: instanceMemberTable,
 	}
-	IAMMemberSequence = Column{
+	InstanceMemberSequence = Column{
 		name:  projection.MemberSequence,
-		table: iamMemberTable,
+		table: instanceMemberTable,
 	}
-	IAMMemberResourceOwner = Column{
+	InstanceMemberResourceOwner = Column{
 		name:  projection.MemberResourceOwner,
-		table: iamMemberTable,
+		table: instanceMemberTable,
 	}
-	IAMMemberIAMID = Column{
-		name:  projection.IAMMemberIAMIDCol,
-		table: iamMemberTable,
+	InstanceMemberInstanceID = Column{
+		name:  projection.MemberInstanceID,
+		table: instanceMemberTable,
+	}
+	InstanceMemberIAMID = Column{
+		name:  projection.InstanceMemberIAMIDCol,
+		table: instanceMemberTable,
 	}
 )
 
@@ -56,13 +62,16 @@ func (q *IAMMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery) (*Members, error) {
-	query, scan := prepareIAMMembersQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	query, scan := prepareInstanceMembersQuery()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")
 	}
 
-	currentSequence, err := q.latestSequence(ctx, iamMemberTable)
+	currentSequence, err := q.latestSequence(ctx, instanceMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -79,14 +88,14 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery) (*Me
 	return members, err
 }
 
-func prepareIAMMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
 	return sq.Select(
-			IAMMemberCreationDate.identifier(),
-			IAMMemberChangeDate.identifier(),
-			IAMMemberSequence.identifier(),
-			IAMMemberResourceOwner.identifier(),
-			IAMMemberUserID.identifier(),
-			IAMMemberRoles.identifier(),
+			InstanceMemberCreationDate.identifier(),
+			InstanceMemberChangeDate.identifier(),
+			InstanceMemberSequence.identifier(),
+			InstanceMemberResourceOwner.identifier(),
+			InstanceMemberUserID.identifier(),
+			InstanceMemberRoles.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanFirstNameCol.identifier(),
@@ -95,10 +104,10 @@ func prepareIAMMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
-		).From(iamMemberTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, IAMMemberUserID)).
-			LeftJoin(join(MachineUserIDCol, IAMMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, IAMMemberUserID)).
+		).From(instanceMemberTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, InstanceMemberUserID)).
+			LeftJoin(join(MachineUserIDCol, InstanceMemberUserID)).
+			LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

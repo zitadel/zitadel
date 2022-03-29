@@ -12,6 +12,8 @@ import (
 	"golang.org/x/text/language"
 	"sigs.k8s.io/yaml"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -41,6 +43,10 @@ var (
 	}
 	CustomTextColAggregateID = Column{
 		name:  projection.CustomTextAggregateIDCol,
+		table: customTextTable,
+	}
+	CustomTextColInstanceID = Column{
+		name:  projection.CustomTextInstanceIDCol,
 		table: customTextTable,
 	}
 	CustomTextColSequence = Column{
@@ -80,6 +86,7 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 			CustomTextColAggregateID.identifier(): aggregateID,
 			CustomTextColTemplate.identifier():    template,
 			CustomTextColLanguage.identifier():    language,
+			CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
 		},
 	).ToSql()
 	if err != nil {
@@ -104,6 +111,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 		sq.Eq{
 			CustomTextColAggregateID.identifier(): aggregateID,
 			CustomTextColTemplate.identifier():    template,
+			CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
 		},
 	).ToSql()
 	if err != nil {
@@ -1092,8 +1100,5 @@ func footerKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	}
 	if text.Key == domain.LoginKeyFooterHelp {
 		result.Footer.Help = text.Text
-	}
-	if text.Key == domain.LoginKeyFooterHelpLink {
-		result.Footer.HelpLink = text.Text
 	}
 }

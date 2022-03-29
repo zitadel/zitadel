@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -61,7 +62,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+	iam, err := l.query.Instance(r.Context())
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -94,7 +95,8 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID, instanceID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -125,7 +127,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	if resourceOwner == "" {
-		iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+		iam, err := l.query.Instance(r.Context())
 		if err != nil {
 			l.renderRegister(w, r, authRequest, formData, err)
 			return
@@ -151,7 +153,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		}
 	}
 
-	orgIAMPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	orgIAMPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, formData, err)
 		return

@@ -11,6 +11,7 @@ func ModelPrivacyPolicyToPb(policy *query.PrivacyPolicy) *policy_pb.PrivacyPolic
 		IsDefault:   policy.IsDefault,
 		TosLink:     policy.TOSLink,
 		PrivacyLink: policy.PrivacyLink,
+		HelpLink:    policy.HelpLink,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,

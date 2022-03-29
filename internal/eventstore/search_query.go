@@ -12,6 +12,7 @@ type SearchQueryBuilder struct {
 	limit         uint64
 	desc          bool
 	resourceOwner string
+	instanceID    string
 	queries       []*SearchQuery
 }
 
@@ -49,44 +50,72 @@ func NewSearchQueryBuilder(columns Columns) *SearchQueryBuilder {
 	}
 }
 
+func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matches bool) {
+	if builder.limit > 0 && uint64(existingLen) >= builder.limit {
+		return false
+	}
+	if builder.resourceOwner != "" && event.Aggregate().ResourceOwner != builder.resourceOwner {
+		return false
+	}
+	if event.Aggregate().InstanceID != "" && builder.instanceID != "" && event.Aggregate().InstanceID != builder.instanceID {
+		return false
+	}
+
+	if len(builder.queries) == 0 {
+		return true
+	}
+	for _, query := range builder.queries {
+		if query.matches(event) {
+			return true
+		}
+	}
+	return false
+}
+
 //Columns defines which fields are set
-func (factory *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
-	factory.columns = repository.Columns(columns)
-	return factory
+func (builder *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
+	builder.columns = repository.Columns(columns)
+	return builder
 }
 
 //Limit defines how many events are returned maximally.
-func (factory *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
-	factory.limit = limit
-	return factory
+func (builder *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
+	builder.limit = limit
+	return builder
 }
 
 //ResourceOwner defines the resource owner (org) of the events
-func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
-	factory.resourceOwner = resourceOwner
+func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
+	builder.resourceOwner = resourceOwner
+	return builder
+}
+
+//InstanceID defines the instanceID (system) of the events
+func (factory *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
+	factory.instanceID = instanceID
 	return factory
 }
 
 //OrderDesc changes the sorting order of the returned events to descending
-func (factory *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
-	factory.desc = true
-	return factory
+func (builder *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
+	builder.desc = true
+	return builder
 }
 
 //OrderAsc changes the sorting order of the returned events to ascending
-func (factory *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
-	factory.desc = false
-	return factory
+func (builder *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
+	builder.desc = false
+	return builder
 }
 
 //AddQuery creates a new sub query.
 //All fields in the sub query are AND-connected in the storage request.
 //Multiple sub queries are OR-connected in the storage request.
-func (factory *SearchQueryBuilder) AddQuery() *SearchQuery {
+func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
 	query := &SearchQuery{
-		builder: factory,
+		builder: builder,
 	}
-	factory.queries = append(factory.queries, query)
+	builder.queries = append(builder.queries, query)
 
 	return query
 }
@@ -138,12 +167,32 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 
-func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
+func (query *SearchQuery) matches(event Event) bool {
+	if query.eventSequenceLess > 0 && event.Sequence() >= query.eventSequenceLess {
+		return false
+	}
+	if query.eventSequenceGreater > 0 && event.Sequence() <= query.eventSequenceGreater {
+		return false
+	}
+	if ok := isAggreagteTypes(event.Aggregate(), query.aggregateTypes...); len(query.aggregateTypes) > 0 && !ok {
+		return false
+	}
+	if ok := isAggregateIDs(event.Aggregate(), query.aggregateIDs...); len(query.aggregateIDs) > 0 && !ok {
+		return false
+	}
+	if ok := isEventTypes(event, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
+		return false
+	}
+	return true
+}
+
+func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQuery, error) {
 	if builder == nil ||
 		len(builder.queries) < 1 ||
 		builder.columns.Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
+	builder.instanceID = instanceID
 	filters := make([][]*repository.Filter, len(builder.queries))
 
 	for i, query := range builder.queries {
@@ -155,6 +204,7 @@ func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 			query.eventSequenceGreaterFilter,
 			query.eventSequenceLessFilter,
 			query.builder.resourceOwnerFilter,
+			query.builder.instanceIDFilter,
 		} {
 			if filter := f(); filter != nil {
 				if err := filter.Validate(); err != nil {
@@ -236,6 +286,13 @@ func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldResourceOwner, builder.resourceOwner, repository.OperationEquals)
+}
+
+func (builder *SearchQueryBuilder) instanceIDFilter() *repository.Filter {
+	if builder.instanceID == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldInstanceID, builder.instanceID, repository.OperationEquals)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {

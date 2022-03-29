@@ -196,7 +196,7 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
 		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
 	} else {
-		_, err = c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
+		_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	}
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")

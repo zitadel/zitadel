@@ -23,6 +23,7 @@ type Aggregate struct {
 	editorService string
 	editorUser    string
 	resourceOwner string
+	instanceID    string
 	Events        []*Event
 	Precondition  *precondition
 }
@@ -55,6 +56,7 @@ func (a *Aggregate) AppendEvent(typ EventType, payload interface{}) (*Aggregate,
 		EditorService:    a.editorService,
 		EditorUser:       a.editorUser,
 		ResourceOwner:    a.resourceOwner,
+		InstanceID:       a.instanceID,
 	}
 
 	a.Events = append(a.Events, e)

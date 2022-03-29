@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/database"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,22 +25,21 @@ func newGrant() *cobra.Command {
 Prereqesits:
 - cockroachdb
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			config := Config{}
-			if err := viper.Unmarshal(&config); err != nil {
-				return err
-			}
-			return initialise(config, verifyGrant(config.Database))
+		Run: func(cmd *cobra.Command, args []string) {
+			config := MustNewConfig(viper.New())
+
+			err := initialise(config, VerifyGrant(config.Database.Database, config.Database.User.Username))
+			logging.OnError(err).Fatal("unable to set grant")
 		},
 	}
 }
 
-func verifyGrant(config database.Config) func(*sql.DB) error {
+func VerifyGrant(database, username string) func(*sql.DB) error {
 	return func(db *sql.DB) error {
-		logging.WithFields("user", config.Username).Info("verify grant")
+		logging.WithFields("user", username).Info("verify grant")
 		return verify(db,
-			exists(fmt.Sprintf(searchGrant, config.Database), config.Username),
-			exec(fmt.Sprintf(grantStmt, config.Database, config.Username)),
+			exists(fmt.Sprintf(searchGrant, database), username),
+			exec(fmt.Sprintf(grantStmt, database, username)),
 		)
 	}
 }

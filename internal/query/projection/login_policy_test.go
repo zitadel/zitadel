@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -53,9 +53,10 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -107,7 +108,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (aggregate_id = $14)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (aggregate_id = $14)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -149,7 +150,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -181,7 +182,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -211,7 +212,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_policies WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_policies WHERE (aggregate_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -240,7 +241,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -272,7 +273,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -285,12 +286,12 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceLoginPolicyAdded",
+			name:   "instance.reduceLoginPolicyAdded",
 			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"allowUsernamePassword": true,
 						"allowRegister": true,
@@ -304,19 +305,20 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"secondFactorCheckLifetime": 10000000,
 						"multiFactorCheckLifetime": 10000000
 			}`),
-				), iam.LoginPolicyAddedEventMapper),
+				), instance.LoginPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -339,12 +341,12 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceLoginPolicyChanged",
+			name:   "instance.reduceLoginPolicyChanged",
 			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"allowUsernamePassword": true,
 			"allowRegister": true,
@@ -353,17 +355,17 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			"hidePasswordReset": true,
 			"passwordlessType": 1
 			}`),
-				), iam.LoginPolicyChangedEventMapper),
+				), instance.LoginPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -381,26 +383,26 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceMFAAdded",
+			name:   "instance.reduceMFAAdded",
 			reduce: (&LoginPolicyProjection{}).reduceMFAAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyMultiFactorAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyMultiFactorAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 		"mfaType": 1
 		}`),
-				), iam.MultiFactorAddedEventMapper),
+				), instance.MultiFactorAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -413,26 +415,26 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceMFARemoved",
+			name:   "instance.reduceMFARemoved",
 			reduce: (&LoginPolicyProjection{}).reduceMFARemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyMultiFactorRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyMultiFactorRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 1
 			}`),
-				), iam.MultiFactorRemovedEventMapper),
+				), instance.MultiFactorRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -445,26 +447,26 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduce2FAAdded",
+			name:   "instance.reduce2FAAdded",
 			reduce: (&LoginPolicyProjection{}).reduce2FAAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicySecondFactorAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicySecondFactorAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 2
 			}`),
-				), iam.SecondFactorAddedEventMapper),
+				), instance.SecondFactorAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -477,26 +479,26 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduce2FARemoved",
+			name:   "instance.reduce2FARemoved",
 			reduce: (&LoginPolicyProjection{}).reduce2FARemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicySecondFactorRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicySecondFactorRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 2
 			}`),
-				), iam.SecondFactorRemovedEventMapper),
+				), instance.SecondFactorRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

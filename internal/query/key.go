@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -117,6 +119,10 @@ var (
 		name:  projection.KeyColumnResourceOwner,
 		table: keyTable,
 	}
+	KeyColInstanceID = Column{
+		name:  projection.KeyColumnInstanceID,
+		table: keyTable,
+	}
 	KeyColSequence = Column{
 		name:  projection.KeyColumnSequence,
 		table: keyTable,
@@ -173,8 +179,13 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKey
 		t = time.Now()
 	}
 	stmt, args, err := query.Where(
-		sq.Gt{
-			KeyPublicColExpiry.identifier(): t,
+		sq.And{
+			sq.Eq{
+				KeyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			},
+			sq.Gt{
+				KeyPublicColExpiry.identifier(): t,
+			},
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDFfg", "Errors.Query.SQLStatement")
@@ -200,7 +211,8 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*Pr
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				KeyColUse.identifier(): domain.KeyUsageSigning,
+				KeyColUse.identifier():        domain.KeyUsageSigning,
+				KeyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Gt{
 				KeyPrivateColExpiry.identifier(): t,

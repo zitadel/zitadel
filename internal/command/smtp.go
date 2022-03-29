@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/channels/smtp"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
@@ -26,8 +26,8 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) 
 		}
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMTPConfigAddedEvent(
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigAddedEvent(
 		ctx,
 		iamAgg,
 		config.Tls,
@@ -54,7 +54,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.EmailConfi
 	if smtpConfigWriteModel.State == domain.SMTPConfigStateUnspecified {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
 
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
 		ctx,
@@ -89,12 +89,12 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 	if smtpConfigWriteModel.State == domain.SMTPConfigStateUnspecified {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
 	newPW, err := crypto.Encrypt([]byte(password), c.smtpPasswordCrypto)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMTPConfigPasswordChangedEvent(
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigPasswordChangedEvent(
 		ctx,
 		iamAgg,
 		newPW))
@@ -108,8 +108,8 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) getSMTPConfig(ctx context.Context) (_ *IAMSMTPConfigWriteModel, err error) {
-	writeModel := NewIAMSMTPConfigWriteModel()
+func (c *Commands) getSMTPConfig(ctx context.Context) (_ *InstanceSMTPConfigWriteModel, err error) {
+	writeModel := NewInstanceSMTPConfigWriteModel()
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -12,6 +12,7 @@ type ReadModel struct {
 	ChangeDate        time.Time `json:"-"`
 	Events            []Event   `json:"-"`
 	ResourceOwner     string    `json:"-"`
+	InstanceID        string    `json:"-"`
 }
 
 //AppendEvents adds all the events to the read model.
@@ -33,6 +34,9 @@ func (rm *ReadModel) Reduce() error {
 	}
 	if rm.ResourceOwner == "" {
 		rm.ResourceOwner = rm.Events[0].Aggregate().ResourceOwner
+	}
+	if rm.InstanceID == "" {
+		rm.InstanceID = rm.Events[0].Aggregate().InstanceID
 	}
 
 	if rm.CreationDate.IsZero() {

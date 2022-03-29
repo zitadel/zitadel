@@ -27,16 +27,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
+						` projections.project_roles.creation_date,`+
+						` projections.project_roles.change_date,`+
+						` projections.project_roles.resource_owner,`+
+						` projections.project_roles.sequence,`+
+						` projections.project_roles.role_key,`+
+						` projections.project_roles.display_name,`+
+						` projections.project_roles.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.project_roles`),
+						` FROM projections.project_roles`),
 					nil,
 					nil,
 				),
@@ -48,16 +48,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
+						` projections.project_roles.creation_date,`+
+						` projections.project_roles.change_date,`+
+						` projections.project_roles.resource_owner,`+
+						` projections.project_roles.sequence,`+
+						` projections.project_roles.role_key,`+
+						` projections.project_roles.display_name,`+
+						` projections.project_roles.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.project_roles`),
+						` FROM projections.project_roles`),
 					[]string{
 						"project_id",
 						"creation_date",
@@ -106,16 +106,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
+						` projections.project_roles.creation_date,`+
+						` projections.project_roles.change_date,`+
+						` projections.project_roles.resource_owner,`+
+						` projections.project_roles.sequence,`+
+						` projections.project_roles.role_key,`+
+						` projections.project_roles.display_name,`+
+						` projections.project_roles.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.project_roles`),
+						` FROM projections.project_roles`),
 					[]string{
 						"project_id",
 						"creation_date",
@@ -184,16 +184,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
+						` projections.project_roles.creation_date,`+
+						` projections.project_roles.change_date,`+
+						` projections.project_roles.resource_owner,`+
+						` projections.project_roles.sequence,`+
+						` projections.project_roles.role_key,`+
+						` projections.project_roles.display_name,`+
+						` projections.project_roles.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.project_roles`),
+						` FROM projections.project_roles`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -210,15 +210,15 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRoleQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name`+
-						` FROM zitadel.projections.project_roles`),
+					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
+						` projections.project_roles.creation_date,`+
+						` projections.project_roles.change_date,`+
+						` projections.project_roles.resource_owner,`+
+						` projections.project_roles.sequence,`+
+						` projections.project_roles.role_key,`+
+						` projections.project_roles.display_name,`+
+						` projections.project_roles.group_name`+
+						` FROM projections.project_roles`),
 					nil,
 					nil,
 				),
@@ -236,15 +236,15 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRoleQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name`+
-						` FROM zitadel.projections.project_roles`),
+					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
+						` projections.project_roles.creation_date,`+
+						` projections.project_roles.change_date,`+
+						` projections.project_roles.resource_owner,`+
+						` projections.project_roles.sequence,`+
+						` projections.project_roles.role_key,`+
+						` projections.project_roles.display_name,`+
+						` projections.project_roles.group_name`+
+						` FROM projections.project_roles`),
 					[]string{
 						"project_id",
 						"creation_date",
@@ -283,15 +283,15 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRoleQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name`+
-						` FROM zitadel.projections.project_roles`),
+					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
+						` projections.project_roles.creation_date,`+
+						` projections.project_roles.change_date,`+
+						` projections.project_roles.resource_owner,`+
+						` projections.project_roles.sequence,`+
+						` projections.project_roles.role_key,`+
+						` projections.project_roles.display_name,`+
+						` projections.project_roles.group_name`+
+						` FROM projections.project_roles`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

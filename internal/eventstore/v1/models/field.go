@@ -11,4 +11,5 @@ const (
 	Field_EditorUser
 	Field_EventType
 	Field_CreationDate
+	Field_InstanceID
 )

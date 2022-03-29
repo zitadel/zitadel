@@ -5,7 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/caos/zitadel/internal/database"
+	"github.com/caos/logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -31,21 +31,20 @@ The user provided by flags needs priviledge to
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			config := Config{}
-			if err := viper.Unmarshal(&config); err != nil {
-				return err
-			}
-			return initialise(config, verifyDatabase(config.Database))
+		Run: func(cmd *cobra.Command, args []string) {
+			config := MustNewConfig(viper.New())
+
+			err := initialise(config, VerifyDatabase(config.Database.Database))
+			logging.OnError(err).Fatal("unable to initialize the database")
 		},
 	}
 }
 
-func verifyDatabase(config database.Config) func(*sql.DB) error {
+func VerifyDatabase(database string) func(*sql.DB) error {
 	return func(db *sql.DB) error {
 		return verify(db,
-			exists(searchDatabase, config.Database),
-			exec(fmt.Sprintf(databaseStmt, config.Database)),
+			exists(searchDatabase, database),
+			exec(fmt.Sprintf(databaseStmt, database)),
 		)
 	}
 }
