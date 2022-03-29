@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
@@ -47,7 +46,7 @@ func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.Update
 }
 
 func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigRequest) (*admin_pb.GetSMTPConfigResponse, error) {
-	smtp, err := s.query.SMTPConfigByAggregateID(ctx, domain.IAMID)
+	smtp, err := s.query.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).ID)
 	if err != nil {
 		return nil, err
 	}

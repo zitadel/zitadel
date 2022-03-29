@@ -6,13 +6,12 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.Id, domain.IAMID)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.Id, authz.GetInstance(ctx).ID)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +19,7 @@ func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest
 }
 
 func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*admin_pb.ListIDPsResponse, error) {
-	queries, err := listIDPsToModel(req)
+	queries, err := listIDPsToModel(authz.GetInstance(ctx).ID, req)
 	if err != nil {
 		return nil, err
 	}
