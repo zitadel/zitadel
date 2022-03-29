@@ -2,13 +2,11 @@ package command
 
 import (
 	"context"
-	"io"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"github.com/caos/zitadel/internal/static"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
@@ -233,7 +231,7 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-ZR9fs", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-ZR9fs", "Errors.Instance.LabelPolicy.NotFound")
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
@@ -258,7 +256,7 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-3FGds", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-3FGds", "Errors.Instance.LabelPolicy.NotFound")
 	}
 	err = c.removeAsset(ctx, domain.IAMID, existingPolicy.LogoDarkKey)
 	if err != nil {
@@ -283,14 +281,14 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-vMsf9", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-vMsf9", "Errors.Instance.LabelPolicy.NotFound")
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "INSTANCE-1cxM3", "Errors.Assets.Object.PutFailed")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconDarkAddedEvent(ctx, instanceAgg,  asset.Name))
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconDarkAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -308,7 +306,7 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2nc7F", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2nc7F", "Errors.Instance.LabelPolicy.NotFound")
 	}
 	err = c.removeAsset(ctx, domain.IAMID, existingPolicy.IconDarkKey)
 	if err != nil {
@@ -326,15 +324,6 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-type AssetUpload struct {
-	ResourceOwner string
-	ObjectName    string
-	ContentType   string
-	ObjectType    static.ObjectType
-	File          io.Reader
-	Size          int64
-}
-
 func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
@@ -342,14 +331,14 @@ func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-1N8fE", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-1N8fE", "Errors.Instance.LabelPolicy.NotFound")
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(nil, "INSTANCE-1N8fs", "Errors.Assets.Object.PutFailed")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyFontAddedEvent(ctx, instanceAgg,  asset.Name))
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyFontAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -367,7 +356,7 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Tk0gw", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Tk0gw", "Errors.Instance.LabelPolicy.NotFound")
 	}
 	err = c.removeAsset(ctx, domain.IAMID, existingPolicy.FontKey)
 	if err != nil {

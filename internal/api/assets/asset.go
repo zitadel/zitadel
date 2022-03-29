@@ -1,11 +1,8 @@
 package assets
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,7 +11,6 @@ import (
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
-	"github.com/superseriousbusiness/exifremove/pkg/exifremove"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
@@ -57,7 +53,7 @@ func (h *Handler) Storage() static.Storage {
 type Uploader interface {
 	UploadAsset(ctx context.Context, info string, asset *command.AssetUpload, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
-	ResourceOwner(data authz.CtxData) string
+	ResourceOwner(instance authz.Instance, data authz.CtxData) string
 	ContentTypeAllowed(contentType string) bool
 	MaxFileSize() int64
 	ObjectType() static.ObjectType
@@ -122,7 +118,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		}
 		defer func() {
 			err = file.Close()
-			logging.Log("UPLOAD-GDg34").OnError(err).Warn("could not close file")
+			logging.OnError(err).Warn("could not close file")
 		}()
 		contentType := handler.Header.Get("content-type")
 		size := handler.Size
@@ -135,7 +131,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			return
 		}
 
-		resourceOwner := uploader.ResourceOwner(ctxData)
+		resourceOwner := uploader.ResourceOwner(authz.GetInstance(ctx), ctxData)
 		objectName, err := uploader.ObjectName(ctxData)
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
@@ -163,11 +159,11 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			return
 		}
 		ctx := r.Context()
-		id := mux.Vars(r)["id"]
-		resourceOwner := downloader.BucketName(ctx, id)
+		assetID := mux.Vars(r)["id"]
+		resourceOwner := downloader.BucketName(ctx, assetID)
 		path := ""
-		if id != "" {
-			path = strings.Split(r.RequestURI, id+"/")[1]
+		if assetID != "" {
+			path = strings.Split(r.RequestURI, assetID+"/")[1]
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
@@ -204,26 +200,4 @@ func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName 
 	_, err = w.Write(data)
 	logging.New().OnError(err).Error("error writing response for asset")
 	return nil
-}
-
-func removeExif(file io.Reader, size int64, contentType string) (io.Reader, int64, error) {
-	if !isAllowedContentType(contentType) {
-		return file, size, nil
-	}
-	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(file)
-	if err != nil {
-		return file, 0, err
-	}
-	data, err := exifremove.Remove(buf.Bytes())
-	if err != nil {
-		return nil, 0, err
-	}
-	return bytes.NewReader(data), int64(len(data)), nil
-}
-
-func isAllowedContentType(contentType string) bool {
-	return strings.HasSuffix(contentType, "png") ||
-		strings.HasSuffix(contentType, "jpg") ||
-		strings.HasSuffix(contentType, "jpeg")
 }

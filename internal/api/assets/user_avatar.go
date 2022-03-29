@@ -40,7 +40,7 @@ func (l *myHumanAvatarUploader) ObjectName(ctxData authz.CtxData) (string, error
 	return domain.GetHumanAvatarAssetPath(ctxData.UserID), nil
 }
 
-func (l *myHumanAvatarUploader) ResourceOwner(ctxData authz.CtxData) string {
+func (l *myHumanAvatarUploader) ResourceOwner(_ authz.Instance, ctxData authz.CtxData) string {
 	return ctxData.OrgID
 }
 

@@ -65,9 +65,9 @@ func (l *labelPolicyLogoUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyLogoUploader) ResourceOwner(ctxData authz.CtxData) string {
+func (l *labelPolicyLogoUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return domain.IAMID
+		return instance.ID
 	}
 	return ctxData.OrgID
 }
@@ -196,9 +196,9 @@ func (l *labelPolicyIconUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyIconUploader) ResourceOwner(ctxData authz.CtxData) string {
+func (l *labelPolicyIconUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return domain.IAMID
+		return instance.ID
 	}
 	return ctxData.OrgID
 }
@@ -316,9 +316,9 @@ func (l *labelPolicyFontUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyFontUploader) ResourceOwner(ctxData authz.CtxData) string {
+func (l *labelPolicyFontUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return domain.IAMID
+		return instance.ID
 	}
 	return ctxData.OrgID
 }
