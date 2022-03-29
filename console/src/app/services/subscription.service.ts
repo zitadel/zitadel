@@ -26,7 +26,7 @@ export class SubscriptionService {
     return this.http.get('./assets/environment.json')
       .toPromise().then((data: any) => {
         if (data && data.subscriptionServiceUrl) {
-          const serviceUrl = data.subscriptionServiceUrl;
+          const serviceUrl = data.api;
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
           return this.http.get(`${serviceUrl}/redirect`, {
             headers: {
@@ -48,7 +48,7 @@ export class SubscriptionService {
     return this.http.get('./assets/environment.json')
       .toPromise().then((data: any) => {
         if (data && data.subscriptionServiceUrl) {
-          const serviceUrl = data.subscriptionServiceUrl;
+          const serviceUrl = data.api;
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
           return this.http.get(`${serviceUrl}/customer`, {
             headers: {
@@ -68,7 +68,7 @@ export class SubscriptionService {
     return this.http.get('./assets/environment.json')
       .toPromise().then((data: any) => {
         if (data && data.subscriptionServiceUrl) {
-          const serviceUrl = data.subscriptionServiceUrl;
+          const serviceUrl = data.api;
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
           return this.http.post(`${serviceUrl}/customer`, body, {
             headers: {

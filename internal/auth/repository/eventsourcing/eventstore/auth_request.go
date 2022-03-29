@@ -1145,7 +1145,7 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
-	org, err := queries.OrgByID(context.TODO(), user.ResourceOwner)
+	org, err := queries.OrgByID(ctx, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

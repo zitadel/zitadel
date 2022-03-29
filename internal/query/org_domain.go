@@ -58,7 +58,7 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	query, scan := prepareDomainsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			OrgDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+			OrgDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")

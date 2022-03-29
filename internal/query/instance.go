@@ -39,6 +39,10 @@ var (
 		name:  projection.InstanceColumnProjectID,
 		table: instanceTable,
 	}
+	InstanceColumnConsoleID = Column{
+		name:  projection.InstanceColumnConsoleID,
+		table: instanceTable,
+	}
 	InstanceColumnSetupStarted = Column{
 		name:  projection.InstanceColumnSetUpStarted,
 		table: instanceTable,
@@ -60,9 +64,22 @@ type Instance struct {
 
 	GlobalOrgID     string
 	IAMProjectID    string
+	ConsoleID       string
 	DefaultLanguage language.Tag
 	SetupStarted    domain.Step
 	SetupDone       domain.Step
+}
+
+func (i *Instance) InstanceID() string {
+	return i.ID
+}
+
+func (i *Instance) ProjectID() string {
+	return i.IAMProjectID
+}
+
+func (i *Instance) ConsoleClientID() string {
+	return i.ConsoleID
 }
 
 type InstanceSearchQueries struct {
@@ -81,10 +98,23 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 	stmt, scan := prepareIAMQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		InstanceColumnID.identifier(): authz.GetInstance(ctx).ID,
+		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
+	stmt, scan := prepareIAMQuery()
+	query, args, err := stmt.Where(sq.Eq{
+		InstanceColumnID.identifier(): "system", //TODO: change column to domain when available
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -106,6 +136,7 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 			InstanceColumnSequence.identifier(),
 			InstanceColumnGlobalOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
+			InstanceColumnConsoleID.identifier(),
 			InstanceColumnSetupStarted.identifier(),
 			InstanceColumnSetupDone.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
@@ -120,6 +151,7 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 				&iam.Sequence,
 				&iam.GlobalOrgID,
 				&iam.IAMProjectID,
+				&iam.ConsoleID,
 				&iam.SetupStarted,
 				&iam.SetupDone,
 				&lang,

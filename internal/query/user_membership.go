@@ -102,7 +102,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	query, scan := prepareMembershipsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			membershipInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
@@ -289,6 +289,7 @@ func prepareOrgMember() string {
 		OrgMemberChangeDate.identifier(),
 		OrgMemberSequence.identifier(),
 		OrgMemberResourceOwner.identifier(),
+		OrgMemberInstanceID.identifier(),
 		OrgMemberOrgID.identifier(),
 		"NULL::STRING AS "+membershipIAMID.name,
 		"NULL::STRING AS "+membershipProjectID.name,
@@ -305,6 +306,7 @@ func prepareIAMMember() string {
 		InstanceMemberChangeDate.identifier(),
 		InstanceMemberSequence.identifier(),
 		InstanceMemberResourceOwner.identifier(),
+		InstanceMemberInstanceID.identifier(),
 		"NULL::STRING AS "+membershipOrgID.name,
 		InstanceMemberIAMID.identifier(),
 		"NULL::STRING AS "+membershipProjectID.name,
@@ -321,6 +323,7 @@ func prepareProjectMember() string {
 		ProjectMemberChangeDate.identifier(),
 		ProjectMemberSequence.identifier(),
 		ProjectMemberResourceOwner.identifier(),
+		ProjectMemberInstanceID.identifier(),
 		"NULL::STRING AS "+membershipOrgID.name,
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
@@ -338,6 +341,7 @@ func prepareProjectGrantMember() string {
 		ProjectGrantMemberChangeDate.identifier(),
 		ProjectGrantMemberSequence.identifier(),
 		ProjectGrantMemberResourceOwner.identifier(),
+		ProjectGrantMemberInstanceID.identifier(),
 		"NULL::STRING AS "+membershipOrgID.name,
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),

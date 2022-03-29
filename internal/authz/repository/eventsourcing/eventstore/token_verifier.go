@@ -98,7 +98,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 }
 
 func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error) {
-	app, err := repo.View.ApplicationByOIDCClientID(clientID)
+	app, err := repo.View.ApplicationByOIDCClientID(ctx, clientID)
 	if err != nil {
 		return "", nil, err
 	}

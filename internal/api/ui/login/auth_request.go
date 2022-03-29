@@ -20,7 +20,7 @@ func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
 		return nil, nil
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID, instanceID)
 }
 

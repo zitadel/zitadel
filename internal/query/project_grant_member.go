@@ -80,7 +80,7 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 	query, scan := prepareProjectGrantMembersQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")

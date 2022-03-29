@@ -152,14 +152,10 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		return nil, err
 	}
 
-	iam, err := s.query.Instance(ctx)
-	if err != nil {
-		return nil, err
-	}
 	ctxData := authz.GetCtxData(ctx)
 
 	//client of user is not in project of ZITADEL
-	if ctxData.ProjectID != iam.IAMProjectID {
+	if ctxData.ProjectID != authz.GetInstance(ctx).ProjectID() {
 		userGrantProjectID, err := query.NewUserGrantProjectIDSearchQuery(ctxData.ProjectID)
 		if err != nil {
 			return nil, err

@@ -30,7 +30,7 @@ func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, au
 	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		instanceID := authz.GetInstance(r.Context()).ID
+		instanceID := authz.GetInstance(r.Context()).InstanceID()
 		webAuthNLogin, err = l.authRepo.BeginMFAU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, instanceID)
 	}
 	if err != nil {
@@ -72,7 +72,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	err = l.authRepo.VerifyMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, instanceID, credData, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderU2FVerification(w, r, authReq, step.MFAProviders, err)
