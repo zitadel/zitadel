@@ -59,6 +59,6 @@ func (l *myHumanAvatarDownloader) ObjectName(ctx context.Context, path string) (
 	return domain.GetHumanAvatarAssetPath(authz.GetCtxData(ctx).UserID), nil
 }
 
-func (l *myHumanAvatarDownloader) BucketName(ctx context.Context, id string) string {
+func (l *myHumanAvatarDownloader) ResourceOwner(ctx context.Context, id string) string {
 	return authz.GetCtxData(ctx).OrgID
 }

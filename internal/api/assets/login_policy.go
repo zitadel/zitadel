@@ -67,7 +67,7 @@ func (l *labelPolicyLogoUploader) ObjectName(_ authz.CtxData) (string, error) {
 
 func (l *labelPolicyLogoUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return instance.ID
+		return instance.InstanceID()
 	}
 	return ctxData.OrgID
 }
@@ -139,8 +139,8 @@ func (l *labelPolicyLogoDownloader) ObjectName(ctx context.Context, path string)
 	return policy.Light.LogoURL, nil
 }
 
-func (l *labelPolicyLogoDownloader) BucketName(ctx context.Context, id string) string {
-	return getLabelPolicyBucketName(ctx, l.defaultPolicy, l.preview, l.query)
+func (l *labelPolicyLogoDownloader) ResourceOwner(ctx context.Context, id string) string {
+	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
 func (h *Handler) UploadDefaultLabelPolicyIcon() Uploader {
@@ -198,7 +198,7 @@ func (l *labelPolicyIconUploader) ObjectName(_ authz.CtxData) (string, error) {
 
 func (l *labelPolicyIconUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return instance.ID
+		return instance.InstanceID()
 	}
 	return ctxData.OrgID
 }
@@ -271,8 +271,8 @@ func (l *labelPolicyIconDownloader) ObjectName(ctx context.Context, path string)
 	return policy.Light.IconURL, nil
 }
 
-func (l *labelPolicyIconDownloader) BucketName(ctx context.Context, id string) string {
-	return getLabelPolicyBucketName(ctx, l.defaultPolicy, l.preview, l.query)
+func (l *labelPolicyIconDownloader) ResourceOwner(ctx context.Context, id string) string {
+	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
 func (h *Handler) UploadDefaultLabelPolicyFont() Uploader {
@@ -318,7 +318,7 @@ func (l *labelPolicyFontUploader) ObjectName(_ authz.CtxData) (string, error) {
 
 func (l *labelPolicyFontUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return instance.ID
+		return instance.InstanceID()
 	}
 	return ctxData.OrgID
 }
@@ -362,8 +362,8 @@ func (l *labelPolicyFontDownloader) ObjectName(ctx context.Context, path string)
 	return policy.FontURL, nil
 }
 
-func (l *labelPolicyFontDownloader) BucketName(ctx context.Context, id string) string {
-	return getLabelPolicyBucketName(ctx, l.defaultPolicy, l.preview, l.query)
+func (l *labelPolicyFontDownloader) ResourceOwner(ctx context.Context, id string) string {
+	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
 func getLabelPolicy(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) (*query.LabelPolicy, error) {
@@ -379,16 +379,16 @@ func getLabelPolicy(ctx context.Context, defaultPolicy, preview bool, queries *q
 	return queries.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
-func getLabelPolicyBucketName(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) string {
+func getLabelPolicyResourceOwner(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) string {
 	if defaultPolicy {
-		return domain.IAMID
+		return authz.GetInstance(ctx).InstanceID()
 	}
 	policy, err := getLabelPolicy(ctx, defaultPolicy, preview, queries)
 	if err != nil {
 		return ""
 	}
 	if policy.IsDefault {
-		return domain.IAMID
+		return authz.GetInstance(ctx).InstanceID()
 	}
 	return authz.GetCtxData(ctx).OrgID
 }

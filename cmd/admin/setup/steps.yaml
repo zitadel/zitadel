@@ -40,6 +40,18 @@ S3DefaultInstance:
       TOSLink: https://docs.zitadel.ch/docs/legal/terms-of-service
       PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
       HelpLink: ''
+    LabelPolicy:
+      PrimaryColor: '#5469d4'
+      BackgroundColor: '#fafafa'
+      WarnColor: '#f44336'
+      FontColor: '#000000'
+      PrimaryColorDark: '#5469d4'
+      BackgroundColorDark: '#212121'
+      WarnColorDark: '#f44336'
+      FontColorDark: '#ffffff'
+      HideLoginNameSuffix: false
+      ErrorMsgPopup: false
+      DisableWatermark: false
     LockoutPolicy:
       MaxAttempts: 0
       ShouldShowLockoutFailure: true

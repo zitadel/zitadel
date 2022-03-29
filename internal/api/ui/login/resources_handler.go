@@ -32,5 +32,5 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = assets.GetAsset(w, r, bucketName, data.FileName, l.staticStorage)
-	logging.WithFields("file", data.FileName, "org", bucketName).Warn("asset in login could not be served")
+	logging.WithFields("file", data.FileName, "org", bucketName).OnError(err).Warn("asset in login could not be served")
 }

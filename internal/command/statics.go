@@ -28,7 +28,7 @@ func (c *Commands) uploadAsset(ctx context.Context, upload *AssetUpload) (*stati
 		return nil, err
 	}
 	return c.static.PutObject(ctx,
-		authz.GetInstance(ctx).ID,
+		authz.GetInstance(ctx).InstanceID(),
 		"",
 		upload.ResourceOwner,
 		upload.ObjectName,
@@ -40,11 +40,11 @@ func (c *Commands) uploadAsset(ctx context.Context, upload *AssetUpload) (*stati
 }
 
 func (c *Commands) removeAsset(ctx context.Context, resourceOwner, storeKey string) error {
-	return c.static.RemoveObject(ctx, authz.GetInstance(ctx).ID, resourceOwner, storeKey)
+	return c.static.RemoveObject(ctx, authz.GetInstance(ctx).InstanceID(), resourceOwner, storeKey)
 }
 
 func (c *Commands) removeAssetsFolder(ctx context.Context, resourceOwner string, objectType static.ObjectType) error {
-	return c.static.RemoveObjects(ctx, authz.GetInstance(ctx).ID, resourceOwner, objectType)
+	return c.static.RemoveObjects(ctx, authz.GetInstance(ctx).InstanceID(), resourceOwner, objectType)
 }
 
 func removeExif(file io.Reader, size int64, contentType string) (io.Reader, int64, error) {

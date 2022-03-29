@@ -156,13 +156,13 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return err
 	}
 
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries))
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
+	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, config.ExternalDomain, id.SonyFlakeGenerator, config.ExternalSecure)
 	if err != nil {
 		return err
 	}
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
 
 	issuer := oidc.Issuer(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, keys.OIDC, keys.OIDCKey, eventstore, dbClient, keyChan, userAgentInterceptor, instanceInterceptor.Handler)

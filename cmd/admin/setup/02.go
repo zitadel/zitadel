@@ -14,7 +14,7 @@ CREATE TABLE system.assets (
     resource_owner TEXT,
     name TEXT,
     content_type TEXT,
-    hash TEXT,
+    hash TEXT AS (md5(data)) STORED,
     data BYTES,
     updated_at TIMESTAMPTZ,
 

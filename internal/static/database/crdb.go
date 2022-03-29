@@ -42,21 +42,21 @@ func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resou
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "DATAB-Dfwvq", "")
 	}
+	updatedAt := time.Now()
 	stmt, args, err := squirrel.Insert(assetsTable).
-		Columns(AssetColInstanceID, AssetColLocation, AssetColResourceOwner, AssetColName, AssetColType, AssetColContentType, AssetColData).
-		Values(instanceID, location, resourceOwner, name, objectType, contentType, data).
+		Columns(AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColType, AssetColContentType, AssetColData, AssetColUpdatedAt).
+		Values(instanceID, resourceOwner, name, objectType, contentType, data, updatedAt).
 		Suffix(fmt.Sprintf(
 			"ON CONFLICT (%s, %s, %s) DO UPDATE"+
-				" SET %s = $2, %s = $6, %s = $7"+
-				" RETURNING %s, %s", AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColLocation, AssetColContentType, AssetColData, AssetColHash, AssetColUpdatedAt)).
+				" SET %s = $5, %s = $6"+
+				" RETURNING %s", AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColContentType, AssetColData, AssetColHash)).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "DATAB-32DG1", "")
 	}
 	var hash string
-	var updatedAt time.Time
-	err = c.client.QueryRowContext(ctx, stmt, args...).Scan(&hash, &updatedAt)
+	err = c.client.QueryRowContext(ctx, stmt, args...).Scan(&hash)
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "DATAB-D2g2q", "")
 	}
@@ -72,7 +72,7 @@ func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resou
 }
 
 func (c *crdbStorage) GetObject(ctx context.Context, instanceID, resourceOwner, name string) ([]byte, func() (*static.Asset, error), error) {
-	query, args, err := squirrel.Select(AssetColData, AssetColContentType /*AssetColLocation, */, AssetColHash, AssetColUpdatedAt).
+	query, args, err := squirrel.Select(AssetColData, AssetColContentType, AssetColHash, AssetColUpdatedAt).
 		From(assetsTable).
 		Where(squirrel.Eq{
 			AssetColInstanceID:    instanceID,
@@ -94,7 +94,6 @@ func (c *crdbStorage) GetObject(ctx context.Context, instanceID, resourceOwner, 
 		Scan(
 			&data,
 			&asset.ContentType,
-			&asset.Location,
 			&asset.Hash,
 			&asset.LastModified,
 		)

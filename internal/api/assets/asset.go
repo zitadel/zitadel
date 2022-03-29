@@ -61,17 +61,17 @@ type Uploader interface {
 
 type Downloader interface {
 	ObjectName(ctx context.Context, path string) (string, error)
-	BucketName(ctx context.Context, id string) string
+	ResourceOwner(ctx context.Context, id string) string
 }
 
 type ErrorHandler func(http.ResponseWriter, *http.Request, error, int)
 
 func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, code int) {
-	logging.Log("ASSET-g5ef1").WithError(err).WithField("uri", r.RequestURI).Error("error occurred on asset api")
+	logging.WithFields("uri", r.RequestURI).WithError(err).Error("error occurred on asset api")
 	http.Error(w, err.Error(), code)
 }
 
-func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries) http.Handler {
+func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, instanceInterceptor func(handler http.Handler) http.Handler) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,
@@ -83,7 +83,7 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 
 	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?
 	router := mux.NewRouter()
-	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle)
+	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle, instanceInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{id}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return router
@@ -99,7 +99,7 @@ func (l *publicFileDownloader) ObjectName(_ context.Context, path string) (strin
 	return path, nil
 }
 
-func (l *publicFileDownloader) BucketName(_ context.Context, id string) string {
+func (l *publicFileDownloader) ResourceOwner(_ context.Context, id string) string {
 	return id
 }
 
@@ -160,7 +160,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		}
 		ctx := r.Context()
 		assetID := mux.Vars(r)["id"]
-		resourceOwner := downloader.BucketName(ctx, assetID)
+		resourceOwner := downloader.ResourceOwner(ctx, assetID)
 		path := ""
 		if assetID != "" {
 			path = strings.Split(r.RequestURI, assetID+"/")[1]
@@ -181,7 +181,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 }
 
 func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName string, storage static.Storage) error {
-	data, getInfo, err := storage.GetObject(r.Context(), authz.GetInstance(r.Context()).ID, resourceOwner, objectName)
+	data, getInfo, err := storage.GetObject(r.Context(), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, objectName)
 	if err != nil {
 		return fmt.Errorf("download failed: %v", err)
 	}
