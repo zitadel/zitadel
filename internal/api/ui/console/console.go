@@ -101,23 +101,13 @@ func csp(zitadelDomain string) *middleware.CSP {
 
 func createEnvironmentJSON(api, issuer, clientID string) ([]byte, error) {
 	environment := struct {
-		AuthServiceUrl         string `json:"authServiceUrl,omitempty"`
-		MgmtServiceUrl         string `json:"mgmtServiceUrl,omitempty"`
-		AdminServiceUrl        string `json:"adminServiceUrl,omitempty"`
-		SubscriptionServiceUrl string `json:"subscriptionServiceUrl,omitempty"`
-		AssetServiceUrl        string `json:"assetServiceUrl,omitempty"`
-		API                    string `json:"api,omitempty"`
-		Issuer                 string `json:"issuer,omitempty"`
-		ClientID               string `json:"clientid,omitempty"`
+		API      string `json:"api,omitempty"`
+		Issuer   string `json:"issuer,omitempty"`
+		ClientID string `json:"clientid,omitempty"`
 	}{
-		AuthServiceUrl:         api,
-		MgmtServiceUrl:         api,
-		AdminServiceUrl:        api,
-		SubscriptionServiceUrl: api,
-		AssetServiceUrl:        api,
-		API:                    api,
-		Issuer:                 issuer,
-		ClientID:               clientID,
+		API:      api,
+		Issuer:   issuer,
+		ClientID: clientID,
 	}
 	return json.Marshal(environment)
 }
