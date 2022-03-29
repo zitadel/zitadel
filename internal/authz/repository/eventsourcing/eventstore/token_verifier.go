@@ -14,7 +14,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -266,12 +265,4 @@ func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, require
 		return err
 	}
 	return checkFeatures(features, requiredFeatures...)
-}
-
-func (repo *TokenVerifierRepo) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
-	if err != nil {
-		return nil, err
-	}
-	return repo.Eventstore.FilterEvents(ctx, query)
 }

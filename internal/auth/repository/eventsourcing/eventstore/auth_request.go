@@ -529,7 +529,7 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDPs {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, domain.IAMID, orgID, policy.IsDefault)
+	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, authz.GetInstance(ctx).ID, orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -544,7 +544,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
-		orgID = domain.IAMID
+		orgID = authz.GetInstance(ctx).ID
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -565,7 +565,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.PrivacyPolicy = privacyPolicy
-	privateLabelingOrgID := domain.IAMID
+	privateLabelingOrgID := authz.GetInstance(ctx).ID
 	if request.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
 		privateLabelingOrgID = request.ApplicationResourceOwner
 	}
@@ -582,7 +582,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.LabelPolicy = labelPolicy
-	defaultLoginTranslations, err := repo.getLoginTexts(ctx, domain.IAMID)
+	defaultLoginTranslations, err := repo.getLoginTexts(ctx, authz.GetInstance(ctx).ID)
 	if err != nil {
 		return err
 	}

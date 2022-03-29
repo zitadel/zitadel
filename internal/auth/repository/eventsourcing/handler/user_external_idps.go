@@ -6,7 +6,6 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -172,7 +171,7 @@ func (i *ExternalIDP) fillConfigData(externalIDP *usr_view_model.ExternalIDPView
 }
 
 func (i *ExternalIDP) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-4Rsu8", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
 	return spooler.HandleError(event, err, i.view.GetLatestExternalIDPFailedEvent, i.view.ProcessedExternalIDPFailedEvent, i.view.ProcessedExternalIDPSequence, i.errorCountUntilSkip)
 }
 
@@ -185,5 +184,5 @@ func (i *ExternalIDP) getOrgIDPConfig(instanceID, aggregateID, idpConfigID strin
 }
 
 func (i *ExternalIDP) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, domain.IAMID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, instanceID)
 }

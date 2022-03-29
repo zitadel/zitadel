@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 )
 
@@ -24,7 +25,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bucketName := domain.IAMID
+	bucketName := authz.GetInstance(r.Context()).ID
 	if data.OrgID != "" && !data.DefaultPolicy {
 		bucketName = data.OrgID
 	}

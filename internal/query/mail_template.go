@@ -75,7 +75,7 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string) (*MailTem
 					MailTemplateColAggregateID.identifier(): orgID,
 				},
 				sq.Eq{
-					MailTemplateColAggregateID.identifier(): domain.IAMID,
+					MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).ID,
 				},
 			},
 		}).
@@ -92,7 +92,7 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string) (*MailTem
 func (q *Queries) DefaultMailTemplate(ctx context.Context) (*MailTemplate, error) {
 	stmt, scan := prepareMailTemplateQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		MailTemplateColAggregateID.identifier(): domain.IAMID,
+		MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).ID,
 		MailTemplateColInstanceID.identifier():  authz.GetInstance(ctx).ID,
 	}).
 		OrderBy(MailTemplateColIsDefault.identifier()).

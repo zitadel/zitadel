@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
@@ -111,7 +110,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
 		esConfig := new(iam_view_model.IDPConfigView)
 		providerType := iam_model.IDPProviderTypeSystem
-		if event.AggregateID != domain.IAMID {
+		if event.AggregateID != event.InstanceID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
 		esConfig.AppendEvent(providerType, event)
@@ -120,7 +119,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 			return err
 		}
 		config := new(query2.IDP)
-		if event.AggregateID == domain.IAMID {
+		if event.AggregateID == event.InstanceID {
 			config, err = i.getDefaultIDPConfig(event.InstanceID, esConfig.IDPConfigID)
 		} else {
 			config, err = i.getOrgIDPConfig(event.InstanceID, event.AggregateID, esConfig.IDPConfigID)
@@ -178,7 +177,7 @@ func (i *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, c
 }
 
 func (i *IDPProvider) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Fjd89", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPProviderFailedEvent, i.view.ProcessedIDPProviderFailedEvent, i.view.ProcessedIDPProviderSequence, i.errorCountUntilSkip)
 }
 
@@ -191,5 +190,5 @@ func (i *IDPProvider) getOrgIDPConfig(instanceID, aggregateID, idpConfigID strin
 }
 
 func (u *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, domain.IAMID)
+	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, instanceID)
 }

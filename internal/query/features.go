@@ -170,7 +170,7 @@ func (q *Queries) FeaturesByOrgID(ctx context.Context, orgID string) (*Features,
 					FeatureColumnAggregateID.identifier(): orgID,
 				},
 				sq.Eq{
-					FeatureColumnAggregateID.identifier(): domain.IAMID,
+					FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).ID,
 				},
 			},
 		}).
@@ -187,7 +187,7 @@ func (q *Queries) FeaturesByOrgID(ctx context.Context, orgID string) (*Features,
 func (q *Queries) DefaultFeatures(ctx context.Context) (*Features, error) {
 	query, scan := prepareFeaturesQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		FeatureColumnAggregateID.identifier(): domain.IAMID,
+		FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).ID,
 		FeatureColumnInstanceID.identifier():  authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {

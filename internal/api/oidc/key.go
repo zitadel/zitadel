@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
@@ -171,7 +171,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			ResourceOwner(domain.IAMID).
+			ResourceOwner(authz.GetInstance(ctx).ID).
 			AddQuery().
 			AggregateTypes(keypair.AggregateType).
 			Builder(),
