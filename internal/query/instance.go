@@ -111,7 +111,7 @@ func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
 	stmt, scan := prepareIAMQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		InstanceColumnID.identifier(): "system",
+		InstanceColumnID.identifier(): "system", //TODO: change column to domain when available
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
