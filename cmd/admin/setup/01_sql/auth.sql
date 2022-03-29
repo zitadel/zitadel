@@ -127,6 +127,7 @@ CREATE TABLE auth.tokens (
     audience STRING[] NULL,
     preferred_language STRING NULL,
     refresh_token_id STRING NULL,
+    is_pat BOOL NOT NULL DEFAULT false,
     instance_id STRING NULL,
 
     PRIMARY KEY (id),

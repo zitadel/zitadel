@@ -163,14 +163,14 @@ func (q *Queries) FeaturesByOrgID(ctx context.Context, orgID string) (*Features,
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
-				FeatureColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				FeatureColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Or{
 				sq.Eq{
 					FeatureColumnAggregateID.identifier(): orgID,
 				},
 				sq.Eq{
-					FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).ID,
+					FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -187,8 +187,8 @@ func (q *Queries) FeaturesByOrgID(ctx context.Context, orgID string) (*Features,
 func (q *Queries) DefaultFeatures(ctx context.Context) (*Features, error) {
 	query, scan := prepareFeaturesQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).ID,
-		FeatureColumnInstanceID.identifier():  authz.GetInstance(ctx).ID,
+		FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		FeatureColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-1Ndlg", "Errors.Query.SQLStatement")

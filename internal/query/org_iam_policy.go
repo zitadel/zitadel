@@ -75,14 +75,14 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, orgID string) (*DomainP
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Or{
 				sq.Eq{
 					DomainPolicyColID.identifier(): orgID,
 				},
 				sq.Eq{
-					DomainPolicyColID.identifier(): authz.GetInstance(ctx).ID,
+					DomainPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -99,8 +99,8 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, orgID string) (*DomainP
 func (q *Queries) DefaultDomainPolicy(ctx context.Context) (*DomainPolicy, error) {
 	stmt, scan := prepareDomainPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		DomainPolicyColID.identifier():         authz.GetInstance(ctx).ID,
-		DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		DomainPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
+		DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
 		OrderBy(DomainPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()

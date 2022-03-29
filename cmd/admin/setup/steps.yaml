@@ -22,7 +22,7 @@ S2DefaultInstance:
     PasswordAgePolicy:
       ExpireWarnDays: 0
       MaxAgeDays: 0
-    OrgIAMPolicy:
+    DomainPolicy:
       UserLoginMustBeDomain: true
     LoginPolicy:
       AllowUsernamePassword: true

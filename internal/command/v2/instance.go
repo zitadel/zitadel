@@ -61,6 +61,19 @@ type InstanceSetup struct {
 		PrivacyLink string
 		HelpLink    string
 	}
+	LabelPolicy struct {
+		PrimaryColor        string
+		BackgroundColor     string
+		WarnColor           string
+		FontColor           string
+		PrimaryColorDark    string
+		BackgroundColorDark string
+		WarnColorDark       string
+		FontColorDark       string
+		HideLoginNameSuffix bool
+		ErrorMsgPopup       bool
+		DisableWatermark    bool
+	}
 	LockoutPolicy struct {
 		MaxAttempts              uint64
 		ShouldShowLockoutFailure bool
@@ -195,6 +208,22 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 		AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
 		AddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
+		AddDefaultLabelPolicy(
+			instanceAgg,
+			setup.LabelPolicy.PrimaryColor,
+			setup.LabelPolicy.BackgroundColor,
+			setup.LabelPolicy.WarnColor,
+			setup.LabelPolicy.FontColor,
+			setup.LabelPolicy.PrimaryColorDark,
+			setup.LabelPolicy.BackgroundColorDark,
+			setup.LabelPolicy.WarnColorDark,
+			setup.LabelPolicy.FontColorDark,
+			setup.LabelPolicy.HideLoginNameSuffix,
+			setup.LabelPolicy.ErrorMsgPopup,
+			setup.LabelPolicy.DisableWatermark,
+		),
+		ActivateDefaultLabelPolicy(instanceAgg),
+
 		AddEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
 
@@ -206,9 +235,9 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 		AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
 		AddHumanCommand(instanceID, userAgg, &setup.Org.Human, command.userPasswordAlg),
 		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
+		AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
 
 		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
-
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
 		AddAPIApp(
@@ -259,6 +288,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			0,
 			nil,
 		),
+		SetIAMConsoleID(instanceAgg, setup.Zitadel.consoleClientID),
 	)
 
 	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter, validations...)
@@ -277,12 +307,23 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 	}, nil
 }
 
-//SetIAMProject defines the commands to set the id of the IAM project onto the instance
+//SetIAMProject defines the command to set the id of the IAM project onto the instance
 func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
 				instance.NewIAMProjectSetEvent(ctx, &a.Aggregate, projectID),
+			}, nil
+		}, nil
+	}
+}
+
+//SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+func SetIAMConsoleID(a *instance.Aggregate, clientID string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID),
 			}, nil
 		}, nil
 	}

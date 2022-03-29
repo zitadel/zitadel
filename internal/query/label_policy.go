@@ -54,7 +54,7 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*La
 			},
 			sq.Eq{
 				LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
-				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
@@ -81,7 +81,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 			},
 			sq.Eq{
 				LabelPolicyColState.identifier():      domain.LabelPolicyStatePreview,
-				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
@@ -99,7 +99,7 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, e
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).ID,
 		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
-		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -116,7 +116,7 @@ func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, 
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).ID,
 		LabelPolicyColState.identifier():      domain.LabelPolicyStatePreview,
-		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()

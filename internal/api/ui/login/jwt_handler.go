@@ -45,7 +45,7 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -209,7 +209,7 @@ func (l *Login) handleJWTCallback(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)

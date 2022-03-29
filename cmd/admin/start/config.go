@@ -2,6 +2,8 @@ package start
 
 import (
 	"github.com/caos/logging"
+	"github.com/spf13/viper"
+
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http/middleware"
@@ -16,7 +18,6 @@ import (
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query/projection"
 	static_config "github.com/caos/zitadel/internal/static/config"
-	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -25,6 +26,8 @@ type Config struct {
 	ExternalPort    uint16
 	ExternalDomain  string
 	ExternalSecure  bool
+	HTTP2HostHeader string
+	HTTP1HostHeader string
 	Database        database.Config
 	Projections     projection.Config
 	AuthZ           authz.Config

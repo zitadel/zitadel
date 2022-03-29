@@ -86,7 +86,7 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(HumanNickNameCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(HumanDisplayNameCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(HumanPreferredLanguageCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(HumanGenderCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(HumanGenderCol, crdb.ColumnTypeEnum, crdb.Nullable()),
 			crdb.NewColumn(HumanAvatarURLCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(HumanEmailCol, crdb.ColumnTypeText),
 			crdb.NewColumn(HumanIsEmailVerifiedCol, crdb.ColumnTypeBool, crdb.Default(false)),

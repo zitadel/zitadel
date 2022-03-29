@@ -68,7 +68,7 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID, instanceID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -89,7 +89,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)

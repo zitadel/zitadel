@@ -122,14 +122,14 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				MessageTextColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				MessageTextColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Or{
 				sq.Eq{
 					MessageTextColAggregateID.identifier(): orgID,
 				},
 				sq.Eq{
-					MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).ID,
+					MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -146,8 +146,8 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).ID,
-		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
+		MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).
 		Limit(1).ToSql()
 	if err != nil {
@@ -177,7 +177,7 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 			MessageTextColLanguage.identifier():    language,
 			MessageTextColType.identifier():        messageType,
 			MessageTextColAggregateID.identifier(): aggregateID,
-			MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
+			MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 		},
 	).
 		OrderBy(MessageTextColAggregateID.identifier()).
@@ -203,7 +203,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ekjFF", "Errors.TranslationFile.ReadError")
 	}
-	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).ID, messageType, language)
+	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID, messageType, language)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	}
 	result := notificationText.GetMessageTextByType(messageType)
 	result.IsDefault = true
-	result.AggregateID = authz.GetInstance(ctx).ID
+	result.AggregateID = authz.GetInstance(ctx).InstanceID()
 	return result, nil
 }
 

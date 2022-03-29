@@ -212,7 +212,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID str
 		sq.Eq{
 			AppColumnID.identifier():         appID,
 			AppColumnProjectID.identifier():  projectID,
-			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -228,7 +228,7 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppColumnID.identifier():         appID,
-			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -244,7 +244,7 @@ func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppOIDCConfigColumnClientID.identifier(): appID,
-			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).ID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -259,7 +259,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (stri
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).ID},
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			sq.Or{
 				sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
 				sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
@@ -279,7 +279,7 @@ func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (*Projec
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppOIDCConfigColumnClientID.identifier(): id,
-			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).ID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -295,7 +295,7 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App,
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppOIDCConfigColumnClientID.identifier(): clientID,
-			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).ID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -310,7 +310,7 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (*App, err
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).ID},
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			sq.Or{
 				sq.Eq{AppOIDCConfigColumnClientID.identifier(): clientID},
 				sq.Eq{AppAPIConfigColumnClientID.identifier(): clientID},
@@ -329,7 +329,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (*A
 	query, scan := prepareAppsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(
-			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).ID},
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
 		).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
@@ -351,7 +351,7 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 	query, scan := prepareClientIDsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(
-			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).ID},
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
 		).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")

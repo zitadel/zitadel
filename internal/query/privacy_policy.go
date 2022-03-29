@@ -84,14 +84,14 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+				PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Or{
 				sq.Eq{
 					PrivacyColID.identifier(): orgID,
 				},
 				sq.Eq{
-					PrivacyColID.identifier(): authz.GetInstance(ctx).ID,
+					PrivacyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -108,8 +108,8 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 func (q *Queries) DefaultPrivacyPolicy(ctx context.Context) (*PrivacyPolicy, error) {
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		PrivacyColID.identifier():         authz.GetInstance(ctx).ID,
-		PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		PrivacyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
+		PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()
