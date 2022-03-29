@@ -35,8 +35,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	S1ProjectionTable *ProjectionTable
-	S2DefaultInstance *DefaultInstance
+	s1ProjectionTable *ProjectionTable
+	s2AssetsTable     *AssetTable
+	S3DefaultInstance *DefaultInstance
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

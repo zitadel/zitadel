@@ -35,7 +35,7 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
-		tenantID      string
+		instanceID    string
 		location      string
 		resourceOwner string
 		name          string
@@ -66,12 +66,12 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 								testNow,
 							},
 						},
-						"tenantID", "location", "resourceOwner", "name", "contentType", static.ObjectTypeUserAvatar, []byte("test"),
+						"instanceID", "location", "resourceOwner", "name", "contentType", static.ObjectTypeUserAvatar, []byte("test"),
 					)),
 			},
 			args{
 				ctx:           context.Background(),
-				tenantID:      "tenantID",
+				instanceID:    "instanceID",
 				location:      "location",
 				resourceOwner: "resourceOwner",
 				name:          "name",
@@ -80,7 +80,7 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 				objectSize:    4,
 			},
 			&static.Asset{
-				TenantID:     "tenantID",
+				InstanceID:   "instanceID",
 				Name:         "name",
 				Hash:         "md5Hash",
 				Size:         4,
@@ -96,7 +96,7 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 			c := &crdbStorage{
 				client: tt.fields.client.db,
 			}
-			got, err := c.PutObject(tt.args.ctx /*tt.args.tenantID, tt.args.location,*/, tt.args.resourceOwner, tt.args.name, tt.args.contentType, tt.args.objectType, tt.args.data, tt.args.objectSize)
+			got, err := c.PutObject(tt.args.ctx, tt.args.instanceID, tt.args.location, tt.args.resourceOwner, tt.args.name, tt.args.contentType, tt.args.objectType, tt.args.data, tt.args.objectSize)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateObject() error = %v, wantErr %v", err, tt.wantErr)
 				return

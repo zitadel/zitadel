@@ -25,19 +25,19 @@ type Minio struct {
 	MultiDelete  bool
 }
 
-func (m *Minio) PutObject(ctx context.Context, tenantID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
-	err := m.createBucket(ctx, tenantID, location)
+func (m *Minio) PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
+	err := m.createBucket(ctx, instanceID, location)
 	if err != nil && !caos_errs.IsErrorAlreadyExists(err) {
 		return nil, err
 	}
-	bucketName := m.prefixBucketName(tenantID)
+	bucketName := m.prefixBucketName(instanceID)
 	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	info, err := m.Client.PutObject(ctx, bucketName, objectName, object, objectSize, minio.PutObjectOptions{ContentType: contentType})
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "MINIO-590sw", "Errors.Assets.Object.PutFailed")
 	}
 	return &static.Asset{
-		TenantID:      info.Bucket,
+		InstanceID:    info.Bucket,
 		ResourceOwner: resourceOwner,
 		Name:          info.Key,
 		Hash:          info.ETag,
@@ -48,8 +48,8 @@ func (m *Minio) PutObject(ctx context.Context, tenantID, location, resourceOwner
 	}, nil
 }
 
-func (m *Minio) GetObject(ctx context.Context, tenantID, resourceOwner, name string) ([]byte, func() (*static.Asset, error), error) {
-	bucketName := m.prefixBucketName(tenantID)
+func (m *Minio) GetObject(ctx context.Context, instanceID, resourceOwner, name string) ([]byte, func() (*static.Asset, error), error) {
+	bucketName := m.prefixBucketName(instanceID)
 	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	object, err := m.Client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
 	if err != nil {
@@ -60,7 +60,7 @@ func (m *Minio) GetObject(ctx context.Context, tenantID, resourceOwner, name str
 		if err != nil {
 			return nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
 		}
-		return m.objectToAssetInfo(tenantID, resourceOwner, info), nil
+		return m.objectToAssetInfo(instanceID, resourceOwner, info), nil
 	}
 	asset, err := io.ReadAll(object)
 	if err != nil {
@@ -69,8 +69,8 @@ func (m *Minio) GetObject(ctx context.Context, tenantID, resourceOwner, name str
 	return asset, info, nil
 }
 
-func (m *Minio) GetObjectInfo(ctx context.Context, tenantID, resourceOwner, name string) (*static.Asset, error) {
-	bucketName := m.prefixBucketName(tenantID)
+func (m *Minio) GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*static.Asset, error) {
+	bucketName := m.prefixBucketName(instanceID)
 	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	objectInfo, err := m.Client.StatObject(ctx, bucketName, objectName, minio.StatObjectOptions{})
 	if err != nil {
@@ -79,11 +79,11 @@ func (m *Minio) GetObjectInfo(ctx context.Context, tenantID, resourceOwner, name
 		}
 		return nil, caos_errs.ThrowInternal(err, "MINIO-1vySX", "Errors.Assets.Object.GetFailed")
 	}
-	return m.objectToAssetInfo(tenantID, resourceOwner, objectInfo), nil
+	return m.objectToAssetInfo(instanceID, resourceOwner, objectInfo), nil
 }
 
-func (m *Minio) RemoveObject(ctx context.Context, tenantID, resourceOwner, name string) error {
-	bucketName := m.prefixBucketName(tenantID)
+func (m *Minio) RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error {
+	bucketName := m.prefixBucketName(instanceID)
 	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	err := m.Client.RemoveObject(ctx, bucketName, objectName, minio.RemoveObjectOptions{})
 	if err != nil {
@@ -92,8 +92,8 @@ func (m *Minio) RemoveObject(ctx context.Context, tenantID, resourceOwner, name 
 	return nil
 }
 
-func (m *Minio) RemoveObjects(ctx context.Context, tenantID, resourceOwner string, objectType static.ObjectType) error {
-	bucketName := m.prefixBucketName(tenantID)
+func (m *Minio) RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType static.ObjectType) error {
+	bucketName := m.prefixBucketName(instanceID)
 	objectsCh := make(chan minio.ObjectInfo)
 	g := new(errgroup.Group)
 
@@ -167,7 +167,7 @@ func (m *Minio) listObjects(ctx context.Context, bucketName, prefix string, recu
 
 func (m *Minio) objectToAssetInfo(bucketName string, resourceOwner string, object minio.ObjectInfo) *static.Asset {
 	return &static.Asset{
-		TenantID:      bucketName,
+		InstanceID:    bucketName,
 		ResourceOwner: resourceOwner,
 		Name:          object.Key,
 		Hash:          object.ETag,

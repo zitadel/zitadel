@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	errs "errors"
 	"fmt"
 	"io"
 	"time"
@@ -10,15 +11,14 @@ import (
 	"github.com/Masterminds/squirrel"
 
 	caos_errors "github.com/caos/zitadel/internal/errors"
-
 	"github.com/caos/zitadel/internal/static"
 )
 
 var _ static.Storage = (*crdbStorage)(nil)
 
 const (
-	assetsTable           = "zitadel.system.assets"
-	AssetColTenant        = "tenant"
+	assetsTable           = "system.assets"
+	AssetColInstanceID    = "instance_id"
 	AssetColType          = "asset_type"
 	AssetColLocation      = "location"
 	AssetColResourceOwner = "resource_owner"
@@ -37,18 +37,18 @@ func NewStorage(client *sql.DB, _ map[string]interface{}) (static.Storage, error
 	return &crdbStorage{client: client}, nil
 }
 
-func (c *crdbStorage) PutObject(ctx context.Context, tenantID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
+func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
 	data, err := io.ReadAll(object)
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "DATAB-Dfwvq", "")
 	}
 	stmt, args, err := squirrel.Insert(assetsTable).
-		Columns(AssetColTenant, AssetColLocation, AssetColResourceOwner, AssetColName, AssetColType, AssetColContentType, AssetColData).
-		Values(tenantID, location, resourceOwner, name, objectType, contentType, data).
+		Columns(AssetColInstanceID, AssetColLocation, AssetColResourceOwner, AssetColName, AssetColType, AssetColContentType, AssetColData).
+		Values(instanceID, location, resourceOwner, name, objectType, contentType, data).
 		Suffix(fmt.Sprintf(
 			"ON CONFLICT (%s, %s, %s) DO UPDATE"+
 				" SET %s = $2, %s = $6, %s = $7"+
-				" RETURNING %s, %s", AssetColTenant, AssetColResourceOwner, AssetColName, AssetColLocation, AssetColContentType, AssetColData, AssetColHash, AssetColUpdatedAt)).
+				" RETURNING %s, %s", AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColLocation, AssetColContentType, AssetColData, AssetColHash, AssetColUpdatedAt)).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
@@ -61,7 +61,7 @@ func (c *crdbStorage) PutObject(ctx context.Context, tenantID, location, resourc
 		return nil, caos_errors.ThrowInternal(err, "DATAB-D2g2q", "")
 	}
 	return &static.Asset{
-		TenantID:     tenantID,
+		InstanceID:   instanceID,
 		Name:         name,
 		Hash:         hash,
 		Size:         objectSize,
@@ -71,22 +71,22 @@ func (c *crdbStorage) PutObject(ctx context.Context, tenantID, location, resourc
 	}, nil
 }
 
-func (c *crdbStorage) GetObject(ctx context.Context, tenantID, resourceOwner, name string) ([]byte, func() (*static.Asset, error), error) {
-	query, args, err := squirrel.Select(AssetColData, AssetColContentType, AssetColLocation, AssetColHash, AssetColUpdatedAt).
+func (c *crdbStorage) GetObject(ctx context.Context, instanceID, resourceOwner, name string) ([]byte, func() (*static.Asset, error), error) {
+	query, args, err := squirrel.Select(AssetColData, AssetColContentType /*AssetColLocation, */, AssetColHash, AssetColUpdatedAt).
 		From(assetsTable).
 		Where(squirrel.Eq{
-			AssetColTenant:        tenantID,
+			AssetColInstanceID:    instanceID,
 			AssetColResourceOwner: resourceOwner,
 			AssetColName:          name,
 		}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-
+		return nil, nil, caos_errors.ThrowInternal(err, "DATAB-GE3hz", "")
 	}
 	var data []byte
 	asset := &static.Asset{
-		TenantID:      tenantID,
+		InstanceID:    instanceID,
 		ResourceOwner: resourceOwner,
 		Name:          name,
 	}
@@ -99,6 +99,9 @@ func (c *crdbStorage) GetObject(ctx context.Context, tenantID, resourceOwner, na
 			&asset.LastModified,
 		)
 	if err != nil {
+		if errs.Is(err, sql.ErrNoRows) {
+			return nil, nil, caos_errors.ThrowNotFound(err, "DATAB-pCP8P", "Errors.Asset.NotFound")
+		}
 		return nil, nil, caos_errors.ThrowInternal(err, "DATAB-Sfgb3", "")
 	}
 	asset.Size = int64(len(data))
@@ -109,21 +112,21 @@ func (c *crdbStorage) GetObject(ctx context.Context, tenantID, resourceOwner, na
 		nil
 }
 
-func (c *crdbStorage) GetObjectInfo(ctx context.Context, tenantID, resourceOwner, name string) (*static.Asset, error) {
+func (c *crdbStorage) GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*static.Asset, error) {
 	query, args, err := squirrel.Select(AssetColContentType, AssetColLocation, "length("+AssetColData+")", AssetColHash, AssetColUpdatedAt).
 		From(assetsTable).
 		Where(squirrel.Eq{
-			AssetColTenant:        tenantID,
+			AssetColInstanceID:    instanceID,
 			AssetColResourceOwner: resourceOwner,
 			AssetColName:          name,
 		}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-
+		return nil, caos_errors.ThrowInternal(err, "DATAB-rggt2", "")
 	}
 	asset := &static.Asset{
-		TenantID:      tenantID,
+		InstanceID:    instanceID,
 		ResourceOwner: resourceOwner,
 		Name:          name,
 	}
@@ -141,10 +144,10 @@ func (c *crdbStorage) GetObjectInfo(ctx context.Context, tenantID, resourceOwner
 	return asset, nil
 }
 
-func (c *crdbStorage) RemoveObject(ctx context.Context, tenantID, resourceOwner, name string) error {
+func (c *crdbStorage) RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error {
 	stmt, args, err := squirrel.Delete(assetsTable).
 		Where(squirrel.Eq{
-			AssetColTenant:        tenantID,
+			AssetColInstanceID:    instanceID,
 			AssetColResourceOwner: resourceOwner,
 			AssetColName:          name,
 		}).
@@ -155,26 +158,26 @@ func (c *crdbStorage) RemoveObject(ctx context.Context, tenantID, resourceOwner,
 	}
 	_, err = c.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
-
+		return caos_errors.ThrowInternal(err, "DATAB-RHNgf", "")
 	}
 	return nil
 }
 
-func (c *crdbStorage) RemoveObjects(ctx context.Context, tenantID, resourceOwner string, objectType static.ObjectType) error {
+func (c *crdbStorage) RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType static.ObjectType) error {
 	stmt, args, err := squirrel.Delete(assetsTable).
 		Where(squirrel.Eq{
-			AssetColTenant:        tenantID,
+			AssetColInstanceID:    instanceID,
 			AssetColResourceOwner: resourceOwner,
 			AssetColType:          objectType,
 		}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-
+		return caos_errors.ThrowInternal(err, "DATAB-Sfgeq", "")
 	}
 	_, err = c.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
-
+		return caos_errors.ThrowInternal(err, "DATAB-Efgt2", "")
 	}
 	return nil
 }

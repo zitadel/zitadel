@@ -10,11 +10,11 @@ import (
 type CreateStorage func(client *sql.DB, rawConfig map[string]interface{}) (Storage, error)
 
 type Storage interface {
-	PutObject(ctx context.Context, tenantID, location, resourceOwner, name, contentType string, objectType ObjectType, object io.Reader, objectSize int64) (*Asset, error)
-	GetObject(ctx context.Context, tenantID, resourceOwner, name string) ([]byte, func() (*Asset, error), error)
-	GetObjectInfo(ctx context.Context, tenantID, resourceOwner, name string) (*Asset, error)
-	RemoveObject(ctx context.Context, tenantID, resourceOwner, name string) error
-	RemoveObjects(ctx context.Context, tenantID, resourceOwner string, objectType ObjectType) error
+	PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType ObjectType, object io.Reader, objectSize int64) (*Asset, error)
+	GetObject(ctx context.Context, instanceID, resourceOwner, name string) ([]byte, func() (*Asset, error), error)
+	GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*Asset, error)
+	RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error
+	RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType ObjectType) error
 	//TODO: add functionality to move asset location
 }
 
@@ -26,7 +26,7 @@ const (
 )
 
 type Asset struct {
-	TenantID      string
+	InstanceID    string
 	ResourceOwner string
 	Name          string
 	Hash          string

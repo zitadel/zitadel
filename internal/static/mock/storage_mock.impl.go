@@ -19,10 +19,10 @@ func NewStorage(t *testing.T) *MockStorage {
 func (m *MockStorage) ExpectPutObject() *MockStorage {
 	m.EXPECT().
 		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		DoAndReturn(func(ctx context.Context, tenantID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
+		DoAndReturn(func(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
 			hash, _ := io.ReadAll(object)
 			return &static.Asset{
-				TenantID:     tenantID,
+				InstanceID:   instanceID,
 				Name:         name,
 				Hash:         string(hash),
 				Size:         objectSize,

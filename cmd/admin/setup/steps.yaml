@@ -1,4 +1,4 @@
-S2DefaultInstance:
+S3DefaultInstance:
   InstanceSetup:
     Org:
       Name: ZITADEL

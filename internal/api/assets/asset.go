@@ -181,7 +181,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 }
 
 func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName string, storage static.Storage) error {
-	data, getInfo, err := storage.GetObject(r.Context(), "0", resourceOwner, objectName)
+	data, getInfo, err := storage.GetObject(r.Context(), authz.GetInstance(r.Context()).ID, resourceOwner, objectName)
 	if err != nil {
 		return fmt.Errorf("download failed: %v", err)
 	}
