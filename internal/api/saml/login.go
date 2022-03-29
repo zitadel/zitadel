@@ -33,6 +33,7 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 	}
 
 	authRequest, err := p.storage.AuthRequestByID(r.Context(), requestID)
+	response.RequestID = authRequest.GetAuthRequestID()
 	response.RelayState = authRequest.GetRelayState()
 	response.ProtocolBinding = authRequest.GetBindingType()
 	response.AcsUrl = authRequest.GetAccessConsumerServiceURL()

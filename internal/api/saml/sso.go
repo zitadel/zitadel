@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/saml/checker"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/xml_dsig"
 	"net/http"
@@ -26,6 +27,13 @@ type AuthRequestForm struct {
 }
 
 func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request) {
+	checker := checker.Checker{}
+	var authRequestForm *AuthRequestForm
+	var authNRequest *samlp.AuthnRequest
+	var sp *ServiceProvider
+	var authRequest AuthRequestInt
+	var err error
+
 	response := &Response{
 		PostTemplate: p.postTemplate,
 		ErrorFunc: func(err error) {
@@ -34,139 +42,235 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		Issuer: p.EntityID,
 	}
 
-	authRequestForm, err := getAuthRequestFromRequest(r)
-	if err != nil {
-		logging.Log("SAML-837n2s").Error(err)
-		http.Error(w, fmt.Errorf("failed to parse form: %w", err).Error(), http.StatusInternalServerError)
-		return
-	}
-	if authRequestForm.RelayState == "" {
-		logging.Log("SAML-86272s").Error(err)
-		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("empty relaystate").Error()))
-		return
-	}
-	response.SigAlg = authRequestForm.SigAlg
-	response.RelayState = authRequestForm.RelayState
+	// parse form to cover POST and REDIRECT binding
+	checker.WithLogicStep(
+		func() error {
+			authRequestForm, err = getAuthRequestFromRequest(r)
+			if err != nil {
+				return err
+			}
+			response.SigAlg = authRequestForm.SigAlg
+			response.RelayState = authRequestForm.RelayState
+			return nil
+		},
+		"SAML-837n2s",
+		func() {
+			http.Error(w, fmt.Errorf("failed to parse form: %w", err).Error(), http.StatusInternalServerError)
+		},
+	)
 
-	if err := verifyForm(authRequestForm); err != nil {
-		logging.Log("SAML-827n2s").Error(err)
-		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to validate form: %w", err).Error()))
-		return
-	}
+	// verify that relayState is provided
+	checker.WithValueNotEmptyCheck(
+		"relayState",
+		func() string { return authRequestForm.RelayState },
+		"SAML-86272s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("empty relaystate").Error()))
+		},
+	)
 
-	authNRequest, err := decodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
-	if err != nil {
-		logging.Log("SAML-837s2s").Error(err)
-		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to decode request: %w", err).Error()))
-		return
-	}
-	response.RequestID = authNRequest.Id
+	// verify that request is not empty
+	checker.WithValueNotEmptyCheck(
+		"SAMLRequest",
+		func() string { return authRequestForm.AuthRequest },
+		"SAML-nu32kq",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("no auth request provided").Error()))
+		},
+	)
 
-	sp, err := p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
-	if err != nil {
-		logging.Log(" SAML-317s2s").Error(err)
-		http.Error(w, fmt.Errorf("failed to find registered serviceprovider: %w", err).Error(), http.StatusInternalServerError)
-		return
-	}
-	if sp == nil {
-		logging.Log("SAML-837nas").Error(err)
-		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("unknown service provider: %w", err).Error()))
-		return
-	}
-	response.Audience = sp.GetEntityID()
+	// verify that there is a signature provided if signature algorithm is provided
+	checker.WithConditionalValueNotEmpty(
+		func() bool { return authRequestForm.SigAlg != "" },
+		"Signature",
+		func() string { return authRequestForm.Sig },
+		"SAML-827n2s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("signature algorith provided but no signature").Error()))
+		},
+	)
 
-	if sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
-		p.Metadata.WantAuthnRequestsSigned == "true" ||
-		authRequestForm.Sig != "" ||
-		(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue != xml_dsig.SignatureValueType{} && authNRequest.Signature.SignatureValue.Text != "") {
+	// decode request from xml into golang struct
+	checker.WithLogicStep(
+		func() error {
+			authNRequest, err = decodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
+			if err != nil {
+				return err
+			}
+			response.RequestID = authNRequest.Id
+			return nil
+		},
+		"SAML-837s2s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to decode request").Error()))
+		},
+	)
 
-		switch authNRequest.ProtocolBinding {
-		case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
+	// get persistet service provider from issuer out of the request
+	checker.WithLogicStep(
+		func() error {
+			sp, err = p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+		" SAML-317s2s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to find registered serviceprovider: %w", err).Error()))
+		},
+	)
+	checker.WithValueStep(
+		func() { response.Audience = sp.GetEntityID() },
+	)
+
+	// get signature out of request if POST-binding
+	checker.WithConditionalLogicStep(
+		func() bool {
+			return sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
+				p.Metadata.WantAuthnRequestsSigned == "true" ||
+				authRequestForm.Sig != "" ||
+				(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue != xml_dsig.SignatureValueType{} && authNRequest.Signature.SignatureValue.Text != "") &&
+					authNRequest.ProtocolBinding == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+		},
+		func() error {
 			authRequestForm.SigAlg = authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm
 			authRequestForm.Sig = authNRequest.Signature.SignatureValue.Text
 
 			authRequestForm.AuthRequest, err = authNRequestIntoStringWithoutSignature(authRequestForm.Encoding, authRequestForm.AuthRequest)
 			if err != nil {
-				logging.Log("SAML-i1o2mh").Error(err)
-				response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to send response: %w", err).Error()))
-				return
+				return err
 			}
-		case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
-			//do nothing? as everything should be in the form
-		}
-
-		if err := sp.verifySignature(
-			authRequestForm.AuthRequest,
-			authRequestForm.RelayState,
-			authRequestForm.SigAlg,
-			authRequestForm.Sig,
-		); err != nil {
-			logging.Log("SAML-817n2s").Error(err)
-			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify signature: %w", err).Error()))
-			return
-		}
-	}
-
-	if err := p.verifyRequestDestination(authNRequest); err != nil {
-		logging.Log("SAML-83722s").Error(err)
-		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify request destination: %w", err).Error()))
-		return
-	}
-
-	for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
-		if acs.Binding == authNRequest.ProtocolBinding {
-			response.AcsUrl = acs.Location
-			response.ProtocolBinding = acs.Binding
-			break
-		}
-	}
-	if response.AcsUrl == "" {
-		for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
-			response.AcsUrl = acs.Location
-			response.ProtocolBinding = acs.Binding
-			break
-		}
-	}
-	if response.AcsUrl == "" {
-		logging.Log("SAML-83712s").Error(err)
-		response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("missing assertion consumer url").Error()))
-		return
-	}
-	if response.ProtocolBinding == "" {
-		logging.Log("SAML-83711s").Error(err)
-		response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("missing binding").Error()))
-		return
-	}
-
-	if err := verifyRequestContent(
-		authNRequest,
-		string(sp.metadata.EntityID),
-	); err != nil {
-		logging.Log("SAML-8kj22s").Error(err)
-		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify request content: %w", err).Error()))
-		return
-	}
-
-	authRequest, err := p.storage.CreateAuthRequest(
-		r.Context(),
-		authNRequest,
-		response.AcsUrl,
-		response.ProtocolBinding,
-		authRequestForm.RelayState,
-		sp.ID,
+			return nil
+		},
+		"SAML-i1o2mh",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to extract signature from request: %w", err).Error()))
+		},
 	)
-	if err != nil {
-		logging.Log("SAML-8opi22s").Error(err)
-		response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to persist request %w", err).Error()))
+
+	// verify signature if necessary
+	checker.WithConditionalLogicStep(
+		func() bool {
+			return sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
+				p.Metadata.WantAuthnRequestsSigned == "true" ||
+				authRequestForm.Sig != "" ||
+				(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue != xml_dsig.SignatureValueType{} && authNRequest.Signature.SignatureValue.Text != "")
+		},
+		func() error {
+			err = sp.verifySignature(
+				authRequestForm.AuthRequest,
+				authRequestForm.RelayState,
+				authRequestForm.SigAlg,
+				authRequestForm.Sig,
+			)
+			return err
+		},
+		"SAML-817n2s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify signature: %w", err).Error()))
+		},
+	)
+
+	// verify that destination in request is this IDP
+	checker.WithLogicStep(
+		func() error { err = p.verifyRequestDestination(authNRequest); return err },
+		"SAML-83722s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify request destination: %w", err).Error()))
+		},
+	)
+
+	// work out used acs url and protocolbinding for response
+	checker.WithValueStep(
+		func() {
+			for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+				if acs.Binding == authNRequest.ProtocolBinding {
+					response.AcsUrl = acs.Location
+					response.ProtocolBinding = acs.Binding
+					break
+				}
+			}
+			if response.AcsUrl == "" {
+				for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+					response.AcsUrl = acs.Location
+					response.ProtocolBinding = acs.Binding
+					break
+				}
+			}
+		},
+	)
+
+	// check if supported acs url is provided
+	checker.WithValueNotEmptyCheck(
+		"acsUrl",
+		func() string { return response.AcsUrl },
+		"SAML-83712s",
+		func() {
+			response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("missing usable assertion consumer url").Error()))
+		},
+	)
+
+	// check if supported protocolbinding is provided
+	checker.WithValueNotEmptyCheck(
+		"protocol binding",
+		func() string { return response.ProtocolBinding },
+		"SAML-83711s",
+		func() {
+			response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("missing usable protocol binding").Error()))
+		},
+	)
+
+	//check if authrequest has required attributes
+	checker.WithValuesNotEmptyCheck(
+		func() []string { return []string{authNRequest.Id, authNRequest.Version, authNRequest.Issuer.Text} },
+		"SAML-8kj22s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("request is missing requiered attributes").Error()))
+		},
+	)
+
+	//check if entityId used in the request and serviceprovider is equal
+	checker.WithValueEqualsCheck(
+		"entityID",
+		func() string { return authNRequest.Issuer.Text },
+		func() string { return string(sp.metadata.EntityID) },
+		"SAML-7qj22s",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("provided issuer is not equal to known service provider").Error()))
+		},
+	)
+
+	// persist authrequest
+	checker.WithLogicStep(
+		func() error {
+			authRequest, err = p.storage.CreateAuthRequest(
+				r.Context(),
+				authNRequest,
+				response.AcsUrl,
+				response.ProtocolBinding,
+				authRequestForm.RelayState,
+				sp.ID,
+			)
+			return err
+		},
+		"SAML-8opi22s",
+		func() {
+			response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to persist request: %w", err).Error()))
+		},
+	)
+
+	//check and log errors if necessary
+	if checker.CheckFailed() {
 		return
 	}
 
-	switch response.AcsUrl {
+	switch response.ProtocolBinding {
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
 		http.Redirect(w, r, sp.LoginURL(authRequest.GetID()), http.StatusSeeOther)
 	default:
 		logging.Log("SAML-67722s").Error(err)
-		response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("unsupported binding: %s", authNRequest.ProtocolBinding).Error()))
+		response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("unsupported binding: %s", response.ProtocolBinding).Error()))
 	}
 	return
 }
@@ -186,32 +290,6 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 	}
 
 	return request, nil
-}
-
-func verifyForm(r *AuthRequestForm) error {
-	if r.AuthRequest == "" {
-		return fmt.Errorf("empty SAMLRequest")
-	}
-
-	/*if r.Encoding == "" {
-		r.Encoding = EncodingDeflate
-	}*/
-
-	if r.RelayState == "" {
-		return fmt.Errorf("empty RelayState")
-	}
-	//should be 80, but google / SNOW implement it wrong
-	/*if len(r.RelayState) > 80 {
-		return fmt.Errorf("relaystate should not be longer than 300")
-	}*/
-
-	if r.SigAlg != "" {
-		if r.Sig == "" {
-			return fmt.Errorf("empty Signature")
-		}
-	}
-
-	return nil
 }
 
 func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequest, error) {
@@ -252,23 +330,4 @@ func authNRequestIntoStringWithoutSignature(encoding string, message string) (st
 
 	return base64.StdEncoding.EncodeToString(authRequest), nil
 
-}
-
-func verifyRequestContent(request *samlp.AuthnRequest, entityID string) error {
-	if request.Id == "" {
-		return fmt.Errorf("request with empty id")
-	}
-
-	if request.Version == "" {
-		return fmt.Errorf("request with empty version")
-	}
-
-	if request.Issuer.Text == "" {
-		return fmt.Errorf("request with empty issuer")
-	}
-
-	if request.Issuer.Text != entityID {
-		return fmt.Errorf("request with unknown issuer")
-	}
-	return nil
 }

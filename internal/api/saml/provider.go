@@ -238,7 +238,6 @@ func getCACert(storage Storage) ([]byte, *rsa.PrivateKey) {
 			return certWebKey.Key.([]byte), keyWebKey.Key.(*rsa.PrivateKey)
 		}
 	}
-
 }
 
 func getMetadataCert(storage Storage) ([]byte, *rsa.PrivateKey) {
