@@ -14,7 +14,7 @@ import (
 const (
 	InstanceMemberProjectionTable = "projections.instance_members"
 
-	InstanceMemberIAMIDCol = "instance_id"
+	InstanceMemberIAMIDCol = "id"
 )
 
 type InstanceMemberProjection struct {

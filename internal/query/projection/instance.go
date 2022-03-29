@@ -17,6 +17,7 @@ const (
 	InstanceColumnChangeDate      = "change_date"
 	InstanceColumnGlobalOrgID     = "global_org_id"
 	InstanceColumnProjectID       = "iam_project_id"
+	InstanceColumnConsoleID       = "console_client_id"
 	InstanceColumnSequence        = "sequence"
 	InstanceColumnSetUpStarted    = "setup_started"
 	InstanceColumnSetUpDone       = "setup_done"
@@ -37,6 +38,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(InstanceColumnSetUpStarted, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(InstanceColumnSetUpDone, crdb.ColumnTypeInt64, crdb.Default(0)),
@@ -61,6 +63,10 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.ProjectSetEventType,
 					Reduce: p.reduceIAMProjectSet,
+				},
+				{
+					Event:  instance.ConsoleSetEventType,
+					Reduce: p.reduceConsoleSet,
 				},
 				{
 					Event:  instance.DefaultLanguageSetEventType,
@@ -107,6 +113,22 @@ func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnProjectID, e.ProjectID),
+		},
+	), nil
+}
+
+func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.ConsoleSetEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
+	}
+	return crdb.NewUpsertStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
+			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
+			handler.NewCol(InstanceColumnSequence, e.Sequence()),
+			handler.NewCol(InstanceColumnConsoleID, e.ClientID),
 		},
 	), nil
 }

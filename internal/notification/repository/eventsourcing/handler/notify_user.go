@@ -251,7 +251,7 @@ func (u *NotifyUser) loginNameInformation(ctx context.Context, orgID string) (us
 		return false, "", nil, err
 	}
 	if org.DomainPolicy == nil {
-		policy, err := u.queries.DefaultDomainPolicy(authz.WithInstance(ctx, authz.Instance{ID: org.InstanceID}))
+		policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
 		if err != nil {
 			return false, "", nil, err
 		}

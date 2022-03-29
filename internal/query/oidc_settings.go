@@ -76,7 +76,7 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 	stmt, scan := prepareOIDCSettingsQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OIDCSettingsColumnAggregateID.identifier(): aggregateID,
-		OIDCSettingsColumnInstanceID.identifier():  authz.GetInstance(ctx).ID,
+		OIDCSettingsColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatment")

@@ -21,7 +21,7 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 	instance := authz.GetInstance(ctx)
 	editorUser := ctxData.UserID
 	resourceOwner := ctxData.OrgID
-	instanceID := instance.ID
+	instanceID := instance.InstanceID()
 
 	aggregate := &Aggregate{
 		ID:               id,

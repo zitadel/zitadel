@@ -41,7 +41,7 @@ func (es *Eventstore) Health(ctx context.Context) error {
 //Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
-	events, constraints, err := commandsToRepository(authz.GetInstance(ctx).ID, cmds)
+	events, constraints, err := commandsToRepository(authz.GetInstance(ctx).InstanceID(), cmds)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func uniqueConstraintsToRepository(instanceID string, constraints []*EventUnique
 //Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
-	query, err := queryFactory.build(authz.GetInstance(ctx).ID)
+	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 //LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
-	query, err := queryFactory.build(authz.GetInstance(ctx).ID)
+	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return 0, err
 	}

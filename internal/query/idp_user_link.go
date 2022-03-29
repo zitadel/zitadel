@@ -86,7 +86,7 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	query, scan := prepareIDPUserLinksQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+			IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")

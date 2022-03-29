@@ -39,7 +39,7 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).ID
+	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authSession, err)

@@ -43,3 +43,16 @@ func AddDefaultLabelPolicy(
 		}, nil
 	}
 }
+
+func ActivateDefaultLabelPolicy(
+	a *instance.Aggregate,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
+			return []eventstore.Command{
+				instance.NewLabelPolicyActivatedEvent(ctx, &a.Aggregate),
+			}, nil
+		}, nil
+	}
+}
