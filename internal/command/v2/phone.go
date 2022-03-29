@@ -29,5 +29,5 @@ func FormatPhoneNumber(number string) (string, error) {
 }
 
 func newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
-	return newCryptoCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
+	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
 }

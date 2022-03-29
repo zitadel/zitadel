@@ -183,7 +183,7 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	return c.createHuman(ctx, orgID, human, link, true, false, domainPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 }
 
-func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, selfregister, passwordless bool, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
+func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, selfregister, passwordless bool, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) (events []eventstore.Command, addedHuman *HumanWriteModel, err error) {
 	// if err := human.CheckDomainPolicy(domainPolicy); err != nil {
 	// 	return nil, nil, err
 	// }

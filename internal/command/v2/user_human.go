@@ -43,6 +43,12 @@ type AddHuman struct {
 	Register               bool
 }
 
+type addCommand interface {
+	eventstore.Command
+	AddPhoneData(phoneNumber string)
+	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
+}
+
 func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, phoneAlg, initCodeAlg crypto.EncryptionAlgorithm) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if !human.Email.Valid() {
@@ -75,12 +81,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				return nil, err
 			}
 
-			var createCmd interface {
-				eventstore.Command
-				AddPhoneData(phoneNumber string)
-				AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
-			}
-
+			var createCmd addCommand
 			if human.Register {
 				createCmd = user.NewHumanRegisteredEvent(
 					ctx,
@@ -110,9 +111,11 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 					domainPolicy.UserLoginMustBeDomain,
 				)
 			}
+
 			if human.Phone.Number != "" {
 				createCmd.AddPhoneData(human.Phone.Number)
 			}
+
 			if human.Password != "" {
 				if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
 					return nil, err
@@ -125,8 +128,8 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				createCmd.AddPasswordData(secret, human.PasswordChangeRequired)
 			}
 
-			if human.notInitialised() {
-				value, expiry, err := newUserCode(ctx, filter, initCodeAlg)
+			if human.shouldAddInitCode() {
+				value, expiry, err := newUserInitCode(ctx, filter, initCodeAlg)
 				if err != nil {
 					return nil, err
 				}
@@ -199,8 +202,10 @@ func (h *AddHuman) ensureDisplayName() {
 	h.DisplayName = h.FirstName + " " + h.LastName
 }
 
-func (h *AddHuman) notInitialised() bool {
+func (h *AddHuman) shouldAddInitCode() bool {
+	//user without idp
 	return !h.Email.Verified ||
+		//user with idp
 		!h.ExternalIDP &&
 			!h.Passwordless &&
 			h.Password != ""

@@ -5,20 +5,29 @@ import (
 	"strings"
 	"time"
 
+	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/id"
+	project_repo "github.com/caos/zitadel/internal/repository/project"
 )
 
+type AddApp struct {
+}
+
+type addOIDCApp struct {
+	App     AddApp
+	Version domain.OIDCVersion
+}
+
 func AddOIDCApp(
-	a project.Aggregate,
+	a project_repo.Aggregate,
 	version domain.OIDCVersion,
 	appID,
-	name,
-	clientID string,
+	name string,
 	clientSecret *crypto.CryptoValue,
 	redirectUris []string,
 	responseTypes []domain.OIDCResponseType,
@@ -33,29 +42,63 @@ func AddOIDCApp(
 	idTokenUserinfoAssertion bool,
 	clockSkew time.Duration,
 	additionalOrigins []string,
+	clientSecretAlg crypto.EncryptionAlgorithm,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if appID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument")
 		}
+
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument")
 		}
-		if clientID == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "PROJE-ghTsJ", "Errors.Invalid.Argument")
+
+		if clockSkew > time.Second*5 || clockSkew < 0 {
+			return nil, errors.ThrowInvalidArgument(nil, "V2-PnCMS", "Errors.Invalid.Argument")
 		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if exists, err := ExistsProject(ctx, filter, a.ID, a.ResourceOwner); !exists || err != nil {
-				return nil, errors.ThrowNotFound(err, "PROJE-5LQ0U", "Errors.Project.NotFound")
+
+		for _, origin := range additionalOrigins {
+			if !http_util.IsOrigin(origin) {
+				return nil, errors.ThrowInvalidArgument(nil, "V2-DqWPX", "Errors.Invalid.Argument")
 			}
+		}
+
+		if !domain.ContainsRequiredGrantTypes(responseTypes, grantTypes) {
+			return nil, errors.ThrowInvalidArgument(nil, "V2-sLpW1", "Errors.Invalid.Argument")
+		}
+
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
+			project, err := projectWriteModel(ctx, filter, a.ID, a.ResourceOwner)
+			if err != nil || !project.State.Valid() {
+				return nil, errors.ThrowNotFound(err, "PROJE-6swVG", "Errors.Project.NotFound")
+			}
+
+			clientID, err := domain.NewClientID(id.SonyFlakeGenerator, project.Name)
+			if err != nil {
+				return nil, errors.ThrowInternal(err, "V2-VMSQ1", "Errors.Internal")
+			}
+
+			var (
+				clientSecret      *crypto.CryptoValue
+				clientSecretPlain string
+			)
+			//requires client secret
+			// TODO(release blocking):we have to return the secret
+			if authMethodType == domain.OIDCAuthMethodTypeBasic || authMethodType == domain.OIDCAuthMethodTypePost {
+				clientSecret, clientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
+				if err != nil {
+					return nil, err
+				}
+			}
+
 			return []eventstore.Command{
-				project.NewApplicationAddedEvent(
+				project_repo.NewApplicationAddedEvent(
 					ctx,
 					&a.Aggregate,
 					appID,
 					name,
 				),
-				project.NewOIDCConfigAddedEvent(
+				project_repo.NewOIDCConfigAddedEvent(
 					ctx,
 					&a.Aggregate,
 					version,
@@ -82,12 +125,11 @@ func AddOIDCApp(
 }
 
 func AddAPIApp(
-	a project.Aggregate,
+	a project_repo.Aggregate,
 	appID,
-	name,
-	clientID string,
-	clientSecret *crypto.CryptoValue,
+	name string,
 	authMethodType domain.APIAuthMethodType,
+	clientSecretAlg crypto.EncryptionAlgorithm,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if appID == "" {
@@ -96,21 +138,38 @@ func AddAPIApp(
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument")
 		}
-		if clientID == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XXED5", "Errors.Invalid.Argument")
-		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if exists, err := ExistsProject(ctx, filter, a.ID, a.ResourceOwner); !exists || err != nil {
+			project, err := projectWriteModel(ctx, filter, a.ID, a.ResourceOwner)
+			if err != nil || !project.State.Valid() {
 				return nil, errors.ThrowNotFound(err, "PROJE-Sf2gb", "Errors.Project.NotFound")
 			}
+
+			clientID, err := domain.NewClientID(id.SonyFlakeGenerator, project.Name)
+			if err != nil {
+				return nil, errors.ThrowInternal(err, "V2-f0pgP", "Errors.Internal")
+			}
+
+			var (
+				clientSecret      *crypto.CryptoValue
+				clientSecretPlain string
+			)
+			//requires client secret
+			// TODO(release blocking):we have to return the secret
+			if authMethodType == domain.APIAuthMethodTypeBasic {
+				clientSecret, clientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
+				if err != nil {
+					return nil, err
+				}
+			}
+
 			return []eventstore.Command{
-				project.NewApplicationAddedEvent(
+				project_repo.NewApplicationAddedEvent(
 					ctx,
 					&a.Aggregate,
 					appID,
 					name,
 				),
-				project.NewAPIConfigAddedEvent(
+				project_repo.NewAPIConfigAddedEvent(
 					ctx,
 					&a.Aggregate,
 					appID,
@@ -123,33 +182,6 @@ func AddAPIApp(
 	}
 }
 
-func ExistsApp(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, appID, resourceOwner string) (exists bool, err error) {
-	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(resourceOwner).
-		OrderAsc().
-		AddQuery().
-		AggregateTypes(project.AggregateType).
-		AggregateIDs(projectID).
-		EventTypes(
-			project.ApplicationAddedType,
-			project.ApplicationRemovedType,
-		).Builder())
-	if err != nil {
-		return false, err
-	}
-
-	for _, event := range events {
-		switch e := event.(type) {
-		case *project.ApplicationAddedEvent:
-			if e.AppID == appID {
-				exists = true
-			}
-		case *project.ApplicationRemovedEvent:
-			if e.AppID == appID {
-				exists = false
-			}
-		}
-	}
-
-	return exists, nil
+func newAppClientSecret(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, plain string, err error) {
+	return newCryptoCodeWithPlain(ctx, filter, domain.SecretGeneratorTypeAppSecret, alg)
 }

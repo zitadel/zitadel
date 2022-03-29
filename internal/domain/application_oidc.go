@@ -146,10 +146,15 @@ func (a *OIDCApp) OriginsValid() bool {
 	return true
 }
 
-func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
-	grantTypes := make([]OIDCGrantType, 0)
-	implicit := false
-	for _, r := range a.ResponseTypes {
+func ContainsRequiredGrantTypes(responseTypes []OIDCResponseType, grantTypes []OIDCGrantType) bool {
+	required := RequiredOIDCGrantTypes(responseTypes)
+	return ContainsOIDCGrantTypes(required, grantTypes)
+}
+
+func RequiredOIDCGrantTypes(responseTypes []OIDCResponseType) (grantTypes []OIDCGrantType) {
+	var implicit bool
+
+	for _, r := range responseTypes {
 		switch r {
 		case OIDCResponseTypeCode:
 			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
@@ -160,7 +165,21 @@ func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
 			}
 		}
 	}
+
 	return grantTypes
+}
+
+func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
+	return RequiredOIDCGrantTypes(a.ResponseTypes)
+}
+
+func ContainsOIDCGrantTypes(shouldContain, list []OIDCGrantType) bool {
+	for _, should := range shouldContain {
+		if !containsOIDCGrantType(list, should) {
+			return false
+		}
+	}
+	return true
 }
 
 func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) bool {

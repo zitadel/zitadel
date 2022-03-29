@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -13,6 +14,13 @@ func AddOrgMember(a *org.Aggregate, userID string, roles ...string) preparation.
 	return func() (preparation.CreateCommands, error) {
 		if userID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
+		}
+		if len(roles) == 0 {
+			return nil, errors.ThrowInvalidArgument(nil, "V2-PfYhb", "Errors.Invalid.Argument")
+		}
+
+		if len(domain.CheckForInvalidRoles(roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
+			return nil, errors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 		}
 		// TODO: check roles
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

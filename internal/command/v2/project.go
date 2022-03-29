@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -47,29 +48,17 @@ func AddProject(
 	}
 }
 
-func ExistsProject(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, resourceOwner string) (exists bool, err error) {
-	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(resourceOwner).
-		OrderAsc().
-		AddQuery().
-		AggregateTypes(project.AggregateType).
-		AggregateIDs(projectID).
-		EventTypes(
-			project.ProjectAddedType,
-			project.ProjectRemovedType,
-		).Builder())
+func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, resourceOwner string) (project *command.ProjectWriteModel, err error) {
+	project = new(command.ProjectWriteModel)
+	events, err := filter(ctx, project.Query())
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	for _, event := range events {
-		switch event.(type) {
-		case *project.ProjectAddedEvent:
-			exists = true
-		case *project.ProjectRemovedEvent:
-			exists = false
-		}
+	project.AppendEvents(events...)
+	if err := project.Reduce(); err != nil {
+		return nil, err
 	}
 
-	return exists, nil
+	return project, nil
 }

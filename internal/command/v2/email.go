@@ -19,5 +19,5 @@ func (e *Email) Valid() bool {
 }
 
 func newEmailCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
-	return newCryptoCode(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
+	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
 }

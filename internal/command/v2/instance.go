@@ -205,7 +205,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 	validations = append(validations,
 		AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
-		AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg),
+		AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg, command.phoneAlg, command.initCodeAlg),
 		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 
 		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
@@ -225,6 +225,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			*projectAgg,
 			setup.Zitadel.adminID,
 			adminAppName,
+
 			setup.Zitadel.adminClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,

@@ -17,6 +17,8 @@ type Command struct {
 	es              *eventstore.Eventstore
 	userPasswordAlg crypto.HashAlgorithm
 	iamDomain       string
+	phoneAlg        crypto.EncryptionAlgorithm
+	initCodeAlg     crypto.EncryptionAlgorithm
 }
 
 func New(es *eventstore.Eventstore, iamDomain string, defaults sd.SystemDefaults) *Command {

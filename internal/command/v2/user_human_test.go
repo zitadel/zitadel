@@ -21,6 +21,8 @@ func TestAddHumanCommand(t *testing.T) {
 		human       *AddHuman
 		passwordAlg crypto.HashAlgorithm
 		filter      preparation.FilterToQueryReducer
+		phoneAlg    crypto.EncryptionAlgorithm
+		initCodeAlg crypto.EncryptionAlgorithm
 	}
 	agg := user.NewAggregate("id", "ro")
 	tests := []struct {
@@ -33,7 +35,9 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email: "invalid",
+					Email: Email{
+						Address: "invalid",
+					},
 				},
 			},
 			want: Want{
@@ -45,7 +49,9 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email: "support@zitadel.ch",
+					Email: Email{
+						Address: "support@zitadel.ch",
+					},
 				},
 			},
 			want: Want{
@@ -57,7 +63,7 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email:     "support@zitadel.ch",
+					Email:     Email{Address: "support@zitadel.ch"},
 					FirstName: "hurst",
 				},
 			},
@@ -70,7 +76,7 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email:     "support@zitadel.ch",
+					Email:     Email{Address: "support@zitadel.ch"},
 					FirstName: "gigi",
 					LastName:  "giraffe",
 					Password:  "short",
@@ -110,7 +116,7 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email:     "support@zitadel.ch",
+					Email:     Email{Address: "support@zitadel.ch"},
 					FirstName: "gigi",
 					LastName:  "giraffe",
 					Password:  "",
@@ -163,7 +169,7 @@ func TestAddHumanCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg), tt.args.filter, tt.want)
+			AssertValidation(t, AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg, tt.args.phoneAlg, tt.args.initCodeAlg), tt.args.filter, tt.want)
 		})
 	}
 }

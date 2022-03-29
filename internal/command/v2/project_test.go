@@ -182,7 +182,7 @@ func TestExistsProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExists, err := ExistsProject(context.Background(), tt.args.filter, tt.args.id, tt.args.resourceOwner)
+			gotExists, err := projectWriteModel(context.Background(), tt.args.filter, tt.args.id, tt.args.resourceOwner)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ExistsUser() error = %v, wantErr %v", err, tt.wantErr)
 				return

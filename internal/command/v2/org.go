@@ -34,7 +34,7 @@ func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.Obje
 
 	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter,
 		AddOrg(orgAgg, o.Name, command.iamDomain),
-		AddHumanCommand(userAgg, &o.Human, command.userPasswordAlg),
+		AddHumanCommand(userAgg, &o.Human, command.userPasswordAlg, command.phoneAlg, command.initCodeAlg),
 		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 	)
 	if err != nil {
