@@ -32,7 +32,7 @@ func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.ChangeUsername(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).ID, authReq.UserOrgID, authReq.UserID, data.Username)
+	_, err = l.command.ChangeUsername(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).InstanceID(), authReq.UserOrgID, authReq.UserID, data.Username)
 	if err != nil {
 		l.renderChangeUsername(w, r, authReq, err)
 		return

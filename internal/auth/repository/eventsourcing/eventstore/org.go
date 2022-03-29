@@ -39,7 +39,7 @@ func (repo *OrgRepository) GetMyPasswordComplexityPolicy(ctx context.Context) (*
 }
 
 func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).ID, domain.LoginCustomText)
+	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), domain.LoginCustomText)
 	if err != nil {
 		return nil, err
 	}

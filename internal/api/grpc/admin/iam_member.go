@@ -35,7 +35,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 }
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
-	member, err := s.command.AddInstanceMember(ctx, authz.GetInstance(ctx).ID, AddIAMMemberToDomain(req))
+	member, err := s.command.AddInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), AddIAMMemberToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberReq
 }
 
 func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMemberRequest) (*admin_pb.UpdateIAMMemberResponse, error) {
-	member, err := s.command.ChangeInstanceMember(ctx, authz.GetInstance(ctx).ID, UpdateIAMMemberToDomain(req))
+	member, err := s.command.ChangeInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), UpdateIAMMemberToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMem
 }
 
 func (s *Server) RemoveIAMMember(ctx context.Context, req *admin_pb.RemoveIAMMemberRequest) (*admin_pb.RemoveIAMMemberResponse, error) {
-	objectDetails, err := s.command.RemoveInstanceMember(ctx, authz.GetInstance(ctx).ID, req.UserId)
+	objectDetails, err := s.command.RemoveInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), req.UserId)
 	if err != nil {
 		return nil, err
 	}

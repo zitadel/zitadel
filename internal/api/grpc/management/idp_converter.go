@@ -91,7 +91,7 @@ func listIDPsToModel(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (quer
 	if err != nil {
 		return nil, err
 	}
-	resourceOwnerQuery, err := query.NewIDPResourceOwnerListSearchQuery(authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID)
+	resourceOwnerQuery, err := query.NewIDPResourceOwnerListSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

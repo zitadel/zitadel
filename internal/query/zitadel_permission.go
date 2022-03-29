@@ -12,7 +12,7 @@ func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string
 	if err != nil {
 		return nil, err
 	}
-	orgIDsQuery, err := NewMembershipResourceOwnersSearchQuery(orgID, authz.GetInstance(ctx).ID)
+	orgIDsQuery, err := NewMembershipResourceOwnersSearchQuery(orgID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}

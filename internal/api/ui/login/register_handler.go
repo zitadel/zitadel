@@ -85,7 +85,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).ID, resourceOwner, data.toHumanDomain(), nil, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, data.toHumanDomain(), nil, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return

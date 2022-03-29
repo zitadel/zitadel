@@ -26,7 +26,7 @@ func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *admin_pb.GetPre
 }
 
 func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabelPolicyRequest) (*admin_pb.UpdateLabelPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID, updateLabelPolicyToDomain(req))
+	policy, err := s.command.ChangeDefaultLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID(), updateLabelPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabe
 }
 
 func (s *Server) ActivateLabelPolicy(ctx context.Context, req *admin_pb.ActivateLabelPolicyRequest) (*admin_pb.ActivateLabelPolicyResponse, error) {
-	policy, err := s.command.ActivateDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID)
+	policy, err := s.command.ActivateDefaultLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *Server) ActivateLabelPolicy(ctx context.Context, req *admin_pb.Activate
 }
 
 func (s *Server) RemoveLabelPolicyLogo(ctx context.Context, req *admin_pb.RemoveLabelPolicyLogoRequest) (*admin_pb.RemoveLabelPolicyLogoResponse, error) {
-	policy, err := s.command.RemoveLogoDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID)
+	policy, err := s.command.RemoveLogoDefaultLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *Server) RemoveLabelPolicyLogo(ctx context.Context, req *admin_pb.Remove
 }
 
 func (s *Server) RemoveLabelPolicyLogoDark(ctx context.Context, req *admin_pb.RemoveLabelPolicyLogoDarkRequest) (*admin_pb.RemoveLabelPolicyLogoDarkResponse, error) {
-	policy, err := s.command.RemoveLogoDarkDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID)
+	policy, err := s.command.RemoveLogoDarkDefaultLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (s *Server) RemoveLabelPolicyLogoDark(ctx context.Context, req *admin_pb.Re
 }
 
 func (s *Server) RemoveLabelPolicyIcon(ctx context.Context, req *admin_pb.RemoveLabelPolicyIconRequest) (*admin_pb.RemoveLabelPolicyIconResponse, error) {
-	policy, err := s.command.RemoveIconDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID)
+	policy, err := s.command.RemoveIconDefaultLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (s *Server) RemoveLabelPolicyIcon(ctx context.Context, req *admin_pb.Remove
 }
 
 func (s *Server) RemoveLabelPolicyIconDark(ctx context.Context, req *admin_pb.RemoveLabelPolicyIconDarkRequest) (*admin_pb.RemoveLabelPolicyIconDarkResponse, error) {
-	policy, err := s.command.RemoveIconDarkDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID)
+	policy, err := s.command.RemoveIconDarkDefaultLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (s *Server) RemoveLabelPolicyIconDark(ctx context.Context, req *admin_pb.Re
 }
 
 func (s *Server) RemoveLabelPolicyFont(ctx context.Context, req *admin_pb.RemoveLabelPolicyFontRequest) (*admin_pb.RemoveLabelPolicyFontResponse, error) {
-	policy, err := s.command.RemoveFontDefaultLabelPolicy(ctx, authz.GetInstance(ctx).ID)
+	policy, err := s.command.RemoveFontDefaultLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}

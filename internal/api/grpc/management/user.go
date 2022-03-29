@@ -200,7 +200,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 	if err != nil {
 		return nil, err
 	}
-	human, err := s.command.AddHuman(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req), initCodeGenerator, phoneCodeGenerator)
+	human, err := s.command.AddHuman(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req), initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +251,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 }
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
-	machine, err := s.command.AddMachine(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
+	machine, err := s.command.AddMachine(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -326,7 +326,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, authz.GetInstance(ctx).ID, req.Id, authz.GetCtxData(ctx).OrgID, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
+	objectDetails, err := s.command.RemoveUser(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, authz.GetCtxData(ctx).OrgID, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -344,7 +344,7 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
-	objectDetails, err := s.command.ChangeUsername(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, req.UserId, req.UserName)
+	objectDetails, err := s.command.ChangeUsername(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, req.UserId, req.UserName)
 	if err != nil {
 		return nil, err
 	}
@@ -527,7 +527,7 @@ func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHuman
 }
 
 func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHumanInitialPasswordRequest) (*mgmt_pb.SetHumanInitialPasswordResponse, error) {
-	objectDetails, err := s.command.SetPassword(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, true)
 	if err != nil {
 		return nil, err
 	}
@@ -537,7 +537,7 @@ func (s *Server) SetHumanInitialPassword(ctx context.Context, req *mgmt_pb.SetHu
 }
 
 func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPasswordRequest) (*mgmt_pb.SetHumanPasswordResponse, error) {
-	objectDetails, err := s.command.SetPassword(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired)
+	objectDetails, err := s.command.SetPassword(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, req.UserId, req.Password, !req.NoChangeRequired)
 	if err != nil {
 		return nil, err
 	}

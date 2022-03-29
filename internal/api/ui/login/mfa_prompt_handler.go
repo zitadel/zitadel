@@ -92,7 +92,7 @@ func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) handleOTPCreation(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaVerifyData) {
-	otp, err := l.command.AddHumanOTP(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).ID, authReq.UserID, authReq.UserOrgID)
+	otp, err := l.command.AddHumanOTP(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).InstanceID(), authReq.UserID, authReq.UserOrgID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.Id, authz.GetInstance(ctx).ID)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.Id, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest
 }
 
 func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*admin_pb.ListIDPsResponse, error) {
-	queries, err := listIDPsToModel(authz.GetInstance(ctx).ID, req)
+	queries, err := listIDPsToModel(authz.GetInstance(ctx).InstanceID(), req)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*
 }
 
 func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest) (*admin_pb.AddOIDCIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, authz.GetInstance(ctx).ID, addOIDCIDPRequestToDomain(req))
+	config, err := s.command.AddDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), addOIDCIDPRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest
 }
 
 func (s *Server) AddJWTIDP(ctx context.Context, req *admin_pb.AddJWTIDPRequest) (*admin_pb.AddJWTIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, authz.GetInstance(ctx).ID, addJWTIDPRequestToDomain(req))
+	config, err := s.command.AddDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), addJWTIDPRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (s *Server) AddJWTIDP(ctx context.Context, req *admin_pb.AddJWTIDPRequest) 
 }
 
 func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) (*admin_pb.UpdateIDPResponse, error) {
-	config, err := s.command.ChangeDefaultIDPConfig(ctx, authz.GetInstance(ctx).ID, updateIDPToDomain(req))
+	config, err := s.command.ChangeDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), updateIDPToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 }
 
 func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPRequest) (*admin_pb.DeactivateIDPResponse, error) {
-	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, authz.GetInstance(ctx).ID, req.IdpId)
+	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.IdpId)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPR
 }
 
 func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPRequest) (*admin_pb.ReactivateIDPResponse, error) {
-	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, authz.GetInstance(ctx).ID, req.IdpId)
+	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.IdpId)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 		return nil, err
 	}
 
-	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, authz.GetInstance(ctx).ID, req.IdpId, idpsToDomain(idps.IDPs), idpUserLinksToDomain(userLinks.Links)...)
+	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.IdpId, idpsToDomain(idps.IDPs), idpUserLinksToDomain(userLinks.Links)...)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 }
 
 func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateIDPOIDCConfigRequest) (*admin_pb.UpdateIDPOIDCConfigResponse, error) {
-	config, err := s.command.ChangeDefaultIDPOIDCConfig(ctx, authz.GetInstance(ctx).ID, updateOIDCConfigToDomain(req))
+	config, err := s.command.ChangeDefaultIDPOIDCConfig(ctx, authz.GetInstance(ctx).InstanceID(), updateOIDCConfigToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateID
 }
 
 func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDPJWTConfigRequest) (*admin_pb.UpdateIDPJWTConfigResponse, error) {
-	config, err := s.command.ChangeDefaultIDPJWTConfig(ctx, authz.GetInstance(ctx).ID, updateJWTConfigToDomain(req))
+	config, err := s.command.ChangeDefaultIDPJWTConfig(ctx, authz.GetInstance(ctx).InstanceID(), updateJWTConfigToDomain(req))
 	if err != nil {
 		return nil, err
 	}

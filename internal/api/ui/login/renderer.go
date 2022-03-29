@@ -342,7 +342,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
-		PrivateLabelingOrgID:   l.getPrivateLabelingID(authz.GetInstance(r.Context()).ID, authReq),
+		PrivateLabelingOrgID:   l.getPrivateLabelingID(authz.GetInstance(r.Context()).InstanceID(), authReq),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),

@@ -18,7 +18,7 @@ func (s *Server) GetLockoutPolicy(ctx context.Context, req *admin_pb.GetLockoutP
 }
 
 func (s *Server) UpdateLockoutPolicy(ctx context.Context, req *admin_pb.UpdateLockoutPolicyRequest) (*admin_pb.UpdateLockoutPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLockoutPolicy(ctx, authz.GetInstance(ctx).ID, UpdateLockoutPolicyToDomain(req))
+	policy, err := s.command.ChangeDefaultLockoutPolicy(ctx, authz.GetInstance(ctx).InstanceID(), UpdateLockoutPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

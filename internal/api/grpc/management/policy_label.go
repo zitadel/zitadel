@@ -34,7 +34,7 @@ func (s *Server) GetDefaultLabelPolicy(ctx context.Context, req *mgmt_pb.GetDefa
 }
 
 func (s *Server) AddCustomLabelPolicy(ctx context.Context, req *mgmt_pb.AddCustomLabelPolicyRequest) (*mgmt_pb.AddCustomLabelPolicyResponse, error) {
-	policy, err := s.command.AddLabelPolicy(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, addLabelPolicyToDomain(req))
+	policy, err := s.command.AddLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, addLabelPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (s *Server) AddCustomLabelPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 }
 
 func (s *Server) UpdateCustomLabelPolicy(ctx context.Context, req *mgmt_pb.UpdateCustomLabelPolicyRequest) (*mgmt_pb.UpdateCustomLabelPolicyResponse, error) {
-	policy, err := s.command.ChangeLabelPolicy(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, updateLabelPolicyToDomain(req))
+	policy, err := s.command.ChangeLabelPolicy(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, updateLabelPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ func (s *Server) GetDefaultInitMessageText(ctx context.Context, req *admin_pb.Ge
 }
 
 func (s *Server) GetCustomInitMessageText(ctx context.Context, req *admin_pb.GetCustomInitMessageTextRequest) (*admin_pb.GetCustomInitMessageTextResponse, error) {
-	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).ID, domain.InitCodeMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.InitCodeMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *Server) GetCustomInitMessageText(ctx context.Context, req *admin_pb.Get
 }
 
 func (s *Server) SetDefaultInitMessageText(ctx context.Context, req *admin_pb.SetDefaultInitMessageTextRequest) (*admin_pb.SetDefaultInitMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetInitCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetInitCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (s *Server) SetDefaultInitMessageText(ctx context.Context, req *admin_pb.Se
 }
 
 func (s *Server) ResetCustomInitMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomInitMessageTextToDefaultRequest) (*admin_pb.ResetCustomInitMessageTextToDefaultResponse, error) {
-	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).ID, domain.InitCodeMessageType, language.Make(req.Language))
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).InstanceID(), domain.InitCodeMessageType, language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (s *Server) GetDefaultPasswordResetMessageText(ctx context.Context, req *ad
 }
 
 func (s *Server) GetCustomPasswordResetMessageText(ctx context.Context, req *admin_pb.GetCustomPasswordResetMessageTextRequest) (*admin_pb.GetCustomPasswordResetMessageTextResponse, error) {
-	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).ID, domain.PasswordResetMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.PasswordResetMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (s *Server) GetCustomPasswordResetMessageText(ctx context.Context, req *adm
 }
 
 func (s *Server) SetDefaultPasswordResetMessageText(ctx context.Context, req *admin_pb.SetDefaultPasswordResetMessageTextRequest) (*admin_pb.SetDefaultPasswordResetMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetPasswordResetCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetPasswordResetCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (s *Server) SetDefaultPasswordResetMessageText(ctx context.Context, req *ad
 }
 
 func (s *Server) ResetCustomPasswordResetMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomPasswordResetMessageTextToDefaultRequest) (*admin_pb.ResetCustomPasswordResetMessageTextToDefaultResponse, error) {
-	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).ID, domain.PasswordResetMessageType, language.Make(req.Language))
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).InstanceID(), domain.PasswordResetMessageType, language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *Server) GetDefaultVerifyEmailMessageText(ctx context.Context, req *admi
 }
 
 func (s *Server) GetCustomVerifyEmailMessageText(ctx context.Context, req *admin_pb.GetCustomVerifyEmailMessageTextRequest) (*admin_pb.GetCustomVerifyEmailMessageTextResponse, error) {
-	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).ID, domain.VerifyEmailMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.VerifyEmailMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (s *Server) GetCustomVerifyEmailMessageText(ctx context.Context, req *admin
 }
 
 func (s *Server) SetDefaultVerifyEmailMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifyEmailMessageTextRequest) (*admin_pb.SetDefaultVerifyEmailMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetVerifyEmailCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetVerifyEmailCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (s *Server) SetDefaultVerifyEmailMessageText(ctx context.Context, req *admi
 }
 
 func (s *Server) ResetCustomVerifyEmailMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomVerifyEmailMessageTextToDefaultRequest) (*admin_pb.ResetCustomVerifyEmailMessageTextToDefaultResponse, error) {
-	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).ID, domain.VerifyEmailMessageType, language.Make(req.Language))
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).InstanceID(), domain.VerifyEmailMessageType, language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (s *Server) GetDefaultVerifyPhoneMessageText(ctx context.Context, req *admi
 }
 
 func (s *Server) GetCustomVerifyPhoneMessageText(ctx context.Context, req *admin_pb.GetCustomVerifyPhoneMessageTextRequest) (*admin_pb.GetCustomVerifyPhoneMessageTextResponse, error) {
-	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).ID, domain.VerifyPhoneMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (s *Server) GetCustomVerifyPhoneMessageText(ctx context.Context, req *admin
 }
 
 func (s *Server) SetDefaultVerifyPhoneMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.SetDefaultVerifyPhoneMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetVerifyPhoneCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetVerifyPhoneCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (s *Server) SetDefaultVerifyPhoneMessageText(ctx context.Context, req *admi
 }
 
 func (s *Server) ResetCustomVerifyPhoneMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomVerifyPhoneMessageTextToDefaultRequest) (*admin_pb.ResetCustomVerifyPhoneMessageTextToDefaultResponse, error) {
-	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).ID, domain.VerifyPhoneMessageType, language.Make(req.Language))
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).InstanceID(), domain.VerifyPhoneMessageType, language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func (s *Server) GetDefaultDomainClaimedMessageText(ctx context.Context, req *ad
 }
 
 func (s *Server) GetCustomDomainClaimedMessageText(ctx context.Context, req *admin_pb.GetCustomDomainClaimedMessageTextRequest) (*admin_pb.GetCustomDomainClaimedMessageTextResponse, error) {
-	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).ID, domain.DomainClaimedMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (s *Server) GetCustomDomainClaimedMessageText(ctx context.Context, req *adm
 }
 
 func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *admin_pb.SetDefaultDomainClaimedMessageTextRequest) (*admin_pb.SetDefaultDomainClaimedMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetDomainClaimedCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetDomainClaimedCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *ad
 }
 
 func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomDomainClaimedMessageTextToDefaultRequest) (*admin_pb.ResetCustomDomainClaimedMessageTextToDefaultResponse, error) {
-	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).ID, domain.DomainClaimedMessageType, language.Make(req.Language))
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).InstanceID(), domain.DomainClaimedMessageType, language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +263,7 @@ func (s *Server) GetDefaultPasswordlessRegistrationMessageText(ctx context.Conte
 }
 
 func (s *Server) GetCustomPasswordlessRegistrationMessageText(ctx context.Context, req *admin_pb.GetCustomPasswordlessRegistrationMessageTextRequest) (*admin_pb.GetCustomPasswordlessRegistrationMessageTextResponse, error) {
-	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).ID, domain.PasswordlessRegistrationMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.PasswordlessRegistrationMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +273,7 @@ func (s *Server) GetCustomPasswordlessRegistrationMessageText(ctx context.Contex
 }
 
 func (s *Server) SetDefaultPasswordlessRegistrationMessageText(ctx context.Context, req *admin_pb.SetDefaultPasswordlessRegistrationMessageTextRequest) (*admin_pb.SetDefaultPasswordlessRegistrationMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetPasswordlessRegistrationCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetPasswordlessRegistrationCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +287,7 @@ func (s *Server) SetDefaultPasswordlessRegistrationMessageText(ctx context.Conte
 }
 
 func (s *Server) ResetCustomPasswordlessRegistrationMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) (*admin_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse, error) {
-	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).ID, domain.PasswordlessRegistrationMessageType, language.Make(req.Language))
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, authz.GetInstance(ctx).InstanceID(), domain.PasswordlessRegistrationMessageType, language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *admin_pb.GetDefa
 	}, nil
 }
 func (s *Server) GetCustomLoginTexts(ctx context.Context, req *admin_pb.GetCustomLoginTextsRequest) (*admin_pb.GetCustomLoginTextsResponse, error) {
-	msg, err := s.query.GetCustomLoginTexts(ctx, authz.GetInstance(ctx).ID, req.Language)
+	msg, err := s.query.GetCustomLoginTexts(ctx, authz.GetInstance(ctx).InstanceID(), req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +320,7 @@ func (s *Server) GetCustomLoginTexts(ctx context.Context, req *admin_pb.GetCusto
 }
 
 func (s *Server) SetCustomLoginText(ctx context.Context, req *admin_pb.SetCustomLoginTextsRequest) (*admin_pb.SetCustomLoginTextsResponse, error) {
-	result, err := s.command.SetCustomInstanceLoginText(ctx, authz.GetInstance(ctx).ID, SetLoginTextToDomain(req))
+	result, err := s.command.SetCustomInstanceLoginText(ctx, authz.GetInstance(ctx).InstanceID(), SetLoginTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -334,7 +334,7 @@ func (s *Server) SetCustomLoginText(ctx context.Context, req *admin_pb.SetCustom
 }
 
 func (s *Server) ResetCustomLoginTextToDefault(ctx context.Context, req *admin_pb.ResetCustomLoginTextsToDefaultRequest) (*admin_pb.ResetCustomLoginTextsToDefaultResponse, error) {
-	result, err := s.command.RemoveCustomInstanceLoginTexts(ctx, authz.GetInstance(ctx).ID, language.Make(req.Language))
+	result, err := s.command.RemoveCustomInstanceLoginTexts(ctx, authz.GetInstance(ctx).InstanceID(), language.Make(req.Language))
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ func (s *Server) GetSecretGenerator(ctx context.Context, req *admin_pb.GetSecret
 }
 
 func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.UpdateSecretGeneratorRequest) (*admin_pb.UpdateSecretGeneratorResponse, error) {
-	details, err := s.command.ChangeSecretGeneratorConfig(ctx, authz.GetInstance(ctx).ID, SecretGeneratorTypeToDomain(req.GeneratorType), UpdateSecretGeneratorToConfig(req))
+	details, err := s.command.ChangeSecretGeneratorConfig(ctx, authz.GetInstance(ctx).InstanceID(), SecretGeneratorTypeToDomain(req.GeneratorType), UpdateSecretGeneratorToConfig(req))
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.Update
 }
 
 func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigRequest) (*admin_pb.GetSMTPConfigResponse, error) {
-	smtp, err := s.query.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).ID)
+	smtp, err := s.query.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigR
 }
 
 func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
-	details, err := s.command.ChangeSMTPConfig(ctx, authz.GetInstance(ctx).ID, UpdateSMTPToConfig(req))
+	details, err := s.command.ChangeSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), UpdateSMTPToConfig(req))
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 }
 
 func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
-	details, err := s.command.ChangeSMTPConfigPassword(ctx, authz.GetInstance(ctx).ID, req.Password)
+	details, err := s.command.ChangeSMTPConfigPassword(ctx, authz.GetInstance(ctx).InstanceID(), req.Password)
 	if err != nil {
 		return nil, err
 	}

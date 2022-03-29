@@ -29,7 +29,7 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 	publicKeyExp := time.Now().UTC().Add(c.publicKeyLifetime)
 
 	//TODO: InstanceID not available here?
-	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).ID)
+	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
 	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
@@ -43,5 +43,5 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 
 func setOIDCCtx(ctx context.Context) context.Context {
 	//TODO: InstanceID not available here?
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: oidcUser, OrgID: authz.GetInstance(ctx).ID})
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: oidcUser, OrgID: authz.GetInstance(ctx).InstanceID()})
 }

@@ -41,7 +41,7 @@ func (s *Server) GetSMSProvider(ctx context.Context, req *admin_pb.GetSMSProvide
 }
 
 func (s *Server) AddSMSProviderTwilio(ctx context.Context, req *admin_pb.AddSMSProviderTwilioRequest) (*admin_pb.AddSMSProviderTwilioResponse, error) {
-	id, result, err := s.command.AddSMSConfigTwilio(ctx, authz.GetInstance(ctx).ID, AddSMSConfigTwilioToConfig(req))
+	id, result, err := s.command.AddSMSConfigTwilio(ctx, authz.GetInstance(ctx).InstanceID(), AddSMSConfigTwilioToConfig(req))
 	if err != nil {
 		return nil, err
 
@@ -53,7 +53,7 @@ func (s *Server) AddSMSProviderTwilio(ctx context.Context, req *admin_pb.AddSMSP
 }
 
 func (s *Server) UpdateSMSProviderTwilio(ctx context.Context, req *admin_pb.UpdateSMSProviderTwilioRequest) (*admin_pb.UpdateSMSProviderTwilioResponse, error) {
-	result, err := s.command.ChangeSMSConfigTwilio(ctx, authz.GetInstance(ctx).ID, req.Id, UpdateSMSConfigTwilioToConfig(req))
+	result, err := s.command.ChangeSMSConfigTwilio(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, UpdateSMSConfigTwilioToConfig(req))
 	if err != nil {
 		return nil, err
 
@@ -64,7 +64,7 @@ func (s *Server) UpdateSMSProviderTwilio(ctx context.Context, req *admin_pb.Upda
 }
 
 func (s *Server) UpdateSMSProviderTwilioToken(ctx context.Context, req *admin_pb.UpdateSMSProviderTwilioTokenRequest) (*admin_pb.UpdateSMSProviderTwilioTokenResponse, error) {
-	result, err := s.command.ChangeSMSConfigTwilioToken(ctx, authz.GetInstance(ctx).ID, req.Id, req.Token)
+	result, err := s.command.ChangeSMSConfigTwilioToken(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.Token)
 	if err != nil {
 		return nil, err
 

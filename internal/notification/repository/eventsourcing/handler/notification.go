@@ -411,7 +411,7 @@ func (n *Notification) OnSuccess() error {
 }
 
 func getSetNotifyContextData(instanceID, orgID string) context.Context {
-	ctx := authz.WithInstance(context.Background(), authz.Instance{ID: instanceID})
+	ctx := authz.WithInstanceID(context.Background(), instanceID)
 	return authz.SetCtxData(ctx, authz.CtxData{UserID: NotifyUserID, OrgID: orgID})
 }
 
@@ -427,7 +427,7 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate
 
 // Read iam smtp config
 func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, error) {
-	config, err := n.queries.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).ID)
+	config, err := n.queries.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -448,7 +448,7 @@ func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, er
 
 // Read iam twilio config
 func (n *Notification) getTwilioConfig(ctx context.Context) (*twilio.TwilioConfig, error) {
-	config, err := n.queries.SMSProviderConfigByID(ctx, authz.GetInstance(ctx).ID)
+	config, err := n.queries.SMSProviderConfigByID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +468,7 @@ func (n *Notification) getTwilioConfig(ctx context.Context) (*twilio.TwilioConfi
 
 // Read iam filesystem provider config
 func (n *Notification) getFileSystemProvider(ctx context.Context) (*fs.FSConfig, error) {
-	config, err := n.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).ID, domain.NotificationProviderTypeFile)
+	config, err := n.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile)
 	if err != nil {
 		return nil, err
 	}
@@ -479,7 +479,7 @@ func (n *Notification) getFileSystemProvider(ctx context.Context) (*fs.FSConfig,
 
 // Read iam log provider config
 func (n *Notification) getLogProvider(ctx context.Context) (*log.LogConfig, error) {
-	config, err := n.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).ID, domain.NotificationProviderTypeLog)
+	config, err := n.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog)
 	if err != nil {
 		return nil, err
 	}
@@ -494,7 +494,7 @@ func (n *Notification) getTranslatorWithOrgTexts(ctx context.Context, orgID, tex
 		return nil, err
 	}
 
-	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).ID, textType)
+	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), textType)
 	if err != nil {
 		return translator, nil
 	}

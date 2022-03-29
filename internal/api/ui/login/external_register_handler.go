@@ -158,7 +158,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).ID, resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -239,7 +239,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).ID, resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

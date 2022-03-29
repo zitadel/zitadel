@@ -55,7 +55,7 @@ func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDo
 	query, scan := prepareInstanceDomainsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			InstanceDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+			InstanceDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-inlsF", "Errors.Query.SQLStatement")

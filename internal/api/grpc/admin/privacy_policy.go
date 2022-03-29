@@ -18,7 +18,7 @@ func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *admin_pb.GetPrivacyPol
 }
 
 func (s *Server) UpdatePrivacyPolicy(ctx context.Context, req *admin_pb.UpdatePrivacyPolicyRequest) (*admin_pb.UpdatePrivacyPolicyResponse, error) {
-	result, err := s.command.ChangeDefaultPrivacyPolicy(ctx, authz.GetInstance(ctx).ID, UpdatePrivacyPolicyToDomain(req))
+	result, err := s.command.ChangeDefaultPrivacyPolicy(ctx, authz.GetInstance(ctx).InstanceID(), UpdatePrivacyPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

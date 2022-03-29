@@ -49,7 +49,7 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*La
 					LabelPolicyColID.identifier(): orgID,
 				},
 				sq.Eq{
-					LabelPolicyColID.identifier(): authz.GetInstance(ctx).ID,
+					LabelPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 			sq.Eq{
@@ -76,7 +76,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 					LabelPolicyColID.identifier(): orgID,
 				},
 				sq.Eq{
-					LabelPolicyColID.identifier(): authz.GetInstance(ctx).ID,
+					LabelPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 			sq.Eq{
@@ -97,7 +97,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		LabelPolicyColID.identifier():         authz.GetInstance(ctx).ID,
+		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
 		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
@@ -114,7 +114,7 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, e
 func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		LabelPolicyColID.identifier():         authz.GetInstance(ctx).ID,
+		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		LabelPolicyColState.identifier():      domain.LabelPolicyStatePreview,
 		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).

@@ -18,7 +18,7 @@ func (s *Server) GetPasswordComplexityPolicy(ctx context.Context, _ *admin_pb.Ge
 }
 
 func (s *Server) UpdatePasswordComplexityPolicy(ctx context.Context, req *admin_pb.UpdatePasswordComplexityPolicyRequest) (*admin_pb.UpdatePasswordComplexityPolicyResponse, error) {
-	result, err := s.command.ChangeDefaultPasswordComplexityPolicy(ctx, authz.GetInstance(ctx).ID, UpdatePasswordComplexityPolicyToDomain(req))
+	result, err := s.command.ChangeDefaultPasswordComplexityPolicy(ctx, authz.GetInstance(ctx).InstanceID(), UpdatePasswordComplexityPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

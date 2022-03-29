@@ -35,7 +35,7 @@ func (s *Server) GetAction(ctx context.Context, req *mgmt_pb.GetActionRequest) (
 }
 
 func (s *Server) CreateAction(ctx context.Context, req *mgmt_pb.CreateActionRequest) (*mgmt_pb.CreateActionResponse, error) {
-	id, details, err := s.command.AddAction(ctx, createActionRequestToDomain(req), authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID)
+	id, details, err := s.command.AddAction(ctx, createActionRequestToDomain(req), authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (s *Server) DeactivateAction(ctx context.Context, req *mgmt_pb.DeactivateAc
 }
 
 func (s *Server) ReactivateAction(ctx context.Context, req *mgmt_pb.ReactivateActionRequest) (*mgmt_pb.ReactivateActionResponse, error) {
-	details, err := s.command.ReactivateAction(ctx, req.Id, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ReactivateAction(ctx, req.Id, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

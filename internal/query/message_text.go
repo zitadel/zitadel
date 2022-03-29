@@ -203,7 +203,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ekjFF", "Errors.TranslationFile.ReadError")
 	}
-	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID, messageType, language)
+	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), messageType, language)
 	if err != nil {
 		return nil, err
 	}

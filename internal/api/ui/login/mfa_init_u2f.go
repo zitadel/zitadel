@@ -22,7 +22,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 	var errID, errMessage, credentialData string
 	var u2f *domain.WebAuthNToken
 	if err == nil {
-		u2f, err = l.command.HumanAddU2FSetup(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).ID, authReq.UserID, authReq.UserOrgID, true)
+		u2f, err = l.command.HumanAddU2FSetup(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).InstanceID(), authReq.UserID, authReq.UserOrgID, true)
 	}
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)

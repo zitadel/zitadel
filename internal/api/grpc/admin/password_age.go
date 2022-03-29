@@ -20,7 +20,7 @@ func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *admin_pb.GetPass
 }
 
 func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, req *admin_pb.UpdatePasswordAgePolicyRequest) (*admin_pb.UpdatePasswordAgePolicyResponse, error) {
-	result, err := s.command.ChangeDefaultPasswordAgePolicy(ctx, authz.GetInstance(ctx).ID, UpdatePasswordAgePolicyToDomain(req))
+	result, err := s.command.ChangeDefaultPasswordAgePolicy(ctx, authz.GetInstance(ctx).InstanceID(), UpdatePasswordAgePolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

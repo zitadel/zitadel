@@ -21,7 +21,7 @@ func (s *Server) GetDefaultFeatures(ctx context.Context, _ *admin_pb.GetDefaultF
 }
 
 func (s *Server) SetDefaultFeatures(ctx context.Context, req *admin_pb.SetDefaultFeaturesRequest) (*admin_pb.SetDefaultFeaturesResponse, error) {
-	details, err := s.command.SetDefaultFeatures(ctx, authz.GetInstance(ctx).ID, setDefaultFeaturesRequestToDomain(req))
+	details, err := s.command.SetDefaultFeatures(ctx, authz.GetInstance(ctx).InstanceID(), setDefaultFeaturesRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (s *Server) GetOrgFeatures(ctx context.Context, req *admin_pb.GetOrgFeature
 }
 
 func (s *Server) SetOrgFeatures(ctx context.Context, req *admin_pb.SetOrgFeaturesRequest) (*admin_pb.SetOrgFeaturesResponse, error) {
-	details, err := s.command.SetOrgFeatures(ctx, authz.GetInstance(ctx).ID, req.OrgId, setOrgFeaturesRequestToDomain(req))
+	details, err := s.command.SetOrgFeatures(ctx, authz.GetInstance(ctx).InstanceID(), req.OrgId, setOrgFeaturesRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (s *Server) SetOrgFeatures(ctx context.Context, req *admin_pb.SetOrgFeature
 }
 
 func (s *Server) ResetOrgFeatures(ctx context.Context, req *admin_pb.ResetOrgFeaturesRequest) (*admin_pb.ResetOrgFeaturesResponse, error) {
-	details, err := s.command.RemoveOrgFeatures(ctx, authz.GetInstance(ctx).ID, req.OrgId)
+	details, err := s.command.RemoveOrgFeatures(ctx, authz.GetInstance(ctx).InstanceID(), req.OrgId)
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bucketName := authz.GetInstance(r.Context()).ID
+	bucketName := authz.GetInstance(r.Context()).InstanceID()
 	if data.OrgID != "" && !data.DefaultPolicy {
 		bucketName = data.OrgID
 	}

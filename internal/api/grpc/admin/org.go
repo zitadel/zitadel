@@ -62,7 +62,7 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.SetUpOrg(ctx, authz.GetInstance(ctx).ID, org, human, initCodeGenerator, phoneCodeGenerator, userIDs, false)
+	objectDetails, err := s.command.SetUpOrg(ctx, authz.GetInstance(ctx).InstanceID(), org, human, initCodeGenerator, phoneCodeGenerator, userIDs, false)
 	if err != nil {
 		return nil, err
 	}

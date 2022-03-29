@@ -31,7 +31,7 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, req *mgmt_pb.GetDefa
 }
 
 func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCustomLoginPolicyRequest) (*mgmt_pb.AddCustomLoginPolicyResponse, error) {
-	policy, err := s.command.AddLoginPolicy(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, addLoginPolicyToDomain(req))
+	policy, err := s.command.AddLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, addLoginPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 }
 
 func (s *Server) UpdateCustomLoginPolicy(ctx context.Context, req *mgmt_pb.UpdateCustomLoginPolicyRequest) (*mgmt_pb.UpdateCustomLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, updateLoginPolicyToDomain(req))
+	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, updateLoginPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *mgmt_pb.ListLogin
 }
 
 func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *mgmt_pb.AddIDPToLoginPolicyRequest) (*mgmt_pb.AddIDPToLoginPolicyResponse, error) {
-	idp, err := s.command.AddIDPProviderToLoginPolicy(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, &domain.IDPProvider{IDPConfigID: req.IdpId, Type: idp.IDPProviderTypeFromPb(req.OwnerType)})
+	idp, err := s.command.AddIDPProviderToLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, &domain.IDPProvider{IDPConfigID: req.IdpId, Type: idp.IDPProviderTypeFromPb(req.OwnerType)})
 	if err != nil {
 		return nil, err
 	}

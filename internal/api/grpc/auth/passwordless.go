@@ -39,7 +39,7 @@ func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswo
 
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPasswordlessRequest) (*auth_pb.AddMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	token, err := s.command.HumanAddPasswordlessSetup(ctx, authz.GetInstance(ctx).ID, ctxData.UserID, ctxData.ResourceOwner, false, domain.AuthenticatorAttachmentUnspecified)
+	token, err := s.command.HumanAddPasswordlessSetup(ctx, authz.GetInstance(ctx).InstanceID(), ctxData.UserID, ctxData.ResourceOwner, false, domain.AuthenticatorAttachmentUnspecified)
 	if err != nil {
 		return nil, err
 	}

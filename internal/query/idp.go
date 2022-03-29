@@ -193,7 +193,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner
 					IDPResourceOwnerCol.identifier(): resourceOwner,
 				},
 				sq.Eq{
-					IDPResourceOwnerCol.identifier(): authz.GetInstance(ctx).ID,
+					IDPResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		},
