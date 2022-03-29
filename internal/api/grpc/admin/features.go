@@ -21,7 +21,7 @@ func (s *Server) GetDefaultFeatures(ctx context.Context, _ *admin_pb.GetDefaultF
 }
 
 func (s *Server) SetDefaultFeatures(ctx context.Context, req *admin_pb.SetDefaultFeaturesRequest) (*admin_pb.SetDefaultFeaturesResponse, error) {
-	details, err := s.command.SetDefaultFeatures(ctx, setDefaultFeaturesRequestToDomain(req))
+	details, err := s.command.SetDefaultFeatures(ctx, authz.GetInstance(ctx).ID, setDefaultFeaturesRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}

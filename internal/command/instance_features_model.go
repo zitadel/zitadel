@@ -14,12 +14,12 @@ type InstanceFeaturesWriteModel struct {
 	FeaturesWriteModel
 }
 
-func NewInstanceFeaturesWriteModel() *InstanceFeaturesWriteModel {
+func NewInstanceFeaturesWriteModel(instanceID string) *InstanceFeaturesWriteModel {
 	return &InstanceFeaturesWriteModel{
 		FeaturesWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 		},
 	}

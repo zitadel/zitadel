@@ -11,11 +11,11 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
+func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, instanceID, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
 	if !addAction.IsValid() {
 		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
 	}
-	err = c.checkAdditionalActionAllowed(ctx, resourceOwner)
+	err = c.checkAdditionalActionAllowed(ctx, instanceID, resourceOwner)
 	if err != nil {
 		return "", nil, err
 	}
@@ -44,8 +44,8 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 	return actionModel.AggregateID, writeModelToObjectDetails(&actionModel.WriteModel), nil
 }
 
-func (c *Commands) checkAdditionalActionAllowed(ctx context.Context, resourceOwner string) error {
-	features, err := c.getOrgFeaturesOrDefault(ctx, resourceOwner)
+func (c *Commands) checkAdditionalActionAllowed(ctx context.Context, instanceID, resourceOwner string) error {
+	features, err := c.getOrgFeaturesOrDefault(ctx, instanceID, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 	return writeModelToObjectDetails(&existingAction.WriteModel), nil
 }
 
-func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) ReactivateAction(ctx context.Context, actionID string, instanceID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-BNm56", "Errors.IDMissing")
 	}
@@ -145,7 +145,7 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 	if existingAction.State != domain.ActionStateInactive {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J53zh", "Errors.Action.NotInactive")
 	}
-	err = c.checkAdditionalActionAllowed(ctx, resourceOwner)
+	err = c.checkAdditionalActionAllowed(ctx, instanceID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

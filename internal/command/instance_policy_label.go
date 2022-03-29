@@ -157,7 +157,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context, instanceID 
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Xc8Kf", "Errors.IAM.LabelPolicy.NotFound")
 	}
 
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.LogoKey)
+	err = c.RemoveAsset(ctx, instanceID, existingPolicy.LogoKey)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +206,7 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context, instanceID 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-4M0qw", "Errors.IAM.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.IconKey)
+	err = c.RemoveAsset(ctx, instanceID, existingPolicy.IconKey)
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context, instanc
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-3FGds", "Errors.IAM.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.LogoDarkKey)
+	err = c.RemoveAsset(ctx, instanceID, existingPolicy.LogoDarkKey)
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context, instanc
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2nc7F", "Errors.IAM.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.IconDarkKey)
+	err = c.RemoveAsset(ctx, instanceID, existingPolicy.IconDarkKey)
 	if err != nil {
 		return nil, err
 	}
@@ -353,7 +353,7 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context, instanceID 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Tk0gw", "Errors.IAM.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, domain.IAMID, existingPolicy.FontKey)
+	err = c.RemoveAsset(ctx, instanceID, existingPolicy.FontKey)
 	if err != nil {
 		return nil, err
 	}

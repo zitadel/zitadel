@@ -107,9 +107,10 @@ func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func NewOrgAuthFactorsAllowedWriteModel(orgID string) *OrgAuthFactorsAllowedWriteModel {
+func NewOrgAuthFactorsAllowedWriteModel(instanceID, orgID string) *OrgAuthFactorsAllowedWriteModel {
 	return &OrgAuthFactorsAllowedWriteModel{
 		WriteModel: eventstore.WriteModel{
+			InstanceID:    instanceID,
 			AggregateID:   orgID,
 			ResourceOwner: orgID,
 		},
@@ -186,7 +187,7 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilde
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(instance.AggregateType).
-		AggregateIDs(domain.IAMID).
+		AggregateIDs(wm.InstanceID).
 		EventTypes(
 			instance.LoginPolicySecondFactorAddedEventType,
 			instance.LoginPolicySecondFactorRemovedEventType,

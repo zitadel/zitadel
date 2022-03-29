@@ -83,7 +83,7 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, instanceID, orgID stri
 	}
 	removedEvent := org.NewFeaturesRemovedEvent(ctx, OrgAggregateFromWriteModel(&existingFeatures.FeaturesWriteModel.WriteModel))
 
-	features, err := c.getDefaultFeatures(ctx)
+	features, err := c.getDefaultFeatures(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, instanceID, orgID 
 		if defaultPolicy.ForceMFA != existingPolicy.ForceMFA {
 			policy.ForceMFA = defaultPolicy.ForceMFA
 		}
-		authFactorsEvents, err := c.setDefaultAuthFactorsInCustomLoginPolicy(ctx, orgID)
+		authFactorsEvents, err := c.setDefaultAuthFactorsInCustomLoginPolicy(ctx, instanceID, orgID)
 		if err != nil {
 			return nil, err
 		}
@@ -260,8 +260,8 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, instanceID, orgID 
 	return events, nil
 }
 
-func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, orgID string) ([]eventstore.Command, error) {
-	orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, orgID)
+func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, instanceID, orgID string) ([]eventstore.Command, error) {
+	orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -374,7 +374,7 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, instanceID, orgID 
 	return events, nil
 }
 
-func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, orgID string) (*domain.Features, error) {
+func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, instanceID, orgID string) (*domain.Features, error) {
 	existingFeatures := NewOrgFeaturesWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
@@ -384,7 +384,7 @@ func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, orgID string) (*
 		return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
 	}
 
-	existingIAMFeatures := NewInstanceFeaturesWriteModel()
+	existingIAMFeatures := NewInstanceFeaturesWriteModel(instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, existingIAMFeatures)
 	if err != nil {
 		return nil, err

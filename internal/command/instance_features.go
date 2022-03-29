@@ -9,8 +9,8 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 )
 
-func (c *Commands) SetDefaultFeatures(ctx context.Context, features *domain.Features) (*domain.ObjectDetails, error) {
-	existingFeatures := NewInstanceFeaturesWriteModel()
+func (c *Commands) SetDefaultFeatures(ctx context.Context, instanceID string, features *domain.Features) (*domain.ObjectDetails, error) {
+	existingFeatures := NewInstanceFeaturesWriteModel(instanceID)
 	setEvent, err := c.setDefaultFeatures(ctx, existingFeatures, features)
 	if err != nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *Ins
 	return setEvent, nil
 }
 
-func (c *Commands) getDefaultFeatures(ctx context.Context) (*domain.Features, error) {
-	existingFeatures := NewInstanceFeaturesWriteModel()
+func (c *Commands) getDefaultFeatures(ctx context.Context, instanceID string) (*domain.Features, error) {
+	existingFeatures := NewInstanceFeaturesWriteModel(instanceID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
 		return nil, err

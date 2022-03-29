@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
 
@@ -341,7 +342,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
-		PrivateLabelingOrgID:   l.getPrivateLabelingID(authReq),
+		PrivateLabelingOrgID:   l.getPrivateLabelingID(authz.GetInstance(r.Context()).ID, authReq),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -455,8 +456,8 @@ func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
-func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
-	privateLabelingOrgID := domain.IAMID
+func (l *Login) getPrivateLabelingID(instanceID string, authReq *domain.AuthRequest) string {
+	privateLabelingOrgID := instanceID
 	if authReq == nil {
 		return privateLabelingOrgID
 	}

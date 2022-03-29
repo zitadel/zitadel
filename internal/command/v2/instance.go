@@ -133,7 +133,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 	if err != nil {
 		return nil, err
 	}
-	ctx = authz.SetCtxData(authz.WithInstance(ctx, authz.Instance{ID: "system"}), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
+	ctx = authz.SetCtxData(authz.WithInstance(ctx, authz.Instance{ID: instanceID}), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {

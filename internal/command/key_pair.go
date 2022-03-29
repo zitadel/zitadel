@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
-	keypair "github.com/caos/zitadel/internal/repository/keypair"
+	"github.com/caos/zitadel/internal/repository/keypair"
 )
 
 const (
@@ -28,7 +28,8 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 	privateKeyExp := time.Now().UTC().Add(c.privateKeyLifetime)
 	publicKeyExp := time.Now().UTC().Add(c.publicKeyLifetime)
 
-	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
+	//TODO: InstanceID not available here?
+	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).ID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
 	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
@@ -41,5 +42,6 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 }
 
 func setOIDCCtx(ctx context.Context) context.Context {
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: oidcUser, OrgID: domain.IAMID})
+	//TODO: InstanceID not available here?
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: oidcUser, OrgID: authz.GetInstance(ctx).ID})
 }

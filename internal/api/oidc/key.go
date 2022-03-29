@@ -100,20 +100,20 @@ func (o *OPStorage) resetTimer(timer *time.Timer, shortRefresh bool) (nextCheck 
 
 func (o *OPStorage) refreshSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, algorithm string, sequence uint64) {
 	if o.currentKey != nil && o.currentKey.Expiry().Before(time.Now().UTC()) {
-		logging.Log("OIDC-ADg26").Info("unset current signing key")
+		logging.New().Info("unset current signing key")
 		keyCh <- jose.SigningKey{}
 	}
 	ok, err := o.ensureIsLatestKey(ctx, sequence)
 	if err != nil {
-		logging.Log("OIDC-sdz53").WithError(err).Error("could not ensure latest key")
+		logging.New().WithError(err).Error("could not ensure latest key")
 		return
 	}
 	if !ok {
-		logging.Log("EVENT-GBD23").Warn("view not up to date, retrying later")
+		logging.New().Warn("view not up to date, retrying later")
 		return
 	}
 	err = o.lockAndGenerateSigningKeyPair(ctx, algorithm)
-	logging.Log("EVENT-B4d21").OnError(err).Warn("could not create signing key")
+	logging.New().OnError(err).Warn("could not create signing key")
 }
 
 func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (bool, error) {
@@ -161,7 +161,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 		if errors.IsErrorAlreadyExists(err) {
 			return nil
 		}
-		logging.Log("OIDC-Dfg32").OnError(err).Warn("initial lock failed")
+		logging.New().OnError(err).Warn("initial lock failed")
 		return err
 	}
 

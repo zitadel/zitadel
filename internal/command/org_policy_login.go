@@ -428,11 +428,11 @@ func (c *Commands) removeMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 	return org.NewLoginPolicyMultiFactorRemovedEvent(ctx, orgAgg, multiFactor), nil
 }
 
-func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgID string) (_ *OrgAuthFactorsAllowedWriteModel, err error) {
+func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, instanceID, orgID string) (_ *OrgAuthFactorsAllowedWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewOrgAuthFactorsAllowedWriteModel(orgID)
+	writeModel := NewOrgAuthFactorsAllowedWriteModel(instanceID, orgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

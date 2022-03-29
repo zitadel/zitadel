@@ -159,7 +159,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, instanceID, idpID
 	}
 
 	for _, idpProvider := range idpProviders {
-		if idpProvider.AggregateID == domain.IAMID {
+		if idpProvider.AggregateID == instanceID {
 			userEvents := c.removeIDPProviderFromDefaultLoginPolicy(ctx, instanceAgg, idpProvider, true, externalIDPs...)
 			events = append(events, userEvents...)
 		}
