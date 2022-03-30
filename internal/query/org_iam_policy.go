@@ -24,6 +24,7 @@ type DomainPolicy struct {
 	State         domain.PolicyState
 
 	UserLoginMustBeDomain bool
+	ValidateOrgDomains    bool
 
 	IsDefault bool
 }
@@ -58,6 +59,10 @@ var (
 	}
 	DomainPolicyColUserLoginMustBeDomain = Column{
 		name:  projection.DomainPolicyUserLoginMustBeDomainCol,
+		table: domainPolicyTable,
+	}
+	DomainPolicyColValidateOrgDomains = Column{
+		name:  projection.DomainPolicyValidateOrgDomainsCol,
 		table: domainPolicyTable,
 	}
 	DomainPolicyColIsDefault = Column{
@@ -120,6 +125,7 @@ func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy
 			DomainPolicyColChangeDate.identifier(),
 			DomainPolicyColResourceOwner.identifier(),
 			DomainPolicyColUserLoginMustBeDomain.identifier(),
+			DomainPolicyColValidateOrgDomains.identifier(),
 			DomainPolicyColIsDefault.identifier(),
 			DomainPolicyColState.identifier(),
 		).
@@ -133,6 +139,7 @@ func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy
 				&policy.ChangeDate,
 				&policy.ResourceOwner,
 				&policy.UserLoginMustBeDomain,
+				&policy.ValidateOrgDomains,
 				&policy.IsDefault,
 				&policy.State,
 			)

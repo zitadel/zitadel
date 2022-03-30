@@ -27,7 +27,7 @@ func (s *Server) GetCustomDomainPolicy(ctx context.Context, req *admin_pb.GetCus
 }
 
 func (s *Server) AddCustomDomainPolicy(ctx context.Context, req *admin_pb.AddCustomDomainPolicyRequest) (*admin_pb.AddCustomDomainPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain))
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, req.ValidateOrgDomains))
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +76,10 @@ func (s *Server) ResetCustomDomainPolicyTo(ctx context.Context, req *admin_pb.Re
 	return nil, nil //TOOD: return data
 }
 
-func domainPolicyToDomain(userLoginMustBeDomain bool) *domain.DomainPolicy {
+func domainPolicyToDomain(userLoginMustBeDomain, validateOrgDomains bool) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
 		UserLoginMustBeDomain: userLoginMustBeDomain,
+		ValidateOrgDomains:    validateOrgDomains,
 	}
 }
 
@@ -88,6 +89,7 @@ func updateDomainPolicyToDomain(req *admin_pb.UpdateDomainPolicyRequest) *domain
 		// 	// AggreagateID: //TODO: there should only be ONE default
 		// },
 		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
+		ValidateOrgDomains:    req.ValidateOrgDomains,
 	}
 }
 
@@ -97,11 +99,12 @@ func updateCustomDomainPolicyToDomain(req *admin_pb.UpdateCustomDomainPolicyRequ
 			AggregateID: req.OrgId,
 		},
 		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
+		ValidateOrgDomains:    req.ValidateOrgDomains,
 	}
 }
 
 func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCustomOrgIAMPolicyRequest) (*admin_pb.AddCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain))
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, true))
 	if err != nil {
 		return nil, err
 	}
@@ -161,6 +164,7 @@ func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCus
 func updateOrgIAMPolicyToDomain(req *admin_pb.UpdateOrgIAMPolicyRequest) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
 		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
+		ValidateOrgDomains:    true,
 	}
 }
 
@@ -170,5 +174,6 @@ func updateCustomOrgIAMPolicyToDomain(req *admin_pb.UpdateCustomOrgIAMPolicyRequ
 			AggregateID: req.OrgId,
 		},
 		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
+		ValidateOrgDomains:    true,
 	}
 }
