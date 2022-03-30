@@ -3,6 +3,7 @@ package id
 import (
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -119,6 +120,9 @@ func cloudRunContainerID() (uint16, error) {
 		return 0, err
 	}
 
-	fmt.Println("CONTAINER ID", string(body))
-	return 0, nil
+	h := fnv.New32()
+	if _, err = h.Write(body); err != nil {
+		return 0, err
+	}
+	return uint16(h.Sum32()), nil
 }
