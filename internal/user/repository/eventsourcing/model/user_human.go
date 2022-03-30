@@ -5,9 +5,12 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/user/model"
 )
 
@@ -47,79 +50,79 @@ func (p *Human) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (h *Human) AppendEvent(event *es_models.Event) (err error) {
-	switch event.Type {
-	case UserAdded,
-		UserRegistered,
-		UserProfileChanged,
-		HumanAdded,
-		HumanRegistered,
-		HumanProfileChanged:
+	switch eventstore.EventType(event.Type) {
+	case user.UserV1AddedType,
+		user.UserV1RegisteredType,
+		user.UserV1ProfileChangedType,
+		user.HumanAddedType,
+		user.HumanRegisteredType,
+		user.HumanProfileChangedType:
 		err = h.setData(event)
-	case InitializedUserCodeAdded,
-		InitializedHumanCodeAdded:
+	case user.UserV1InitialCodeAddedType,
+		user.HumanInitialCodeAddedType:
 		err = h.appendInitUsercodeCreatedEvent(event)
-	case UserPasswordChanged,
-		HumanPasswordChanged:
+	case user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType:
 		err = h.appendUserPasswordChangedEvent(event)
-	case UserPasswordCodeAdded,
-		HumanPasswordCodeAdded:
+	case user.UserV1PasswordCodeAddedType,
+		user.HumanPasswordCodeAddedType:
 		err = h.appendPasswordSetRequestedEvent(event)
-	case UserEmailChanged,
-		HumanEmailChanged:
+	case user.UserV1EmailChangedType,
+		user.HumanEmailChangedType:
 		err = h.appendUserEmailChangedEvent(event)
-	case UserEmailCodeAdded,
-		HumanEmailCodeAdded:
+	case user.UserV1EmailCodeAddedType,
+		user.HumanEmailCodeAddedType:
 		err = h.appendUserEmailCodeAddedEvent(event)
-	case UserEmailVerified,
-		HumanEmailVerified:
+	case user.UserV1EmailVerifiedType,
+		user.HumanEmailVerifiedType:
 		h.appendUserEmailVerifiedEvent()
-	case UserPhoneChanged,
-		HumanPhoneChanged:
+	case user.UserV1PhoneChangedType,
+		user.HumanPhoneChangedType:
 		err = h.appendUserPhoneChangedEvent(event)
-	case UserPhoneCodeAdded,
-		HumanPhoneCodeAdded:
+	case user.UserV1PhoneCodeAddedType,
+		user.HumanPhoneCodeAddedType:
 		err = h.appendUserPhoneCodeAddedEvent(event)
-	case UserPhoneVerified,
-		HumanPhoneVerified:
+	case user.UserV1PhoneVerifiedType,
+		user.HumanPhoneVerifiedType:
 		h.appendUserPhoneVerifiedEvent()
-	case UserPhoneRemoved,
-		HumanPhoneRemoved:
+	case user.UserV1PhoneRemovedType,
+		user.HumanPhoneRemovedType:
 		h.appendUserPhoneRemovedEvent()
-	case UserAddressChanged,
-		HumanAddressChanged:
+	case user.UserV1AddressChangedType,
+		user.HumanAddressChangedType:
 		err = h.appendUserAddressChangedEvent(event)
-	case MFAOTPAdded,
-		HumanMFAOTPAdded:
+	case user.UserV1MFAOTPAddedType,
+		user.HumanMFAOTPAddedType:
 		err = h.appendOTPAddedEvent(event)
-	case MFAOTPVerified,
-		HumanMFAOTPVerified:
+	case user.UserV1MFAOTPVerifiedType,
+		user.HumanMFAOTPVerifiedType:
 		h.appendOTPVerifiedEvent()
-	case MFAOTPRemoved,
-		HumanMFAOTPRemoved:
+	case user.UserV1MFAOTPRemovedType,
+		user.HumanMFAOTPRemovedType:
 		h.appendOTPRemovedEvent()
-	case HumanExternalIDPAdded:
+	case user.UserIDPLinkAddedType:
 		err = h.appendExternalIDPAddedEvent(event)
-	case HumanExternalIDPRemoved, HumanExternalIDPCascadeRemoved:
+	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		err = h.appendExternalIDPRemovedEvent(event)
-	case HumanMFAU2FTokenAdded:
+	case user.HumanU2FTokenAddedType:
 		err = h.appendU2FAddedEvent(event)
-	case HumanMFAU2FTokenVerified:
+	case user.HumanU2FTokenVerifiedType:
 		err = h.appendU2FVerifiedEvent(event)
-	case HumanMFAU2FTokenSignCountChanged:
+	case user.HumanU2FTokenSignCountChangedType:
 		err = h.appendU2FChangeSignCountEvent(event)
-	case HumanMFAU2FTokenRemoved:
+	case user.HumanU2FTokenRemovedType:
 		err = h.appendU2FRemovedEvent(event)
-	case HumanPasswordlessTokenAdded:
+	case user.HumanPasswordlessTokenAddedType:
 		err = h.appendPasswordlessAddedEvent(event)
-	case HumanPasswordlessTokenVerified:
+	case user.HumanPasswordlessTokenVerifiedType:
 		err = h.appendPasswordlessVerifiedEvent(event)
-	case HumanPasswordlessTokenChangeSignCount:
+	case user.HumanPasswordlessTokenSignCountChangedType:
 		err = h.appendPasswordlessChangeSignCountEvent(event)
-	case HumanPasswordlessTokenRemoved:
+	case user.HumanPasswordlessTokenRemovedType:
 		err = h.appendPasswordlessRemovedEvent(event)
-	case HumanMFAU2FTokenBeginLogin:
+	case user.HumanU2FTokenBeginLoginType:
 		err = h.appendU2FLoginEvent(event)
-	case HumanPasswordlessTokenBeginLogin:
+	case user.HumanPasswordlessTokenBeginLoginType:
 		err = h.appendPasswordlessLoginEvent(event)
 	}
 	if err != nil {

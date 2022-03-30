@@ -12,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/id"
-	key_model "github.com/caos/zitadel/internal/key/model"
 )
 
 type OIDCConfig struct {
@@ -35,7 +34,6 @@ type OIDCConfig struct {
 	IDTokenRoleAssertion     bool
 	IDTokenUserinfoAssertion bool
 	ClockSkew                time.Duration
-	ClientKeys               []*ClientKey
 }
 
 type OIDCVersion int32
@@ -88,17 +86,6 @@ const (
 	OIDCTokenTypeBearer OIDCTokenType = iota
 	OIDCTokenTypeJWT
 )
-
-type ClientKey struct {
-	es_models.ObjectRoot
-
-	ApplicationID  string
-	ClientID       string
-	KeyID          string
-	Type           key_model.AuthNKeyType
-	ExpirationDate time.Time
-	PrivateKey     []byte
-}
 
 type Token struct {
 	es_models.ObjectRoot

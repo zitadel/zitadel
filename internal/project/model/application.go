@@ -68,15 +68,3 @@ func (a *Application) IsValid(includeConfig bool) bool {
 	}
 	return true
 }
-
-func (a *Application) GetKey(keyID string) (int, *ClientKey) {
-	if a.OIDCConfig == nil {
-		return -1, nil
-	}
-	for i, k := range a.OIDCConfig.ClientKeys {
-		if k.KeyID == keyID {
-			return i, k
-		}
-	}
-	return -1, nil
-}

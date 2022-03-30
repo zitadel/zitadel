@@ -16,17 +16,7 @@ type Org struct {
 	Name    string
 	Domains []*OrgDomain
 
-	Members                  []*OrgMember
-	DomainPolicy             *iam_model.DomainPolicy
-	LoginPolicy              *iam_model.LoginPolicy
-	LabelPolicy              *iam_model.LabelPolicy
-	MailTemplate             *iam_model.MailTemplate
-	MailTexts                []*iam_model.MailText
-	PasswordComplexityPolicy *iam_model.PasswordComplexityPolicy
-	PasswordAgePolicy        *iam_model.PasswordAgePolicy
-	LockoutPolicy            *iam_model.LockoutPolicy
-
-	IDPs []*iam_model.IDPConfig
+	DomainPolicy *iam_model.DomainPolicy
 }
 type OrgChanges struct {
 	Changes      []*OrgChange
@@ -72,15 +62,6 @@ func (o *Org) GetDomain(domain *OrgDomain) (int, *OrgDomain) {
 	return -1, nil
 }
 
-func (o *Org) GetIDP(idpID string) (int, *iam_model.IDPConfig) {
-	for i, idp := range o.IDPs {
-		if idp.IDPConfigID == idpID {
-			return i, idp
-		}
-	}
-	return -1, nil
-}
-
 func (o *Org) GetPrimaryDomain() *OrgDomain {
 	for _, d := range o.Domains {
 		if d.Primary {
@@ -88,15 +69,6 @@ func (o *Org) GetPrimaryDomain() *OrgDomain {
 		}
 	}
 	return nil
-}
-
-func (o *Org) MemeberByUserID(userID string) (*OrgMember, int) {
-	for i, member := range o.Members {
-		if member.UserID == userID {
-			return member, i
-		}
-	}
-	return nil, -1
 }
 
 func (o *Org) nameForDomain(iamDomain string) string {

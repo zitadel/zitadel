@@ -5,11 +5,12 @@ import (
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/user/repository/view"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -53,7 +54,7 @@ func (u *UserSession) Subscription() *v1.Subscription {
 }
 
 func (_ *UserSession) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{es_model.UserAggregate}
+	return []models.AggregateType{user.AggregateType}
 }
 
 func (u *UserSession) CurrentSequence() (uint64, error) {
@@ -74,22 +75,22 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 
 func (u *UserSession) Reduce(event *models.Event) (err error) {
 	var session *view_model.UserSessionView
-	switch event.Type {
-	case es_model.UserPasswordCheckSucceeded,
-		es_model.UserPasswordCheckFailed,
-		es_model.MFAOTPCheckSucceeded,
-		es_model.MFAOTPCheckFailed,
-		es_model.SignedOut,
-		es_model.HumanPasswordCheckSucceeded,
-		es_model.HumanPasswordCheckFailed,
-		es_model.HumanExternalLoginCheckSucceeded,
-		es_model.HumanMFAOTPCheckSucceeded,
-		es_model.HumanMFAOTPCheckFailed,
-		es_model.HumanMFAU2FTokenCheckSucceeded,
-		es_model.HumanMFAU2FTokenCheckFailed,
-		es_model.HumanPasswordlessTokenCheckSucceeded,
-		es_model.HumanPasswordlessTokenCheckFailed,
-		es_model.HumanSignedOut:
+	switch eventstore.EventType(event.Type) {
+	case user.UserV1PasswordCheckSucceededType,
+		user.UserV1PasswordCheckFailedType,
+		user.UserV1MFAOTPCheckSucceededType,
+		user.UserV1MFAOTPCheckFailedType,
+		user.UserV1SignedOutType,
+		user.HumanPasswordCheckSucceededType,
+		user.HumanPasswordCheckFailedType,
+		user.UserIDPLoginCheckSucceededType,
+		user.HumanMFAOTPCheckSucceededType,
+		user.HumanMFAOTPCheckFailedType,
+		user.HumanU2FTokenCheckSucceededType,
+		user.HumanU2FTokenCheckFailedType,
+		user.HumanPasswordlessTokenCheckSucceededType,
+		user.HumanPasswordlessTokenCheckFailedType,
+		user.HumanSignedOutType:
 		eventData, err := view_model.UserSessionFromEvent(event)
 		if err != nil {
 			return err
@@ -109,22 +110,22 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 			}
 		}
 		return u.updateSession(session, event)
-	case es_model.UserPasswordChanged,
-		es_model.MFAOTPRemoved,
-		es_model.UserProfileChanged,
-		es_model.UserLocked,
-		es_model.UserDeactivated,
-		es_model.HumanPasswordChanged,
-		es_model.HumanMFAOTPRemoved,
-		es_model.HumanProfileChanged,
-		es_model.HumanAvatarAdded,
-		es_model.HumanAvatarRemoved,
-		es_model.DomainClaimed,
-		es_model.UserUserNameChanged,
-		es_model.HumanExternalIDPRemoved,
-		es_model.HumanExternalIDPCascadeRemoved,
-		es_model.HumanPasswordlessTokenRemoved,
-		es_model.HumanMFAU2FTokenRemoved:
+	case user.UserV1PasswordChangedType,
+		user.UserV1MFAOTPRemovedType,
+		user.UserV1ProfileChangedType,
+		user.UserLockedType,
+		user.UserDeactivatedType,
+		user.HumanPasswordChangedType,
+		user.HumanMFAOTPRemovedType,
+		user.HumanProfileChangedType,
+		user.HumanAvatarAddedType,
+		user.HumanAvatarRemovedType,
+		user.UserDomainClaimedType,
+		user.UserUserNameChangedType,
+		user.UserIDPLinkRemovedType,
+		user.UserIDPLinkCascadeRemovedType,
+		user.HumanPasswordlessTokenRemovedType,
+		user.HumanU2FTokenRemovedType:
 		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
 		if err != nil {
 			return err
@@ -141,7 +142,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 			}
 		}
 		return u.view.PutUserSessions(sessions, event)
-	case es_model.UserRemoved:
+	case user.UserRemovedType:
 		return u.view.DeleteUserSessions(event.AggregateID, event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event)
