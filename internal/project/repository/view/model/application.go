@@ -60,43 +60,6 @@ type ApplicationView struct {
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
 
-func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
-	return &model.ApplicationView{
-		ID:                     app.ID,
-		ProjectID:              app.ProjectID,
-		Name:                   app.Name,
-		State:                  model.AppState(app.State),
-		Sequence:               app.Sequence,
-		CreationDate:           app.CreationDate,
-		ChangeDate:             app.ChangeDate,
-		ResourceOwner:          app.ResourceOwner,
-		ProjectRoleAssertion:   app.ProjectRoleAssertion,
-		ProjectRoleCheck:       app.ProjectRoleCheck,
-		HasProjectCheck:        app.HasProjectCheck,
-		PrivateLabelingSetting: app.PrivateLabelingSetting,
-
-		IsOIDC:                     app.IsOIDC,
-		OIDCVersion:                model.OIDCVersion(app.OIDCVersion),
-		OIDCClientID:               app.OIDCClientID,
-		OIDCRedirectUris:           app.OIDCRedirectUris,
-		OIDCResponseTypes:          OIDCResponseTypesToModel(app.OIDCResponseTypes),
-		OIDCGrantTypes:             OIDCGrantTypesToModel(app.OIDCGrantTypes),
-		OIDCApplicationType:        model.OIDCApplicationType(app.OIDCApplicationType),
-		OIDCAuthMethodType:         model.OIDCAuthMethodType(app.OIDCAuthMethodType),
-		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
-		NoneCompliant:              app.NoneCompliant,
-		ComplianceProblems:         app.ComplianceProblems,
-		DevMode:                    app.DevMode,
-		OriginAllowList:            app.OriginAllowList,
-		AdditionalOrigins:          app.AdditionalOrigins,
-		AccessTokenType:            model.OIDCTokenType(app.AccessTokenType),
-		AccessTokenRoleAssertion:   app.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:       app.IDTokenRoleAssertion,
-		IDTokenUserinfoAssertion:   app.IDTokenUserinfoAssertion,
-		ClockSkew:                  app.ClockSkew,
-	}
-}
-
 func OIDCResponseTypesToModel(oidctypes []int64) []model.OIDCResponseType {
 	result := make([]model.OIDCResponseType, len(oidctypes))
 	for i, t := range oidctypes {
