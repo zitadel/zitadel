@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
 )
 
 type Email struct {
@@ -31,41 +31,6 @@ func (e *Email) Changes(changed *Email) map[string]interface{} {
 		changes["email"] = changed.EmailAddress
 	}
 	return changes
-}
-
-func EmailFromModel(email *model.Email) *Email {
-	return &Email{
-		ObjectRoot:      email.ObjectRoot,
-		EmailAddress:    email.EmailAddress,
-		IsEmailVerified: email.IsEmailVerified,
-	}
-}
-
-func EmailToModel(email *Email) *model.Email {
-	return &model.Email{
-		ObjectRoot:      email.ObjectRoot,
-		EmailAddress:    email.EmailAddress,
-		IsEmailVerified: email.IsEmailVerified,
-	}
-}
-
-func EmailCodeFromModel(code *model.EmailCode) *EmailCode {
-	if code == nil {
-		return nil
-	}
-	return &EmailCode{
-		ObjectRoot: code.ObjectRoot,
-		Expiry:     code.Expiry,
-		Code:       code.Code,
-	}
-}
-
-func EmailCodeToModel(code *EmailCode) *model.EmailCode {
-	return &model.EmailCode{
-		ObjectRoot: code.ObjectRoot,
-		Expiry:     code.Expiry,
-		Code:       code.Code,
-	}
 }
 
 func (u *Human) appendUserEmailChangedEvent(event *es_models.Event) error {

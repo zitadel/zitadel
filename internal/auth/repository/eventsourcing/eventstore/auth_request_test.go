@@ -17,6 +17,7 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -431,8 +432,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{},
 				userEventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.UserDeactivated,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserDeactivatedType),
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
@@ -453,8 +454,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{},
 				userEventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.UserLocked,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserLockedType),
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
@@ -1687,8 +1688,8 @@ func Test_userSessionByIDs(t *testing.T) {
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MFAOTPCheckSucceeded,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 					},
 				},
@@ -1710,8 +1711,8 @@ func Test_userSessionByIDs(t *testing.T) {
 				user:    &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MFAOTPCheckSucceeded,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
@@ -1737,8 +1738,8 @@ func Test_userSessionByIDs(t *testing.T) {
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.MFAOTPCheckSucceeded,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
@@ -1764,8 +1765,8 @@ func Test_userSessionByIDs(t *testing.T) {
 				user:    &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.UserRemoved,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserRemovedType),
 					},
 				},
 			},
@@ -1834,8 +1835,8 @@ func Test_userByID(t *testing.T) {
 				},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.UserPasswordChanged,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserV1PasswordChangedType),
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data:          nil,
 					},
@@ -1860,8 +1861,8 @@ func Test_userByID(t *testing.T) {
 				},
 				eventProvider: &mockEventUser{
 					&es_models.Event{
-						AggregateType: user_es_model.UserAggregate,
-						Type:          user_es_model.UserPasswordChanged,
+						AggregateType: user_repo.AggregateType,
+						Type:          es_models.EventType(user_repo.UserV1PasswordChangedType),
 						CreationDate:  time.Now().UTC().Round(1 * time.Second),
 						Data: func() []byte {
 							data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})

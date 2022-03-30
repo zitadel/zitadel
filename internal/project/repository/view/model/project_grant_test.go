@@ -2,12 +2,15 @@ package model
 
 import (
 	"encoding/json"
+	"reflect"
+	"testing"
+
+	"github.com/lib/pq"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
-	"reflect"
-	"testing"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 func mockProjectData(project *es_model.Project) []byte {
@@ -33,7 +36,7 @@ func TestProjectGrantAppendEvent(t *testing.T) {
 		{
 			name: "append added project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: pq.StringArray{"Role"}})},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.GrantAddedType), ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: pq.StringArray{"Role"}})},
 				project: &ProjectGrantView{},
 			},
 			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
@@ -41,7 +44,7 @@ func TestProjectGrantAppendEvent(t *testing.T) {
 		{
 			name: "append change project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantChanged, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", RoleKeys: pq.StringArray{"RoleChanged"}})},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.GrantChangedType), ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", RoleKeys: pq.StringArray{"RoleChanged"}})},
 				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
 			},
 			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"RoleChanged"}},
@@ -49,7 +52,7 @@ func TestProjectGrantAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantDeactivated, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.GrantDeactivatedType), ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
 				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
 			},
 			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateInactive), GrantedRoleKeys: pq.StringArray{"Role"}},
@@ -57,7 +60,7 @@ func TestProjectGrantAppendEvent(t *testing.T) {
 		{
 			name: "append reactivate project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantReactivated, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.GrantReactivatedType), ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
 				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateInactive), GrantedRoleKeys: pq.StringArray{"Role"}},
 			},
 			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},

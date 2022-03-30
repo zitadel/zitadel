@@ -8,9 +8,10 @@ import (
 	"github.com/lib/pq"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 const (
@@ -89,17 +90,17 @@ func ProjectGrantsToModel(projects []*ProjectGrantView) []*model.ProjectGrantVie
 func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.ProjectGrantAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.GrantAddedType:
 		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setProjectGrantData(event)
-	case es_model.ProjectGrantChanged, es_model.ProjectGrantCascadeChanged:
+	case project.GrantChangedType, project.GrantCascadeChangedType:
 		err = p.setProjectGrantData(event)
-	case es_model.ProjectGrantDeactivated:
+	case project.GrantDeactivatedType:
 		p.State = int32(model.ProjectStateInactive)
-	case es_model.ProjectGrantReactivated:
+	case project.GrantReactivatedType:
 		p.State = int32(model.ProjectStateActive)
 	}
 	return err

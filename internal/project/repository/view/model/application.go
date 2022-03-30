@@ -10,9 +10,10 @@ import (
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 const (
@@ -112,41 +113,33 @@ func OIDCGrantTypesToModel(granttypes []int64) []model.OIDCGrantType {
 	return result
 }
 
-func ApplicationViewsToModel(roles []*ApplicationView) []*model.ApplicationView {
-	result := make([]*model.ApplicationView, len(roles))
-	for i, r := range roles {
-		result[i] = ApplicationViewToModel(r)
-	}
-	return result
-}
-
 func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 	view := new(ApplicationView)
-	switch event.Type {
-	case es_model.ApplicationAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.ApplicationAddedType:
 		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
-	case es_model.ApplicationChanged,
-		es_model.OIDCConfigAdded,
-		es_model.OIDCConfigChanged,
-		es_model.APIConfigAdded,
-		es_model.APIConfigChanged,
-		es_model.ApplicationDeactivated,
-		es_model.ApplicationReactivated:
+	case project.ApplicationChangedType,
+		project.OIDCConfigAddedType,
+		project.OIDCConfigChangedType,
+		project.APIConfigAddedType,
+		project.APIConfigChangedType,
+		project.ApplicationDeactivatedType,
+		project.ApplicationReactivatedType:
 		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
-	case es_model.ApplicationRemoved:
+	case project.ApplicationRemovedType:
 		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
-	case es_model.ProjectChanged:
+	case project.ProjectChangedType:
 		return a.AppendEvent(event)
-	case es_model.ProjectRemoved:
+	case project.ProjectRemovedType:
 		return a.AppendEvent(event)
 	default:
 		return nil
@@ -160,13 +153,13 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	a.Sequence = event.Sequence
 	a.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.ApplicationAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.ApplicationAddedType:
 		a.setRootData(event)
 		a.CreationDate = event.CreationDate
 		a.ResourceOwner = event.ResourceOwner
 		err = a.SetData(event)
-	case es_model.OIDCConfigAdded:
+	case project.OIDCConfigAddedType:
 		a.IsOIDC = true
 		err = a.SetData(event)
 		if err != nil {
@@ -174,27 +167,27 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
-	case es_model.APIConfigAdded:
+	case project.APIConfigAddedType:
 		a.IsOIDC = false
 		return a.SetData(event)
-	case es_model.ApplicationChanged:
+	case project.ApplicationChangedType:
 		return a.SetData(event)
-	case es_model.OIDCConfigChanged:
+	case project.OIDCConfigChangedType:
 		err = a.SetData(event)
 		if err != nil {
 			return err
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
-	case es_model.APIConfigChanged:
+	case project.APIConfigChangedType:
 		return a.SetData(event)
-	case es_model.ProjectChanged:
+	case project.ProjectChangedType:
 		return a.setProjectChanges(event)
-	case es_model.ApplicationDeactivated:
+	case project.ApplicationDeactivatedType:
 		a.State = int32(model.AppStateInactive)
-	case es_model.ApplicationReactivated:
+	case project.ApplicationReactivatedType:
 		a.State = int32(model.AppStateActive)
-	case es_model.ApplicationRemoved, es_model.ProjectRemoved:
+	case project.ApplicationRemovedType, project.ProjectRemovedType:
 		a.State = int32(model.AppStateRemoved)
 	}
 	return err

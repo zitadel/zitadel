@@ -7,9 +7,10 @@ import (
 	"github.com/caos/logging"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 const (
@@ -71,8 +72,8 @@ func ExternalIDPViewsToModel(externalIDPs []*ExternalIDPView) []*model.ExternalI
 func (i *ExternalIDPView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.HumanExternalIDPAdded:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserIDPLinkAddedType:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)

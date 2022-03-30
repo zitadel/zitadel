@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -21,9 +22,9 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -1094,24 +1095,24 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	}
 	sessionCopy := *session
 	for _, event := range events {
-		switch event.Type {
-		case es_model.UserPasswordCheckSucceeded,
-			es_model.UserPasswordCheckFailed,
-			es_model.MFAOTPCheckSucceeded,
-			es_model.MFAOTPCheckFailed,
-			es_model.SignedOut,
-			es_model.UserLocked,
-			es_model.UserDeactivated,
-			es_model.HumanPasswordCheckSucceeded,
-			es_model.HumanPasswordCheckFailed,
-			es_model.HumanExternalLoginCheckSucceeded,
-			es_model.HumanMFAOTPCheckSucceeded,
-			es_model.HumanMFAOTPCheckFailed,
-			es_model.HumanSignedOut,
-			es_model.HumanPasswordlessTokenCheckSucceeded,
-			es_model.HumanPasswordlessTokenCheckFailed,
-			es_model.HumanMFAU2FTokenCheckSucceeded,
-			es_model.HumanMFAU2FTokenCheckFailed:
+		switch eventstore.EventType(event.Type) {
+		case user_repo.UserV1PasswordCheckSucceededType,
+			user_repo.UserV1PasswordCheckFailedType,
+			user_repo.UserV1MFAOTPCheckSucceededType,
+			user_repo.UserV1MFAOTPCheckFailedType,
+			user_repo.UserV1SignedOutType,
+			user_repo.UserLockedType,
+			user_repo.UserDeactivatedType,
+			user_repo.HumanPasswordCheckSucceededType,
+			user_repo.HumanPasswordCheckFailedType,
+			user_repo.UserIDPLoginCheckSucceededType,
+			user_repo.HumanMFAOTPCheckSucceededType,
+			user_repo.HumanMFAOTPCheckFailedType,
+			user_repo.HumanSignedOutType,
+			user_repo.HumanPasswordlessTokenCheckSucceededType,
+			user_repo.HumanPasswordlessTokenCheckFailedType,
+			user_repo.HumanU2FTokenCheckSucceededType,
+			user_repo.HumanU2FTokenCheckFailedType:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
@@ -1120,7 +1121,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			if eventData.UserAgentID != agentID {
 				continue
 			}
-		case es_model.UserRemoved:
+		case user_repo.UserRemovedType:
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
 		err := sessionCopy.AppendEvent(event)
