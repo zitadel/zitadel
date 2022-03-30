@@ -13,135 +13,107 @@ import (
 	"time"
 )
 
+type LogoutResponse struct {
+	LogoutTemplate *template.Template
+	RelayState     string
+	SAMLResponse   string
+	LogoutURL      string
+
+	RequestID string
+	Issuer    string
+	ErrorFunc func(err error)
+}
+
 type LogoutResponseForm struct {
 	RelayState   string
 	SAMLResponse string
 	LogoutURL    string
 }
 
-func sendBackLogoutResponse(template *template.Template, w http.ResponseWriter, relayState string, logoutURL string, resp *samlp.LogoutResponse) error {
+func (r *LogoutResponse) sendBackLogoutResponse(w http.ResponseWriter, resp *samlp.LogoutResponse) {
 	var xmlbuff bytes.Buffer
 
 	memWriter := bufio.NewWriter(&xmlbuff)
 	_, err := memWriter.Write([]byte(xml.Header))
 	if err != nil {
-		return err
+		r.ErrorFunc(err)
+		return
 	}
 
 	encoder := xml.NewEncoder(memWriter)
 	err = encoder.Encode(resp)
 	if err != nil {
-		return err
+		r.ErrorFunc(err)
+		return
 	}
 
 	err = memWriter.Flush()
 	if err != nil {
-		return err
+		r.ErrorFunc(err)
+		return
 	}
 
 	samlMessage := base64.StdEncoding.EncodeToString(xmlbuff.Bytes())
 
 	data := LogoutResponseForm{
-		RelayState:   url.QueryEscape(relayState),
+		RelayState:   url.QueryEscape(r.RelayState),
 		SAMLResponse: samlMessage,
-		LogoutURL:    logoutURL,
+		LogoutURL:    r.LogoutURL,
 	}
 
-	return template.Execute(w, data)
+	if err := r.LogoutTemplate.Execute(w, data); err != nil {
+		r.ErrorFunc(err)
+		return
+	}
 }
 
-func makeSuccessfulLogoutResponse(
-	request *samlp.LogoutRequest,
-	logoutURL string,
-	entityID string,
-) *samlp.LogoutResponse {
-	now := time.Now().UTC()
-	nowStr := now.Format(DefaultTimeFormat)
-
-	issuer := &saml.NameIDType{
-		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   entityID,
-	}
-
+func (r *LogoutResponse) makeSuccessfulLogoutResponse() *samlp.LogoutResponse {
 	return makeLogoutResponse(
-		request.Id,
-		logoutURL,
-		nowStr,
+		r.RequestID,
+		r.LogoutURL,
+		time.Now().UTC().Format(DefaultTimeFormat),
 		StatusCodeSuccess,
 		"",
-		issuer,
+		getIssuer(r.Issuer),
 	)
 }
 
-func makeUnsupportedlLogoutResponse(
-	request *samlp.LogoutRequest,
-	logoutURL string,
-	entityID string,
+func (r *LogoutResponse) makeUnsupportedlLogoutResponse(
 	message string,
 ) *samlp.LogoutResponse {
-	now := time.Now().UTC()
-	nowStr := now.Format(DefaultTimeFormat)
-
-	issuer := &saml.NameIDType{
-		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   entityID,
-	}
-
 	return makeLogoutResponse(
-		request.Id,
-		logoutURL,
-		nowStr,
+		r.RequestID,
+		r.LogoutURL,
+		time.Now().UTC().Format(DefaultTimeFormat),
 		StatusCodeRequestUnsupported,
 		message,
-		issuer,
+		getIssuer(r.Issuer),
 	)
 }
 
-func makePartialLogoutResponse(
-	request *samlp.LogoutRequest,
-	logoutURL string,
-	entityID string,
+func (r *LogoutResponse) makePartialLogoutResponse(
 	message string,
 ) *samlp.LogoutResponse {
-	now := time.Now().UTC()
-	nowStr := now.Format(DefaultTimeFormat)
-
-	issuer := &saml.NameIDType{
-		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   entityID,
-	}
-
 	return makeLogoutResponse(
-		request.Id,
-		logoutURL,
-		nowStr,
+		r.RequestID,
+		r.LogoutURL,
+		time.Now().UTC().Format(DefaultTimeFormat),
 		StatusCodePartialLogout,
 		message,
-		issuer,
+		getIssuer(r.Issuer),
 	)
 }
 
-func makeDeniedLogoutResponse(
-	request *samlp.LogoutRequest,
-	logoutURL string,
-	entityID string,
+func (r *LogoutResponse) makeDeniedLogoutResponse(
 	message string,
 ) *samlp.LogoutResponse {
-	now := time.Now().UTC()
-	nowStr := now.Format(DefaultTimeFormat)
-
-	issuer := &saml.NameIDType{
-		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   entityID,
-	}
-
 	return makeLogoutResponse(
-		request.Id,
-		logoutURL,
-		nowStr,
+		r.RequestID,
+		r.LogoutURL,
+		time.Now().UTC().Format(DefaultTimeFormat),
 		StatusCodeRequestDenied,
 		message,
-		issuer,
+		getIssuer(r.Issuer),
 	)
 }
 

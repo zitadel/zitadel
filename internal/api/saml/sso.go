@@ -113,6 +113,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			if err != nil {
 				return err
 			}
+			response.Audience = sp.GetEntityID()
 			return nil
 		},
 		" SAML-317s2s",
@@ -120,8 +121,31 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to find registered serviceprovider: %w", err).Error()))
 		},
 	)
-	checker.WithValueStep(
-		func() { response.Audience = sp.GetEntityID() },
+
+	//validate used certificate for signing the request
+	checker.WithConditionalLogicStep(
+		func() bool {
+			return authNRequest.Signature != nil && authNRequest.Signature.KeyInfo != nil &&
+				sp.metadata.SPSSODescriptor.KeyDescriptor != nil && len(sp.metadata.SPSSODescriptor.KeyDescriptor) > 0
+		},
+		func() error {
+			for _, keyDesc := range sp.metadata.SPSSODescriptor.KeyDescriptor {
+				for _, spX509Data := range keyDesc.KeyInfo.X509Data {
+					for _, spX509Cert := range spX509Data.X509Certificate {
+						for _, reqX509Data := range authNRequest.Signature.KeyInfo.X509Data {
+							if spX509Cert == reqX509Data.X509Certificate {
+								return nil
+							}
+						}
+					}
+				}
+			}
+			return fmt.Errorf("unknown certificate used to sign request")
+		},
+		"SAML-b17d9a",
+		func() {
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to validate certificate from request: %w", err).Error()))
+		},
 	)
 
 	// get signature out of request if POST-binding
