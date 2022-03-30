@@ -19,6 +19,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
+	"github.com/caos/zitadel/cmd/admin/key"
+
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/assets"
@@ -59,7 +61,10 @@ Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := MustNewConfig(viper.GetViper())
-			masterKey, _ := cmd.Flags().GetString(flagMasterKey)
+			masterKey, err := key.MasterKey(cmd)
+			if err != nil {
+				return err
+			}
 
 			return startZitadel(config, masterKey)
 		},
