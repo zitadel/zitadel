@@ -26,7 +26,7 @@ type AuthRequestRepository interface {
 	VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID, instanceID string, credentialData []byte, info *domain.BrowserInfo) error
 	BeginPasswordlessSetup(ctx context.Context, instanceID, userID, resourceOwner string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error)
 	VerifyPasswordlessSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName string, credentialData []byte) (err error)
-	BeginPasswordlessInitCodeSetup(ctx context.Context, instanceID, serID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error)
+	BeginPasswordlessInitCodeSetup(ctx context.Context, instanceID, userID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error)
 	VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error)
 	BeginPasswordlessLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID, instanceID string) (*domain.WebAuthNLogin, error)
 	VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID, instanceID string, credentialData []byte, info *domain.BrowserInfo) error
