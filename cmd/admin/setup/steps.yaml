@@ -24,6 +24,7 @@ S2DefaultInstance:
       MaxAgeDays: 0
     DomainPolicy:
       UserLoginMustBeDomain: true
+      ValidateOrgDomains: true
     LoginPolicy:
       AllowUsernamePassword: true
       AllowRegister: true

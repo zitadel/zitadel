@@ -82,6 +82,7 @@ func TestAddHumanCommand(t *testing.T) {
 								context.Background(),
 								&org.NewAggregate("id", "ro").Aggregate,
 								true,
+								true,
 							),
 						}, nil
 					}).
@@ -122,6 +123,7 @@ func TestAddHumanCommand(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(
 								context.Background(),
 								&org.NewAggregate("id", "ro").Aggregate,
+								true,
 								true,
 							),
 						}, nil

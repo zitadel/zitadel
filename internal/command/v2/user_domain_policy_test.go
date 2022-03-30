@@ -53,6 +53,7 @@ func Test_customDomainPolicy(t *testing.T) {
 							context.Background(),
 							&org.NewAggregate("id", "ro").Aggregate,
 							true,
+							true,
 						),
 					}, nil
 				},
@@ -64,6 +65,7 @@ func Test_customDomainPolicy(t *testing.T) {
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,
+				ValidateOrgDomains:    true,
 				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,
@@ -122,6 +124,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 							context.Background(),
 							&instance.NewAggregate().Aggregate,
 							true,
+							true,
 						),
 					}, nil
 				},
@@ -133,6 +136,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,
+				ValidateOrgDomains:    true,
 				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,
@@ -181,6 +185,7 @@ func Test_DomainPolicy(t *testing.T) {
 							context.Background(),
 							&org.NewAggregate("id", "ro").Aggregate,
 							true,
+							true,
 						),
 					}, nil
 				},
@@ -192,6 +197,7 @@ func Test_DomainPolicy(t *testing.T) {
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,
+				ValidateOrgDomains:    true,
 				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,
@@ -224,6 +230,7 @@ func Test_DomainPolicy(t *testing.T) {
 								context.Background(),
 								&instance.NewAggregate().Aggregate,
 								true,
+								true,
 							),
 						}, nil
 					}).
@@ -236,6 +243,7 @@ func Test_DomainPolicy(t *testing.T) {
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,
+				ValidateOrgDomains:    true,
 				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,

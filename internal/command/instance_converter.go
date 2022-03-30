@@ -78,6 +78,7 @@ func writeModelToDomainPolicy(wm *InstanceDomainPolicyWriteModel) *domain.Domain
 	return &domain.DomainPolicy{
 		ObjectRoot:            writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
 		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
+		ValidateOrgDomains:    wm.ValidateOrgDomains,
 	}
 }
 

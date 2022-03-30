@@ -42,6 +42,7 @@ type InstanceSetup struct {
 	}
 	DomainPolicy struct {
 		UserLoginMustBeDomain bool
+		ValidateOrgDomains    bool
 	}
 	LoginPolicy struct {
 		AllowUsernamePassword      bool
@@ -187,6 +188,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 		AddDefaultDomainPolicy(
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
+			setup.DomainPolicy.ValidateOrgDomains,
 		),
 		AddDefaultLoginPolicy(
 			instanceAgg,

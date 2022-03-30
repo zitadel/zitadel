@@ -55,10 +55,14 @@ func (wm *InstanceDomainPolicyWriteModel) Query() *eventstore.SearchQueryBuilder
 func (wm *InstanceDomainPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userLoginMustBeDomain bool) (*instance.DomainPolicyChangedEvent, bool) {
-	changes := make([]policy.OrgPolicyChanges, 0)
+	userLoginMustBeDomain,
+	validateOrgDomain bool) (*instance.DomainPolicyChangedEvent, bool) {
+	changes := make([]policy.DomainPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
+	}
+	if wm.ValidateOrgDomains != validateOrgDomain {
+		changes = append(changes, policy.ChangeValidateOrgDomains(validateOrgDomain))
 	}
 	if len(changes) == 0 {
 		return nil, false

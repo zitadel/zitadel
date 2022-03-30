@@ -10,7 +10,8 @@ import (
 
 func AddDefaultDomainPolicy(
 	a *instance.Aggregate,
-	userLoginMustBeDomain bool,
+	userLoginMustBeDomain,
+	validateOrgDomains bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -18,6 +19,7 @@ func AddDefaultDomainPolicy(
 			return []eventstore.Command{
 				instance.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
 					userLoginMustBeDomain,
+					validateOrgDomains,
 				),
 			}, nil
 		}, nil

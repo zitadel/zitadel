@@ -821,7 +821,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org2", "org2").Aggregate,
-								false))),
+								false, false))),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
