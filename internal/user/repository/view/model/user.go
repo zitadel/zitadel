@@ -8,7 +8,6 @@ import (
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -179,7 +178,7 @@ func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 			Region:                   user.Region,
 			StreetAddress:            user.StreetAddress,
 			OTPState:                 model.MFAState(user.OTPState),
-			MFAMaxSetUp:              req_model.MFALevel(user.MFAMaxSetUp),
+			MFAMaxSetUp:              domain.MFALevel(user.MFAMaxSetUp),
 			MFAInitSkipped:           user.MFAInitSkipped,
 			InitRequired:             user.InitRequired,
 			PasswordlessInitRequired: user.PasswordlessInitRequired,
@@ -511,22 +510,22 @@ func (u *UserView) ComputeObject() {
 func (u *UserView) ComputeMFAMaxSetUp() {
 	for _, token := range u.PasswordlessTokens {
 		if token.State == int32(model.MFAStateReady) {
-			u.MFAMaxSetUp = int32(req_model.MFALevelMultiFactor)
+			u.MFAMaxSetUp = int32(domain.MFALevelMultiFactor)
 			u.PasswordlessInitRequired = false
 			return
 		}
 	}
 	for _, token := range u.U2FTokens {
 		if token.State == int32(model.MFAStateReady) {
-			u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
+			u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 			return
 		}
 	}
 	if u.OTPState == int32(model.MFAStateReady) {
-		u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
+		u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 		return
 	}
-	u.MFAMaxSetUp = int32(req_model.MFALevelNotSetUp)
+	u.MFAMaxSetUp = int32(domain.MFALevelNotSetUp)
 }
 
 func (u *UserView) SetEmptyUserType() {

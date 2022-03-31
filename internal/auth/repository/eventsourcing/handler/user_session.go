@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/caos/logging"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
@@ -105,7 +105,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 				ResourceOwner: event.ResourceOwner,
 				UserAgentID:   eventData.UserAgentID,
 				UserID:        event.AggregateID,
-				State:         int32(req_model.UserSessionStateActive),
+				State:         int32(domain.UserSessionStateActive),
 				InstanceID:    event.InstanceID,
 			}
 		}

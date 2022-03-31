@@ -12,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -43,54 +42,6 @@ type NotifyUser struct {
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	State              int32          `json:"-" gorm:"-"`
 	InstanceID         string         `json:"instanceID" gorm:"column:instance_id"`
-}
-
-func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
-	return &NotifyUser{
-		ID:                 user.ID,
-		ChangeDate:         user.ChangeDate,
-		CreationDate:       user.CreationDate,
-		ResourceOwner:      user.ResourceOwner,
-		UserName:           user.UserName,
-		LoginNames:         user.LoginNames,
-		PreferredLoginName: user.PreferredLoginName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		NickName:           user.NickName,
-		DisplayName:        user.DisplayName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             int32(user.Gender),
-		LastEmail:          user.LastEmail,
-		VerifiedEmail:      user.VerifiedEmail,
-		LastPhone:          user.LastPhone,
-		VerifiedPhone:      user.VerifiedPhone,
-		PasswordSet:        user.PasswordSet,
-		Sequence:           user.Sequence,
-	}
-}
-
-func NotifyUserToModel(user *NotifyUser) *model.NotifyUser {
-	return &model.NotifyUser{
-		ID:                 user.ID,
-		ChangeDate:         user.ChangeDate,
-		CreationDate:       user.CreationDate,
-		ResourceOwner:      user.ResourceOwner,
-		UserName:           user.UserName,
-		LoginNames:         user.LoginNames,
-		PreferredLoginName: user.PreferredLoginName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		NickName:           user.NickName,
-		DisplayName:        user.DisplayName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             model.Gender(user.Gender),
-		LastEmail:          user.LastEmail,
-		VerifiedEmail:      user.VerifiedEmail,
-		LastPhone:          user.LastPhone,
-		VerifiedPhone:      user.VerifiedPhone,
-		PasswordSet:        user.PasswordSet,
-		Sequence:           user.Sequence,
-	}
 }
 
 func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string {

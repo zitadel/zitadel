@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -644,7 +643,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordlessTokens:     user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
 					PasswordChangeRequired: false,
 					IsEmailVerified:        false,
-					MFAMaxSetUp:            int32(model.MFALevelMultiFactor),
+					MFAMaxSetUp:            int32(domain.MFALevelMultiFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				lockoutPolicyProvider: &mockLockoutPolicy{
@@ -692,7 +691,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				lockoutPolicyProvider: &mockLockoutPolicy{
@@ -725,7 +724,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider:   &mockEventUser{},
 				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
@@ -786,7 +785,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider:   &mockEventUser{},
 				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
@@ -822,7 +821,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet:        true,
 					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
 					OTPState:           int32(user_model.MFAStateReady),
-					MFAMaxSetUp:        int32(model.MFALevelMultiFactor),
+					MFAMaxSetUp:        int32(domain.MFALevelMultiFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -855,7 +854,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
 					OTPState:    int32(user_model.MFAStateReady),
-					MFAMaxSetUp: int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp: int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -889,7 +888,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
 					OTPState:    int32(user_model.MFAStateReady),
-					MFAMaxSetUp: int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp: int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -926,7 +925,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
 					IsEmailVerified:        true,
-					MFAMaxSetUp:            int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:            int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -957,7 +956,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
-					MFAMaxSetUp: int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp: int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -988,7 +987,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
 					PasswordChangeRequired: true,
-					MFAMaxSetUp:            int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:            int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -1019,7 +1018,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider:   &mockEventUser{},
 				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
@@ -1054,7 +1053,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider:   &mockEventUser{},
 				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
@@ -1090,7 +1089,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider:   &mockEventUser{},
 				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
@@ -1126,7 +1125,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -1164,7 +1163,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -1203,7 +1202,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -1241,7 +1240,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -1279,7 +1278,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
@@ -1314,7 +1313,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
 					IsEmailVerified: true,
-					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
 				},
 				userEventProvider: &mockEventUser{},
 				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
@@ -1399,7 +1398,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp: model.MFALevelNotSetUp,
+						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
 			},
@@ -1417,7 +1416,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp: model.MFALevelNotSetUp,
+						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
 			},
@@ -1436,7 +1435,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp: model.MFALevelNotSetUp,
+						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
 			},
@@ -1460,7 +1459,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp: model.MFALevelNotSetUp,
+						MFAMaxSetUp: domain.MFALevelNotSetUp,
 					},
 				},
 			},
@@ -1483,7 +1482,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp:    model.MFALevelNotSetUp,
+						MFAMaxSetUp:    domain.MFALevelNotSetUp,
 						MFAInitSkipped: time.Now().UTC(),
 					},
 				},
@@ -1503,7 +1502,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp: model.MFALevelSecondFactor,
+						MFAMaxSetUp: domain.MFALevelSecondFactor,
 						OTPState:    user_model.MFAStateReady,
 					},
 				},
@@ -1524,7 +1523,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp: model.MFALevelSecondFactor,
+						MFAMaxSetUp: domain.MFALevelSecondFactor,
 						OTPState:    user_model.MFAStateReady,
 					},
 				},
@@ -1574,7 +1573,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			args{
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
-						MFAMaxSetUp: model.MFALevelSecondFactor,
+						MFAMaxSetUp: domain.MFALevelSecondFactor,
 					},
 				},
 				request: &domain.AuthRequest{

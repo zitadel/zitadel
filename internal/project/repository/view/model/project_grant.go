@@ -45,48 +45,6 @@ type ProjectGrant struct {
 	InstanceID   string   `json:"instanceID"`
 }
 
-func ProjectGrantFromModel(project *model.ProjectGrantView) *ProjectGrantView {
-	return &ProjectGrantView{
-		ProjectID:         project.ProjectID,
-		OrgID:             project.OrgID,
-		Name:              project.Name,
-		ChangeDate:        project.ChangeDate,
-		CreationDate:      project.CreationDate,
-		State:             int32(project.State),
-		ResourceOwner:     project.ResourceOwner,
-		ResourceOwnerName: project.ResourceOwnerName,
-		OrgName:           project.OrgName,
-		GrantID:           project.GrantID,
-		GrantedRoleKeys:   project.GrantedRoleKeys,
-		Sequence:          project.Sequence,
-	}
-}
-
-func ProjectGrantToModel(project *ProjectGrantView) *model.ProjectGrantView {
-	return &model.ProjectGrantView{
-		ProjectID:         project.ProjectID,
-		OrgID:             project.OrgID,
-		Name:              project.Name,
-		ChangeDate:        project.ChangeDate,
-		CreationDate:      project.CreationDate,
-		State:             model.ProjectState(project.State),
-		ResourceOwner:     project.ResourceOwner,
-		ResourceOwnerName: project.ResourceOwnerName,
-		OrgName:           project.OrgName,
-		GrantID:           project.GrantID,
-		Sequence:          project.Sequence,
-		GrantedRoleKeys:   project.GrantedRoleKeys,
-	}
-}
-
-func ProjectGrantsToModel(projects []*ProjectGrantView) []*model.ProjectGrantView {
-	result := make([]*model.ProjectGrantView, len(projects))
-	for i, p := range projects {
-		result[i] = ProjectGrantToModel(p)
-	}
-	return result
-}
-
 func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Sequence

@@ -6,7 +6,6 @@ import (
 
 	"github.com/caos/logging"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -60,7 +59,7 @@ func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *m
 		ChangeDate:                   userSession.ChangeDate,
 		CreationDate:                 userSession.CreationDate,
 		ResourceOwner:                userSession.ResourceOwner,
-		State:                        req_model.UserSessionState(userSession.State),
+		State:                        domain.UserSessionState(userSession.State),
 		UserAgentID:                  userSession.UserAgentID,
 		UserID:                       userSession.UserID,
 		UserName:                     userSession.UserName,
@@ -73,9 +72,9 @@ func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *m
 		PasswordlessVerification:     userSession.PasswordlessVerification,
 		ExternalLoginVerification:    userSession.ExternalLoginVerification,
 		SecondFactorVerification:     userSession.SecondFactorVerification,
-		SecondFactorVerificationType: req_model.MFAType(userSession.SecondFactorVerificationType),
+		SecondFactorVerificationType: domain.MFAType(userSession.SecondFactorVerificationType),
 		MultiFactorVerification:      userSession.MultiFactorVerification,
-		MultiFactorVerificationType:  req_model.MFAType(userSession.MultiFactorVerificationType),
+		MultiFactorVerificationType:  domain.MFAType(userSession.MultiFactorVerificationType),
 		Sequence:                     userSession.Sequence,
 	}
 }
@@ -95,7 +94,7 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:
 		v.PasswordVerification = event.CreationDate
-		v.State = int32(req_model.UserSessionStateActive)
+		v.State = int32(domain.UserSessionStateActive)
 	case user.UserIDPLoginCheckSucceededType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
@@ -104,12 +103,12 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		}
 		v.ExternalLoginVerification = event.CreationDate
 		v.SelectedIDPConfigID = data.SelectedIDPConfigID
-		v.State = int32(req_model.UserSessionStateActive)
+		v.State = int32(domain.UserSessionStateActive)
 	case user.HumanPasswordlessTokenCheckSucceededType:
 		v.PasswordlessVerification = event.CreationDate
 		v.MultiFactorVerification = event.CreationDate
-		v.MultiFactorVerificationType = int32(req_model.MFATypeU2FUserVerification)
-		v.State = int32(req_model.UserSessionStateActive)
+		v.MultiFactorVerificationType = int32(domain.MFATypeU2FUserVerification)
+		v.State = int32(domain.UserSessionStateActive)
 	case user.HumanPasswordlessTokenCheckFailedType,
 		user.HumanPasswordlessTokenRemovedType:
 		v.PasswordlessVerification = time.Time{}
@@ -134,11 +133,11 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeOTP)
+			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
 		}
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
-		v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeOTP)
+		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
 	case user.UserV1MFAOTPCheckFailedType,
 		user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPCheckFailedType,
@@ -153,10 +152,10 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeU2F)
+			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeU2F)
 		}
 	case user.HumanU2FTokenCheckSucceededType:
-		v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeU2F)
+		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeU2F)
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType,
 		user.UserLockedType,
@@ -164,11 +163,11 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		v.PasswordlessVerification = time.Time{}
 		v.PasswordVerification = time.Time{}
 		v.SecondFactorVerification = time.Time{}
-		v.SecondFactorVerificationType = int32(req_model.MFALevelNotSetUp)
+		v.SecondFactorVerificationType = int32(domain.MFALevelNotSetUp)
 		v.MultiFactorVerification = time.Time{}
-		v.MultiFactorVerificationType = int32(req_model.MFALevelNotSetUp)
+		v.MultiFactorVerificationType = int32(domain.MFALevelNotSetUp)
 		v.ExternalLoginVerification = time.Time{}
-		v.State = int32(req_model.UserSessionStateTerminated)
+		v.State = int32(domain.UserSessionStateTerminated)
 	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
@@ -176,8 +175,8 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	return nil
 }
 
-func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time, mfaType req_model.MFAType) {
+func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time, mfaType domain.MFAType) {
 	v.SecondFactorVerification = verificationTime
 	v.SecondFactorVerificationType = int32(mfaType)
-	v.State = int32(req_model.UserSessionStateActive)
+	v.State = int32(domain.UserSessionStateActive)
 }
