@@ -67,7 +67,7 @@ type Downloader interface {
 type ErrorHandler func(http.ResponseWriter, *http.Request, error, int)
 
 func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, code int) {
-	logging.WithFields("uri", r.RequestURI).WithError(err).Error("error occurred on asset api")
+	logging.WithFields("uri", r.RequestURI).WithError(err).Warn("error occurred on asset api")
 	http.Error(w, err.Error(), code)
 }
 
@@ -171,7 +171,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			return
 		}
 		if objectName == "" {
-			s.ErrorHandler()(w, r, fmt.Errorf("file not found: %v", objectName), http.StatusNotFound)
+			s.ErrorHandler()(w, r, fmt.Errorf("file not found: %v", path), http.StatusNotFound)
 			return
 		}
 		if err = GetAsset(w, r, resourceOwner, objectName, s.Storage()); err != nil {
