@@ -13,9 +13,8 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/key"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/saml"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/md"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"gopkg.in/square/go-jose.v2"
 	"io"
 	"net/http"
@@ -30,7 +29,7 @@ type IDPStorage interface {
 }
 
 type AuthStorage interface {
-	CreateAuthRequest(context.Context, *samlp.AuthnRequest, string, string, string, string) (AuthRequestInt, error)
+	CreateAuthRequest(context.Context, *samlp.AuthnRequestType, string, string, string, string) (AuthRequestInt, error)
 	AuthRequestByID(context.Context, string) (AuthRequestInt, error)
 	AuthRequestByCode(context.Context, string) (AuthRequestInt, error)
 	GetAttributesFromNameID(ctx context.Context, nameID string) (map[string]interface{}, error)
@@ -210,14 +209,7 @@ func (p *IdentityProvider) DeleteServiceProvider(entityID string) error {
 	return nil
 }
 
-func (p *IdentityProvider) getIssuer() *saml.Issuer {
-	return &saml.Issuer{
-		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   string(p.EntityID),
-	}
-}
-
-func (p *IdentityProvider) verifyRequestDestination(request *samlp.AuthnRequest) error {
+func (p *IdentityProvider) verifyRequestDestination(request *samlp.AuthnRequestType) error {
 	// google provides no destination in their requests
 	if request.Destination != "" {
 		foundEndpoint := false
@@ -261,7 +253,7 @@ func getResponseCert(storage Storage) ([]byte, *rsa.PrivateKey) {
 }
 
 func (i *IdentityProvider) certificateHandleFunc(w http.ResponseWriter, r *http.Request) {
-	cert := i.Metadata.KeyDescriptor[0].KeyInfo.X509Data[0].X509Certificate[0]
+	cert := i.Metadata.KeyDescriptor[0].KeyInfo.X509Data[0].X509Certificate
 
 	data, err := base64.StdEncoding.DecodeString(cert)
 	if err != nil {

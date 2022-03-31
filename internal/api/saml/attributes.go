@@ -1,6 +1,6 @@
 package saml
 
-import "github.com/caos/zitadel/internal/api/saml/xml/protocol/saml"
+import "github.com/caos/zitadel/internal/api/saml/xml/saml"
 
 type AttributeSetter interface {
 	SetEmail(string)

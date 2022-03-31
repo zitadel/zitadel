@@ -13,7 +13,7 @@ import (
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/key"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
+	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -96,7 +96,7 @@ type Provider struct {
 	caKey        string
 
 	MetadataEndpoint *op.Endpoint
-	Metadata         *md.EntityDescriptor
+	Metadata         *md.EntityDescriptorType
 	Signer           xmlsig.Signer
 
 	IdentityProvider *IdentityProvider

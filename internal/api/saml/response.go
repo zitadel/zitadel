@@ -6,8 +6,8 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/saml"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/saml"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/http"
 	"net/url"
 	"text/template"
@@ -84,7 +84,7 @@ type AuthResponseForm struct {
 func (r *Response) sendBackResponse(
 	req *http.Request,
 	w http.ResponseWriter,
-	resp *samlp.Response,
+	resp *samlp.ResponseType,
 ) {
 	var xmlbuff bytes.Buffer
 
@@ -115,7 +115,7 @@ func (r *Response) sendBackResponse(
 
 func (r *Response) makeUnsupportedBindingResponse(
 	message string,
-) *samlp.Response {
+) *samlp.ResponseType {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
@@ -130,7 +130,7 @@ func (r *Response) makeUnsupportedBindingResponse(
 
 func (r *Response) makeResponderFailResponse(
 	message string,
-) *samlp.Response {
+) *samlp.ResponseType {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
@@ -145,7 +145,7 @@ func (r *Response) makeResponderFailResponse(
 
 func (r *Response) makeDeniedResponse(
 	message string,
-) *samlp.Response {
+) *samlp.ResponseType {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
@@ -160,7 +160,7 @@ func (r *Response) makeDeniedResponse(
 
 func (r *Response) makeFailedResponse(
 	message string,
-) *samlp.Response {
+) *samlp.ResponseType {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
@@ -175,7 +175,7 @@ func (r *Response) makeFailedResponse(
 
 func (r *Response) makeSuccessfulResponse(
 	attributes *Attributes,
-) *samlp.Response {
+) *samlp.ResponseType {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	fiveFromNowStr := now.Add(5 * time.Minute).Format(DefaultTimeFormat)
@@ -191,7 +191,7 @@ func (r *Response) makeAssertionResponse(
 	issueInstant string,
 	untilInstant string,
 	attributes *Attributes,
-) *samlp.Response {
+) *samlp.ResponseType {
 
 	response := makeResponse(r.RequestID, r.AcsUrl, issueInstant, StatusCodeSuccess, "", r.Issuer)
 	assertion := makeAssertion(r.RequestID, r.AcsUrl, r.SendIP, issueInstant, untilInstant, r.Issuer, attributes.GetNameID(), attributes.GetSAML(), r.Audience)
@@ -216,11 +216,11 @@ func makeAssertion(
 	nameID *saml.NameIDType,
 	attributes []*saml.AttributeType,
 	audience string,
-) *saml.Assertion {
+) *saml.AssertionType {
 	id := NewID()
 	issuerP := getIssuer(issuer)
 
-	ret := &saml.Assertion{
+	ret := &saml.AssertionType{
 		Version:      "2.0",
 		Id:           id,
 		IssueInstant: issueInstant,
@@ -272,8 +272,8 @@ func makeResponse(
 	status string,
 	message string,
 	issuer string,
-) *samlp.Response {
-	return &samlp.Response{
+) *samlp.ResponseType {
+	return &samlp.ResponseType{
 		Version:      "2.0",
 		Id:           NewID(),
 		IssueInstant: issueInstant,

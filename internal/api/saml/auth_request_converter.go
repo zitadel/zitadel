@@ -2,7 +2,7 @@ package saml
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"time"
@@ -73,7 +73,7 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ AuthRequestInt, err
 	return &AuthRequest{authReq}, nil
 }
 
-func CreateAuthRequestToBusiness(ctx context.Context, authReq *samlp.AuthnRequest, acsUrl, protocolBinding, issuerID, relayState, userAgentID string) *domain.AuthRequest {
+func CreateAuthRequestToBusiness(ctx context.Context, authReq *samlp.AuthnRequestType, acsUrl, protocolBinding, issuerID, relayState, userAgentID string) *domain.AuthRequest {
 	return &domain.AuthRequest{
 		CreationDate:  time.Now(),
 		AgentID:       userAgentID,

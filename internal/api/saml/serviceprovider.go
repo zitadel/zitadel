@@ -10,10 +10,9 @@ import (
 	"encoding/asn1"
 	"encoding/base64"
 	"fmt"
-	mdxml "github.com/caos/zitadel/internal/api/saml/xml"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/saml"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml"
+	"github.com/caos/zitadel/internal/api/saml/xml/md"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"math/big"
 	"net/url"
 	"strings"
@@ -26,7 +25,7 @@ type ServiceProviderConfig struct {
 
 type ServiceProvider struct {
 	ID              string
-	metadata        *md.EntityDescriptor
+	metadata        *md.EntityDescriptorType
 	url             string
 	signerPublicKey interface{}
 	defaultLoginURL string
@@ -43,7 +42,7 @@ func (sp *ServiceProvider) LoginURL(id string) string {
 func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginURL string) (*ServiceProvider, error) {
 	metadataData := make([]byte, 0)
 	if config.URL != "" {
-		body, err := mdxml.ReadMetadataFromURL(config.URL)
+		body, err := xml.ReadMetadataFromURL(config.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +50,7 @@ func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginUR
 	} else {
 		metadataData = []byte(config.Metadata)
 	}
-	metadata, err := mdxml.ParseMetadataXmlIntoStruct(metadataData)
+	metadata, err := xml.ParseMetadataXmlIntoStruct(metadataData)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +60,7 @@ func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginUR
 	if metadata.SPSSODescriptor.KeyDescriptor != nil && len(metadata.SPSSODescriptor.KeyDescriptor) > 0 {
 		for _, keydesc := range metadata.SPSSODescriptor.KeyDescriptor {
 			if keydesc.Use == md.KeyTypesSigning {
-				certStr = keydesc.KeyInfo.X509Data[0].X509Certificate[0]
+				certStr = keydesc.KeyInfo.X509Data[0].X509Certificate
 			}
 		}
 
@@ -89,19 +88,12 @@ func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginUR
 	}, nil
 }
 
-func (sp *ServiceProvider) verifyRequest(request *samlp.AuthnRequest) error {
+func (sp *ServiceProvider) verifyRequest(request *samlp.AuthnRequestType) error {
 	if string(sp.metadata.EntityID) != request.Issuer.Text {
 		return fmt.Errorf("request contains unknown issuer")
 	}
 
 	return nil
-}
-
-func (sp *ServiceProvider) getIssuer() *saml.Issuer {
-	return &saml.Issuer{
-		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   string(sp.metadata.EntityID),
-	}
 }
 
 func (sp *ServiceProvider) verifySignature(request, relayState, sigAlg, expectedSig string) error {

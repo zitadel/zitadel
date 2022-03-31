@@ -3,11 +3,10 @@ package saml
 import (
 	"encoding/xml"
 	"github.com/amdonov/xmlsig"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/xml_dsig"
-	xml_dsigp "github.com/caos/zitadel/internal/api/saml/xml/protocol/xml_dsig"
+	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 )
 
-func createSignatureM(signer xmlsig.Signer, data interface{}) (*xml_dsig.SignatureType, error) {
+func createSignature(signer xmlsig.Signer, data interface{}) (*xml_dsig.SignatureType, error) {
 	sig, err := signer.CreateSignature(data)
 	if err != nil {
 		return nil, err
@@ -51,58 +50,6 @@ func createSignatureM(signer xmlsig.Signer, data interface{}) (*xml_dsig.Signatu
 		KeyInfo: &xml_dsig.KeyInfoType{
 			XMLName: xml.Name{},
 			X509Data: []xml_dsig.X509DataType{{
-				X509Certificate: []string{sig.KeyInfo.X509Data.X509Certificate},
-			}},
-			InnerXml: "",
-		},
-		InnerXml: "",
-	}, nil
-}
-
-func createSignatureP(signer xmlsig.Signer, data interface{}) (*xml_dsigp.SignatureType, error) {
-	sig, err := signer.CreateSignature(data)
-	if err != nil {
-		return nil, err
-	}
-	transforms := []xml_dsigp.TransformType{}
-	for _, t := range sig.SignedInfo.Reference.Transforms.Transform {
-		transforms = append(transforms, xml_dsigp.TransformType{
-			XMLName:   xml.Name{},
-			Algorithm: t.Algorithm,
-		})
-	}
-
-	return &xml_dsigp.SignatureType{
-		XMLName: xml.Name{},
-		SignedInfo: xml_dsigp.SignedInfoType{
-			XMLName: xml.Name{},
-			CanonicalizationMethod: xml_dsigp.CanonicalizationMethodType{
-				XMLName:   xml.Name{},
-				Algorithm: sig.SignedInfo.CanonicalizationMethod.Algorithm,
-			},
-			SignatureMethod: xml_dsigp.SignatureMethodType{
-				XMLName:   xml.Name{},
-				Algorithm: sig.SignedInfo.SignatureMethod.Algorithm,
-			},
-			Reference: []xml_dsigp.ReferenceType{{
-				DigestValue: xml_dsigp.DigestValueType(sig.SignedInfo.Reference.DigestValue),
-				DigestMethod: xml_dsigp.DigestMethodType{
-					XMLName:   xml.Name{},
-					Algorithm: sig.SignedInfo.Reference.DigestMethod.Algorithm,
-				},
-				Transforms: &xml_dsigp.TransformsType{
-					Transform: transforms,
-				},
-				URI: sig.SignedInfo.Reference.URI,
-			}},
-			InnerXml: "",
-		},
-		SignatureValue: xml_dsigp.SignatureValueType{
-			Text: sig.SignatureValue,
-		},
-		KeyInfo: &xml_dsigp.KeyInfoType{
-			XMLName: xml.Name{},
-			X509Data: []xml_dsigp.X509DataType{{
 				X509Certificate: sig.KeyInfo.X509Data.X509Certificate,
 			}},
 			InnerXml: "",

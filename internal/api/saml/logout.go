@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/http"
 	"time"
 )
@@ -22,7 +22,7 @@ type LogoutRequestForm struct {
 func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Request) {
 	checker := checker.Checker{}
 	var logoutRequestForm *LogoutRequestForm
-	var logoutRequest *samlp.LogoutRequest
+	var logoutRequest *samlp.LogoutRequestType
 	var err error
 	var sp *ServiceProvider
 	response := &LogoutResponse{
@@ -127,13 +127,13 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	logging.Log("SAML-892u3n").Info(fmt.Sprintf("logout request for user %s", logoutRequest.NameID.Text))
 }
 
-func decodeLogoutRequest(encoding string, message string) (*samlp.LogoutRequest, error) {
+func decodeLogoutRequest(encoding string, message string) (*samlp.LogoutRequestType, error) {
 	reqBytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return nil, err
 	}
 
-	req := &samlp.LogoutRequest{}
+	req := &samlp.LogoutRequestType{}
 	switch encoding {
 	case "":
 		reader := flate.NewReader(bytes.NewReader(reqBytes))

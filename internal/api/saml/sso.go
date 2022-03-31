@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/xml_dsig"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
 	"regexp"
 )
@@ -29,7 +29,7 @@ type AuthRequestForm struct {
 func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request) {
 	checker := checker.Checker{}
 	var authRequestForm *AuthRequestForm
-	var authNRequest *samlp.AuthnRequest
+	var authNRequest *samlp.AuthnRequestType
 	var sp *ServiceProvider
 	var authRequest AuthRequestInt
 	var err error
@@ -131,13 +131,12 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		func() error {
 			for _, keyDesc := range sp.metadata.SPSSODescriptor.KeyDescriptor {
 				for _, spX509Data := range keyDesc.KeyInfo.X509Data {
-					for _, spX509Cert := range spX509Data.X509Certificate {
-						for _, reqX509Data := range authNRequest.Signature.KeyInfo.X509Data {
-							if spX509Cert == reqX509Data.X509Certificate {
-								return nil
-							}
+					for _, reqX509Data := range authNRequest.Signature.KeyInfo.X509Data {
+						if spX509Data.X509Certificate == reqX509Data.X509Certificate {
+							return nil
 						}
 					}
+
 				}
 			}
 			return fmt.Errorf("unknown certificate used to sign request")
@@ -316,13 +315,13 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 	return request, nil
 }
 
-func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequest, error) {
+func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequestType, error) {
 	reqBytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return nil, fmt.Errorf("failed to base64 decode: %w", err)
 	}
 
-	req := &samlp.AuthnRequest{}
+	req := &samlp.AuthnRequestType{}
 	switch encoding {
 	case EncodingDeflate:
 		reader := flate.NewReader(bytes.NewReader(reqBytes))

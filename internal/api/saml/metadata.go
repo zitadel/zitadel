@@ -5,9 +5,9 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/caos/oidc/pkg/op"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/xenc"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/xml_dsig"
+	"github.com/caos/zitadel/internal/api/saml/xml/md"
+	"github.com/caos/zitadel/internal/api/saml/xml/xenc"
+	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
 )
 
@@ -44,7 +44,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			KeyInfo: xml_dsig.KeyInfoType{
 				KeyName: []string{metadataEndpoint.Absolute("") + " IDP " + string(md.KeyTypesSigning)},
 				X509Data: []xml_dsig.X509DataType{{
-					X509Certificate: []string{base64.StdEncoding.EncodeToString(idpCertData)},
+					X509Certificate: base64.StdEncoding.EncodeToString(idpCertData),
 				}},
 			},
 		},
@@ -56,7 +56,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			KeyInfo: xml_dsig.KeyInfoType{
 				KeyName: []string{metadataEndpoint.Absolute("") + " IDP " + string(md.KeyTypesEncryption)},
 				X509Data: []xml_dsig.X509DataType{{
-					X509Certificate: []string{base64.StdEncoding.EncodeToString(idpCertData)},
+					X509Certificate: base64.StdEncoding.EncodeToString(idpCertData),
 				}},
 			},
 			EncryptionMethod: []xenc.EncryptionMethodType{{
@@ -154,9 +154,9 @@ func (p *IdentityProviderConfig) getMetadata(
 
 func (p *ProviderConfig) getMetadata(
 	idp *IdentityProvider,
-) *md.EntityDescriptor {
+) *md.EntityDescriptorType {
 
-	entity := &md.EntityDescriptor{
+	entity := &md.EntityDescriptorType{
 		XMLName:       xml.Name{Local: "md"},
 		EntityID:      md.EntityIDType(idp.EntityID),
 		Id:            NewID(),
@@ -214,9 +214,9 @@ func (p *ProviderConfig) getMetadata(
 	return entity
 }
 
-func (p *Provider) GetMetadata() (*md.EntityDescriptor, error) {
+func (p *Provider) GetMetadata() (*md.EntityDescriptorType, error) {
 	metadata := *p.Metadata
-	idpSig, err := createSignatureM(p.Signer, metadata)
+	idpSig, err := createSignature(p.Signer, metadata)
 	if err != nil {
 		return nil, err
 	}

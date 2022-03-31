@@ -3,7 +3,7 @@ package xml
 import (
 	"encoding/base64"
 	"encoding/xml"
-	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
+	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"io"
 	"net/http"
 )
@@ -24,14 +24,14 @@ func ReadMetadataFromURL(url string) ([]byte, error) {
 	return []byte(bodyEncoded), nil
 }
 
-func ParseMetadataXmlIntoStruct(xmlData []byte) (*md.EntityDescriptor, error) {
+func ParseMetadataXmlIntoStruct(xmlData []byte) (*md.EntityDescriptorType, error) {
 	xmlDataDecoded := make([]byte, 0)
 	xmlDataDecoded, err := base64.StdEncoding.DecodeString(string(xmlData))
 	if err != nil {
 		return nil, err
 	}
 
-	metadata := &md.EntityDescriptor{}
+	metadata := &md.EntityDescriptorType{}
 	if err := xml.Unmarshal(xmlDataDecoded, metadata); err != nil {
 		return nil, err
 	}

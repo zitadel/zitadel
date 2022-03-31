@@ -5,8 +5,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/xml"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/saml"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/saml"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/http"
 	"net/url"
 	"text/template"
@@ -30,7 +30,7 @@ type LogoutResponseForm struct {
 	LogoutURL    string
 }
 
-func (r *LogoutResponse) sendBackLogoutResponse(w http.ResponseWriter, resp *samlp.LogoutResponse) {
+func (r *LogoutResponse) sendBackLogoutResponse(w http.ResponseWriter, resp *samlp.LogoutResponseType) {
 	var xmlbuff bytes.Buffer
 
 	memWriter := bufio.NewWriter(&xmlbuff)
@@ -67,7 +67,7 @@ func (r *LogoutResponse) sendBackLogoutResponse(w http.ResponseWriter, resp *sam
 	}
 }
 
-func (r *LogoutResponse) makeSuccessfulLogoutResponse() *samlp.LogoutResponse {
+func (r *LogoutResponse) makeSuccessfulLogoutResponse() *samlp.LogoutResponseType {
 	return makeLogoutResponse(
 		r.RequestID,
 		r.LogoutURL,
@@ -80,7 +80,7 @@ func (r *LogoutResponse) makeSuccessfulLogoutResponse() *samlp.LogoutResponse {
 
 func (r *LogoutResponse) makeUnsupportedlLogoutResponse(
 	message string,
-) *samlp.LogoutResponse {
+) *samlp.LogoutResponseType {
 	return makeLogoutResponse(
 		r.RequestID,
 		r.LogoutURL,
@@ -93,7 +93,7 @@ func (r *LogoutResponse) makeUnsupportedlLogoutResponse(
 
 func (r *LogoutResponse) makePartialLogoutResponse(
 	message string,
-) *samlp.LogoutResponse {
+) *samlp.LogoutResponseType {
 	return makeLogoutResponse(
 		r.RequestID,
 		r.LogoutURL,
@@ -106,7 +106,7 @@ func (r *LogoutResponse) makePartialLogoutResponse(
 
 func (r *LogoutResponse) makeDeniedLogoutResponse(
 	message string,
-) *samlp.LogoutResponse {
+) *samlp.LogoutResponseType {
 	return makeLogoutResponse(
 		r.RequestID,
 		r.LogoutURL,
@@ -124,8 +124,8 @@ func makeLogoutResponse(
 	status string,
 	message string,
 	issuer *saml.NameIDType,
-) *samlp.LogoutResponse {
-	return &samlp.LogoutResponse{
+) *samlp.LogoutResponseType {
+	return &samlp.LogoutResponseType{
 		Id:           NewID(),
 		InResponseTo: requestID,
 		Version:      "2.0",

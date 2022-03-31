@@ -5,7 +5,7 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/key"
 	"github.com/caos/zitadel/internal/api/saml/xml"
-	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/crypto"
@@ -106,7 +106,7 @@ func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyC
 	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLResponseSinging)
 }
 
-func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest, acsUrl, protocolBinding, relayState, issuerID string) (_ AuthRequestInt, err error) {
+func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, issuerID string) (_ AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
