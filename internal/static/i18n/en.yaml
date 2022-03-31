@@ -22,6 +22,7 @@ Errors:
     Object:
       PutFailed: Object not created
       GetFailed: Object could not be read
+      NotFound: Object could not be found
       PresignedTokenFailed: Signed token could not be created
       ListFailed: Objectlist could not be read
       RemoveFailed: Object could not be removed
