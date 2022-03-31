@@ -4,12 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCommandSide_AddInstanceDomain(t *testing.T) {
@@ -17,10 +18,9 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx            context.Context
-		instanceID     string
-		domain         string
-		claimedUserIDs []string
+		ctx        context.Context
+		instanceID string
+		domain     string
 	}
 	type res struct {
 		want *domain.ObjectDetails

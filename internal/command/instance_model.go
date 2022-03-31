@@ -1,10 +1,11 @@
 package command
 
 import (
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"golang.org/x/text/language"
 )
 
 type InstanceWriteModel struct {
@@ -70,11 +71,6 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(instance.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			instance.ProjectSetEventType,
-			instance.GlobalOrgSetEventType,
-			instance.DefaultLanguageSetEventType,
-			instance.SetupStartedEventType,
-			instance.SetupDoneEventType,
 			instance.InstanceAddedEventType,
 			instance.InstanceChangedEventType,
 			instance.InstanceRemovedEventType,
