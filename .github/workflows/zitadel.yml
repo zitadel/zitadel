@@ -3,6 +3,9 @@ name: ZITADEL Release
 on:
   #pull_request:
   push:
+    tags-ignore:
+      - "*"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,14 +16,6 @@ jobs:
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Semantic Release
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v2
-        with:
-          dry_run: true
-          semantic_version: 19.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -32,41 +27,46 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Run GoReleaser Snapshot
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      - name: Build
         uses: goreleaser/goreleaser-action@v2
         with:
           distribution: goreleaser
           version: v1.5.0
-          args: release --snapshot
+          args: build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run GoReleaser Release on tag
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        uses: goreleaser/goreleaser-action@v2
+      - name: Tag
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: true
+          semantic_version: 19.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: goreleaser/goreleaser-action@v2
+        name: Publish ZITADEL
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.semantic.outputs.new-release-published == 'true' }}
         with:
           distribution: goreleaser
           version: v1.5.0
           args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v2
-        name: Upload goreleaser dist
-        with:
-          name: goreleaser-dist
-          path: .artifacts/goreleaser
-      - uses: actions/upload-artifact@v2
-        name: Upload gRPC clients
+          RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
+      - name: Publish gRPC clients
+        uses: actions/upload-artifact@v2
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.semantic.outputs.new-release-published == 'true' }}
         with:
           name: grpc-clients
           path: .artifacts/grpc
-      - uses: actions/upload-artifact@v2
-        name: Upload compiled console
+      - name: Publish console
+        uses: actions/upload-artifact@v2
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.semantic.outputs.new-release-published == 'true' }}
         with:
           name: console
           path: .artifacts/console
-      - uses: codecov/codecov-action@v1
-        name: Upload go coverage
+      - name: Publish go coverage
+        uses: codecov/codecov-action@v1
         with:
           files: .artifacts/codecov/profile.cov
           name: go-codecov
