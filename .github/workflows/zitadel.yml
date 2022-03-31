@@ -32,7 +32,7 @@ jobs:
         with:
           distribution: goreleaser
           version: v1.5.0
-          args: build
+          args: release --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag
