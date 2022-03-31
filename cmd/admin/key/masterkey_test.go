@@ -11,6 +11,7 @@ func Test_checkSingleFlag(t *testing.T) {
 	type args struct {
 		masterKeyFile    string
 		masterKeyFromArg string
+		masterKeyFromEnv bool
 	}
 	tests := []struct {
 		name    string
@@ -22,14 +23,16 @@ func Test_checkSingleFlag(t *testing.T) {
 			args{
 				masterKeyFile:    "",
 				masterKeyFromArg: "",
+				masterKeyFromEnv: false,
 			},
 			assert.Error,
 		},
 		{
-			"both values, error",
+			"multiple values, error",
 			args{
 				masterKeyFile:    "file",
 				masterKeyFromArg: "masterkey",
+				masterKeyFromEnv: true,
 			},
 			assert.Error,
 		},
@@ -38,6 +41,7 @@ func Test_checkSingleFlag(t *testing.T) {
 			args{
 				masterKeyFile:    "file",
 				masterKeyFromArg: "",
+				masterKeyFromEnv: false,
 			},
 			assert.NoError,
 		},
@@ -46,13 +50,23 @@ func Test_checkSingleFlag(t *testing.T) {
 			args{
 				masterKeyFile:    "",
 				masterKeyFromArg: "masterkey",
+				masterKeyFromEnv: false,
+			},
+			assert.NoError,
+		},
+		{
+			"only env, ok",
+			args{
+				masterKeyFile:    "",
+				masterKeyFromArg: "",
+				masterKeyFromEnv: true,
 			},
 			assert.NoError,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.wantErr(t, checkSingleFlag(tt.args.masterKeyFile, tt.args.masterKeyFromArg), fmt.Sprintf("checkSingleFlag(%v, %v)", tt.args.masterKeyFile, tt.args.masterKeyFromArg))
+			tt.wantErr(t, checkSingleFlag(tt.args.masterKeyFile, tt.args.masterKeyFromArg, tt.args.masterKeyFromEnv), fmt.Sprintf("checkSingleFlag(%v, %v)", tt.args.masterKeyFile, tt.args.masterKeyFromArg))
 		})
 	}
 }
