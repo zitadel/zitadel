@@ -27,12 +27,14 @@ dist: .artifacts/goreleaser
 dockers:
 - image_templates:
   - "caos/zitadel:{{ .Version }}-amd64"
+  skip_push: false
   use: buildx
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/amd64"
 - image_templates:
   - "caos/zitadel:{{ .Version }}-arm64"
+  skip_push: false
   use: buildx
   dockerfile: build/Dockerfile
   build_flag_templates:
