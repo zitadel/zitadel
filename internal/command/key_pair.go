@@ -29,7 +29,7 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 	publicKeyExp := time.Now().UTC().Add(c.publicKeyLifetime)
 
 	//TODO: InstanceID not available here?
-	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
+	keyPairWriteModel := NewKeyPairWriteModel(keyID, "system") //TODO: change with multi issuer
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
 	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
