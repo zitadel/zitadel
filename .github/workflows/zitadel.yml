@@ -32,17 +32,7 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Run GoReleaser Snapshot
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          distribution: goreleaser
-          version: v1.5.0
-          args: release --snapshot
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run GoReleaser Release on tag
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: goreleaser/goreleaser-action@v2
         with:
           distribution: goreleaser
@@ -50,11 +40,6 @@ jobs:
           args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v2
-        name: Upload goreleaser dist
-        with:
-          name: goreleaser-dist
-          path: .artifacts/goreleaser
       - uses: actions/upload-artifact@v2
         name: Upload gRPC clients
         with:
