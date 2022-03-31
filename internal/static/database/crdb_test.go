@@ -73,7 +73,7 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 						static.ObjectTypeUserAvatar,
 						"contentType",
 						[]byte("test"),
-						sqlmock.AnyArg(),
+						"now()",
 					)),
 			},
 			args{
