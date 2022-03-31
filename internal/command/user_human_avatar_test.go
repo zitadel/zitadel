@@ -53,7 +53,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "avatar",
-					ContentType:   "png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeUserAvatar,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -78,7 +78,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "avatar",
-					ContentType:   "png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeUserAvatar,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -119,7 +119,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "avatar",
-					ContentType:   "png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeUserAvatar,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -130,7 +130,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 			},
 		},
 		{
-			name: "logo added, ok",
+			name: "avatar added, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -170,7 +170,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "avatar",
-					ContentType:   "png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeUserAvatar,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,

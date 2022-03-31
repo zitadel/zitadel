@@ -42,21 +42,21 @@ func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resou
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "DATAB-Dfwvq", "Errors.Internal")
 	}
-	updatedAt := time.Now()
 	stmt, args, err := squirrel.Insert(assetsTable).
 		Columns(AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColType, AssetColContentType, AssetColData, AssetColUpdatedAt).
-		Values(instanceID, resourceOwner, name, objectType, contentType, data, updatedAt).
+		Values(instanceID, resourceOwner, name, objectType, contentType, data, "now()").
 		Suffix(fmt.Sprintf(
 			"ON CONFLICT (%s, %s, %s) DO UPDATE"+
 				" SET %s = $5, %s = $6"+
-				" RETURNING %s", AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColContentType, AssetColData, AssetColHash)).
+				" RETURNING %s, %s", AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColContentType, AssetColData, AssetColHash, AssetColUpdatedAt)).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "DATAB-32DG1", "Errors.Internal")
 	}
 	var hash string
-	err = c.client.QueryRowContext(ctx, stmt, args...).Scan(&hash)
+	var updatedAt time.Time
+	err = c.client.QueryRowContext(ctx, stmt, args...).Scan(&hash, &updatedAt)
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "DATAB-D2g2q", "Errors.Internal")
 	}

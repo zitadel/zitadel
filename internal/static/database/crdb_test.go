@@ -21,12 +21,12 @@ var (
 )
 
 const (
-	objectStmt = "INSERT INTO zitadel.assets.assets" +
-		" (tenant,location,resource_owner,name,content_type,data)" +
-		" VALUES ($1,$2,$3,$4,$5,$6)" +
-		" ON CONFLICT DO UPDATE SET" +
-		" location = $2, content_type = $5, data = $6" +
-		" RETURNING hash, updated_at"
+	objectStmt = "INSERT INTO system.assets" +
+		" (instance_id,resource_owner,name,asset_type,content_type,data,updated_at)" +
+		" VALUES ($1,$2,$3,$4,$5,$6,$7)" +
+		" ON CONFLICT (instance_id, resource_owner, name) DO UPDATE SET" +
+		" content_type = $5, data = $6" +
+		" RETURNING hash"
 )
 
 func Test_crdbStorage_CreateObject(t *testing.T) {
@@ -55,7 +55,8 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 			"create ok",
 			fields{
 				client: prepareDB(t,
-					expectQuery(objectStmt,
+					expectQuery(
+						objectStmt,
 						[]string{
 							"hash",
 							"updated_at",
@@ -66,7 +67,13 @@ func Test_crdbStorage_CreateObject(t *testing.T) {
 								testNow,
 							},
 						},
-						"instanceID", "location", "resourceOwner", "name", "contentType", static.ObjectTypeUserAvatar, []byte("test"),
+						"instanceID",
+						"resourceOwner",
+						"name",
+						static.ObjectTypeUserAvatar,
+						"contentType",
+						[]byte("test"),
+						sqlmock.AnyArg(),
 					)),
 			},
 			args{

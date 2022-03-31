@@ -810,7 +810,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -834,7 +834,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -876,7 +876,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -928,7 +928,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1120,7 +1120,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1144,7 +1144,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1186,7 +1186,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1238,7 +1238,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1427,7 +1427,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1451,7 +1451,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1493,7 +1493,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1545,7 +1545,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1737,7 +1737,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1761,7 +1761,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1803,7 +1803,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1855,7 +1855,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "org1",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,

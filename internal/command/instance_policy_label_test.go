@@ -493,8 +493,8 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -517,7 +517,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -568,7 +568,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -777,7 +777,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -794,8 +794,8 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -818,7 +818,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -869,7 +869,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1039,7 +1039,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1056,8 +1056,8 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1080,7 +1080,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1131,7 +1131,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "logo",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1340,7 +1340,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1357,8 +1357,8 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1381,7 +1381,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1432,7 +1432,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
 					ObjectName:    "icon",
-					ContentType:   "image/png",
+					ContentType:   "image",
 					ObjectType:    static.ObjectTypeStyling,
 					File:          bytes.NewReader([]byte("test")),
 					Size:          4,
@@ -1658,8 +1658,8 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLabelPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
