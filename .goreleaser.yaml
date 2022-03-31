@@ -3,7 +3,7 @@ release:
   github:
     owner: caos
     name: zitadel
-  draft: true
+  draft: false
   prerelease: auto
 before:
   hooks:
