@@ -5,9 +5,11 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 )
 
 type Token struct {
@@ -22,32 +24,6 @@ type Token struct {
 	PreferredLanguage string    `json:"preferredLanguage" gorm:"column:preferred_language"`
 }
 
-func TokenFromModel(token *model.Token) *Token {
-	return &Token{
-		ObjectRoot:        token.ObjectRoot,
-		TokenID:           token.TokenID,
-		ApplicationID:     token.ApplicationID,
-		UserAgentID:       token.UserAgentID,
-		Audience:          token.Audience,
-		Scopes:            token.Scopes,
-		Expiration:        token.Expiration,
-		PreferredLanguage: token.PreferredLanguage,
-	}
-}
-
-func TokenToModel(token *Token) *model.Token {
-	return &model.Token{
-		ObjectRoot:        token.ObjectRoot,
-		TokenID:           token.TokenID,
-		ApplicationID:     token.ApplicationID,
-		UserAgentID:       token.UserAgentID,
-		Audience:          token.Audience,
-		Scopes:            token.Scopes,
-		Expiration:        token.Expiration,
-		PreferredLanguage: token.PreferredLanguage,
-	}
-}
-
 func (t *Token) AppendEvents(events ...*es_models.Event) error {
 	for _, event := range events {
 		if err := t.AppendEvent(event); err != nil {
@@ -59,8 +35,8 @@ func (t *Token) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (t *Token) AppendEvent(event *es_models.Event) error {
-	switch event.Type {
-	case UserTokenAdded:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserTokenAddedType:
 		err := t.setData(event)
 		if err != nil {
 			return err

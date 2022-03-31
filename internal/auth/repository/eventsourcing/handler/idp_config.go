@@ -2,14 +2,14 @@ package handler
 
 import (
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+
+	"github.com/caos/zitadel/internal/eventstore"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
@@ -50,8 +50,8 @@ func (i *IDPConfig) Subscription() *v1.Subscription {
 	return i.subscription
 }
 
-func (_ *IDPConfig) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+func (_ *IDPConfig) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{org.AggregateType, instance.AggregateType}
 }
 
 func (i *IDPConfig) CurrentSequence() (uint64, error) {
@@ -62,37 +62,37 @@ func (i *IDPConfig) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPConfig) EventQuery() (*es_models.SearchQuery, error) {
+func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestIDPConfigSequence()
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
+	return models.NewSearchQuery().
 		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (i *IDPConfig) Reduce(event *es_models.Event) (err error) {
+func (i *IDPConfig) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.OrgAggregate:
+	case org.AggregateType:
 		err = i.processIdpConfig(iam_model.IDPProviderTypeOrg, event)
-	case iam_es_model.IAMAggregate:
+	case instance.AggregateType:
 		err = i.processIdpConfig(iam_model.IDPProviderTypeSystem, event)
 	}
 	return err
 }
 
-func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, event *es_models.Event) (err error) {
+func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, event *models.Event) (err error) {
 	idp := new(iam_view_model.IDPConfigView)
-	switch event.Type {
-	case model.IDPConfigAdded,
-		iam_es_model.IDPConfigAdded:
+	switch eventstore.EventType(event.Type) {
+	case org.IDPConfigAddedEventType,
+		instance.IDPConfigAddedEventType:
 		err = idp.AppendEvent(providerType, event)
-	case model.IDPConfigChanged, iam_es_model.IDPConfigChanged,
-		model.OIDCIDPConfigAdded, iam_es_model.OIDCIDPConfigAdded,
-		model.OIDCIDPConfigChanged, iam_es_model.OIDCIDPConfigChanged,
-		es_models.EventType(org.IDPJWTConfigAddedEventType), es_models.EventType(instance.IDPJWTConfigAddedEventType),
-		es_models.EventType(org.IDPJWTConfigChangedEventType), es_models.EventType(instance.IDPJWTConfigChangedEventType):
+	case org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType,
+		org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType,
+		org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType,
+		org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType,
+		org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType:
 		err = idp.SetData(event)
 		if err != nil {
 			return err
@@ -102,8 +102,8 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 			return err
 		}
 		err = idp.AppendEvent(providerType, event)
-	case model.IDPConfigDeactivated, iam_es_model.IDPConfigDeactivated,
-		model.IDPConfigReactivated, iam_es_model.IDPConfigReactivated:
+	case org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType,
+		org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType:
 		err = idp.SetData(event)
 		if err != nil {
 			return err
@@ -113,7 +113,7 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 			return err
 		}
 		err = idp.AppendEvent(providerType, event)
-	case model.IDPConfigRemoved, iam_es_model.IDPConfigRemoved:
+	case org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType:
 		err = idp.SetData(event)
 		if err != nil {
 			return err
@@ -128,7 +128,7 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 	return i.view.PutIDPConfig(idp, event)
 }
 
-func (i *IDPConfig) OnError(event *es_models.Event, err error) error {
+func (i *IDPConfig) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-Ejf8s", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPConfigFailedEvent, i.view.ProcessedIDPConfigFailedEvent, i.view.ProcessedIDPConfigSequence, i.errorCountUntilSkip)
 }

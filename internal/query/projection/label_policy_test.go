@@ -146,13 +146,14 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5",
+							expectedStmt: "UPSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5 AND copy_table.instance_id = $6",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.LabelPolicyStateActive,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},
@@ -608,13 +609,14 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5",
+							expectedStmt: "UPSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5 AND copy_table.instance_id = $6",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.LabelPolicyStateActive,
 								"agg-id",
 								domain.LabelPolicyStatePreview,
+								"instance-id",
 							},
 						},
 					},

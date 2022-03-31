@@ -22,27 +22,6 @@ func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	return user, err
 }
 
-func UserByIDAndResourceOwner(db *gorm.DB, table, userID, resourceOwner string) (*model.UserView, error) {
-	user := new(model.UserView)
-	userIDQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyUserID,
-		Method: domain.SearchMethodEquals,
-		Value:  userID,
-	}
-	resourceOwnerQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyResourceOwner,
-		Method: domain.SearchMethodEquals,
-		Value:  resourceOwner,
-	}
-	query := repository.PrepareGetByQuery(table, userIDQuery, resourceOwnerQuery)
-	err := query(db, user)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-fb93Fs", "Errors.User.NotFound")
-	}
-	user.SetEmptyUserType()
-	return user, err
-}
-
 func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error) {
 	user := new(model.UserView)
 	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
@@ -148,71 +127,6 @@ func GetGlobalUserByLoginName(db *gorm.DB, table, loginName string) (*model.User
 	}
 	user.SetEmptyUserType()
 	return user, err
-}
-
-func IsUserUnique(db *gorm.DB, table, userName, email, orgID string) (bool, error) {
-	user := new(model.UserView)
-
-	emailUnique := email == ""
-	userNameUnique := userName == ""
-	if email != "" {
-		query := repository.PrepareGetByQuery(table, uniqueEmailQuery(userName, orgID)...)
-		err := query(db, user)
-		if err != nil && !caos_errs.IsNotFound(err) {
-			return false, err
-		}
-		if caos_errs.IsNotFound(err) {
-			emailUnique = true
-		}
-	}
-	if userName != "" {
-		query := repository.PrepareGetByQuery(table, uniqueUsernameQuery(userName, orgID)...)
-		err := query(db, user)
-		if err != nil && !caos_errs.IsNotFound(err) {
-			return false, err
-		}
-		if caos_errs.IsNotFound(err) {
-			userNameUnique = true
-		}
-	}
-
-	return emailUnique && userNameUnique, nil
-}
-
-func uniqueEmailQuery(email, orgID string) []repository.SearchQuery {
-	queries := []repository.SearchQuery{
-		&model.UserSearchQuery{
-			Key:    usr_model.UserSearchKeyEmail,
-			Method: domain.SearchMethodEquals,
-			Value:  email,
-		},
-	}
-	if orgID == "" {
-		return queries
-	}
-	return append(queries, &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyResourceOwner,
-		Method: domain.SearchMethodEquals,
-		Value:  orgID,
-	})
-
-}
-func uniqueUsernameQuery(userName, orgID string) []repository.SearchQuery {
-	queries := []repository.SearchQuery{
-		&model.UserSearchQuery{
-			Key:    usr_model.UserSearchKeyUserName,
-			Method: domain.SearchMethodEquals,
-			Value:  userName,
-		},
-	}
-	if orgID == "" {
-		return queries
-	}
-	return append(queries, &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyResourceOwner,
-		Method: domain.SearchMethodEquals,
-		Value:  orgID,
-	})
 }
 
 func UserMFAs(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {

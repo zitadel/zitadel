@@ -23,15 +23,6 @@ type ApplicationID struct {
 	AppID string `json:"appId"`
 }
 
-func GetApplication(apps []*Application, id string) (int, *Application) {
-	for i, a := range apps {
-		if a.AppID == id {
-			return i, a
-		}
-	}
-	return -1, nil
-}
-
 func (a *Application) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {

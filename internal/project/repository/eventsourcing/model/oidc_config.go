@@ -8,9 +8,9 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	"github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 type OIDCConfig struct {
@@ -75,36 +75,16 @@ func (key *ClientKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *ClientKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch event.Type {
-	case ClientKeyAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.ApplicationKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {
 			return errors.ThrowInternal(err, "MODEL-Fetg3", "Errors.Internal")
 		}
-	case ClientKeyRemoved:
+	case project.ApplicationKeyRemovedEventType:
 		key.ExpirationDate = event.CreationDate
 	}
 	return err
-}
-
-func ClientKeysToModel(keys []*ClientKey) []*model.ClientKey {
-	clientKeys := make([]*model.ClientKey, len(keys))
-	for i, key := range keys {
-		clientKeys[i] = ClientKeyToModel(key)
-	}
-	return clientKeys
-}
-
-func ClientKeyToModel(key *ClientKey) *model.ClientKey {
-	return &model.ClientKey{
-		ObjectRoot:     key.ObjectRoot,
-		ExpirationDate: key.ExpirationDate,
-		ApplicationID:  key.ApplicationID,
-		ClientID:       key.ClientID,
-		KeyID:          key.KeyID,
-		PrivateKey:     key.privateKey,
-		Type:           key_model.AuthNKeyType(key.Type),
-	}
 }
 
 func (key *ClientKey) GenerateClientKeyPair(keySize int) error {

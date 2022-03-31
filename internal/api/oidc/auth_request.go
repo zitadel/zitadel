@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -100,16 +98,6 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		return "", time.Time{}, err
 	}
 	return resp.TokenID, resp.Expiration, nil
-}
-
-func grantsToScopes(grants []*grant_model.UserGrantView) []string {
-	scopes := make([]string, 0)
-	for _, grant := range grants {
-		for _, role := range grant.RoleKeys {
-			scopes = append(scopes, fmt.Sprintf("%v:%v", grant.ResourceOwner, role))
-		}
-	}
-	return scopes
 }
 
 func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {

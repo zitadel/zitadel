@@ -19,7 +19,6 @@ type APIConfig struct {
 	ClientSecret       *crypto.CryptoValue
 	ClientSecretString string
 	AuthMethodType     APIAuthMethodType
-	ClientKeys         []*ClientKey
 }
 
 type APIAuthMethodType int32

@@ -338,6 +338,7 @@ func (p *LabelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStateActive),
 			handler.NewCol(LabelPolicyCreationDateCol, nil),
 			handler.NewCol(LabelPolicyResourceOwnerCol, nil),
+			handler.NewCol(LabelPolicyInstanceIDCol, nil),
 			handler.NewCol(LabelPolicyIDCol, nil),
 			handler.NewCol(LabelPolicyIsDefaultCol, nil),
 			handler.NewCol(LabelPolicyHideLoginNameSuffixCol, nil),
@@ -360,6 +361,7 @@ func (p *LabelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
