@@ -3,6 +3,7 @@ package start
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/cmd/admin/initialise"
+	"github.com/caos/zitadel/cmd/admin/key"
 	"github.com/caos/zitadel/cmd/admin/setup"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -20,16 +21,18 @@ Last ZITADEL starts.
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
+			masterKey, err := key.MasterKey(cmd)
+			logging.OnError(err).Panic("No master key provided")
+
 			initialise.InitAll(initialise.MustNewConfig(viper.GetViper()))
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
-			setup.Setup(setupConfig, setupSteps)
+			setup.Setup(setupConfig, setupSteps, masterKey)
 
 			startConfig := MustNewConfig(viper.GetViper())
-			startMasterKey, _ := cmd.Flags().GetString(flagMasterKey)
 
-			err := startZitadel(startConfig, startMasterKey)
+			err = startZitadel(startConfig, masterKey)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}

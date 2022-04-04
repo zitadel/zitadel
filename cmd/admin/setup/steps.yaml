@@ -8,10 +8,14 @@ S2DefaultInstance:
         LastName: Admin
         NickName:
         DisplayName:
-        Email: admin@zitadel.ch
+        Email: 
+          Address: admin@zitadel.ch
+          IsValid:
         PreferredLanguage:
         Gender:
         Phone:
+          Number:
+          IsValid:
         Password: Password1!
     PasswordComplexityPolicy: 
       MinLength: 8
