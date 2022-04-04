@@ -19,12 +19,13 @@ const (
 type LoginPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AllowUserNamePassword bool                    `json:"allowUsernamePassword,omitempty"`
-	AllowRegister         bool                    `json:"allowRegister,omitempty"`
-	AllowExternalIDP      bool                    `json:"allowExternalIdp,omitempty"`
-	ForceMFA              bool                    `json:"forceMFA,omitempty"`
-	HidePasswordReset     bool                    `json:"hidePasswordReset,omitempty"`
-	PasswordlessType      domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	AllowUserNamePassword  bool                    `json:"allowUsernamePassword,omitempty"`
+	AllowRegister          bool                    `json:"allowRegister,omitempty"`
+	AllowExternalIDP       bool                    `json:"allowExternalIdp,omitempty"`
+	ForceMFA               bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset      bool                    `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	PasswordlessType       domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
 func (e *LoginPolicyAddedEvent) Data() interface{} {
@@ -41,17 +42,19 @@ func NewLoginPolicyAddedEvent(
 	allowRegister,
 	allowExternalIDP,
 	forceMFA,
-	hidePasswordReset bool,
+	hidePasswordReset,
+	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
-		BaseEvent:             *base,
-		AllowExternalIDP:      allowExternalIDP,
-		AllowRegister:         allowRegister,
-		AllowUserNamePassword: allowUserNamePassword,
-		ForceMFA:              forceMFA,
-		PasswordlessType:      passwordlessType,
-		HidePasswordReset:     hidePasswordReset,
+		BaseEvent:              *base,
+		AllowExternalIDP:       allowExternalIDP,
+		AllowRegister:          allowRegister,
+		AllowUserNamePassword:  allowUserNamePassword,
+		ForceMFA:               forceMFA,
+		PasswordlessType:       passwordlessType,
+		HidePasswordReset:      hidePasswordReset,
+		IgnoreUnknownUsernames: ignoreUnknownUsernames,
 	}
 }
 
@@ -71,12 +74,13 @@ func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, err
 type LoginPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AllowUserNamePassword *bool                    `json:"allowUsernamePassword,omitempty"`
-	AllowRegister         *bool                    `json:"allowRegister,omitempty"`
-	AllowExternalIDP      *bool                    `json:"allowExternalIdp,omitempty"`
-	ForceMFA              *bool                    `json:"forceMFA,omitempty"`
-	HidePasswordReset     *bool                    `json:"hidePasswordReset,omitempty"`
-	PasswordlessType      *domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	AllowUserNamePassword  *bool                    `json:"allowUsernamePassword,omitempty"`
+	AllowRegister          *bool                    `json:"allowRegister,omitempty"`
+	AllowExternalIDP       *bool                    `json:"allowExternalIdp,omitempty"`
+	ForceMFA               *bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset      *bool                    `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames *bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	PasswordlessType       *domain.PasswordlessType `json:"passwordlessType,omitempty"`
 }
 
 func (e *LoginPolicyChangedEvent) Data() interface{} {
@@ -138,6 +142,12 @@ func ChangePasswordlessType(passwordlessType domain.PasswordlessType) func(*Logi
 func ChangeHidePasswordReset(hidePasswordReset bool) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.HidePasswordReset = &hidePasswordReset
+	}
+}
+
+func ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.IgnoreUnknownUsernames = &ignoreUnknownUsernames
 	}
 }
 

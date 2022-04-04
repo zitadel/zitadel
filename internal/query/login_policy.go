@@ -7,26 +7,28 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 type LoginPolicy struct {
-	OrgID                 string
-	CreationDate          time.Time
-	ChangeDate            time.Time
-	Sequence              uint64
-	AllowRegister         bool
-	AllowUsernamePassword bool
-	AllowExternalIDPs     bool
-	ForceMFA              bool
-	SecondFactors         []domain.SecondFactorType
-	MultiFactors          []domain.MultiFactorType
-	PasswordlessType      domain.PasswordlessType
-	IsDefault             bool
-	HidePasswordReset     bool
+	OrgID                  string
+	CreationDate           time.Time
+	ChangeDate             time.Time
+	Sequence               uint64
+	AllowRegister          bool
+	AllowUsernamePassword  bool
+	AllowExternalIDPs      bool
+	ForceMFA               bool
+	SecondFactors          []domain.SecondFactorType
+	MultiFactors           []domain.MultiFactorType
+	PasswordlessType       domain.PasswordlessType
+	IsDefault              bool
+	HidePasswordReset      bool
+	IgnoreUnknownUsernames bool
 }
 
 type SecondFactors struct {
@@ -93,6 +95,10 @@ var (
 	}
 	LoginPolicyColumnHidePasswordReset = Column{
 		name:  projection.LoginPolicyHidePWResetCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnIgnoreUnknownUsernames = Column{
+		name:  projection.IgnoreUnknownUsernames,
 		table: loginPolicyTable,
 	}
 )
@@ -234,6 +240,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			LoginPolicyColumnPasswordlessType.identifier(),
 			LoginPolicyColumnIsDefault.identifier(),
 			LoginPolicyColumnHidePasswordReset.identifier(),
+			LoginPolicyColumnIgnoreUnknownUsernames.identifier(),
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
@@ -253,6 +260,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				&p.PasswordlessType,
 				&p.IsDefault,
 				&p.HidePasswordReset,
+				&p.IgnoreUnknownUsernames,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

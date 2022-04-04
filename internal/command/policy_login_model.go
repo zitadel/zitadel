@@ -9,13 +9,14 @@ import (
 type LoginPolicyWriteModel struct {
 	eventstore.WriteModel
 
-	AllowUserNamePassword bool
-	AllowRegister         bool
-	AllowExternalIDP      bool
-	ForceMFA              bool
-	HidePasswordReset     bool
-	PasswordlessType      domain.PasswordlessType
-	State                 domain.PolicyState
+	AllowUserNamePassword  bool
+	AllowRegister          bool
+	AllowExternalIDP       bool
+	ForceMFA               bool
+	HidePasswordReset      bool
+	IgnoreUnknownUsernames bool
+	PasswordlessType       domain.PasswordlessType
+	State                  domain.PolicyState
 }
 
 func (wm *LoginPolicyWriteModel) Reduce() error {
@@ -28,6 +29,7 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.ForceMFA = e.ForceMFA
 			wm.PasswordlessType = e.PasswordlessType
 			wm.HidePasswordReset = e.HidePasswordReset
+			wm.IgnoreUnknownUsernames = e.IgnoreUnknownUsernames
 			wm.State = domain.PolicyStateActive
 		case *policy.LoginPolicyChangedEvent:
 			if e.AllowRegister != nil {
@@ -44,6 +46,9 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			}
 			if e.HidePasswordReset != nil {
 				wm.HidePasswordReset = *e.HidePasswordReset
+			}
+			if e.IgnoreUnknownUsernames != nil {
+				wm.IgnoreUnknownUsernames = *e.IgnoreUnknownUsernames
 			}
 			if e.PasswordlessType != nil {
 				wm.PasswordlessType = *e.PasswordlessType

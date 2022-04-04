@@ -16,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/features"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/policy"
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/static"
 	"github.com/caos/zitadel/internal/static/mock"
@@ -159,6 +160,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -338,6 +340,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -543,6 +546,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -758,6 +762,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -993,6 +998,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 							),
 						),
@@ -1000,6 +1006,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							org.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -1015,6 +1022,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								true,
 								true,
 								true,
 								true,
@@ -1200,7 +1208,20 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								org.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.MultiFactorTypeU2FWithPIN),
 							),
 							eventFromEventPusher(
-								newLoginPolicyChangedEvent(context.Background(), "org1", true, true, true, true, true, domain.PasswordlessTypeAllowed),
+								func() *org.LoginPolicyChangedEvent {
+									event, _ := org.NewLoginPolicyChangedEvent(context.Background(),
+										&org.NewAggregate("org1", "org1").Aggregate,
+										[]policy.LoginPolicyChanges{
+											policy.ChangeAllowUserNamePassword(true),
+											policy.ChangeAllowRegister(true),
+											policy.ChangeAllowExternalIDP(true),
+											policy.ChangeForceMFA(true),
+											policy.ChangeHidePasswordReset(true),
+											policy.ChangePasswordlessType(domain.PasswordlessTypeAllowed),
+										},
+									)
+									return event
+								}(),
 							),
 							eventFromEventPusher(
 								org.NewPasswordComplexityPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
@@ -1277,6 +1298,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,
@@ -1537,6 +1559,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							iam.NewLoginPolicyAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
+								false,
 								false,
 								false,
 								false,

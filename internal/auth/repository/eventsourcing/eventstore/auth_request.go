@@ -290,7 +290,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID, false)
 	if err != nil {
 		return err
 	}
@@ -310,6 +310,9 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, res
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, id, userAgentID, userID)
 	if err != nil {
+		if isIgnoreUserNotFoundError(err, request) {
+			return errors.ThrowInvalidArgument(nil, "EVENT-SDe2f", "Errors.User.UsernameOrPassword.Invalid")
+		}
 		return err
 	}
 	policy, err := repo.getLockoutPolicy(ctx, resourceOwner)
@@ -317,6 +320,10 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, id, userID, res
 		return err
 	}
 	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+}
+
+func isIgnoreUserNotFoundError(err error, request *domain.AuthRequest) bool {
+	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && errors.IsNotFound(err) && errors.Contains(err, "Errors.User.NotFound")
 }
 
 func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
@@ -489,9 +496,9 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
-	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, false)
 	if err != nil {
-		return nil, err
+		return request, err
 	}
 	return request, nil
 }
@@ -618,6 +625,13 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 			}
 		}
 	}
+	if request.LoginPolicy.IgnoreUnknownUsernames {
+		if err != nil && !errors.IsNotFound(err) {
+			return err
+		}
+		request.SetUserInfo("UNKNOWN", loginName, loginName, "", "", request.RequestedOrgID)
+		return nil
+	}
 	if err != nil {
 		return err
 	}
@@ -656,15 +670,16 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 			CreationDate:  policy.CreationDate,
 			ChangeDate:    policy.ChangeDate,
 		},
-		Default:               policy.IsDefault,
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowRegister:         policy.AllowRegister,
-		AllowExternalIDP:      policy.AllowExternalIDPs,
-		ForceMFA:              policy.ForceMFA,
-		SecondFactors:         policy.SecondFactors,
-		MultiFactors:          policy.MultiFactors,
-		PasswordlessType:      policy.PasswordlessType,
-		HidePasswordReset:     policy.HidePasswordReset,
+		Default:                policy.IsDefault,
+		AllowUsernamePassword:  policy.AllowUsernamePassword,
+		AllowRegister:          policy.AllowRegister,
+		AllowExternalIDP:       policy.AllowExternalIDPs,
+		ForceMFA:               policy.ForceMFA,
+		SecondFactors:          policy.SecondFactors,
+		MultiFactors:           policy.MultiFactors,
+		PasswordlessType:       policy.PasswordlessType,
+		HidePasswordReset:      policy.HidePasswordReset,
+		IgnoreUnknownUsernames: policy.IgnoreUnknownUsernames,
 	}
 }
 
@@ -688,7 +703,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID, false)
 	if err != nil {
 		return err
 	}
@@ -734,7 +749,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 		return steps, nil
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
 		return nil, err
 	}
@@ -1114,10 +1129,16 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string, ignoreUnknownUsernames bool) (user *user_model.UserView, err error) {
 	// PLANNED: Check LockoutPolicy
-	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
+	user, err = userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
+		if ignoreUnknownUsernames && errors.IsNotFound(err) {
+			return &user_model.UserView{
+				ID:        userID,
+				HumanView: &user_model.HumanView{},
+			}, nil
+		}
 		return nil, err
 	}
 

@@ -128,6 +128,11 @@ message LoginPolicy {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
+    bool ignore_unknown_usernames = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
 }
 
 enum SecondFactorType {

@@ -35,13 +35,14 @@ func memberWriteModelToMember(writeModel *MemberWriteModel) *domain.Member {
 
 func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.WriteModel),
-		AllowUsernamePassword: wm.AllowUserNamePassword,
-		AllowRegister:         wm.AllowRegister,
-		AllowExternalIDP:      wm.AllowExternalIDP,
-		HidePasswordReset:     wm.HidePasswordReset,
-		ForceMFA:              wm.ForceMFA,
-		PasswordlessType:      wm.PasswordlessType,
+		ObjectRoot:             writeModelToObjectRoot(wm.WriteModel),
+		AllowUsernamePassword:  wm.AllowUserNamePassword,
+		AllowRegister:          wm.AllowRegister,
+		AllowExternalIDP:       wm.AllowExternalIDP,
+		HidePasswordReset:      wm.HidePasswordReset,
+		ForceMFA:               wm.ForceMFA,
+		PasswordlessType:       wm.PasswordlessType,
+		IgnoreUnknownUsernames: wm.IgnoreUnknownUsernames,
 	}
 }
 

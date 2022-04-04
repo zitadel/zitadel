@@ -241,7 +241,17 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 	if !features.LoginPolicyPasswordReset && defaultPolicy.HidePasswordReset != existingPolicy.HidePasswordReset {
 		policy.HidePasswordReset = defaultPolicy.HidePasswordReset
 	}
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel), policy.AllowUserNamePassword, policy.AllowRegister, policy.AllowExternalIDP, policy.ForceMFA, policy.HidePasswordReset, policy.PasswordlessType)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
+		ctx,
+		OrgAggregateFromWriteModel(&existingPolicy.WriteModel),
+		policy.AllowUserNamePassword,
+		policy.AllowRegister,
+		policy.AllowExternalIDP,
+		policy.ForceMFA,
+		policy.HidePasswordReset,
+		policy.IgnoreUnknownUsernames,
+		policy.PasswordlessType,
+	)
 	if hasChanged {
 		events = append(events, changedEvent)
 	}

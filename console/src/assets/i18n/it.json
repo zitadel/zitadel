@@ -991,6 +991,8 @@
       "FORCEMFA_DESC": "Se l'opzione \u00e8 selezionata, gli utenti devono configurare un secondo fattore per il login.",
       "HIDEPASSWORDRESET": "Nascondi ripristino della password",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
+      "IGNOREUNKNOWNUSERNAMES": "Ignora i nomi utente sconosciuti",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione \u00e8 selezionata, il passo della password viene visualizzato nel login anche se l'utente non \u00e8 stato trovato. All'utente non viene mostrato se il nome utente o la password erano errati durante il controllo della password",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana"

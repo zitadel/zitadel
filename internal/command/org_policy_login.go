@@ -42,6 +42,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 			policy.AllowExternalIDP,
 			policy.ForceMFA,
 			policy.HidePasswordReset,
+			policy.IgnoreUnknownUsernames,
 			policy.PasswordlessType))
 	if err != nil {
 		return nil, err
@@ -100,6 +101,7 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 		policy.AllowExternalIDP,
 		policy.ForceMFA,
 		policy.HidePasswordReset,
+		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType)
 
 	if !hasChanged {
