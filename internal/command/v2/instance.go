@@ -93,16 +93,8 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	if err != nil {
 		return err
 	}
-	s.Zitadel.mgmtClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
-	if err != nil {
-		return err
-	}
 
 	s.Zitadel.adminID, err = id.SonyFlakeGenerator.Next()
-	if err != nil {
-		return err
-	}
-	s.Zitadel.adminClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
 	if err != nil {
 		return err
 	}
@@ -111,23 +103,15 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	if err != nil {
 		return err
 	}
-	s.Zitadel.authClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
-	if err != nil {
-		return err
-	}
 
 	s.Zitadel.consoleID, err = id.SonyFlakeGenerator.Next()
-	if err != nil {
-		return err
-	}
-	s.Zitadel.consoleClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
+func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
 	// TODO
 	// instanceID, err := id.SonyFlakeGenerator.Next()
 	// if err != nil {
@@ -202,71 +186,82 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 	}
 
 	validations = append(validations,
-		AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
-		AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg, command.phoneAlg, command.initCodeAlg),
-		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
+		AddOrg(orgAgg, setup.Org.Name, c.iamDomain),
+		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.phoneAlg, c.initCodeAlg),
+		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 
 		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
 		AddAPIApp(
-			*projectAgg,
-			setup.Zitadel.mgmtID,
-			mgmtAppName,
-			domain.APIAuthMethodTypePrivateKeyJWT,
-			// setup.Zitadel.mgmtClientID,
+			&addAPIApp{
+				AddApp: AddApp{
+					Aggregate: *projectAgg,
+					ID:        setup.Zitadel.mgmtID,
+					Name:      mgmtAppName,
+				},
+				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+			},
 			nil,
 		),
 
 		AddAPIApp(
-			*projectAgg,
-			setup.Zitadel.adminID,
-			adminAppName,
-
-			setup.Zitadel.adminClientID,
+			&addAPIApp{
+				AddApp: AddApp{
+					Aggregate: *projectAgg,
+					ID:        setup.Zitadel.adminID,
+					Name:      adminAppName,
+				},
+				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+			},
 			nil,
-			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
 		AddAPIApp(
-			*projectAgg,
-			setup.Zitadel.authID,
-			authAppName,
-			setup.Zitadel.authClientID,
+			&addAPIApp{
+				AddApp: AddApp{
+					Aggregate: *projectAgg,
+					ID:        setup.Zitadel.authID,
+					Name:      authAppName,
+				},
+				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+			},
 			nil,
-			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
 		AddOIDCApp(
-			*projectAgg,
-			domain.OIDCVersionV1,
-			setup.Zitadel.consoleID,
-			consoleAppName,
-			setup.Zitadel.consoleClientID,
-			nil,
-			[]string{setup.Zitadel.BaseURL + consoleRedirectPath},
-			[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-			[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-			domain.OIDCApplicationTypeUserAgent,
-			domain.OIDCAuthMethodTypeNone,
-			[]string{setup.Zitadel.BaseURL + consolePostLogoutPath},
-			setup.Zitadel.IsDevMode,
-			domain.OIDCTokenTypeBearer,
-			false,
-			false,
-			false,
-			0,
+			&addOIDCApp{
+				AddApp: AddApp{
+					Aggregate: *projectAgg,
+					ID:        setup.Zitadel.consoleID,
+					Name:      consoleAppName,
+				},
+				Version:                  domain.OIDCVersionV1,
+				RedirectUris:             []string{setup.Zitadel.BaseURL + consoleRedirectPath},
+				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType:          domain.OIDCApplicationTypeUserAgent,
+				AuthMethodType:           domain.OIDCAuthMethodTypeNone,
+				PostLogoutRedirectUris:   []string{setup.Zitadel.BaseURL + consolePostLogoutPath},
+				DevMode:                  setup.Zitadel.IsDevMode,
+				AccessTokenType:          domain.OIDCTokenTypeBearer,
+				AccessTokenRoleAssertion: false,
+				IDTokenRoleAssertion:     false,
+				IDTokenUserinfoAssertion: false,
+				ClockSkew:                0,
+			},
+
 			nil,
 		),
 	)
 
-	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter, validations...)
+	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, validations...)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := command.es.Push(ctx, cmds...)
+	events, err := c.es.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

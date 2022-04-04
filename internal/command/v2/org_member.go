@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func AddOrgMember(a *org.Aggregate, userID string, roles ...string) preparation.Validation {
+func (c *Command) AddOrgMember(a *org.Aggregate, userID string, roles ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if userID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
