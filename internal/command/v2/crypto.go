@@ -8,28 +8,41 @@ import (
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 )
 
-func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
+func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (value *crypto.CryptoValue, expiry time.Duration, err error) {
 	config, err := secretGeneratorConfig(ctx, filter, typ)
 	if err != nil {
 		return nil, -1, err
 	}
 
-	value, _, err = crypto.NewCode(crypto.NewEncryptionGenerator(*config, alg))
+	switch a := alg.(type) {
+	case crypto.HashAlgorithm:
+		value, _, err = crypto.NewCode(crypto.NewHashGenerator(*config, a))
+	case crypto.EncryptionAlgorithm:
+		value, _, err = crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
+	}
 	if err != nil {
 		return nil, -1, err
 	}
 	return value, config.Expiry, nil
 }
 
-func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, plain string, err error) {
+func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (value *crypto.CryptoValue, plain string, err error) {
 	config, err := secretGeneratorConfig(ctx, filter, typ)
 	if err != nil {
 		return nil, "", err
 	}
 
-	return crypto.NewCode(crypto.NewEncryptionGenerator(*config, alg))
+	switch a := alg.(type) {
+	case crypto.HashAlgorithm:
+		return crypto.NewCode(crypto.NewHashGenerator(*config, a))
+	case crypto.EncryptionAlgorithm:
+		return crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
+	}
+
+	return nil, "", errors.ThrowInvalidArgument(nil, "V2-NGESt", "Errors.Internal")
 }
 
 func secretGeneratorConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType) (*crypto.GeneratorConfig, error) {

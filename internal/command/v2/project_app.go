@@ -28,7 +28,6 @@ func AddOIDCApp(
 	version domain.OIDCVersion,
 	appID,
 	name string,
-	clientSecret *crypto.CryptoValue,
 	redirectUris []string,
 	responseTypes []domain.OIDCResponseType,
 	grantTypes []domain.OIDCGrantType,
@@ -42,7 +41,7 @@ func AddOIDCApp(
 	idTokenUserinfoAssertion bool,
 	clockSkew time.Duration,
 	additionalOrigins []string,
-	clientSecretAlg crypto.EncryptionAlgorithm,
+	clientSecretAlg crypto.HashAlgorithm,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if appID == "" {
@@ -129,7 +128,7 @@ func AddAPIApp(
 	appID,
 	name string,
 	authMethodType domain.APIAuthMethodType,
-	clientSecretAlg crypto.EncryptionAlgorithm,
+	clientSecretAlg crypto.HashAlgorithm,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if appID == "" {
@@ -182,6 +181,6 @@ func AddAPIApp(
 	}
 }
 
-func newAppClientSecret(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, plain string, err error) {
+func newAppClientSecret(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.HashAlgorithm) (value *crypto.CryptoValue, plain string, err error) {
 	return newCryptoCodeWithPlain(ctx, filter, domain.SecretGeneratorTypeAppSecret, alg)
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/ui/console"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
@@ -134,7 +133,6 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 	// if err != nil {
 	// 	return nil, err
 	// }
-	ctx = authz.SetCtxData(authz.WithInstance(ctx, authz.Instance{ID: "system"}), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -216,9 +214,9 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			*projectAgg,
 			setup.Zitadel.mgmtID,
 			mgmtAppName,
-			setup.Zitadel.mgmtClientID,
-			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
+			// setup.Zitadel.mgmtClientID,
+			nil,
 		),
 
 		AddAPIApp(
