@@ -75,7 +75,7 @@ all queries need to match (AND)
 [SetUpOrgResponse](#setuporgresponse)
 
 Creates a new org and user 
-and adds the user to the orgs members as *ORG_OWNER*
+and adds the user to the orgs members as ORG_OWNER
 
 
 
@@ -792,7 +792,7 @@ The default text from the translation file will trigger after
 
 
 
-    DELETE: /text/message/verifyemail/{language}
+    DELETE: /text/message/passwordreset/{language}
 
 
 ### GetDefaultVerifyEmailMessageText

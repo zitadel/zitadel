@@ -36,7 +36,7 @@ title: zitadel/management.proto
 > **rpc** GetIAM([GetIAMRequest](#getiamrequest))
 [GetIAMResponse](#getiamresponse)
 
-Returns some needed settings of the IAM (global organisation ID, ZITADEL project ID)
+Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project ID)
 
 
 
@@ -2378,7 +2378,7 @@ The default text of the IAM will trigger after
 
 
 
-    DELETE: /text/message/verifyemail/{language}
+    DELETE: /text/message/passwordreset/{language}
 
 
 ### GetCustomVerifyEmailMessageText
