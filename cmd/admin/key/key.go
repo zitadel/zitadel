@@ -17,8 +17,7 @@ import (
 )
 
 const (
-	flagMasterKey = "masterkey"
-	flagKeyFile   = "file"
+	flagKeyFile = "file"
 )
 
 type Config struct {
@@ -30,7 +29,7 @@ func New() *cobra.Command {
 		Use:   "keys",
 		Short: "manage encryption keys",
 	}
-	cmd.PersistentFlags().String(flagMasterKey, "", "masterkey for en/decryption keys")
+	AddMasterKeyFlag(cmd)
 	cmd.AddCommand(newKey())
 	return cmd
 }
@@ -67,7 +66,10 @@ new -f keys.yaml key2=anotherkey`,
 			if err := viper.Unmarshal(config); err != nil {
 				return err
 			}
-			masterKey, _ := cmd.Flags().GetString(flagMasterKey)
+			masterKey, err := MasterKey(cmd)
+			if err != nil {
+				return err
+			}
 			storage, err := keyStorage(config.Database, masterKey)
 			if err != nil {
 				return err
@@ -113,7 +115,7 @@ func keysFromYAML(file io.Reader) ([]*crypto.Key, error) {
 	return keys, nil
 }
 
-func openFile(fileName string) (*os.File, error) {
+func openFile(fileName string) (io.Reader, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, caos_errs.ThrowInternalf(err, "KEY-asGr2", "failed to open file: %s", fileName)
