@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context, instanceID string) (*domain.PrivacyPolicy, error) {
-	policyWriteModel := NewInstancePrivacyPolicyWriteModel(instanceID)
+func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context) (*domain.PrivacyPolicy, error) {
+	policyWriteModel := NewInstancePrivacyPolicyWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -24,8 +24,8 @@ func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context, instanceID strin
 	return policy, nil
 }
 
-func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, instanceID string, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
-	addedPolicy := NewInstancePrivacyPolicyWriteModel(instanceID)
+func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+	addedPolicy := NewInstancePrivacyPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	events, err := c.addDefaultPrivacyPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -55,8 +55,8 @@ func (c *Commands) addDefaultPrivacyPolicy(ctx context.Context, instanceAgg *eve
 	return instance.NewPrivacyPolicyAddedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink), nil
 }
 
-func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, instanceID string, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
-	existingPolicy, err := c.defaultPrivacyPolicyWriteModelByID(ctx, instanceID)
+func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+	existingPolicy, err := c.defaultPrivacyPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -80,11 +80,11 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, instanceID st
 	return writeModelToPrivacyPolicy(&existingPolicy.PrivacyPolicyWriteModel), nil
 }
 
-func (c *Commands) defaultPrivacyPolicyWriteModelByID(ctx context.Context, instanceID string) (policy *InstancePrivacyPolicyWriteModel, err error) {
+func (c *Commands) defaultPrivacyPolicyWriteModelByID(ctx context.Context) (policy *InstancePrivacyPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstancePrivacyPolicyWriteModel(instanceID)
+	writeModel := NewInstancePrivacyPolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

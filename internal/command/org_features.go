@@ -374,7 +374,7 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 	return events, nil
 }
 
-func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, instanceID, orgID string) (*domain.Features, error) {
+func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, orgID string) (*domain.Features, error) {
 	existingFeatures := NewOrgFeaturesWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {

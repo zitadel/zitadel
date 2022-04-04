@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/repository/idpconfig"
@@ -13,12 +14,12 @@ type InstanceIDPJWTConfigWriteModel struct {
 	JWTConfigWriteModel
 }
 
-func NewInstanceIDPJWTConfigWriteModel(instanceID, idpConfigID string) *InstanceIDPJWTConfigWriteModel {
+func NewInstanceIDPJWTConfigWriteModel(ctx context.Context, idpConfigID string) *InstanceIDPJWTConfigWriteModel {
 	return &InstanceIDPJWTConfigWriteModel{
 		JWTConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   instanceID,
-				ResourceOwner: instanceID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			IDPConfigID: idpConfigID,
 		},

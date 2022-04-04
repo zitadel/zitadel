@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, instanceID string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	addedPolicy := NewInstancePasswordAgePolicyWriteModel(instanceID)
+func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	addedPolicy := NewInstancePasswordAgePolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	event, err := c.addDefaultPasswordAgePolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -42,8 +42,8 @@ func (c *Commands) addDefaultPasswordAgePolicy(ctx context.Context, instanceAgg 
 
 }
 
-func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, instanceID string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	existingPolicy, err := c.defaultPasswordAgePolicyWriteModelByID(ctx, instanceID)
+func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
+	existingPolicy, err := c.defaultPasswordAgePolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -69,11 +69,11 @@ func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, instanceI
 	return writeModelToPasswordAgePolicy(&existingPolicy.PasswordAgePolicyWriteModel), nil
 }
 
-func (c *Commands) defaultPasswordAgePolicyWriteModelByID(ctx context.Context, instanceID string) (policy *InstancePasswordAgePolicyWriteModel, err error) {
+func (c *Commands) defaultPasswordAgePolicyWriteModelByID(ctx context.Context) (policy *InstancePasswordAgePolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstancePasswordAgePolicyWriteModel(instanceID)
+	writeModel := NewInstancePasswordAgePolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

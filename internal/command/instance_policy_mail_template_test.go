@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -19,9 +20,8 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.MailTemplate
+		ctx    context.Context
+		policy *domain.MailTemplate
 	}
 	type res struct {
 		want *domain.MailTemplate
@@ -41,9 +41,8 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				policy:     &domain.MailTemplate{},
+				ctx:    context.Background(),
+				policy: &domain.MailTemplate{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -65,8 +64,7 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.MailTemplate{
 					Template: []byte("template"),
 				},
@@ -83,7 +81,8 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewMailTemplateAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									[]byte("template"),
@@ -94,8 +93,7 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.MailTemplate{
 					Template: []byte("template"),
 				},
@@ -103,6 +101,7 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 			res: res{
 				want: &domain.MailTemplate{
 					ObjectRoot: models.ObjectRoot{
+						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
@@ -116,7 +115,7 @@ func TestCommandSide_AddDefaultMailTemplatePolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultMailTemplate(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.AddDefaultMailTemplate(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -135,9 +134,8 @@ func TestCommandSide_ChangeDefaultMailTemplatePolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.MailTemplate
+		ctx    context.Context
+		policy *domain.MailTemplate
 	}
 	type res struct {
 		want *domain.MailTemplate
@@ -157,9 +155,8 @@ func TestCommandSide_ChangeDefaultMailTemplatePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				policy:     &domain.MailTemplate{},
+				ctx:    context.Background(),
+				policy: &domain.MailTemplate{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -174,8 +171,7 @@ func TestCommandSide_ChangeDefaultMailTemplatePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.MailTemplate{
 					Template: []byte("template-change"),
 				},
@@ -200,8 +196,7 @@ func TestCommandSide_ChangeDefaultMailTemplatePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.MailTemplate{
 					Template: []byte("template"),
 				},
@@ -233,8 +228,7 @@ func TestCommandSide_ChangeDefaultMailTemplatePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.MailTemplate{
 					Template: []byte("template-change"),
 				},
@@ -255,7 +249,7 @@ func TestCommandSide_ChangeDefaultMailTemplatePolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultMailTemplate(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.ChangeDefaultMailTemplate(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

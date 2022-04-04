@@ -72,7 +72,7 @@ func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *d
 	return token, url, nil
 }
 
-func (c *Commands) ValidateOrgDomain(ctx context.Context, instanceID string, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.ObjectDetails, error) {
+func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.ObjectDetails, error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}

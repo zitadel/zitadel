@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/repository/instance"
 
@@ -12,8 +13,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-func (c *Commands) AddInstanceDomain(ctx context.Context, instanceID, instanceDomain string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(instanceID)
+func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.addInstanceDomain(instanceAgg, instanceDomain, false)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
@@ -26,12 +27,12 @@ func (c *Commands) AddInstanceDomain(ctx context.Context, instanceID, instanceDo
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: instanceID,
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }
 
-func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceID, instanceDomain string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(instanceID)
+func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.removeInstanceDomain(instanceAgg, instanceDomain)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
@@ -44,7 +45,7 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceID, instanc
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: instanceID,
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
 }
 
@@ -54,7 +55,7 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, a.ID, instanceDomain)
+			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -72,7 +73,7 @@ func (c *Commands) removeInstanceDomain(a *instance.Aggregate, instanceDomain st
 			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-39nls", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, a.ID, instanceDomain)
+			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -87,8 +88,8 @@ func (c *Commands) removeInstanceDomain(a *instance.Aggregate, instanceDomain st
 	}
 }
 
-func (c *Commands) getInstanceDomainWriteModel(ctx context.Context, instanceID, domain string) (*InstanceDomainWriteModel, error) {
-	domainWriteModel := NewInstanceDomainWriteModel(instanceID, domain)
+func (c *Commands) getInstanceDomainWriteModel(ctx context.Context, domain string) (*InstanceDomainWriteModel, error) {
+	domainWriteModel := NewInstanceDomainWriteModel(ctx, domain)
 	err := c.eventstore.FilterToQueryReducer(ctx, domainWriteModel)
 	if err != nil {
 		return nil, err

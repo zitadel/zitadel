@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/settings"
 
@@ -13,12 +14,12 @@ type InstanceDebugNotificationFileWriteModel struct {
 	DebugNotificationWriteModel
 }
 
-func NewInstanceDebugNotificationFileWriteModel(instanceID string) *InstanceDebugNotificationFileWriteModel {
+func NewInstanceDebugNotificationFileWriteModel(ctx context.Context) *InstanceDebugNotificationFileWriteModel {
 	return &InstanceDebugNotificationFileWriteModel{
 		DebugNotificationWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   instanceID,
-				ResourceOwner: instanceID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 		},
 	}

@@ -1161,9 +1161,8 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		factor     domain.MultiFactorType
+		ctx    context.Context
+		factor domain.MultiFactorType
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1183,9 +1182,8 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.MultiFactorTypeUnspecified,
+				ctx:    context.Background(),
+				factor: domain.MultiFactorTypeUnspecified,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1207,9 +1205,8 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.MultiFactorTypeU2FWithPIN,
+				ctx:    context.Background(),
+				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -1223,7 +1220,8 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.MultiFactorTypeU2FWithPIN),
@@ -1233,9 +1231,8 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.MultiFactorTypeU2FWithPIN,
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1249,7 +1246,7 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			_, got, err := r.AddMultiFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.factor)
+			_, got, err := r.AddMultiFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1268,9 +1265,8 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		factor     domain.MultiFactorType
+		ctx    context.Context
+		factor domain.MultiFactorType
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1290,9 +1286,8 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.MultiFactorTypeUnspecified,
+				ctx:    context.Background(),
+				factor: domain.MultiFactorTypeUnspecified,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1307,9 +1302,8 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.MultiFactorTypeU2FWithPIN,
+				ctx:    context.Background(),
+				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1337,9 +1331,8 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.MultiFactorTypeU2FWithPIN,
+				ctx:    context.Background(),
+				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1370,9 +1363,8 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.MultiFactorTypeU2FWithPIN,
+				ctx:    context.Background(),
+				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1386,7 +1378,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveMultiFactorFromDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.factor)
+			got, err := r.RemoveMultiFactorFromDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

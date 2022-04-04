@@ -1,6 +1,9 @@
 package command
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/eventstore"
@@ -11,12 +14,12 @@ type InstanceCustomLoginTextReadModel struct {
 	CustomLoginTextReadModel
 }
 
-func NewInstanceCustomLoginTextReadModel(instanceID string, lang language.Tag) *InstanceCustomLoginTextReadModel {
+func NewInstanceCustomLoginTextReadModel(ctx context.Context, lang language.Tag) *InstanceCustomLoginTextReadModel {
 	return &InstanceCustomLoginTextReadModel{
 		CustomLoginTextReadModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   instanceID,
-				ResourceOwner: instanceID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			Language: lang,
 		},

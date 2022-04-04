@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -14,12 +15,12 @@ type InstanceMailTemplateWriteModel struct {
 	MailTemplateWriteModel
 }
 
-func NewInstanceMailTemplateWriteModel(instanceID string) *InstanceMailTemplateWriteModel {
+func NewInstanceMailTemplateWriteModel(ctx context.Context) *InstanceMailTemplateWriteModel {
 	return &InstanceMailTemplateWriteModel{
 		MailTemplateWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   instanceID,
-				ResourceOwner: instanceID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 		},
 	}

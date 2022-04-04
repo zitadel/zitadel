@@ -33,7 +33,7 @@ func (s *Server) GetSecretGenerator(ctx context.Context, req *admin_pb.GetSecret
 }
 
 func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.UpdateSecretGeneratorRequest) (*admin_pb.UpdateSecretGeneratorResponse, error) {
-	details, err := s.command.ChangeSecretGeneratorConfig(ctx, authz.GetInstance(ctx).InstanceID(), SecretGeneratorTypeToDomain(req.GeneratorType), UpdateSecretGeneratorToConfig(req))
+	details, err := s.command.ChangeSecretGeneratorConfig(ctx, SecretGeneratorTypeToDomain(req.GeneratorType), UpdateSecretGeneratorToConfig(req))
 	if err != nil {
 		return nil, err
 	}

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -21,7 +22,6 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
-		instanceID    string
 		generator     *crypto.GeneratorConfig
 		generatorType domain.SecretGeneratorType
 	}
@@ -83,7 +83,6 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 					IncludeSymbols:      true,
 				},
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -97,25 +96,27 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								4,
-								time.Hour*1,
-								true,
-								true,
-								true,
-								true,
-							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewSecretGeneratorAddedEvent(
+									context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									domain.SecretGeneratorTypeInitCode,
+									4,
+									time.Hour*1,
+									true,
+									true,
+									true,
+									true,
+								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(instance.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
 					),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				generator: &crypto.GeneratorConfig{
 					Length:              4,
 					Expiry:              1 * time.Hour,
@@ -125,7 +126,6 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 					IncludeSymbols:      true,
 				},
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -139,7 +139,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddSecretGeneratorConfig(tt.args.ctx, tt.args.instanceID, tt.args.generatorType, tt.args.generator)
+			got, err := r.AddSecretGeneratorConfig(tt.args.ctx, tt.args.generatorType, tt.args.generator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -184,7 +184,6 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 				ctx:           context.Background(),
 				generator:     &crypto.GeneratorConfig{},
 				generatorType: domain.SecretGeneratorTypeUnspecified,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -201,7 +200,6 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -237,7 +235,6 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -276,7 +273,6 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 					IncludeSymbols:      true,
 				},
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -329,7 +325,6 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 					IncludeSymbols:      false,
 				},
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -343,7 +338,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeSecretGeneratorConfig(tt.args.ctx, tt.args.instanceID, tt.args.generatorType, tt.args.generator)
+			got, err := r.ChangeSecretGeneratorConfig(tt.args.ctx, tt.args.generatorType, tt.args.generator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -386,7 +381,6 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				generatorType: domain.SecretGeneratorTypeUnspecified,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -403,7 +397,6 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -439,7 +432,6 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -480,7 +472,6 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				generatorType: domain.SecretGeneratorTypeInitCode,
-				instanceID:    "INSTANCE",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -494,7 +485,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveSecretGeneratorConfig(tt.args.ctx, tt.args.instanceID, tt.args.generatorType)
+			got, err := r.RemoveSecretGeneratorConfig(tt.args.ctx, tt.args.generatorType)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

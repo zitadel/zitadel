@@ -19,7 +19,7 @@ func (s *Server) GetOIDCSettings(ctx context.Context, _ *admin_pb.GetOIDCSetting
 }
 
 func (s *Server) UpdateOIDCSettings(ctx context.Context, req *admin_pb.UpdateOIDCSettingsRequest) (*admin_pb.UpdateOIDCSettingsResponse, error) {
-	result, err := s.command.ChangeOIDCSettings(ctx, authz.GetInstance(ctx).InstanceID(), UpdateOIDCConfigToConfig(req))
+	result, err := s.command.ChangeOIDCSettings(ctx, UpdateOIDCConfigToConfig(req))
 	if err != nil {
 		return nil, err
 	}

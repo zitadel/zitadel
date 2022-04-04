@@ -1,6 +1,9 @@
 package command
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -14,11 +17,11 @@ type InstanceDomainWriteModel struct {
 	State     domain.InstanceDomainState
 }
 
-func NewInstanceDomainWriteModel(instanceID, instanceDomain string) *InstanceDomainWriteModel {
+func NewInstanceDomainWriteModel(ctx context.Context, instanceDomain string) *InstanceDomainWriteModel {
 	return &InstanceDomainWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   instanceID,
-			ResourceOwner: instanceID,
+			AggregateID:   authz.GetInstance(ctx).InstanceID(),
+			ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 		},
 		Domain: instanceDomain,
 	}

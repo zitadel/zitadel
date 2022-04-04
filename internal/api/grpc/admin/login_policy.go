@@ -119,7 +119,7 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddMultiFactorToLoginPolicyRequest) (*admin_pb.AddMultiFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), policy_grpc.MultiFactorTypeToDomain(req.Type))
+	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *admin_pb.
 }
 
 func (s *Server) RemoveMultiFactorFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveMultiFactorFromLoginPolicyRequest) (*admin_pb.RemoveMultiFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), policy_grpc.MultiFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveMultiFactorFromDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}

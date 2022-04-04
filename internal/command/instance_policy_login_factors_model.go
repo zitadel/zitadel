@@ -60,12 +60,12 @@ type InstanceMultiFactorWriteModel struct {
 	MultiFactorWriteModel
 }
 
-func NewInstanceMultiFactorWriteModel(instanceID string, factorType domain.MultiFactorType) *InstanceMultiFactorWriteModel {
+func NewInstanceMultiFactorWriteModel(ctx context.Context, factorType domain.MultiFactorType) *InstanceMultiFactorWriteModel {
 	return &InstanceMultiFactorWriteModel{
 		MultiFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   instanceID,
-				ResourceOwner: instanceID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			MFAType: factorType,
 		},

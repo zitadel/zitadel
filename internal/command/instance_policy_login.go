@@ -259,11 +259,11 @@ func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context,
 	return writeModelToObjectDetails(&secondFactorModel.WriteModel), nil
 }
 
-func (c *Commands) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, instanceID string, multiFactor domain.MultiFactorType) (domain.MultiFactorType, *domain.ObjectDetails, error) {
+func (c *Commands) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (domain.MultiFactorType, *domain.ObjectDetails, error) {
 	if !multiFactor.Valid() {
 		return domain.MultiFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-5m9fs", "Errors.IAM.LoginPolicy.MFA.Unspecified")
 	}
-	multiFactorModel := NewInstanceMultiFactorWriteModel(instanceID, multiFactor)
+	multiFactorModel := NewInstanceMultiFactorWriteModel(ctx, multiFactor)
 	instanceAgg := InstanceAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 	event, err := c.addMultiFactorToDefaultLoginPolicy(ctx, instanceAgg, multiFactorModel, multiFactor)
 	if err != nil {
@@ -293,11 +293,11 @@ func (c *Commands) addMultiFactorToDefaultLoginPolicy(ctx context.Context, insta
 	return instance.NewLoginPolicyMultiFactorAddedEvent(ctx, instanceAgg, multiFactor), nil
 }
 
-func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, instanceID string, multiFactor domain.MultiFactorType) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType) (*domain.ObjectDetails, error) {
 	if !multiFactor.Valid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-33m9F", "Errors.IAM.LoginPolicy.MFA.Unspecified")
 	}
-	multiFactorModel := NewInstanceMultiFactorWriteModel(instanceID, multiFactor)
+	multiFactorModel := NewInstanceMultiFactorWriteModel(ctx, multiFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return nil, err

@@ -268,10 +268,9 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		orgID      string
-		policy     *domain.LoginPolicy
+		ctx    context.Context
+		orgID  string
+		policy *domain.LoginPolicy
 	}
 	type res struct {
 		want *domain.LoginPolicy
@@ -291,8 +290,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LoginPolicy{
 					AllowRegister:         true,
 					AllowUsernamePassword: true,
@@ -314,9 +312,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				policy: &domain.LoginPolicy{
 					AllowRegister:         true,
 					AllowUsernamePassword: true,
@@ -374,9 +371,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				policy: &domain.LoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
@@ -439,9 +435,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				policy: &domain.LoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
@@ -525,9 +520,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				policy: &domain.LoginPolicy{
 					AllowRegister:              false,
 					AllowUsernamePassword:      false,
@@ -568,7 +562,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				eventstore:    tt.fields.eventstore,
 				tokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := r.ChangeLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.policy)
+			got, err := r.ChangeLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -700,7 +694,6 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		provider      *domain.IDPProvider
-		instanceID    string
 		resourceOwner string
 	}
 	type res struct {
@@ -721,8 +714,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 					Name:        "name",
@@ -742,7 +734,6 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider:      &domain.IDPProvider{},
 			},
@@ -760,7 +751,6 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
@@ -800,7 +790,6 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
@@ -860,7 +849,6 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
@@ -921,8 +909,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 					Name:        "name",
@@ -947,7 +934,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.provider)
+			got, err := r.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

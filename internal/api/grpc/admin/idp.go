@@ -124,7 +124,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 }
 
 func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateIDPOIDCConfigRequest) (*admin_pb.UpdateIDPOIDCConfigResponse, error) {
-	config, err := s.command.ChangeDefaultIDPOIDCConfig(ctx, authz.GetInstance(ctx).InstanceID(), updateOIDCConfigToDomain(req))
+	config, err := s.command.ChangeDefaultIDPOIDCConfig(ctx, updateOIDCConfigToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (s *Server) UpdateIDPOIDCConfig(ctx context.Context, req *admin_pb.UpdateID
 }
 
 func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDPJWTConfigRequest) (*admin_pb.UpdateIDPJWTConfigResponse, error) {
-	config, err := s.command.ChangeDefaultIDPJWTConfig(ctx, authz.GetInstance(ctx).InstanceID(), updateJWTConfigToDomain(req))
+	config, err := s.command.ChangeDefaultIDPJWTConfig(ctx, updateJWTConfigToDomain(req))
 	if err != nil {
 		return nil, err
 	}

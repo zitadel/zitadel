@@ -27,7 +27,6 @@ func TestCommands_AddAction(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		addAction     *domain.Action
-		instanceID    string
 		resourceOwner string
 	}
 	type res struct {
@@ -51,7 +50,6 @@ func TestCommands_AddAction(t *testing.T) {
 				addAction: &domain.Action{
 					Script: "test()",
 				},
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res{
@@ -94,7 +92,6 @@ func TestCommands_AddAction(t *testing.T) {
 					Name:   "name",
 					Script: "name() {};",
 				},
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res{
@@ -153,7 +150,6 @@ func TestCommands_AddAction(t *testing.T) {
 					Name:   "name",
 					Script: "name() {};",
 				},
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res{
@@ -211,7 +207,6 @@ func TestCommands_AddAction(t *testing.T) {
 					Name:   "name2",
 					Script: "name2() {};",
 				},
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res{
@@ -228,7 +223,7 @@ func TestCommands_AddAction(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			id, details, err := c.AddAction(tt.args.ctx, tt.args.addAction, tt.args.instanceID, tt.args.resourceOwner)
+			id, details, err := c.AddAction(tt.args.ctx, tt.args.addAction, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -600,7 +595,6 @@ func TestCommands_ReactivateAction(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		actionID      string
-		instanceID    string
 		resourceOwner string
 	}
 	type res struct {
@@ -622,7 +616,6 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				ctx:           context.Background(),
 				actionID:      "",
 				resourceOwner: "org1",
-				instanceID:    "INSTANCE",
 			},
 			res{
 				err: errors.IsErrorInvalidArgument,
@@ -639,7 +632,6 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				ctx:           context.Background(),
 				actionID:      "id1",
 				resourceOwner: "org1",
-				instanceID:    "INSTANCE",
 			},
 			res{
 				err: errors.IsNotFound,
@@ -666,7 +658,6 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				ctx:           context.Background(),
 				actionID:      "id1",
 				resourceOwner: "org1",
-				instanceID:    "INSTANCE",
 			},
 			res{
 				err: errors.IsPreconditionFailed,
@@ -722,7 +713,6 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				ctx:           context.Background(),
 				actionID:      "id1",
 				resourceOwner: "org1",
-				instanceID:    "INSTANCE",
 			},
 			res{
 				err: errors.IsPreconditionFailed,
@@ -792,7 +782,6 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				ctx:           context.Background(),
 				actionID:      "id1",
 				resourceOwner: "org1",
-				instanceID:    "INSTANCE",
 			},
 			res{
 				details: &domain.ObjectDetails{
@@ -806,7 +795,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			details, err := c.ReactivateAction(tt.args.ctx, tt.args.actionID, tt.args.instanceID, tt.args.resourceOwner)
+			details, err := c.ReactivateAction(tt.args.ctx, tt.args.actionID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

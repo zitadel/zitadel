@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -19,9 +20,8 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.PasswordAgePolicy
+		ctx    context.Context
+		policy *domain.PasswordAgePolicy
 	}
 	type res struct {
 		want *domain.PasswordAgePolicy
@@ -50,8 +50,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordAgePolicy{
 					MaxAgeDays:     365,
 					ExpireWarnDays: 10,
@@ -69,7 +68,8 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewPasswordAgePolicyAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									365,
@@ -81,8 +81,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.PasswordAgePolicy{
 					ExpireWarnDays: 365,
 					MaxAgeDays:     10,
@@ -91,6 +90,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 			res: res{
 				want: &domain.PasswordAgePolicy{
 					ObjectRoot: models.ObjectRoot{
+						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
@@ -105,7 +105,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPasswordAgePolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.AddDefaultPasswordAgePolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -124,9 +124,8 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.PasswordAgePolicy
+		ctx    context.Context
+		policy *domain.PasswordAgePolicy
 	}
 	type res struct {
 		want *domain.PasswordAgePolicy
@@ -147,8 +146,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordAgePolicy{
 					MaxAgeDays:     365,
 					ExpireWarnDays: 10,
@@ -175,8 +173,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordAgePolicy{
 					ExpireWarnDays: 365,
 					MaxAgeDays:     10,
@@ -210,8 +207,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordAgePolicy{
 					MaxAgeDays:     125,
 					ExpireWarnDays: 5,
@@ -234,7 +230,7 @@ func TestCommandSide_ChangeDefaultPasswordAgePolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultPasswordAgePolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.ChangeDefaultPasswordAgePolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

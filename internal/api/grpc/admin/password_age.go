@@ -3,7 +3,6 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
@@ -20,7 +19,7 @@ func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *admin_pb.GetPass
 }
 
 func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, req *admin_pb.UpdatePasswordAgePolicyRequest) (*admin_pb.UpdatePasswordAgePolicyResponse, error) {
-	result, err := s.command.ChangeDefaultPasswordAgePolicy(ctx, authz.GetInstance(ctx).InstanceID(), UpdatePasswordAgePolicyToDomain(req))
+	result, err := s.command.ChangeDefaultPasswordAgePolicy(ctx, UpdatePasswordAgePolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

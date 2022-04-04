@@ -3,7 +3,6 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
@@ -18,7 +17,7 @@ func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *admin_pb.GetPrivacyPol
 }
 
 func (s *Server) UpdatePrivacyPolicy(ctx context.Context, req *admin_pb.UpdatePrivacyPolicyRequest) (*admin_pb.UpdatePrivacyPolicyResponse, error) {
-	result, err := s.command.ChangeDefaultPrivacyPolicy(ctx, authz.GetInstance(ctx).InstanceID(), UpdatePrivacyPolicyToDomain(req))
+	result, err := s.command.ChangeDefaultPrivacyPolicy(ctx, UpdatePrivacyPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

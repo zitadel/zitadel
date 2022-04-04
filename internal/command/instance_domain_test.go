@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -18,9 +19,8 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		domain     string
+		ctx    context.Context
+		domain string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -64,9 +64,8 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				domain:     "domain.ch",
+				ctx:    context.Background(),
+				domain: "domain.ch",
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -80,20 +79,21 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewDomainAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"domain.ch",
-								false,
-							)),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewDomainAddedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"domain.ch",
+									false,
+								)),
 						},
-						uniqueConstraintsFromEventConstraint(instance.NewAddInstanceDomainUniqueConstraint("domain.ch")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewAddInstanceDomainUniqueConstraint("domain.ch")),
 					),
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				domain:     "domain.ch",
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				domain: "domain.ch",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -107,7 +107,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddInstanceDomain(tt.args.ctx, tt.args.instanceID, tt.args.domain)
+			got, err := r.AddInstanceDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -126,9 +126,8 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		domain     string
+		ctx    context.Context
+		domain string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -164,9 +163,8 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				domain:     "domain.ch",
+				ctx:    context.Background(),
+				domain: "domain.ch",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -178,7 +176,8 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewDomainAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								"domain.ch",
@@ -188,19 +187,20 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewDomainRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"domain.ch",
-							)),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewDomainRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"domain.ch",
+								)),
 						},
-						uniqueConstraintsFromEventConstraint(instance.NewRemoveInstanceDomainUniqueConstraint("domain.ch")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewRemoveInstanceDomainUniqueConstraint("domain.ch")),
 					),
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				domain:     "domain.ch",
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				domain: "domain.ch",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -225,9 +225,8 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				domain:     "domain.ch",
+				ctx:    context.Background(),
+				domain: "domain.ch",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -239,7 +238,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveInstanceDomain(tt.args.ctx, tt.args.instanceID, tt.args.domain)
+			got, err := r.RemoveInstanceDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

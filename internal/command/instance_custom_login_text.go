@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -11,8 +12,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, instanceID string, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
-	iamAgg := instance.NewAggregate(instanceID)
+func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
+	iamAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	events, existingMailText, err := c.setCustomInstanceLoginText(ctx, &iamAgg.Aggregate, loginText)
 	if err != nil {
 		return nil, err
@@ -28,11 +29,11 @@ func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, instanceID st
 	return writeModelToObjectDetails(&existingMailText.WriteModel), nil
 }
 
-func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, instanceID string, lang language.Tag) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang language.Tag) (*domain.ObjectDetails, error) {
 	if lang == language.Und {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-Gfbg3", "Errors.CustomText.Invalid")
 	}
-	customText, err := c.defaultLoginTextWriteModelByID(ctx, instanceID, lang)
+	customText, err := c.defaultLoginTextWriteModelByID(ctx, lang)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "Instance-kd9fs", "Errors.CustomText.Invalid")
 	}
 
-	existingLoginText, err := c.defaultLoginTextWriteModelByID(ctx, instanceAgg.ID, text.Language)
+	existingLoginText, err := c.defaultLoginTextWriteModelByID(ctx, text.Language)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -61,8 +62,8 @@ func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *
 	return events, existingLoginText, nil
 }
 
-func (c *Commands) defaultLoginTextWriteModelByID(ctx context.Context, instanceID string, lang language.Tag) (*InstanceCustomLoginTextReadModel, error) {
-	writeModel := NewInstanceCustomLoginTextReadModel(instanceID, lang)
+func (c *Commands) defaultLoginTextWriteModelByID(ctx context.Context, lang language.Tag) (*InstanceCustomLoginTextReadModel, error) {
+	writeModel := NewInstanceCustomLoginTextReadModel(ctx, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

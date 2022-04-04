@@ -7,11 +7,11 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
-func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, instanceID string, config *domain.JWTIDPConfig) (*domain.JWTIDPConfig, error) {
+func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain.JWTIDPConfig) (*domain.JWTIDPConfig, error) {
 	if config.IDPConfigID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-m9322", "Errors.IDMissing")
 	}
-	existingConfig := NewInstanceIDPJWTConfigWriteModel(instanceID, config.IDPConfigID)
+	existingConfig := NewInstanceIDPJWTConfigWriteModel(ctx, config.IDPConfigID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err

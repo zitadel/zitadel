@@ -11,8 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, instanceID string, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
-	writeModel := NewInstanceDebugNotificationFileWriteModel(instanceID)
+func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+	writeModel := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.addDefaultDebugNotificationFile(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
@@ -46,8 +46,8 @@ func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, instance
 	return events, nil
 }
 
-func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, instanceID string, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
-	writeModel := NewInstanceDebugNotificationFileWriteModel(instanceID)
+func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+	writeModel := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.changeDefaultDebugNotificationProviderFile(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
@@ -86,8 +86,8 @@ func (c *Commands) changeDefaultDebugNotificationProviderFile(ctx context.Contex
 	return events, nil
 }
 
-func (c *Commands) RemoveDefaultNotificationFile(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
-	existingProvider := NewInstanceDebugNotificationFileWriteModel(instanceID)
+func (c *Commands) RemoveDefaultNotificationFile(ctx context.Context) (*domain.ObjectDetails, error) {
+	existingProvider := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&existingProvider.WriteModel)
 	err := c.defaultDebugNotificationProviderFileWriteModelByID(ctx, existingProvider)
 	if err != nil {

@@ -197,7 +197,7 @@ func (s *Server) ValidateOrgDomain(ctx context.Context, req *mgmt_pb.ValidateOrg
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ValidateOrgDomain(ctx, authz.GetInstance(ctx).InstanceID(), ValidateOrgDomainRequestToDomain(ctx, req), userIDs)
+	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, req), userIDs)
 	if err != nil {
 		return nil, err
 	}

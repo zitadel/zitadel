@@ -45,7 +45,7 @@ func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 }
 
 func (s *Server) UpdateCustomLoginPolicy(ctx context.Context, req *mgmt_pb.UpdateCustomLoginPolicyRequest) (*mgmt_pb.UpdateCustomLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID, updateLoginPolicyToDomain(req))
+	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, updateLoginPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

@@ -78,7 +78,7 @@ func (c *Commands) getOrgLoginPolicy(ctx context.Context, orgID string) (*domain
 	return c.getDefaultLoginPolicy(ctx)
 }
 
-func (c *Commands) ChangeLoginPolicy(ctx context.Context, instanceID, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
 	}
@@ -178,7 +178,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 	return writeModelToObjectDetails(&existingPolicy.LoginPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, instanceID, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}

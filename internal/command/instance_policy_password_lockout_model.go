@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -13,12 +14,12 @@ type InstanceLockoutPolicyWriteModel struct {
 	LockoutPolicyWriteModel
 }
 
-func NewInstanceLockoutPolicyWriteModel(instanceID string) *InstanceLockoutPolicyWriteModel {
+func NewInstanceLockoutPolicyWriteModel(ctx context.Context) *InstanceLockoutPolicyWriteModel {
 	return &InstanceLockoutPolicyWriteModel{
 		LockoutPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   instanceID,
-				ResourceOwner: instanceID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 		},
 	}

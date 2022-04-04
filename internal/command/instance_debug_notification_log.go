@@ -11,8 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDebugNotificationProviderLog(ctx context.Context, instanceID string, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
-	writeModel := NewInstanceDebugNotificationLogWriteModel(instanceID)
+func (c *Commands) AddDebugNotificationProviderLog(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+	writeModel := NewInstanceDebugNotificationLogWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.addDefaultDebugNotificationLog(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
@@ -46,8 +46,8 @@ func (c *Commands) addDefaultDebugNotificationLog(ctx context.Context, instanceA
 	return events, nil
 }
 
-func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, instanceID string, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
-	writeModel := NewInstanceDebugNotificationLogWriteModel(instanceID)
+func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
+	writeModel := NewInstanceDebugNotificationLogWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	event, err := c.changeDefaultDebugNotificationProviderLog(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
@@ -81,8 +81,8 @@ func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context
 	return changedEvent, nil
 }
 
-func (c *Commands) RemoveDefaultNotificationLog(ctx context.Context, instanceID string) (*domain.ObjectDetails, error) {
-	existingProvider := NewInstanceDebugNotificationLogWriteModel(instanceID)
+func (c *Commands) RemoveDefaultNotificationLog(ctx context.Context) (*domain.ObjectDetails, error) {
+	existingProvider := NewInstanceDebugNotificationLogWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&existingProvider.WriteModel)
 	err := c.defaultDebugNotificationProviderLogWriteModelByID(ctx, existingProvider)
 	if err != nil {

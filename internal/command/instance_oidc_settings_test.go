@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -20,7 +21,6 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		instanceID string
 		oidcConfig *domain.OIDCSettings
 	}
 	type res struct {
@@ -52,8 +52,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
@@ -73,22 +72,23 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewOIDCSettingsAddedEvent(
-								context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								time.Hour*1,
-								time.Hour*1,
-								time.Hour*1,
-								time.Hour*1,
-							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewOIDCSettingsAddedEvent(
+									context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									time.Hour*1,
+									time.Hour*1,
+									time.Hour*1,
+									time.Hour*1,
+								),
 							),
 						},
 					),
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
@@ -108,7 +108,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOIDCSettings(tt.args.ctx, tt.args.instanceID, tt.args.oidcConfig)
+			got, err := r.AddOIDCSettings(tt.args.ctx, tt.args.oidcConfig)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -128,7 +128,6 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		instanceID string
 		oidcConfig *domain.OIDCSettings
 	}
 	type res struct {
@@ -150,8 +149,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -177,8 +175,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
@@ -221,8 +218,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        2 * time.Hour,
 					IdTokenLifetime:            2 * time.Hour,
@@ -242,7 +238,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeOIDCSettings(tt.args.ctx, tt.args.instanceID, tt.args.oidcConfig)
+			got, err := r.ChangeOIDCSettings(tt.args.ctx, tt.args.oidcConfig)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

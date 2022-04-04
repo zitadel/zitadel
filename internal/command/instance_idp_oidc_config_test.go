@@ -287,7 +287,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				eventstore:            tt.fields.eventstore,
 				idpConfigSecretCrypto: tt.fields.secretCrypto,
 			}
-			got, err := r.ChangeDefaultIDPOIDCConfig(tt.args.ctx, tt.args.instanceID, tt.args.config)
+			got, err := r.ChangeDefaultIDPOIDCConfig(tt.args.ctx, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

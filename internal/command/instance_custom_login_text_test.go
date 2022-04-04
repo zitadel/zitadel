@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -19,9 +20,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		config     *domain.CustomLoginText
+		ctx    context.Context
+		config *domain.CustomLoginText
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -41,9 +41,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				config:     &domain.CustomLoginText{},
+				ctx:    context.Background(),
+				config: &domain.CustomLoginText{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -57,1090 +56,1310 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitleLinkingProcess, "TitleLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescriptionLinkingProcess, "DescriptionLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountOtherUser, "OtherUser", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateActive, "SessionState0", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateInactive, "SessionState1", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitleLinkingProcess, "TitleLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescriptionLinkingProcess, "DescriptionLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNameLabel, "LoginNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUsernamePlaceHolder, "UsernamePlaceholder", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginLoginnamePlaceHolder, "LoginnamePlaceholder", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginRegisterButtonText, "RegisterButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordLabel, "PasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetLinkText, "ResetLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordBackButtonText, "BackButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordMinLength, "MinLength", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasUppercase, "HasUppercase", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasLowercase, "HasLowercase", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasNumber, "HasNumber", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasSymbol, "HasSymbol", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordConfirmation, "Confirmation", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeNextButtonText, "NextButtonText", language.English,
 								),
-							), eventFromEventPusher(
+							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordLabel, "NewPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordResendButtonText, "ResendButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationResendButtonText, "ResendButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneLoginButtonText, "LoginButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordLabel, "NewPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, "ResendButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, "Provider0", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, "Provider1", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, "SkipButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescriptionOTP, "OTPDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPSecretLabel, "SecretLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTokenNameLabel, "TokenNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersChooseOther, "ChooseOther", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersOTP, "Provider0", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersU2F, "Provider1", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FValidateTokenText, "ValidateTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessLoginWithPwButtonText, "LoginWithPwButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, "ValidateTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordLabel, "NewPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionUserNameButtonText, "RegisterUsernamePasswordButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, "ExternalLoginDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLastnameLabel, "LastnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserEmailLabel, "EmailLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLanguageLabel, "LanguageLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserGenderLabel, "GenderLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordLabel, "PasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, "BackButtonText", language.English,
 								),
-							), eventFromEventPusher(
+							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgOrgNameLabel, "OrgNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgLastnameLabel, "LastnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgEmailLabel, "EmailLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordLabel, "PasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, "SaveButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, "AutoRedirectDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, "RedirectedDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneLoginButtonText, "LoginButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterTOS, "TOS", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 								),
@@ -1150,8 +1369,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				config: &domain.CustomLoginText{
 					Language: language.English,
 					SelectAccount: domain.SelectAccountScreenText{
@@ -1454,1092 +1672,1310 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitleLinkingProcess, "TitleLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescriptionLinkingProcess, "DescriptionLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountOtherUser, "OtherUser", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateActive, "SessionState0", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateInactive, "SessionState1", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitleLinkingProcess, "TitleLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescriptionLinkingProcess, "DescriptionLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNameLabel, "LoginNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUsernamePlaceHolder, "UsernamePlaceholder", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginLoginnamePlaceHolder, "LoginnamePlaceholder", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginRegisterButtonText, "RegisterButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordLabel, "PasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetLinkText, "ResetLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordBackButtonText, "BackButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordMinLength, "MinLength", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasUppercase, "HasUppercase", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasLowercase, "HasLowercase", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasNumber, "HasNumber", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasSymbol, "HasSymbol", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordConfirmation, "Confirmation", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordLabel, "NewPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordResendButtonText, "ResendButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationResendButtonText, "ResendButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneLoginButtonText, "LoginButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordLabel, "NewPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, "ResendButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, "Provider0", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, "Provider1", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, "SkipButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescriptionOTP, "OTPDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPSecretLabel, "SecretLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTokenNameLabel, "TokenNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersChooseOther, "ChooseOther", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersOTP, "Provider0", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersU2F, "Provider1", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FValidateTokenText, "ValidateTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessLoginWithPwButtonText, "LoginWithPwButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, "ValidateTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordLabel, "NewPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionUserNameButtonText, "RegisterUsernamePasswordButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, "ExternalLoginDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, "FirstnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLastnameLabel, "LastnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserEmailLabel, "EmailLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLanguageLabel, "LanguageLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserGenderLabel, "GenderLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordLabel, "PasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, "BackButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgOrgNameLabel, "OrgNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgFirstnameLabel, "FirstnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgLastnameLabel, "LastnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgEmailLabel, "EmailLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordLabel, "PasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, "SaveButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, "AutoRedirectDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, "RedirectedDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneLoginButtonText, "LoginButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterTOS, "TOS", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 							),
@@ -2547,1092 +2983,1310 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitleLinkingProcess, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescriptionLinkingProcess, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountOtherUser, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateActive, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateInactive, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountUserMustBeMemberOfOrg, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitleLinkingProcess, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescriptionLinkingProcess, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUsernamePlaceHolder, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginLoginnamePlaceHolder, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginRegisterButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUserMustBeMemberOfOrg, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordBackButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordMinLength, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasUppercase, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasLowercase, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasNumber, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasSymbol, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordConfirmation, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeUsernameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordCodeLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordConfirmLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordResendButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationCodeLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationResendButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneLoginButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirmLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescriptionOTP, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPSecretLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCodeLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTokenNameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FRegisterTokenButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FNotSupported, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FErrorRetry, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersChooseOther, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersOTP, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersU2F, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPCodeLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FValidateTokenText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FNotSupported, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FErrorRetry, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessLoginWithPwButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessNotSupported, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessErrorRetry, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordConfirmLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionUserNameButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLastnameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserEmailLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserUsernameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLanguageLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserGenderLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordConfirmLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSAndPrivacyLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirm, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgOrgNameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgFirstnameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgLastnameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgUsernameLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgEmailLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordConfirmLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSAndPrivacyLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSConfirm, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneCancelButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneTitle, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneDescription, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneLoginButtonText, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterTOS, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, language.English,
 								),
@@ -3642,8 +4296,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				config: &domain.CustomLoginText{
 					Language:                         language.English,
 					SelectAccount:                    domain.SelectAccountScreenText{},
@@ -3694,2184 +4347,2620 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitleLinkingProcess, "TitleLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescriptionLinkingProcess, "DescriptionLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountOtherUser, "OtherUser", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateActive, "SessionState0", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateInactive, "SessionState1", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitleLinkingProcess, "TitleLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescriptionLinkingProcess, "DescriptionLinking", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNameLabel, "LoginNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUsernamePlaceHolder, "UsernamePlaceholder", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginLoginnamePlaceHolder, "LoginnamePlaceholder", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginRegisterButtonText, "RegisterButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordLabel, "PasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetLinkText, "ResetLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordBackButtonText, "BackButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordMinLength, "MinLength", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasUppercase, "HasUppercase", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasLowercase, "HasLowercase", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasNumber, "HasNumber", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasSymbol, "HasSymbol", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordConfirmation, "Confirmation", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordLabel, "NewPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordResendButtonText, "ResendButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationResendButtonText, "ResendButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneLoginButtonText, "LoginButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordLabel, "NewPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, "ResendButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, "Provider0", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, "Provider1", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, "SkipButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescriptionOTP, "OTPDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPSecretLabel, "SecretLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTokenNameLabel, "TokenNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersChooseOther, "ChooseOther", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersOTP, "Provider0", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersU2F, "Provider1", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPCodeLabel, "CodeLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FValidateTokenText, "ValidateTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessLoginWithPwButtonText, "LoginWithPwButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, "ValidateTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordLabel, "NewPasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionUserNameButtonText, "RegisterUsernamePasswordButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, "ExternalLoginDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, "FirstnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLastnameLabel, "LastnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserEmailLabel, "EmailLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLanguageLabel, "LanguageLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserGenderLabel, "GenderLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordLabel, "PasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, "BackButtonText", language.English,
 							),
 						),
 
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgOrgNameLabel, "OrgNameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgFirstnameLabel, "FirstnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgLastnameLabel, "LastnameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgUsernameLabel, "UsernameLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgEmailLabel, "EmailLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordLabel, "PasswordLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, "SaveButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneCancelButtonText, "CancelButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, "AutoRedirectDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, "RedirectedDescription", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, "NextButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneTitle, "Title", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneDescription, "Description", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneLoginButtonText, "LoginButtonText", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterTOS, "TOS", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitleLinkingProcess, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescriptionLinkingProcess, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountOtherUser, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateActive, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateInactive, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountUserMustBeMemberOfOrg, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitleLinkingProcess, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescriptionLinkingProcess, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUsernamePlaceHolder, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginLoginnamePlaceHolder, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginRegisterButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUserMustBeMemberOfOrg, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordBackButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordMinLength, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasUppercase, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasLowercase, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasNumber, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasSymbol, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordConfirmation, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeUsernameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordCodeLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordConfirmLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordResendButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationCodeLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationResendButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneLoginButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirmLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescriptionOTP, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPSecretLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCodeLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTokenNameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FRegisterTokenButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FNotSupported, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FErrorRetry, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersChooseOther, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersOTP, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersU2F, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPCodeLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FValidateTokenText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FNotSupported, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FErrorRetry, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessLoginWithPwButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessNotSupported, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessErrorRetry, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordConfirmLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionUserNameButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, language.English,
 							),
 						),
 
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLastnameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserEmailLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserUsernameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLanguageLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserGenderLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordConfirmLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSAndPrivacyLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirm, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgOrgNameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgFirstnameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgLastnameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgUsernameLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgEmailLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordConfirmLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSAndPrivacyLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSConfirm, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneCancelButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneTitle, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneDescription, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneLoginButtonText, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterTOS, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, language.English,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, language.English,
 							),
@@ -5879,1092 +6968,1310 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitleLinkingProcess, "TitleLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountDescriptionLinkingProcess, "DescriptionLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountOtherUser, "OtherUser", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateActive, "SessionState0", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountSessionStateInactive, "SessionState1", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginTitleLinkingProcess, "TitleLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginDescriptionLinkingProcess, "DescriptionLinking", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNameLabel, "LoginNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUsernamePlaceHolder, "UsernamePlaceholder", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginLoginnamePlaceHolder, "LoginnamePlaceholder", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginRegisterButtonText, "RegisterButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginExternalUserDescription, "ExternalUserDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLoginUserMustBeMemberOfOrg, "MustBeMemberOfOrg", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordLabel, "PasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetLinkText, "ResetLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordBackButtonText, "BackButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordMinLength, "MinLength", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasUppercase, "HasUppercase", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasLowercase, "HasLowercase", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasNumber, "HasNumber", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordHasSymbol, "HasSymbol", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordConfirmation, "Confirmation", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyUsernameChangeDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordLabel, "NewPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordResendButtonText, "ResendButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitPasswordDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationResendButtonText, "ResendButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyEmailVerificationDoneLoginButtonText, "LoginButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordLabel, "NewPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserResendButtonText, "ResendButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitializeUserNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitUserDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptOTPOption, "Provider0", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptU2FOption, "Provider1", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptSkipButtonText, "SkipButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAPromptNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPDescriptionOTP, "OTPDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPSecretLabel, "SecretLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAOTPCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FTokenNameLabel, "TokenNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFAU2FErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyInitMFADoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersChooseOther, "ChooseOther", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersOTP, "Provider0", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyMFAProvidersU2F, "Provider1", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPCodeLabel, "CodeLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAOTPNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FValidateTokenText, "ValidateTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyVerifyMFAU2FErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessLoginWithPwButtonText, "LoginWithPwButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessValidateTokenButtonText, "ValidateTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordLabel, "NewPasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNewPasswordConfirmLabel, "NewPasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordResetDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionUserNameButtonText, "RegisterUsernamePasswordButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, "ExternalLoginDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserDescriptionOrgRegister, "DescriptionOrgRegister", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLastnameLabel, "LastnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserEmailLabel, "EmailLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserLanguageLabel, "LanguageLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserGenderLabel, "GenderLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordLabel, "PasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, "BackButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgOrgNameLabel, "OrgNameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgFirstnameLabel, "FirstnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgLastnameLabel, "LastnameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgUsernameLabel, "UsernameLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgEmailLabel, "EmailLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordLabel, "PasswordLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPasswordConfirmLabel, "PasswordConfirmLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, "SaveButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneCancelButtonText, "CancelButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundLinkButtonText, "LinkButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginAutoRedirectDescription, "AutoRedirectDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginRedirectedDescription, "RedirectedDescription", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginNextButtonText, "NextButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneTitle, "Title", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneDescription, "Description", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyLogoutDoneLoginButtonText, "LoginButtonText", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterTOS, "TOS", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterPrivacyPolicy, "PrivacyPolicy", language.English,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 								),
@@ -6974,8 +8281,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				config: &domain.CustomLoginText{
 					Language: language.English,
 					SelectAccount: domain.SelectAccountScreenText{
@@ -7278,7 +8584,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.SetCustomInstanceLoginText(tt.args.ctx, tt.args.instanceID, tt.args.config)
+			got, err := r.SetCustomInstanceLoginText(tt.args.ctx, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

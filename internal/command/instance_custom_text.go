@@ -12,8 +12,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) SetInstanceCustomText(ctx context.Context, instanceID string, customText *domain.CustomText) (*domain.CustomText, error) {
-	setText := NewInstanceCustomTextWriteModel(instanceID, customText.Key, customText.Language)
+func (c *Commands) SetInstanceCustomText(ctx context.Context, customText *domain.CustomText) (*domain.CustomText, error) {
+	setText := NewInstanceCustomTextWriteModel(ctx, customText.Key, customText.Language)
 	instanceAgg := InstanceAggregateFromWriteModel(&setText.CustomTextWriteModel.WriteModel)
 	event, err := c.setDefaultCustomText(ctx, instanceAgg, setText, customText)
 	if err != nil {
@@ -48,11 +48,11 @@ func (c *Commands) setDefaultCustomText(ctx context.Context, instanceAgg *events
 		text.Language), nil
 }
 
-func (c *Commands) defaultCustomTextWriteModelByID(ctx context.Context, instanceID, key string, language language.Tag) (policy *InstanceCustomTextWriteModel, err error) {
+func (c *Commands) defaultCustomTextWriteModelByID(ctx context.Context, key string, language language.Tag) (policy *InstanceCustomTextWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceCustomTextWriteModel(instanceID, key, language)
+	writeModel := NewInstanceCustomTextWriteModel(ctx, key, language)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
