@@ -32,10 +32,9 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 		tokenVerifier orgFeatureChecker
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		orgID      string
-		policy     *domain.LoginPolicy
+		ctx    context.Context
+		orgID  string
+		policy *domain.LoginPolicy
 	}
 	type res struct {
 		want *domain.LoginPolicy
@@ -55,8 +54,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LoginPolicy{
 					AllowRegister:         true,
 					AllowUsernamePassword: true,
@@ -93,9 +91,8 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				policy: &domain.LoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
@@ -141,9 +138,8 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				policy: &domain.LoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
@@ -209,9 +205,8 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				policy: &domain.LoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
@@ -253,7 +248,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				eventstore:    tt.fields.eventstore,
 				tokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := r.AddLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.policy)
+			got, err := r.AddLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -23,9 +24,8 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.LabelPolicy
+		ctx    context.Context
+		policy *domain.LabelPolicy
 	}
 	type res struct {
 		want *domain.LabelPolicy
@@ -63,8 +63,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -91,7 +90,8 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewLabelPolicyAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									"#ffffff",
@@ -112,8 +112,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -131,6 +130,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 			res: res{
 				want: &domain.LabelPolicy{
 					ObjectRoot: models.ObjectRoot{
+						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
@@ -154,7 +154,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.AddDefaultLabelPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -173,9 +173,8 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.LabelPolicy
+		ctx    context.Context
+		policy *domain.LabelPolicy
 	}
 	type res struct {
 		want *domain.LabelPolicy
@@ -196,8 +195,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
 					PrimaryColor:    "#ffffff",
 					BackgroundColor: "#ffffff",
@@ -234,8 +232,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -299,8 +296,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#000000",
 					BackgroundColor:     "#000000",
@@ -341,7 +337,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.ChangeDefaultLabelPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -360,8 +356,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -382,8 +377,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -424,8 +418,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -439,7 +432,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ActivateDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID)
+			got, err := r.ActivateDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -460,7 +453,6 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		instanceID string
 		storageKey string
 	}
 	type res struct {
@@ -481,8 +473,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -498,7 +489,6 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -542,7 +532,6 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -557,7 +546,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddLogoDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.storageKey)
+			got, err := r.AddLogoDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -577,8 +566,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -599,8 +587,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -640,8 +627,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsInternal,
@@ -690,8 +676,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -706,7 +691,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveLogoDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveLogoDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -726,7 +711,6 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		instanceID string
 		storageKey string
 	}
 	type res struct {
@@ -747,8 +731,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -764,7 +747,6 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -808,7 +790,6 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -823,7 +804,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIconDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.storageKey)
+			got, err := r.AddIconDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -843,8 +824,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -865,8 +845,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -915,8 +894,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -931,7 +909,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveIconDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveIconDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1033,7 +1011,6 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -1048,7 +1025,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.storageKey)
+			got, err := r.AddLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1068,8 +1045,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1090,8 +1066,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1130,8 +1105,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsInternal,
@@ -1180,8 +1154,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1196,7 +1169,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveLogoDarkDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1216,7 +1189,6 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		instanceID string
 		storageKey string
 	}
 	type res struct {
@@ -1237,8 +1209,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1255,7 +1226,6 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 			args: args{
 				ctx:        context.Background(),
 				storageKey: "key",
-				instanceID: "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1298,7 +1268,6 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -1313,7 +1282,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.storageKey)
+			got, err := r.AddIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1333,8 +1302,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1355,8 +1323,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1395,8 +1362,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsInternal,
@@ -1445,8 +1411,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1461,7 +1426,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveIconDarkDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1481,7 +1446,6 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		instanceID string
 		storageKey string
 	}
 	type res struct {
@@ -1502,8 +1466,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1520,7 +1483,6 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 			args: args{
 				ctx:        context.Background(),
 				storageKey: "key",
-				instanceID: "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1563,7 +1525,6 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
-				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -1578,7 +1539,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddFontDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID, tt.args.storageKey)
+			got, err := r.AddFontDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1598,8 +1559,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1620,8 +1580,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1660,8 +1619,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				err: caos_errs.IsInternal,
@@ -1710,8 +1668,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1726,7 +1683,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
-			got, err := r.RemoveFontDefaultLabelPolicy(tt.args.ctx, tt.args.instanceID)
+			got, err := r.RemoveFontDefaultLabelPolicy(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context, instanceID string) (*domain.PasswordComplexityPolicy, error) {
-	policyWriteModel := NewInstancePasswordComplexityPolicyWriteModel(instanceID)
+func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*domain.PasswordComplexityPolicy, error) {
+	policyWriteModel := NewInstancePasswordComplexityPolicyWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -24,8 +24,8 @@ func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context, insta
 	return policy, nil
 }
 
-func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, instanceID string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
-	addedPolicy := NewInstancePasswordComplexityPolicyWriteModel(instanceID)
+func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+	addedPolicy := NewInstancePasswordComplexityPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	events, err := c.addDefaultPasswordComplexityPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -59,12 +59,12 @@ func (c *Commands) addDefaultPasswordComplexityPolicy(ctx context.Context, insta
 	return instance.NewPasswordComplexityPolicyAddedEvent(ctx, instanceAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol), nil
 }
 
-func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, instanceID string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
 
-	existingPolicy, err := c.defaultPasswordComplexityPolicyWriteModelByID(ctx, instanceID)
+	existingPolicy, err := c.defaultPasswordComplexityPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -88,11 +88,11 @@ func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, in
 	return writeModelToPasswordComplexityPolicy(&existingPolicy.PasswordComplexityPolicyWriteModel), nil
 }
 
-func (c *Commands) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Context, instanceID string) (policy *InstancePasswordComplexityPolicyWriteModel, err error) {
+func (c *Commands) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Context) (policy *InstancePasswordComplexityPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstancePasswordComplexityPolicyWriteModel(instanceID)
+	writeModel := NewInstancePasswordComplexityPolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

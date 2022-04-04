@@ -157,6 +157,26 @@ func eventFromEventPusher(event eventstore.Command) *repository.Event {
 	}
 }
 
+func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Command) *repository.Event {
+	data, _ := eventstore.EventData(event)
+	return &repository.Event{
+		ID:                            "",
+		Sequence:                      0,
+		PreviousAggregateSequence:     0,
+		PreviousAggregateTypeSequence: 0,
+		CreationDate:                  time.Time{},
+		Type:                          repository.EventType(event.Type()),
+		Data:                          data,
+		EditorService:                 event.EditorService(),
+		EditorUser:                    event.EditorUser(),
+		Version:                       repository.Version(event.Aggregate().Version),
+		AggregateID:                   event.Aggregate().ID,
+		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
+		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
+		InstanceID:                    sql.NullString{String: instanceID, Valid: instanceID != ""},
+	}
+}
+
 func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *repository.Event {
 	e := eventFromEventPusher(event)
 	e.CreationDate = time.Now()
@@ -165,6 +185,15 @@ func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *reposito
 
 func uniqueConstraintsFromEventConstraint(constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
 	return &repository.UniqueConstraint{
+		UniqueType:   constraint.UniqueType,
+		UniqueField:  constraint.UniqueField,
+		ErrorMessage: constraint.ErrorMessage,
+		Action:       repository.UniqueConstraintAction(constraint.Action)}
+}
+
+func uniqueConstraintsFromEventConstraintWithInstanceID(instanceID string, constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
+	return &repository.UniqueConstraint{
+		InstanceID:   instanceID,
 		UniqueType:   constraint.UniqueType,
 		UniqueField:  constraint.UniqueField,
 		ErrorMessage: constraint.ErrorMessage,

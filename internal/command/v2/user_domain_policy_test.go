@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
@@ -85,8 +86,7 @@ func Test_customDomainPolicy(t *testing.T) {
 
 func Test_defaultDomainPolicy(t *testing.T) {
 	type args struct {
-		instanceID string
-		filter     preparation.FilterToQueryReducer
+		filter preparation.FilterToQueryReducer
 	}
 	tests := []struct {
 		name    string
@@ -97,7 +97,6 @@ func Test_defaultDomainPolicy(t *testing.T) {
 		{
 			name: "err from filter",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
@@ -108,7 +107,6 @@ func Test_defaultDomainPolicy(t *testing.T) {
 		{
 			name: "no events",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{}, nil
 				},
@@ -119,7 +117,6 @@ func Test_defaultDomainPolicy(t *testing.T) {
 		{
 			name: "policy found",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
 						instance.NewDomainPolicyAddedEvent(
@@ -144,7 +141,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := instanceDomainPolicy(context.Background(), tt.args.instanceID, tt.args.filter)
+			got, err := instanceDomainPolicy(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -158,8 +155,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 
 func Test_DomainPolicy(t *testing.T) {
 	type args struct {
-		instanceID string
-		filter     preparation.FilterToQueryReducer
+		filter preparation.FilterToQueryReducer
 	}
 	tests := []struct {
 		name    string
@@ -170,7 +166,6 @@ func Test_DomainPolicy(t *testing.T) {
 		{
 			name: "err from filter custom",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
@@ -181,7 +176,6 @@ func Test_DomainPolicy(t *testing.T) {
 		{
 			name: "custom found",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
 						org.NewDomainPolicyAddedEvent(
@@ -206,7 +200,6 @@ func Test_DomainPolicy(t *testing.T) {
 		{
 			name: "err from filter default",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
@@ -222,7 +215,6 @@ func Test_DomainPolicy(t *testing.T) {
 		{
 			name: "default found",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
@@ -252,7 +244,6 @@ func Test_DomainPolicy(t *testing.T) {
 		{
 			name: "no policy found",
 			args: args{
-				instanceID: "INSTANCE",
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, nil
 				},
@@ -263,7 +254,7 @@ func Test_DomainPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := domainPolicyWriteModel(context.Background(), tt.args.instanceID, tt.args.filter)
+			got, err := domainPolicyWriteModel(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return

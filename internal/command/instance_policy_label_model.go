@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/policy"
@@ -12,12 +13,12 @@ type InstanceLabelPolicyWriteModel struct {
 	LabelPolicyWriteModel
 }
 
-func NewInstanceLabelPolicyWriteModel(instanceID string) *InstanceLabelPolicyWriteModel {
+func NewInstanceLabelPolicyWriteModel(ctx context.Context) *InstanceLabelPolicyWriteModel {
 	return &InstanceLabelPolicyWriteModel{
 		LabelPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   instanceID,
-				ResourceOwner: instanceID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 		},
 	}

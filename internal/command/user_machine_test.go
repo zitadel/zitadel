@@ -23,10 +23,9 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		orgID      string
-		machine    *domain.Machine
+		ctx     context.Context
+		orgID   string
+		machine *domain.Machine
 	}
 	type res struct {
 		want *domain.Machine
@@ -46,9 +45,8 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				machine: &domain.Machine{
 					Username: "username",
 				},
@@ -67,9 +65,8 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				machine: &domain.Machine{
 					Username: "username",
 					Name:     "name",
@@ -95,9 +92,8 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				machine: &domain.Machine{
 					Username: "username",
 					Name:     "name",
@@ -138,9 +134,8 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
+				ctx:   context.Background(),
+				orgID: "org1",
 				machine: &domain.Machine{
 					Username:    "username",
 					Description: "description",
@@ -167,7 +162,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddMachine(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.machine)
+			got, err := r.AddMachine(tt.args.ctx, tt.args.orgID, tt.args.machine)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -22,10 +23,9 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx        context.Context
-			instanceID string
-			orgID      string
-			userID     string
+			ctx    context.Context
+			orgID  string
+			userID string
 		}
 	)
 	type res struct {
@@ -46,10 +46,9 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
-				userID:     "",
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				orgID:  "org1",
+				userID: "",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -64,10 +63,9 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
-				userID:     "user1",
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				orgID:  "org1",
+				userID: "user1",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -98,10 +96,9 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
-				userID:     "user1",
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				orgID:  "org1",
+				userID: "user1",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -141,10 +138,9 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
-				userID:     "user1",
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				orgID:  "org1",
+				userID: "user1",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -206,10 +202,9 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				orgID:      "org1",
-				userID:     "user1",
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				orgID:  "org1",
+				userID: "user1",
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -221,7 +216,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddHumanOTP(tt.args.ctx, tt.args.instanceID, tt.args.userID, tt.args.orgID)
+			got, err := r.AddHumanOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

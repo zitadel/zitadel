@@ -53,7 +53,7 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 		return nil, err
 	}
 	ctxData := authz.GetCtxData(ctx)
-	org, err := s.command.AddOrg(ctx, authz.GetInstance(ctx).InstanceID(), req.Name, ctxData.UserID, ctxData.ResourceOwner, userIDs)
+	org, err := s.command.AddOrg(ctx, req.Name, ctxData.UserID, ctxData.ResourceOwner, userIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 }
 
 func (s *Server) AddOrgDomain(ctx context.Context, req *mgmt_pb.AddOrgDomainRequest) (*mgmt_pb.AddOrgDomainResponse, error) {
-	domain, err := s.command.AddOrgDomain(ctx, authz.GetInstance(ctx).InstanceID(), AddOrgDomainRequestToDomain(ctx, req), nil)
+	domain, err := s.command.AddOrgDomain(ctx, AddOrgDomainRequestToDomain(ctx, req), nil)
 	if err != nil {
 		return nil, err
 	}

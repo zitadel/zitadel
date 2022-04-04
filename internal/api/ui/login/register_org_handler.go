@@ -3,7 +3,6 @@ package login
 import (
 	"net/http"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -76,7 +75,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, err = l.command.SetUpOrg(ctx, authz.GetInstance(r.Context()).InstanceID(), data.toOrgDomain(), data.toUserDomain(), initCodeGenerator, phoneCodeGenerator, userIDs, true)
+	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), initCodeGenerator, phoneCodeGenerator, userIDs, true)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return

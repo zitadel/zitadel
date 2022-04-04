@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) SetPassword(ctx context.Context, instanceID, orgID, userID, passwordString string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordString string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if userID == "" {
@@ -31,7 +31,7 @@ func (c *Commands) SetPassword(ctx context.Context, instanceID, orgID, userID, p
 		ChangeRequired: oneTime,
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	passwordEvent, err := c.changePassword(ctx, instanceID, "", password, userAgg, existingPassword)
+	passwordEvent, err := c.changePassword(ctx, "", password, userAgg, existingPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *Commands) SetPassword(ctx context.Context, instanceID, orgID, userID, p
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, instanceID, orgID, userID, code, passwordString, userAgentID string, passwordVerificationCode crypto.Generator) (err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string, passwordVerificationCode crypto.Generator) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -75,7 +75,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, instanceID, or
 		ChangeRequired: false,
 	}
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	passwordEvent, err := c.changePassword(ctx, instanceID, userAgentID, password, userAgg, existingCode)
+	passwordEvent, err := c.changePassword(ctx, userAgentID, password, userAgg, existingCode)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, instanceID, or
 	return err
 }
 
-func (c *Commands) ChangePassword(ctx context.Context, instanceID, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -113,7 +113,7 @@ func (c *Commands) ChangePassword(ctx context.Context, instanceID, orgID, userID
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	command, err := c.changePassword(ctx, instanceID, userAgentID, password, userAgg, existingPassword)
+	command, err := c.changePassword(ctx, userAgentID, password, userAgg, existingPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Commands) ChangePassword(ctx context.Context, instanceID, orgID, userID
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) changePassword(ctx context.Context, instanceID, userAgentID string, password *domain.Password, userAgg *eventstore.Aggregate, existingPassword *HumanPasswordWriteModel) (event eventstore.Command, err error) {
+func (c *Commands) changePassword(ctx context.Context, userAgentID string, password *domain.Password, userAgg *eventstore.Aggregate, existingPassword *HumanPasswordWriteModel) (event eventstore.Command, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -138,7 +138,7 @@ func (c *Commands) changePassword(ctx context.Context, instanceID, userAgentID s
 	if existingPassword.UserState == domain.UserStateInitial {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
 	}
-	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, instanceID, userAgg.ResourceOwner)
+	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, userAgg.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 	return err
 }
 
-func (c *Commands) HumanCheckPassword(ctx context.Context, instanceID, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
+func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -207,7 +207,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, instanceID, orgID, us
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
 	}
 
-	loginPolicy, err := c.getOrgLoginPolicy(ctx, instanceID, orgID)
+	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
 	}

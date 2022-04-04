@@ -221,7 +221,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplMapping, funcs,
 		i18n.TranslatorConfig{DefaultLanguage: defaultLanguage, CookieName: cookieName},
 	)
-	logging.Log("APP-40tSoJ").OnError(err).WithError(err).Panic("error creating renderer")
+	logging.New().OnError(err).WithError(err).Panic("error creating renderer")
 	return r
 }
 
@@ -230,7 +230,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
 		return
 	}
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, authReq.InstanceID)
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 	if err != nil {
 		l.renderInternalError(w, r, authReq, err)
 		return

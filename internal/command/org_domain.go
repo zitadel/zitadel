@@ -13,13 +13,13 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) AddOrgDomain(ctx context.Context, instanceID string, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.OrgDomain, error) {
+func (c *Commands) AddOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.OrgDomain, error) {
 	if !orgDomain.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
 	domainWriteModel := NewOrgDomainWriteModel(orgDomain.AggregateID, orgDomain.Domain)
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	events, err := c.addOrgDomain(ctx, instanceID, orgAgg, domainWriteModel, orgDomain, claimedUserIDs)
+	events, err := c.addOrgDomain(ctx, orgAgg, domainWriteModel, orgDomain, claimedUserIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +102,9 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, instanceID string, org
 		events = append(events, org.NewDomainVerifiedEvent(ctx, orgAgg, orgDomain.Domain))
 
 		for _, userID := range claimedUserIDs {
-			userEvents, _, err := c.userDomainClaimed(ctx, instanceID, userID)
+			userEvents, _, err := c.userDomainClaimed(ctx, userID)
 			if err != nil {
-				logging.LogWithFields("COMMAND-5m8fs", "userid", userID).WithError(err).Warn("could not claim user")
+				logging.WithFields("userid", userID).WithError(err).Warn("could not claim user")
 				continue
 			}
 			events = append(events, userEvents...)
@@ -177,7 +177,7 @@ func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDom
 	return writeModelToObjectDetails(&domainWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addOrgDomain(ctx context.Context, instanceID string, orgAgg *eventstore.Aggregate, addedDomain *OrgDomainWriteModel, orgDomain *domain.OrgDomain, claimedUserIDs []string) ([]eventstore.Command, error) {
+func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregate, addedDomain *OrgDomainWriteModel, orgDomain *domain.OrgDomain, claimedUserIDs []string) ([]eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedDomain)
 	if err != nil {
 		return nil, err
@@ -193,7 +193,7 @@ func (c *Commands) addOrgDomain(ctx context.Context, instanceID string, orgAgg *
 	if orgDomain.Verified {
 		events = append(events, org.NewDomainVerifiedEvent(ctx, orgAgg, orgDomain.Domain))
 		for _, userID := range claimedUserIDs {
-			userEvents, _, err := c.userDomainClaimed(ctx, instanceID, userID)
+			userEvents, _, err := c.userDomainClaimed(ctx, userID)
 			if err != nil {
 				logging.WithFields("userid", userID).WithError(err).Warn("could not claim user")
 				continue

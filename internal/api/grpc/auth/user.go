@@ -45,7 +45,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUser(ctx, authz.GetInstance(ctx).InstanceID(), ctxData.UserID, ctxData.ResourceOwner, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUser
 
 func (s *Server) UpdateMyUserName(ctx context.Context, req *auth_pb.UpdateMyUserNameRequest) (*auth_pb.UpdateMyUserNameResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.ChangeUsername(ctx, authz.GetInstance(ctx).InstanceID(), ctxData.ResourceOwner, ctxData.UserID, req.UserName)
+	objectDetails, err := s.command.ChangeUsername(ctx, ctxData.ResourceOwner, ctxData.UserID, req.UserName)
 	if err != nil {
 		return nil, err
 	}

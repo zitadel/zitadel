@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddHumanOTP(ctx context.Context, instanceID, userID, resourceowner string) (*domain.OTP, error) {
+func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string) (*domain.OTP, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
@@ -25,7 +25,7 @@ func (c *Commands) AddHumanOTP(ctx context.Context, instanceID, userID, resource
 		logging.Log("COMMAND-Cm0ds").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-55M9f", "Errors.Org.NotFound")
 	}
-	orgPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, org.AggregateID)
+	orgPolicy, err := c.getOrgDomainPolicy(ctx, org.AggregateID)
 	if err != nil {
 		logging.Log("COMMAND-y5zv9").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")

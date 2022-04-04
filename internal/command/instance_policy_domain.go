@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, instanceID string, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
-	addedPolicy := NewInstanceDomainPolicyWriteModel(instanceID)
+func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
+	addedPolicy := NewInstanceDomainPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	event, err := c.addDefaultDomainPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -40,8 +40,8 @@ func (c *Commands) addDefaultDomainPolicy(ctx context.Context, instanceAgg *even
 	return iam_repo.NewDomainPolicyAddedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain), nil
 }
 
-func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, instanceID string, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
-	existingPolicy, err := c.defaultDomainPolicyWriteModelByID(ctx, instanceID)
+func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
+	existingPolicy, err := c.defaultDomainPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +66,8 @@ func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, instanceID str
 	return writeModelToDomainPolicy(existingPolicy), nil
 }
 
-func (c *Commands) getDefaultDomainPolicy(ctx context.Context, instanceID string) (*domain.DomainPolicy, error) {
-	policyWriteModel, err := c.defaultDomainPolicyWriteModelByID(ctx, instanceID)
+func (c *Commands) getDefaultDomainPolicy(ctx context.Context) (*domain.DomainPolicy, error) {
+	policyWriteModel, err := c.defaultDomainPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -79,11 +79,11 @@ func (c *Commands) getDefaultDomainPolicy(ctx context.Context, instanceID string
 	return policy, nil
 }
 
-func (c *Commands) defaultDomainPolicyWriteModelByID(ctx context.Context, instanceID string) (policy *InstanceDomainPolicyWriteModel, err error) {
+func (c *Commands) defaultDomainPolicyWriteModelByID(ctx context.Context) (policy *InstanceDomainPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceDomainPolicyWriteModel(instanceID)
+	writeModel := NewInstanceDomainPolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

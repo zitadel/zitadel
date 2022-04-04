@@ -23,7 +23,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
-		instanceID    string
 		userID        string
 		resourceOwner string
 		links         []*domain.UserIDPLink
@@ -45,9 +44,8 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				userID:     "",
+				ctx:    context.Background(),
+				userID: "",
 				links: []*domain.UserIDPLink{
 					{
 						IDPConfigID:    "config1",
@@ -69,7 +67,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -86,7 +83,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				links: []*domain.UserIDPLink{
@@ -112,7 +108,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				links: []*domain.UserIDPLink{
@@ -140,7 +135,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				links: []*domain.UserIDPLink{
@@ -191,7 +185,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				links: []*domain.UserIDPLink{
@@ -242,7 +235,6 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 				links: []*domain.UserIDPLink{
@@ -264,7 +256,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.BulkAddedUserIDPLinks(tt.args.ctx, tt.args.instanceID, tt.args.userID, tt.args.resourceOwner, tt.args.links)
+			err := r.BulkAddedUserIDPLinks(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.links)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

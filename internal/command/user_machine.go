@@ -9,11 +9,11 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddMachine(ctx context.Context, instanceID, orgID string, machine *domain.Machine) (*domain.Machine, error) {
+func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
 	if !machine.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 	}
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, orgID)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
 	}

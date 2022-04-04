@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddLoginPolicy(ctx context.Context, instanceID, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Fn8ds", "Errors.ResourceOwnerMissing")
 	}
@@ -26,7 +26,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, instanceID, resourceOwner
 		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
 	}
 
-	err = c.checkLoginPolicyAllowed(ctx, instanceID, resourceOwner, policy)
+	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *Commands) orgLoginPolicyWriteModelByID(ctx context.Context, orgID strin
 	return policyWriteModel, nil
 }
 
-func (c *Commands) getOrgLoginPolicy(ctx context.Context, instanceID, orgID string) (*domain.LoginPolicy, error) {
+func (c *Commands) getOrgLoginPolicy(ctx context.Context, orgID string) (*domain.LoginPolicy, error) {
 	policy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (c *Commands) getOrgLoginPolicy(ctx context.Context, instanceID, orgID stri
 	if policy.State == domain.PolicyStateActive {
 		return writeModelToLoginPolicy(&policy.LoginPolicyWriteModel), nil
 	}
-	return c.getDefaultLoginPolicy(ctx, instanceID)
+	return c.getDefaultLoginPolicy(ctx)
 }
 
 func (c *Commands) ChangeLoginPolicy(ctx context.Context, instanceID, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
@@ -91,7 +91,7 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, instanceID, resourceOw
 		return nil, caos_errs.ThrowNotFound(nil, "Org-M0sif", "Errors.Org.LoginPolicy.NotFound")
 	}
 
-	err = c.checkLoginPolicyAllowed(ctx, instanceID, resourceOwner, policy)
+	err = c.checkLoginPolicyAllowed(ctx, resourceOwner, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +127,8 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, instanceID, resourceOw
 	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
 }
 
-func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, instanceID, resourceOwner string, policy *domain.LoginPolicy) error {
-	defaultPolicy, err := c.getDefaultLoginPolicy(ctx, instanceID)
+func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) error {
+	defaultPolicy, err := c.getDefaultLoginPolicy(ctx)
 	if err != nil {
 		return err
 	}
@@ -196,7 +196,7 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, instanceID, 
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
 		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
 	} else {
-		_, err = c.getInstanceIDPConfigByID(ctx, instanceID, idpProvider.IDPConfigID)
+		_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	}
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
@@ -428,11 +428,11 @@ func (c *Commands) removeMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 	return org.NewLoginPolicyMultiFactorRemovedEvent(ctx, orgAgg, multiFactor), nil
 }
 
-func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, instanceID, orgID string) (_ *OrgAuthFactorsAllowedWriteModel, err error) {
+func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgID string) (_ *OrgAuthFactorsAllowedWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewOrgAuthFactorsAllowedWriteModel(instanceID, orgID)
+	writeModel := NewOrgAuthFactorsAllowedWriteModel(ctx, orgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

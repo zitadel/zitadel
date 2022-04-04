@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) SetOrgFeatures(ctx context.Context, instanceID, resourceOwner string, features *domain.Features) (*domain.ObjectDetails, error) {
+func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, features *domain.Features) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
 	}
@@ -52,7 +52,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, instanceID, resourceOwner
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
 	}
 
-	events, err := c.ensureOrgSettingsToFeatures(ctx, instanceID, resourceOwner, features)
+	events, err := c.ensureOrgSettingsToFeatures(ctx, resourceOwner, features)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, instanceID, resourceOwner
 	return writeModelToObjectDetails(&existingFeatures.WriteModel), nil
 }
 
-func (c *Commands) RemoveOrgFeatures(ctx context.Context, instanceID, orgID string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Features-G5tg", "Errors.ResourceOwnerMissing")
 	}
@@ -83,11 +83,11 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, instanceID, orgID stri
 	}
 	removedEvent := org.NewFeaturesRemovedEvent(ctx, OrgAggregateFromWriteModel(&existingFeatures.FeaturesWriteModel.WriteModel))
 
-	features, err := c.getDefaultFeatures(ctx, instanceID)
+	features, err := c.getDefaultFeatures(ctx)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.ensureOrgSettingsToFeatures(ctx, instanceID, orgID, features)
+	events, err := c.ensureOrgSettingsToFeatures(ctx, orgID, features)
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +104,8 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, instanceID, orgID stri
 	return writeModelToObjectDetails(&existingFeatures.WriteModel), nil
 }
 
-func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, instanceID, orgID string, features *domain.Features) ([]eventstore.Command, error) {
-	events, err := c.setAllowedLoginPolicy(ctx, instanceID, orgID, features)
+func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+	events, err := c.setAllowedLoginPolicy(ctx, orgID, features)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, instanceID, 
 			events = append(events, removePasswordComplexityEvent)
 		}
 	}
-	labelPolicyEvents, err := c.setAllowedLabelPolicy(ctx, instanceID, orgID, features)
+	labelPolicyEvents, err := c.setAllowedLabelPolicy(ctx, orgID, features)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, instanceID, 
 	return events, nil
 }
 
-func (c *Commands) setAllowedLoginPolicy(ctx context.Context, instanceID, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
 	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -208,7 +208,7 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, instanceID, orgID 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, nil
 	}
-	defaultPolicy, err := c.getDefaultLoginPolicy(ctx, instanceID)
+	defaultPolicy, err := c.getDefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, instanceID, orgID 
 		if defaultPolicy.ForceMFA != existingPolicy.ForceMFA {
 			policy.ForceMFA = defaultPolicy.ForceMFA
 		}
-		authFactorsEvents, err := c.setDefaultAuthFactorsInCustomLoginPolicy(ctx, instanceID, orgID)
+		authFactorsEvents, err := c.setDefaultAuthFactorsInCustomLoginPolicy(ctx, orgID)
 		if err != nil {
 			return nil, err
 		}
@@ -260,8 +260,8 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, instanceID, orgID 
 	return events, nil
 }
 
-func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, instanceID, orgID string) ([]eventstore.Command, error) {
-	orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, instanceID, orgID)
+func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, orgID string) ([]eventstore.Command, error) {
+	orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -318,7 +318,7 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 	return events, nil
 }
 
-func (c *Commands) setAllowedLabelPolicy(ctx context.Context, instanceID, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
 	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
@@ -334,7 +334,7 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, instanceID, orgID 
 		}
 		return append(events, removeEvent), nil
 	}
-	defaultPolicy, err := c.getDefaultLabelPolicy(ctx, instanceID)
+	defaultPolicy, err := c.getDefaultLabelPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +384,7 @@ func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, instanceID, orgI
 		return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
 	}
 
-	existingIAMFeatures := NewInstanceFeaturesWriteModel(instanceID)
+	existingIAMFeatures := NewInstanceFeaturesWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, existingIAMFeatures)
 	if err != nil {
 		return nil, err

@@ -18,7 +18,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ChangeUsername(ctx context.Context, instanceID, orgID, userID, userName string) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) (*domain.ObjectDetails, error) {
 	if orgID == "" || userID == "" || userName == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
@@ -36,7 +36,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, instanceID, orgID, userID
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, orgID)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
@@ -173,7 +173,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) RemoveUser(ctx context.Context, instanceID, userID, resourceOwner string, cascadingUserMemberships []*query.Membership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*query.Membership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -186,7 +186,7 @@ func (c *Commands) RemoveUser(ctx context.Context, instanceID, userID, resourceO
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-m9od", "Errors.User.NotFound")
 	}
 
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, existingUser.ResourceOwner)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotExisting")
 	}
@@ -309,7 +309,7 @@ func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID
 	return user.NewUserTokenRemovedEvent(ctx, userAgg, tokenID), refreshTokenWriteModel, nil
 }
 
-func (c *Commands) userDomainClaimed(ctx context.Context, instanceID, userID string) (events []eventstore.Command, _ *UserWriteModel, err error) {
+func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events []eventstore.Command, _ *UserWriteModel, err error) {
 	existingUser, err := c.userWriteModelByID(ctx, userID, "")
 	if err != nil {
 		return nil, nil, err
@@ -320,7 +320,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, instanceID, userID str
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, existingUser.ResourceOwner)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}

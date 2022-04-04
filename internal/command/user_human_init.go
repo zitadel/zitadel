@@ -49,7 +49,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
-func (c *Commands) HumanVerifyInitCode(ctx context.Context, instanceID, userID, resourceOwner, code, passwordString string, initCodeGenerator crypto.Generator) error {
+func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string, initCodeGenerator crypto.Generator) error {
 	if userID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
@@ -85,7 +85,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, instanceID, userID, 
 			SecretString:   passwordString,
 			ChangeRequired: false,
 		}
-		passwordEvent, err := c.changePassword(ctx, instanceID, "", password, userAgg, passwordWriteModel)
+		passwordEvent, err := c.changePassword(ctx, "", password, userAgg, passwordWriteModel)
 		if err != nil {
 			return err
 		}

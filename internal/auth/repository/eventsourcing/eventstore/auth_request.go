@@ -87,7 +87,7 @@ type userEventProvider interface {
 }
 
 type userCommandProvider interface {
-	BulkAddedUserIDPLinks(ctx context.Context, instanceID, userID, resourceOwner string, externalIDPs []*domain.UserIDPLink) error
+	BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.UserIDPLink) error
 }
 
 type orgViewProvider interface {
@@ -156,22 +156,22 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID, instanceID string) (_ *domain.AuthRequest, err error) {
+func (repo *AuthRequestRepo) AuthRequestByID(ctx context.Context, id, userAgentID string) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, instanceID, false)
+	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, false)
 }
 
-func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID, instanceID string) (_ *domain.AuthRequest, err error) {
+func (repo *AuthRequestRepo) AuthRequestByIDCheckLoggedIn(ctx context.Context, id, userAgentID string) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, instanceID, true)
+	return repo.getAuthRequestNextSteps(ctx, id, userAgentID, true)
 }
 
-func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAgentID, instanceID string) (err error) {
+func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, id, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -179,10 +179,10 @@ func (repo *AuthRequestRepo) SaveAuthCode(ctx context.Context, id, code, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code, instanceID string) (_ *domain.AuthRequest, err error) {
+func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.AuthRequests.GetAuthRequestByCode(ctx, code, instanceID)
+	request, err := repo.AuthRequests.GetAuthRequestByCode(ctx, code)
 	if err != nil {
 		return nil, err
 	}
@@ -198,16 +198,16 @@ func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code, instan
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id, instanceID string) (err error) {
+func (repo *AuthRequestRepo) DeleteAuthRequest(ctx context.Context, id string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.AuthRequests.DeleteAuthRequest(ctx, id, instanceID)
+	return repo.AuthRequests.DeleteAuthRequest(ctx, id)
 }
 
-func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, userAgentID, instanceID string) (err error) {
+func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, id, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -218,10 +218,10 @@ func (repo *AuthRequestRepo) CheckLoginName(ctx context.Context, id, loginName, 
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID, instanceID string) (err error) {
+func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, idpConfigID, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -232,10 +232,10 @@ func (repo *AuthRequestRepo) SelectExternalIDP(ctx context.Context, authReqID, i
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID, instanceID string, externalUser *domain.ExternalUser, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -257,10 +257,10 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID, userAgentID, instanceID string, externalUser *domain.ExternalUser) (err error) {
+func (repo *AuthRequestRepo) SetExternalUserLogin(ctx context.Context, authReqID, userAgentID string, externalUser *domain.ExternalUser) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -277,10 +277,10 @@ func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID, instanceID string) (err error) {
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, id, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -299,10 +299,10 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, userID, resourceOwner, password, userAgentID, instanceID string, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, userID, resourceOwner, password, userAgentID string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequestEnsureUser(ctx, authReqID, userAgentID, userID, instanceID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authReqID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
@@ -310,7 +310,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, user
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckPassword(ctx, instanceID, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
 }
 
 func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
@@ -328,41 +328,41 @@ func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
 	}
 }
 
-func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID, instanceID string, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAOTP(ctx context.Context, authRequestID, userID, resourceOwner, code, userAgentID string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID, instanceID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
 	return repo.Command.HumanCheckMFAOTP(ctx, userID, code, resourceOwner, request.WithCurrentInfo(info))
 }
 
-func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID, instanceID string) (login *domain.WebAuthNLogin, err error) {
+func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID, instanceID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return nil, err
 	}
 	return repo.Command.HumanBeginU2FLogin(ctx, userID, resourceOwner, request, true)
 }
 
-func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID, instanceID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID, instanceID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
 	return repo.Command.HumanFinishU2FLogin(ctx, userID, resourceOwner, credentialData, request, true)
 }
 
-func (repo *AuthRequestRepo) BeginPasswordlessSetup(ctx context.Context, instanceID, userID, resourceOwner string, authenticatorPlatform domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
+func (repo *AuthRequestRepo) BeginPasswordlessSetup(ctx context.Context, userID, resourceOwner string, authenticatorPlatform domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.Command.HumanAddPasswordlessSetup(ctx, instanceID, userID, resourceOwner, true, authenticatorPlatform)
+	return repo.Command.HumanAddPasswordlessSetup(ctx, userID, resourceOwner, true, authenticatorPlatform)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName string, credentialData []byte) (err error) {
@@ -372,14 +372,14 @@ func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID
 	return err
 }
 
-func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, instanceID, userID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
+func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	passwordlessInitCode, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, repo.UserCodeAlg)
 	if err != nil {
 		return nil, err
 	}
-	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, instanceID, userID, resourceOwner, codeID, verificationCode, preferredPlatformType, passwordlessInitCode)
+	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode, preferredPlatformType, passwordlessInitCode)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
@@ -393,34 +393,34 @@ func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context
 	return err
 }
 
-func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID, instanceID string) (login *domain.WebAuthNLogin, err error) {
+func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string) (login *domain.WebAuthNLogin, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID, instanceID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return nil, err
 	}
 	return repo.Command.HumanBeginPasswordlessLogin(ctx, userID, resourceOwner, request, true)
 }
 
-func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID, instanceID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID, instanceID)
+	request, err := repo.getAuthRequestEnsureUser(ctx, authRequestID, userAgentID, userID)
 	if err != nil {
 		return err
 	}
 	return repo.Command.HumanFinishPasswordlessLogin(ctx, userID, resourceOwner, credentialData, request, true)
 }
 
-func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID, instanceID string, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
-	err = linkExternalIDPs(ctx, repo.UserCommandProvider, instanceID, request)
+	err = linkExternalIDPs(ctx, repo.UserCommandProvider, request)
 	if err != nil {
 		return err
 	}
@@ -432,8 +432,8 @@ func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, userAgentID, instanceID string) error {
-	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID, instanceID)
+func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -442,10 +442,10 @@ func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *domain.Human, externalIDP *domain.UserIDPLink, orgMemberRoles []string, authReqID, userAgentID, resourceOwner, instanceID string, metadatas []*domain.Metadata, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *domain.Human, externalIDP *domain.UserIDPLink, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, metadatas []*domain.Metadata, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID, instanceID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -457,7 +457,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	human, err := repo.Command.RegisterHuman(ctx, instanceID, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, phoneCodeGenerator)
+	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return err
 	}
@@ -478,8 +478,8 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID, instanceID string, checkLoggedIn bool) (*domain.AuthRequest, error) {
-	request, err := repo.getAuthRequest(ctx, id, userAgentID, instanceID)
+func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, userAgentID string, checkLoggedIn bool) (*domain.AuthRequest, error) {
+	request, err := repo.getAuthRequest(ctx, id, userAgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -491,8 +491,8 @@ func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, us
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authRequestID, userAgentID, userID, instanceID string) (*domain.AuthRequest, error) {
-	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID, instanceID)
+func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authRequestID, userAgentID, userID string) (*domain.AuthRequest, error) {
+	request, err := repo.getAuthRequest(ctx, authRequestID, userAgentID)
 	if err != nil {
 		return nil, err
 	}
@@ -506,8 +506,8 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	return request, nil
 }
 
-func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID, instanceID string) (*domain.AuthRequest, error) {
-	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id, instanceID)
+func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID string) (*domain.AuthRequest, error) {
+	request, err := repo.AuthRequests.GetAuthRequestByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -1185,7 +1185,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	return user_view_model.UserToModel(&userCopy, viewProvider.PrefixAvatarURL()), nil
 }
 
-func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, instanceID string, request *domain.AuthRequest) error {
+func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, request *domain.AuthRequest) error {
 	externalIDPs := make([]*domain.UserIDPLink, len(request.LinkingUsers))
 	for i, linkingUser := range request.LinkingUsers {
 		externalIDP := &domain.UserIDPLink{
@@ -1200,7 +1200,7 @@ func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvid
 		UserID: "LOGIN",
 		OrgID:  request.UserOrgID,
 	}
-	return userCommandProvider.BulkAddedUserIDPLinks(authz.SetCtxData(ctx, data), instanceID, request.UserID, request.UserOrgID, externalIDPs)
+	return userCommandProvider.BulkAddedUserIDPLinks(authz.SetCtxData(ctx, data), request.UserID, request.UserOrgID, externalIDPs)
 }
 
 func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, idpProviders []*domain.IDPProvider) bool {

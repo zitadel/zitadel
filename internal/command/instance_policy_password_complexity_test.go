@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -19,9 +20,8 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.PasswordComplexityPolicy
+		ctx    context.Context
+		policy *domain.PasswordComplexityPolicy
 	}
 	type res struct {
 		want *domain.PasswordComplexityPolicy
@@ -41,8 +41,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    0,
 					HasUppercase: true,
@@ -72,8 +71,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    8,
 					HasUppercase: true,
@@ -94,7 +92,8 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									8,
@@ -106,8 +105,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    8,
 					HasUppercase: true,
@@ -119,6 +117,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 			res: res{
 				want: &domain.PasswordComplexityPolicy{
 					ObjectRoot: models.ObjectRoot{
+						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
@@ -136,7 +135,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.AddDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -155,9 +154,8 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.PasswordComplexityPolicy
+		ctx    context.Context
+		policy *domain.PasswordComplexityPolicy
 	}
 	type res struct {
 		want *domain.PasswordComplexityPolicy
@@ -177,8 +175,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    0,
 					HasUppercase: true,
@@ -200,8 +197,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    8,
 					HasUppercase: true,
@@ -231,8 +227,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    8,
 					HasUppercase: true,
@@ -269,8 +264,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    10,
 					HasUppercase: false,
@@ -299,7 +293,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.ChangeDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

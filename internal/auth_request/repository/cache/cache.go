@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
@@ -26,12 +27,12 @@ func (c *AuthRequestCache) Health(ctx context.Context) error {
 	return c.client.PingContext(ctx)
 }
 
-func (c *AuthRequestCache) GetAuthRequestByID(_ context.Context, id, instanceID string) (*domain.AuthRequest, error) {
-	return c.getAuthRequest("id", id, instanceID)
+func (c *AuthRequestCache) GetAuthRequestByID(ctx context.Context, id string) (*domain.AuthRequest, error) {
+	return c.getAuthRequest("id", id, authz.GetInstance(ctx).InstanceID())
 }
 
-func (c *AuthRequestCache) GetAuthRequestByCode(_ context.Context, code, instanceID string) (*domain.AuthRequest, error) {
-	return c.getAuthRequest("code", code, instanceID)
+func (c *AuthRequestCache) GetAuthRequestByCode(ctx context.Context, code string) (*domain.AuthRequest, error) {
+	return c.getAuthRequest("code", code, authz.GetInstance(ctx).InstanceID())
 }
 
 func (c *AuthRequestCache) SaveAuthRequest(_ context.Context, request *domain.AuthRequest) error {
@@ -45,8 +46,8 @@ func (c *AuthRequestCache) UpdateAuthRequest(_ context.Context, request *domain.
 	return c.saveAuthRequest(request, "UPDATE auth.auth_requests SET request = $2, instance_id = $3, change_date = $4, code = $5 WHERE id = $1", request.ChangeDate, request.Code)
 }
 
-func (c *AuthRequestCache) DeleteAuthRequest(_ context.Context, id, instanceID string) error {
-	_, err := c.client.Exec("DELETE FROM auth.auth_requests WHERE instance_id = $1 and id = $2", instanceID, id)
+func (c *AuthRequestCache) DeleteAuthRequest(ctx context.Context, id string) error {
+	_, err := c.client.Exec("DELETE FROM auth.auth_requests WHERE instance_id = $1 and id = $2", authz.GetInstance(ctx).InstanceID(), id)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "CACHE-dsHw3", "unable to delete auth request")
 	}

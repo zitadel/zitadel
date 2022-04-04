@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -22,9 +23,8 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.LoginPolicy
+		ctx    context.Context
+		policy *domain.LoginPolicy
 	}
 	type res struct {
 		want *domain.LoginPolicy
@@ -62,8 +62,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LoginPolicy{
 					AllowRegister:         true,
 					AllowUsernamePassword: true,
@@ -82,7 +81,8 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewLoginPolicyAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
@@ -103,8 +103,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.LoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
@@ -122,6 +121,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 			res: res{
 				want: &domain.LoginPolicy{
 					ObjectRoot: models.ObjectRoot{
+						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
@@ -145,7 +145,7 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.AddDefaultLoginPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -164,9 +164,8 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		policy     *domain.LoginPolicy
+		ctx    context.Context
+		policy *domain.LoginPolicy
 	}
 	type res struct {
 		want *domain.LoginPolicy
@@ -187,8 +186,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LoginPolicy{
 					AllowRegister:    true,
 					AllowExternalIDP: true,
@@ -224,8 +222,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				policy: &domain.LoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
@@ -250,7 +247,8 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewLoginPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
@@ -269,7 +267,8 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								newDefaultLoginPolicyChangedEvent(context.Background(),
 									false,
 									false,
@@ -288,8 +287,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.LoginPolicy{
 					AllowRegister:              false,
 					AllowUsernamePassword:      false,
@@ -307,6 +305,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 			res: res{
 				want: &domain.LoginPolicy{
 					ObjectRoot: models.ObjectRoot{
+						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
@@ -330,7 +329,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
+			got, err := r.ChangeDefaultLoginPolicy(tt.args.ctx, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -349,9 +348,8 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		provider   *domain.IDPProvider
+		ctx      context.Context
+		provider *domain.IDPProvider
 	}
 	type res struct {
 		want *domain.IDPProvider
@@ -371,9 +369,8 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				provider:   &domain.IDPProvider{},
+				ctx:      context.Background(),
+				provider: &domain.IDPProvider{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -388,8 +385,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -425,8 +421,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -481,8 +476,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -497,7 +491,8 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewLoginPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
@@ -515,7 +510,8 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 						),
 					),
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewIDPConfigAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
@@ -529,7 +525,8 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewIdentityProviderAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1"),
@@ -539,8 +536,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -548,6 +544,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 			res: res{
 				want: &domain.IDPProvider{
 					ObjectRoot: models.ObjectRoot{
+						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
@@ -561,7 +558,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIDPProviderToDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.provider)
+			got, err := r.AddIDPProviderToDefaultLoginPolicy(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -581,7 +578,6 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx                 context.Context
-		instanceID          string
 		provider            *domain.IDPProvider
 		cascadeExternalIDPs []*domain.UserIDPLink
 	}
@@ -603,9 +599,8 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				provider:   &domain.IDPProvider{},
+				ctx:      context.Background(),
+				provider: &domain.IDPProvider{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -620,8 +615,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -657,8 +651,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -707,8 +700,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -760,8 +752,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -815,8 +806,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -890,8 +880,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
@@ -917,7 +906,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveIDPProviderFromDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.provider, tt.args.cascadeExternalIDPs...)
+			got, err := r.RemoveIDPProviderFromDefaultLoginPolicy(tt.args.ctx, tt.args.provider, tt.args.cascadeExternalIDPs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -936,9 +925,8 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		factor     domain.SecondFactorType
+		ctx    context.Context
+		factor domain.SecondFactorType
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -958,9 +946,8 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.SecondFactorTypeUnspecified,
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeUnspecified,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -982,9 +969,8 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.SecondFactorTypeOTP,
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTP,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -998,7 +984,8 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewLoginPolicySecondFactorAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.SecondFactorTypeOTP),
@@ -1008,9 +995,8 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.SecondFactorTypeOTP,
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				factor: domain.SecondFactorTypeOTP,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1024,7 +1010,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			_, got, err := r.AddSecondFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.factor)
+			_, got, err := r.AddSecondFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1043,9 +1029,8 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		instanceID string
-		factor     domain.SecondFactorType
+		ctx    context.Context
+		factor domain.SecondFactorType
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1065,9 +1050,8 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.SecondFactorTypeUnspecified,
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeUnspecified,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1082,9 +1066,8 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.SecondFactorTypeOTP,
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTP,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1112,9 +1095,8 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.SecondFactorTypeOTP,
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTP,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1145,9 +1127,8 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				factor:     domain.SecondFactorTypeOTP,
+				ctx:    context.Background(),
+				factor: domain.SecondFactorTypeOTP,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1161,7 +1142,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveSecondFactorFromDefaultLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.factor)
+			got, err := r.RemoveSecondFactorFromDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

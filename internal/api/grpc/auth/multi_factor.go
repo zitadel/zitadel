@@ -37,7 +37,7 @@ func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFac
 
 func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFactorOTPRequest) (*auth_pb.AddMyAuthFactorOTPResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	otp, err := s.command.AddHumanOTP(ctx, authz.GetInstance(ctx).InstanceID(), ctxData.UserID, ctxData.ResourceOwner)
+	otp, err := s.command.AddHumanOTP(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *Server) RemoveMyAuthFactorOTP(ctx context.Context, _ *auth_pb.RemoveMyA
 
 func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFactorU2FRequest) (*auth_pb.AddMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	u2f, err := s.command.HumanAddU2FSetup(ctx, authz.GetInstance(ctx).InstanceID(), ctxData.UserID, ctxData.ResourceOwner, false)
+	u2f, err := s.command.HumanAddU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}

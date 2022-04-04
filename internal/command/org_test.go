@@ -29,7 +29,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 	}
 	type args struct {
 		ctx            context.Context
-		instanceID     string
 		name           string
 		userID         string
 		resourceOwner  string
@@ -54,7 +53,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
@@ -98,7 +96,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -168,7 +165,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -238,7 +234,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -308,7 +303,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -334,7 +328,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				iamDomain:    tt.fields.iamDomain,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddOrg(tt.args.ctx, tt.args.instanceID, tt.args.name, tt.args.userID, tt.args.resourceOwner, tt.args.claimedUserIDs)
+			got, err := r.AddOrg(tt.args.ctx, tt.args.name, tt.args.userID, tt.args.resourceOwner, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

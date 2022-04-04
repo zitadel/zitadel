@@ -34,7 +34,7 @@ func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*
 }
 
 func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest) (*admin_pb.AddOIDCIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), addOIDCIDPRequestToDomain(req))
+	config, err := s.command.AddDefaultIDPConfig(ctx, addOIDCIDPRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest
 }
 
 func (s *Server) AddJWTIDP(ctx context.Context, req *admin_pb.AddJWTIDPRequest) (*admin_pb.AddJWTIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), addJWTIDPRequestToDomain(req))
+	config, err := s.command.AddDefaultIDPConfig(ctx, addJWTIDPRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (s *Server) AddJWTIDP(ctx context.Context, req *admin_pb.AddJWTIDPRequest) 
 }
 
 func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) (*admin_pb.UpdateIDPResponse, error) {
-	config, err := s.command.ChangeDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), updateIDPToDomain(req))
+	config, err := s.command.ChangeDefaultIDPConfig(ctx, updateIDPToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 }
 
 func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPRequest) (*admin_pb.DeactivateIDPResponse, error) {
-	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.IdpId)
+	objectDetails, err := s.command.DeactivateDefaultIDPConfig(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s *Server) DeactivateIDP(ctx context.Context, req *admin_pb.DeactivateIDPR
 }
 
 func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPRequest) (*admin_pb.ReactivateIDPResponse, error) {
-	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.IdpId)
+	objectDetails, err := s.command.ReactivateDefaultIDPConfig(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 		return nil, err
 	}
 
-	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.IdpId, idpsToDomain(idps.IDPs), idpUserLinksToDomain(userLinks.Links)...)
+	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.IdpId, idpsToDomain(idps.IDPs), idpUserLinksToDomain(userLinks.Links)...)
 	if err != nil {
 		return nil, err
 	}

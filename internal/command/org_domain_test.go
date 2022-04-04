@@ -27,7 +27,6 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 	}
 	type args struct {
 		ctx            context.Context
-		instanceID     string
 		domain         *domain.OrgDomain
 		claimedUserIDs []string
 	}
@@ -49,9 +48,8 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				domain:     &domain.OrgDomain{},
+				ctx:    context.Background(),
+				domain: &domain.OrgDomain{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -79,8 +77,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -116,8 +113,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -141,7 +137,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.instanceID, tt.args.domain, tt.args.claimedUserIDs)
+			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -11,8 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) getDefaultLoginPolicy(ctx context.Context, instanceID string) (*domain.LoginPolicy, error) {
-	policyWriteModel := NewInstanceLoginPolicyWriteModel(instanceID)
+func (c *Commands) getDefaultLoginPolicy(ctx context.Context) (*domain.LoginPolicy, error) {
+	policyWriteModel := NewInstanceLoginPolicyWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -22,8 +22,8 @@ func (c *Commands) getDefaultLoginPolicy(ctx context.Context, instanceID string)
 	return policy, nil
 }
 
-func (c *Commands) AddDefaultLoginPolicy(ctx context.Context, instanceID string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	addedPolicy := NewInstanceLoginPolicyWriteModel(instanceID)
+func (c *Commands) AddDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	addedPolicy := NewInstanceLoginPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	event, err := c.addDefaultLoginPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -64,8 +64,8 @@ func (c *Commands) addDefaultLoginPolicy(ctx context.Context, instanceAgg *event
 		policy.MultiFactorCheckLifetime), nil
 }
 
-func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, instanceID string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
-	existingPolicy := NewInstanceLoginPolicyWriteModel(instanceID)
+func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
+	existingPolicy := NewInstanceLoginPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
 	event, err := c.changeDefaultLoginPolicy(ctx, instanceAgg, existingPolicy, policy)
 	if err != nil {
@@ -109,11 +109,11 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, instanceAgg *ev
 	return changedEvent, nil
 }
 
-func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, instanceID string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-9nf88", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
-	existingPolicy := NewInstanceLoginPolicyWriteModel(instanceID)
+	existingPolicy := NewInstanceLoginPolicyWriteModel(ctx)
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
@@ -122,11 +122,11 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, insta
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-GVDfe", "Errors.IAM.LoginPolicy.NotFound")
 	}
 
-	_, err = c.getInstanceIDPConfigByID(ctx, instanceID, idpProvider.IDPConfigID)
+	_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "INSTANCE-m8fsd", "Errors.IDPConfig.NotExisting")
 	}
-	idpModel := NewInstanceIdentityProviderWriteModel(instanceID, idpProvider.IDPConfigID)
+	idpModel := NewInstanceIdentityProviderWriteModel(ctx, idpProvider.IDPConfigID)
 	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
@@ -147,11 +147,11 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, insta
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, instanceID string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-66m9s", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
-	existingPolicy := NewInstanceLoginPolicyWriteModel(instanceID)
+	existingPolicy := NewInstanceLoginPolicyWriteModel(ctx)
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
@@ -160,7 +160,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Dfg4t", "Errors.IAM.LoginPolicy.NotFound")
 	}
 
-	idpModel := NewInstanceIdentityProviderWriteModel(instanceID, idpProvider.IDPConfigID)
+	idpModel := NewInstanceIdentityProviderWriteModel(ctx, idpProvider.IDPConfigID)
 	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
@@ -193,7 +193,7 @@ func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	for _, idp := range cascadeExternalIDPs {
 		userEvent, _, err := c.removeUserIDPLink(ctx, idp, true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-4nfsf", "userid", idp.AggregateID, "idp-id", idp.IDPConfigID).WithError(err).Warn("could not cascade remove externalidp in remove provider from policy")
+			logging.WithFields("COMMAND-4nfsf", "userid", idp.AggregateID, "idp-id", idp.IDPConfigID).WithError(err).Warn("could not cascade remove externalidp in remove provider from policy")
 			continue
 		}
 		events = append(events, userEvent)
@@ -201,11 +201,11 @@ func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	return events
 }
 
-func (c *Commands) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, instanceID string, secondFactor domain.SecondFactorType) (domain.SecondFactorType, *domain.ObjectDetails, error) {
+func (c *Commands) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (domain.SecondFactorType, *domain.ObjectDetails, error) {
 	if !secondFactor.Valid() {
 		return domain.SecondFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-5m9fs", "Errors.IAM.LoginPolicy.MFA.Unspecified")
 	}
-	secondFactorModel := NewInstanceSecondFactorWriteModel(instanceID, secondFactor)
+	secondFactorModel := NewInstanceSecondFactorWriteModel(ctx, secondFactor)
 	instanceAgg := InstanceAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 	event, err := c.addSecondFactorToDefaultLoginPolicy(ctx, instanceAgg, secondFactorModel, secondFactor)
 	if err != nil {
@@ -235,11 +235,11 @@ func (c *Commands) addSecondFactorToDefaultLoginPolicy(ctx context.Context, inst
 	return instance.NewLoginPolicySecondFactorAddedEvent(ctx, instanceAgg, secondFactor), nil
 }
 
-func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, instanceID string, secondFactor domain.SecondFactorType) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType) (*domain.ObjectDetails, error) {
 	if !secondFactor.Valid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-55n8s", "Errors.IAM.LoginPolicy.MFA.Unspecified")
 	}
-	secondFactorModel := NewInstanceSecondFactorWriteModel(instanceID, secondFactor)
+	secondFactorModel := NewInstanceSecondFactorWriteModel(ctx, secondFactor)
 	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return nil, err

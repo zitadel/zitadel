@@ -30,7 +30,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
-		instanceID    string
 		resourceOwner string
 		features      *domain.Features
 	}
@@ -52,8 +51,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
+				ctx: context.Background(),
 				features: &domain.Features{
 					TierName:                 "Test",
 					State:                    domain.FeaturesStateActive,
@@ -88,7 +86,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -121,7 +118,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -299,7 +295,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -512,7 +507,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -733,7 +727,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -964,7 +957,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -1281,7 +1273,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -1475,7 +1466,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -1513,7 +1503,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 				iamDomain:  tt.fields.iamDomain,
 				static:     tt.fields.static,
 			}
-			got, err := r.SetOrgFeatures(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.features)
+			got, err := r.SetOrgFeatures(tt.args.ctx, tt.args.resourceOwner, tt.args.features)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1534,7 +1524,6 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 	}
 	type args struct {
 		ctx           context.Context
-		instanceID    string
 		resourceOwner string
 	}
 	type res struct {
@@ -1571,7 +1560,6 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res: res{
@@ -1731,7 +1719,6 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
-				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 			},
 			res: res{
@@ -1747,7 +1734,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 				iamDomain:  tt.fields.iamDomain,
 			}
-			got, err := r.RemoveOrgFeatures(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner)
+			got, err := r.RemoveOrgFeatures(tt.args.ctx, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

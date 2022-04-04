@@ -8,7 +8,6 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -68,8 +67,7 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).InstanceID()
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID, instanceID)
+	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -89,8 +87,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).InstanceID()
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID, instanceID)
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -158,7 +155,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -239,7 +236,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

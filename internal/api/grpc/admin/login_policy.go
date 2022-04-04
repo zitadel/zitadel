@@ -23,7 +23,7 @@ func (s *Server) GetLoginPolicy(ctx context.Context, _ *admin_pb.GetLoginPolicyR
 }
 
 func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginPolicyRequest) (*admin_pb.UpdateLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), updateLoginPolicyToDomain(p))
+	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, updateLoginPolicyToDomain(p))
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLogi
 }
 
 func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPToLoginPolicyRequest) (*admin_pb.AddIDPToLoginPolicyResponse, error) {
-	idp, err := s.command.AddIDPProviderToDefaultLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), &domain.IDPProvider{IDPConfigID: req.IdpId})
+	idp, err := s.command.AddIDPProviderToDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId})
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.Rem
 		Queries: []query.SearchQuery{idpQuery},
 	})
 
-	objectDetails, err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(idps.Links)...)
+	objectDetails, err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(idps.Links)...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddSecondFactorToLoginPolicyRequest) (*admin_pb.AddSecondFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), policy_grpc.SecondFactorTypeToDomain(req.Type))
+	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *admin_pb
 }
 
 func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveSecondFactorFromLoginPolicyRequest) (*admin_pb.RemoveSecondFactorFromLoginPolicyResponse, error) {
-	objectDetails, err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, authz.GetInstance(ctx).InstanceID(), policy_grpc.SecondFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.RemoveSecondFactorFromDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}

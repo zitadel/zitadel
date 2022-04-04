@@ -53,7 +53,7 @@ func AddHumanCommand(instanceID string, a *user.Aggregate, human *AddHuman, pass
 		human.Phone = strings.TrimSpace(human.Phone)
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainPolicy, err := domainPolicyWriteModel(ctx, instanceID, filter)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
 			}
@@ -75,7 +75,7 @@ func AddHumanCommand(instanceID string, a *user.Aggregate, human *AddHuman, pass
 				cmd.AddPhoneData(human.Phone) //TODO: pass if verified
 			}
 			if human.Password != "" {
-				passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, instanceID, filter)
+				passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
 				if err != nil {
 					return nil, err
 				}
