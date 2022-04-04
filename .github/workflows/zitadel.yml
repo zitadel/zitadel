@@ -32,7 +32,7 @@ jobs:
         with:
           distribution: goreleaser
           version: v1.5.0
-          args: release --snapshot
+          args: release --snapshot --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag
@@ -45,7 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
-        if: ${{ github.event_name == 'workflow_dispatch' || steps.semantic.outputs.new-release-published == 'true' }}
+        if: ${{ steps.semantic.outputs.new-release-published == 'true' }}
         with:
           distribution: goreleaser
           version: v1.5.0
@@ -55,13 +55,13 @@ jobs:
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
       - name: Publish gRPC clients
         uses: actions/upload-artifact@v2
-        if: ${{ github.event_name == 'workflow_dispatch' || steps.semantic.outputs.new-release-published == 'true' }}
+        if: ${{ steps.semantic.outputs.new-release-published == 'true' }}
         with:
           name: grpc-clients
           path: .artifacts/grpc
       - name: Publish console
         uses: actions/upload-artifact@v2
-        if: ${{ github.event_name == 'workflow_dispatch' || steps.semantic.outputs.new-release-published == 'true' }}
+        if: ${{ steps.semantic.outputs.new-release-published == 'true' }}
         with:
           name: console
           path: .artifacts/console
