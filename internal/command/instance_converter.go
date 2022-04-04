@@ -196,10 +196,3 @@ func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
 		MaxActions:               wm.MaxActions,
 	}
 }
-
-func instanceDomainWriteModelToInstanceDomain(wm *InstanceDomainWriteModel) *domain.InstanceDomain {
-	return &domain.InstanceDomain{
-		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
-		Domain:     wm.Domain,
-	}
-}

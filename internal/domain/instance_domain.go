@@ -2,20 +2,7 @@ package domain
 
 import (
 	"strings"
-
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
-
-type InstanceDomain struct {
-	models.ObjectRoot
-
-	Domain    string
-	Generated bool
-}
-
-func (i *InstanceDomain) IsValid() bool {
-	return i.AggregateID != "" && i.Domain != ""
-}
 
 type InstanceDomainState int32
 
