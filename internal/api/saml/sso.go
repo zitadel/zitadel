@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
+	"reflect"
 	"regexp"
 )
 
@@ -157,8 +158,18 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 					authNRequest.ProtocolBinding == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
 		},
 		func() error {
-			authRequestForm.SigAlg = authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm
-			authRequestForm.Sig = authNRequest.Signature.SignatureValue.Text
+			if authNRequest.Signature != nil &&
+				!reflect.DeepEqual(authNRequest.Signature.SignedInfo, xml_dsig.SignedInfoType{}) &&
+				!reflect.DeepEqual(authNRequest.Signature.SignedInfo.SignatureMethod, xml_dsig.SignatureMethodType{}) &&
+				authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm == "" {
+				authRequestForm.SigAlg = authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm
+			}
+
+			if authNRequest.Signature != nil &&
+				!reflect.DeepEqual(authNRequest.Signature.SignatureValue, xml_dsig.SignatureValueType{}) &&
+				authNRequest.Signature.SignatureValue.Text == "" {
+				authRequestForm.Sig = authNRequest.Signature.SignatureValue.Text
+			}
 
 			authRequestForm.AuthRequest, err = authNRequestIntoStringWithoutSignature(authRequestForm.Encoding, authRequestForm.AuthRequest)
 			if err != nil {
@@ -181,6 +192,19 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 				(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue != xml_dsig.SignatureValueType{} && authNRequest.Signature.SignatureValue.Text != "")
 		},
 		func() error {
+			if authRequestForm.AuthRequest == "" {
+				return fmt.Errorf("no authrequest provided but required")
+			}
+			if authRequestForm.RelayState == "" {
+				return fmt.Errorf("no relaystate provided but required")
+			}
+			if authRequestForm.Sig == "" {
+				return fmt.Errorf("no signature provided but required")
+			}
+			if authRequestForm.SigAlg == "" {
+				return fmt.Errorf("no signature algorithm provided but required")
+			}
+
 			err = sp.verifySignature(
 				authRequestForm.AuthRequest,
 				authRequestForm.RelayState,
