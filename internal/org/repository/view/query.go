@@ -1,11 +1,9 @@
 package view
 
 import (
-	"time"
-
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 func OrgByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
@@ -18,39 +16,6 @@ func OrgByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, err
 
 func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate).
+		AggregateTypeFilter(org.AggregateType).
 		LatestSequenceFilter(latestSequence)
-}
-
-func OrgDomainUniqueQuery(domain string) *es_models.SearchQuery {
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgDomainAggregate).
-		AggregateIDFilter(domain).
-		OrderDesc().
-		SetLimit(1)
-}
-
-func OrgNameUniqueQuery(name string) *es_models.SearchQuery {
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgNameAggregate).
-		AggregateIDFilter(name).
-		OrderDesc().
-		SetLimit(1)
-}
-
-func ChangesQuery(orgID string, latestSequence, limit uint64, sortAscending bool, auditLogRetention time.Duration) *es_models.SearchQuery {
-	query := es_models.NewSearchQuery().
-		AggregateTypeFilter(model.OrgAggregate)
-
-	if !sortAscending {
-		query.OrderDesc()
-	}
-	if auditLogRetention > 0 {
-		query.CreationDateNewerFilter(time.Now().Add(-auditLogRetention))
-	}
-
-	query.LatestSequenceFilter(latestSequence).
-		AggregateIDFilter(orgID).
-		SetLimit(limit)
-	return query
 }

@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
 )
 
 type Password struct {
@@ -29,42 +29,6 @@ type PasswordCode struct {
 type PasswordChange struct {
 	Password
 	UserAgentID string `json:"userAgentID,omitempty"`
-}
-
-func PasswordFromModel(password *model.Password) *Password {
-	return &Password{
-		ObjectRoot:     password.ObjectRoot,
-		Secret:         password.SecretCrypto,
-		ChangeRequired: password.ChangeRequired,
-	}
-}
-
-func PasswordToModel(password *Password) *model.Password {
-	return &model.Password{
-		ObjectRoot:     password.ObjectRoot,
-		SecretCrypto:   password.Secret,
-		ChangeRequired: password.ChangeRequired,
-	}
-}
-
-func PasswordCodeToModel(code *PasswordCode) *model.PasswordCode {
-	return &model.PasswordCode{
-		ObjectRoot:       code.ObjectRoot,
-		Expiry:           code.Expiry,
-		Code:             code.Code,
-		NotificationType: model.NotificationType(code.NotificationType),
-	}
-}
-
-func PasswordChangeFromModel(password *model.Password, userAgentID string) *PasswordChange {
-	return &PasswordChange{
-		Password: Password{
-			ObjectRoot:     password.ObjectRoot,
-			Secret:         password.SecretCrypto,
-			ChangeRequired: password.ChangeRequired,
-		},
-		UserAgentID: userAgentID,
-	}
 }
 
 func (u *Human) appendUserPasswordChangedEvent(event *es_models.Event) error {

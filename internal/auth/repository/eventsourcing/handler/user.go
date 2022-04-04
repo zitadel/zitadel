@@ -6,6 +6,7 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -17,7 +18,6 @@ import (
 	query2 "github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/org"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -62,7 +62,7 @@ func (u *User) Subscription() *v1.Subscription {
 	return u.subscription
 }
 func (_ *User) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+	return []es_models.AggregateType{user_repo.AggregateType, org.AggregateType}
 }
 
 func (u *User) CurrentSequence() (uint64, error) {
@@ -85,9 +85,9 @@ func (u *User) EventQuery() (*es_models.SearchQuery, error) {
 
 func (u *User) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case es_model.UserAggregate:
+	case user_repo.AggregateType:
 		return u.ProcessUser(event)
-	case org_es_model.OrgAggregate:
+	case org.AggregateType:
 		return u.ProcessOrg(event)
 	default:
 		return nil
@@ -96,63 +96,63 @@ func (u *User) Reduce(event *es_models.Event) (err error) {
 
 func (u *User) ProcessUser(event *es_models.Event) (err error) {
 	user := new(view_model.UserView)
-	switch event.Type {
-	case es_model.UserAdded,
-		es_model.MachineAdded,
-		es_model.HumanAdded,
-		es_model.UserRegistered,
-		es_model.HumanRegistered:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserV1AddedType,
+		user_repo.MachineAddedEventType,
+		user_repo.HumanAddedType,
+		user_repo.UserV1RegisteredType,
+		user_repo.HumanRegisteredType:
 		err = user.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = u.fillLoginNames(user)
-	case es_model.UserProfileChanged,
-		es_model.UserEmailChanged,
-		es_model.UserEmailVerified,
-		es_model.UserPhoneChanged,
-		es_model.UserPhoneVerified,
-		es_model.UserPhoneRemoved,
-		es_model.UserAddressChanged,
-		es_model.UserDeactivated,
-		es_model.UserReactivated,
-		es_model.UserLocked,
-		es_model.UserUnlocked,
-		es_model.MFAOTPAdded,
-		es_model.MFAOTPVerified,
-		es_model.MFAOTPRemoved,
-		es_model.MFAInitSkipped,
-		es_model.UserPasswordChanged,
-		es_model.HumanProfileChanged,
-		es_model.HumanEmailChanged,
-		es_model.HumanEmailVerified,
-		es_model.HumanAvatarAdded,
-		es_model.HumanAvatarRemoved,
-		es_model.HumanPhoneChanged,
-		es_model.HumanPhoneVerified,
-		es_model.HumanPhoneRemoved,
-		es_model.HumanAddressChanged,
-		es_model.HumanMFAOTPAdded,
-		es_model.HumanMFAOTPVerified,
-		es_model.HumanMFAOTPRemoved,
-		es_model.HumanMFAU2FTokenAdded,
-		es_model.HumanMFAU2FTokenVerified,
-		es_model.HumanMFAU2FTokenRemoved,
-		es_model.HumanPasswordlessTokenAdded,
-		es_model.HumanPasswordlessTokenVerified,
-		es_model.HumanPasswordlessTokenRemoved,
-		es_model.HumanMFAInitSkipped,
-		es_model.MachineChanged,
-		es_model.HumanPasswordChanged,
-		es_models.EventType(user_repo.HumanPasswordlessInitCodeAddedType),
-		es_models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
+	case user_repo.UserV1ProfileChangedType,
+		user_repo.UserV1EmailChangedType,
+		user_repo.UserV1EmailVerifiedType,
+		user_repo.UserV1PhoneChangedType,
+		user_repo.UserV1PhoneVerifiedType,
+		user_repo.UserV1PhoneRemovedType,
+		user_repo.UserV1AddressChangedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserReactivatedType,
+		user_repo.UserLockedType,
+		user_repo.UserUnlockedType,
+		user_repo.UserV1MFAOTPAddedType,
+		user_repo.UserV1MFAOTPVerifiedType,
+		user_repo.UserV1MFAOTPRemovedType,
+		user_repo.UserV1MFAInitSkippedType,
+		user_repo.UserV1PasswordChangedType,
+		user_repo.HumanProfileChangedType,
+		user_repo.HumanEmailChangedType,
+		user_repo.HumanEmailVerifiedType,
+		user_repo.HumanAvatarAddedType,
+		user_repo.HumanAvatarRemovedType,
+		user_repo.HumanPhoneChangedType,
+		user_repo.HumanPhoneVerifiedType,
+		user_repo.HumanPhoneRemovedType,
+		user_repo.HumanAddressChangedType,
+		user_repo.HumanMFAOTPAddedType,
+		user_repo.HumanMFAOTPVerifiedType,
+		user_repo.HumanMFAOTPRemovedType,
+		user_repo.HumanU2FTokenAddedType,
+		user_repo.HumanU2FTokenVerifiedType,
+		user_repo.HumanU2FTokenRemovedType,
+		user_repo.HumanPasswordlessTokenAddedType,
+		user_repo.HumanPasswordlessTokenVerifiedType,
+		user_repo.HumanPasswordlessTokenRemovedType,
+		user_repo.HumanMFAInitSkippedType,
+		user_repo.MachineChangedEventType,
+		user_repo.HumanPasswordChangedType,
+		user_repo.HumanPasswordlessInitCodeAddedType,
+		user_repo.HumanPasswordlessInitCodeRequestedType:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
 		err = user.AppendEvent(event)
-	case es_model.DomainClaimed,
-		es_model.UserUserNameChanged:
+	case user_repo.UserDomainClaimedType,
+		user_repo.UserUserNameChangedType:
 		user, err = u.view.UserByID(event.AggregateID)
 		if err != nil {
 			return err
@@ -162,7 +162,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 			return err
 		}
 		err = u.fillLoginNames(user)
-	case es_model.UserRemoved:
+	case user_repo.UserRemovedType:
 		return u.view.DeleteUser(event.AggregateID, event)
 	default:
 		return u.view.ProcessedUserSequence(event)
@@ -184,14 +184,14 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 }
 
 func (u *User) ProcessOrg(event *es_models.Event) (err error) {
-	switch event.Type {
-	case org_es_model.OrgDomainVerified,
-		org_es_model.OrgDomainRemoved,
-		es_models.EventType(org.DomainPolicyAddedEventType),
-		es_models.EventType(org.DomainPolicyChangedEventType),
-		es_models.EventType(org.DomainPolicyRemovedEventType):
+	switch eventstore.EventType(event.Type) {
+	case org.OrgDomainVerifiedEventType,
+		org.OrgDomainRemovedEventType,
+		org.DomainPolicyAddedEventType,
+		org.DomainPolicyChangedEventType,
+		org.DomainPolicyRemovedEventType:
 		return u.fillLoginNamesOnOrgUsers(event)
-	case org_es_model.OrgDomainPrimarySet:
+	case org.OrgDomainPrimarySetEventType:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
 		return u.view.ProcessedUserSequence(event)

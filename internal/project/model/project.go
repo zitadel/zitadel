@@ -1,8 +1,6 @@
 package model
 
 import (
-	"github.com/golang/protobuf/ptypes/timestamp"
-
 	"github.com/caos/zitadel/internal/domain"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
@@ -21,21 +19,6 @@ type Project struct {
 	HasProjectCheck        bool
 	PrivateLabelingSetting domain.PrivateLabelingSetting
 }
-type ProjectChanges struct {
-	Changes      []*ProjectChange
-	LastSequence uint64
-}
-
-type ProjectChange struct {
-	ChangeDate        *timestamp.Timestamp `json:"changeDate,omitempty"`
-	EventType         string               `json:"eventType,omitempty"`
-	Sequence          uint64               `json:"sequence,omitempty"`
-	ModifierId        string               `json:"modifierUser,omitempty"`
-	ModifierName      string               `json:"-"`
-	ModifierLoginName string               `json:"-"`
-	ModifierAvatarURL string               `json:"-"`
-	Data              interface{}          `json:"data,omitempty"`
-}
 
 type ProjectState int32
 
@@ -44,10 +27,6 @@ const (
 	ProjectStateInactive
 	ProjectStateRemoved
 )
-
-func NewProject(id string) *Project {
-	return &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: id}, State: ProjectStateActive}
-}
 
 func (p *Project) IsActive() bool {
 	return p.State == ProjectStateActive

@@ -6,7 +6,6 @@ import (
 
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/org/model"
 )
 
 type OrgMember struct {
@@ -49,48 +48,4 @@ func (m *OrgMember) Changes(updatedMember *OrgMember) map[string]interface{} {
 	}
 
 	return changes
-}
-
-func OrgMemberFromEvent(member *OrgMember, event *es_models.Event) (*OrgMember, error) {
-	if member == nil {
-		member = new(OrgMember)
-	}
-	member.ObjectRoot.AppendEvent(event)
-	err := json.Unmarshal(event.Data, member)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "EVENT-D4qxo", "invalid event data")
-	}
-	return member, nil
-}
-
-func OrgMembersFromModel(members []*model.OrgMember) []*OrgMember {
-	convertedMembers := make([]*OrgMember, len(members))
-	for i, m := range members {
-		convertedMembers[i] = OrgMemberFromModel(m)
-	}
-	return convertedMembers
-}
-
-func OrgMemberFromModel(member *model.OrgMember) *OrgMember {
-	return &OrgMember{
-		ObjectRoot: member.ObjectRoot,
-		UserID:     member.UserID,
-		Roles:      member.Roles,
-	}
-}
-
-func OrgMembersToModel(members []*OrgMember) []*model.OrgMember {
-	convertedMembers := make([]*model.OrgMember, len(members))
-	for i, m := range members {
-		convertedMembers[i] = OrgMemberToModel(m)
-	}
-	return convertedMembers
-}
-
-func OrgMemberToModel(member *OrgMember) *model.OrgMember {
-	return &model.OrgMember{
-		ObjectRoot: member.ObjectRoot,
-		UserID:     member.UserID,
-		Roles:      member.Roles,
-	}
 }

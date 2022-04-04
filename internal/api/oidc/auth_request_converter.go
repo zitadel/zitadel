@@ -12,7 +12,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_utils "github.com/caos/zitadel/internal/api/http"
-	model2 "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/user/model"
@@ -207,8 +206,8 @@ func UILocalesToBusiness(tags []language.Tag) []string {
 
 func GetSelectedIDPIDFromScopes(scopes oidc.SpaceDelimitedArray) string {
 	for _, scope := range scopes {
-		if strings.HasPrefix(scope, model2.SelectIDPScope) {
-			return strings.TrimPrefix(scope, model2.SelectIDPScope)
+		if strings.HasPrefix(scope, domain.SelectIDPScope) {
+			return strings.TrimPrefix(scope, domain.SelectIDPScope)
 		}
 	}
 	return ""

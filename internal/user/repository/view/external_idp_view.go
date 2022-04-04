@@ -70,68 +70,6 @@ func ExternalIDPsByIDPConfigID(db *gorm.DB, table, idpConfigID string) ([]*model
 	return externalIDPs, err
 }
 
-func ExternalIDPsByIDPConfigIDAndResourceOwner(db *gorm.DB, table, idpConfigID, resourceOwner string) ([]*model.ExternalIDPView, error) {
-	externalIDPs := make([]*model.ExternalIDPView, 0)
-	idpConfigIDQuery := &usr_model.ExternalIDPSearchQuery{
-		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
-		Method: domain.SearchMethodEquals,
-		Value:  idpConfigID,
-	}
-	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
-		Key:    usr_model.ExternalIDPSearchKeyResourceOwner,
-		Method: domain.SearchMethodEquals,
-		Value:  resourceOwner,
-	}
-	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
-		Queries: []*usr_model.ExternalIDPSearchQuery{orgIDQuery, idpConfigIDQuery},
-	})
-	_, err := query(db, &externalIDPs)
-	return externalIDPs, err
-}
-
-func ExternalIDPsByIDPConfigIDAndResourceOwners(db *gorm.DB, table, idpConfigID string, resourceOwners []string) ([]*model.ExternalIDPView, error) {
-	externalIDPs := make([]*model.ExternalIDPView, 0)
-	idpConfigIDQuery := &usr_model.ExternalIDPSearchQuery{
-		Key:    usr_model.ExternalIDPSearchKeyIdpConfigID,
-		Method: domain.SearchMethodEquals,
-		Value:  idpConfigID,
-	}
-	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
-		Key:    usr_model.ExternalIDPSearchKeyResourceOwner,
-		Method: domain.SearchMethodIsOneOf,
-		Value:  resourceOwners,
-	}
-	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
-		Queries: []*usr_model.ExternalIDPSearchQuery{orgIDQuery, idpConfigIDQuery},
-	})
-	_, err := query(db, &externalIDPs)
-	return externalIDPs, err
-}
-
-func ExternalIDPsByUserID(db *gorm.DB, table, userID string) ([]*model.ExternalIDPView, error) {
-	externalIDPs := make([]*model.ExternalIDPView, 0)
-	orgIDQuery := &usr_model.ExternalIDPSearchQuery{
-		Key:    usr_model.ExternalIDPSearchKeyUserID,
-		Method: domain.SearchMethodEquals,
-		Value:  userID,
-	}
-	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{
-		Queries: []*usr_model.ExternalIDPSearchQuery{orgIDQuery},
-	})
-	_, err := query(db, &externalIDPs)
-	return externalIDPs, err
-}
-
-func SearchExternalIDPs(db *gorm.DB, table string, req *usr_model.ExternalIDPSearchRequest) ([]*model.ExternalIDPView, uint64, error) {
-	externalIDPs := make([]*model.ExternalIDPView, 0)
-	query := repository.PrepareSearchQuery(table, model.ExternalIDPSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})
-	count, err := query(db, &externalIDPs)
-	if err != nil {
-		return nil, 0, err
-	}
-	return externalIDPs, count, nil
-}
-
 func PutExternalIDPs(db *gorm.DB, table string, externalIDPs ...*model.ExternalIDPView) error {
 	save := repository.PrepareBulkSave(table)
 	u := make([]interface{}, len(externalIDPs))
