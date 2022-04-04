@@ -258,11 +258,3 @@ func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, se
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
 }
-
-func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, requiredFeatures ...string) error {
-	features, err := repo.Query.DefaultFeatures(ctx)
-	if err != nil {
-		return err
-	}
-	return checkFeatures(features, requiredFeatures...)
-}

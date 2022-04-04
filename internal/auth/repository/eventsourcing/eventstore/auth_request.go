@@ -8,12 +8,12 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -21,9 +21,9 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	project_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -842,7 +842,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 				LoginName:         session.LoginName,
 				ResourceOwner:     session.ResourceOwner,
 				AvatarKey:         session.AvatarKey,
-				UserSessionState:  model.UserSessionStateToDomain(session.State),
+				UserSessionState:  session.State,
 				SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
 			})
 		}
@@ -888,7 +888,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
 	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
-	promptRequired := (model.MFALevelToDomain(user.MFAMaxSetUp) < mfaLevel) || (len(allowedProviders) == 0 && required)
+	promptRequired := (user.MFAMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user, request) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
@@ -912,14 +912,14 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		fallthrough
 	case domain.MFALevelSecondFactor:
 		if checkVerificationTimeMaxAge(userSession.SecondFactorVerification, request.LoginPolicy.SecondFactorCheckLifetime, request) {
-			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.SecondFactorVerificationType))
+			request.MFAsVerified = append(request.MFAsVerified, userSession.SecondFactorVerificationType)
 			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
 	case domain.MFALevelMultiFactor:
 		if checkVerificationTimeMaxAge(userSession.MultiFactorVerification, request.LoginPolicy.MultiFactorCheckLifetime, request) {
-			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.MultiFactorVerificationType))
+			request.MFAsVerified = append(request.MFAsVerified, userSession.MultiFactorVerificationType)
 			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
 		}
@@ -930,7 +930,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 }
 
 func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, request *domain.AuthRequest) bool {
-	if user.MFAMaxSetUp > model.MFALevelNotSetUp {
+	if user.MFAMaxSetUp > domain.MFALevelNotSetUp {
 		return true
 	}
 	return checkVerificationTime(user.MFAInitSkipped, request.LoginPolicy.MFAInitSkipLifetime)
@@ -1094,24 +1094,24 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	}
 	sessionCopy := *session
 	for _, event := range events {
-		switch event.Type {
-		case es_model.UserPasswordCheckSucceeded,
-			es_model.UserPasswordCheckFailed,
-			es_model.MFAOTPCheckSucceeded,
-			es_model.MFAOTPCheckFailed,
-			es_model.SignedOut,
-			es_model.UserLocked,
-			es_model.UserDeactivated,
-			es_model.HumanPasswordCheckSucceeded,
-			es_model.HumanPasswordCheckFailed,
-			es_model.HumanExternalLoginCheckSucceeded,
-			es_model.HumanMFAOTPCheckSucceeded,
-			es_model.HumanMFAOTPCheckFailed,
-			es_model.HumanSignedOut,
-			es_model.HumanPasswordlessTokenCheckSucceeded,
-			es_model.HumanPasswordlessTokenCheckFailed,
-			es_model.HumanMFAU2FTokenCheckSucceeded,
-			es_model.HumanMFAU2FTokenCheckFailed:
+		switch eventstore.EventType(event.Type) {
+		case user_repo.UserV1PasswordCheckSucceededType,
+			user_repo.UserV1PasswordCheckFailedType,
+			user_repo.UserV1MFAOTPCheckSucceededType,
+			user_repo.UserV1MFAOTPCheckFailedType,
+			user_repo.UserV1SignedOutType,
+			user_repo.UserLockedType,
+			user_repo.UserDeactivatedType,
+			user_repo.HumanPasswordCheckSucceededType,
+			user_repo.HumanPasswordCheckFailedType,
+			user_repo.UserIDPLoginCheckSucceededType,
+			user_repo.HumanMFAOTPCheckSucceededType,
+			user_repo.HumanMFAOTPCheckFailedType,
+			user_repo.HumanSignedOutType,
+			user_repo.HumanPasswordlessTokenCheckSucceededType,
+			user_repo.HumanPasswordlessTokenCheckFailedType,
+			user_repo.HumanU2FTokenCheckSucceededType,
+			user_repo.HumanU2FTokenCheckFailedType:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
@@ -1120,7 +1120,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			if eventData.UserAgentID != agentID {
 				continue
 			}
-		case es_model.UserRemoved:
+		case user_repo.UserRemovedType:
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
 		err := sessionCopy.AppendEvent(event)

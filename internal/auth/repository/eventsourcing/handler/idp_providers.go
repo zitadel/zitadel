@@ -6,15 +6,17 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	query2 "github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 const (
@@ -61,8 +63,8 @@ func (i *IDPProvider) Subscription() *v1.Subscription {
 	return i.subscription
 }
 
-func (_ *IDPProvider) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
+func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
+	return []es_models.AggregateType{instance.AggregateType, org.AggregateType}
 }
 
 func (i *IDPProvider) CurrentSequence() (uint64, error) {
@@ -73,7 +75,7 @@ func (i *IDPProvider) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPProvider) EventQuery() (*es_models.SearchQuery, error) {
+func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return nil, err
@@ -83,31 +85,31 @@ func (i *IDPProvider) EventQuery() (*es_models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (i *IDPProvider) Reduce(event *es_models.Event) (err error) {
+func (i *IDPProvider) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IAMAggregate, org_es_model.OrgAggregate:
+	case instance.AggregateType, org.AggregateType:
 		err = i.processIdpProvider(event)
 	}
 	return err
 }
 
-func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
+func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 	provider := new(iam_view_model.IDPProviderView)
-	switch event.Type {
-	case model.LoginPolicyIDPProviderAdded, org_es_model.LoginPolicyIDPProviderAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.LoginPolicyIDPProviderAddedEventType, org.LoginPolicyIDPProviderAddedEventType:
 		err = provider.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = i.fillData(provider)
-	case model.LoginPolicyIDPProviderRemoved, model.LoginPolicyIDPProviderCascadeRemoved,
-		org_es_model.LoginPolicyIDPProviderRemoved, org_es_model.LoginPolicyIDPProviderCascadeRemoved:
+	case instance.LoginPolicyIDPProviderRemovedEventType, instance.LoginPolicyIDPProviderCascadeRemovedEventType,
+		org.LoginPolicyIDPProviderRemovedEventType, org.LoginPolicyIDPProviderCascadeRemovedEventType:
 		err = provider.SetData(event)
 		if err != nil {
 			return err
 		}
 		return i.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event)
-	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
+	case instance.IDPConfigChangedEventType, org.IDPConfigChangedEventType:
 		esConfig := new(iam_view_model.IDPConfigView)
 		providerType := iam_model.IDPProviderTypeSystem
 		if event.AggregateID != event.InstanceID {
@@ -131,7 +133,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 			i.fillConfigData(provider, config)
 		}
 		return i.view.PutIDPProviders(event, providers...)
-	case org_es_model.LoginPolicyRemoved:
+	case org.LoginPolicyRemovedEventType:
 		return i.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event)
 	default:
 		return i.view.ProcessedIDPProviderSequence(event)

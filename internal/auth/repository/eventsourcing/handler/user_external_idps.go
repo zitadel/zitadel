@@ -7,16 +7,17 @@ import (
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	query2 "github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/user"
 	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -65,7 +66,7 @@ func (i *ExternalIDP) Subscription() *v1.Subscription {
 }
 
 func (_ *ExternalIDP) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{model.UserAggregate, iam_es_model.IAMAggregate, org_es_model.OrgAggregate}
+	return []es_models.AggregateType{user.AggregateType, instance.AggregateType, org.AggregateType}
 }
 
 func (i *ExternalIDP) CurrentSequence() (uint64, error) {
@@ -88,9 +89,9 @@ func (i *ExternalIDP) EventQuery() (*es_models.SearchQuery, error) {
 
 func (i *ExternalIDP) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case model.UserAggregate:
+	case user.AggregateType:
 		err = i.processUser(event)
-	case iam_es_model.IAMAggregate, org_es_model.OrgAggregate:
+	case instance.AggregateType, org.AggregateType:
 		err = i.processIdpConfig(event)
 	}
 	return err
@@ -98,20 +99,20 @@ func (i *ExternalIDP) Reduce(event *es_models.Event) (err error) {
 
 func (i *ExternalIDP) processUser(event *es_models.Event) (err error) {
 	externalIDP := new(usr_view_model.ExternalIDPView)
-	switch event.Type {
-	case model.HumanExternalIDPAdded:
+	switch eventstore.EventType(event.Type) {
+	case user.UserIDPLinkAddedType:
 		err = externalIDP.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = i.fillData(externalIDP)
-	case model.HumanExternalIDPRemoved, model.HumanExternalIDPCascadeRemoved:
+	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		err = externalIDP.SetData(event)
 		if err != nil {
 			return err
 		}
 		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event)
-	case model.UserRemoved:
+	case user.UserRemovedType:
 		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event)
 	default:
 		return i.view.ProcessedExternalIDPSequence(event)
@@ -123,11 +124,11 @@ func (i *ExternalIDP) processUser(event *es_models.Event) (err error) {
 }
 
 func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
-	switch event.Type {
-	case iam_es_model.IDPConfigChanged, org_es_model.IDPConfigChanged:
+	switch eventstore.EventType(event.Type) {
+	case instance.IDPConfigChangedEventType, org.IDPConfigChangedEventType:
 		configView := new(iam_view_model.IDPConfigView)
 		config := new(query2.IDP)
-		if event.Type == iam_es_model.IDPConfigChanged {
+		if eventstore.EventType(event.Type) == instance.IDPConfigChangedEventType {
 			configView.AppendEvent(iam_model.IDPProviderTypeSystem, event)
 		} else {
 			configView.AppendEvent(iam_model.IDPProviderTypeOrg, event)
@@ -136,7 +137,7 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		if event.AggregateType == iam_es_model.IAMAggregate {
+		if event.AggregateType == instance.AggregateType {
 			config, err = i.getDefaultIDPConfig(event.InstanceID, configView.IDPConfigID)
 		} else {
 			config, err = i.getOrgIDPConfig(event.InstanceID, event.AggregateID, configView.IDPConfigID)

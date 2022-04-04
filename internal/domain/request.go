@@ -5,6 +5,7 @@ const (
 	OrgDomainPrimaryClaim = "urn:zitadel:iam:org:domain:primary"
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
 	AudSuffix             = ":aud"
+	SelectIDPScope        = "urn:zitadel:iam:org:idp:id:"
 )
 
 //TODO: Change AuthRequest to interface and let oidcauthreqesut implement it

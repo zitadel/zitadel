@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"time"
 
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/query"
-
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 const (
@@ -53,12 +53,14 @@ func PasswordComplexityViewToModel(policy *query.PasswordComplexityPolicy) *mode
 func (i *PasswordComplexityPolicyView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.PasswordComplexityPolicyAdded, org_es_model.PasswordComplexityPolicyAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.PasswordComplexityPolicyAddedEventType,
+		org.PasswordComplexityPolicyAddedEventType:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
-	case es_model.PasswordComplexityPolicyChanged, org_es_model.PasswordComplexityPolicyChanged:
+	case instance.PasswordComplexityPolicyChangedEventType,
+		org.PasswordComplexityPolicyChangedEventType:
 		err = i.SetData(event)
 	}
 	return err
