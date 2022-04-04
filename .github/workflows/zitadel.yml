@@ -27,8 +27,8 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Test
-        run: go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
+#      - name: Test
+#        run: go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
       - name: Build
         uses: goreleaser/goreleaser-action@v2
         with:
