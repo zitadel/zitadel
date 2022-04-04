@@ -2412,7 +2412,7 @@ service ManagementService {
     // The default text of the IAM will trigger after
     rpc ResetCustomPasswordResetMessageTextToDefault(ResetCustomPasswordResetMessageTextToDefaultRequest) returns (ResetCustomPasswordResetMessageTextToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/text/message/verifyemail/{language}"
+            delete: "/text/message/passwordreset/{language}"
         };
 
         option (zitadel.v1.auth_option) = {

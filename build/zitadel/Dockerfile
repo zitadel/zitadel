@@ -17,7 +17,10 @@ ENV PROTOC_ARCH x86_64
 FROM ${BUILDARCH}-base AS base
 ARG PROTOC_VERSION=3.18.0
 ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
-ARG GATEWAY_VERSION=2.6.0
+ARG GATEWAY_VERSION=2.10.0
+#0.6.3+ has an issue with enums and imports:
+#https://github.com/envoyproxy/protoc-gen-validate/issues/565
+#https://github.com/envoyproxy/protoc-gen-validate/issues/552
 ARG VALIDATOR_VERSION=0.6.2
 
 RUN apk add tar curl rsync

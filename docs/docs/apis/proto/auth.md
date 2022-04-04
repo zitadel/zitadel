@@ -550,7 +550,7 @@ Returns a list of features, which are allowed on these organisation based on the
 > **rpc** ListMyZitadelPermissions([ListMyZitadelPermissionsRequest](#listmyzitadelpermissionsrequest))
 [ListMyZitadelPermissionsResponse](#listmyzitadelpermissionsresponse)
 
-Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g *ORG_OWNER*)
+Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g ORG_OWNER)
 
 
 
