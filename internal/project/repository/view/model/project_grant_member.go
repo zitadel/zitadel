@@ -7,11 +7,10 @@ import (
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 const (
@@ -43,43 +42,15 @@ type ProjectGrantMemberView struct {
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func ProjectGrantMemberToModel(member *ProjectGrantMemberView, prefixAvatarURL string) *model.ProjectGrantMemberView {
-	return &model.ProjectGrantMemberView{
-		UserID:             member.UserID,
-		GrantID:            member.GrantID,
-		ProjectID:          member.ProjectID,
-		UserName:           member.UserName,
-		Email:              member.Email,
-		FirstName:          member.FirstName,
-		LastName:           member.LastName,
-		DisplayName:        member.DisplayName,
-		PreferredLoginName: member.PreferredLoginName,
-		AvatarURL:          domain.AvatarURL(prefixAvatarURL, member.UserResourceOwner, member.AvatarKey),
-		UserResourceOwner:  member.UserResourceOwner,
-		Roles:              member.Roles,
-		Sequence:           member.Sequence,
-		CreationDate:       member.CreationDate,
-		ChangeDate:         member.ChangeDate,
-	}
-}
-
-func ProjectGrantMembersToModel(roles []*ProjectGrantMemberView, prefixAvatarURL string) []*model.ProjectGrantMemberView {
-	result := make([]*model.ProjectGrantMemberView, len(roles))
-	for i, r := range roles {
-		result[i] = ProjectGrantMemberToModel(r, prefixAvatarURL)
-	}
-	return result
-}
-
 func (r *ProjectGrantMemberView) AppendEvent(event *models.Event) (err error) {
 	r.Sequence = event.Sequence
 	r.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.ProjectGrantMemberAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.GrantMemberAddedType:
 		r.setRootData(event)
 		r.CreationDate = event.CreationDate
 		err = r.SetData(event)
-	case es_model.ProjectGrantMemberChanged:
+	case project.GrantMemberChangedType:
 		err = r.SetData(event)
 	}
 	return err

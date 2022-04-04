@@ -101,7 +101,7 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	query, scan := prepareActionsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).
 		ToSql()
 	if err != nil {
@@ -126,7 +126,7 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*
 		sq.Eq{
 			ActionColumnID.identifier():            id,
 			ActionColumnResourceOwner.identifier(): orgID,
-			ActionColumnInstanceID.identifier():    authz.GetInstance(ctx).ID,
+			ActionColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")

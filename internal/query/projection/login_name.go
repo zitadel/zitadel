@@ -107,7 +107,7 @@ func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameDomainIsPrimaryCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginNameDomainIsPrimaryCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LoginNameDomainResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameDomainInstanceIDCol, crdb.ColumnTypeText),
 		},

@@ -43,7 +43,7 @@ func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(OrgColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(OrgColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OrgColumnName, crdb.ColumnTypeText),
-			crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText, crdb.Default("")),
 		},
 			crdb.NewPrimaryKey(OrgColumnInstanceID, OrgColumnID),
 			crdb.WithIndex(crdb.NewIndex("domain_idx", []string{OrgColumnDomain})),

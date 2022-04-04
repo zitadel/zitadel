@@ -44,6 +44,7 @@ func New(
 	},
 	authZ internal_authz.Config,
 	externalSecure bool,
+	http2HostName string,
 ) *API {
 	verifier := internal_authz.Start(repo)
 	api := &API{
@@ -53,7 +54,7 @@ func New(
 		router:         router,
 		externalSecure: externalSecure,
 	}
-	api.grpcServer = server.CreateServer(api.verifier, authZ, repo.Queries)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, repo.Queries, http2HostName)
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())

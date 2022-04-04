@@ -73,5 +73,5 @@ func (h *handler) QueryLimit() uint64 {
 }
 
 func withInstanceID(ctx context.Context, instanceID string) context.Context {
-	return authz.WithInstance(ctx, authz.Instance{ID: instanceID})
+	return authz.WithInstanceID(ctx, instanceID)
 }

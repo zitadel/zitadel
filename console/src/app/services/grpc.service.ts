@@ -34,7 +34,7 @@ export class GrpcService {
       .get('./assets/environment.json')
       .toPromise()
       .then((data: any) => {
-        if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
+        if (data && data.api && data.issuer) {
           const interceptors = {
             unaryInterceptors: [
               new OrgInterceptor(this.storageService),
@@ -44,20 +44,19 @@ export class GrpcService {
           };
 
           this.auth = new AuthServiceClient(
-            data.authServiceUrl,
+            data.api,
             null,
             // @ts-ignore
             interceptors,
           );
           this.mgmt = new ManagementServiceClient(
-            data.mgmtServiceUrl,
+            data.api,
             null,
             // @ts-ignore
             interceptors,
           );
           this.admin = new AdminServiceClient(
-            // TODO: replace with service url
-            data.mgmtServiceUrl,
+            data.api,
             null,
             // @ts-ignore
             interceptors,

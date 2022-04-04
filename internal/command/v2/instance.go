@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/ui/console"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
@@ -59,6 +60,19 @@ type InstanceSetup struct {
 		TOSLink     string
 		PrivacyLink string
 		HelpLink    string
+	}
+	LabelPolicy struct {
+		PrimaryColor        string
+		BackgroundColor     string
+		WarnColor           string
+		FontColor           string
+		PrimaryColorDark    string
+		BackgroundColorDark string
+		WarnColorDark       string
+		FontColorDark       string
+		HideLoginNameSuffix bool
+		ErrorMsgPopup       bool
+		DisableWatermark    bool
 	}
 	LockoutPolicy struct {
 		MaxAttempts              uint64
@@ -117,6 +131,7 @@ func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*dom
 	// if err != nil {
 	// 	return nil, err
 	// }
+	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, "system"), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -178,6 +193,22 @@ func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*dom
 		AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
 		AddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
+		AddDefaultLabelPolicy(
+			instanceAgg,
+			setup.LabelPolicy.PrimaryColor,
+			setup.LabelPolicy.BackgroundColor,
+			setup.LabelPolicy.WarnColor,
+			setup.LabelPolicy.FontColor,
+			setup.LabelPolicy.PrimaryColorDark,
+			setup.LabelPolicy.BackgroundColorDark,
+			setup.LabelPolicy.WarnColorDark,
+			setup.LabelPolicy.FontColorDark,
+			setup.LabelPolicy.HideLoginNameSuffix,
+			setup.LabelPolicy.ErrorMsgPopup,
+			setup.LabelPolicy.DisableWatermark,
+		),
+		ActivateDefaultLabelPolicy(instanceAgg),
+
 		AddEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
 
@@ -189,9 +220,9 @@ func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*dom
 		AddOrg(orgAgg, setup.Org.Name, c.iamDomain),
 		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.phoneAlg, c.initCodeAlg),
 		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
+		AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
 
 		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
-
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
 		AddAPIApp(
@@ -254,6 +285,7 @@ func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*dom
 
 			nil,
 		),
+		SetIAMConsoleID(instanceAgg, setup.Zitadel.consoleClientID),
 	)
 
 	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, validations...)
@@ -272,12 +304,23 @@ func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*dom
 	}, nil
 }
 
-//SetIAMProject defines the commands to set the id of the IAM project onto the instance
+//SetIAMProject defines the command to set the id of the IAM project onto the instance
 func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
 				instance.NewIAMProjectSetEvent(ctx, &a.Aggregate, projectID),
+			}, nil
+		}, nil
+	}
+}
+
+//SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+func SetIAMConsoleID(a *instance.Aggregate, clientID string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID),
 			}, nil
 		}, nil
 	}

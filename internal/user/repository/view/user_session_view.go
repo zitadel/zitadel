@@ -3,7 +3,6 @@ package view
 import (
 	"github.com/jinzhu/gorm"
 
-	auth_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -63,7 +62,7 @@ func ActiveUserSessions(db *gorm.DB, table string) (uint64, error) {
 	activeQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyState,
 		Method: domain.SearchMethodEquals,
-		Value:  auth_model.UserSessionStateActive,
+		Value:  domain.UserSessionStateActive,
 	}
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
 		Queries: []*usr_model.UserSessionSearchQuery{activeQuery},

@@ -1,8 +1,10 @@
 package console
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
@@ -10,6 +12,8 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 )
@@ -24,10 +28,14 @@ type spaHandler struct {
 	fileSystem http.FileSystem
 }
 
+var (
+	//go:embed static/*
+	static embed.FS
+)
+
 const (
-	envRequestPath    = "/assets/environment.json"
-	consoleDefaultDir = "./console/"
-	HandlerPrefix     = "/ui/console"
+	envRequestPath = "/assets/environment.json"
+	HandlerPrefix  = "/ui/console"
 )
 
 var (
@@ -51,18 +59,11 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(config Config, domain, url, issuer, clientID string) (http.Handler, error) {
-	environmentJSON, err := createEnvironmentJSON(url, issuer, clientID)
+func Start(config Config, domain, url, issuer string, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
+	fSys, err := fs.Sub(static, "static")
 	if err != nil {
-		return nil, fmt.Errorf("unable to marshal env for console: %w", err)
+		return nil, err
 	}
-
-	consoleDir := consoleDefaultDir
-	if config.ConsoleOverwriteDir != "" {
-		consoleDir = config.ConsoleOverwriteDir
-	}
-	consoleHTTPDir := http.Dir(consoleDir)
-
 	cache := assetsCacheInterceptorIgnoreManifest(
 		config.ShortCache.MaxAge,
 		config.ShortCache.SharedMaxAge,
@@ -72,11 +73,21 @@ func Start(config Config, domain, url, issuer, clientID string) (http.Handler, e
 	security := middleware.SecurityHeaders(csp(domain), nil)
 
 	handler := &http.ServeMux{}
-	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
-	handler.Handle(envRequestPath, cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write(environmentJSON)
+	handler.Handle("/", cache(security(http.FileServer(&spaHandler{http.FS(fSys)}))))
+	handler.Handle(envRequestPath, instanceHandler(cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		instance := authz.GetInstance(r.Context())
+		if instance.InstanceID() == "" {
+			http.Error(w, "empty instanceID", http.StatusInternalServerError)
+			return
+		}
+		environmentJSON, err := createEnvironmentJSON(url, issuer, instance.ConsoleClientID())
+		if err != nil {
+			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
+			return
+		}
+		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
-	}))))
+	})))))
 	return handler, nil
 }
 
@@ -92,23 +103,15 @@ func csp(zitadelDomain string) *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(url, issuer, clientID string) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID string) ([]byte, error) {
 	environment := struct {
-		AuthServiceUrl         string `json:"authServiceUrl,omitempty"`
-		MgmtServiceUrl         string `json:"mgmtServiceUrl,omitempty"`
-		AdminServiceUrl        string `json:"adminServiceUrl,omitempty"`
-		SubscriptionServiceUrl string `json:"subscriptionServiceUrl,omitempty"`
-		AssetServiceUrl        string `json:"assetServiceUrl,omitempty"`
-		Issuer                 string `json:"issuer,omitempty"`
-		ClientID               string `json:"clientid,omitempty"`
+		API      string `json:"api,omitempty"`
+		Issuer   string `json:"issuer,omitempty"`
+		ClientID string `json:"clientid,omitempty"`
 	}{
-		AuthServiceUrl:         url,
-		MgmtServiceUrl:         url,
-		AdminServiceUrl:        url,
-		SubscriptionServiceUrl: url,
-		AssetServiceUrl:        url,
-		Issuer:                 issuer,
-		ClientID:               clientID,
+		API:      api,
+		Issuer:   issuer,
+		ClientID: clientID,
 	}
 	return json.Marshal(environment)
 }

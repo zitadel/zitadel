@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
@@ -46,7 +44,7 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
 	}
-	instanceID := authz.GetInstance(ctx).ID
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID, instanceID)
 	if err != nil {
 		return nil, err
@@ -58,7 +56,7 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	instanceID := authz.GetInstance(ctx).ID
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	resp, err := o.repo.AuthRequestByCode(ctx, code, instanceID)
 	if err != nil {
 		return nil, err
@@ -73,7 +71,7 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
 	}
-	instanceID := authz.GetInstance(ctx).ID
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	return o.repo.SaveAuthCode(ctx, id, code, userAgentID, instanceID)
 }
 
@@ -81,7 +79,7 @@ func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	instanceID := authz.GetInstance(ctx).ID
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	return o.repo.DeleteAuthRequest(ctx, id, instanceID)
 }
 
@@ -100,16 +98,6 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		return "", time.Time{}, err
 	}
 	return resp.TokenID, resp.Expiration, nil
-}
-
-func grantsToScopes(grants []*grant_model.UserGrantView) []string {
-	scopes := make([]string, 0)
-	for _, grant := range grants {
-		for _, role := range grant.RoleKeys {
-			scopes = append(scopes, fmt.Sprintf("%v:%v", grant.ResourceOwner, role))
-		}
-	}
-	return scopes
 }
 
 func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {

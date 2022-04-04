@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
 )
 
 type Address struct {
@@ -37,28 +37,6 @@ func (a *Address) Changes(changed *Address) map[string]interface{} {
 		changes["streetAddress"] = changed.StreetAddress
 	}
 	return changes
-}
-
-func AddressFromModel(address *model.Address) *Address {
-	return &Address{
-		ObjectRoot:    address.ObjectRoot,
-		Country:       address.Country,
-		Locality:      address.Locality,
-		PostalCode:    address.PostalCode,
-		Region:        address.Region,
-		StreetAddress: address.StreetAddress,
-	}
-}
-
-func AddressToModel(address *Address) *model.Address {
-	return &model.Address{
-		ObjectRoot:    address.ObjectRoot,
-		Country:       address.Country,
-		Locality:      address.Locality,
-		PostalCode:    address.PostalCode,
-		Region:        address.Region,
-		StreetAddress: address.StreetAddress,
-	}
 }
 
 func (u *Human) appendUserAddressChangedEvent(event *es_models.Event) error {

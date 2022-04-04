@@ -44,8 +44,3 @@ func DeleteOrgProjectMappingsByProjectGrantID(db *gorm.DB, table, projectGrantID
 	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyProjectGrantID), projectGrantID)
 	return delete(db)
 }
-
-func DeleteOrgProjectMappingsByOrgID(db *gorm.DB, table, orgID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyOrgID), orgID)
-	return delete(db)
-}

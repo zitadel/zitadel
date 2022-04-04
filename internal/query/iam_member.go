@@ -65,7 +65,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery) (*Me
 	query, scan := prepareInstanceMembersQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")

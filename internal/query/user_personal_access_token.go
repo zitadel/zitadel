@@ -87,7 +87,7 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, id string, querie
 	}
 	stmt, args, err := query.Where(sq.Eq{
 		PersonalAccessTokenColumnID.identifier():         id,
-		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgfb4", "Errors.Query.SQLStatment")
@@ -101,7 +101,7 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 	query, scan := preparePersonalAccessTokensQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+			PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Hjw2w", "Errors.Query.InvalidRequest")

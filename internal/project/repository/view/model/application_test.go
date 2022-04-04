@@ -2,10 +2,12 @@ package model
 
 import (
 	"encoding/json"
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"testing"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 func mockAppData(app *es_model.Application) []byte {
@@ -31,7 +33,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append added app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ApplicationAdded, Data: mockAppData(&es_model.Application{Name: "AppName"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationAddedType), Data: mockAppData(&es_model.Application{Name: "AppName"})},
 				app:   &ApplicationView{},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
@@ -39,7 +41,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append changed app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ApplicationChanged, Data: mockAppData(&es_model.Application{Name: "AppNameChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationChangedType), Data: mockAppData(&es_model.Application{Name: "AppNameChanged"})},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppNameChanged", State: int32(model.AppStateActive)},
@@ -47,7 +49,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ApplicationDeactivated},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationDeactivatedType)},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateInactive)},
@@ -55,7 +57,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append reactivate app event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ApplicationReactivated},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ApplicationReactivatedType)},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateInactive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
@@ -63,7 +65,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append added oidc config event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.OIDCConfigAdded, Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientID"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.OIDCConfigAddedType), Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientID"})},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", IsOIDC: true, OIDCClientID: "clientID", State: int32(model.AppStateActive)},
@@ -71,7 +73,7 @@ func TestApplicationAppendEvent(t *testing.T) {
 		{
 			name: "append changed oidc config event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.OIDCConfigAdded, Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientIDChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.OIDCConfigAddedType), Data: mockOIDCConfigData(&es_model.OIDCConfig{ClientID: "clientIDChanged"})},
 				app:   &ApplicationView{ProjectID: "AggregateID", Name: "AppName", OIDCClientID: "clientID", State: int32(model.AppStateActive)},
 			},
 			result: &ApplicationView{ProjectID: "AggregateID", Name: "AppName", IsOIDC: true, OIDCClientID: "clientIDChanged", State: int32(model.AppStateActive)},

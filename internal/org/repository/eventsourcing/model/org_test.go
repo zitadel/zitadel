@@ -6,6 +6,7 @@ import (
 
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 func TestOrgFromEvents(t *testing.T) {
@@ -22,7 +23,7 @@ func TestOrgFromEvents(t *testing.T) {
 			name: "org from events, ok",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "ID", Sequence: 1, Type: OrgAdded},
+					{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgAddedEventType)},
 				},
 				org: &Org{Name: "OrgName"},
 			},
@@ -32,7 +33,7 @@ func TestOrgFromEvents(t *testing.T) {
 			name: "org from events, nil org",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "ID", Sequence: 1, Type: OrgAdded},
+					{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgAddedEventType)},
 				},
 				org: nil,
 			},
@@ -66,7 +67,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append added event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgAdded},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgAddedEventType)},
 				org:   &Org{Name: "OrgName"},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive), Name: "OrgName"},
@@ -74,7 +75,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgChanged, Data: []byte(`{"name": "OrgName}`)},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgChangedEventType), Data: []byte(`{"name": "OrgName}`)},
 				org:   &Org{Name: "OrgNameChanged"},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive), Name: "OrgNameChanged"},
@@ -82,14 +83,14 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgDeactivated},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgDeactivatedEventType)},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: OrgReactivated},
+				event: &es_models.Event{AggregateID: "ID", Sequence: 1, Type: es_models.EventType(org.OrgReactivatedEventType)},
 			},
 			result: &Org{ObjectRoot: es_models.ObjectRoot{AggregateID: "ID"}, State: int32(model.OrgStateActive)},
 		},

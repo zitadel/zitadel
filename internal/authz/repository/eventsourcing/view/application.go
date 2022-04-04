@@ -8,8 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (v *View) ApplicationByOIDCClientID(clientID string) (*query.App, error) {
-	return v.Query.AppByOIDCClientID(context.TODO(), clientID)
+func (v *View) ApplicationByOIDCClientID(ctx context.Context, clientID string) (*query.App, error) {
+	return v.Query.AppByOIDCClientID(ctx, clientID)
 }
 
 func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, appName string) (_ *query.App, err error) {
