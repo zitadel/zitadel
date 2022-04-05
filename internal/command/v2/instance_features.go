@@ -81,7 +81,7 @@ func SetDefaultFeatures(
 }
 
 func defaultFeatures(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.InstanceFeaturesWriteModel, error) {
-	features := command.NewInstanceFeaturesWriteModel()
+	features := command.NewInstanceFeaturesWriteModel(ctx)
 	events, err := filter(ctx, features.Query())
 	if err != nil {
 		return nil, err

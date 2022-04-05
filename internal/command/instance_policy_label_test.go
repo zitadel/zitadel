@@ -5,10 +5,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -497,7 +497,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -798,7 +798,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1016,9 +1016,9 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx    context.Context
+		ctx        context.Context
 		instanceID string
-		upload *AssetUpload
+		upload     *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1039,7 +1039,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
 				instanceID: "INSTANCE",
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
@@ -1062,7 +1062,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1081,7 +1081,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				storage: mock.NewStorage(t).ExpectPutObjectError(),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
 				instanceID: "INSTANCE",
 				upload: &AssetUpload{
 					ResourceOwner: "IAM",
@@ -1364,7 +1364,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1665,7 +1665,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",

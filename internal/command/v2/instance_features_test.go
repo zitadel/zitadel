@@ -46,7 +46,7 @@ func TestSetDefaultFeatures(t *testing.T) {
 		{
 			name: "invalid state",
 			args: args{
-				a:                        instance.NewAggregate(),
+				a:                        instance.NewAggregate("INSTANCE"),
 				tierName:                 "",
 				tierDescription:          "",
 				state:                    0,
@@ -77,7 +77,7 @@ func TestSetDefaultFeatures(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				a:                        instance.NewAggregate(),
+				a:                        instance.NewAggregate("INSTANCE"),
 				tierName:                 "",
 				tierDescription:          "",
 				state:                    domain.FeaturesStateActive,
@@ -104,7 +104,7 @@ func TestSetDefaultFeatures(t *testing.T) {
 			want: Want{
 				Commands: []eventstore.Command{
 					func() *instance.FeaturesSetEvent {
-						event, _ := instance.NewFeaturesSetEvent(context.Background(), &instance.NewAggregate().Aggregate,
+						event, _ := instance.NewFeaturesSetEvent(context.Background(), &instance.NewAggregate("INSTANCE").Aggregate,
 							[]features.FeaturesChanges{
 								features.ChangeState(domain.FeaturesStateActive),
 							},
