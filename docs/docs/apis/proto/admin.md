@@ -3699,6 +3699,7 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
 | password_check_lifetime |  google.protobuf.Duration | - |  |
 | external_login_check_lifetime |  google.protobuf.Duration | - |  |
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |

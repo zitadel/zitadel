@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -56,6 +57,7 @@ func (c *Commands) addDefaultLoginPolicy(ctx context.Context, instanceAgg *event
 		policy.AllowExternalIDP,
 		policy.ForceMFA,
 		policy.HidePasswordReset,
+		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
 		policy.PasswordCheckLifetime,
 		policy.ExternalLoginCheckLifetime,
@@ -97,6 +99,7 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, instanceAgg *ev
 		policy.AllowExternalIDP,
 		policy.ForceMFA,
 		policy.HidePasswordReset,
+		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
 		policy.PasswordCheckLifetime,
 		policy.ExternalLoginCheckLifetime,

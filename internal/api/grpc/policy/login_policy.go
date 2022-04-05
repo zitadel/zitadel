@@ -1,12 +1,13 @@
 package policy
 
 import (
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
 	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
-	"google.golang.org/protobuf/types/known/durationpb"
-	timestamp_pb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
@@ -18,6 +19,7 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		ForceMfa:                   policy.ForceMFA,
 		PasswordlessType:           ModelPasswordlessTypeToPb(policy.PasswordlessType),
 		HidePasswordReset:          policy.HidePasswordReset,
+		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
 		PasswordCheckLifetime:      durationpb.New(policy.PasswordCheckLifetime),
 		ExternalLoginCheckLifetime: durationpb.New(policy.ExternalLoginCheckLifetime),
 		MfaInitSkipLifetime:        durationpb.New(policy.MFAInitSkipLifetime),
@@ -25,8 +27,8 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		MultiFactorCheckLifetime:   durationpb.New(policy.MultiFactorCheckLifetime),
 		Details: &object.ObjectDetails{
 			Sequence:      policy.Sequence,
-			CreationDate:  timestamp_pb.New(policy.CreationDate),
-			ChangeDate:    timestamp_pb.New(policy.ChangeDate),
+			CreationDate:  timestamppb.New(policy.CreationDate),
+			ChangeDate:    timestamppb.New(policy.ChangeDate),
 			ResourceOwner: policy.OrgID,
 		},
 	}

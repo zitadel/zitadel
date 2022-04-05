@@ -10,7 +10,6 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -30,6 +29,7 @@ type LoginPolicy struct {
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
+	IgnoreUnknownUsernames     bool
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
 	MFAInitSkipLifetime        time.Duration
@@ -105,6 +105,10 @@ var (
 	}
 	LoginPolicyColumnHidePasswordReset = Column{
 		name:  projection.LoginPolicyHidePWResetCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnIgnoreUnknownUsernames = Column{
+		name:  projection.IgnoreUnknownUsernames,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnPasswordCheckLifetime = Column{
@@ -284,6 +288,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			LoginPolicyColumnPasswordlessType.identifier(),
 			LoginPolicyColumnIsDefault.identifier(),
 			LoginPolicyColumnHidePasswordReset.identifier(),
+			LoginPolicyColumnIgnoreUnknownUsernames.identifier(),
 			LoginPolicyColumnPasswordCheckLifetime.identifier(),
 			LoginPolicyColumnExternalLoginCheckLifetime.identifier(),
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
@@ -308,6 +313,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				&p.PasswordlessType,
 				&p.IsDefault,
 				&p.HidePasswordReset,
+				&p.IgnoreUnknownUsernames,
 				&p.PasswordCheckLifetime,
 				&p.ExternalLoginCheckLifetime,
 				&p.MFAInitSkipLifetime,

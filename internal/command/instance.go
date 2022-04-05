@@ -67,6 +67,7 @@ type InstanceSetup struct {
 		AllowExternalIDP           bool
 		ForceMFA                   bool
 		HidePasswordReset          bool
+		IgnoreUnknownUsername      bool
 		PasswordlessType           domain.PasswordlessType
 		PasswordCheckLifetime      time.Duration
 		ExternalLoginCheckLifetime time.Duration
@@ -203,6 +204,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.AllowExternalIDP,
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
+			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.PasswordlessType,
 			setup.LoginPolicy.PasswordCheckLifetime,
 			setup.LoginPolicy.ExternalLoginCheckLifetime,

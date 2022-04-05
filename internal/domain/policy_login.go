@@ -19,6 +19,7 @@ type LoginPolicy struct {
 	MultiFactors               []MultiFactorType
 	PasswordlessType           PasswordlessType
 	HidePasswordReset          bool
+	IgnoreUnknownUsernames     bool
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
 	MFAInitSkipLifetime        time.Duration

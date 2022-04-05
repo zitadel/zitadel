@@ -29,6 +29,7 @@ const (
 	LoginPolicyMFAsCol                  = "multi_factors"
 	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
 	LoginPolicyHidePWResetCol           = "hide_password_reset"
+	IgnoreUnknownUsernames              = "ignore_unknown_usernames"
 	PasswordCheckLifetimeCol            = "password_check_lifetime"
 	ExternalLoginCheckLifetimeCol       = "external_login_check_lifetime"
 	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
@@ -60,6 +61,7 @@ func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LoginPolicyMFAsCol, crdb.ColumnTypeEnumArray, crdb.Nullable()),
 			crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(LoginPolicyHidePWResetCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(IgnoreUnknownUsernames, crdb.ColumnTypeBool),
 			crdb.NewColumn(PasswordCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
@@ -167,6 +169,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyPasswordlessTypeCol, policyEvent.PasswordlessType),
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
+		handler.NewCol(IgnoreUnknownUsernames, policyEvent.IgnoreUnknownUsernames),
 		handler.NewCol(PasswordCheckLifetimeCol, policyEvent.PasswordCheckLifetime),
 		handler.NewCol(ExternalLoginCheckLifetimeCol, policyEvent.ExternalLoginCheckLifetime),
 		handler.NewCol(MFAInitSkipLifetimeCol, policyEvent.MFAInitSkipLifetime),
@@ -207,6 +210,9 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	}
 	if policyEvent.HidePasswordReset != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyHidePWResetCol, *policyEvent.HidePasswordReset))
+	}
+	if policyEvent.IgnoreUnknownUsernames != nil {
+		cols = append(cols, handler.NewCol(IgnoreUnknownUsernames, *policyEvent.IgnoreUnknownUsernames))
 	}
 	if policyEvent.PasswordCheckLifetime != nil {
 		cols = append(cols, handler.NewCol(PasswordCheckLifetimeCol, *policyEvent.PasswordCheckLifetime))

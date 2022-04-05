@@ -16,6 +16,7 @@ type LoginPolicyWriteModel struct {
 	AllowExternalIDP           bool
 	ForceMFA                   bool
 	HidePasswordReset          bool
+	IgnoreUnknownUsernames     bool
 	PasswordlessType           domain.PasswordlessType
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
@@ -35,6 +36,7 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.ForceMFA = e.ForceMFA
 			wm.PasswordlessType = e.PasswordlessType
 			wm.HidePasswordReset = e.HidePasswordReset
+			wm.IgnoreUnknownUsernames = e.IgnoreUnknownUsernames
 			wm.PasswordCheckLifetime = e.PasswordCheckLifetime
 			wm.ExternalLoginCheckLifetime = e.ExternalLoginCheckLifetime
 			wm.MFAInitSkipLifetime = e.MFAInitSkipLifetime
@@ -56,6 +58,9 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			}
 			if e.HidePasswordReset != nil {
 				wm.HidePasswordReset = *e.HidePasswordReset
+			}
+			if e.IgnoreUnknownUsernames != nil {
+				wm.IgnoreUnknownUsernames = *e.IgnoreUnknownUsernames
 			}
 			if e.PasswordlessType != nil {
 				wm.PasswordlessType = *e.PasswordlessType

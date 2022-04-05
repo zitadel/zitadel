@@ -247,6 +247,7 @@ DefaultInstance:
     AllowExternalIDP: true
     ForceMFA: false
     HidePasswordReset: false
+    IgnoreUnknownUsernames: false
     PasswordlessType: 1 #1: allowed 0: not allowed
     PasswordCheckLifetime: 240h #10d
     ExternalLoginCheckLifetime: 240h #10d

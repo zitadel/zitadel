@@ -16,6 +16,7 @@ func updateLoginPolicyToDomain(p *admin_pb.UpdateLoginPolicyRequest) *domain.Log
 		ForceMFA:                   p.ForceMfa,
 		PasswordlessType:           policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
 		HidePasswordReset:          p.HidePasswordReset,
+		IgnoreUnknownUsernames:     p.IgnoreUnknownUsernames,
 		PasswordCheckLifetime:      p.PasswordCheckLifetime.AsDuration(),
 		ExternalLoginCheckLifetime: p.ExternalLoginCheckLifetime.AsDuration(),
 		MFAInitSkipLifetime:        p.MfaInitSkipLifetime.AsDuration(),

@@ -35,6 +35,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"allowExternalIdp": false,
 						"forceMFA": false,
 						"hidePasswordReset": true,
+						"ignoreUnknownUsernames": true,
 						"passwordlessType": 1,
 						"passwordCheckLifetime": 10000000,
 						"externalLoginCheckLifetime": 10000000,
@@ -53,7 +54,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -66,6 +67,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								false,
 								domain.PasswordlessTypeAllowed,
 								false,
+								true,
 								true,
 								time.Millisecond * 10,
 								time.Millisecond * 10,
@@ -91,6 +93,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"allowExternalIdp": true,
 						"forceMFA": true,
 						"hidePasswordReset": true,
+						"ignoreUnknownUsernames": true,
 						"passwordlessType": 1,
 						"passwordCheckLifetime": 10000000,
 						"externalLoginCheckLifetime": 10000000,
@@ -108,7 +111,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (aggregate_id = $14)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (aggregate_id = $15)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -117,6 +120,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								true,
 								true,
 								time.Millisecond * 10,
 								time.Millisecond * 10,
@@ -298,6 +302,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"allowExternalIdp": false,
 						"forceMFA": false,
 						"hidePasswordReset": true,
+						"ignoreUnknownUsernames": true,
 						"passwordlessType": 1,
 						"passwordCheckLifetime": 10000000,
 						"externalLoginCheckLifetime": 10000000,
@@ -315,7 +320,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -327,6 +332,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
+								true,
 								true,
 								true,
 								time.Millisecond * 10,
@@ -353,6 +359,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			"allowExternalIdp": true,
 			"forceMFA": true,
 			"hidePasswordReset": true,
+			"ignoreUnknownUsernames": true,
 			"passwordlessType": 1
 			}`),
 				), instance.LoginPolicyChangedEventMapper),
@@ -365,7 +372,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (aggregate_id = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -374,6 +381,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								true,
 								true,
 								"agg-id",
 							},
