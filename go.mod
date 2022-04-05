@@ -51,7 +51,7 @@ require (
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.8.0
 	github.com/sony/sonyflake v1.0.0
-	github.com/spf13/cobra v1.2.1
+	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
