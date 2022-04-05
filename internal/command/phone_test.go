@@ -6,32 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-// func TestFormatPhoneNumber(t *testing.T) {
-// 	type args struct {
-// 		number string
-// 	}
-// 	tests := []struct {
-// 		name    string
-// 		args    args
-// 		want    string
-// 		wantErr bool
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			got, err := FormatPhoneNumber(tt.args.number)
-// 			if (err != nil) != tt.wantErr {
-// 				t.Errorf("FormatPhoneNumber() error = %v, wantErr %v", err, tt.wantErr)
-// 				return
-// 			}
-// 			if got != tt.want {
-// 				t.Errorf("FormatPhoneNumber() = %v, want %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
-
 func TestFormatPhoneNumber(t *testing.T) {
 	type args struct {
 		number string

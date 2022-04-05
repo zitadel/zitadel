@@ -3,10 +3,22 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/command/preparation"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/repository/project"
 )
+
+type AddApp struct {
+	Aggregate project.Aggregate
+	ID        string
+	Name      string
+}
+
+func newAppClientSecret(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.HashAlgorithm) (value *crypto.CryptoValue, plain string, err error) {
+	return newCryptoCodeWithPlain(ctx, filter, domain.SecretGeneratorTypeAppSecret, alg)
+}
 
 func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {

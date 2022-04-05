@@ -17,6 +17,56 @@ S2DefaultInstance:
           Number:
           Verified:
         Password: Password1!
+    SecretGenerators:
+      PasswordSaltCost: 14
+      ClientSecret:
+        Length: 64
+        IncludeLowerLetters: true
+        IncludeUpperLetters: true
+        IncludeDigits: true
+        IncludeSymbols: false
+      InitializeUserCode:
+        Length: 6
+        Expiry: '72h'
+        IncludeLowerLetters: false
+        IncludeUpperLetters: true
+        IncludeDigits: true
+        IncludeSymbols: false
+      EmailVerificationCode:
+        Length: 6
+        Expiry: '1h'
+        IncludeLowerLetters: false
+        IncludeUpperLetters: true
+        IncludeDigits: true
+        IncludeSymbols: false
+      PhoneVerificationCode:
+        Length: 6
+        Expiry: '1h'
+        IncludeLowerLetters: false
+        IncludeUpperLetters: true
+        IncludeDigits: true
+        IncludeSymbols: false
+      PasswordVerificationCode:
+        Length: 6
+        Expiry: '1h'
+        IncludeLowerLetters: false
+        IncludeUpperLetters: true
+        IncludeDigits: true
+        IncludeSymbols: false
+      PasswordlessInitCode:
+        Length: 12
+        Expiry: '1h'
+        IncludeLowerLetters: true
+        IncludeUpperLetters: true
+        IncludeDigits: true
+        IncludeSymbols: false
+      DomainVerification:
+        Length: 32
+        IncludeLowerLetters: true
+        IncludeUpperLetters: true
+        IncludeDigits: true
+        IncludeSymbols: false
+
     PasswordComplexityPolicy: 
       MinLength: 8
       HasLowercase: true 

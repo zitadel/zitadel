@@ -4,8 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -46,7 +45,7 @@ func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQuer
 }
 
 func secretGeneratorConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType) (*crypto.GeneratorConfig, error) {
-	wm := command.NewInstanceSecretGeneratorConfigWriteModel(typ)
+	wm := NewInstanceSecretGeneratorConfigWriteModel(typ)
 	events, err := filter(ctx, wm.Query())
 	if err != nil {
 		return nil, err

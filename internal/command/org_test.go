@@ -9,6 +9,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -19,6 +20,53 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
+
+func TestAddOrg(t *testing.T) {
+	type args struct {
+		a    *org.Aggregate
+		name string
+	}
+
+	ctx := context.Background()
+	agg := org.NewAggregate("test", "test")
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:    agg,
+				name: "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:    agg,
+				name: "caos ag",
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewOrgAddedEvent(ctx, &agg.Aggregate, "caos ag"),
+					org.NewDomainAddedEvent(ctx, &agg.Aggregate, "caos-ag.localhost"),
+					org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "caos-ag.localhost"),
+					org.NewDomainPrimarySetEvent(ctx, &agg.Aggregate, "caos-ag.localhost"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, AddOrgCommand(tt.args.a, tt.args.name, "localhost"), nil, tt.want)
+		})
+	}
+}
 
 func TestCommandSide_AddOrg(t *testing.T) {
 	type fields struct {

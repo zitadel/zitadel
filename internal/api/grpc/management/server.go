@@ -28,7 +28,8 @@ type Server struct {
 	userCodeAlg     crypto.EncryptionAlgorithm
 }
 
-func CreateServer(command *command.Commands,
+func CreateServer(
+	command *command.Commands,
 	query *query.Queries,
 	sd systemdefaults.SystemDefaults,
 	assetAPIPrefix string,

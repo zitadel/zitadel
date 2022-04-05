@@ -48,6 +48,17 @@ type Commands struct {
 	privateKeyLifetime time.Duration
 	publicKeyLifetime  time.Duration
 	tokenVerifier      orgFeatureChecker
+
+	v2 *commandNew
+}
+
+type commandNew struct {
+	es              *eventstore.Eventstore
+	userPasswordAlg crypto.HashAlgorithm
+	iamDomain       string
+	phoneAlg        crypto.EncryptionAlgorithm
+	initCodeAlg     crypto.EncryptionAlgorithm
+	zitadelRoles    []authz.RoleMapping
 }
 
 type orgFeatureChecker interface {
@@ -64,6 +75,7 @@ func StartCommands(es *eventstore.Eventstore,
 	otpEncryption,
 	smtpEncryption,
 	smsEncryption,
+	userEncryption,
 	domainVerificationEncryption,
 	oidcEncryption crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
@@ -81,7 +93,9 @@ func StartCommands(es *eventstore.Eventstore,
 		smsCrypto:             smsEncryption,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
+		v2:                    NewCommandV2(es, defaults.Domain, defaults, userEncryption, authZConfig.RolePermissionMappings),
 	}
+
 	instance_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
@@ -111,6 +125,31 @@ func StartCommands(es *eventstore.Eventstore,
 
 	repo.tokenVerifier = authZRepo
 	return repo, nil
+}
+
+func NewCommandV2(
+	es *eventstore.Eventstore,
+	iamDomain string,
+	defaults sd.SystemDefaults,
+	userAlg crypto.EncryptionAlgorithm,
+	zitadelRoles []authz.RoleMapping,
+) *commandNew {
+	instance_repo.RegisterEventMappers(es)
+	org.RegisterEventMappers(es)
+	usr_repo.RegisterEventMappers(es)
+	usr_grant_repo.RegisterEventMappers(es)
+	proj_repo.RegisterEventMappers(es)
+	keypair.RegisterEventMappers(es)
+	action.RegisterEventMappers(es)
+
+	return &commandNew{
+		es:              es,
+		iamDomain:       iamDomain,
+		userPasswordAlg: crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost),
+		initCodeAlg:     userAlg,
+		phoneAlg:        userAlg,
+		zitadelRoles:    zitadelRoles,
+	}
 }
 
 func AppendAndReduce(object interface {

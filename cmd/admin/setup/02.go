@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	command "github.com/caos/zitadel/internal/command/v2"
+	command "github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	crypto_db "github.com/caos/zitadel/internal/crypto/database"
@@ -39,7 +39,7 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		return err
 	}
 
-	cmd := command.New(mig.es, mig.iamDomain, mig.defaults, userAlg, mig.zitadelRoles)
+	cmd := command.NewCommandV2(mig.es, mig.iamDomain, mig.defaults, userAlg, mig.zitadelRoles)
 
 	_, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup)
 	return err

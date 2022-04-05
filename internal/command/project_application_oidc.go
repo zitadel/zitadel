@@ -2,16 +2,122 @@ package command
 
 import (
 	"context"
+	"strings"
+	"time"
 
 	"github.com/caos/logging"
 
+	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/id"
+	project_repo "github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
+
+type addOIDCApp struct {
+	AddApp
+	Version                  domain.OIDCVersion
+	RedirectUris             []string
+	ResponseTypes            []domain.OIDCResponseType
+	GrantTypes               []domain.OIDCGrantType
+	ApplicationType          domain.OIDCApplicationType
+	AuthMethodType           domain.OIDCAuthMethodType
+	PostLogoutRedirectUris   []string
+	DevMode                  bool
+	AccessTokenType          domain.OIDCTokenType
+	AccessTokenRoleAssertion bool
+	IDTokenRoleAssertion     bool
+	IDTokenUserinfoAssertion bool
+	ClockSkew                time.Duration
+	AdditionalOrigins        []string
+
+	ClientID          string
+	ClientSecret      *crypto.CryptoValue
+	ClientSecretPlain string
+}
+
+//AddOIDCAppCommand prepares the commands to add an oidc app. The ClientID will be set during the CreateCommands
+func AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if app.ID == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument")
+		}
+
+		if app.Name = strings.TrimSpace(app.Name); app.Name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument")
+		}
+
+		if app.ClockSkew > time.Second*5 || app.ClockSkew < 0 {
+			return nil, errors.ThrowInvalidArgument(nil, "V2-PnCMS", "Errors.Invalid.Argument")
+		}
+
+		for _, origin := range app.AdditionalOrigins {
+			if !http_util.IsOrigin(origin) {
+				return nil, errors.ThrowInvalidArgument(nil, "V2-DqWPX", "Errors.Invalid.Argument")
+			}
+		}
+
+		if !domain.ContainsRequiredGrantTypes(app.ResponseTypes, app.GrantTypes) {
+			return nil, errors.ThrowInvalidArgument(nil, "V2-sLpW1", "Errors.Invalid.Argument")
+		}
+
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
+			project, err := projectWriteModel(ctx, filter, app.Aggregate.ID, app.Aggregate.ResourceOwner)
+			if err != nil || !project.State.Valid() {
+				return nil, errors.ThrowNotFound(err, "PROJE-6swVG", "Errors.Project.NotFound")
+			}
+
+			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator, project.Name)
+			if err != nil {
+				return nil, errors.ThrowInternal(err, "V2-VMSQ1", "Errors.Internal")
+			}
+
+			//requires client secret
+			// TODO(release blocking):we have to return the secret
+			if app.AuthMethodType == domain.OIDCAuthMethodTypeBasic || app.AuthMethodType == domain.OIDCAuthMethodTypePost {
+				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			return []eventstore.Command{
+				project_repo.NewApplicationAddedEvent(
+					ctx,
+					&app.Aggregate.Aggregate,
+					app.ID,
+					app.Name,
+				),
+				project_repo.NewOIDCConfigAddedEvent(
+					ctx,
+					&app.Aggregate.Aggregate,
+					app.Version,
+					app.ID,
+					app.ClientID,
+					app.ClientSecret,
+					app.RedirectUris,
+					app.ResponseTypes,
+					app.GrantTypes,
+					app.ApplicationType,
+					app.AuthMethodType,
+					app.PostLogoutRedirectUris,
+					app.DevMode,
+					app.AccessTokenType,
+					app.AccessTokenRoleAssertion,
+					app.IDTokenRoleAssertion,
+					app.IDTokenUserinfoAssertion,
+					app.ClockSkew,
+					app.AdditionalOrigins,
+				),
+			}, nil
+		}, nil
+	}
+}
 
 func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.OIDCApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
 	if application == nil || application.AggregateID == "" {
@@ -52,7 +158,7 @@ func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstor
 	}
 
 	events = []eventstore.Command{
-		project.NewApplicationAddedEvent(ctx, projectAgg, oidcApp.AppID, oidcApp.AppName),
+		project_repo.NewApplicationAddedEvent(ctx, projectAgg, oidcApp.AppID, oidcApp.AppName),
 	}
 
 	var stringPw string
@@ -64,7 +170,7 @@ func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstor
 	if err != nil {
 		return nil, "", err
 	}
-	events = append(events, project.NewOIDCConfigAddedEvent(ctx,
+	events = append(events, project_repo.NewOIDCConfigAddedEvent(ctx,
 		projectAgg,
 		oidcApp.OIDCVersion,
 		oidcApp.AppID,
@@ -164,7 +270,7 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
+	pushedEvents, err := c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
 	if err != nil {
 		return nil, err
 	}
@@ -201,10 +307,10 @@ func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID,
 	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = c.eventstore.Push(ctx, project.NewOIDCConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
+		_, err = c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
 		return err
 	}
-	_, err = c.eventstore.Push(ctx, project.NewOIDCConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
+	_, err = c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
 	logging.Log("COMMAND-ADfhz").OnError(err).Error("could not push event OIDCClientSecretCheckFailed")
 	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
 }

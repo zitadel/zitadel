@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -20,6 +21,129 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
+
+func TestAddDomain(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "domain",
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, AddOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+		})
+	}
+}
+
+func TestVerifyDomain(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "domain",
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainVerifiedEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, VerifyOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+		})
+	}
+}
+
+func TestSetDomainPrimary(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "domain",
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, SetPrimaryOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+		})
+	}
+}
 
 func TestCommandSide_AddOrgDomain(t *testing.T) {
 	type fields struct {

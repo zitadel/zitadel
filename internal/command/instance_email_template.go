@@ -5,8 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -95,8 +94,8 @@ func SetInstanceCustomTexts(
 	}
 }
 
-func existingInstanceCustomMessageText(ctx context.Context, filter preparation.FilterToQueryReducer, textType string, lang language.Tag) (*command.InstanceCustomMessageTextWriteModel, error) {
-	writeModel := command.NewInstanceCustomMessageTextWriteModel(textType, lang)
+func existingInstanceCustomMessageText(ctx context.Context, filter preparation.FilterToQueryReducer, textType string, lang language.Tag) (*InstanceCustomMessageTextWriteModel, error) {
+	writeModel := NewInstanceCustomMessageTextWriteModel(textType, lang)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err

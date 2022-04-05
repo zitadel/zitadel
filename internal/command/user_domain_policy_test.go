@@ -5,8 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,14 +13,14 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func Test_customPasswordComplexityPolicy(t *testing.T) {
+func Test_customDomainPolicy(t *testing.T) {
 	type args struct {
 		filter preparation.FilterToQueryReducer
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PasswordComplexityPolicyWriteModel
+		want    *PolicyDomainWriteModel
 		wantErr bool
 	}{
 		{
@@ -49,56 +48,48 @@ func Test_customPasswordComplexityPolicy(t *testing.T) {
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
-						org.NewPasswordComplexityPolicyAddedEvent(
+						org.NewDomainPolicyAddedEvent(
 							context.Background(),
 							&org.NewAggregate("id", "ro").Aggregate,
-							8,
-							true,
-							true,
-							true,
 							true,
 						),
 					}, nil
 				},
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
 					ResourceOwner: "ro",
 					Events:        []eventstore.Event{},
 				},
-				MinLength:    8,
-				HasLowercase: true,
-				HasUppercase: true,
-				HasNumber:    true,
-				HasSymbol:    true,
-				State:        domain.PolicyStateActive,
+				UserLoginMustBeDomain: true,
+				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := customPasswordComplexityPolicy(context.Background(), tt.args.filter)
+			got, err := orgDomainPolicy(context.Background(), tt.args.filter)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("customPasswordComplexityPolicy() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("customDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("customPasswordComplexityPolicy() = %v, want %v", got, tt.want)
+				t.Errorf("customDomainPolicy() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_defaultPasswordComplexityPolicy(t *testing.T) {
+func Test_defaultDomainPolicy(t *testing.T) {
 	type args struct {
 		filter preparation.FilterToQueryReducer
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PasswordComplexityPolicyWriteModel
+		want    *PolicyDomainWriteModel
 		wantErr bool
 	}{
 		{
@@ -126,56 +117,48 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
-						instance.NewPasswordComplexityPolicyAddedEvent(
+						instance.NewDomainPolicyAddedEvent(
 							context.Background(),
 							&instance.NewAggregate().Aggregate,
-							8,
-							true,
-							true,
-							true,
 							true,
 						),
 					}, nil
 				},
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "IAM",
 					ResourceOwner: "IAM",
 					Events:        []eventstore.Event{},
 				},
-				MinLength:    8,
-				HasLowercase: true,
-				HasUppercase: true,
-				HasNumber:    true,
-				HasSymbol:    true,
-				State:        domain.PolicyStateActive,
+				UserLoginMustBeDomain: true,
+				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := defaultPasswordComplexityPolicy(context.Background(), tt.args.filter)
+			got, err := instanceDomainPolicy(context.Background(), tt.args.filter)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("defaultPasswordComplexityPolicy() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("defaultPasswordComplexityPolicy() = %v, want %v", got, tt.want)
+				t.Errorf("defaultDomainPolicy() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_passwordComplexityPolicy(t *testing.T) {
+func Test_DomainPolicy(t *testing.T) {
 	type args struct {
 		filter preparation.FilterToQueryReducer
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PasswordComplexityPolicyWriteModel
+		want    *PolicyDomainWriteModel
 		wantErr bool
 	}{
 		{
@@ -193,30 +176,22 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
-						org.NewPasswordComplexityPolicyAddedEvent(
+						org.NewDomainPolicyAddedEvent(
 							context.Background(),
 							&org.NewAggregate("id", "ro").Aggregate,
-							8,
-							true,
-							true,
-							true,
 							true,
 						),
 					}, nil
 				},
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
 					ResourceOwner: "ro",
 					Events:        []eventstore.Event{},
 				},
-				MinLength:    8,
-				HasLowercase: true,
-				HasUppercase: true,
-				HasNumber:    true,
-				HasSymbol:    true,
-				State:        domain.PolicyStateActive,
+				UserLoginMustBeDomain: true,
+				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},
@@ -244,31 +219,23 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 					}).
 					Append(func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
-							instance.NewPasswordComplexityPolicyAddedEvent(
+							instance.NewDomainPolicyAddedEvent(
 								context.Background(),
 								&instance.NewAggregate().Aggregate,
-								8,
-								true,
-								true,
-								true,
 								true,
 							),
 						}, nil
 					}).
 					Filter(),
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "IAM",
 					ResourceOwner: "IAM",
 					Events:        []eventstore.Event{},
 				},
-				MinLength:    8,
-				HasLowercase: true,
-				HasUppercase: true,
-				HasNumber:    true,
-				HasSymbol:    true,
-				State:        domain.PolicyStateActive,
+				UserLoginMustBeDomain: true,
+				State:                 domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},
@@ -285,13 +252,13 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := passwordComplexityPolicyWriteModel(context.Background(), tt.args.filter)
+			got, err := domainPolicyWriteModel(context.Background(), tt.args.filter)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("defaultPasswordComplexityPolicy() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("defaultPasswordComplexityPolicy() = %v, want %v", got, tt.want)
+				t.Errorf("defaultDomainPolicy() = %v, want %v", got, tt.want)
 			}
 		})
 	}

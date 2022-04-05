@@ -7,12 +7,17 @@ const (
 	SecretGeneratorTypeInitCode
 	SecretGeneratorTypeVerifyEmailCode
 	SecretGeneratorTypeVerifyPhoneCode
+	SecretGeneratorTypeVerifyDomain
 	SecretGeneratorTypePasswordResetCode
 	SecretGeneratorTypePasswordlessInitCode
 	SecretGeneratorTypeAppSecret
 
 	secretGeneratorTypeCount
 )
+
+func (t SecretGeneratorType) Valid() bool {
+	return t > SecretGeneratorTypeUnspecified && t < secretGeneratorTypeCount
+}
 
 type SecretGeneratorState int32
 

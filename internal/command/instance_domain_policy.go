@@ -3,22 +3,22 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddPrivacyPolicy(
+func AddDefaultDomainPolicy(
 	a *instance.Aggregate,
-	tosLink,
-	privacyLink,
-	helpLink string,
+	userLoginMustBeDomain bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists
 			return []eventstore.Command{
-				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink),
+				instance.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
+					userLoginMustBeDomain,
+				),
 			}, nil
 		}, nil
 	}
