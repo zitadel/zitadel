@@ -36,7 +36,7 @@ type Login struct {
 	authRepo            auth_repository.Repository
 	baseURL             string
 	consolePath         string
-	oidcAuthCallbackURL string
+	oidcAuthCallbackURL func(string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 	iamDomain           string
@@ -63,8 +63,8 @@ func CreateLogin(config Config,
 	systemDefaults systemdefaults.SystemDefaults,
 	consolePath,
 	domain,
-	baseURL,
-	oidcAuthCallbackURL string,
+	baseURL string,
+	oidcAuthCallbackURL func(string) string,
 	externalSecure bool,
 	userAgentCookie,
 	instanceHandler mux.MiddlewareFunc,
