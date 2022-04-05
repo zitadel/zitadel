@@ -10,12 +10,12 @@ S2DefaultInstance:
         DisplayName:
         Email: 
           Address: admin@zitadel.ch
-          IsValid:
+          Verified: true
         PreferredLanguage:
         Gender:
         Phone:
           Number:
-          IsValid:
+          Verified:
         Password: Password1!
     PasswordComplexityPolicy: 
       MinLength: 8

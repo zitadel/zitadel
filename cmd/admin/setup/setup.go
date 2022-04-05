@@ -53,6 +53,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.S2DefaultInstance.masterKey = masterKey
 	steps.S2DefaultInstance.iamDomain = config.SystemDefaults.Domain
 	steps.S2DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
+	steps.S2DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.S2DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
 	steps.S2DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 

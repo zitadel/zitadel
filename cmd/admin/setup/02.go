@@ -30,6 +30,10 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
+	if err = verifyKey(mig.userEncryptionKey, keyStorage); err != nil {
+		return err
+	}
+
 	userAlg, err := crypto.NewAESCrypto(mig.userEncryptionKey, keyStorage)
 	if err != nil {
 		return err
@@ -43,4 +47,16 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 
 func (mig *DefaultInstance) String() string {
 	return "02_default_instance"
+}
+
+func verifyKey(key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
+	_, err = crypto.LoadKey(key.EncryptionKeyID, storage)
+	if err == nil {
+		return nil
+	}
+	k, err := crypto.NewKey(key.EncryptionKeyID)
+	if err != nil {
+		return err
+	}
+	return storage.CreateKeys(k)
 }

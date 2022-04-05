@@ -22,7 +22,6 @@ func (c *Command) AddOrgMember(a *org.Aggregate, userID string, roles ...string)
 		if len(domain.CheckForInvalidRoles(roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
 			return nil, errors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 		}
-		// TODO: check roles
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 				if exists, err := ExistsUser(ctx, filter, userID, a.ID); err != nil || !exists {
 					return nil, errors.ThrowNotFound(err, "ORG-GoXOn", "Errors.User.NotFound")

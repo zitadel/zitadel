@@ -77,7 +77,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				return nil, err
 			}
 
-			if err = userValidateDomain(ctx, a, human.Username, filter); err != nil {
+			if err = userValidateDomain(ctx, a, human.Username, domainPolicy.UserLoginMustBeDomain, filter); err != nil {
 				return nil, err
 			}
 
@@ -164,11 +164,16 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 	}
 }
 
-func userValidateDomain(ctx context.Context, a *user.Aggregate, username string, filter preparation.FilterToQueryReducer) error {
+func userValidateDomain(ctx context.Context, a *user.Aggregate, username string, mustBeDomain bool, filter preparation.FilterToQueryReducer) error {
+	if mustBeDomain {
+		return nil
+	}
+
 	usernameSplit := strings.Split(username, "@")
 	if len(usernameSplit) != 2 {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
 	}
+
 	domainCheck := command.NewOrgDomainVerifiedWriteModel(usernameSplit[1])
 	events, err := filter(ctx, domainCheck.Query())
 	if err != nil {

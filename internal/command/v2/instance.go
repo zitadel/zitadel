@@ -86,15 +86,11 @@ type ZitadelConfig struct {
 	IsDevMode bool
 	BaseURL   string
 
-	projectID       string
-	mgmtID          string
-	mgmtClientID    string
-	adminID         string
-	adminClientID   string
-	authID          string
-	authClientID    string
-	consoleID       string
-	consoleClientID string
+	projectID string
+	mgmtID    string
+	adminID   string
+	authID    string
+	consoleID string
 }
 
 func (s *InstanceSetup) generateIDs() (err error) {
@@ -216,6 +212,27 @@ func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*dom
 		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
 	}
 
+	console := &addOIDCApp{
+		AddApp: AddApp{
+			Aggregate: *projectAgg,
+			ID:        setup.Zitadel.consoleID,
+			Name:      consoleAppName,
+		},
+		Version:                  domain.OIDCVersionV1,
+		RedirectUris:             []string{setup.Zitadel.BaseURL + consoleRedirectPath},
+		ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+		GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+		ApplicationType:          domain.OIDCApplicationTypeUserAgent,
+		AuthMethodType:           domain.OIDCAuthMethodTypeNone,
+		PostLogoutRedirectUris:   []string{setup.Zitadel.BaseURL + consolePostLogoutPath},
+		DevMode:                  setup.Zitadel.IsDevMode,
+		AccessTokenType:          domain.OIDCTokenTypeBearer,
+		AccessTokenRoleAssertion: false,
+		IDTokenRoleAssertion:     false,
+		IDTokenUserinfoAssertion: false,
+		ClockSkew:                0,
+	}
+
 	validations = append(validations,
 		AddOrg(orgAgg, setup.Org.Name, c.iamDomain),
 		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.phoneAlg, c.initCodeAlg),
@@ -262,30 +279,10 @@ func (c *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*dom
 		),
 
 		AddOIDCApp(
-			&addOIDCApp{
-				AddApp: AddApp{
-					Aggregate: *projectAgg,
-					ID:        setup.Zitadel.consoleID,
-					Name:      consoleAppName,
-				},
-				Version:                  domain.OIDCVersionV1,
-				RedirectUris:             []string{setup.Zitadel.BaseURL + consoleRedirectPath},
-				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-				GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-				ApplicationType:          domain.OIDCApplicationTypeUserAgent,
-				AuthMethodType:           domain.OIDCAuthMethodTypeNone,
-				PostLogoutRedirectUris:   []string{setup.Zitadel.BaseURL + consolePostLogoutPath},
-				DevMode:                  setup.Zitadel.IsDevMode,
-				AccessTokenType:          domain.OIDCTokenTypeBearer,
-				AccessTokenRoleAssertion: false,
-				IDTokenRoleAssertion:     false,
-				IDTokenUserinfoAssertion: false,
-				ClockSkew:                0,
-			},
-
+			console,
 			nil,
 		),
-		SetIAMConsoleID(instanceAgg, setup.Zitadel.consoleClientID),
+		SetIAMConsoleID(instanceAgg, &console.ClientID),
 	)
 
 	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, validations...)
@@ -316,7 +313,7 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 }
 
 //SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
-func SetIAMConsoleID(a *instance.Aggregate, clientID string) preparation.Validation {
+func SetIAMConsoleID(a *instance.Aggregate, clientID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{

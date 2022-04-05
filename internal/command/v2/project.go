@@ -49,7 +49,7 @@ func AddProject(
 }
 
 func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, resourceOwner string) (project *command.ProjectWriteModel, err error) {
-	project = new(command.ProjectWriteModel)
+	project = command.NewProjectWriteModel(projectID, resourceOwner)
 	events, err := filter(ctx, project.Query())
 	if err != nil {
 		return nil, err
