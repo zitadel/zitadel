@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
@@ -120,7 +121,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					return []eventstore.Event{
 						instance.NewDomainPolicyAddedEvent(
 							context.Background(),
-							&instance.NewAggregate().Aggregate,
+							&instance.NewAggregate("INSTANCE").Aggregate,
 							true,
 						),
 					}, nil
@@ -128,8 +129,8 @@ func Test_defaultDomainPolicy(t *testing.T) {
 			},
 			want: &command.PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
-					AggregateID:   "IAM",
-					ResourceOwner: "IAM",
+					AggregateID:   "INSTANCE",
+					ResourceOwner: "INSTANCE",
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,
@@ -140,7 +141,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := instanceDomainPolicy(context.Background(), tt.args.filter)
+			got, err := instanceDomainPolicy(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -222,7 +223,7 @@ func Test_DomainPolicy(t *testing.T) {
 						return []eventstore.Event{
 							instance.NewDomainPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						}, nil
@@ -231,8 +232,8 @@ func Test_DomainPolicy(t *testing.T) {
 			},
 			want: &command.PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
-					AggregateID:   "IAM",
-					ResourceOwner: "IAM",
+					AggregateID:   "INSTANCE",
+					ResourceOwner: "INSTANCE",
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,
@@ -253,7 +254,7 @@ func Test_DomainPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := domainPolicyWriteModel(context.Background(), tt.args.filter)
+			got, err := domainPolicyWriteModel(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return

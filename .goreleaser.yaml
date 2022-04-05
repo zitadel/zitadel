@@ -13,6 +13,7 @@ before:
     - sh -c "cp -r .artifacts/grpc/go-client/* ."
     - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
     - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console
+    - sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
 builds:
   - env:
       - CGO_ENABLED=0

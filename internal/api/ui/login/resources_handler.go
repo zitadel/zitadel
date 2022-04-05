@@ -6,7 +6,7 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/assets"
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/api/authz"
 )
 
 type dynamicResourceData struct {
@@ -26,7 +26,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bucketName := domain.IAMID
+	bucketName := authz.GetInstance(r.Context()).InstanceID()
 	if data.OrgID != "" && !data.DefaultPolicy {
 		bucketName = data.OrgID
 	}

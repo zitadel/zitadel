@@ -14,7 +14,7 @@ func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*que
 	events := make([]eventstore.Command, 0)
 	for _, membership := range memberships {
 		if membership.IAM != nil {
-			iamAgg := instance.NewAggregate()
+			iamAgg := instance.NewAggregate(membership.IAM.IAMID)
 			removeEvent := c.removeInstanceMember(ctx, &iamAgg.Aggregate, membership.UserID, true)
 			events = append(events, removeEvent)
 		} else if membership.Org != nil {

@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	addedPolicy := NewInstancePasswordAgePolicyWriteModel()
+	addedPolicy := NewInstancePasswordAgePolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	event, err := c.addDefaultPasswordAgePolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -73,7 +73,7 @@ func (c *Commands) defaultPasswordAgePolicyWriteModelByID(ctx context.Context) (
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstancePasswordAgePolicyWriteModel()
+	writeModel := NewInstancePasswordAgePolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

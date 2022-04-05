@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -39,9 +40,10 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -49,7 +51,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				provider: &fs.FSConfig{
 					Compact: true,
 					Enabled: true,
@@ -67,9 +69,10 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 								),
 							),
@@ -78,14 +81,14 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				provider: &fs.FSConfig{
 					Compact: true,
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: domain.IAMID,
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -97,9 +100,10 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 								),
 							),
@@ -108,7 +112,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				provider: &fs.FSConfig{
 					Compact: true,
 					Enabled: true,
@@ -116,7 +120,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: domain.IAMID,
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -185,7 +189,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -209,16 +213,18 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								newDefaultDebugNotificationLogChangedEvent(context.Background(),
 									false),
 							),
@@ -227,7 +233,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				provider: &fs.FSConfig{
 					Compact: false,
 					Enabled: false,
@@ -235,7 +241,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -247,14 +253,15 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								newDefaultDebugNotificationLogChangedEvent(context.Background(),
 									false),
 							),
@@ -263,7 +270,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				provider: &fs.FSConfig{
 					Compact: false,
 					Enabled: true,
@@ -271,7 +278,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -333,29 +340,31 @@ func TestCommandSide_RemoveDebugNotificationProviderLog(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewDebugNotificationProviderLogRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate),
+									&instance.NewAggregate("INSTANCE").Aggregate),
 							),
 						},
 					),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -380,7 +389,7 @@ func TestCommandSide_RemoveDebugNotificationProviderLog(t *testing.T) {
 }
 func newDefaultDebugNotificationLogChangedEvent(ctx context.Context, compact bool) *instance.DebugNotificationProviderLogChangedEvent {
 	event, _ := instance.NewDebugNotificationProviderLogChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]settings.DebugNotificationProviderChanges{
 			settings.ChangeCompact(compact),
 		},

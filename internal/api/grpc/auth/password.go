@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/grpc/object"
 
 	"github.com/caos/zitadel/internal/api/authz"

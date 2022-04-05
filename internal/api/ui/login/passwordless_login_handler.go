@@ -25,7 +25,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 	var errID, errMessage, credentialData string
 	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
-		webAuthNLogin, err = l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID, authReq.InstanceID)
+		webAuthNLogin, err = l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID)
 	}
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -62,7 +62,7 @@ func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Re
 		l.renderPasswordlessVerification(w, r, authReq, formData.PasswordLogin, err)
 		return
 	}
-	err = l.authRepo.VerifyPasswordless(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID, authReq.InstanceID, credData, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyPasswordless(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID, credData, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderPasswordlessVerification(w, r, authReq, formData.PasswordLogin, err)
 		return

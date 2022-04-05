@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -16,12 +17,12 @@ type InstanceIDPOIDCConfigWriteModel struct {
 	OIDCConfigWriteModel
 }
 
-func NewInstanceIDPOIDCConfigWriteModel(idpConfigID string) *InstanceIDPOIDCConfigWriteModel {
+func NewInstanceIDPOIDCConfigWriteModel(ctx context.Context, idpConfigID string) *InstanceIDPOIDCConfigWriteModel {
 	return &InstanceIDPOIDCConfigWriteModel{
 		OIDCConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			IDPConfigID: idpConfigID,
 		},

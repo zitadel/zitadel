@@ -2,6 +2,9 @@ package command
 
 import (
 	"context"
+	"testing"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -10,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/policy"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
@@ -60,7 +62,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true, true, true, true,
 							),
@@ -69,7 +71,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    8,
 					HasUppercase: true,
@@ -90,9 +92,10 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									8,
 									true, true, true, true,
 								),
@@ -102,7 +105,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.PasswordComplexityPolicy{
 					MinLength:    8,
 					HasUppercase: true,
@@ -114,8 +117,9 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 			res: res{
 				want: &domain.PasswordComplexityPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						InstanceID:    "INSTANCE",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					MinLength:    8,
 					HasUppercase: true,
@@ -214,7 +218,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true, true, true, true,
 							),
@@ -244,7 +248,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true, true, true, true,
 							),
@@ -272,8 +276,8 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 			res: res{
 				want: &domain.PasswordComplexityPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					MinLength:    10,
 					HasUppercase: false,
@@ -305,7 +309,7 @@ func TestCommandSide_ChangeDefaultPasswordComplexityPolicy(t *testing.T) {
 
 func newDefaultPasswordComplexityPolicyChangedEvent(ctx context.Context, minLength uint64, hasUpper, hasLower, hasNumber, hasSymbol bool) *instance.PasswordComplexityPolicyChangedEvent {
 	event, _ := instance.NewPasswordComplexityPolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.PasswordComplexityPolicyChanges{
 			policy.ChangeMinLength(minLength),
 			policy.ChangeHasUppercase(hasUpper),

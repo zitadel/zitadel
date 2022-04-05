@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"testing"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -13,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
-	"testing"
 )
 
 func TestCommandSide_AddIAMMember(t *testing.T) {
@@ -127,7 +128,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 							),
 						),
@@ -174,13 +175,13 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					expectFilter(),
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internal"),
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+							eventFromEventPusherWithInstanceID("INSTANCE", instance.NewMemberAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							)),
 						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("IAM", "user1")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", member.NewAddMemberUniqueConstraint("INSTANCE", "user1")),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -190,7 +191,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -206,7 +207,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username1",
@@ -224,13 +226,15 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
-								"user1",
-								[]string{"IAM_OWNER"}...,
-							)),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewMemberAddedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									"user1",
+									[]string{"IAM_OWNER"}...,
+								)),
 						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("IAM", "user1")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", member.NewAddMemberUniqueConstraint("INSTANCE", "user1")),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -240,7 +244,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -249,8 +253,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 			res: res{
 				want: &domain.Member{
 					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "IAM",
-						AggregateID:   "IAM",
+						InstanceID:    "INSTANCE",
+						ResourceOwner: "INSTANCE",
+						AggregateID:   "INSTANCE",
 					},
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -284,8 +289,9 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx    context.Context
-		member *domain.Member
+		ctx        context.Context
+		instanceID string
+		member     *domain.Member
 	}
 	type res struct {
 		want *domain.Member
@@ -362,7 +368,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							),
@@ -394,7 +400,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							),
@@ -403,7 +409,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewMemberChangedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
 							)),
@@ -429,8 +435,8 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 			res: res{
 				want: &domain.Member{
 					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "IAM",
-						AggregateID:   "IAM",
+						ResourceOwner: "INSTANCE",
+						AggregateID:   "INSTANCE",
 					},
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER", "IAM_OWNER_VIEWER"},
@@ -463,8 +469,9 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		userID string
+		ctx        context.Context
+		instanceID string
+		userID     string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -515,7 +522,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							),
@@ -524,11 +531,11 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewMemberRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 							)),
 						},
-						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("IAM", "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("INSTANCE", "user1")),
 					),
 				),
 			},
@@ -538,7 +545,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},

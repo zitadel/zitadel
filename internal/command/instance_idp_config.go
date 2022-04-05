@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -21,7 +22,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 	if err != nil {
 		return nil, err
 	}
-	addedConfig := NewInstanceIDPConfigWriteModel(idpConfigID)
+	addedConfig := NewInstanceIDPConfigWriteModel(ctx, idpConfigID)
 
 	instanceAgg := InstanceAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.Command{
@@ -159,7 +160,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 	}
 
 	for _, idpProvider := range idpProviders {
-		if idpProvider.AggregateID == domain.IAMID {
+		if idpProvider.AggregateID == authz.GetInstance(ctx).InstanceID() {
 			userEvents := c.removeIDPProviderFromDefaultLoginPolicy(ctx, instanceAgg, idpProvider, true, externalIDPs...)
 			events = append(events, userEvents...)
 		}
@@ -194,7 +195,7 @@ func (c *Commands) isntanceIDPConfigWriteModelByID(ctx context.Context, idpID st
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceIDPConfigWriteModel(idpID)
+	writeModel := NewInstanceIDPConfigWriteModel(ctx, idpID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

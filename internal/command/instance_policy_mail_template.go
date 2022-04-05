@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
-	addedPolicy := NewInstanceMailTemplateWriteModel()
+	addedPolicy := NewInstanceMailTemplateWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
 	event, err := c.addDefaultMailTemplate(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -86,7 +86,7 @@ func (c *Commands) defaultMailTemplateWriteModelByID(ctx context.Context) (polic
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceMailTemplateWriteModel()
+	writeModel := NewInstanceMailTemplateWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

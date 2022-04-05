@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -61,9 +62,10 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 					t,
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewIDPConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1",
 									"name1",
 									domain.IDPConfigTypeOIDC,
@@ -71,9 +73,10 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 									true,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewIDPOIDCConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"clientid1",
 									"config1",
 									"issuer",
@@ -91,14 +94,14 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "IAM")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "config1"),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				config: &domain.IDPConfig{
 					Name:         "name1",
 					StylingType:  domain.IDPConfigStylingTypeGoogle,
@@ -118,8 +121,9 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 			res: res{
 				want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						InstanceID:    "INSTANCE",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID:  "config1",
 					Name:         "name1",
@@ -136,9 +140,10 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 					t,
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewIDPConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1",
 									"name1",
 									domain.IDPConfigTypeOIDC,
@@ -146,9 +151,10 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 									false,
 								),
 							),
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewIDPJWTConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1",
 									"jwt-endpoint",
 									"issuer",
@@ -157,13 +163,13 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "IAM")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "config1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				config: &domain.IDPConfig{
 					Name:        "name1",
 					StylingType: domain.IDPConfigStylingTypeGoogle,
@@ -178,8 +184,9 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 			res: res{
 				want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						InstanceID:    "INSTANCE",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID: "config1",
 					Name:        "name1",
@@ -269,7 +276,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -279,7 +286,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -303,8 +310,8 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 								newDefaultIDPConfigChangedEvent(context.Background(), "config1", "name1", "name2", domain.IDPConfigStylingTypeUnspecified, false),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "IAM")),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name2", "IAM")),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name2", "INSTANCE")),
 					),
 				),
 			},
@@ -320,8 +327,8 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 			res: res{
 				want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID:  "config1",
 					Name:         "name2",
@@ -353,7 +360,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 
 func newDefaultIDPConfigChangedEvent(ctx context.Context, configID, oldName, newName string, stylingType domain.IDPConfigStylingType, autoRegister bool) *instance.IDPConfigChangedEvent {
 	event, _ := instance.NewIDPConfigChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		configID,
 		oldName,
 		[]idpconfig.IDPConfigChanges{

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -22,11 +23,11 @@ type InstanceSecretGeneratorConfigWriteModel struct {
 	State               domain.SecretGeneratorState
 }
 
-func NewInstanceSecretGeneratorConfigWriteModel(GeneratorType domain.SecretGeneratorType) *InstanceSecretGeneratorConfigWriteModel {
+func NewInstanceSecretGeneratorConfigWriteModel(ctx context.Context, GeneratorType domain.SecretGeneratorType) *InstanceSecretGeneratorConfigWriteModel {
 	return &InstanceSecretGeneratorConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   authz.GetInstance(ctx).InstanceID(),
+			ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 		},
 		GeneratorType: GeneratorType,
 	}

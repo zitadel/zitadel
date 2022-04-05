@@ -159,7 +159,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,
@@ -178,7 +178,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								false,
 								false,
@@ -191,7 +191,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"primary",
 								"secondary",
 								"warn",
@@ -240,7 +240,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
 								"text",
@@ -252,7 +252,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.LoginCustomText,
 								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
@@ -264,7 +264,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"toslink",
 								"privacylink",
 								"helpLink",
@@ -275,7 +275,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								5,
 								false,
 							),
@@ -343,7 +343,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,
@@ -362,7 +362,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								false,
 								false,
@@ -375,7 +375,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"primary",
 								"secondary",
 								"warn",
@@ -445,7 +445,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
 								"text",
@@ -457,7 +457,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.LoginCustomText,
 								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
@@ -469,7 +469,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"toslink",
 								"privacylink",
 								"helplink",
@@ -480,7 +480,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								5,
 								false,
 							),
@@ -553,7 +553,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,
@@ -572,7 +572,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								false,
 								false,
@@ -585,7 +585,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"primary",
 								"secondary",
 								"warn",
@@ -662,7 +662,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
 								"text",
@@ -674,7 +674,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.LoginCustomText,
 								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
@@ -686,7 +686,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"toslink",
 								"privacylink",
 								"helplink",
@@ -697,7 +697,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								5,
 								false,
 							),
@@ -773,7 +773,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,
@@ -792,7 +792,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								false,
 								false,
@@ -805,7 +805,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"primary",
 								"secondary",
 								"warn",
@@ -889,7 +889,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
 								"text",
@@ -901,7 +901,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.LoginCustomText,
 								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
@@ -913,7 +913,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"toslink",
 								"privacylink",
 								"helplink",
@@ -924,7 +924,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								5,
 								false,
 							),
@@ -1008,7 +1008,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -1025,7 +1025,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,
@@ -1045,7 +1045,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
 								true,
@@ -1064,10 +1064,10 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					//orgLoginPolicyAuthFactorsWriteModel
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(), &instance.NewAggregate().Aggregate, domain.SecondFactorTypeU2F),
+							instance.NewLoginPolicySecondFactorAddedEvent(context.Background(), &instance.NewAggregate("INSTANCE").Aggregate, domain.SecondFactorTypeU2F),
 						),
 						eventFromEventPusher(
-							instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &instance.NewAggregate().Aggregate, domain.MultiFactorTypeU2FWithPIN),
+							instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &instance.NewAggregate("INSTANCE").Aggregate, domain.MultiFactorTypeU2FWithPIN),
 						),
 						eventFromEventPusher(
 							org.NewLoginPolicySecondFactorAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.SecondFactorTypeOTP),
@@ -1085,7 +1085,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								false,
 								false,
@@ -1096,7 +1096,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								7,
 								false,
 								false,
@@ -1111,7 +1111,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"primary",
 								"secondary",
 								"warn",
@@ -1128,7 +1128,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"custom",
 								"secondary",
 								"warn",
@@ -1181,7 +1181,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
 								"text",
@@ -1193,7 +1193,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.LoginCustomText,
 								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
@@ -1205,7 +1205,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"toslink",
 								"privacylink",
 								"helplink",
@@ -1318,7 +1318,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,
@@ -1337,7 +1337,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								false,
 								false,
@@ -1350,7 +1350,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"primary",
 								"secondary",
 								"warn",
@@ -1399,7 +1399,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
 								"text",
@@ -1411,7 +1411,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.LoginCustomText,
 								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
@@ -1423,7 +1423,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"toslink",
 								"privacylink",
 								"helplink",
@@ -1434,7 +1434,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								5,
 								false,
 							),
@@ -1583,7 +1583,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,
@@ -1602,7 +1602,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								false,
 								false,
@@ -1615,7 +1615,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"primary",
 								"secondary",
 								"warn",
@@ -1664,7 +1664,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.InitCodeMessageType,
 								domain.MessageSubject,
 								"text",
@@ -1676,7 +1676,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewCustomTextSetEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.LoginCustomText,
 								domain.LoginKeyExternalRegistrationUserOverviewTitle,
 								"text",
@@ -1688,7 +1688,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewPrivacyPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"toslink",
 								"privacylink",
 								"helplink",
@@ -1699,7 +1699,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewLockoutPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								5,
 								false,
 							),
@@ -1751,7 +1751,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 func newIAMFeaturesSetEvent(ctx context.Context, tierName string, state domain.FeaturesState, auditLog time.Duration) *instance.FeaturesSetEvent {
 	event, _ := instance.NewFeaturesSetEvent(
 		ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]features.FeaturesChanges{
 			features.ChangeTierName(tierName),
 			features.ChangeState(state),

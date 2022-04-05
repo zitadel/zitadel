@@ -13,7 +13,7 @@ import (
 )
 
 func (c *Commands) SetInstanceCustomText(ctx context.Context, customText *domain.CustomText) (*domain.CustomText, error) {
-	setText := NewInstanceCustomTextWriteModel(customText.Key, customText.Language)
+	setText := NewInstanceCustomTextWriteModel(ctx, customText.Key, customText.Language)
 	instanceAgg := InstanceAggregateFromWriteModel(&setText.CustomTextWriteModel.WriteModel)
 	event, err := c.setDefaultCustomText(ctx, instanceAgg, setText, customText)
 	if err != nil {
@@ -52,7 +52,7 @@ func (c *Commands) defaultCustomTextWriteModelByID(ctx context.Context, key stri
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceCustomTextWriteModel(key, language)
+	writeModel := NewInstanceCustomTextWriteModel(ctx, key, language)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

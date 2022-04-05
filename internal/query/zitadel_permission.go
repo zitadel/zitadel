@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 )
 
@@ -11,7 +12,7 @@ func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string
 	if err != nil {
 		return nil, err
 	}
-	orgIDsQuery, err := NewMembershipResourceOwnersSearchQuery(orgID, domain.IAMID)
+	orgIDsQuery, err := NewMembershipResourceOwnersSearchQuery(orgID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}

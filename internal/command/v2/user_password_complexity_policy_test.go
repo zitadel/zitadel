@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
@@ -128,7 +129,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 					return []eventstore.Event{
 						instance.NewPasswordComplexityPolicyAddedEvent(
 							context.Background(),
-							&instance.NewAggregate().Aggregate,
+							&instance.NewAggregate("INSTANCE").Aggregate,
 							8,
 							true,
 							true,
@@ -140,8 +141,8 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 			},
 			want: &command.PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
-					AggregateID:   "IAM",
-					ResourceOwner: "IAM",
+					AggregateID:   "INSTANCE",
+					ResourceOwner: "INSTANCE",
 					Events:        []eventstore.Event{},
 				},
 				MinLength:    8,
@@ -156,7 +157,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := defaultPasswordComplexityPolicy(context.Background(), tt.args.filter)
+			got, err := defaultPasswordComplexityPolicy(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultPasswordComplexityPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -246,7 +247,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 						return []eventstore.Event{
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true,
 								true,
@@ -259,8 +260,8 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 			},
 			want: &command.PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
-					AggregateID:   "IAM",
-					ResourceOwner: "IAM",
+					AggregateID:   "INSTANCE",
+					ResourceOwner: "INSTANCE",
 					Events:        []eventstore.Event{},
 				},
 				MinLength:    8,
@@ -285,7 +286,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := passwordComplexityPolicyWriteModel(context.Background(), tt.args.filter)
+			got, err := passwordComplexityPolicyWriteModel(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultPasswordComplexityPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return

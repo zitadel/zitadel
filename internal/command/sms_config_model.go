@@ -23,11 +23,11 @@ type TwilioConfig struct {
 	SenderNumber string
 }
 
-func NewIAMSMSConfigWriteModel(id string) *IAMSMSConfigWriteModel {
+func NewIAMSMSConfigWriteModel(instanceID, id string) *IAMSMSConfigWriteModel {
 	return &IAMSMSConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
 		},
 		ID: id,
 	}
