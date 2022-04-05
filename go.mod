@@ -57,15 +57,15 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0
-	go.opentelemetry.io/otel v1.2.0
+	go.opentelemetry.io/otel v1.6.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.2.0
 	go.opentelemetry.io/otel/exporters/prometheus v0.25.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.2.0
-	go.opentelemetry.io/otel/metric v0.25.0
-	go.opentelemetry.io/otel/sdk v1.2.0
+	go.opentelemetry.io/otel/metric v0.28.0
+	go.opentelemetry.io/otel/sdk v1.6.0
 	go.opentelemetry.io/otel/sdk/export/metric v0.25.0
-	go.opentelemetry.io/otel/sdk/metric v0.25.0
-	go.opentelemetry.io/otel/trace v1.2.0
+	go.opentelemetry.io/otel/sdk/metric v0.28.0
+	go.opentelemetry.io/otel/trace v1.6.0
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -134,7 +134,8 @@ require (
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.0.0 // indirect
 	github.com/go-git/go-git/v5 v5.2.0 // indirect
-	github.com/go-logr/logr v0.4.0 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b // indirect
 	github.com/gobuffalo/flect v0.2.3 // indirect
@@ -201,7 +202,6 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.2.0 // indirect
-	go.opentelemetry.io/otel/internal/metric v0.25.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220403103023-749bd193bc2b // indirect
