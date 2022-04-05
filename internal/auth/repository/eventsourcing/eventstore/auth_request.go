@@ -26,6 +26,8 @@ import (
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
+const unknownUserID = "UNKNOWN"
+
 type AuthRequestRepo struct {
 	Command      *command.Commands
 	Query        *query.Queries
@@ -629,7 +631,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
-		request.SetUserInfo("UNKNOWN", loginName, loginName, "", "", request.RequestedOrgID)
+		request.SetUserInfo(unknownUserID, loginName, loginName, "", "", request.RequestedOrgID)
 		return nil
 	}
 	if err != nil {
