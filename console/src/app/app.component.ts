@@ -358,7 +358,6 @@ export class AppComponent implements OnDestroy {
   }
 
   public setActiveOrg(org: Org.AsObject): void {
-    console.log(this.org);
     this.org = org;
     this.authService.setActiveOrg(org);
     this.loadPrivateLabelling();
