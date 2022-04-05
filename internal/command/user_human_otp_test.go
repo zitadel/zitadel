@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -46,7 +45,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "",
 			},
@@ -63,7 +62,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
 			},
@@ -96,7 +95,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
 			},
@@ -138,7 +137,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
 			},
@@ -202,7 +201,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
 			},
