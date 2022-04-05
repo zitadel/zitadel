@@ -26,11 +26,11 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bucketName := authz.GetInstance(r.Context()).InstanceID()
+	resourceOwner := authz.GetInstance(r.Context()).InstanceID()
 	if data.OrgID != "" && !data.DefaultPolicy {
-		bucketName = data.OrgID
+		resourceOwner = data.OrgID
 	}
 
-	err = assets.GetAsset(w, r, bucketName, data.FileName, l.staticStorage)
-	logging.WithFields("file", data.FileName, "org", bucketName).OnError(err).Warn("asset in login could not be served")
+	err = assets.GetAsset(w, r, resourceOwner, data.FileName, l.staticStorage)
+	logging.WithFields("file", data.FileName, "org", resourceOwner).OnError(err).Warn("asset in login could not be served")
 }
