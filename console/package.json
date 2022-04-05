@@ -78,7 +78,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.7.0",
-    "mochawesome": "^6.2.2",
+    "mochawesome": "^7.1.3",
     "prettier": "^2.4.1",
     "protractor": "~7.0.0",
     "stylelint": "^13.10.0",
