@@ -29,9 +29,7 @@ export class InfoRowComponent implements OnInit {
         .toPromise().then((env: any) => {
           this.environmentMap = {
             issuer: env.issuer,
-            adminServiceUrl: env.adminServiceUrl,
-            mgmtServiceUrl: env.mgmtServiceUrl,
-            authServiceUrl: env.adminServiceUrl,
+            api: env.api,
           };
         });
     }

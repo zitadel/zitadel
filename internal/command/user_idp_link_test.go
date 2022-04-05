@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
@@ -208,7 +208,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewIDPConfigAddedEvent(context.Background(),
+							instance.NewIDPConfigAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"config1",
 								"name",

@@ -54,7 +54,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 
 	unprocessedEvents, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
 	if err != nil {
-		logging.LogWithFields("HANDL-L6YH1", "seq", event.Sequence).Warn("filter failed")
+		logging.WithFields("HANDL-L6YH1", "sequence", event.Sequence).Warn("filter failed")
 		return
 	}
 
@@ -74,12 +74,12 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		}
 
 		err = handler.Reduce(unprocessedEvent)
-		logging.LogWithFields("HANDL-V42TI", "seq", unprocessedEvent.Sequence).OnError(err).Warn("reduce failed")
+		logging.WithFields("HANDL-V42TI", "sequence", unprocessedEvent.Sequence).OnError(err).Warn("reduce failed")
 	}
 	if len(unprocessedEvents) == eventLimit {
-		logging.LogWithFields("QUERY-BSqe9", "seq", event.Sequence).Warn("didnt process event")
+		logging.WithFields("QUERY-BSqe9", "sequence", event.Sequence).Warn("didnt process event")
 		return
 	}
 	err = handler.Reduce(event)
-	logging.LogWithFields("HANDL-wQDL2", "seq", event.Sequence).OnError(err).Warn("reduce failed")
+	logging.WithFields("HANDL-wQDL2", "sequence", event.Sequence).OnError(err).Warn("reduce failed")
 }

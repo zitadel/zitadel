@@ -8,7 +8,7 @@ type ObjectRoot struct {
 	AggregateID   string    `json:"-"`
 	Sequence      uint64    `json:"-"`
 	ResourceOwner string    `json:"-"`
-	Tenant        string    `json:"-"`
+	InstanceID    string    `json:"-"`
 	CreationDate  time.Time `json:"-"`
 	ChangeDate    time.Time `json:"-"`
 }
@@ -22,8 +22,8 @@ func (o *ObjectRoot) AppendEvent(event *Event) {
 	if o.ResourceOwner == "" {
 		o.ResourceOwner = event.ResourceOwner
 	}
-	if o.Tenant == "" {
-		o.Tenant = event.Tenant
+	if o.InstanceID == "" {
+		o.InstanceID = event.InstanceID
 	}
 
 	o.ChangeDate = event.CreationDate

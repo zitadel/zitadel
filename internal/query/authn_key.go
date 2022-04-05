@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -27,6 +29,10 @@ var (
 	}
 	AuthNKeyColumnResourceOwner = Column{
 		name:  projection.AuthNKeyResourceOwnerCol,
+		table: authNKeyTable,
+	}
+	AuthNKeyColumnInstanceID = Column{
+		name:  projection.AuthNKeyInstanceIDCol,
 		table: authNKeyTable,
 	}
 	AuthNKeyColumnAggregateID = Column{
@@ -96,7 +102,8 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	query = queries.toQuery(query)
 	stmt, args, err := query.Where(
 		sq.Eq{
-			AuthNKeyColumnEnabled.identifier(): true,
+			AuthNKeyColumnEnabled.identifier():    true,
+			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -122,8 +129,9 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, id string, queries ...Sea
 	}
 	stmt, args, err := query.Where(
 		sq.Eq{
-			AuthNKeyColumnID.identifier():      id,
-			AuthNKeyColumnEnabled.identifier(): true,
+			AuthNKeyColumnID.identifier():         id,
+			AuthNKeyColumnEnabled.identifier():    true,
+			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AGhg4", "Errors.Query.SQLStatement")
@@ -141,6 +149,7 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 				AuthNKeyColumnID.identifier():         id,
 				AuthNKeyColumnIdentifier.identifier(): identifier,
 				AuthNKeyColumnEnabled.identifier():    true,
+				AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Gt{
 				AuthNKeyColumnExpiration.identifier(): time.Now(),

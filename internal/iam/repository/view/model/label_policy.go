@@ -4,21 +4,20 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 const (
 	LabelPolicyKeyAggregateID = "aggregate_id"
 	LabelPolicyKeyState       = "label_policy_state"
+	LabelPolicyKeyInstanceID  = "instance_id"
 )
 
 type LabelPolicyView struct {
@@ -45,7 +44,8 @@ type LabelPolicyView struct {
 	DisableWatermark    bool   `json:"disableWatermark" gorm:"column:disable_watermark"`
 	Default             bool   `json:"-" gorm:"-"`
 
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
+	Sequence   uint64 `json:"-" gorm:"column:sequence"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
 }
 
 type AssetView struct {
@@ -82,101 +82,85 @@ func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
 	}
 }
 
-func LabelPolicyViewToModel(policy *LabelPolicyView) *model.LabelPolicyView {
-	return &model.LabelPolicyView{
-		AggregateID:  policy.AggregateID,
-		Sequence:     policy.Sequence,
-		CreationDate: policy.CreationDate,
-		ChangeDate:   policy.ChangeDate,
-
-		PrimaryColor:    policy.PrimaryColor,
-		BackgroundColor: policy.BackgroundColor,
-		WarnColor:       policy.WarnColor,
-		FontColor:       policy.FontColor,
-		LogoURL:         policy.LogoURL,
-		IconURL:         policy.IconURL,
-
-		PrimaryColorDark:    policy.PrimaryColorDark,
-		BackgroundColorDark: policy.BackgroundColorDark,
-		WarnColorDark:       policy.WarnColorDark,
-		FontColorDark:       policy.FontColorDark,
-		LogoDarkURL:         policy.LogoDarkURL,
-		IconDarkURL:         policy.IconDarkURL,
-
-		FontURL: policy.FontURL,
-
-		HideLoginNameSuffix: policy.HideLoginNameSuffix,
-		ErrorMsgPopup:       policy.ErrorMsgPopup,
-		DisableWatermark:    policy.DisableWatermark,
-		Default:             policy.Default,
-	}
-}
-
 func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 	asset := &AssetView{}
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.LabelPolicyAdded, org_es_model.LabelPolicyAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.LabelPolicyAddedEventType,
+		org.LabelPolicyAddedEventType:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		i.State = int32(domain.LabelPolicyStatePreview)
 		err = i.SetData(event)
-	case es_model.LabelPolicyChanged, org_es_model.LabelPolicyChanged:
+	case instance.LabelPolicyChangedEventType,
+		org.LabelPolicyChangedEventType:
 		err = i.SetData(event)
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyLogoAdded, org_es_model.LabelPolicyLogoAdded:
+	case instance.LabelPolicyLogoAddedEventType,
+		org.LabelPolicyLogoAddedEventType:
 		err = asset.SetData(event)
 		if err != nil {
 			return err
 		}
 		i.LogoURL = asset.AssetURL
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyLogoRemoved, org_es_model.LabelPolicyLogoRemoved:
+	case instance.LabelPolicyLogoRemovedEventType,
+		org.LabelPolicyLogoRemovedEventType:
 		i.LogoURL = ""
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyIconAdded, org_es_model.LabelPolicyIconAdded:
+	case instance.LabelPolicyIconAddedEventType,
+		org.LabelPolicyIconAddedEventType:
 		err = asset.SetData(event)
 		if err != nil {
 			return err
 		}
 		i.IconURL = asset.AssetURL
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyIconRemoved, org_es_model.LabelPolicyIconRemoved:
+	case instance.LabelPolicyIconRemovedEventType,
+		org.LabelPolicyIconRemovedEventType:
 		i.IconURL = ""
-	case es_model.LabelPolicyLogoDarkAdded, org_es_model.LabelPolicyLogoDarkAdded:
+	case instance.LabelPolicyLogoDarkAddedEventType,
+		org.LabelPolicyLogoDarkAddedEventType:
 		err = asset.SetData(event)
 		if err != nil {
 			return err
 		}
 		i.LogoDarkURL = asset.AssetURL
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyLogoDarkRemoved, org_es_model.LabelPolicyLogoDarkRemoved:
+	case instance.LabelPolicyLogoDarkRemovedEventType,
+		org.LabelPolicyLogoDarkRemovedEventType:
 		i.LogoDarkURL = ""
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyIconDarkAdded, org_es_model.LabelPolicyIconDarkAdded:
+	case instance.LabelPolicyIconDarkAddedEventType,
+		org.LabelPolicyIconDarkAddedEventType:
 		err = asset.SetData(event)
 		if err != nil {
 			return err
 		}
 		i.IconDarkURL = asset.AssetURL
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyIconDarkRemoved, org_es_model.LabelPolicyIconDarkRemoved:
+	case instance.LabelPolicyIconDarkRemovedEventType,
+		org.LabelPolicyIconDarkRemovedEventType:
 		i.IconDarkURL = ""
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyFontAdded, org_es_model.LabelPolicyFontAdded:
+	case instance.LabelPolicyFontAddedEventType,
+		org.LabelPolicyFontAddedEventType:
 		err = asset.SetData(event)
 		if err != nil {
 			return err
 		}
 		i.FontURL = asset.AssetURL
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyFontRemoved, org_es_model.LabelPolicyFontRemoved:
+	case instance.LabelPolicyFontRemovedEventType,
+		org.LabelPolicyFontRemovedEventType:
 		i.FontURL = ""
 		i.State = int32(domain.LabelPolicyStatePreview)
-	case es_model.LabelPolicyActivated, org_es_model.LabelPolicyActivated:
+	case instance.LabelPolicyActivatedEventType,
+		org.LabelPolicyActivatedEventType:
 		i.State = int32(domain.LabelPolicyStateActive)
-	case es_model.LabelPolicyAssetsRemoved, org_es_model.LabelPolicyAssetsRemoved:
+	case instance.LabelPolicyAssetsRemovedEventType,
+		org.LabelPolicyAssetsRemovedEventType:
 		i.LogoURL = ""
 		i.IconURL = ""
 		i.LogoDarkURL = ""
@@ -189,6 +173,7 @@ func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 
 func (r *LabelPolicyView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
+	r.InstanceID = event.InstanceID
 }
 
 func (r *LabelPolicyView) SetData(event *models.Event) error {

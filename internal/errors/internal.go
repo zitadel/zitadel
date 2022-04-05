@@ -32,3 +32,11 @@ func IsInternal(err error) bool {
 	_, ok := err.(Internal)
 	return ok
 }
+
+func (err *InternalError) Is(target error) bool {
+	t, ok := target.(*InternalError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}

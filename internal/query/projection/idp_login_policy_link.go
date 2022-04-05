@@ -3,29 +3,51 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
+)
+
+const (
+	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links"
+
+	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
+	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
+	IDPLoginPolicyLinkCreationDateCol  = "creation_date"
+	IDPLoginPolicyLinkChangeDateCol    = "change_date"
+	IDPLoginPolicyLinkSequenceCol      = "sequence"
+	IDPLoginPolicyLinkResourceOwnerCol = "resource_owner"
+	IDPLoginPolicyLinkInstanceIDCol    = "instance_id"
+	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
 )
 
 type IDPLoginPolicyLinkProjection struct {
 	crdb.StatementHandler
 }
 
-const (
-	IDPLoginPolicyLinkTable = "zitadel.projections.idp_login_policy_links"
-)
-
 func NewIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPLoginPolicyLinkProjection {
 	p := new(IDPLoginPolicyLinkProjection)
 	config.ProjectionName = IDPLoginPolicyLinkTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(IDPLoginPolicyLinkIDPIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPLoginPolicyLinkAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPLoginPolicyLinkCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPLoginPolicyLinkChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPLoginPolicyLinkSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPLoginPolicyLinkInstanceIDCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(IDPLoginPolicyLinkInstanceIDCol, IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
+			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{IDPLoginPolicyLinkResourceOwnerCol})),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -58,38 +80,28 @@ func (p *IDPLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.LoginPolicyIDPProviderAddedEventType,
+					Event:  instance.LoginPolicyIDPProviderAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.LoginPolicyIDPProviderCascadeRemovedEventType,
+					Event:  instance.LoginPolicyIDPProviderCascadeRemovedEventType,
 					Reduce: p.reduceCascadeRemoved,
 				},
 				{
-					Event:  iam.LoginPolicyIDPProviderRemovedEventType,
+					Event:  instance.LoginPolicyIDPProviderRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 				{
-					Event:  iam.IDPConfigRemovedEventType,
+					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
 			},
 		},
 	}
 }
-
-const (
-	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
-	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
-	IDPLoginPolicyLinkCreationDateCol  = "creation_date"
-	IDPLoginPolicyLinkChangeDateCol    = "change_date"
-	IDPLoginPolicyLinkSequenceCol      = "sequence"
-	IDPLoginPolicyLinkResourceOwnerCol = "resource_owner"
-	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
-)
 
 func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var (
@@ -101,12 +113,11 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*han
 	case *org.IdentityProviderAddedEvent:
 		idp = e.IdentityProviderAddedEvent
 		providerType = domain.IdentityProviderTypeOrg
-	case *iam.IdentityProviderAddedEvent:
+	case *instance.IdentityProviderAddedEvent:
 		idp = e.IdentityProviderAddedEvent
 		providerType = domain.IdentityProviderTypeSystem
 	default:
-		logging.LogWithFields("HANDL-oce92", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, iam.LoginPolicyIDPProviderAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Nlp55", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Nlp55", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, instance.LoginPolicyIDPProviderAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(&idp,
@@ -117,6 +128,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*han
 			handler.NewCol(IDPLoginPolicyLinkChangeDateCol, idp.CreationDate()),
 			handler.NewCol(IDPLoginPolicyLinkSequenceCol, idp.Sequence()),
 			handler.NewCol(IDPLoginPolicyLinkResourceOwnerCol, idp.Aggregate().ResourceOwner),
+			handler.NewCol(IDPLoginPolicyLinkInstanceIDCol, idp.Aggregate().InstanceID),
 			handler.NewCol(IDPLoginPolicyLinkProviderTypeCol, providerType),
 		},
 	), nil
@@ -128,11 +140,10 @@ func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*h
 	switch e := event.(type) {
 	case *org.IdentityProviderRemovedEvent:
 		idp = e.IdentityProviderRemovedEvent
-	case *iam.IdentityProviderRemovedEvent:
+	case *instance.IdentityProviderRemovedEvent:
 		idp = e.IdentityProviderRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-vAH3I", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, iam.LoginPolicyIDPProviderRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-tUMYY", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-tUMYY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, instance.LoginPolicyIDPProviderRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(&idp,
@@ -149,11 +160,10 @@ func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 	switch e := event.(type) {
 	case *org.IdentityProviderCascadeRemovedEvent:
 		idp = e.IdentityProviderCascadeRemovedEvent
-	case *iam.IdentityProviderCascadeRemovedEvent:
+	case *instance.IdentityProviderCascadeRemovedEvent:
 		idp = e.IdentityProviderCascadeRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-7lZaf", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, iam.LoginPolicyIDPProviderCascadeRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-iCKSj", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, instance.LoginPolicyIDPProviderCascadeRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(&idp,
@@ -170,11 +180,10 @@ func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
-	case *iam.IDPConfigRemovedEvent:
+	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		logging.LogWithFields("HANDL-aJvob", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-u6tze", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-u6tze", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(event,
@@ -188,8 +197,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 func (p *IDPLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-WTYC1", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-QSoSe", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QSoSe", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{

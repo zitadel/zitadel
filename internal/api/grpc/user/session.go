@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/user"
 )
@@ -34,11 +34,11 @@ func UserSessionToPb(session *user_model.UserSessionView) *user.Session {
 	}
 }
 
-func SessionStateToPb(state auth_req_model.UserSessionState) user.SessionState {
+func SessionStateToPb(state domain.UserSessionState) user.SessionState {
 	switch state {
-	case auth_req_model.UserSessionStateActive:
+	case domain.UserSessionStateActive:
 		return user.SessionState_SESSION_STATE_ACTIVE
-	case auth_req_model.UserSessionStateTerminated:
+	case domain.UserSessionStateTerminated:
 		return user.SessionState_SESSION_STATE_TERMINATED
 	default:
 		return user.SessionState_SESSION_STATE_UNSPECIFIED

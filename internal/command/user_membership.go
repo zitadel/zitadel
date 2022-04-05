@@ -5,7 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
 )
@@ -14,8 +14,8 @@ func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*que
 	events := make([]eventstore.Command, 0)
 	for _, membership := range memberships {
 		if membership.IAM != nil {
-			iamAgg := iam.NewAggregate()
-			removeEvent := c.removeIAMMember(ctx, &iamAgg.Aggregate, membership.UserID, true)
+			iamAgg := instance.NewAggregate(membership.IAM.IAMID)
+			removeEvent := c.removeInstanceMember(ctx, &iamAgg.Aggregate, membership.UserID, true)
 			events = append(events, removeEvent)
 		} else if membership.Org != nil {
 			iamAgg := org.NewAggregate(membership.Org.OrgID, membership.ResourceOwner)

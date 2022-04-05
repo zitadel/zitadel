@@ -3,14 +3,15 @@ package projection
 import (
 	"testing"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/lib/pq"
 )
 
 func TestIDPProjection_reduces(t *testing.T) {
@@ -24,11 +25,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam.reduceIDPAdded",
+			name: "instance.reduceIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"name": "custom-zitadel-instance",
@@ -36,24 +37,25 @@ func TestIDPProjection_reduces(t *testing.T) {
 	"stylingType": 0,
 	"autoRegister": true
 }`),
-				), iam.IDPConfigAddedEventMapper),
+				), instance.IDPConfigAddedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps (id, creation_date, change_date, sequence, resource_owner, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idps (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.IDPConfigStateActive,
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeUnspecified,
@@ -66,29 +68,29 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPChanged",
+			name: "instance.reduceIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"name": "custom-zitadel-instance",
 	"stylingType": 1,
 	"autoRegister": true
 }`),
-				), iam.IDPConfigChangedEventMapper),
+				), instance.IDPConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.idps SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeGoogle,
@@ -103,26 +105,26 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPDeactivated",
+			name: "instance.reduceIDPDeactivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigDeactivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigDeactivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id"
 }`),
-				), iam.IDPConfigDeactivatedEventMapper),
+				), instance.IDPConfigDeactivatedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateInactive,
 								anyArg{},
@@ -135,26 +137,26 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPReactivated",
+			name: "instance.reduceIDPReactivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigReactivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigReactivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id"
 }`),
-				), iam.IDPConfigReactivatedEventMapper),
+				), instance.IDPConfigReactivatedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPReactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateActive,
 								anyArg{},
@@ -167,26 +169,26 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPRemoved",
+			name: "instance.reduceIDPRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id"
 }`),
-				), iam.IDPConfigRemovedEventMapper),
+				), instance.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idps WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.idps WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 							},
@@ -196,11 +198,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceOIDCConfigAdded",
+			name: "instance.reduceOIDCConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPOIDCConfigAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPOIDCConfigAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"clientId": "client-id",
@@ -216,18 +218,18 @@ func TestIDPProjection_reduces(t *testing.T) {
     "idpDisplayNameMapping": 0,
     "usernameMapping": 1
 }`),
-				), iam.IDPOIDCConfigAddedEventMapper),
+				), instance.IDPOIDCConfigAddedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -236,7 +238,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps_oidc_config (idp_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idps_oidc_config (idp_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"client-id",
@@ -254,11 +256,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceOIDCConfigChanged",
+			name: "instance.reduceOIDCConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPOIDCConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPOIDCConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"clientId": "client-id",
@@ -274,18 +276,18 @@ func TestIDPProjection_reduces(t *testing.T) {
     "idpDisplayNameMapping": 0,
     "usernameMapping": 1
 }`),
-				), iam.IDPOIDCConfigChangedEventMapper),
+				), instance.IDPOIDCConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -293,7 +295,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9)",
+							expectedStmt: "UPDATE projections.idps_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9)",
 							expectedArgs: []interface{}{
 								"client-id",
 								anyArg{},
@@ -311,17 +313,17 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceOIDCConfigChanged: no op",
+			name: "instance.reduceOIDCConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPOIDCConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPOIDCConfigChangedEventType),
+					instance.AggregateType,
 					[]byte("{}"),
-				), iam.IDPOIDCConfigChangedEventMapper),
+				), instance.IDPOIDCConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -331,11 +333,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceJWTConfigAdded",
+			name: "instance.reduceJWTConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPJWTConfigAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPJWTConfigAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"jwtEndpoint": "https://api.zitadel.ch/jwt",
@@ -343,18 +345,18 @@ func TestIDPProjection_reduces(t *testing.T) {
     "keysEndpoint": "https://api.zitadel.ch/keys",
     "headerName": "hodor"
 }`),
-				), iam.IDPJWTConfigAddedEventMapper),
+				), instance.IDPJWTConfigAddedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -363,7 +365,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps_jwt_config (idp_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idps_jwt_config (idp_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"https://api.zitadel.ch/jwt",
@@ -377,11 +379,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceJWTConfigChanged",
+			name: "instance.reduceJWTConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPJWTConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPJWTConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"jwtEndpoint": "https://api.zitadel.ch/jwt",
@@ -389,18 +391,18 @@ func TestIDPProjection_reduces(t *testing.T) {
     "keysEndpoint": "https://api.zitadel.ch/keys",
     "headerName": "hodor"
 }`),
-				), iam.IDPJWTConfigChangedEventMapper),
+				), instance.IDPJWTConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -408,7 +410,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5)",
+							expectedStmt: "UPDATE projections.idps_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5)",
 							expectedArgs: []interface{}{
 								"https://api.zitadel.ch/jwt",
 								"issuer",
@@ -422,17 +424,17 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceJWTConfigChanged: no op",
+			name: "instance.reduceJWTConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPJWTConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPJWTConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{}`),
-				), iam.IDPJWTConfigChangedEventMapper),
+				), instance.IDPJWTConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -465,13 +467,14 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps (id, creation_date, change_date, sequence, resource_owner, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idps (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.IDPConfigStateActive,
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeUnspecified,
@@ -506,7 +509,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.idps SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeGoogle,
@@ -540,7 +543,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateInactive,
 								anyArg{},
@@ -572,7 +575,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.IDPConfigStateActive,
 								anyArg{},
@@ -604,7 +607,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idps WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.idps WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 							},
@@ -645,7 +648,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -654,7 +657,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps_oidc_config (idp_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idps_oidc_config (idp_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"client-id",
@@ -703,7 +706,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -711,7 +714,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9)",
+							expectedStmt: "UPDATE projections.idps_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9)",
 							expectedArgs: []interface{}{
 								"client-id",
 								anyArg{},
@@ -772,7 +775,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -781,7 +784,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idps_jwt_config (idp_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idps_jwt_config (idp_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"https://api.zitadel.ch/jwt",
@@ -818,7 +821,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -826,7 +829,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5)",
+							expectedStmt: "UPDATE projections.idps_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5)",
 							expectedArgs: []interface{}{
 								"https://api.zitadel.ch/jwt",
 								"issuer",

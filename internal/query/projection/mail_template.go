@@ -3,37 +3,51 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
+)
+
+const (
+	MailTemplateTable = "projections.mail_templates"
+
+	MailTemplateAggregateIDCol  = "aggregate_id"
+	MailTemplateInstanceIDCol   = "instance_id"
+	MailTemplateCreationDateCol = "creation_date"
+	MailTemplateChangeDateCol   = "change_date"
+	MailTemplateSequenceCol     = "sequence"
+	MailTemplateStateCol        = "state"
+	MailTemplateIsDefaultCol    = "is_default"
+	MailTemplateTemplateCol     = "template"
 )
 
 type MailTemplateProjection struct {
 	crdb.StatementHandler
 }
 
-const (
-	MailTemplateTable = "zitadel.projections.mail_templates"
-
-	MailTemplateAggregateIDCol  = "aggregate_id"
-	MailTemplateCreationDateCol = "creation_date"
-	MailTemplateChangeDateCol   = "change_date"
-	MailTemplateSequenceCol     = "sequence"
-	MailTemplateStateCol        = "state"
-	MailTemplateTemplateCol     = "template"
-	MailTemplateIsDefaultCol    = "is_default"
-)
-
 func NewMailTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *MailTemplateProjection {
 	p := new(MailTemplateProjection)
 	config.ProjectionName = MailTemplateTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(MailTemplateAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MailTemplateInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MailTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MailTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MailTemplateSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MailTemplateStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
+		},
+			crdb.NewPrimaryKey(MailTemplateInstanceIDCol, MailTemplateAggregateIDCol),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -58,14 +72,14 @@ func (p *MailTemplateProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.MailTemplateAddedEventType,
+					Event:  instance.MailTemplateAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.MailTemplateChangedEventType,
+					Event:  instance.MailTemplateChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -80,17 +94,17 @@ func (p *MailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 	case *org.MailTemplateAddedEvent:
 		templateEvent = e.MailTemplateAddedEvent
 		isDefault = false
-	case *iam.MailTemplateAddedEvent:
+	case *instance.MailTemplateAddedEvent:
 		templateEvent = e.MailTemplateAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-94jfG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateAddedEventType, iam.MailTemplateAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-0pJ3f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-0pJ3f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateAddedEventType, instance.MailTemplateAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&templateEvent,
 		[]handler.Column{
 			handler.NewCol(MailTemplateAggregateIDCol, templateEvent.Aggregate().ID),
+			handler.NewCol(MailTemplateInstanceIDCol, templateEvent.Aggregate().InstanceID),
 			handler.NewCol(MailTemplateCreationDateCol, templateEvent.CreationDate()),
 			handler.NewCol(MailTemplateChangeDateCol, templateEvent.CreationDate()),
 			handler.NewCol(MailTemplateSequenceCol, templateEvent.Sequence()),
@@ -105,11 +119,10 @@ func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 	switch e := event.(type) {
 	case *org.MailTemplateChangedEvent:
 		policyEvent = e.MailTemplateChangedEvent
-	case *iam.MailTemplateChangedEvent:
+	case *instance.MailTemplateChangedEvent:
 		policyEvent = e.MailTemplateChangedEvent
 	default:
-		logging.LogWithFields("PROJE-02J9f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateChangedEventType, iam.MailTemplateChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-gJ03f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gJ03f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateChangedEventType, instance.MailTemplateChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(MailTemplateChangeDateCol, policyEvent.CreationDate()),
@@ -129,8 +142,7 @@ func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 func (p *MailTemplateProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.MailTemplateRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-2m0fp", "seq", event.Sequence(), "expectedType", org.MailTemplateRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-3jJGs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3jJGs", "reduce.wrong.event.type %s", org.MailTemplateRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

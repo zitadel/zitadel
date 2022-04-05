@@ -30,7 +30,7 @@ const (
 		" SELECT MAX(event_sequence) seq, 1 join_me" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2" +
-		" AND (CASE WHEN $9::STRING IS NULL THEN tenant is null else tenant = $9::STRING END)" +
+		" AND (CASE WHEN $9::STRING IS NULL THEN instance_id is null else instance_id = $9::STRING END)" +
 		") AS agg_type " +
 		// combined with
 		"LEFT JOIN " +
@@ -39,7 +39,7 @@ const (
 		" SELECT event_sequence seq, resource_owner ro, 1 join_me" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2 AND aggregate_id = $3" +
-		" AND (CASE WHEN $9::STRING IS NULL THEN tenant is null else tenant = $9::STRING END)" +
+		" AND (CASE WHEN $9::STRING IS NULL THEN instance_id is null else instance_id = $9::STRING END)" +
 		" ORDER BY event_sequence DESC" +
 		" LIMIT 1" +
 		") AS agg USING(join_me)" +
@@ -54,7 +54,7 @@ const (
 		" editor_user," +
 		" editor_service," +
 		" resource_owner," +
-		" tenant," +
+		" instance_id," +
 		" event_sequence," +
 		" previous_aggregate_sequence," +
 		" previous_aggregate_type_sequence" +
@@ -70,25 +70,27 @@ const (
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
 		" IFNULL((resource_owner), $8::VARCHAR) AS resource_owner," +
-		" $9::VARCHAR AS tenant," +
+		" $9::VARCHAR AS instance_id," +
 		" NEXTVAL(CONCAT('eventstore.', IFNULL($9, 'system'), '_seq'))," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +
-		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner, tenant"
+		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner, instance_id"
 
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
 						unique_type,
-						unique_field
+						unique_field,
+						instance_id
 					) 
 					VALUES (  
 						$1,
-						$2
+						$2,
+						$3
 					)`
 
 	uniqueDelete = `DELETE FROM eventstore.unique_constraints
-					WHERE unique_type = $1 and unique_field = $2`
+					WHERE unique_type = $1 and unique_field = $2 and instance_id = $3`
 )
 
 type CRDB struct {
@@ -120,8 +122,8 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
-				event.Tenant,
-			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner, &event.Tenant)
+				event.InstanceID,
+			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
 
 			event.PreviousAggregateSequence = uint64(previousAggregateSequence)
 			event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
@@ -132,7 +134,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 					"aggregateId", event.AggregateID,
 					"aggregateType", event.AggregateType,
 					"eventType", event.Type,
-					"tenant", event.Tenant,
+					"instanceID", event.InstanceID,
 				).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
@@ -159,8 +161,9 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 
 	for _, uniqueConstraint := range uniqueConstraints {
 		uniqueConstraint.UniqueField = strings.ToLower(uniqueConstraint.UniqueField)
-		if uniqueConstraint.Action == repository.UniqueConstraintAdd {
-			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
+		switch uniqueConstraint.Action {
+		case repository.UniqueConstraintAdd:
+			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
@@ -172,8 +175,8 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
 			}
-		} else if uniqueConstraint.Action == repository.UniqueConstraintRemoved {
-			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
+		case repository.UniqueConstraintRemoved:
+			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
@@ -229,7 +232,7 @@ func (db *CRDB) eventQuery() string {
 		", editor_service" +
 		", editor_user" +
 		", resource_owner" +
-		", tenant" +
+		", instance_id" +
 		", aggregate_type" +
 		", aggregate_id" +
 		", aggregate_version" +
@@ -250,8 +253,8 @@ func (db *CRDB) columnName(col repository.Field) string {
 		return "event_sequence"
 	case repository.FieldResourceOwner:
 		return "resource_owner"
-	case repository.FieldTenant:
-		return "tenant"
+	case repository.FieldInstanceID:
+		return "instance_id"
 	case repository.FieldEditorService:
 		return "editor_service"
 	case repository.FieldEditorUser:

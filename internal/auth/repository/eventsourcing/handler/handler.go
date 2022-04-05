@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
@@ -68,4 +70,8 @@ func (h *handler) LockDuration() time.Duration {
 
 func (h *handler) QueryLimit() uint64 {
 	return h.bulkLimit
+}
+
+func withInstanceID(ctx context.Context, instanceID string) context.Context {
+	return authz.WithInstanceID(ctx, instanceID)
 }

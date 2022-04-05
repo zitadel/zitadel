@@ -28,18 +28,18 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			prepare: prepareSMTPConfigQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT zitadel.projections.smtp_configs.aggregate_id,`+
-						` zitadel.projections.smtp_configs.creation_date,`+
-						` zitadel.projections.smtp_configs.change_date,`+
-						` zitadel.projections.smtp_configs.resource_owner,`+
-						` zitadel.projections.smtp_configs.sequence,`+
-						` zitadel.projections.smtp_configs.tls,`+
-						` zitadel.projections.smtp_configs.sender_address,`+
-						` zitadel.projections.smtp_configs.sender_name,`+
-						` zitadel.projections.smtp_configs.host,`+
-						` zitadel.projections.smtp_configs.username,`+
-						` zitadel.projections.smtp_configs.password`+
-						` FROM zitadel.projections.smtp_configs`,
+					`SELECT projections.smtp_configs.aggregate_id,`+
+						` projections.smtp_configs.creation_date,`+
+						` projections.smtp_configs.change_date,`+
+						` projections.smtp_configs.resource_owner,`+
+						` projections.smtp_configs.sequence,`+
+						` projections.smtp_configs.tls,`+
+						` projections.smtp_configs.sender_address,`+
+						` projections.smtp_configs.sender_name,`+
+						` projections.smtp_configs.host,`+
+						` projections.smtp_configs.username,`+
+						` projections.smtp_configs.password`+
+						` FROM projections.smtp_configs`,
 					nil,
 					nil,
 				),
@@ -57,18 +57,18 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			prepare: prepareSMTPConfigQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.smtp_configs.aggregate_id,`+
-						` zitadel.projections.smtp_configs.creation_date,`+
-						` zitadel.projections.smtp_configs.change_date,`+
-						` zitadel.projections.smtp_configs.resource_owner,`+
-						` zitadel.projections.smtp_configs.sequence,`+
-						` zitadel.projections.smtp_configs.tls,`+
-						` zitadel.projections.smtp_configs.sender_address,`+
-						` zitadel.projections.smtp_configs.sender_name,`+
-						` zitadel.projections.smtp_configs.host,`+
-						` zitadel.projections.smtp_configs.username,`+
-						` zitadel.projections.smtp_configs.password`+
-						` FROM zitadel.projections.smtp_configs`),
+					regexp.QuoteMeta(`SELECT projections.smtp_configs.aggregate_id,`+
+						` projections.smtp_configs.creation_date,`+
+						` projections.smtp_configs.change_date,`+
+						` projections.smtp_configs.resource_owner,`+
+						` projections.smtp_configs.sequence,`+
+						` projections.smtp_configs.tls,`+
+						` projections.smtp_configs.sender_address,`+
+						` projections.smtp_configs.sender_name,`+
+						` projections.smtp_configs.host,`+
+						` projections.smtp_configs.username,`+
+						` projections.smtp_configs.password`+
+						` FROM projections.smtp_configs`),
 					[]string{
 						"aggregate_id",
 						"creation_date",
@@ -116,18 +116,18 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 			prepare: prepareSMTPConfigQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.smtp_configs.aggregate_id,`+
-						` zitadel.projections.smtp_configs.creation_date,`+
-						` zitadel.projections.smtp_configs.change_date,`+
-						` zitadel.projections.smtp_configs.resource_owner,`+
-						` zitadel.projections.smtp_configs.sequence,`+
-						` zitadel.projections.smtp_configs.tls,`+
-						` zitadel.projections.smtp_configs.sender_address,`+
-						` zitadel.projections.smtp_configs.sender_name,`+
-						` zitadel.projections.smtp_configs.host,`+
-						` zitadel.projections.smtp_configs.username,`+
-						` zitadel.projections.smtp_configs.password`+
-						` FROM zitadel.projections.smtp_configs`),
+					regexp.QuoteMeta(`SELECT projections.smtp_configs.aggregate_id,`+
+						` projections.smtp_configs.creation_date,`+
+						` projections.smtp_configs.change_date,`+
+						` projections.smtp_configs.resource_owner,`+
+						` projections.smtp_configs.sequence,`+
+						` projections.smtp_configs.tls,`+
+						` projections.smtp_configs.sender_address,`+
+						` projections.smtp_configs.sender_name,`+
+						` projections.smtp_configs.host,`+
+						` projections.smtp_configs.username,`+
+						` projections.smtp_configs.password`+
+						` FROM projections.smtp_configs`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

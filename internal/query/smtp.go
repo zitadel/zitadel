@@ -7,6 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query/projection"
 
@@ -33,6 +36,10 @@ var (
 		name:  projection.SMTPConfigColumnResourceOwner,
 		table: smtpConfigsTable,
 	}
+	SMTPConfigColumnInstanceID = Column{
+		name:  projection.SMTPConfigColumnInstanceID,
+		table: smtpConfigsTable,
+	}
 	SMTPConfigColumnSequence = Column{
 		name:  projection.SMTPConfigColumnSequence,
 		table: smtpConfigsTable,
@@ -41,12 +48,12 @@ var (
 		name:  projection.SMTPConfigColumnTLS,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnFromAddress = Column{
-		name:  projection.SMTPConfigColumnFromAddress,
+	SMTPConfigColumnSenderAddress = Column{
+		name:  projection.SMTPConfigColumnSenderAddress,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnFromName = Column{
-		name:  projection.SMTPConfigColumnFromName,
+	SMTPConfigColumnSenderName = Column{
+		name:  projection.SMTPConfigColumnSenderName,
 		table: smtpConfigsTable,
 	}
 	SMTPConfigColumnSMTPHost = Column{
@@ -87,6 +94,7 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 	stmt, scan := prepareSMTPConfigQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnAggregateID.identifier(): aggregateID,
+		SMTPConfigColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatment")
@@ -106,8 +114,8 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
 			SMTPConfigColumnTLS.identifier(),
-			SMTPConfigColumnFromAddress.identifier(),
-			SMTPConfigColumnFromName.identifier(),
+			SMTPConfigColumnSenderAddress.identifier(),
+			SMTPConfigColumnSenderName.identifier(),
 			SMTPConfigColumnSMTPHost.identifier(),
 			SMTPConfigColumnSMTPUser.identifier(),
 			SMTPConfigColumnSMTPPassword.identifier()).

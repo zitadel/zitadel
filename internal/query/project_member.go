@@ -7,6 +7,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -40,6 +42,10 @@ var (
 		name:  projection.MemberResourceOwner,
 		table: projectMemberTable,
 	}
+	ProjectMemberInstanceID = Column{
+		name:  projection.MemberInstanceID,
+		table: projectMemberTable,
+	}
 	ProjectMemberProjectID = Column{
 		name:  projection.ProjectMemberProjectIDCol,
 		table: projectMemberTable,
@@ -59,7 +65,10 @@ func (q *ProjectMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery) (*Members, error) {
 	query, scan := prepareProjectMembersQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
 	}

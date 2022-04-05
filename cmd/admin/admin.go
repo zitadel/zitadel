@@ -26,6 +26,7 @@ func New() *cobra.Command {
 		initialise.New(),
 		setup.New(),
 		start.New(),
+		start.NewStartFromInit(),
 		key.New(),
 	)
 

@@ -3,29 +3,61 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
+)
+
+const (
+	PasswordComplexityTable = "projections.password_complexity_policies"
+
+	ComplexityPolicyIDCol            = "id"
+	ComplexityPolicyCreationDateCol  = "creation_date"
+	ComplexityPolicyChangeDateCol    = "change_date"
+	ComplexityPolicySequenceCol      = "sequence"
+	ComplexityPolicyStateCol         = "state"
+	ComplexityPolicyIsDefaultCol     = "is_default"
+	ComplexityPolicyResourceOwnerCol = "resource_owner"
+	ComplexityPolicyInstanceIDCol    = "instance_id"
+	ComplexityPolicyMinLengthCol     = "min_length"
+	ComplexityPolicyHasLowercaseCol  = "has_lowercase"
+	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
+	ComplexityPolicyHasSymbolCol     = "has_symbol"
+	ComplexityPolicyHasNumberCol     = "has_number"
 )
 
 type PasswordComplexityProjection struct {
 	crdb.StatementHandler
 }
 
-const (
-	PasswordComplexityTable = "zitadel.projections.password_complexity_policies"
-)
-
 func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordComplexityProjection {
 	p := new(PasswordComplexityProjection)
 	config.ProjectionName = PasswordComplexityTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(ComplexityPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ComplexityPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ComplexityPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ComplexityPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ComplexityPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ComplexityPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(ComplexityPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ComplexityPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ComplexityPolicyMinLengthCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ComplexityPolicyHasLowercaseCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(ComplexityPolicyHasUppercaseCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(ComplexityPolicyHasSymbolCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(ComplexityPolicyHasNumberCol, crdb.ColumnTypeBool),
+		},
+			crdb.NewPrimaryKey(ComplexityPolicyInstanceIDCol, ComplexityPolicyIDCol),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -50,14 +82,14 @@ func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.PasswordComplexityPolicyAddedEventType,
+					Event:  instance.PasswordComplexityPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.PasswordComplexityPolicyChangedEventType,
+					Event:  instance.PasswordComplexityPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -72,12 +104,11 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 	case *org.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
 		isDefault = false
-	case *iam.PasswordComplexityPolicyAddedEvent:
+	case *instance.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-mP8AR", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, iam.PasswordComplexityPolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KTHmJ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KTHmJ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, instance.PasswordComplexityPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -93,6 +124,7 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 			handler.NewCol(ComplexityPolicyHasSymbolCol, policyEvent.HasSymbol),
 			handler.NewCol(ComplexityPolicyHasNumberCol, policyEvent.HasNumber),
 			handler.NewCol(ComplexityPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(ComplexityPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 			handler.NewCol(ComplexityPolicyIsDefaultCol, isDefault),
 		}), nil
 }
@@ -102,11 +134,10 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
-	case *iam.PasswordComplexityPolicyChangedEvent:
+	case *instance.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-L4UHn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, iam.PasswordComplexityPolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-cf3Xb", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-cf3Xb", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, instance.PasswordComplexityPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(ComplexityPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -138,8 +169,7 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordComplexityPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-ibd0c", "seq", event.Sequence(), "expectedType", org.PasswordComplexityPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-wttCd", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-wttCd", "reduce.wrong.event.type %s", org.PasswordComplexityPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,
@@ -147,18 +177,3 @@ func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.Event) (*h
 			handler.NewCond(ComplexityPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }
-
-const (
-	ComplexityPolicyCreationDateCol  = "creation_date"
-	ComplexityPolicyChangeDateCol    = "change_date"
-	ComplexityPolicySequenceCol      = "sequence"
-	ComplexityPolicyIDCol            = "id"
-	ComplexityPolicyStateCol         = "state"
-	ComplexityPolicyMinLengthCol     = "min_length"
-	ComplexityPolicyHasLowercaseCol  = "has_lowercase"
-	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
-	ComplexityPolicyHasSymbolCol     = "has_symbol"
-	ComplexityPolicyHasNumberCol     = "has_number"
-	ComplexityPolicyIsDefaultCol     = "is_default"
-	ComplexityPolicyResourceOwnerCol = "resource_owner"
-)

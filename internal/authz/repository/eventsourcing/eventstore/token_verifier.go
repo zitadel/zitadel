@@ -14,7 +14,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
@@ -98,7 +97,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 }
 
 func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error) {
-	app, err := repo.View.ApplicationByOIDCClientID(clientID)
+	app, err := repo.View.ApplicationByOIDCClientID(ctx, clientID)
 	if err != nil {
 		return "", nil, err
 	}
@@ -236,7 +235,7 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	iam, err := repo.Query.IAMByID(ctx, domain.IAMID)
+	iam, err := repo.Query.Instance(ctx)
 	if err != nil {
 		return "", "", err
 	}
@@ -258,20 +257,4 @@ func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, se
 		return nil, err
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
-}
-
-func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, requiredFeatures ...string) error {
-	features, err := repo.Query.DefaultFeatures(ctx)
-	if err != nil {
-		return err
-	}
-	return checkFeatures(features, requiredFeatures...)
-}
-
-func (repo *TokenVerifierRepo) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
-	if err != nil {
-		return nil, err
-	}
-	return repo.Eventstore.FilterEvents(ctx, query)
 }

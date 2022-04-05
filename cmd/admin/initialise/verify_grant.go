@@ -25,12 +25,11 @@ func newGrant() *cobra.Command {
 Prereqesits:
 - cockroachdb
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			config := Config{}
-			if err := viper.Unmarshal(&config); err != nil {
-				return err
-			}
-			return initialise(config, VerifyGrant(config.Database.Database, config.Database.User.Username))
+		Run: func(cmd *cobra.Command, args []string) {
+			config := MustNewConfig(viper.New())
+
+			err := initialise(config, VerifyGrant(config.Database.Database, config.Database.User.Username))
+			logging.OnError(err).Fatal("unable to set grant")
 		},
 	}
 }

@@ -6,9 +6,11 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 type Memberships struct {
@@ -68,6 +70,14 @@ func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipOrgID, value, TextEquals)
 }
 
+func NewMembershipResourceOwnersSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(membershipResourceOwner, list, ListIn)
+}
+
 func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipProjectID, value, TextEquals)
 }
@@ -90,11 +100,14 @@ func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 
 func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery) (*Memberships, error) {
 	query, scan := prepareMembershipsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
-	latestSequence, err := q.latestSequence(ctx, orgMemberTable, iamMemberTable, projectMemberTable, projectGrantMemberTable)
+	latestSequence, err := q.latestSequence(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -140,12 +153,16 @@ var (
 		name:  projection.MemberResourceOwner,
 		table: membershipAlias,
 	}
+	membershipInstanceID = Column{
+		name:  projection.MemberInstanceID,
+		table: membershipAlias,
+	}
 	membershipOrgID = Column{
 		name:  projection.OrgMemberOrgIDCol,
 		table: membershipAlias,
 	}
 	membershipIAMID = Column{
-		name:  projection.IAMMemberIAMIDCol,
+		name:  projection.InstanceMemberIAMIDCol,
 		table: membershipAlias,
 	}
 	membershipProjectID = Column{
@@ -272,6 +289,7 @@ func prepareOrgMember() string {
 		OrgMemberChangeDate.identifier(),
 		OrgMemberSequence.identifier(),
 		OrgMemberResourceOwner.identifier(),
+		OrgMemberInstanceID.identifier(),
 		OrgMemberOrgID.identifier(),
 		"NULL::STRING AS "+membershipIAMID.name,
 		"NULL::STRING AS "+membershipProjectID.name,
@@ -282,17 +300,18 @@ func prepareOrgMember() string {
 
 func prepareIAMMember() string {
 	stmt, _ := sq.Select(
-		IAMMemberUserID.identifier(),
-		IAMMemberRoles.identifier(),
-		IAMMemberCreationDate.identifier(),
-		IAMMemberChangeDate.identifier(),
-		IAMMemberSequence.identifier(),
-		IAMMemberResourceOwner.identifier(),
+		InstanceMemberUserID.identifier(),
+		InstanceMemberRoles.identifier(),
+		InstanceMemberCreationDate.identifier(),
+		InstanceMemberChangeDate.identifier(),
+		InstanceMemberSequence.identifier(),
+		InstanceMemberResourceOwner.identifier(),
+		InstanceMemberInstanceID.identifier(),
 		"NULL::STRING AS "+membershipOrgID.name,
-		IAMMemberIAMID.identifier(),
+		InstanceMemberIAMID.identifier(),
 		"NULL::STRING AS "+membershipProjectID.name,
 		"NULL::STRING AS "+membershipGrantID.name,
-	).From(iamMemberTable.identifier()).MustSql()
+	).From(instanceMemberTable.identifier()).MustSql()
 	return stmt
 }
 
@@ -304,6 +323,7 @@ func prepareProjectMember() string {
 		ProjectMemberChangeDate.identifier(),
 		ProjectMemberSequence.identifier(),
 		ProjectMemberResourceOwner.identifier(),
+		ProjectMemberInstanceID.identifier(),
 		"NULL::STRING AS "+membershipOrgID.name,
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
@@ -321,6 +341,7 @@ func prepareProjectGrantMember() string {
 		ProjectGrantMemberChangeDate.identifier(),
 		ProjectGrantMemberSequence.identifier(),
 		ProjectGrantMemberResourceOwner.identifier(),
+		ProjectGrantMemberInstanceID.identifier(),
 		"NULL::STRING AS "+membershipOrgID.name,
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),

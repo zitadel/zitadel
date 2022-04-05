@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -16,11 +15,12 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/gorilla/mux"
-	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+
+	"github.com/caos/zitadel/cmd/admin/key"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
@@ -38,18 +38,13 @@ import (
 	"github.com/caos/zitadel/internal/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/crypto"
 	cryptoDB "github.com/caos/zitadel/internal/crypto/database"
 	"github.com/caos/zitadel/internal/database"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/static"
-	static_config "github.com/caos/zitadel/internal/static/config"
 	"github.com/caos/zitadel/internal/webauthn"
 	"github.com/caos/zitadel/openapi"
 )
@@ -66,82 +61,22 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := new(startConfig)
-			err := viper.Unmarshal(config, viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
-				mapstructure.StringToTimeDurationHookFunc(),
-				mapstructure.StringToSliceHookFunc(":"),
-			)))
+			config := MustNewConfig(viper.GetViper())
+			masterKey, err := key.MasterKey(cmd)
 			if err != nil {
 				return err
 			}
-			err = config.Log.SetLogger()
-			if err != nil {
-				return err
-			}
-			masterKey, _ := cmd.Flags().GetString("masterkey")
+
 			return startZitadel(config, masterKey)
 		},
 	}
-	bindUint16Flag(start, "port", "port to run ZITADEL on")
-	bindStringFlag(start, "externalDomain", "domain ZITADEL will be exposed on")
-	bindStringFlag(start, "externalPort", "port ZITADEL will be exposed on")
-	bindBoolFlag(start, "externalSecure", "if ZITADEL will be served on HTTPS")
 
-	start.PersistentFlags().String(flagMasterKey, "", "masterkey for en/decryption keys")
+	startFlags(start)
 
 	return start
 }
 
-func bindStringFlag(cmd *cobra.Command, name, description string) {
-	cmd.PersistentFlags().String(name, viper.GetString(name), description)
-	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
-}
-
-func bindUint16Flag(cmd *cobra.Command, name, description string) {
-	cmd.PersistentFlags().Uint16(name, uint16(viper.GetUint(name)), description)
-	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
-}
-
-func bindBoolFlag(cmd *cobra.Command, name, description string) {
-	cmd.PersistentFlags().Bool(name, viper.GetBool(name), description)
-	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
-}
-
-type startConfig struct {
-	Log             *logging.Config
-	Port            uint16
-	ExternalPort    uint16
-	ExternalDomain  string
-	ExternalSecure  bool
-	Database        database.Config
-	Projections     projection.Config
-	AuthZ           authz.Config
-	Auth            auth_es.Config
-	Admin           admin_es.Config
-	UserAgentCookie *middleware.UserAgentCookieConfig
-	OIDC            oidc.Config
-	Login           login.Config
-	Console         console.Config
-	Notification    notification.Config
-	AssetStorage    static_config.AssetStorageConfig
-	InternalAuthZ   internal_authz.Config
-	SystemDefaults  systemdefaults.SystemDefaults
-	EncryptionKeys  *encryptionKeyConfig
-}
-
-type encryptionKeyConfig struct {
-	DomainVerification   *crypto.KeyConfig
-	IDPConfig            *crypto.KeyConfig
-	OIDC                 *crypto.KeyConfig
-	OTP                  *crypto.KeyConfig
-	SMS                  *crypto.KeyConfig
-	SMTP                 *crypto.KeyConfig
-	User                 *crypto.KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
-}
-
-func startZitadel(config *startConfig, masterKey string) error {
+func startZitadel(config *Config, masterKey string) error {
 	ctx := context.Background()
 	keyChan := make(chan interface{})
 
@@ -199,7 +134,7 @@ func startZitadel(config *startConfig, masterKey string) error {
 	return listen(ctx, router, config.Port)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *startConfig, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -209,7 +144,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo)
 
-	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure)
+	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
@@ -234,9 +169,10 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return err
 	}
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
 
 	issuer := oidc.Issuer(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
-	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, keys.OIDC, keys.OIDCKey, eventstore, dbClient, keyChan, userAgentInterceptor)
+	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, keys.OIDC, keys.OIDCKey, eventstore, dbClient, keyChan, userAgentInterceptor, instanceInterceptor.Handler)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
@@ -248,18 +184,14 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
 
-	consoleID, err := consoleClientID(ctx, queries)
-	if err != nil {
-		return fmt.Errorf("unable to get client_id for console: %w", err)
-	}
 	baseURL := http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
-	c, err := console.Start(config.Console, config.ExternalDomain, baseURL, issuer, consoleID)
+	c, err := console.Start(config.Console, config.ExternalDomain, baseURL, issuer, instanceInterceptor.Handler)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, baseURL, op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix+"/", config.ExternalDomain, baseURL, op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
@@ -305,30 +237,4 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	}
 	logging.New().Info("server shutdown gracefully")
 	return nil
-}
-
-//TODO:!!??!!
-func consoleClientID(ctx context.Context, queries *query.Queries) (string, error) {
-	iam, err := queries.IAMByID(ctx, domain.IAMID)
-	if err != nil {
-		return "", err
-	}
-	projectID, err := query.NewAppProjectIDSearchQuery(iam.IAMProjectID)
-	if err != nil {
-		return "", err
-	}
-	name, err := query.NewAppNameSearchQuery(query.TextContainsIgnoreCase, "console") //TODO:!!??!!
-	if err != nil {
-		return "", err
-	}
-	apps, err := queries.SearchApps(ctx, &query.AppSearchQueries{
-		Queries: []query.SearchQuery{projectID, name},
-	})
-	if err != nil {
-		return "", err
-	}
-	if len(apps.Apps) != 1 || apps.Apps[0].OIDCConfig == nil {
-		return "", errors.New("invalid app")
-	}
-	return apps.Apps[0].OIDCConfig.ClientID, nil
 }

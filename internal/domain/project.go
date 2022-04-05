@@ -30,7 +30,13 @@ const (
 	PrivateLabelingSettingUnspecified PrivateLabelingSetting = iota
 	PrivateLabelingSettingEnforceProjectResourceOwnerPolicy
 	PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy
+
+	privateLabelingSettingMax
 )
+
+func (s PrivateLabelingSetting) Valid() bool {
+	return s >= PrivateLabelingSettingUnspecified && s < privateLabelingSettingMax
+}
 
 func (o *Project) IsValid() bool {
 	return o.Name != ""

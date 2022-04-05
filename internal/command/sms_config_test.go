@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,8 +24,9 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 		alg         crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx context.Context
-		sms *twilio.TwilioConfig
+		ctx        context.Context
+		instanceID string
+		sms        *twilio.TwilioConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -45,9 +46,9 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(iam.NewSMSConfigTwilioAddedEvent(
+							eventFromEventPusher(instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
 								"sid",
 								"senderName",
@@ -66,7 +67,8 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				sms: &twilio.TwilioConfig{
 					SID:          "sid",
 					Token:        "token",
@@ -75,7 +77,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -87,7 +89,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 				idGenerator: tt.fields.idGenerator,
 				smsCrypto:   tt.fields.alg,
 			}
-			_, got, err := r.AddSMSConfigTwilio(tt.args.ctx, tt.args.sms)
+			_, got, err := r.AddSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.sms)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -106,9 +108,10 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
-		sms *twilio.TwilioConfig
+		ctx        context.Context
+		instanceID string
+		id         string
+		sms        *twilio.TwilioConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -144,9 +147,10 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				sms: &twilio.TwilioConfig{},
-				id:  "id",
+				ctx:        context.Background(),
+				sms:        &twilio.TwilioConfig{},
+				instanceID: "INSTANCE",
+				id:         "id",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -159,9 +163,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
 								"sid",
 								"senderName",
@@ -183,7 +187,8 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 					Token:        "token",
 					SenderNumber: "senderName",
 				},
-				id: "providerid",
+				instanceID: "INSTANCE",
+				id:         "providerid",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -196,9 +201,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
 								"sid",
 								"token",
@@ -232,11 +237,12 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 					Token:        "token2",
 					SenderNumber: "senderName2",
 				},
-				id: "providerid",
+				instanceID: "INSTANCE",
+				id:         "providerid",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -246,7 +252,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeSMSConfigTwilio(tt.args.ctx, tt.args.id, tt.args.sms)
+			got, err := r.ChangeSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.sms)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -265,8 +271,9 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx        context.Context
+		instanceID string
+		id         string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -301,8 +308,9 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				id:  "id",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "id",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -315,9 +323,9 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
 								"sid",
 								"sender-name",
@@ -328,9 +336,9 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigTwilioActivatedEvent(
+								instance.NewSMSConfigTwilioActivatedEvent(
 									context.Background(),
-									&iam.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"providerid",
 								),
 							),
@@ -339,12 +347,13 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				id:  "providerid",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "providerid",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -354,7 +363,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ActivateSMSConfigTwilio(tt.args.ctx, tt.args.id)
+			got, err := r.ActivateSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -373,8 +382,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx        context.Context
+		instanceID string
+		id         string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -409,8 +419,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				id:  "id",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "id",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -423,9 +434,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
 								"sid",
 								"sender-name",
@@ -433,9 +444,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioActivatedEvent(
+							instance.NewSMSConfigTwilioActivatedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
 							),
 						),
@@ -443,9 +454,9 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigDeactivatedEvent(
+								instance.NewSMSConfigDeactivatedEvent(
 									context.Background(),
-									&iam.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"providerid",
 								),
 							),
@@ -454,12 +465,13 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				id:  "providerid",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "providerid",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -469,7 +481,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.DeactivateSMSConfigTwilio(tt.args.ctx, tt.args.id)
+			got, err := r.DeactivateSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -488,8 +500,9 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx        context.Context
+		instanceID string
+		id         string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -524,8 +537,9 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				id:  "id",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "id",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -538,9 +552,9 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMSConfigTwilioAddedEvent(
+							instance.NewSMSConfigTwilioAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
 								"sid",
 								"sender-name",
@@ -551,9 +565,9 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigRemovedEvent(
+								instance.NewSMSConfigRemovedEvent(
 									context.Background(),
-									&iam.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"providerid",
 								),
 							),
@@ -562,12 +576,13 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				id:  "providerid",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "providerid",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -577,7 +592,7 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveSMSConfigTwilio(tt.args.ctx, tt.args.id)
+			got, err := r.RemoveSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -591,13 +606,13 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 	}
 }
 
-func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, senderName string) *iam.SMSConfigTwilioChangedEvent {
-	changes := []iam.SMSConfigTwilioChanges{
-		iam.ChangeSMSConfigTwilioSID(sid),
-		iam.ChangeSMSConfigTwilioSenderNumber(senderName),
+func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, senderName string) *instance.SMSConfigTwilioChangedEvent {
+	changes := []instance.SMSConfigTwilioChanges{
+		instance.ChangeSMSConfigTwilioSID(sid),
+		instance.ChangeSMSConfigTwilioSenderNumber(senderName),
 	}
-	event, _ := iam.NewSMSConfigTwilioChangedEvent(ctx,
-		&iam.NewAggregate().Aggregate,
+	event, _ := instance.NewSMSConfigTwilioChangedEvent(ctx,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		id,
 		changes,
 	)

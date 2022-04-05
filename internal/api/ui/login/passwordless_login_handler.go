@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	"github.com/caos/zitadel/internal/domain"
-
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 )
 
 const (
@@ -27,8 +25,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 	var errID, errMessage, credentialData string
 	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
-		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		webAuthNLogin, err = l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID)
+		webAuthNLogin, err = l.authRepo.BeginPasswordlessLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID)
 	}
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -65,8 +62,7 @@ func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Re
 		l.renderPasswordlessVerification(w, r, authReq, formData.PasswordLogin, err)
 		return
 	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.VerifyPasswordless(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, credData, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyPasswordless(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID, credData, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderPasswordlessVerification(w, r, authReq, formData.PasswordLogin, err)
 		return

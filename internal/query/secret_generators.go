@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -21,6 +23,10 @@ var (
 	}
 	SecretGeneratorColumnAggregateID = Column{
 		name:  projection.SecretGeneratorColumnAggregateID,
+		table: secretGeneratorsTable,
+	}
+	SecretGeneratorColumnInstanceID = Column{
+		name:  projection.SecretGeneratorColumnInstanceID,
 		table: secretGeneratorsTable,
 	}
 	SecretGeneratorColumnGeneratorType = Column{
@@ -131,6 +137,7 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 	stmt, scan := prepareSecretGeneratorQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SecretGeneratorColumnGeneratorType.identifier(): generatorType,
+		SecretGeneratorColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatment")
@@ -142,7 +149,10 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 
 func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGeneratorSearchQueries) (secretGenerators *SecretGenerators, err error) {
 	query, scan := prepareSecretGeneratorsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			SecretGeneratorColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9lw", "Errors.Query.InvalidRequest")
 	}

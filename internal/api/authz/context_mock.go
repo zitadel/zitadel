@@ -2,11 +2,13 @@ package authz
 
 import "context"
 
-func NewMockContext(tenantID, orgID, userID string) context.Context {
-	return context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID, TenantID: tenantID})
+func NewMockContext(instanceID, orgID, userID string) context.Context {
+	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
+	return context.WithValue(ctx, instanceKey, instanceID)
 }
 
-func NewMockContextWithPermissions(tenantID, orgID, userID string, permissions []string) context.Context {
-	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID, TenantID: tenantID})
+func NewMockContextWithPermissions(instanceID, orgID, userID string, permissions []string) context.Context {
+	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
+	ctx = context.WithValue(ctx, instanceKey, instanceID)
 	return context.WithValue(ctx, requestPermissionsKey, permissions)
 }

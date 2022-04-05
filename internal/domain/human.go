@@ -58,9 +58,9 @@ func (u *Human) IsValid() bool {
 	return u.Username != "" && u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
 
-func (u *Human) CheckOrgIAMPolicy(policy *OrgIAMPolicy) error {
+func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 	if policy == nil {
-		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.OrgIamPolicyNil")
+		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.DomainPolicyNil")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.Username == "" && u.Email != nil {
 		u.Username = u.EmailAddress

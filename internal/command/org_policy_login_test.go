@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 	"github.com/caos/zitadel/internal/repository/user"
@@ -118,8 +118,8 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLoginPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -165,8 +165,8 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLoginPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -351,8 +351,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLoginPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -415,8 +415,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLoginPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -480,8 +480,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewLoginPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,

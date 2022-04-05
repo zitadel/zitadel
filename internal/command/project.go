@@ -38,13 +38,6 @@ func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, r
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
 	projectRole := domain.RoleProjectOwner
-	iam, err := c.GetIAM(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	if iam.GlobalOrgID == resourceOwner {
-		projectRole = domain.RoleProjectOwnerGlobal
-	}
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(
 			ctx,

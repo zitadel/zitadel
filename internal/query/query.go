@@ -15,7 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/repository/action"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	iam_repo "github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"

@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -48,6 +50,10 @@ var (
 	}
 	FeatureColumnAggregateID = Column{
 		name:  projection.FeatureAggregateIDCol,
+		table: featureTable,
+	}
+	FeatureColumnInstanceID = Column{
+		name:  projection.FeatureInstanceIDCol,
 		table: featureTable,
 	}
 	FeatureColumnChangeDate = Column{
@@ -155,12 +161,17 @@ var (
 func (q *Queries) FeaturesByOrgID(ctx context.Context, orgID string) (*Features, error) {
 	query, scan := prepareFeaturesQuery()
 	stmt, args, err := query.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				FeatureColumnAggregateID.identifier(): orgID,
+				FeatureColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
-			sq.Eq{
-				FeatureColumnAggregateID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					FeatureColumnAggregateID.identifier(): orgID,
+				},
+				sq.Eq{
+					FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				},
 			},
 		}).
 		OrderBy(FeatureColumnIsDefault.identifier()).
@@ -176,7 +187,8 @@ func (q *Queries) FeaturesByOrgID(ctx context.Context, orgID string) (*Features,
 func (q *Queries) DefaultFeatures(ctx context.Context) (*Features, error) {
 	query, scan := prepareFeaturesQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		FeatureColumnAggregateID.identifier(): domain.IAMID,
+		FeatureColumnAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		FeatureColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-1Ndlg", "Errors.Query.SQLStatement")

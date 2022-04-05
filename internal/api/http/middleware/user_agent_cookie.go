@@ -21,6 +21,10 @@ func UserAgentIDFromCtx(ctx context.Context) (string, bool) {
 	return userAgentID, ok
 }
 
+func InstanceIDFromCtx(ctx context.Context) string {
+	return "" //TODO: implement
+}
+
 type UserAgent struct {
 	ID string
 }

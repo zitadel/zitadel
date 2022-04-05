@@ -28,15 +28,15 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 			prepare: prepareDebugNotificationProviderQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.notification_providers.aggregate_id,`+
-						` zitadel.projections.notification_providers.creation_date,`+
-						` zitadel.projections.notification_providers.change_date,`+
-						` zitadel.projections.notification_providers.sequence,`+
-						` zitadel.projections.notification_providers.resource_owner,`+
-						` zitadel.projections.notification_providers.state,`+
-						` zitadel.projections.notification_providers.provider_type,`+
-						` zitadel.projections.notification_providers.compact`+
-						` FROM zitadel.projections.notification_providers`),
+					regexp.QuoteMeta(`SELECT projections.notification_providers.aggregate_id,`+
+						` projections.notification_providers.creation_date,`+
+						` projections.notification_providers.change_date,`+
+						` projections.notification_providers.sequence,`+
+						` projections.notification_providers.resource_owner,`+
+						` projections.notification_providers.state,`+
+						` projections.notification_providers.provider_type,`+
+						` projections.notification_providers.compact`+
+						` FROM projections.notification_providers`),
 					nil,
 					nil,
 				),
@@ -54,15 +54,15 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 			prepare: prepareDebugNotificationProviderQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.notification_providers.aggregate_id,`+
-						` zitadel.projections.notification_providers.creation_date,`+
-						` zitadel.projections.notification_providers.change_date,`+
-						` zitadel.projections.notification_providers.sequence,`+
-						` zitadel.projections.notification_providers.resource_owner,`+
-						` zitadel.projections.notification_providers.state,`+
-						` zitadel.projections.notification_providers.provider_type,`+
-						` zitadel.projections.notification_providers.compact`+
-						` FROM zitadel.projections.notification_providers`),
+					regexp.QuoteMeta(`SELECT projections.notification_providers.aggregate_id,`+
+						` projections.notification_providers.creation_date,`+
+						` projections.notification_providers.change_date,`+
+						` projections.notification_providers.sequence,`+
+						` projections.notification_providers.resource_owner,`+
+						` projections.notification_providers.state,`+
+						` projections.notification_providers.provider_type,`+
+						` projections.notification_providers.compact`+
+						` FROM projections.notification_providers`),
 					[]string{
 						"aggregate_id",
 						"creation_date",
@@ -101,15 +101,15 @@ func Test_NotificationProviderPrepares(t *testing.T) {
 			prepare: prepareDebugNotificationProviderQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.notification_providers.aggregate_id,`+
-						` zitadel.projections.notification_providers.creation_date,`+
-						` zitadel.projections.notification_providers.change_date,`+
-						` zitadel.projections.notification_providers.sequence,`+
-						` zitadel.projections.notification_providers.resource_owner,`+
-						` zitadel.projections.notification_providers.state,`+
-						` zitadel.projections.notification_providers.provider_type,`+
-						` zitadel.projections.notification_providers.compact`+
-						` FROM zitadel.projections.notification_providers`),
+					regexp.QuoteMeta(`SELECT projections.notification_providers.aggregate_id,`+
+						` projections.notification_providers.creation_date,`+
+						` projections.notification_providers.change_date,`+
+						` projections.notification_providers.sequence,`+
+						` projections.notification_providers.resource_owner,`+
+						` projections.notification_providers.state,`+
+						` projections.notification_providers.provider_type,`+
+						` projections.notification_providers.compact`+
+						` FROM projections.notification_providers`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

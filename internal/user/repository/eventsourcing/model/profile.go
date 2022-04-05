@@ -6,7 +6,6 @@ import (
 	"golang.org/x/text/language"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
 )
 
 type Profile struct {
@@ -41,30 +40,6 @@ func (p *Profile) Changes(changed *Profile) map[string]interface{} {
 		changes["gender"] = changed.Gender
 	}
 	return changes
-}
-
-func ProfileFromModel(profile *model.Profile) *Profile {
-	return &Profile{
-		ObjectRoot:        profile.ObjectRoot,
-		FirstName:         profile.FirstName,
-		LastName:          profile.LastName,
-		NickName:          profile.NickName,
-		DisplayName:       profile.DisplayName,
-		PreferredLanguage: LanguageTag(profile.PreferredLanguage),
-		Gender:            int32(profile.Gender),
-	}
-}
-
-func ProfileToModel(profile *Profile) *model.Profile {
-	return &model.Profile{
-		ObjectRoot:        profile.ObjectRoot,
-		FirstName:         profile.FirstName,
-		LastName:          profile.LastName,
-		NickName:          profile.NickName,
-		DisplayName:       profile.DisplayName,
-		PreferredLanguage: language.Tag(profile.PreferredLanguage),
-		Gender:            model.Gender(profile.Gender),
-	}
 }
 
 type LanguageTag language.Tag

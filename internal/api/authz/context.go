@@ -15,12 +15,12 @@ const (
 	requestPermissionsKey key = 1
 	dataKey               key = 2
 	allPermissionsKey     key = 3
+	instanceKey           key = 4
 )
 
 type CtxData struct {
 	UserID            string
 	OrgID             string
-	TenantID          string //TODO: Set Tenant ID on some context
 	ProjectID         string
 	AgentID           string
 	PreferredLanguage string
@@ -43,7 +43,7 @@ type Memberships []*Membership
 type Membership struct {
 	MemberType  MemberType
 	AggregateID string
-	//ObjectID differs from aggregate id if obejct is sub of an aggregate
+	//ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
 	Roles []string

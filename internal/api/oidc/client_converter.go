@@ -7,7 +7,6 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
-	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
@@ -101,13 +100,13 @@ func (c *Client) AccessTokenType() op.AccessTokenType {
 }
 
 func (c *Client) IsScopeAllowed(scope string) bool {
-	if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 		return true
 	}
-	if strings.HasPrefix(scope, authreq_model.ProjectIDScope) {
+	if strings.HasPrefix(scope, domain.ProjectIDScope) {
 		return true
 	}
-	if strings.HasPrefix(scope, authreq_model.SelectIDPScope) {
+	if strings.HasPrefix(scope, domain.SelectIDPScope) {
 		return true
 	}
 	if strings.HasPrefix(scope, ScopeUserMetaData) {

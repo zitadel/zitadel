@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -43,7 +43,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.password_age_policies (creation_date, change_date, sequence, id, state, expire_warn_days, max_age_days, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.password_age_policies (creation_date, change_date, sequence, id, state, expire_warn_days, max_age_days, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -54,6 +54,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 								uint64(13),
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -81,7 +82,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.password_age_policies SET (change_date, sequence, expire_warn_days, max_age_days) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.password_age_policies SET (change_date, sequence, expire_warn_days, max_age_days) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -112,7 +113,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.password_age_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.password_age_policies WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -122,27 +123,27 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&PasswordAgeProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordAgePolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordAgePolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 					}`),
-				), iam.PasswordAgePolicyAddedEventMapper),
+				), instance.PasswordAgePolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.password_age_policies (creation_date, change_date, sequence, id, state, expire_warn_days, max_age_days, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.password_age_policies (creation_date, change_date, sequence, id, state, expire_warn_days, max_age_days, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -153,6 +154,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 								uint64(13),
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -160,27 +162,27 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&PasswordAgeProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordAgePolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordAgePolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 					}`),
-				), iam.PasswordAgePolicyChangedEventMapper),
+				), instance.PasswordAgePolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.password_age_policies SET (change_date, sequence, expire_warn_days, max_age_days) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.password_age_policies SET (change_date, sequence, expire_warn_days, max_age_days) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

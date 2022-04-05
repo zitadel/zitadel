@@ -5,15 +5,13 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/static"
-
 	"golang.org/x/text/language"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/static"
 )
 
 type UserView struct {
@@ -58,7 +56,7 @@ type HumanView struct {
 	OTPState                 MFAState
 	U2FTokens                []*WebAuthNView
 	PasswordlessTokens       []*WebAuthNView
-	MFAMaxSetUp              req_model.MFALevel
+	MFAMaxSetUp              domain.MFALevel
 	MFAInitSkipped           time.Time
 	InitRequired             bool
 	PasswordlessInitRequired bool
@@ -100,6 +98,7 @@ const (
 	UserSearchKeyLoginNames
 	UserSearchKeyType
 	UserSearchKeyPreferredLoginName
+	UserSearchKeyInstanceID
 )
 
 type UserSearchQuery struct {
@@ -225,9 +224,9 @@ func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) boo
 		return true
 	}
 	switch u.MFAMaxSetUp {
-	case req_model.MFALevelSecondFactor:
+	case domain.MFALevelSecondFactor:
 		return policy.HasSecondFactors()
-	case req_model.MFALevelMultiFactor:
+	case domain.MFALevelMultiFactor:
 		return policy.HasMultiFactors()
 	default:
 		return false

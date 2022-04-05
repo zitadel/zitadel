@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,22 +12,72 @@ import (
 	"github.com/caos/zitadel/internal/repository/keypair"
 )
 
+const (
+	KeyProjectionTable = "projections.keys"
+	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
+	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
+
+	KeyColumnID            = "id"
+	KeyColumnCreationDate  = "creation_date"
+	KeyColumnChangeDate    = "change_date"
+	KeyColumnResourceOwner = "resource_owner"
+	KeyColumnInstanceID    = "instance_id"
+	KeyColumnSequence      = "sequence"
+	KeyColumnAlgorithm     = "algorithm"
+	KeyColumnUse           = "use"
+
+	privateKeyTableSuffix  = "private"
+	KeyPrivateColumnID     = "id"
+	KeyPrivateColumnExpiry = "expiry"
+	KeyPrivateColumnKey    = "key"
+
+	publicKeyTableSuffix  = "public"
+	KeyPublicColumnID     = "id"
+	KeyPublicColumnExpiry = "expiry"
+	KeyPublicColumnKey    = "key"
+)
+
 type KeyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
 	keyChan             chan<- interface{}
 }
 
-const (
-	KeyProjectionTable = "zitadel.projections.keys"
-	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
-	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
-)
-
 func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, keyChan chan<- interface{}) *KeyProjection {
 	p := new(KeyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(KeyColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(KeyColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(KeyColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeText, crdb.Default("")),
+		},
+			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
+			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{KeyColumnID})),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
+		},
+			crdb.NewPrimaryKey(KeyPrivateColumnID),
+			privateKeyTableSuffix,
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
+		},
+			crdb.NewPrimaryKey(KeyPublicColumnID),
+			publicKeyTableSuffix,
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.keyChan = keyChan
 	p.encryptionAlgorithm = keyEncryptionAlgorithm
@@ -51,31 +99,10 @@ func (p *KeyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	KeyColumnID            = "id"
-	KeyColumnCreationDate  = "creation_date"
-	KeyColumnChangeDate    = "change_date"
-	KeyColumnResourceOwner = "resource_owner"
-	KeyColumnSequence      = "sequence"
-	KeyColumnAlgorithm     = "algorithm"
-	KeyColumnUse           = "use"
-
-	privateKeyTableSuffix  = "private"
-	KeyPrivateColumnID     = "id"
-	KeyPrivateColumnExpiry = "expiry"
-	KeyPrivateColumnKey    = "key"
-
-	publicKeyTableSuffix  = "public"
-	KeyPublicColumnID     = "id"
-	KeyPublicColumnExpiry = "expiry"
-	KeyPublicColumnKey    = "key"
-)
-
 func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-GEdg3", "seq", event.Sequence(), "expectedType", keypair.AddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-SAbr2", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAbr2", "reduce.wrong.event.type %s", keypair.AddedEventType)
 	}
 	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
 		return crdb.NewNoOpStatement(e), nil
@@ -87,6 +114,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 				handler.NewCol(KeyColumnCreationDate, e.CreationDate()),
 				handler.NewCol(KeyColumnChangeDate, e.CreationDate()),
 				handler.NewCol(KeyColumnResourceOwner, e.Aggregate().ResourceOwner),
+				handler.NewCol(KeyColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(KeyColumnSequence, e.Sequence()),
 				handler.NewCol(KeyColumnAlgorithm, e.Algorithm),
 				handler.NewCol(KeyColumnUse, e.Usage),
@@ -109,7 +137,6 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 	if e.PublicKey.Expiry.After(time.Now()) {
 		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
 		if err != nil {
-			logging.LogWithFields("HANDL-SDfw2", "seq", event.Sequence()).Error("cannot decrypt public key")
 			return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
 		}
 		creates = append(creates, crdb.AddCreateStatement(

@@ -7,6 +7,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -40,6 +42,10 @@ var (
 		name:  projection.MemberResourceOwner,
 		table: projectGrantMemberTable,
 	}
+	ProjectGrantMemberInstanceID = Column{
+		name:  projection.MemberInstanceID,
+		table: projectGrantMemberTable,
+	}
 	ProjectGrantMemberProjectID = Column{
 		name:  projection.ProjectGrantMemberProjectIDCol,
 		table: projectGrantMemberTable,
@@ -52,21 +58,30 @@ var (
 
 type ProjectGrantMembersQuery struct {
 	MembersQuery
-	ProjectID, GrantID string
+	ProjectID, GrantID, OrgID string
 }
 
 func (q *ProjectGrantMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return q.MembersQuery.
 		toQuery(query).
-		Where(sq.Eq{
-			ProjectGrantMemberProjectID.identifier(): q.ProjectID,
-			ProjectGrantMemberGrantID.identifier():   q.GrantID,
+		Where(sq.And{
+			sq.Eq{
+				ProjectGrantMemberProjectID.identifier(): q.ProjectID,
+				ProjectGrantMemberGrantID.identifier():   q.GrantID,
+			},
+			sq.Or{
+				sq.Eq{ProjectGrantColumnResourceOwner.identifier(): q.OrgID},
+				sq.Eq{ProjectGrantColumnGrantedOrgID.identifier(): q.OrgID},
+			},
 		})
 }
 
 func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrantMembersQuery) (*Members, error) {
 	query, scan := prepareProjectGrantMembersQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")
 	}
@@ -108,6 +123,7 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 			LeftJoin(join(HumanUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, ProjectGrantMemberUserID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

@@ -4,18 +4,19 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	query2 "github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/org"
 )
 
 const (
@@ -62,8 +63,8 @@ func (i *IDPProvider) Subscription() *v1.Subscription {
 	return i.subscription
 }
 
-func (_ *IDPProvider) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{model.IAMAggregate, org_es_model.OrgAggregate}
+func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
+	return []es_models.AggregateType{instance.AggregateType, org.AggregateType}
 }
 
 func (i *IDPProvider) CurrentSequence() (uint64, error) {
@@ -74,7 +75,7 @@ func (i *IDPProvider) CurrentSequence() (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPProvider) EventQuery() (*es_models.SearchQuery, error) {
+func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {
 	sequence, err := i.view.GetLatestIDPProviderSequence()
 	if err != nil {
 		return nil, err
@@ -84,34 +85,34 @@ func (i *IDPProvider) EventQuery() (*es_models.SearchQuery, error) {
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
-func (i *IDPProvider) Reduce(event *es_models.Event) (err error) {
+func (i *IDPProvider) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.IAMAggregate, org_es_model.OrgAggregate:
+	case instance.AggregateType, org.AggregateType:
 		err = i.processIdpProvider(event)
 	}
 	return err
 }
 
-func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
+func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 	provider := new(iam_view_model.IDPProviderView)
-	switch event.Type {
-	case model.LoginPolicyIDPProviderAdded, org_es_model.LoginPolicyIDPProviderAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.LoginPolicyIDPProviderAddedEventType, org.LoginPolicyIDPProviderAddedEventType:
 		err = provider.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = i.fillData(provider)
-	case model.LoginPolicyIDPProviderRemoved, model.LoginPolicyIDPProviderCascadeRemoved,
-		org_es_model.LoginPolicyIDPProviderRemoved, org_es_model.LoginPolicyIDPProviderCascadeRemoved:
+	case instance.LoginPolicyIDPProviderRemovedEventType, instance.LoginPolicyIDPProviderCascadeRemovedEventType,
+		org.LoginPolicyIDPProviderRemovedEventType, org.LoginPolicyIDPProviderCascadeRemovedEventType:
 		err = provider.SetData(event)
 		if err != nil {
 			return err
 		}
 		return i.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event)
-	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
+	case instance.IDPConfigChangedEventType, org.IDPConfigChangedEventType:
 		esConfig := new(iam_view_model.IDPConfigView)
 		providerType := iam_model.IDPProviderTypeSystem
-		if event.AggregateID != domain.IAMID {
+		if event.AggregateID != event.InstanceID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
 		esConfig.AppendEvent(providerType, event)
@@ -120,10 +121,10 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 			return err
 		}
 		config := new(query2.IDP)
-		if event.AggregateID == domain.IAMID {
-			config, err = i.getDefaultIDPConfig(context.TODO(), esConfig.IDPConfigID)
+		if event.AggregateID == event.InstanceID {
+			config, err = i.getDefaultIDPConfig(event.InstanceID, esConfig.IDPConfigID)
 		} else {
-			config, err = i.getOrgIDPConfig(context.TODO(), event.AggregateID, esConfig.IDPConfigID)
+			config, err = i.getOrgIDPConfig(event.InstanceID, event.AggregateID, esConfig.IDPConfigID)
 		}
 		if err != nil {
 			return err
@@ -132,7 +133,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 			i.fillConfigData(provider, config)
 		}
 		return i.view.PutIDPProviders(event, providers...)
-	case org_es_model.LoginPolicyRemoved:
+	case org.LoginPolicyRemovedEventType:
 		return i.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event)
 	default:
 		return i.view.ProcessedIDPProviderSequence(event)
@@ -146,9 +147,9 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 func (i *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err error) {
 	var config *query2.IDP
 	if provider.IDPProviderType == int32(iam_model.IDPProviderTypeSystem) {
-		config, err = i.getDefaultIDPConfig(context.Background(), provider.IDPConfigID)
+		config, err = i.getDefaultIDPConfig(provider.InstanceID, provider.IDPConfigID)
 	} else {
-		config, err = i.getOrgIDPConfig(context.Background(), provider.AggregateID, provider.IDPConfigID)
+		config, err = i.getOrgIDPConfig(provider.InstanceID, provider.AggregateID, provider.IDPConfigID)
 	}
 	if err != nil {
 		return err
@@ -178,7 +179,7 @@ func (i *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, c
 }
 
 func (i *IDPProvider) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Fjd89", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in idp provider handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPProviderFailedEvent, i.view.ProcessedIDPProviderFailedEvent, i.view.ProcessedIDPProviderSequence, i.errorCountUntilSkip)
 }
 
@@ -186,10 +187,10 @@ func (i *IDPProvider) OnSuccess() error {
 	return spooler.HandleSuccess(i.view.UpdateIDPProviderSpoolerRunTimestamp)
 }
 
-func (i *IDPProvider) getOrgIDPConfig(ctx context.Context, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, aggregateID)
+func (i *IDPProvider) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, aggregateID)
 }
 
-func (u *IDPProvider) getDefaultIDPConfig(ctx context.Context, idpConfigID string) (*query2.IDP, error) {
-	return u.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, domain.IAMID)
+func (u *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
+	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, instanceID)
 }

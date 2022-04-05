@@ -32,3 +32,11 @@ func IsUnimplemented(err error) bool {
 	_, ok := err.(Unimplemented)
 	return ok
 }
+
+func (err *UnimplementedError) Is(target error) bool {
+	t, ok := target.(*UnimplementedError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}
