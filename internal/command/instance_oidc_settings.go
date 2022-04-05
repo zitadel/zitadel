@@ -69,7 +69,7 @@ func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDC
 }
 
 func (c *Commands) getOIDCSettings(ctx context.Context) (_ *InstanceOIDCSettingsWriteModel, err error) {
-	writeModel := NewInstanceOIDCSettingsWriteModel()
+	writeModel := NewInstanceOIDCSettingsWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

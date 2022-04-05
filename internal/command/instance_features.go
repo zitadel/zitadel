@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Commands) SetDefaultFeatures(ctx context.Context, features *domain.Features) (*domain.ObjectDetails, error) {
-	existingFeatures := NewInstanceFeaturesWriteModel()
+	existingFeatures := NewInstanceFeaturesWriteModel(ctx)
 	setEvent, err := c.setDefaultFeatures(ctx, existingFeatures, features)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *Ins
 }
 
 func (c *Commands) getDefaultFeatures(ctx context.Context) (*domain.Features, error) {
-	existingFeatures := NewInstanceFeaturesWriteModel()
+	existingFeatures := NewInstanceFeaturesWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
 	if err != nil {
 		return nil, err

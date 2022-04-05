@@ -11,7 +11,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 	if config.IDPConfigID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-m9322", "Errors.IDMissing")
 	}
-	existingConfig := NewInstanceIDPJWTConfigWriteModel(config.IDPConfigID)
+	existingConfig := NewInstanceIDPJWTConfigWriteModel(ctx, config.IDPConfigID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err

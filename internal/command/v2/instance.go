@@ -142,12 +142,11 @@ func (s *InstanceSetup) generateIDs() (err error) {
 }
 
 func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
-	// TODO
-	// instanceID, err := id.SonyFlakeGenerator.Next()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, "system"), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
+	instanceID, err := id.SonyFlakeGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -165,7 +164,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 	setup.Org.Human.PasswordChangeRequired = true
 
-	instanceAgg := instance.NewAggregate()
+	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID, orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.Zitadel.projectID, orgID)

@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx)
+func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,8 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) 
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx)
+func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +81,8 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.EmailConfi
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string) (*domain.ObjectDetails, error) {
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx)
+func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, password string) (*domain.ObjectDetails, error) {
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -108,8 +108,8 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) getSMTPConfig(ctx context.Context) (_ *InstanceSMTPConfigWriteModel, err error) {
-	writeModel := NewInstanceSMTPConfigWriteModel()
+func (c *Commands) getSMTPConfig(ctx context.Context, instanceID string) (_ *InstanceSMTPConfigWriteModel, err error) {
+	writeModel := NewInstanceSMTPConfigWriteModel(instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*domain.PasswordComplexityPolicy, error) {
-	policyWriteModel := NewInstancePasswordComplexityPolicyWriteModel()
+	policyWriteModel := NewInstancePasswordComplexityPolicyWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*dom
 }
 
 func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
-	addedPolicy := NewInstancePasswordComplexityPolicyWriteModel()
+	addedPolicy := NewInstancePasswordComplexityPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	events, err := c.addDefaultPasswordComplexityPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -92,7 +92,7 @@ func (c *Commands) defaultPasswordComplexityPolicyWriteModelByID(ctx context.Con
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstancePasswordComplexityPolicyWriteModel()
+	writeModel := NewInstancePasswordComplexityPolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

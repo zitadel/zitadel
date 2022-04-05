@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Commands) AddDebugNotificationProviderFile(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
-	writeModel := NewInstanceDebugNotificationFileWriteModel()
+	writeModel := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.addDefaultDebugNotificationFile(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
@@ -47,7 +47,7 @@ func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, instance
 }
 
 func (c *Commands) ChangeDefaultNotificationFile(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
-	writeModel := NewInstanceDebugNotificationFileWriteModel()
+	writeModel := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
 	events, err := c.changeDefaultDebugNotificationProviderFile(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c *Commands) changeDefaultDebugNotificationProviderFile(ctx context.Contex
 }
 
 func (c *Commands) RemoveDefaultNotificationFile(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingProvider := NewInstanceDebugNotificationFileWriteModel()
+	existingProvider := NewInstanceDebugNotificationFileWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&existingProvider.WriteModel)
 	err := c.defaultDebugNotificationProviderFileWriteModelByID(ctx, existingProvider)
 	if err != nil {

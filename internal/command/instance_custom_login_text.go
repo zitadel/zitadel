@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -12,7 +13,7 @@ import (
 )
 
 func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
-	iamAgg := instance.NewAggregate()
+	iamAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	events, existingMailText, err := c.setCustomInstanceLoginText(ctx, &iamAgg.Aggregate, loginText)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *
 }
 
 func (c *Commands) defaultLoginTextWriteModelByID(ctx context.Context, lang language.Tag) (*InstanceCustomLoginTextReadModel, error) {
-	writeModel := NewInstanceCustomLoginTextReadModel(lang)
+	writeModel := NewInstanceCustomLoginTextReadModel(ctx, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

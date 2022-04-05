@@ -112,7 +112,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -160,7 +160,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -341,7 +341,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -406,7 +406,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -471,7 +471,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",

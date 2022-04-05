@@ -432,7 +432,7 @@ func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewOrgAuthFactorsAllowedWriteModel(orgID)
+	writeModel := NewOrgAuthFactorsAllowedWriteModel(ctx, orgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

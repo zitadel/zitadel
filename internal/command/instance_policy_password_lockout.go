@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
-	addedPolicy := NewInstanceLockoutPolicyWriteModel()
+	addedPolicy := NewInstanceLockoutPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	event, err := c.addDefaultLockoutPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -71,7 +71,7 @@ func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context) (poli
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceLockoutPolicyWriteModel()
+	writeModel := NewInstanceLockoutPolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

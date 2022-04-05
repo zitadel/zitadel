@@ -119,7 +119,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -166,7 +166,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -352,7 +352,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -416,7 +416,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								true,
 								true,
@@ -481,7 +481,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								false,
 								false,
 								false,

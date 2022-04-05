@@ -108,7 +108,7 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 }
 
 func (c *Commands) getSecretConfig(ctx context.Context, generatorType domain.SecretGeneratorType) (_ *InstanceSecretGeneratorConfigWriteModel, err error) {
-	writeModel := NewInstanceSecretGeneratorConfigWriteModel(generatorType)
+	writeModel := NewInstanceSecretGeneratorConfigWriteModel(ctx, generatorType)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

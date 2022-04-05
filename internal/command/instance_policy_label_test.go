@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -44,7 +45,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -89,9 +90,10 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewLabelPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"#ffffff",
 									"#ffffff",
 									"#ffffff",
@@ -110,7 +112,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.LabelPolicy{
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -128,8 +130,9 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 			res: res{
 				want: &domain.LabelPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						InstanceID:    "INSTANCE",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					PrimaryColor:        "#ffffff",
 					BackgroundColor:     "#ffffff",
@@ -211,7 +214,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -256,7 +259,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -311,8 +314,8 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 			res: res{
 				want: &domain.LabelPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					PrimaryColor:        "#000000",
 					BackgroundColor:     "#000000",
@@ -388,7 +391,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -407,7 +410,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyActivatedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 								),
 							),
 						},
@@ -419,7 +422,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -500,7 +503,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -519,7 +522,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyLogoAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -533,7 +536,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -600,7 +603,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -616,7 +619,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyLogoAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -639,7 +642,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -655,7 +658,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyLogoAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -664,7 +667,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyLogoRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -677,7 +680,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -758,7 +761,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -777,7 +780,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyIconAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -791,7 +794,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -857,7 +860,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -873,7 +876,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyIconAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -882,7 +885,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyIconRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -895,7 +898,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -926,6 +929,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
+		instanceID string
 		storageKey string
 	}
 	type res struct {
@@ -946,7 +950,8 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -962,6 +967,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				storageKey: "key",
 			},
 			res: res{
@@ -976,7 +982,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -995,7 +1001,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -1009,7 +1015,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -1075,7 +1081,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1091,7 +1097,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -1114,7 +1120,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1130,7 +1136,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -1139,7 +1145,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -1152,7 +1158,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -1233,7 +1239,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1252,7 +1258,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -1266,7 +1272,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -1332,7 +1338,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1348,7 +1354,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -1371,7 +1377,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1387,7 +1393,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -1396,7 +1402,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -1409,7 +1415,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -1490,7 +1496,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1509,7 +1515,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyFontAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -1523,7 +1529,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -1589,7 +1595,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1605,7 +1611,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyFontAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -1628,7 +1634,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1644,7 +1650,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewLabelPolicyFontAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"key",
 							),
 						),
@@ -1653,7 +1659,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewLabelPolicyFontRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"key",
 								),
 							),
@@ -1666,7 +1672,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -1693,7 +1699,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 
 func newDefaultLabelPolicyChangedEvent(ctx context.Context, primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool) *instance.LabelPolicyChangedEvent {
 	event, _ := instance.NewLabelPolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.LabelPolicyChanges{
 			policy.ChangePrimaryColor(primaryColor),
 			policy.ChangeBackgroundColor(backgroundColor),
