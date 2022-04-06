@@ -1,9 +1,11 @@
 package command
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
@@ -12,12 +14,12 @@ type InstanceCustomMessageTextWriteModel struct {
 	CustomMessageTextReadModel
 }
 
-func NewInstanceCustomMessageTextWriteModel(messageTextType string, lang language.Tag) *InstanceCustomMessageTextWriteModel {
+func NewInstanceCustomMessageTextWriteModel(ctx context.Context, messageTextType string, lang language.Tag) *InstanceCustomMessageTextWriteModel {
 	return &InstanceCustomMessageTextWriteModel{
 		CustomMessageTextReadModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			MessageTextType: messageTextType,
 			Language:        lang,

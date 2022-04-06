@@ -5,9 +5,11 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/lib/pq"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 func mockProjectMemberData(member *es_model.ProjectMember) []byte {
@@ -28,7 +30,7 @@ func TestProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"Role"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.MemberAddedType), ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"Role"}})},
 				member: &ProjectMemberView{},
 			},
 			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"Role"}},
@@ -36,7 +38,7 @@ func TestProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append changed member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.MemberAddedType), ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}})},
 				member: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"Role"}},
 			},
 			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}},

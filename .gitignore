@@ -55,10 +55,11 @@ console/src/app/proto/generated/
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
+/internal/api/ui/console/static/*
 
 # local
 build/local/cloud.env
 migrations/cockroach/migrate_cloud.go
 .notifications
-
 .artifacts
+/zitadel

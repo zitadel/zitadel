@@ -1,4 +1,4 @@
-S2DefaultInstance:
+S3DefaultInstance:
   InstanceSetup:
     Org:
       Name: ZITADEL
@@ -13,6 +13,29 @@ S2DefaultInstance:
         Gender:
         Phone:
         Password: Password1!
+    Features:
+      TierName: Default Tier
+      TierDescription: ""
+      State: 1 #active
+      StateDescription: ""
+      Retention: 8760h #1year
+      LoginPolicyFactors: true
+      LoginPolicyIDP: true
+      LoginPolicyPasswordless: true
+      LoginPolicyRegistration: true
+      LoginPolicyUsernameLogin: true
+      LoginPolicyPasswordReset: true
+      PasswordComplexityPolicy: true
+      LabelPolicyPrivateLabel: true
+      LabelPolicyWatermark: true
+      CustomDomain: true
+      PrivacyPolicy: true
+      MetadataUser: true
+      CustomTextMessage: true
+      CustomTextLogin: true
+      LockoutPolicy: true
+      ActionsAllowed: 2 #ActionsAllowedUnlimited
+      MaxActions: #not necessary because of ActionsAllowedUnlimited
     PasswordComplexityPolicy: 
       MinLength: 8
       HasLowercase: true 
@@ -40,6 +63,18 @@ S2DefaultInstance:
       TOSLink: https://docs.zitadel.ch/docs/legal/terms-of-service
       PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
       HelpLink: ''
+    LabelPolicy:
+      PrimaryColor: '#5469d4'
+      BackgroundColor: '#fafafa'
+      WarnColor: '#f44336'
+      FontColor: '#000000'
+      PrimaryColorDark: '#5469d4'
+      BackgroundColorDark: '#212121'
+      WarnColorDark: '#f44336'
+      FontColorDark: '#ffffff'
+      HideLoginNameSuffix: false
+      ErrorMsgPopup: false
+      DisableWatermark: false
     LockoutPolicy:
       MaxAttempts: 0
       ShouldShowLockoutFailure: true

@@ -141,7 +141,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPoli
 					LoginPolicyColumnOrgID.identifier(): orgID,
 				},
 				sq.Eq{
-					LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+					LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -158,7 +158,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPoli
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) {
 	query, scan := prepareLoginPolicyQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.identifier():      domain.IAMID,
+		LoginPolicyColumnOrgID.identifier():      authz.GetInstance(ctx).InstanceID(),
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
@@ -181,7 +181,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*Second
 					LoginPolicyColumnOrgID.identifier(): orgID,
 				},
 				sq.Eq{
-					LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+					LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -203,7 +203,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*Second
 func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, error) {
 	query, scan := prepareLoginPolicy2FAsQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.identifier():      domain.IAMID,
+		LoginPolicyColumnOrgID.identifier():      authz.GetInstance(ctx).InstanceID(),
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
@@ -231,7 +231,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (*MultiFa
 					LoginPolicyColumnOrgID.identifier(): orgID,
 				},
 				sq.Eq{
-					LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+					LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -253,7 +253,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (*MultiFa
 func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error) {
 	query, scan := prepareLoginPolicyMFAsQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.identifier():      domain.IAMID,
+		LoginPolicyColumnOrgID.identifier():      authz.GetInstance(ctx).InstanceID(),
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {

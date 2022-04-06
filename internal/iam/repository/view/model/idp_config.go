@@ -5,11 +5,9 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
-
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 	"github.com/lib/pq"
@@ -87,34 +85,26 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 	return view
 }
 
-func IdpConfigViewsToModel(idps []*IDPConfigView) []*model.IDPConfigView {
-	result := make([]*model.IDPConfigView, len(idps))
-	for i, idp := range idps {
-		result[i] = IDPConfigViewToModel(idp)
-	}
-	return result
-}
-
 func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.IDPConfigAdded, org_es_model.IDPConfigAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.IDPConfigAddedEventType, org.IDPConfigAddedEventType:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		i.IDPProviderType = int32(providerType)
 		err = i.SetData(event)
-	case es_model.OIDCIDPConfigAdded, org_es_model.OIDCIDPConfigAdded:
+	case instance.IDPOIDCConfigAddedEventType, org.IDPOIDCConfigAddedEventType:
 		i.IsOIDC = true
 		err = i.SetData(event)
-	case es_model.OIDCIDPConfigChanged, org_es_model.OIDCIDPConfigChanged,
-		es_model.IDPConfigChanged, org_es_model.IDPConfigChanged,
-		models.EventType(org.IDPJWTConfigAddedEventType), models.EventType(instance.IDPJWTConfigAddedEventType),
-		models.EventType(org.IDPJWTConfigChangedEventType), models.EventType(instance.IDPJWTConfigChangedEventType):
+	case instance.IDPOIDCConfigChangedEventType, org.IDPOIDCConfigChangedEventType,
+		instance.IDPConfigChangedEventType, org.IDPConfigChangedEventType,
+		org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType,
+		org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType:
 		err = i.SetData(event)
-	case es_model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated:
+	case instance.IDPConfigDeactivatedEventType, org.IDPConfigDeactivatedEventType:
 		i.IDPState = int32(model.IDPConfigStateInactive)
-	case es_model.IDPConfigReactivated, org_es_model.IDPConfigReactivated:
+	case instance.IDPConfigReactivatedEventType, org.IDPConfigReactivatedEventType:
 		i.IDPState = int32(model.IDPConfigStateActive)
 	}
 	return err
@@ -127,7 +117,7 @@ func (r *IDPConfigView) setRootData(event *models.Event) {
 
 func (r *IDPConfigView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
-		logging.Log("EVEN-Smkld").WithError(err).Error("could not unmarshal event data")
+		logging.New().WithError(err).Error("could not unmarshal event data")
 		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
 	}
 	return nil

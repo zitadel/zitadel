@@ -8,12 +8,12 @@ import (
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
@@ -178,7 +178,7 @@ func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 			Region:                   user.Region,
 			StreetAddress:            user.StreetAddress,
 			OTPState:                 model.MFAState(user.OTPState),
-			MFAMaxSetUp:              req_model.MFALevel(user.MFAMaxSetUp),
+			MFAMaxSetUp:              domain.MFALevel(user.MFAMaxSetUp),
 			MFAInitSkipped:           user.MFAInitSkipped,
 			InitRequired:             user.InitRequired,
 			PasswordlessInitRequired: user.PasswordlessInitRequired,
@@ -244,8 +244,8 @@ func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mode
 func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
 	u.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.MachineAdded:
+	switch eventstore.EventType(event.Type) {
+	case user.MachineAddedEventType:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		u.Type = userTypeMachine
@@ -253,10 +253,10 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-	case es_model.UserAdded,
-		es_model.UserRegistered,
-		es_model.HumanRegistered,
-		es_model.HumanAdded:
+	case user.UserV1AddedType,
+		user.UserV1RegisteredType,
+		user.HumanRegisteredType,
+		user.HumanAddedType:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		u.Type = userTypeHuman
@@ -265,93 +265,93 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		err = u.setPasswordData(event)
-	case es_model.UserRemoved:
+	case user.UserRemovedType:
 		u.State = int32(model.UserStateDeleted)
-	case es_model.UserPasswordChanged,
-		es_model.HumanPasswordChanged:
+	case user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType:
 		err = u.setPasswordData(event)
-	case es_model.HumanPasswordlessTokenAdded:
+	case user.HumanPasswordlessTokenAddedType:
 		err = u.addPasswordlessToken(event)
-	case es_model.HumanPasswordlessTokenVerified:
+	case user.HumanPasswordlessTokenVerifiedType:
 		err = u.updatePasswordlessToken(event)
-	case es_model.HumanPasswordlessTokenRemoved:
+	case user.HumanPasswordlessTokenRemovedType:
 		err = u.removePasswordlessToken(event)
-	case es_model.UserProfileChanged,
-		es_model.HumanProfileChanged,
-		es_model.UserAddressChanged,
-		es_model.HumanAddressChanged,
-		es_model.MachineChanged:
+	case user.UserV1ProfileChangedType,
+		user.HumanProfileChangedType,
+		user.UserV1AddressChangedType,
+		user.HumanAddressChangedType,
+		user.MachineChangedEventType:
 		err = u.setData(event)
-	case es_model.DomainClaimed:
+	case user.UserDomainClaimedType:
 		if u.HumanView != nil {
 			u.HumanView.UsernameChangeRequired = true
 		}
 		err = u.setData(event)
-	case es_model.UserUserNameChanged:
+	case user.UserUserNameChangedType:
 		if u.HumanView != nil {
 			u.HumanView.UsernameChangeRequired = false
 		}
 		err = u.setData(event)
-	case es_model.UserEmailChanged,
-		es_model.HumanEmailChanged:
+	case user.UserV1EmailChangedType,
+		user.HumanEmailChangedType:
 		u.IsEmailVerified = false
 		err = u.setData(event)
-	case es_model.UserEmailVerified,
-		es_model.HumanEmailVerified:
+	case user.UserV1EmailVerifiedType,
+		user.HumanEmailVerifiedType:
 		u.IsEmailVerified = true
-	case es_model.UserPhoneChanged,
-		es_model.HumanPhoneChanged:
+	case user.UserV1PhoneChangedType,
+		user.HumanPhoneChangedType:
 		u.IsPhoneVerified = false
 		err = u.setData(event)
-	case es_model.UserPhoneVerified,
-		es_model.HumanPhoneVerified:
+	case user.UserV1PhoneVerifiedType,
+		user.HumanPhoneVerifiedType:
 		u.IsPhoneVerified = true
-	case es_model.UserPhoneRemoved,
-		es_model.HumanPhoneRemoved:
+	case user.UserV1PhoneRemovedType,
+		user.HumanPhoneRemovedType:
 		u.Phone = ""
 		u.IsPhoneVerified = false
-	case es_model.UserDeactivated:
+	case user.UserDeactivatedType:
 		u.State = int32(model.UserStateInactive)
-	case es_model.UserReactivated,
-		es_model.UserUnlocked:
+	case user.UserReactivatedType,
+		user.UserUnlockedType:
 		u.State = int32(model.UserStateActive)
-	case es_model.UserLocked:
+	case user.UserLockedType:
 		u.State = int32(model.UserStateLocked)
-	case es_model.MFAOTPAdded,
-		es_model.HumanMFAOTPAdded:
+	case user.UserV1MFAOTPAddedType,
+		user.HumanMFAOTPAddedType:
 		u.OTPState = int32(model.MFAStateNotReady)
-	case es_model.MFAOTPVerified,
-		es_model.HumanMFAOTPVerified:
+	case user.UserV1MFAOTPVerifiedType,
+		user.HumanMFAOTPVerifiedType:
 		u.OTPState = int32(model.MFAStateReady)
 		u.MFAInitSkipped = time.Time{}
-	case es_model.MFAOTPRemoved,
-		es_model.HumanMFAOTPRemoved:
+	case user.UserV1MFAOTPRemovedType,
+		user.HumanMFAOTPRemovedType:
 		u.OTPState = int32(model.MFAStateUnspecified)
-	case es_model.HumanMFAU2FTokenAdded:
+	case user.HumanU2FTokenAddedType:
 		err = u.addU2FToken(event)
-	case es_model.HumanMFAU2FTokenVerified:
+	case user.HumanU2FTokenVerifiedType:
 		err = u.updateU2FToken(event)
 		if err != nil {
 			return err
 		}
 		u.MFAInitSkipped = time.Time{}
-	case es_model.HumanMFAU2FTokenRemoved:
+	case user.HumanU2FTokenRemovedType:
 		err = u.removeU2FToken(event)
-	case es_model.MFAInitSkipped,
-		es_model.HumanMFAInitSkipped:
+	case user.UserV1MFAInitSkippedType,
+		user.HumanMFAInitSkippedType:
 		u.MFAInitSkipped = event.CreationDate
-	case es_model.InitializedUserCodeAdded,
-		es_model.InitializedHumanCodeAdded:
+	case user.UserV1InitialCodeAddedType,
+		user.HumanInitialCodeAddedType:
 		u.InitRequired = true
-	case es_model.InitializedUserCheckSucceeded,
-		es_model.InitializedHumanCheckSucceeded:
+	case user.UserV1InitializedCheckSucceededType,
+		user.HumanInitializedCheckSucceededType:
 		u.InitRequired = false
-	case es_model.HumanAvatarAdded:
+	case user.HumanAvatarAddedType:
 		err = u.setData(event)
-	case es_model.HumanAvatarRemoved:
+	case user.HumanAvatarRemovedType:
 		u.AvatarKey = ""
-	case models.EventType(user_repo.HumanPasswordlessInitCodeAddedType),
-		models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
+	case user.HumanPasswordlessInitCodeAddedType,
+		user.HumanPasswordlessInitCodeRequestedType:
 		if !u.PasswordSet {
 			u.PasswordlessInitRequired = true
 			u.PasswordInitRequired = false
@@ -510,22 +510,22 @@ func (u *UserView) ComputeObject() {
 func (u *UserView) ComputeMFAMaxSetUp() {
 	for _, token := range u.PasswordlessTokens {
 		if token.State == int32(model.MFAStateReady) {
-			u.MFAMaxSetUp = int32(req_model.MFALevelMultiFactor)
+			u.MFAMaxSetUp = int32(domain.MFALevelMultiFactor)
 			u.PasswordlessInitRequired = false
 			return
 		}
 	}
 	for _, token := range u.U2FTokens {
 		if token.State == int32(model.MFAStateReady) {
-			u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
+			u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 			return
 		}
 	}
 	if u.OTPState == int32(model.MFAStateReady) {
-		u.MFAMaxSetUp = int32(req_model.MFALevelSecondFactor)
+		u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 		return
 	}
-	u.MFAMaxSetUp = int32(req_model.MFALevelNotSetUp)
+	u.MFAMaxSetUp = int32(domain.MFALevelNotSetUp)
 }
 
 func (u *UserView) SetEmptyUserType() {

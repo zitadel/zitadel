@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
 )
 
 type Phone struct {
@@ -31,41 +31,6 @@ func (p *Phone) Changes(changed *Phone) map[string]interface{} {
 		changes["phone"] = changed.PhoneNumber
 	}
 	return changes
-}
-
-func PhoneFromModel(phone *model.Phone) *Phone {
-	return &Phone{
-		ObjectRoot:      phone.ObjectRoot,
-		PhoneNumber:     phone.PhoneNumber,
-		IsPhoneVerified: phone.IsPhoneVerified,
-	}
-}
-
-func PhoneToModel(phone *Phone) *model.Phone {
-	return &model.Phone{
-		ObjectRoot:      phone.ObjectRoot,
-		PhoneNumber:     phone.PhoneNumber,
-		IsPhoneVerified: phone.IsPhoneVerified,
-	}
-}
-
-func PhoneCodeFromModel(code *model.PhoneCode) *PhoneCode {
-	if code == nil {
-		return nil
-	}
-	return &PhoneCode{
-		ObjectRoot: code.ObjectRoot,
-		Expiry:     code.Expiry,
-		Code:       code.Code,
-	}
-}
-
-func PhoneCodeToModel(code *PhoneCode) *model.PhoneCode {
-	return &model.PhoneCode{
-		ObjectRoot: code.ObjectRoot,
-		Expiry:     code.Expiry,
-		Code:       code.Code,
-	}
 }
 
 func (u *Human) appendUserPhoneChangedEvent(event *es_models.Event) error {

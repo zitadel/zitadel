@@ -29,7 +29,6 @@ import (
 
 const (
 	HandlerPrefix = "/oauth/v2"
-	AuthCallback  = HandlerPrefix + "/authorize/callback?id="
 )
 
 type Config struct {

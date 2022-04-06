@@ -7,7 +7,6 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/model"
 )
 
 type APIConfig struct {
@@ -26,28 +25,6 @@ func (c *APIConfig) Changes(changed *APIConfig) map[string]interface{} {
 		changes["authMethodType"] = changed.AuthMethodType
 	}
 	return changes
-}
-
-func APIConfigFromModel(config *model.APIConfig) *APIConfig {
-	return &APIConfig{
-		ObjectRoot:     config.ObjectRoot,
-		AppID:          config.AppID,
-		ClientID:       config.ClientID,
-		ClientSecret:   config.ClientSecret,
-		AuthMethodType: int32(config.AuthMethodType),
-	}
-}
-
-func APIConfigToModel(config *APIConfig) *model.APIConfig {
-	oidcConfig := &model.APIConfig{
-		ObjectRoot:     config.ObjectRoot,
-		AppID:          config.AppID,
-		ClientID:       config.ClientID,
-		ClientSecret:   config.ClientSecret,
-		AuthMethodType: model.APIAuthMethodType(config.AuthMethodType),
-		ClientKeys:     ClientKeysToModel(config.ClientKeys),
-	}
-	return oidcConfig
 }
 
 func (o *APIConfig) setData(event *es_models.Event) error {

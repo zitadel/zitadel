@@ -3,6 +3,8 @@ package start
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/caos/zitadel/cmd/admin/key"
 )
 
 func startFlags(cmd *cobra.Command) {
@@ -11,7 +13,7 @@ func startFlags(cmd *cobra.Command) {
 	bindStringFlag(cmd, "externalPort", "port ZITADEL will be exposed on")
 	bindBoolFlag(cmd, "externalSecure", "if ZITADEL will be served on HTTPS")
 
-	cmd.PersistentFlags().String(flagMasterKey, "", "masterkey for en/decryption keys")
+	key.AddMasterKeyFlag(cmd)
 
 }
 

@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
-
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"

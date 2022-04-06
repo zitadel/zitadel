@@ -11,7 +11,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http"
-	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -84,9 +83,9 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 	}
 	for i := len(scopes) - 1; i >= 0; i-- {
 		scope := scopes[i]
-		if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 			var orgID string
-			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
+			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 			if err == nil {
 				orgID = org.ID
 			}
@@ -242,8 +241,8 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 			}
-			if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
-				userInfo.AppendClaims(authreq_model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
+			if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+				userInfo.AppendClaims(domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 			}
 		}
 	}
@@ -283,8 +282,8 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
-		} else if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
-			claims = appendClaim(claims, authreq_model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
+		} else if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+			claims = appendClaim(claims, domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 		}
 	}
 	if len(roles) == 0 || clientID == "" {

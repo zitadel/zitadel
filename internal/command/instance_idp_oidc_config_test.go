@@ -24,8 +24,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx    context.Context
-			config *domain.OIDCIDPConfig
+			ctx        context.Context
+			instanceID string
+			config     *domain.OIDCIDPConfig
 		}
 	)
 	type res struct {
@@ -46,8 +47,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				config: &domain.OIDCIDPConfig{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				config:     &domain.OIDCIDPConfig{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -62,7 +64,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID: "config1",
 				},
@@ -79,7 +82,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -89,7 +92,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -108,7 +111,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewIDPConfigRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name",
 							),
@@ -117,7 +120,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID: "config1",
 				},
@@ -134,7 +138,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -144,7 +148,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -166,7 +170,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID:           "config1",
 					ClientID:              "clientid1",
@@ -190,7 +195,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -200,7 +205,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -244,7 +249,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID:           "config1",
 					ClientID:              "clientid-changed",
@@ -260,8 +266,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 			res: res{
 				want: &domain.OIDCIDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID:           "config1",
 					ClientID:              "clientid-changed",
@@ -297,7 +303,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 
 func newDefaultIDPOIDCConfigChangedEvent(ctx context.Context, configID, clientID, issuer, authorizationEndpoint, tokenEndpoint string, secret *crypto.CryptoValue, displayMapping, usernameMapping domain.OIDCMappingField, scopes []string) *instance.IDPOIDCConfigChangedEvent {
 	event, _ := instance.NewIDPOIDCConfigChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		configID,
 		[]idpconfig.OIDCConfigChanges{
 			idpconfig.ChangeClientID(clientID),

@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	http_util "github.com/caos/zitadel/internal/api/http"
-	command "github.com/caos/zitadel/internal/command/v2"
+	"github.com/caos/zitadel/internal/command/v2"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/migration"
@@ -46,12 +46,14 @@ func Setup(config *Config, steps *Steps) {
 
 	cmd := command.New(eventstoreClient, "localhost", config.SystemDefaults)
 
-	steps.S2DefaultInstance.cmd = cmd
-	steps.S1ProjectionTable = &ProjectionTable{dbClient: dbClient}
-	steps.S2DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
-	steps.S2DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
+	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}
+	steps.s2AssetsTable = &AssetTable{dbClient: dbClient}
+	steps.S3DefaultInstance.cmd = cmd
+	steps.S3DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
+	steps.S3DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
 	ctx := context.Background()
-	migration.Migrate(ctx, eventstoreClient, steps.S1ProjectionTable)
-	migration.Migrate(ctx, eventstoreClient, steps.S2DefaultInstance)
+	migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
+	migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
+	migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
 }

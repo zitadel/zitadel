@@ -8,9 +8,10 @@ import (
 	"github.com/lib/pq"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/repository/user"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 )
 
@@ -43,54 +44,6 @@ type NotifyUser struct {
 	InstanceID         string         `json:"instanceID" gorm:"column:instance_id"`
 }
 
-func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
-	return &NotifyUser{
-		ID:                 user.ID,
-		ChangeDate:         user.ChangeDate,
-		CreationDate:       user.CreationDate,
-		ResourceOwner:      user.ResourceOwner,
-		UserName:           user.UserName,
-		LoginNames:         user.LoginNames,
-		PreferredLoginName: user.PreferredLoginName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		NickName:           user.NickName,
-		DisplayName:        user.DisplayName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             int32(user.Gender),
-		LastEmail:          user.LastEmail,
-		VerifiedEmail:      user.VerifiedEmail,
-		LastPhone:          user.LastPhone,
-		VerifiedPhone:      user.VerifiedPhone,
-		PasswordSet:        user.PasswordSet,
-		Sequence:           user.Sequence,
-	}
-}
-
-func NotifyUserToModel(user *NotifyUser) *model.NotifyUser {
-	return &model.NotifyUser{
-		ID:                 user.ID,
-		ChangeDate:         user.ChangeDate,
-		CreationDate:       user.CreationDate,
-		ResourceOwner:      user.ResourceOwner,
-		UserName:           user.UserName,
-		LoginNames:         user.LoginNames,
-		PreferredLoginName: user.PreferredLoginName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		NickName:           user.NickName,
-		DisplayName:        user.DisplayName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             model.Gender(user.Gender),
-		LastEmail:          user.LastEmail,
-		VerifiedEmail:      user.VerifiedEmail,
-		LastPhone:          user.LastPhone,
-		VerifiedPhone:      user.VerifiedPhone,
-		PasswordSet:        user.PasswordSet,
-		Sequence:           user.Sequence,
-	}
-}
-
 func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string {
 	if !appendDomain {
 		return u.UserName
@@ -114,12 +67,12 @@ func (u *NotifyUser) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mo
 func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
 	u.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.UserAdded,
-		es_model.UserRegistered,
-		es_model.HumanRegistered,
-		es_model.HumanAdded,
-		es_model.MachineAdded:
+	switch eventstore.EventType(event.Type) {
+	case user.UserV1AddedType,
+		user.UserV1RegisteredType,
+		user.HumanRegisteredType,
+		user.HumanAddedType,
+		user.MachineAddedEventType:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		err = u.setData(event)
@@ -127,28 +80,28 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		err = u.setPasswordData(event)
-	case es_model.UserProfileChanged,
-		es_model.UserEmailChanged,
-		es_model.UserPhoneChanged,
-		es_model.HumanProfileChanged,
-		es_model.HumanEmailChanged,
-		es_model.HumanPhoneChanged,
-		es_model.UserUserNameChanged:
+	case user.UserV1ProfileChangedType,
+		user.UserV1EmailChangedType,
+		user.UserV1PhoneChangedType,
+		user.HumanProfileChangedType,
+		user.HumanEmailChangedType,
+		user.HumanPhoneChangedType,
+		user.UserUserNameChangedType:
 		err = u.setData(event)
-	case es_model.UserEmailVerified,
-		es_model.HumanEmailVerified:
+	case user.UserV1EmailVerifiedType,
+		user.HumanEmailVerifiedType:
 		u.VerifiedEmail = u.LastEmail
-	case es_model.UserPhoneRemoved,
-		es_model.HumanPhoneRemoved:
+	case user.UserV1PhoneRemovedType,
+		user.HumanPhoneRemovedType:
 		u.VerifiedPhone = ""
 		u.LastPhone = ""
-	case es_model.UserPhoneVerified,
-		es_model.HumanPhoneVerified:
+	case user.UserV1PhoneVerifiedType,
+		user.HumanPhoneVerifiedType:
 		u.VerifiedPhone = u.LastPhone
-	case es_model.UserPasswordChanged,
-		es_model.HumanPasswordChanged:
+	case user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType:
 		err = u.setPasswordData(event)
-	case es_model.UserRemoved:
+	case user.UserRemovedType:
 		u.State = int32(UserStateDeleted)
 	}
 	return err

@@ -27,8 +27,32 @@ const (
 )
 
 type InstanceSetup struct {
-	Org                      OrgSetup
-	Zitadel                  ZitadelConfig
+	Org      OrgSetup
+	Zitadel  ZitadelConfig
+	Features struct {
+		TierName                 string
+		TierDescription          string
+		Retention                time.Duration
+		State                    domain.FeaturesState
+		StateDescription         string
+		LoginPolicyFactors       bool
+		LoginPolicyIDP           bool
+		LoginPolicyPasswordless  bool
+		LoginPolicyRegistration  bool
+		LoginPolicyUsernameLogin bool
+		LoginPolicyPasswordReset bool
+		PasswordComplexityPolicy bool
+		LabelPolicyPrivateLabel  bool
+		LabelPolicyWatermark     bool
+		CustomDomain             bool
+		PrivacyPolicy            bool
+		MetadataUser             bool
+		CustomTextMessage        bool
+		CustomTextLogin          bool
+		LockoutPolicy            bool
+		ActionsAllowed           domain.ActionsAllowed
+		MaxActions               int
+	}
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
 		HasLowercase bool
@@ -142,12 +166,11 @@ func (s *InstanceSetup) generateIDs() (err error) {
 }
 
 func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
-	// TODO
-	// instanceID, err := id.SonyFlakeGenerator.Next()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, "system"), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
+	instanceID, err := id.SonyFlakeGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -165,12 +188,37 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 	setup.Org.Human.PasswordChangeRequired = true
 
-	instanceAgg := instance.NewAggregate()
+	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID, orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.Zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
+		SetDefaultFeatures(
+			instanceAgg,
+			setup.Features.TierName,
+			setup.Features.TierDescription,
+			setup.Features.State,
+			setup.Features.StateDescription,
+			setup.Features.Retention,
+			setup.Features.LoginPolicyFactors,
+			setup.Features.LoginPolicyIDP,
+			setup.Features.LoginPolicyPasswordless,
+			setup.Features.LoginPolicyRegistration,
+			setup.Features.LoginPolicyUsernameLogin,
+			setup.Features.LoginPolicyPasswordReset,
+			setup.Features.PasswordComplexityPolicy,
+			setup.Features.LabelPolicyPrivateLabel,
+			setup.Features.LabelPolicyWatermark,
+			setup.Features.CustomDomain,
+			setup.Features.PrivacyPolicy,
+			setup.Features.MetadataUser,
+			setup.Features.CustomTextMessage,
+			setup.Features.CustomTextLogin,
+			setup.Features.LockoutPolicy,
+			setup.Features.ActionsAllowed,
+			setup.Features.MaxActions,
+		),
 		AddPasswordComplexityPolicy(
 			instanceAgg,
 			setup.PasswordComplexityPolicy.MinLength,

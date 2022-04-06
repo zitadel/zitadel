@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
 
@@ -220,7 +221,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplMapping, funcs,
 		i18n.TranslatorConfig{DefaultLanguage: defaultLanguage, CookieName: cookieName},
 	)
-	logging.Log("APP-40tSoJ").OnError(err).WithError(err).Panic("error creating renderer")
+	logging.New().OnError(err).WithError(err).Panic("error creating renderer")
 	return r
 }
 
@@ -229,7 +230,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
 		return
 	}
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, authReq.InstanceID)
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 	if err != nil {
 		l.renderInternalError(w, r, authReq, err)
 		return
@@ -341,7 +342,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
-		PrivateLabelingOrgID:   l.getPrivateLabelingID(authReq),
+		PrivateLabelingOrgID:   l.getPrivateLabelingID(authz.GetInstance(r.Context()).InstanceID(), authReq),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -455,8 +456,8 @@ func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
-func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
-	privateLabelingOrgID := domain.IAMID
+func (l *Login) getPrivateLabelingID(instanceID string, authReq *domain.AuthRequest) string {
+	privateLabelingOrgID := instanceID
 	if authReq == nil {
 		return privateLabelingOrgID
 	}

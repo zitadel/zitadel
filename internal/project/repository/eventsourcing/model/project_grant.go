@@ -23,15 +23,6 @@ type ProjectGrantID struct {
 	GrantID string `json:"grantId"`
 }
 
-func GetProjectGrant(grants []*ProjectGrant, id string) (int, *ProjectGrant) {
-	for i, g := range grants {
-		if g.GrantID == id {
-			return i, g
-		}
-	}
-	return -1, nil
-}
-
 func (g *ProjectGrant) Changes(changed *ProjectGrant) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	changes["grantId"] = g.GrantID
