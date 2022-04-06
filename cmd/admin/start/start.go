@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/oidc/pkg/op"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -189,7 +190,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix+"/", config.ExternalDomain, baseURL, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix+"/", config.ExternalDomain, baseURL, op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
