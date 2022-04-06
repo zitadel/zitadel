@@ -22,6 +22,9 @@ const (
 	ForwardedFor    = "x-forwarded-for"
 	XUserAgent      = "x-user-agent"
 	XGrpcWeb        = "x-grpc-web"
+	IfNoneMatch     = "If-None-Match"
+	LastModified    = "Last-Modified"
+	Etag            = "Etag"
 
 	ContentSecurityPolicy   = "content-security-policy"
 	XXSSProtection          = "x-xss-protection"

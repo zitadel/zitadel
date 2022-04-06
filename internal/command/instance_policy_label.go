@@ -124,10 +124,7 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-3m20c", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -136,8 +133,12 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey str
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Qw0pd", "Errors.IAM.LabelPolicy.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "INSTANCE-3m20c", "Errors.Assets.Object.PutFailed")
+	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoAddedEvent(ctx, instanceAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +159,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Xc8Kf", "Errors.IAM.LabelPolicy.NotFound")
 	}
 
-	err = c.RemoveAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.LogoKey)
+	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.LogoKey)
 	if err != nil {
 		return nil, err
 	}
@@ -174,10 +175,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-yxE4f", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -186,8 +184,12 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey str
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-1yMx0", "Errors.IAM.LabelPolicy.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "INSTANCE-yxE4f", "Errors.Assets.Object.PutFailed")
+	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconAddedEvent(ctx, instanceAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +209,7 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-4M0qw", "Errors.IAM.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.IconKey)
+	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.IconKey)
 	if err != nil {
 		return nil, err
 	}
@@ -223,20 +225,21 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-4fMs9", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-ZR9fs", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-ZR9fs", "Errors.Instance.LabelPolicy.NotFound")
+	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "INSTANCE-4fMs9", "Errors.Assets.Object.PutFailed")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoDarkAddedEvent(ctx, instanceAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoDarkAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -254,9 +257,9 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-3FGds", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-3FGds", "Errors.Instance.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.LogoDarkKey)
+	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.LogoDarkKey)
 	if err != nil {
 		return nil, err
 	}
@@ -272,20 +275,21 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-1cxM3", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-vMsf9", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-vMsf9", "Errors.Instance.LabelPolicy.NotFound")
+	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "INSTANCE-1cxM3", "Errors.Assets.Object.PutFailed")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconDarkAddedEvent(ctx, instanceAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconDarkAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -303,9 +307,9 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2nc7F", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2nc7F", "Errors.Instance.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.IconDarkKey)
+	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.IconDarkKey)
 	if err != nil {
 		return nil, err
 	}
@@ -321,20 +325,21 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-1N8fs", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-1N8fE", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-1N8fE", "Errors.Instance.LabelPolicy.NotFound")
+	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(nil, "INSTANCE-1N8fs", "Errors.Assets.Object.PutFailed")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyFontAddedEvent(ctx, instanceAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyFontAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -352,9 +357,9 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	}
 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Tk0gw", "Errors.IAM.LabelPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-Tk0gw", "Errors.Instance.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.FontKey)
+	err = c.removeAsset(ctx, authz.GetInstance(ctx).InstanceID(), existingPolicy.FontKey)
 	if err != nil {
 		return nil, err
 	}

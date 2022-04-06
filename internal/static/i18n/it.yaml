@@ -22,6 +22,7 @@ Errors:
     Object:
       PutFailed: Oggetto non creato
       GetFailed: Oggetto non può essere letto
+      NotFound: Oggetto non trovato
       PresignedTokenFailed: Il token non può essere creato
       ListFailed: La lista degli oggetti non può essere letta
       RemoveFailed: L'oggetto non può essere rimosso

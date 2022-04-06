@@ -1,11 +1,12 @@
 package login
 
 import (
-	"context"
 	"net/http"
 
+	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/api/assets"
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/domain"
 )
 
 type dynamicResourceData struct {
@@ -25,74 +26,11 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bucketName := authz.GetInstance(r.Context()).InstanceID()
+	resourceOwner := authz.GetInstance(r.Context()).InstanceID()
 	if data.OrgID != "" && !data.DefaultPolicy {
-		bucketName = data.OrgID
+		resourceOwner = data.OrgID
 	}
 
-	etag := r.Header.Get("If-None-Match")
-	asset, info, err := l.getStatic(r.Context(), bucketName, data.FileName)
-	if info != nil && info.ETag == etag {
-		w.WriteHeader(304)
-		return
-	}
-	if err != nil {
-		return
-	}
-	//TODO: enable again when assets are implemented again
-	_ = asset
-	//w.Header().Set("content-length", strconv.FormatInt(info.Size, 10))
-	//w.Header().Set("content-type", info.ContentType)
-	//w.Header().Set("ETag", info.ETag)
-	//w.Write(asset)
-}
-
-func (l *Login) getStatic(ctx context.Context, bucketName, fileName string) ([]byte, *domain.AssetInfo, error) {
-	s := new(staticAsset)
-	//TODO: enable again when assets are implemented again
-	//key := bucketName + "-" + fileName
-	//err := l.staticCache.Get(key, s)
-	//if err == nil && s.Info != nil && (s.Info.Expiration.After(time.Now().Add(-1 * time.Minute))) { //TODO: config?
-	//	return s.Data, s.Info, nil
-	//}
-
-	//info, err := l.staticStorage.GetObjectInfo(ctx, bucketName, fileName)
-	//if err != nil {
-	//	if caos_errs.IsNotFound(err) {
-	//		return nil, nil, err
-	//	}
-	//	return s.Data, s.Info, err
-	//}
-	//if s.Info != nil && s.Info.ETag == info.ETag {
-	//	if info.Expiration.After(s.Info.Expiration) {
-	//		s.Info = info
-	//		//l.cacheStatic(bucketName, fileName, s)
-	//	}
-	//	return s.Data, s.Info, nil
-	//}
-	//
-	//reader, _, err := l.staticStorage.GetObject(ctx, bucketName, fileName)
-	//if err != nil {
-	//	return s.Data, s.Info, err
-	//}
-	//s.Data, err = ioutil.ReadAll(reader)
-	//if err != nil {
-	//	return nil, nil, err
-	//}
-	//s.Info = info
-	//l.cacheStatic(bucketName, fileName, s)
-	return s.Data, s.Info, nil
-}
-
-//TODO: enable again when assets are implemented again
-//
-//func (l *Login) cacheStatic(bucketName, fileName string, s *staticAsset) {
-//	key := bucketName + "-" + fileName
-//	err := l.staticCache.Set(key, &s)
-//	logging.Log("HANDLER-dfht2").OnError(err).Warnf("caching of asset %s: %s failed", bucketName, fileName)
-//}
-
-type staticAsset struct {
-	Data []byte
-	Info *domain.AssetInfo
+	err = assets.GetAsset(w, r, resourceOwner, data.FileName, l.staticStorage)
+	logging.WithFields("file", data.FileName, "org", resourceOwner).OnError(err).Warn("asset in login could not be served")
 }
