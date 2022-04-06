@@ -41,7 +41,7 @@ func (l *myHumanAvatarUploader) ObjectName(ctxData authz.CtxData) (string, error
 }
 
 func (l *myHumanAvatarUploader) ResourceOwner(_ authz.Instance, ctxData authz.CtxData) string {
-	return ctxData.OrgID
+	return ctxData.ResourceOwner
 }
 
 func (l *myHumanAvatarUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
@@ -59,6 +59,6 @@ func (l *myHumanAvatarDownloader) ObjectName(ctx context.Context, path string) (
 	return domain.GetHumanAvatarAssetPath(authz.GetCtxData(ctx).UserID), nil
 }
 
-func (l *myHumanAvatarDownloader) ResourceOwner(ctx context.Context, id string) string {
-	return authz.GetCtxData(ctx).OrgID
+func (l *myHumanAvatarDownloader) ResourceOwner(ctx context.Context, _ string) string {
+	return authz.GetCtxData(ctx).ResourceOwner
 }

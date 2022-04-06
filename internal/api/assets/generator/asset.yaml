@@ -1,6 +1,6 @@
 Services:
   IAM:
-    Prefix: "/iam"
+    Prefix: "/instance"
     Methods:
       DefaultLabelPolicyLogo:
         Path: "/policy/label/logo"

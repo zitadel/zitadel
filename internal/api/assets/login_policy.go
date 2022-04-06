@@ -139,7 +139,7 @@ func (l *labelPolicyLogoDownloader) ObjectName(ctx context.Context, path string)
 	return policy.Light.LogoURL, nil
 }
 
-func (l *labelPolicyLogoDownloader) ResourceOwner(ctx context.Context, id string) string {
+func (l *labelPolicyLogoDownloader) ResourceOwner(ctx context.Context, _ string) string {
 	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
@@ -271,7 +271,7 @@ func (l *labelPolicyIconDownloader) ObjectName(ctx context.Context, path string)
 	return policy.Light.IconURL, nil
 }
 
-func (l *labelPolicyIconDownloader) ResourceOwner(ctx context.Context, id string) string {
+func (l *labelPolicyIconDownloader) ResourceOwner(ctx context.Context, _ string) string {
 	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
@@ -362,7 +362,7 @@ func (l *labelPolicyFontDownloader) ObjectName(ctx context.Context, path string)
 	return policy.FontURL, nil
 }
 
-func (l *labelPolicyFontDownloader) ResourceOwner(ctx context.Context, id string) string {
+func (l *labelPolicyFontDownloader) ResourceOwner(ctx context.Context, _ string) string {
 	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 

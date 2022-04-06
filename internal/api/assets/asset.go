@@ -61,7 +61,7 @@ type Uploader interface {
 
 type Downloader interface {
 	ObjectName(ctx context.Context, path string) (string, error)
-	ResourceOwner(ctx context.Context, id string) string
+	ResourceOwner(ctx context.Context, ownerPath string) string
 }
 
 type ErrorHandler func(http.ResponseWriter, *http.Request, error, int)
@@ -85,7 +85,7 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 	router := mux.NewRouter()
 	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle, instanceInterceptor)
 	RegisterRoutes(router, h)
-	router.PathPrefix("/{id}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
+	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return router
 }
 
@@ -99,8 +99,8 @@ func (l *publicFileDownloader) ObjectName(_ context.Context, path string) (strin
 	return path, nil
 }
 
-func (l *publicFileDownloader) ResourceOwner(_ context.Context, id string) string {
-	return id
+func (l *publicFileDownloader) ResourceOwner(_ context.Context, ownerPath string) string {
+	return ownerPath
 }
 
 const maxMemory = 2 << 20
@@ -159,11 +159,11 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			return
 		}
 		ctx := r.Context()
-		assetID := mux.Vars(r)["id"]
-		resourceOwner := downloader.ResourceOwner(ctx, assetID)
+		ownerPath := mux.Vars(r)["owner"]
+		resourceOwner := downloader.ResourceOwner(ctx, ownerPath)
 		path := ""
-		if assetID != "" {
-			path = strings.Split(r.RequestURI, assetID+"/")[1]
+		if ownerPath != "" {
+			path = strings.Split(r.RequestURI, ownerPath+"/")[1]
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
