@@ -130,10 +130,7 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 	)
 
 	// verify signature if necessary
-	checker.WithConditionalLogicStep(
-		func() bool {
-			return sig != "" && sigAlg != ""
-		},
+	checker.WithLogicStep(
 		func() error {
 			if attrQueryRequest == "" {
 				return fmt.Errorf("no authrequest provided but required")
