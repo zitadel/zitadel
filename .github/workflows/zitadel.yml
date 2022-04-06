@@ -1,7 +1,6 @@
 name: ZITADEL Release
 
 on:
-  #pull_request:
   push:
     tags-ignore:
       - "*"
@@ -45,6 +44,12 @@ jobs:
           semantic_version: 19.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Google Container Registry Login
+        if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
+        run: |
+          echo "${{ secrets.GCR_JSON_KEY_BASE64 }}" | \
+          base64 -d | \
+          docker login -u oauth2accesstoken --password-stdin europe-docker.pkg.dev
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
