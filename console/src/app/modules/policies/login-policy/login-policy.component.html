@@ -129,6 +129,12 @@
       </cnsl-info-section>
     </ng-template> -->
   </div>
+
+  <div class="login-policy-row">
+    <mat-slide-toggle class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.ignoreUnknownUsernames">
+      {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate }}
+    </mat-slide-toggle>
+  </div>
 </cnsl-card>
 
 <div class="login-policy-btn-container">

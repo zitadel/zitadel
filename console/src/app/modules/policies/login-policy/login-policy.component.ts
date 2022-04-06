@@ -88,10 +88,10 @@ export class LoginPolicyComponent implements OnInit {
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
         // if(this.loginData.passwordCheckLifetime) {
         // mgmtreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
         // }
-
         if ((this.loginData as LoginPolicy.AsObject).isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
         } else {
@@ -105,6 +105,7 @@ export class LoginPolicyComponent implements OnInit {
         adminreq.setForceMfa(this.loginData.forceMfa);
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
         adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
         // adminreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
