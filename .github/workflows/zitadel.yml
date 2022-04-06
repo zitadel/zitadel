@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "${{ secrets.GCR_JSON_KEY_BASE64 }}" | \
           base64 -d | \
-          docker login -u oauth2accesstoken --password-stdin europe-docker.pkg.dev
+          docker login -u _json_key --password-stdin https://eu.gcr.io
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
