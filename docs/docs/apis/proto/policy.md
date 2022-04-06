@@ -63,6 +63,7 @@ title: zitadel/policy.proto
 | passwordless_type |  PasswordlessType | - |  |
 | is_default |  bool | - |  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
 
 
 

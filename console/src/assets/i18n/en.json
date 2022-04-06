@@ -991,6 +991,8 @@
       "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
       "HIDEPASSWORDRESET": "Hide Password reset",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
+      "IGNOREUNKNOWNUSERNAMES": "Ignore unknown usernames",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark"

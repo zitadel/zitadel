@@ -107,6 +107,7 @@ export class LoginPolicyComponent implements OnDestroy {
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
         if ((this.loginData as LoginPolicy.AsObject).isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
         } else {
@@ -120,6 +121,7 @@ export class LoginPolicyComponent implements OnDestroy {
         adminreq.setForceMfa(this.loginData.forceMfa);
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
         adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }

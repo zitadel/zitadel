@@ -10,23 +10,25 @@ import (
 
 func addLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
-		AllowUsernamePassword: p.AllowUsernamePassword,
-		AllowRegister:         p.AllowRegister,
-		AllowExternalIDP:      p.AllowExternalIdp,
-		ForceMFA:              p.ForceMfa,
-		PasswordlessType:      policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
-		HidePasswordReset:     p.HidePasswordReset,
+		AllowUsernamePassword:  p.AllowUsernamePassword,
+		AllowRegister:          p.AllowRegister,
+		AllowExternalIDP:       p.AllowExternalIdp,
+		ForceMFA:               p.ForceMfa,
+		PasswordlessType:       policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
+		HidePasswordReset:      p.HidePasswordReset,
+		IgnoreUnknownUsernames: p.IgnoreUnknownUsernames,
 	}
 }
 
 func updateLoginPolicyToDomain(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
-		AllowUsernamePassword: p.AllowUsernamePassword,
-		AllowRegister:         p.AllowRegister,
-		AllowExternalIDP:      p.AllowExternalIdp,
-		ForceMFA:              p.ForceMfa,
-		PasswordlessType:      policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
-		HidePasswordReset:     p.HidePasswordReset,
+		AllowUsernamePassword:  p.AllowUsernamePassword,
+		AllowRegister:          p.AllowRegister,
+		AllowExternalIDP:       p.AllowExternalIdp,
+		ForceMFA:               p.ForceMfa,
+		PasswordlessType:       policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
+		HidePasswordReset:      p.HidePasswordReset,
+		IgnoreUnknownUsernames: p.IgnoreUnknownUsernames,
 	}
 }
 

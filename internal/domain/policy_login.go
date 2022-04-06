@@ -5,16 +5,17 @@ import "github.com/caos/zitadel/internal/eventstore/v1/models"
 type LoginPolicy struct {
 	models.ObjectRoot
 
-	Default               bool
-	AllowUsernamePassword bool
-	AllowRegister         bool
-	AllowExternalIDP      bool
-	IDPProviders          []*IDPProvider
-	ForceMFA              bool
-	SecondFactors         []SecondFactorType
-	MultiFactors          []MultiFactorType
-	PasswordlessType      PasswordlessType
-	HidePasswordReset     bool
+	Default                bool
+	AllowUsernamePassword  bool
+	AllowRegister          bool
+	AllowExternalIDP       bool
+	IDPProviders           []*IDPProvider
+	ForceMFA               bool
+	SecondFactors          []SecondFactorType
+	MultiFactors           []MultiFactorType
+	PasswordlessType       PasswordlessType
+	HidePasswordReset      bool
+	IgnoreUnknownUsernames bool
 }
 
 type IDPProvider struct {

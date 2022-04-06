@@ -147,7 +147,6 @@
         </ng-template>
       </div>
       <div class="row">
-
         <mat-slide-toggle class="toggle" color="primary"
           [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) === false"
           ngDefaultControl [(ngModel)]="loginData.hidePasswordReset">
@@ -165,6 +164,17 @@
             {{'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate}}
           </cnsl-info-section>
         </ng-template>
+      </div>
+      <div class="row">
+        <mat-slide-toggle class="toggle" color="primary"
+          [disabled]="disabled"
+          ngDefaultControl [(ngModel)]="loginData.ignoreUnknownUsernames">
+          {{'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate}}
+        </mat-slide-toggle>
+
+        <cnsl-info-section class="info">
+          {{'POLICY.DATA.IGNOREUNKNOWNUSERNAMES_DESC' | translate}}
+        </cnsl-info-section>
       </div>
 
       <div class="row">

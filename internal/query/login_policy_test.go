@@ -8,9 +8,10 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
-	"github.com/lib/pq"
 )
 
 func Test_LoginPolicyPrepares(t *testing.T) {
@@ -41,7 +42,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.multi_factors,`+
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset`+
+						` zitadel.projections.login_policies.hide_password_reset,`+
+						` zitadel.projections.login_policies.ignore_unknown_usernames`+
 						` FROM zitadel.projections.login_policies`),
 					nil,
 					nil,
@@ -72,7 +74,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.multi_factors,`+
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset`+
+						` zitadel.projections.login_policies.hide_password_reset,`+
+						` zitadel.projections.login_policies.ignore_unknown_usernames`+
 						` FROM zitadel.projections.login_policies`),
 					[]string{
 						"aggregate_id",
@@ -88,6 +91,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"passwordless_type",
 						"is_default",
 						"hide_password_reset",
+						"ignore_unknown_usernames",
 					},
 					[]driver.Value{
 						"ro",
@@ -103,23 +107,25 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
+						true,
 					},
 				),
 			},
 			object: &LoginPolicy{
-				OrgID:                 "ro",
-				CreationDate:          testNow,
-				ChangeDate:            testNow,
-				Sequence:              20211109,
-				AllowRegister:         true,
-				AllowUsernamePassword: true,
-				AllowExternalIDPs:     true,
-				ForceMFA:              true,
-				SecondFactors:         []domain.SecondFactorType{domain.SecondFactorTypeOTP},
-				MultiFactors:          []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
-				PasswordlessType:      domain.PasswordlessTypeAllowed,
-				IsDefault:             true,
-				HidePasswordReset:     true,
+				OrgID:                  "ro",
+				CreationDate:           testNow,
+				ChangeDate:             testNow,
+				Sequence:               20211109,
+				AllowRegister:          true,
+				AllowUsernamePassword:  true,
+				AllowExternalIDPs:      true,
+				ForceMFA:               true,
+				SecondFactors:          []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+				MultiFactors:           []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				PasswordlessType:       domain.PasswordlessTypeAllowed,
+				IsDefault:              true,
+				HidePasswordReset:      true,
+				IgnoreUnknownUsernames: true,
 			},
 		},
 		{
@@ -139,7 +145,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.multi_factors,`+
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset`+
+						` zitadel.projections.login_policies.hide_password_reset,`+
+						` zitadel.projections.login_policies.ignore_unknown_usernames`+
 						` FROM zitadel.projections.login_policies`),
 					sql.ErrConnDone,
 				),

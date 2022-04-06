@@ -1,22 +1,24 @@
 package policy
 
 import (
+	timestamp_pb "google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/object"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
-	timestamp_pb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 	return &policy_pb.LoginPolicy{
-		IsDefault:             policy.IsDefault,
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowRegister:         policy.AllowRegister,
-		AllowExternalIdp:      policy.AllowExternalIDPs,
-		ForceMfa:              policy.ForceMFA,
-		PasswordlessType:      ModelPasswordlessTypeToPb(policy.PasswordlessType),
-		HidePasswordReset:     policy.HidePasswordReset,
+		IsDefault:              policy.IsDefault,
+		AllowUsernamePassword:  policy.AllowUsernamePassword,
+		AllowRegister:          policy.AllowRegister,
+		AllowExternalIdp:       policy.AllowExternalIDPs,
+		ForceMfa:               policy.ForceMFA,
+		PasswordlessType:       ModelPasswordlessTypeToPb(policy.PasswordlessType),
+		HidePasswordReset:      policy.HidePasswordReset,
+		IgnoreUnknownUsernames: policy.IgnoreUnknownUsernames,
 		Details: &object.ObjectDetails{
 			Sequence:      policy.Sequence,
 			CreationDate:  timestamp_pb.New(policy.CreationDate),

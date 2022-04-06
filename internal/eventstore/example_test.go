@@ -316,5 +316,5 @@ func TestUserReadModel(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpected error on filter to reducer: %v", err)
 	}
-	fmt.Printf("%+v", users)
+	t.Logf("%+v", users)
 }

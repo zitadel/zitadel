@@ -111,6 +111,7 @@ const (
 	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
 	LoginPolicyIsDefaultCol             = "is_default"
 	LoginPolicyHidePWResetCol           = "hide_password_reset"
+	IgnoreUnknownUsernames              = "ignore_unknown_usernames"
 )
 
 func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -140,6 +141,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyPasswordlessTypeCol, policyEvent.PasswordlessType),
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
+		handler.NewCol(IgnoreUnknownUsernames, policyEvent.IgnoreUnknownUsernames),
 	}), nil
 }
 
@@ -176,6 +178,9 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	}
 	if policyEvent.HidePasswordReset != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyHidePWResetCol, *policyEvent.HidePasswordReset))
+	}
+	if policyEvent.IgnoreUnknownUsernames != nil {
+		cols = append(cols, handler.NewCol(IgnoreUnknownUsernames, *policyEvent.IgnoreUnknownUsernames))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,
