@@ -65,6 +65,16 @@ func (p *IdentityProviderConfig) getMetadata(
 		})
 	}
 
+	attrs := &Attributes{
+		"empty", "empty", "empty", "empty", "empty", "empty",
+	}
+	attrsSaml := attrs.GetSAML()
+	for _, attr := range attrsSaml {
+		for i := range attr.AttributeValue {
+			attr.AttributeValue[i] = ""
+		}
+	}
+
 	return &md.IDPSSODescriptorType{
 			XMLName:                    xml.Name{},
 			WantAuthnRequestsSigned:    p.WantAuthRequestsSigned,
@@ -86,8 +96,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			AttributeProfile: []string{
 				"urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic",
 			},
-			//TODO definition for all provided attributes
-			Attribute: nil,
+			Attribute: attrsSaml,
 			ArtifactResolutionService: []md.IndexedEndpointType{{
 				Index:     "0",
 				IsDefault: "true",
@@ -108,7 +117,7 @@ func (p *IdentityProviderConfig) getMetadata(
 					Location: p.Endpoints.SingleLogOut.URL,
 				},
 			},
-			NameIDFormat:  []string{p.NameIDFormat},
+			NameIDFormat:  []string{"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"},
 			Signature:     nil,
 			KeyDescriptor: idpKeyDescriptors,
 
@@ -132,13 +141,12 @@ func (p *IdentityProviderConfig) getMetadata(
 				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
 				Location: p.Endpoints.Attribute.URL,
 			}},
-			NameIDFormat: []string{p.NameIDFormat},
+			NameIDFormat: []string{"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"},
 			//TODO definition for more profiles
 			AttributeProfile: []string{
 				"urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic",
 			},
-			//TODO definition for all provided attributes
-			Attribute:     nil,
+			Attribute:     attrsSaml,
 			Signature:     nil,
 			KeyDescriptor: idpKeyDescriptors,
 

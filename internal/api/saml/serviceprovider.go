@@ -98,7 +98,12 @@ func (sp *ServiceProvider) verifyRequest(request *samlp.AuthnRequestType) error 
 
 func (sp *ServiceProvider) verifySignature(request, relayState, sigAlg, expectedSig string) error {
 	// Validate the signature
-	sig := []byte(fmt.Sprintf("SAMLRequest=%s&RelayState=%s&SigAlg=%s", url.QueryEscape(request), url.QueryEscape(relayState), url.QueryEscape(sigAlg)))
+	sig := []byte{}
+	if url.QueryEscape(relayState) != "" {
+		sig = []byte(fmt.Sprintf("SAMLRequest=%s&RelayState=%s&SigAlg=%s", url.QueryEscape(request), url.QueryEscape(relayState), url.QueryEscape(sigAlg)))
+	} else {
+		sig = []byte(fmt.Sprintf("SAMLRequest=%s&SigAlg=%s", url.QueryEscape(request), url.QueryEscape(sigAlg)))
+	}
 	signature, err := base64.StdEncoding.DecodeString(expectedSig)
 
 	if err != nil {

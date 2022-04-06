@@ -194,7 +194,7 @@ func (r *Response) makeAssertionResponse(
 ) *samlp.ResponseType {
 
 	response := makeResponse(r.RequestID, r.AcsUrl, issueInstant, StatusCodeSuccess, "", r.Issuer)
-	assertion := makeAssertion(r.RequestID, r.AcsUrl, r.SendIP, issueInstant, untilInstant, r.Issuer, attributes.GetNameID(), attributes.GetSAML(), r.Audience)
+	assertion := makeAssertion(r.RequestID, r.AcsUrl, r.SendIP, issueInstant, untilInstant, r.Issuer, attributes.GetNameID(), attributes.GetSAML(), r.Audience, true)
 	response.Assertion = *assertion
 	return response
 }
@@ -204,6 +204,41 @@ func getIssuer(entityID string) *saml.NameIDType {
 		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
 		Text:   entityID,
 	}
+}
+
+func makeAttributeQueryResponse(
+	requestID string,
+	issuer string,
+	entityID string,
+	attributes *Attributes,
+	queriedAttrs []saml.AttributeType,
+) *samlp.ResponseType {
+	now := time.Now().UTC()
+	nowStr := now.Format(DefaultTimeFormat)
+	fiveMinutes, _ := time.ParseDuration("5m")
+	fiveFromNow := now.Add(fiveMinutes)
+	fiveFromNowStr := fiveFromNow.Format(DefaultTimeFormat)
+
+	providedAttrs := []*saml.AttributeType{}
+	attrsSaml := attributes.GetSAML()
+	if queriedAttrs == nil || len(queriedAttrs) == 0 {
+		for _, attrSaml := range attrsSaml {
+			providedAttrs = append(providedAttrs, attrSaml)
+		}
+	} else {
+		for _, attrSaml := range attrsSaml {
+			for _, queriedAttr := range queriedAttrs {
+				if attrSaml.Name == queriedAttr.Name && attrSaml.NameFormat == queriedAttr.NameFormat {
+					providedAttrs = append(providedAttrs, attrSaml)
+				}
+			}
+		}
+	}
+
+	response := makeResponse(requestID, "", nowStr, StatusCodeSuccess, "", issuer)
+	assertion := makeAssertion(requestID, "", "", nowStr, fiveFromNowStr, issuer, attributes.GetNameID(), providedAttrs, entityID, false)
+	response.Assertion = *assertion
+	return response
 }
 
 func makeAssertion(
@@ -216,6 +251,7 @@ func makeAssertion(
 	nameID *saml.NameIDType,
 	attributes []*saml.AttributeType,
 	audience string,
+	authN bool,
 ) *saml.AssertionType {
 	id := NewID()
 	issuerP := getIssuer(issuer)
@@ -232,7 +268,6 @@ func makeAssertion(
 					Method: "urn:oasis:names:tc:SAML:2.0:cm:bearer",
 					SubjectConfirmationData: &saml.SubjectConfirmationDataType{
 						InResponseTo: requestID,
-						Recipient:    acsURL,
 						NotBefore:    issueInstant,
 						NotOnOrAfter: untilInstant,
 					},
@@ -249,7 +284,15 @@ func makeAssertion(
 		AttributeStatement: []saml.AttributeStatementType{
 			{Attribute: attributes},
 		},
-		AuthnStatement: []saml.AuthnStatementType{
+	}
+	if acsURL != "" {
+		ret.Subject.SubjectConfirmation[0].SubjectConfirmationData.Recipient = acsURL
+	}
+	if sendIP != "" {
+		ret.Subject.SubjectConfirmation[0].SubjectConfirmationData.Address = sendIP
+	}
+	if authN {
+		ret.AuthnStatement = []saml.AuthnStatementType{
 			{
 				AuthnInstant: issueInstant,
 				SessionIndex: id,
@@ -257,10 +300,7 @@ func makeAssertion(
 					AuthnContextClassRef: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
 				},
 			},
-		},
-	}
-	if sendIP != "" {
-		ret.Subject.SubjectConfirmation[0].SubjectConfirmationData.Address = sendIP
+		}
 	}
 	return ret
 }
@@ -273,7 +313,7 @@ func makeResponse(
 	message string,
 	issuer string,
 ) *samlp.ResponseType {
-	return &samlp.ResponseType{
+	resp := &samlp.ResponseType{
 		Version:      "2.0",
 		Id:           NewID(),
 		IssueInstant: issueInstant,
@@ -284,7 +324,11 @@ func makeResponse(
 			StatusMessage: message,
 		},
 		InResponseTo: requestID,
-		Destination:  acsURL,
 		Issuer:       getIssuer(issuer),
 	}
+
+	if acsURL != "" {
+		resp.Destination = acsURL
+	}
+	return resp
 }

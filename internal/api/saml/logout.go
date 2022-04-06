@@ -1,13 +1,10 @@
 package saml
 
 import (
-	"bytes"
-	"compress/flate"
-	"encoding/base64"
-	"encoding/xml"
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
+	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/http"
 	"time"
@@ -52,7 +49,7 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	//decode logout request to internal struct
 	checker.WithLogicStep(
 		func() error {
-			logoutRequest, err = decodeLogoutRequest(logoutRequestForm.Encoding, logoutRequestForm.LogoutRequest)
+			logoutRequest, err = xml.DecodeLogoutRequest(logoutRequestForm.Encoding, logoutRequestForm.LogoutRequest)
 			if err != nil {
 				return err
 			}
@@ -125,33 +122,6 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 		response.makeSuccessfulLogoutResponse(),
 	)
 	logging.Log("SAML-892u3n").Info(fmt.Sprintf("logout request for user %s", logoutRequest.NameID.Text))
-}
-
-func decodeLogoutRequest(encoding string, message string) (*samlp.LogoutRequestType, error) {
-	reqBytes, err := base64.StdEncoding.DecodeString(message)
-	if err != nil {
-		return nil, err
-	}
-
-	req := &samlp.LogoutRequestType{}
-	switch encoding {
-	case "":
-		reader := flate.NewReader(bytes.NewReader(reqBytes))
-		decoder := xml.NewDecoder(reader)
-		if err = decoder.Decode(req); err != nil {
-			return nil, err
-		}
-	case EncodingDeflate:
-		reader := flate.NewReader(bytes.NewReader(reqBytes))
-		decoder := xml.NewDecoder(reader)
-		if err = decoder.Decode(req); err != nil {
-			return nil, err
-		}
-	default:
-		return nil, fmt.Errorf("unknown encoding")
-	}
-
-	return req, nil
 }
 
 func getLogoutRequestFromRequest(r *http.Request) (*LogoutRequestForm, error) {

@@ -160,7 +160,7 @@ type IDPSSODescriptorType struct {
 	NameIDMappingService       []EndpointType          `xml:"urn:oasis:names:tc:SAML:2.0:metadata NameIDMappingService"`
 	AssertionIDRequestService  []EndpointType          `xml:"urn:oasis:names:tc:SAML:2.0:metadata AssertionIDRequestService"`
 	AttributeProfile           []string                `xml:"AttributeProfile"`
-	Attribute                  []saml.AttributeType    `xml:"Attribute"`
+	Attribute                  []*saml.AttributeType   `xml:"Attribute"`
 	ArtifactResolutionService  []IndexedEndpointType   `xml:"urn:oasis:names:tc:SAML:2.0:metadata ArtifactResolutionService"`
 	SingleLogoutService        []EndpointType          `xml:"urn:oasis:names:tc:SAML:2.0:metadata SingleLogoutService"`
 	ManageNameIDService        []EndpointType          `xml:"urn:oasis:names:tc:SAML:2.0:metadata ManageNameIDService"`
@@ -263,7 +263,7 @@ type AttributeAuthorityDescriptorType struct {
 	AssertionIDRequestService  []EndpointType          `xml:"urn:oasis:names:tc:SAML:2.0:metadata AssertionIDRequestService"`
 	NameIDFormat               []string                `xml:"NameIDFormat"`
 	AttributeProfile           []string                `xml:"AttributeProfile"`
-	Attribute                  []saml.AttributeType    `xml:"Attribute"`
+	Attribute                  []*saml.AttributeType   `xml:"Attribute"`
 	Signature                  *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions                 *ExtensionsType         `xml:"Extensions"`
 	KeyDescriptor              []KeyDescriptorType     `xml:"KeyDescriptor"`

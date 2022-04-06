@@ -1,22 +1,16 @@
 package saml
 
 import (
-	"bytes"
-	"compress/flate"
 	"encoding/base64"
-	"encoding/xml"
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
+	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
 	"reflect"
 	"regexp"
-)
-
-const (
-	EncodingDeflate = "urn:oasis:names:tc:SAML:2.0:bindings:URL-Encoding:DEFLATE"
 )
 
 type AuthRequestForm struct {
@@ -94,7 +88,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	// decode request from xml into golang struct
 	checker.WithLogicStep(
 		func() error {
-			authNRequest, err = decodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
+			authNRequest, err = xml.DecodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
 			if err != nil {
 				return err
 			}
@@ -154,7 +148,9 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			return sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
 				p.Metadata.WantAuthnRequestsSigned == "true" ||
 				authRequestForm.Sig != "" ||
-				(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue != xml_dsig.SignatureValueType{} && authNRequest.Signature.SignatureValue.Text != "") &&
+				(authNRequest.Signature != nil &&
+					!reflect.DeepEqual(authNRequest.Signature.SignatureValue, xml_dsig.SignatureValueType{}) &&
+					authNRequest.Signature.SignatureValue.Text != "") &&
 					authNRequest.ProtocolBinding == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
 		},
 		func() error {
@@ -171,7 +167,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 				authRequestForm.Sig = authNRequest.Signature.SignatureValue.Text
 			}
 
-			authRequestForm.AuthRequest, err = authNRequestIntoStringWithoutSignature(authRequestForm.Encoding, authRequestForm.AuthRequest)
+			authRequestForm.AuthRequest, err = authNRequestIntoStringWithoutSignature(authRequestForm.AuthRequest)
 			if err != nil {
 				return err
 			}
@@ -189,7 +185,9 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			return sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
 				p.Metadata.WantAuthnRequestsSigned == "true" ||
 				authRequestForm.Sig != "" ||
-				(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue != xml_dsig.SignatureValueType{} && authNRequest.Signature.SignatureValue.Text != "")
+				(authNRequest.Signature != nil &&
+					!reflect.DeepEqual(authNRequest.Signature.SignatureValue, xml_dsig.SignatureValueType{}) &&
+					authNRequest.Signature.SignatureValue.Text != "")
 		},
 		func() error {
 			if authRequestForm.AuthRequest == "" {
@@ -221,7 +219,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 
 	// verify that destination in request is this IDP
 	checker.WithLogicStep(
-		func() error { err = p.verifyRequestDestination(authNRequest); return err },
+		func() error { err = p.verifyRequestDestinationOfAuthRequest(authNRequest); return err },
 		"SAML-83722s",
 		func() {
 			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify request destination: %w", err).Error()))
@@ -339,34 +337,7 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 	return request, nil
 }
 
-func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequestType, error) {
-	reqBytes, err := base64.StdEncoding.DecodeString(message)
-	if err != nil {
-		return nil, fmt.Errorf("failed to base64 decode: %w", err)
-	}
-
-	req := &samlp.AuthnRequestType{}
-	switch encoding {
-	case EncodingDeflate:
-		reader := flate.NewReader(bytes.NewReader(reqBytes))
-		decoder := xml.NewDecoder(reader)
-		if err = decoder.Decode(req); err != nil {
-			return nil, fmt.Errorf("failed to defalte decode: %w", err)
-		}
-	default:
-		reader := flate.NewReader(bytes.NewReader(reqBytes))
-		decoder := xml.NewDecoder(reader)
-		if err = decoder.Decode(req); err != nil {
-			if err := xml.Unmarshal(reqBytes, req); err != nil {
-				return nil, fmt.Errorf("failed to unmarshal: %w", err)
-			}
-		}
-	}
-
-	return req, nil
-}
-
-func authNRequestIntoStringWithoutSignature(encoding string, message string) (string, error) {
+func authNRequestIntoStringWithoutSignature(message string) (string, error) {
 	reqBytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return "", fmt.Errorf("failed to base64 decode: %w", err)

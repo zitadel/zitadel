@@ -36,6 +36,11 @@ const (
 	signingKey = "signing_key"
 )
 
+type Storage interface {
+	EntityStorage
+	Health(context.Context) error
+}
+
 type ProviderConfig struct {
 	CertificateAlgorithm string
 

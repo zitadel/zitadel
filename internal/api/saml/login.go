@@ -49,8 +49,7 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	appID := authRequest.GetApplicationID()
-	entityID, err := p.storage.GetEntityIDByAppID(r.Context(), appID)
+	entityID, err := p.storage.GetEntityIDByAppID(r.Context(), authRequest.GetApplicationID())
 	if err != nil {
 		logging.Log("SAML-91jpdk").Error(err)
 		http.Error(w, fmt.Errorf("failed to get entityID: %w", err).Error(), http.StatusInternalServerError)
@@ -59,7 +58,7 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 	response.Audience = entityID
 
 	attrs := &Attributes{}
-	if err := p.storage.SetUserinfo(ctx, attrs, authRequest.GetUserID(), appID, []int{}); err != nil {
+	if err := p.storage.SetUserinfoWithUserID(ctx, attrs, authRequest.GetUserID(), []int{}); err != nil {
 		logging.Log("SAML-91jplp").Error(err)
 		http.Error(w, fmt.Errorf("failed to get userinfo: %w", err).Error(), http.StatusInternalServerError)
 		return

@@ -325,7 +325,6 @@ API:
       SignatureAlgorithm: $ZITADEL_SAML_IDP_SIGNALG
       DigestAlgorithm: $ZITADEL_SAML_IDP_DIGALG
       EncryptionAlgorithm: $ZITADEL_SAML_IDP_ENCALG
-      NameIDFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       WantAuthRequestsSigned: 'false'
       Endpoints:
         Certificate:

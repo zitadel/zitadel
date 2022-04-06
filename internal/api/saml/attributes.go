@@ -9,7 +9,6 @@ type AttributeSetter interface {
 	SetSurname(string)
 	SetUserID(string)
 	SetUsername(string)
-	SetApplicationID(string)
 }
 
 const (
@@ -19,17 +18,15 @@ const (
 	AttributeSurname
 	AttributeUsername
 	AttributeUserID
-	AttributeApplicationID
 )
 
 type Attributes struct {
-	email         string
-	fullName      string
-	givenName     string
-	surname       string
-	userID        string
-	username      string
-	applicationID string
+	email     string
+	fullName  string
+	givenName string
+	surname   string
+	userID    string
+	username  string
 }
 
 var _ AttributeSetter = &Attributes{}
@@ -63,10 +60,6 @@ func (a *Attributes) SetUsername(value string) {
 
 func (a *Attributes) SetUserID(value string) {
 	a.userID = value
-}
-
-func (a *Attributes) SetApplicationID(value string) {
-	a.applicationID = value
 }
 
 func (a *Attributes) GetSAML() []*saml.AttributeType {
@@ -111,13 +104,6 @@ func (a *Attributes) GetSAML() []*saml.AttributeType {
 			Name:           "UserID",
 			NameFormat:     "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
 			AttributeValue: []string{a.userID},
-		})
-	}
-	if a.applicationID != "" {
-		attrs = append(attrs, &saml.AttributeType{
-			Name:           "ApplicationID",
-			NameFormat:     "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
-			AttributeValue: []string{a.applicationID},
 		})
 	}
 	return attrs

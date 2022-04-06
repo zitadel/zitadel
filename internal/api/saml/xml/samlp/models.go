@@ -116,7 +116,7 @@ type AttributeQueryType struct {
 	Id           string                  `xml:"ID,attr"`
 	Version      string                  `xml:"Version,attr"`
 	IssueInstant string                  `xml:"IssueInstant,attr"`
-	Destination  string                  `xml:"Destination,attr,omitempty"`
+	Destination  string                  `xml:"urn:oasis:names:tc:SAML:2.0:protocol Destination,attr,omitempty"`
 	Consent      string                  `xml:"Consent,attr,omitempty"`
 	Attribute    []saml.AttributeType    `xml:"Attribute"`
 	Subject      saml.SubjectType        `xml:"Subject"`

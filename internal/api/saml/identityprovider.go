@@ -28,13 +28,6 @@ type IDPStorage interface {
 	Health(context.Context) error
 }
 
-type AuthStorage interface {
-	CreateAuthRequest(context.Context, *samlp.AuthnRequestType, string, string, string, string) (AuthRequestInt, error)
-	AuthRequestByID(context.Context, string) (AuthRequestInt, error)
-	AuthRequestByCode(context.Context, string) (AuthRequestInt, error)
-	GetAttributesFromNameID(ctx context.Context, nameID string) (map[string]interface{}, error)
-}
-
 type MetadataIDP struct {
 	ValidUntil    string
 	CacheDuration string
@@ -48,7 +41,6 @@ type IdentityProviderConfig struct {
 	DigestAlgorithm     string
 	EncryptionAlgorithm string
 
-	NameIDFormat           string
 	WantAuthRequestsSigned string
 
 	Endpoints *EndpointConfig `yaml:"Endpoints"`
@@ -165,7 +157,7 @@ func (p *IdentityProvider) GetRoutes() []*Route {
 		{p.ArtifactResulationEndpoint.Relative(), notImplementedHandleFunc},
 		{p.SLOArtifactResulationEndpoint.Relative(), notImplementedHandleFunc},
 		{p.NameIDMappingEndpoint.Relative(), notImplementedHandleFunc},
-		{p.AttributeEndpoint.Relative(), notImplementedHandleFunc},
+		{p.AttributeEndpoint.Relative(), p.attributeQueryHandleFunc},
 	}
 }
 
@@ -209,7 +201,24 @@ func (p *IdentityProvider) DeleteServiceProvider(entityID string) error {
 	return nil
 }
 
-func (p *IdentityProvider) verifyRequestDestination(request *samlp.AuthnRequestType) error {
+func (p *IdentityProvider) verifyRequestDestinationOfAuthRequest(request *samlp.AuthnRequestType) error {
+	// google provides no destination in their requests
+	if request.Destination != "" {
+		foundEndpoint := false
+		for _, sso := range p.Metadata.SingleSignOnService {
+			if request.Destination == sso.Location {
+				foundEndpoint = true
+				break
+			}
+		}
+		if !foundEndpoint {
+			return fmt.Errorf("destination of request is unknown")
+		}
+	}
+	return nil
+}
+
+func (p *IdentityProvider) verifyRequestDestinationOfAttrQuery(request *samlp.AttributeQueryType) error {
 	// google provides no destination in their requests
 	if request.Destination != "" {
 		foundEndpoint := false

@@ -18,13 +18,12 @@ import (
 	"time"
 )
 
+var _ EntityStorage = &ProviderStorage{}
+var _ AuthStorage = &ProviderStorage{}
+var _ UserStorage = &ProviderStorage{}
+
 type StorageConfig struct {
 	DefaultLoginURL string
-}
-
-type Storage interface {
-	EntityStorage
-	Health(context.Context) error
 }
 
 type EntityStorage interface {
@@ -35,8 +34,15 @@ type EntityStorage interface {
 	GetResponseSigningKey(context.Context, chan<- key.CertificateAndKey)
 }
 
+type AuthStorage interface {
+	CreateAuthRequest(context.Context, *samlp.AuthnRequestType, string, string, string, string) (AuthRequestInt, error)
+	AuthRequestByID(context.Context, string) (AuthRequestInt, error)
+	AuthRequestByCode(context.Context, string) (AuthRequestInt, error)
+}
+
 type UserStorage interface {
-	SetUserinfo(ctx context.Context, userinfo AttributeSetter, userID, applicationID string, attributes []int) (err error)
+	SetUserinfoWithUserID(ctx context.Context, userinfo AttributeSetter, userID string, attributes []int) (err error)
+	SetUserinfoWithLoginName(ctx context.Context, userinfo AttributeSetter, loginName string, attributes []int) (err error)
 }
 
 type ProviderStorage struct {
@@ -106,7 +112,7 @@ func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyC
 	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLResponseSinging)
 }
 
-func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, issuerID string) (_ AuthRequestInt, err error) {
+func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (_ AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -114,7 +120,7 @@ func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.Auth
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
 
-	authRequest := CreateAuthRequestToBusiness(ctx, req, acsUrl, protocolBinding, issuerID, relayState, userAgentID)
+	authRequest := CreateAuthRequestToBusiness(ctx, req, acsUrl, protocolBinding, applicationID, relayState, userAgentID)
 
 	resp, err := p.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
@@ -149,24 +155,7 @@ func (p *ProviderStorage) AuthRequestByCode(ctx context.Context, code string) (_
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *ProviderStorage) GetAttributesFromNameID(ctx context.Context, nameID string) (_ map[string]interface{}, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	user, err := p.query.GetUserByID(ctx, nameID)
-	if err != nil {
-		return nil, err
-	}
-
-	return map[string]interface{}{
-		"Email":             user.Human.Email,
-		"FirstName":         user.Human.FirstName,
-		"LastName":          user.Human.LastName,
-		"PreferredUsername": user.PreferredLoginName,
-	}, nil
-}
-
-func (p *ProviderStorage) SetUserinfo(ctx context.Context, userinfo AttributeSetter, userID, applicationID string, attributes []int) (err error) {
+func (p *ProviderStorage) SetUserinfoWithUserID(ctx context.Context, userinfo AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	user, err := p.query.GetUserByID(ctx, userID)
@@ -188,8 +177,6 @@ func (p *ProviderStorage) SetUserinfo(ctx context.Context, userinfo AttributeSet
 			userinfo.SetUsername(user.PreferredLoginName)
 		case AttributeUserID:
 			userinfo.SetUserID(userID)
-		case AttributeApplicationID:
-			userinfo.SetApplicationID(applicationID)
 		}
 	}
 	if attributes == nil || len(attributes) == 0 {
@@ -199,6 +186,46 @@ func (p *ProviderStorage) SetUserinfo(ctx context.Context, userinfo AttributeSet
 		userinfo.SetFullName(user.Human.DisplayName)
 		userinfo.SetUsername(user.PreferredLoginName)
 		userinfo.SetUserID(userID)
+	}
+	return nil
+}
+
+func (p *ProviderStorage) SetUserinfoWithLoginName(ctx context.Context, userinfo AttributeSetter, loginName string, attributes []int) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	loginNameSQ, err := query.NewUserLoginNamesSearchQuery(loginName)
+	if err != nil {
+		return err
+	}
+	user, err := p.query.GetUser(ctx, loginNameSQ)
+	if err != nil {
+		return err
+	}
+
+	for _, attribute := range attributes {
+		switch attribute {
+		case AttributeEmail:
+			userinfo.SetEmail(user.Human.Email)
+		case AttributeSurname:
+			userinfo.SetSurname(user.Human.LastName)
+		case AttributeFullName:
+			userinfo.SetFullName(user.Human.DisplayName)
+		case AttributeGivenName:
+			userinfo.SetGivenName(user.Human.FirstName)
+		case AttributeUsername:
+			userinfo.SetUsername(user.PreferredLoginName)
+		case AttributeUserID:
+			userinfo.SetUserID(user.ID)
+		}
+	}
+	if attributes == nil || len(attributes) == 0 {
+		userinfo.SetEmail(user.Human.Email)
+		userinfo.SetSurname(user.Human.LastName)
+		userinfo.SetGivenName(user.Human.FirstName)
+		userinfo.SetFullName(user.Human.DisplayName)
+		userinfo.SetUsername(user.PreferredLoginName)
+		userinfo.SetUserID(user.ID)
 	}
 	return nil
 }
