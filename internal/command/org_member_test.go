@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -23,10 +22,11 @@ import (
 
 func TestAddMember(t *testing.T) {
 	type args struct {
-		a      *org.Aggregate
-		userID string
-		roles  []string
-		filter preparation.FilterToQueryReducer
+		a            *org.Aggregate
+		userID       string
+		roles        []string
+		zitadelRoles []authz.RoleMapping
+		filter       preparation.FilterToQueryReducer
 	}
 
 	ctx := context.Background()
@@ -47,27 +47,42 @@ func TestAddMember(t *testing.T) {
 				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
 			},
 		},
-		// {
-		// 	name: "TODO: invalid roles",
-		// 	args: args{
-		// 		a:      agg,
-		// 		userID: "",
-		// 		roles:  []string{""},
-		// 	},
-		// 	want: preparation.Want{
-		// 		ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
-		// 	},
-		// },
+		{
+			name: "no roles",
+			args: args{
+				a:      agg,
+				userID: "12342",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "V2-PfYhb", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "TODO: invalid roles",
+			args: args{
+				a:      agg,
+				userID: "123",
+				roles:  []string{"ORG_OWNER"},
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "Org-4N8es", ""),
+			},
+		},
 		{
 			name: "user not exists",
 			args: args{
 				a:      agg,
 				userID: "userID",
-				filter: NewMultiFilter().
-					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+				roles:  []string{"ORG_OWNER"},
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "ORG_OWNER",
+					},
+				},
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
-					}).
-					Filter(),
+					}).Filter(),
 			},
 			want: Want{
 				CreateErr: errors.ThrowNotFound(nil, "ORG-GoXOn", "Errors.User.NotFound"),
@@ -78,6 +93,12 @@ func TestAddMember(t *testing.T) {
 			args: args{
 				a:      agg,
 				userID: "userID",
+				roles:  []string{"ORG_OWNER"},
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "ORG_OWNER",
+					},
+				},
 				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
@@ -111,6 +132,12 @@ func TestAddMember(t *testing.T) {
 			args: args{
 				a:      agg,
 				userID: "userID",
+				roles:  []string{"ORG_OWNER"},
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "ORG_OWNER",
+					},
+				},
 				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
@@ -131,14 +158,14 @@ func TestAddMember(t *testing.T) {
 			},
 			want: Want{
 				Commands: []eventstore.Command{
-					org.NewMemberAddedEvent(ctx, &agg.Aggregate, "userID"),
+					org.NewMemberAddedEvent(ctx, &agg.Aggregate, "userID", "ORG_OWNER"),
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, AddOrgMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
+			AssertValidation(t, (&commandNew{zitadelRoles: tt.args.zitadelRoles}).AddOrgMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
 		})
 	}
 }
@@ -293,7 +320,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -315,7 +342,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -352,7 +379,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -402,7 +429,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: errors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -427,7 +454,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internal"),
+					expectPushFailed(errors.ThrowAlreadyExists(nil, "ERROR", "internal"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -455,7 +482,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: errors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -574,7 +601,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -595,7 +622,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -622,7 +649,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -657,7 +684,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -769,7 +796,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -786,7 +813,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{

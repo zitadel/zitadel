@@ -6,12 +6,13 @@ import (
 
 	"github.com/caos/logging"
 
+	errs "errors"
+
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
 )
@@ -23,10 +24,10 @@ func AddOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			existing, err := orgDomain(ctx, filter, a.ID, domain)
-			if err != nil {
+			if err != nil && !errs.Is(err, errors.ThrowNotFound(nil, "", "")) {
 				return nil, err
 			}
-			if existing.Verified {
+			if existing != nil && existing.Verified {
 				return nil, errors.ThrowAlreadyExists(nil, "V2-e1wse", "Errors.Already.Exists")
 			}
 			return []eventstore.Command{org.NewDomainAddedEvent(ctx, &a.Aggregate, domain)}, nil
@@ -53,8 +54,14 @@ func SetPrimaryOrgDomain(a *org.Aggregate, domain string) preparation.Validation
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			existing, err := orgDomain(ctx, filter, a.ID, domain)
-			if err != nil || existing.Primary {
+			if err != nil {
 				return nil, errors.ThrowAlreadyExists(err, "V2-d0Gyw", "Errors.Already.Exists")
+			}
+			if existing.Primary {
+				return nil, errors.ThrowPreconditionFailed(nil, "COMMA-FfoZO", "Errors.Org.DomainAlreadyPrimary")
+			}
+			if !existing.Verified {
+				return nil, errors.ThrowPreconditionFailed(nil, "COMMA-FfoZO", "Errors.Org.DomainNotVerified")
 			}
 			return []eventstore.Command{org.NewDomainPrimarySetEvent(ctx, &a.Aggregate, domain)}, nil
 		}, nil
@@ -67,6 +74,9 @@ func orgDomain(ctx context.Context, filter preparation.FilterToQueryReducer, org
 	if err != nil {
 		return nil, err
 	}
+	if len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "COMMA-kFHpQ", "Errors.Org.DomainNotFound")
+	}
 	wm.AppendEvents(events...)
 	if err = wm.Reduce(); err != nil {
 		return nil, err
@@ -77,7 +87,7 @@ func orgDomain(ctx context.Context, filter preparation.FilterToQueryReducer, org
 
 func (c *Commands) AddOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.OrgDomain, error) {
 	if !orgDomain.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
 	domainWriteModel := NewOrgDomainWriteModel(orgDomain.AggregateID, orgDomain.Domain)
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
@@ -98,21 +108,21 @@ func (c *Commands) AddOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain
 
 func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *domain.OrgDomain) (token, url string, err error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
-		return "", "", caos_errs.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
+		return "", "", errors.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
 	checkType, ok := orgDomain.ValidationType.CheckType()
 	if !ok {
-		return "", "", caos_errs.ThrowInvalidArgument(nil, "ORG-Gsw31", "Errors.Org.DomainVerificationTypeInvalid")
+		return "", "", errors.ThrowInvalidArgument(nil, "ORG-Gsw31", "Errors.Org.DomainVerificationTypeInvalid")
 	}
 	domainWriteModel, err := c.getOrgDomainWriteModel(ctx, orgDomain.AggregateID, orgDomain.Domain)
 	if err != nil {
 		return "", "", err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
-		return "", "", caos_errs.ThrowNotFound(nil, "ORG-AGD31", "Errors.Org.DomainNotOnOrg")
+		return "", "", errors.ThrowNotFound(nil, "ORG-AGD31", "Errors.Org.DomainNotOnOrg")
 	}
 	if domainWriteModel.Verified {
-		return "", "", caos_errs.ThrowPreconditionFailed(nil, "ORG-HGw21", "Errors.Org.DomainAlreadyVerified")
+		return "", "", errors.ThrowPreconditionFailed(nil, "ORG-HGw21", "Errors.Org.DomainAlreadyVerified")
 	}
 	token, err = orgDomain.GenerateVerificationCode(c.domainVerificationGenerator)
 	if err != nil {
@@ -120,7 +130,7 @@ func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *d
 	}
 	url, err = http_utils.TokenUrl(orgDomain.Domain, token, checkType)
 	if err != nil {
-		return "", "", caos_errs.ThrowPreconditionFailed(err, "ORG-Bae21", "Errors.Org.DomainVerificationTypeInvalid")
+		return "", "", errors.ThrowPreconditionFailed(err, "ORG-Bae21", "Errors.Org.DomainVerificationTypeInvalid")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
@@ -136,20 +146,20 @@ func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *d
 
 func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.ObjectDetails, error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
 	}
 	domainWriteModel, err := c.getOrgDomainWriteModel(ctx, orgDomain.AggregateID, orgDomain.Domain)
 	if err != nil {
 		return nil, err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-Sjdi3", "Errors.Org.DomainNotOnOrg")
+		return nil, errors.ThrowNotFound(nil, "ORG-Sjdi3", "Errors.Org.DomainNotOnOrg")
 	}
 	if domainWriteModel.Verified {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-HGw21", "Errors.Org.DomainAlreadyVerified")
+		return nil, errors.ThrowPreconditionFailed(nil, "ORG-HGw21", "Errors.Org.DomainAlreadyVerified")
 	}
 	if domainWriteModel.ValidationCode == nil || domainWriteModel.ValidationType == domain.OrgDomainValidationTypeUnspecified {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-SFBB3", "Errors.Org.DomainVerificationMissing")
+		return nil, errors.ThrowPreconditionFailed(nil, "ORG-SFBB3", "Errors.Org.DomainVerificationMissing")
 	}
 
 	validationCode, err := crypto.DecryptString(domainWriteModel.ValidationCode, c.domainVerificationAlg)
@@ -184,22 +194,22 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 	events = append(events, org.NewDomainVerificationFailedEvent(ctx, orgAgg, orgDomain.Domain))
 	_, err = c.eventstore.Push(ctx, events...)
 	logging.LogWithFields("ORG-dhTE", "orgID", orgAgg.ID, "domain", orgDomain.Domain).OnError(err).Error("NewDomainVerificationFailedEvent push failed")
-	return nil, caos_errs.ThrowInvalidArgument(err, "ORG-GH3s", "Errors.Org.DomainVerificationFailed")
+	return nil, errors.ThrowInvalidArgument(err, "ORG-GH3s", "Errors.Org.DomainVerificationFailed")
 }
 
 func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (*domain.ObjectDetails, error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SsDG2", "Errors.Org.InvalidDomain")
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-SsDG2", "Errors.Org.InvalidDomain")
 	}
 	domainWriteModel, err := c.getOrgDomainWriteModel(ctx, orgDomain.AggregateID, orgDomain.Domain)
 	if err != nil {
 		return nil, err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
+		return nil, errors.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
 	}
 	if !domainWriteModel.Verified {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-Ggd32", "Errors.Org.DomainNotVerified")
+		return nil, errors.ThrowPreconditionFailed(nil, "ORG-Ggd32", "Errors.Org.DomainNotVerified")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewDomainPrimarySetEvent(ctx, orgAgg, orgDomain.Domain))
@@ -215,17 +225,17 @@ func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.Or
 
 func (c *Commands) RemoveOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (*domain.ObjectDetails, error) {
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SJsK3", "Errors.Org.InvalidDomain")
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-SJsK3", "Errors.Org.InvalidDomain")
 	}
 	domainWriteModel, err := c.getOrgDomainWriteModel(ctx, orgDomain.AggregateID, orgDomain.Domain)
 	if err != nil {
 		return nil, err
 	}
 	if domainWriteModel.State != domain.OrgDomainStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
+		return nil, errors.ThrowNotFound(nil, "ORG-GDfA3", "Errors.Org.DomainNotOnOrg")
 	}
 	if domainWriteModel.Primary {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-Sjdi3", "Errors.Org.PrimaryDomainNotDeletable")
+		return nil, errors.ThrowPreconditionFailed(nil, "ORG-Sjdi3", "Errors.Org.PrimaryDomainNotDeletable")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewDomainRemovedEvent(ctx, orgAgg, orgDomain.Domain, domainWriteModel.Verified))
@@ -245,7 +255,7 @@ func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregat
 		return nil, err
 	}
 	if addedDomain.State == domain.OrgDomainStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMA-Bd2jj", "Errors.Org.Domain.AlreadyExists")
+		return nil, errors.ThrowAlreadyExists(nil, "COMMA-Bd2jj", "Errors.Org.Domain.AlreadyExists")
 	}
 
 	events := []eventstore.Command{

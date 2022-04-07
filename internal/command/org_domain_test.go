@@ -9,6 +9,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -26,7 +27,10 @@ func TestAddDomain(t *testing.T) {
 	type args struct {
 		a      *org.Aggregate
 		domain string
+		filter preparation.FilterToQueryReducer
 	}
+
+	agg := org.NewAggregate("test", "test")
 
 	tests := []struct {
 		name string
@@ -36,7 +40,7 @@ func TestAddDomain(t *testing.T) {
 		{
 			name: "invalid domain",
 			args: args{
-				a:      org.NewAggregate("test", "test"),
+				a:      agg,
 				domain: "",
 			},
 			want: Want{
@@ -46,19 +50,39 @@ func TestAddDomain(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				a:      org.NewAggregate("test", "test"),
+				a:      agg,
 				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return nil, nil
+				},
 			},
 			want: Want{
 				Commands: []eventstore.Command{
-					org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
 				},
+			},
+		},
+		{
+			name: "already verified",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
+						org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
+					}, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowAlreadyExists(nil, "", ""),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, AddOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+			AssertValidation(t, AddOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
 		})
 	}
 }
@@ -108,7 +132,10 @@ func TestSetDomainPrimary(t *testing.T) {
 	type args struct {
 		a      *org.Aggregate
 		domain string
+		filter preparation.FilterToQueryReducer
 	}
+
+	agg := org.NewAggregate("test", "test")
 
 	tests := []struct {
 		name string
@@ -118,7 +145,7 @@ func TestSetDomainPrimary(t *testing.T) {
 		{
 			name: "invalid domain",
 			args: args{
-				a:      org.NewAggregate("test", "test"),
+				a:      agg,
 				domain: "",
 			},
 			want: Want{
@@ -126,21 +153,72 @@ func TestSetDomainPrimary(t *testing.T) {
 			},
 		},
 		{
+			name: "not exists",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return nil, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowNotFound(nil, "", ""),
+			},
+		},
+		{
+			name: "not verified",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain")}, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowPreconditionFailed(nil, "", ""),
+			},
+		},
+		{
+			name: "already primary",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
+						org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainPrimarySetEvent(ctx, &agg.Aggregate, "domain"),
+					}, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowPreconditionFailed(nil, "", ""),
+			},
+		},
+		{
 			name: "correct",
 			args: args{
-				a:      org.NewAggregate("test", "test"),
+				a:      agg,
 				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
+						org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
+					}, nil
+				},
 			},
 			want: Want{
 				Commands: []eventstore.Command{
-					org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+					org.NewDomainPrimarySetEvent(context.Background(), &agg.Aggregate, "domain"),
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, SetPrimaryOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+			AssertValidation(t, SetPrimaryOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
 		})
 	}
 }

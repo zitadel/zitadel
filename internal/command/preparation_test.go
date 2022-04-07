@@ -24,7 +24,7 @@ func AssertValidation(t *testing.T, validation preparation.Validation, filter pr
 
 	creates, err := validation()
 	if !errors.Is(err, want.ValidationErr) {
-		t.Errorf("wrong validation err = %v, want %v", err, want.ValidationErr)
+		t.Errorf("wrong validation err = (%[1]T): %[1]v, want (%[2]T): %[2]v", err, want.ValidationErr)
 		return
 	}
 	if err != nil {
@@ -32,7 +32,7 @@ func AssertValidation(t *testing.T, validation preparation.Validation, filter pr
 	}
 	cmds, err := creates(context.Background(), filter)
 	if !errors.Is(err, want.CreateErr) {
-		t.Errorf("wrong create err = %v, want %v", err, want.CreateErr)
+		t.Errorf("wrong create err = (%[1]T): %[1]v, want (%[2]T): %[2]v", err, want.CreateErr)
 		return
 	}
 	if err != nil {
