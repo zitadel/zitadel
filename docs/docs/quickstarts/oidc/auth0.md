@@ -41,7 +41,7 @@ First of all we create the application in your project.
 Click on the "+"-button in the application-section. This will lead you to the the creation wizzard.
 
 1. Insert the name of the application. In this example we simply use "auth0"
-2. The application type "WEB" es already preselected
+2. The application type "WEB" is already preselected
    ![app name](/img/oidc/auth0/zitadel-app-name.jpg)
 3. Press continue
 4. auth0 uses the code flow to that's why we have to change the type from "PKCE" to "CODE"
