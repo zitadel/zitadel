@@ -1,0 +1,70 @@
+---
+title: Connect with auth0
+---
+
+This guide shows how to enable login with ZITADEL on auth0.
+
+It covers how to:
+
+- create a project in ZITADEL
+- create and configure the application in your project
+- create and configure the connection in your auth0 tenant
+
+Prerequisits:
+
+- existing ZITADEL organisation, if not present follow [this guide](../../guides/basics/get-started#trying-out-zitadel-on-zitadelch)
+- existing project, if not present follow the first 3 steps [here](../../guides/basics/projects#exercise---create-a-simple-project)
+- existing auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
+
+We have to switch between ZITADEL and auth0. If the headings begin with "ZITADEL" switch to the ZITADEL console and if the headings start with auth0 please switch to the auth0 gui. The guide uses light design print screens for auth0 and dark design for ZITADEL console.
+
+## **auth0**: Create a new connection
+
+In Authentication > Enterprise
+
+1. Press the "+" button right to "OpenID Connect"  
+  ![Create new connection](/img/oidc/auth0/auth0-create-app.png)
+2. Set a connection name for example "ZITADEL"
+3. The issuer url is `https://issuer.zitadel.ch/.well-known/openid-configuration`
+4. Copy the callback URL (ending with `/login/callback`)
+
+The configuration should look like this:
+
+![initial connection configuration](/img/oidc/auth0/auth0-init-app.png)
+
+Next we have to switch to the ZITADEL console.
+
+## **ZITADEL**: Create the application
+
+First of all we create the application in your project.
+
+Click on the "+"-button in the application-section. This will lead you to the the creation wizzard.
+
+1. Insert the name of the application. In this example we simply use "auth0"
+2. The application type "WEB" es already preselected
+   ![app name](/img/oidc/auth0/zitadel-app-name.jpg)
+3. Press continue
+4. auth0 uses the code flow to that's why we have to change the type from "PKCE" to "CODE"
+   ![app type](/img/oidc/auth0/zitadel-app-type.png)
+5. Click "continue"
+6. Paste the Callback URL (copied in auth0 gui) in the "Redirect URI"-field
+   ![redirects](/img/oidc/auth0/zitadel-redirects.png)
+7. Click "continue"
+8. Click "Create"
+9. We now see the client id and client secret. We need these information in the next steps
+   ![client](/img/oidc/auth0/zitadel-client.png)
+
+## **auth0**: Connect ZITADEL
+
+1. Copy the client id from ZITADEL and past it into the "Client ID" field
+2. Copy the client secret from ZITADEL and past it into the "Client Secret" field
+   ![full configuration](/img/oidc/auth0/auth0-full.png)
+3. click Create
+4. To verify the connection go to the "Applications" tab and enable the Default App
+   [enable app](/img/oidc/auth0/auth0-enable-app.png)
+5. Click "Back to OpenID Connect"
+6. Click on the "..." button right to the newly created connection and click "Try"
+   ![click try](/img/oidc/auth0/auth0-try.png)
+7. ZITADEL should open on a new tab and you can enter your login information
+8. After you logged in you should see the following:
+   ![full configuration](/img/oidc/auth0/auth0-works.png)
