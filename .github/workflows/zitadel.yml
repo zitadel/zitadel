@@ -37,7 +37,11 @@ jobs:
       - name: DEBUG
         run: "ls -la .artifacts/grpc/go-client/"
       - name: DEBUG
-        run: "ls -la .artifacts/grpc/go-client/policy"
+        run: "ls -la .artifacts/grpc/go-client/pkg"
+      - name: DEBUG
+        run: "ls -la .artifacts/grpc/go-client/pkg/grpc"
+      - name: DEBUG
+        run: "ls -la .artifacts/grpc/go-client/pkg/grpc/policy"
       - name: DEBUG
         run: "ls -la"
       - name: DEBUG
