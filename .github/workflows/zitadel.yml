@@ -32,16 +32,12 @@ jobs:
         run: docker build -f build/grpc/Dockerfile -t zitadel-base:local .
       - name: Build gRPC Client
         run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client && sh -c "cp -r .artifacts/grpc/go-client/* ."
-      - name: DEBUG
-        run: "ls -la pkg/grpc/policy"
       - name: Test
         run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
       - name: Build JS Client
         run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
       - name: Build Console
         run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console && sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
-      - name: DEBUG
-        run: "ls -la pkg/grpc/policy"
       - name: Build ZITADEL
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -50,8 +46,6 @@ jobs:
           args: release --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: DEBUG
-        run: "ls -la pkg/grpc/policy"
       - name: Tag
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
