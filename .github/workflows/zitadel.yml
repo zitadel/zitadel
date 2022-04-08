@@ -15,7 +15,7 @@ jobs:
     env:
       DOCKER_BUILDKIT: 1
       GOPATH: /home/runner/work/zitadel/zitadel
-      WORKDIR: $GOPATH/src/github.com/caos/zitadel
+      WORKDIR: /home/runner/work/zitadel/zitadel/src/github.com/caos/zitadel
     steps:
       - name: Set up Go
         uses: actions/setup-go@v2
