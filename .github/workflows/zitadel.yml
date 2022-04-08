@@ -33,20 +33,8 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Build Base
-        run: docker build -f build/grpc/Dockerfile -t zitadel-base:local .
-        working-directory: ${{ env.WORKDIR }}
-      - name: Build gRPC Client
-        run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client && sh -c "cp -r .artifacts/grpc/go-client/* ."
-        working-directory: ${{ env.WORKDIR }}
       - name: Test
         run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
-        working-directory: ${{ env.WORKDIR }}
-      - name: Build JS Client
-        run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
-        working-directory: ${{ env.WORKDIR }}
-      - name: Build Console
-        run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console && sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
         working-directory: ${{ env.WORKDIR }}
       - name: Build ZITADEL
         uses: goreleaser/goreleaser-action@v2
