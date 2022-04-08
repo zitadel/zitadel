@@ -33,20 +33,6 @@ jobs:
       - name: Build gRPC Client
         run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client && sh -c "cp -r .artifacts/grpc/go-client/* ."
       - name: DEBUG
-        run: "ls -la"
-      - name: DEBUG
-        run: "ls -la .artifacts/grpc/go-client/"
-      - name: DEBUG
-        run: "ls -la .artifacts/grpc/go-client/pkg"
-      - name: DEBUG
-        run: "ls -la .artifacts/grpc/go-client/pkg/grpc"
-      - name: DEBUG
-        run: "ls -la .artifacts/grpc/go-client/pkg/grpc/policy"
-      - name: DEBUG
-        run: "ls -la"
-      - name: DEBUG
-        run: "ls -la pkg/grpc"
-      - name: DEBUG
         run: "ls -la pkg/grpc/policy"
       - name: Test
         run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
@@ -54,6 +40,8 @@ jobs:
         run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
       - name: Build Console
         run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console && sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
+      - name: DEBUG
+        run: "ls -la pkg/grpc/policy"
       - name: Build ZITADEL
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -62,6 +50,8 @@ jobs:
           args: release --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: DEBUG
+        run: "ls -la pkg/grpc/policy"
       - name: Tag
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
@@ -76,6 +66,8 @@ jobs:
           echo "${{ secrets.GCR_JSON_KEY_BASE64 }}" | \
           base64 -d | \
           docker login -u _json_key --password-stdin https://eu.gcr.io
+      - name: DEBUG
+        run: "ls -la pkg/grpc/policy"
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
