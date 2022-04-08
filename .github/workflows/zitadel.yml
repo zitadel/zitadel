@@ -51,9 +51,9 @@ jobs:
           distribution: goreleaser
           version: v1.5.0
           args: release --snapshot
+          workdir: ${{env.WORKING_DIRECTORY}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Tag
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
@@ -76,10 +76,10 @@ jobs:
           distribution: goreleaser
           version: v1.5.0
           args: release --rm-dist
+          workdir: ${{env.WORKING_DIRECTORY}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
-        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Publish gRPC clients
         uses: actions/upload-artifact@v2
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
