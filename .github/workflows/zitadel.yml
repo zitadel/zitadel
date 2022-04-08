@@ -12,6 +12,8 @@ permissions:
 jobs:
   Build:
     runs-on: ubuntu-20.04
+    env:
+      DOCKER_BUILDKIT: 1
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
