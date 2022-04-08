@@ -6,6 +6,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
 	"github.com/caos/zitadel/internal/api/saml/xml"
+	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
@@ -119,98 +120,79 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 
 	//validate used certificate for signing the request
 	checker.WithConditionalLogicStep(
-		func() bool {
-			return authNRequest.Signature != nil && authNRequest.Signature.KeyInfo != nil &&
-				sp.metadata.SPSSODescriptor.KeyDescriptor != nil && len(sp.metadata.SPSSODescriptor.KeyDescriptor) > 0
-		},
-		func() error {
-			for _, keyDesc := range sp.metadata.SPSSODescriptor.KeyDescriptor {
-				for _, spX509Data := range keyDesc.KeyInfo.X509Data {
-					for _, reqX509Data := range authNRequest.Signature.KeyInfo.X509Data {
-						if spX509Data.X509Certificate == reqX509Data.X509Certificate {
-							return nil
-						}
-					}
-
-				}
-			}
-			return fmt.Errorf("unknown certificate used to sign request")
-		},
+		certificateCheckNecessary(
+			func() *xml_dsig.SignatureType { return authNRequest.Signature },
+			func() *md.EntityDescriptorType { return sp.metadata },
+		),
+		checkCertificate(
+			func() *xml_dsig.SignatureType { return authNRequest.Signature },
+			func() *md.EntityDescriptorType { return sp.metadata },
+		),
 		"SAML-b17d9a",
 		func() {
 			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to validate certificate from request: %w", err).Error()))
 		},
 	)
 
-	// get signature out of request if POST-binding
+	/*
+		// get signature out of request if POST-binding
+		checker.WithConditionalLogicStep(
+			signatureGetNecessary(
+				func() *md.IDPSSODescriptorType { return p.Metadata },
+				func() *md.EntityDescriptorType { return sp.metadata },
+				func() string { return authRequestForm.Sig },
+				func() *xml_dsig.SignatureType { return authNRequest.Signature },
+				func() string { return authNRequest.ProtocolBinding },
+			),
+			getSignatureFromAuthRequest(
+				func() *xml_dsig.SignatureType { return authNRequest.Signature },
+				func() string { return authRequestForm.AuthRequest },
+				func(request string) { authRequestForm.AuthRequest = request },
+				func(sig string) { authRequestForm.Sig = sig },
+				func(sigAlg string) { authRequestForm.SigAlg = sigAlg },
+				func(errF error) { err = errF },
+			),
+			"SAML-i1o2mh",
+			func() {
+				response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to extract signature from request: %w", err).Error()))
+			},
+		)*/
+
+	// verify signature if necessary
 	checker.WithConditionalLogicStep(
-		func() bool {
-			return sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
-				p.Metadata.WantAuthnRequestsSigned == "true" ||
-				authRequestForm.Sig != "" ||
-				(authNRequest.Signature != nil &&
-					!reflect.DeepEqual(authNRequest.Signature.SignatureValue, xml_dsig.SignatureValueType{}) &&
-					authNRequest.Signature.SignatureValue.Text != "") &&
-					authNRequest.ProtocolBinding == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-		},
-		func() error {
-			if authNRequest.Signature != nil &&
-				!reflect.DeepEqual(authNRequest.Signature.SignedInfo, xml_dsig.SignedInfoType{}) &&
-				!reflect.DeepEqual(authNRequest.Signature.SignedInfo.SignatureMethod, xml_dsig.SignatureMethodType{}) &&
-				authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm == "" {
-				authRequestForm.SigAlg = authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm
-			}
-
-			if authNRequest.Signature != nil &&
-				!reflect.DeepEqual(authNRequest.Signature.SignatureValue, xml_dsig.SignatureValueType{}) &&
-				authNRequest.Signature.SignatureValue.Text == "" {
-				authRequestForm.Sig = authNRequest.Signature.SignatureValue.Text
-			}
-
-			authRequestForm.AuthRequest, err = authNRequestIntoStringWithoutSignature(authRequestForm.AuthRequest)
-			if err != nil {
-				return err
-			}
-			return nil
-		},
-		"SAML-i1o2mh",
+		signatureRedirectVerificationNecessary(
+			func() *md.IDPSSODescriptorType { return p.Metadata },
+			func() *md.EntityDescriptorType { return sp.metadata },
+			func() string { return authRequestForm.Sig },
+			func() string { return authNRequest.ProtocolBinding },
+		),
+		verifyRedirectSignature(
+			func() string { return authRequestForm.AuthRequest },
+			func() string { return authRequestForm.RelayState },
+			func() string { return authRequestForm.Sig },
+			func() string { return authRequestForm.SigAlg },
+			func() *ServiceProvider { return sp },
+			func(errF error) { err = errF },
+		),
+		"SAML-817n2s",
 		func() {
-			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to extract signature from request: %w", err).Error()))
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify signature: %w", err).Error()))
 		},
 	)
 
 	// verify signature if necessary
 	checker.WithConditionalLogicStep(
-		func() bool {
-			return sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
-				p.Metadata.WantAuthnRequestsSigned == "true" ||
-				authRequestForm.Sig != "" ||
-				(authNRequest.Signature != nil &&
-					!reflect.DeepEqual(authNRequest.Signature.SignatureValue, xml_dsig.SignatureValueType{}) &&
-					authNRequest.Signature.SignatureValue.Text != "")
-		},
-		func() error {
-			if authRequestForm.AuthRequest == "" {
-				return fmt.Errorf("no authrequest provided but required")
-			}
-			if authRequestForm.RelayState == "" {
-				return fmt.Errorf("no relaystate provided but required")
-			}
-			if authRequestForm.Sig == "" {
-				return fmt.Errorf("no signature provided but required")
-			}
-			if authRequestForm.SigAlg == "" {
-				return fmt.Errorf("no signature algorithm provided but required")
-			}
-
-			err = sp.verifySignature(
-				authRequestForm.AuthRequest,
-				authRequestForm.RelayState,
-				authRequestForm.SigAlg,
-				authRequestForm.Sig,
-			)
-			return err
-		},
+		signaturePostVerificationNecessary(
+			func() *md.IDPSSODescriptorType { return p.Metadata },
+			func() *md.EntityDescriptorType { return sp.metadata },
+			func() *xml_dsig.SignatureType { return authNRequest.Signature },
+			func() string { return authNRequest.ProtocolBinding },
+		),
+		verifyPostSignature(
+			func() string { return authRequestForm.AuthRequest },
+			func() *ServiceProvider { return sp },
+			func(errF error) { err = errF },
+		),
 		"SAML-817n2s",
 		func() {
 			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify signature: %w", err).Error()))
@@ -343,9 +325,132 @@ func authNRequestIntoStringWithoutSignature(message string) (string, error) {
 		return "", fmt.Errorf("failed to base64 decode: %w", err)
 	}
 
-	regex := regexp.MustCompile(`(<)(.?)(.?)(:?)(Signature)(.|\n|\t|\r|\f)*(</)(.?)(.?)(:?)(Signature>)`)
-	authRequest := regex.ReplaceAll(reqBytes, []byte(""))
+	regexSignValue := regexp.MustCompile(`(<)(.?)(.?)(:?)(SignatureValue)(.|\n|\t|\r|\f)*(</)(.?)(.?)(:?)(SignatureValue>)`)
+	authRequestWithoutSignValue := regexSignValue.ReplaceAll(reqBytes, []byte(""))
+
+	regexKeyInfo := regexp.MustCompile(`(<)(.?)(.?)(:?)(KeyInfo)(.|\n|\t|\r|\f)*(</)(.?)(.?)(:?)(KeyInfo>)`)
+	authRequest := regexKeyInfo.ReplaceAll(authRequestWithoutSignValue, []byte(""))
 
 	return base64.StdEncoding.EncodeToString(authRequest), nil
 
+}
+
+func certificateCheckNecessary(
+	authRequestSignatureF func() *xml_dsig.SignatureType,
+	spMetadataF func() *md.EntityDescriptorType,
+) func() bool {
+	return func() bool {
+		sig := authRequestSignatureF()
+		spMetadata := spMetadataF()
+		return sig != nil && sig.KeyInfo != nil &&
+			spMetadata.SPSSODescriptor.KeyDescriptor != nil && len(spMetadata.SPSSODescriptor.KeyDescriptor) > 0
+	}
+}
+
+func checkCertificate(
+	authRequestSignatureF func() *xml_dsig.SignatureType,
+	spMetadataF func() *md.EntityDescriptorType,
+) func() error {
+	return func() error {
+		for _, keyDesc := range spMetadataF().SPSSODescriptor.KeyDescriptor {
+			for _, spX509Data := range keyDesc.KeyInfo.X509Data {
+				for _, reqX509Data := range authRequestSignatureF().KeyInfo.X509Data {
+					if spX509Data.X509Certificate == reqX509Data.X509Certificate {
+						return nil
+					}
+				}
+
+			}
+		}
+		return fmt.Errorf("unknown certificate used to sign request")
+	}
+}
+
+func signatureRedirectVerificationNecessary(
+	idpMetadataF func() *md.IDPSSODescriptorType,
+	spMetadataF func() *md.EntityDescriptorType,
+	signatureF func() string,
+	protocolBinding func() string,
+) func() bool {
+	return func() bool {
+
+		return (spMetadataF().SPSSODescriptor.AuthnRequestsSigned == "true" ||
+			idpMetadataF().WantAuthnRequestsSigned == "true" ||
+			signatureF() != "") &&
+			protocolBinding() == "urn:oasis:names:ts:SAML:2.0:bindings:HTTP-Redirect"
+	}
+}
+
+func verifyRedirectSignature(
+	authRequest func() string,
+	relayState func() string,
+	sig func() string,
+	sigAlg func() string,
+	sp func() *ServiceProvider,
+	errF func(error),
+) func() error {
+	return func() error {
+		if authRequest() == "" {
+			return fmt.Errorf("no authrequest provided but required")
+		}
+		if relayState() == "" {
+			return fmt.Errorf("no relaystate provided but required")
+		}
+		if sig() == "" {
+			return fmt.Errorf("no signature provided but required")
+		}
+		if sigAlg() == "" {
+			return fmt.Errorf("no signature algorithm provided but required")
+		}
+
+		spInstance := sp()
+		err := spInstance.verifyRedirectSignature(
+			authRequest(),
+			relayState(),
+			sigAlg(),
+			sig(),
+		)
+		errF(err)
+		return err
+	}
+}
+
+func signaturePostVerificationNecessary(
+	idpMetadataF func() *md.IDPSSODescriptorType,
+	spMetadataF func() *md.EntityDescriptorType,
+	authRequestSignatureF func() *xml_dsig.SignatureType,
+	protocolBinding func() string,
+) func() bool {
+	return func() bool {
+		authRequestSignature := authRequestSignatureF()
+
+		return spMetadataF().SPSSODescriptor.AuthnRequestsSigned == "true" ||
+			idpMetadataF().WantAuthnRequestsSigned == "true" ||
+			(authRequestSignature != nil &&
+				!reflect.DeepEqual(authRequestSignature.SignatureValue, xml_dsig.SignatureValueType{}) &&
+				authRequestSignature.SignatureValue.Text != "") &&
+				protocolBinding() == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+	}
+}
+
+func verifyPostSignature(
+	authRequestF func() string,
+	spF func() *ServiceProvider,
+	errF func(error),
+) func() error {
+	return func() error {
+		sp := spF()
+
+		data, err := base64.StdEncoding.DecodeString(authRequestF())
+		if err != nil {
+			errF(err)
+			return err
+		}
+
+		if err := sp.verifyPostSignature(string(data)); err != nil {
+			errF(err)
+			return err
+		}
+		return nil
+	}
 }

@@ -10,11 +10,14 @@ import (
 	"encoding/asn1"
 	"encoding/base64"
 	"fmt"
+	"github.com/beevik/etree"
+	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"math/big"
 	"net/url"
+	"regexp"
 	"strings"
 )
 
@@ -96,7 +99,7 @@ func (sp *ServiceProvider) verifyRequest(request *samlp.AuthnRequestType) error 
 	return nil
 }
 
-func (sp *ServiceProvider) verifySignature(request, relayState, sigAlg, expectedSig string) error {
+func (sp *ServiceProvider) verifyRedirectSignature(request, relayState, sigAlg, expectedSig string) error {
 	// Validate the signature
 	sig := []byte{}
 	if url.QueryEscape(relayState) != "" {
@@ -105,22 +108,77 @@ func (sp *ServiceProvider) verifySignature(request, relayState, sigAlg, expected
 		sig = []byte(fmt.Sprintf("SAMLRequest=%s&SigAlg=%s", url.QueryEscape(request), url.QueryEscape(sigAlg)))
 	}
 	signature, err := base64.StdEncoding.DecodeString(expectedSig)
-
 	if err != nil {
 		return err
 	}
+
+	return sp.verifySignature(sigAlg, sig, signature)
+}
+func (sp *ServiceProvider) getSigningCerts() ([]*x509.Certificate, error) {
+	var certStrs []string
+
+	for _, keyDescriptor := range sp.metadata.SPSSODescriptor.KeyDescriptor {
+		for _, x509Data := range keyDescriptor.KeyInfo.X509Data {
+			if len(x509Data.X509Certificate) != 0 {
+				switch keyDescriptor.Use {
+				case "", "signing":
+					certStrs = append(certStrs, x509Data.X509Certificate)
+				}
+			}
+		}
+	}
+
+	if len(certStrs) == 0 {
+		return nil, fmt.Errorf("cannot find any signing certificate in the IDP SSO descriptor")
+	}
+
+	var certs []*x509.Certificate
+
+	regex := regexp.MustCompile(`\s+`)
+	for _, certStr := range certStrs {
+		certStr = regex.ReplaceAllString(certStr, "")
+		certBytes, err := base64.StdEncoding.DecodeString(certStr)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse certificate: %s", err)
+		}
+
+		parsedCert, err := x509.ParseCertificate(certBytes)
+		if err != nil {
+			return nil, err
+		}
+		certs = append(certs, parsedCert)
+	}
+
+	return certs, nil
+}
+
+func (sp *ServiceProvider) verifyPostSignature(authRequest string) error {
+	doc := etree.NewDocument()
+	if err := doc.ReadFromBytes([]byte(authRequest)); err != nil {
+		return err
+	}
+
+	certs, err := sp.getSigningCerts()
+	if err != nil {
+		return err
+	}
+
+	return signature.Validate(certs, doc.Root())
+}
+
+func (sp *ServiceProvider) verifySignature(sigAlg string, elementToSign []byte, signature []byte) error {
 	switch sigAlg {
 	case "http://www.w3.org/2009/xmldsig11#dsa-sha256":
-		sum := sha256Sum(sig)
+		sum := sha256Sum(elementToSign)
 		return verifyDSA(sp, signature, sum)
 	case "http://www.w3.org/2000/09/xmldsig#dsa-sha1":
-		sum := sha1Sum(sig)
+		sum := sha1Sum(elementToSign)
 		return verifyDSA(sp, signature, sum)
 	case "http://www.w3.org/2000/09/xmldsig#rsa-sha1":
-		sum := sha1Sum(sig)
+		sum := sha1Sum(elementToSign)
 		return rsa.VerifyPKCS1v15(sp.signerPublicKey.(*rsa.PublicKey), crypto.SHA1, sum, signature)
 	case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256":
-		sum := sha256Sum(sig)
+		sum := sha256Sum(elementToSign)
 		return rsa.VerifyPKCS1v15(sp.signerPublicKey.(*rsa.PublicKey), crypto.SHA256, sum, signature)
 	default:
 		return fmt.Errorf("unsupported signature algorithm, %s", sigAlg)

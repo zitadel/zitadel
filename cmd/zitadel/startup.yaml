@@ -306,7 +306,6 @@ API:
         EncryptionKeyID: $ZITADEL_COOKIE_KEY
     Metadata:
       SignatureAlgorithm: $ZITADEL_SAML_METADATA_SIGNALG
-      DigestAlgorithm: $ZITADEL_SAML_METADATA_DIGALG
       Path: 'metadata'
       URL: '$ZITADEL_SAML/metadata'
     Organisation:
@@ -323,8 +322,6 @@ API:
         #CacheDuration: "PT30S"
         ErrorURL: "https://caos.ch"
       SignatureAlgorithm: $ZITADEL_SAML_IDP_SIGNALG
-      DigestAlgorithm: $ZITADEL_SAML_IDP_DIGALG
-      EncryptionAlgorithm: $ZITADEL_SAML_IDP_ENCALG
       WantAuthRequestsSigned: 'false'
       Endpoints:
         Certificate:

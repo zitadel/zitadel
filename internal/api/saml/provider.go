@@ -7,7 +7,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/amdonov/xmlsig"
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	http_utils "github.com/caos/zitadel/internal/api/http"
@@ -27,6 +26,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	dsig "github.com/russellhaering/goxmldsig"
 	"gopkg.in/square/go-jose.v2"
 	"net/http"
 )
@@ -56,11 +56,9 @@ type ProviderConfig struct {
 }
 
 type Metadata struct {
-	Path                string
-	URL                 string
-	SignatureAlgorithm  string
-	DigestAlgorithm     string
-	EncryptionAlgorithm string
+	Path               string
+	URL                string
+	SignatureAlgorithm string
 }
 
 type Certificate struct {
@@ -102,7 +100,8 @@ type Provider struct {
 
 	MetadataEndpoint *op.Endpoint
 	Metadata         *md.EntityDescriptorType
-	Signer           xmlsig.Signer
+	signingContext   *dsig.SigningContext
+	//Signer           xmlsig.Signer
 
 	IdentityProvider *IdentityProvider
 }
@@ -169,11 +168,11 @@ func NewProvider(
 		return nil, err
 	}
 
-	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
-		SignatureAlgorithm: conf.Metadata.SignatureAlgorithm,
-		DigestAlgorithm:    conf.Metadata.DigestAlgorithm,
-	})
-	if err != nil {
+	keyStore := dsig.TLSCertKeyStore(tlsCert)
+
+	signingContext := dsig.NewDefaultSigningContext(keyStore)
+	signingContext.Canonicalizer = dsig.MakeC14N10ExclusiveCanonicalizerWithPrefixList("")
+	if err := signingContext.SetSignatureMethod(conf.Metadata.SignatureAlgorithm); err != nil {
 		return nil, err
 	}
 
@@ -190,7 +189,7 @@ func NewProvider(
 	prov := &Provider{
 		MetadataEndpoint: &metadata,
 		Metadata:         conf.getMetadata(idp),
-		Signer:           signer,
+		signingContext:   signingContext,
 		storage:          storage,
 		IdentityProvider: idp,
 		interceptors: []HttpInterceptor{

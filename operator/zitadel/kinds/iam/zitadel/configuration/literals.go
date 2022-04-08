@@ -128,10 +128,7 @@ func literalsConfigMap(
 				literalsConfigMap["ZITADEL_SAML_CONTACT_TEL"] = desired.SAML.Contact.TelephoneNumber
 			}
 			literalsConfigMap["ZITADEL_SAML_METADATA_SIGNALG"] = desired.SAML.SigningAlgorithm
-			literalsConfigMap["ZITADEL_SAML_METADATA_DIGALG"] = desired.SAML.DigestAlgorithm
 			literalsConfigMap["ZITADEL_SAML_IDP_SIGNALG"] = desired.SAML.SigningAlgorithm
-			literalsConfigMap["ZITADEL_SAML_IDP_DIGALG"] = desired.SAML.DigestAlgorithm
-			literalsConfigMap["ZITADEL_SAML_IDP_ENCALG"] = desired.SAML.EncryptAlgorithm
 			literalsConfigMap["ZITADEL_SAML_ERRORURL"] = desired.SAML.ErrorURL
 		}
 		if desired.Proxy != nil {

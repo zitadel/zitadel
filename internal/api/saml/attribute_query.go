@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
+	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
@@ -142,7 +143,7 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 				return fmt.Errorf("no signature algorithm provided but required")
 			}
 
-			err = sp.verifySignature(
+			err = sp.verifyRedirectSignature(
 				attrQueryRequest,
 				"",
 				sigAlg,
@@ -190,11 +191,11 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 
 	checker.WithLogicStep(
 		func() error {
-			signature, err := createSignature(p.signer, response.Body.Response.Assertion)
+			signature, err := signature.Create(p.signingContext, response.Body.Response)
 			if err != nil {
 				return err
 			}
-			response.Body.Response.Assertion.Signature = signature
+			response.Body.Response.Signature = signature
 			return nil
 		},
 		"SAML-p012sa",

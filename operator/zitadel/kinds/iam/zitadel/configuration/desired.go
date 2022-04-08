@@ -157,8 +157,6 @@ type Proxy struct {
 type SAML struct {
 	Contact          *Contact `yaml:"contact,omitempty"`
 	SigningAlgorithm string   `yaml:"signingAlgorithm,omitempty"`
-	DigestAlgorithm  string   `yaml:"digestAlgorithm,omitempty"`
-	EncryptAlgorithm string   `yaml:"encryptAlgorithm,omitempty"`
 	ErrorURL         string   `yaml:"errorURL,omitempty"`
 }
 

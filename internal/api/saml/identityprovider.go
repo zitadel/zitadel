@@ -9,12 +9,12 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
-	"github.com/amdonov/xmlsig"
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/key"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
+	dsig "github.com/russellhaering/goxmldsig"
 	"gopkg.in/square/go-jose.v2"
 	"io"
 	"net/http"
@@ -70,7 +70,8 @@ type IdentityProvider struct {
 	EntityID   string
 	Metadata   *md.IDPSSODescriptorType
 	AAMetadata *md.AttributeAuthorityDescriptorType
-	signer     xmlsig.Signer
+	//signer         xmlsig.Signer
+	signingContext *dsig.SigningContext
 
 	CertificateEndpoint           op.Endpoint
 	CallbackEndpoint              op.Endpoint
@@ -86,6 +87,12 @@ type IdentityProvider struct {
 
 func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
 	cert, key := getResponseCert(storage)
+
+	if conf.SignatureAlgorithm != dsig.RSASHA1SignatureMethod &&
+		conf.SignatureAlgorithm != dsig.RSASHA256SignatureMethod &&
+		conf.SignatureAlgorithm != dsig.RSASHA512SignatureMethod {
+		return nil, fmt.Errorf("invalid signing method %s", conf.SignatureAlgorithm)
+	}
 
 	certPem := pem.EncodeToMemory(
 		&pem.Block{
@@ -105,13 +112,23 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		return nil, err
 	}
 
-	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
-		SignatureAlgorithm: conf.SignatureAlgorithm,
-		DigestAlgorithm:    conf.DigestAlgorithm,
-	})
-	if err != nil {
+	keyStore := dsig.TLSCertKeyStore(tlsCert)
+
+	signingContext := dsig.NewDefaultSigningContext(keyStore)
+	signingContext.Canonicalizer = dsig.MakeC14N10ExclusiveCanonicalizerWithPrefixList("")
+	if err := signingContext.SetSignatureMethod(conf.SignatureAlgorithm); err != nil {
 		return nil, err
 	}
+
+	/*
+		signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
+			SignatureAlgorithm: conf.SignatureAlgorithm,
+			DigestAlgorithm:    conf.DigestAlgorithm,
+		})
+		if err != nil {
+			return nil, err
+		}
+	*/
 
 	postTemplate, err := template.New("post").Parse(postTemplate)
 	if err != nil {
@@ -129,7 +146,7 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		EntityID:                      metadataEndpoint.Absolute(""),
 		Metadata:                      metadata,
 		AAMetadata:                    aaMetadata,
-		signer:                        signer,
+		signingContext:                signingContext,
 		CertificateEndpoint:           op.NewEndpointWithURL(conf.Endpoints.Certificate.Path, conf.Endpoints.Certificate.URL),
 		CallbackEndpoint:              op.NewEndpointWithURL(conf.Endpoints.Callback.Path, conf.Endpoints.Callback.URL),
 		SingleSignOnEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL),

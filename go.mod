@@ -89,7 +89,10 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-require github.com/golang-jwt/jwt/v4 v4.1.0
+require (
+	github.com/beevik/etree v1.1.0
+	github.com/golang-jwt/jwt/v4 v4.1.0
+)
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
@@ -154,6 +157,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
@@ -186,6 +190,7 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rs/xid v1.2.1 // indirect
+	github.com/russellhaering/goxmldsig v1.2.0 // indirect
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect

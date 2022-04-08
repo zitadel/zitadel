@@ -1,11 +1,9 @@
 package saml
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/base64"
-	"encoding/xml"
 	"fmt"
+	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/http"
@@ -45,7 +43,13 @@ type Response struct {
 
 func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, response string) {
 	if r.AcsUrl == "" {
-		if _, err := w.Write([]byte(response)); err != nil {
+		responseDecoded, err := base64.StdEncoding.DecodeString(response)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("error while writing response: %w", err), http.StatusInternalServerError)
+			return
+		}
+
+		if _, err := w.Write(responseDecoded); err != nil {
 			r.ErrorFunc(err)
 			return
 		}
@@ -53,9 +57,11 @@ func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, resp
 
 	switch r.ProtocolBinding {
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
+		respData := base64.StdEncoding.EncodeToString([]byte(response))
+
 		data := AuthResponseForm{
 			url.QueryEscape(r.RelayState),
-			response,
+			respData,
 			r.AcsUrl,
 		}
 
@@ -64,7 +70,16 @@ func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, resp
 			return
 		}
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
-		redirectURL := fmt.Sprintf("%s?SAMLResponse=%s&RelayState= %s", r.AcsUrl, url.QueryEscape(response), url.QueryEscape(r.RelayState))
+		respData, err := xml.DeflateAndBase64([]byte(response))
+		if err != nil {
+			r.ErrorFunc(err)
+			return
+		}
+
+		redirectURL := fmt.Sprintf("%s?SAMLResponse=%s", r.AcsUrl, url.QueryEscape(string(respData)))
+		if r.RelayState != "" {
+			redirectURL = fmt.Sprintf("%s&RelayState=%s", redirectURL, url.QueryEscape(r.RelayState))
+		}
 		if r.Signature != "" && r.SigAlg != "" {
 			redirectURL = fmt.Sprintf("%s&Signature=%s&SigAlg=%s", redirectURL, url.QueryEscape(r.Signature), url.QueryEscape(r.SigAlg))
 		}
@@ -86,31 +101,12 @@ func (r *Response) sendBackResponse(
 	w http.ResponseWriter,
 	resp *samlp.ResponseType,
 ) {
-	var xmlbuff bytes.Buffer
-
-	memWriter := bufio.NewWriter(&xmlbuff)
-	_, err := memWriter.Write([]byte(xml.Header))
+	respStr, err := xml.Marshal(resp)
 	if err != nil {
 		r.ErrorFunc(err)
 		return
 	}
-
-	encoder := xml.NewEncoder(memWriter)
-	err = encoder.Encode(resp)
-	if err != nil {
-		r.ErrorFunc(err)
-		return
-	}
-
-	err = memWriter.Flush()
-	if err != nil {
-		r.ErrorFunc(err)
-		return
-	}
-
-	samlMessage := base64.StdEncoding.EncodeToString(xmlbuff.Bytes())
-
-	r.doResponse(req, w, samlMessage)
+	r.doResponse(req, w, respStr)
 }
 
 func (r *Response) makeUnsupportedBindingResponse(

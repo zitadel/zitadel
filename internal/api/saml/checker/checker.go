@@ -72,7 +72,7 @@ func (c *Checker) WithValueEqualsCheck(valueName string, value func() string, eq
 	return c
 }
 
-func (c *Checker) WithConditionalValueNotEmpty(cond func() bool, valueName string, value func()string, errorLogID string, errorFunc func()) *Checker {
+func (c *Checker) WithConditionalValueNotEmpty(cond func() bool, valueName string, value func() string, errorLogID string, errorFunc func()) *Checker {
 	c.addStep(func() bool {
 		if cond() {
 			if value() == "" {

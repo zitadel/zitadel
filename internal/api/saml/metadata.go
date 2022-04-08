@@ -4,7 +4,9 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/xenc"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
@@ -12,8 +14,15 @@ import (
 )
 
 func (p *Provider) metadataHandle(w http.ResponseWriter, r *http.Request) {
-	err := writeXML(w, p.Metadata)
+	metadata, err := p.GetMetadata()
 	if err != nil {
+		err := fmt.Errorf("error while getting metadata: %w", err)
+		logging.Log("SAML-mp2ok3").Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := writeXML(w, metadata); err != nil {
 		http.Error(w, fmt.Errorf("failed to respond with metadata").Error(), http.StatusInternalServerError)
 		return
 	}
@@ -224,7 +233,7 @@ func (p *ProviderConfig) getMetadata(
 
 func (p *Provider) GetMetadata() (*md.EntityDescriptorType, error) {
 	metadata := *p.Metadata
-	idpSig, err := createSignature(p.Signer, metadata)
+	idpSig, err := signature.Create(p.signingContext, metadata)
 	if err != nil {
 		return nil, err
 	}
