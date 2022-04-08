@@ -63,3 +63,4 @@ migrations/cockroach/migrate_cloud.go
 .notifications
 .artifacts
 /zitadel
+ 
