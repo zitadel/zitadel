@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
+      GOPATH: /home/runner/work/zitadel/zitadel
     steps:
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -22,7 +23,7 @@ jobs:
       - name: Source checkout
         uses: actions/checkout@v2
         with:
-          path: src/github.com/caos
+          path: src/github.com/caos/zitadel
       - run: pwd
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -47,6 +48,7 @@ jobs:
           distribution: goreleaser
           version: v1.5.0
           args: release --snapshot
+          workdir: ${{env.GITHUB_WORKSPACE}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag
@@ -55,6 +57,7 @@ jobs:
         with:
           dry_run: false
           semantic_version: 19.0.2
+          working_directory: ${{env.GITHUB_WORKSPACE}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Google Container Registry Login
@@ -70,6 +73,7 @@ jobs:
           distribution: goreleaser
           version: v1.5.0
           args: release --rm-dist
+          workdir: ${{env.GITHUB_WORKSPACE}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
@@ -78,15 +82,15 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         with:
           name: grpc-clients
-          path: .artifacts/grpc
+          path: ${{env.GITHUB_WORKSPACE}}/.artifacts/grpc
       - name: Publish console
         uses: actions/upload-artifact@v2
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         with:
           name: console
-          path: .artifacts/console
+          path: ${{env.GITHUB_WORKSPACE}}/.artifacts/console
       - name: Publish go coverage
         uses: codecov/codecov-action@v1
         with:
-          files: .artifacts/codecov/profile.cov
+          files: ${{env.GITHUB_WORKSPACE}}/.artifacts/codecov/profile.cov
           name: go-codecov
