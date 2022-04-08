@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
+      WORKING_DIRECTORY: /home/runner/go/src/github.com/caos/zitadel
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -30,14 +32,19 @@ jobs:
           install: true
       - name: Build Base
         run: docker build -f build/grpc/Dockerfile -t zitadel-base:local .
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Build gRPC Client
         run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client && sh -c "cp -r .artifacts/grpc/go-client/* ."
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Test
         run: docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Build JS Client
         run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Build Console
         run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console && sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Build ZITADEL
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -46,6 +53,7 @@ jobs:
           args: release --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Tag
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
@@ -54,14 +62,13 @@ jobs:
           semantic_version: 19.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Google Container Registry Login
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         run: |
           echo "${{ secrets.GCR_JSON_KEY_BASE64 }}" | \
           base64 -d | \
           docker login -u _json_key --password-stdin https://eu.gcr.io
-      - name: DEBUG
-        run: "ls -la pkg/grpc/policy"
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
@@ -72,20 +79,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Publish gRPC clients
         uses: actions/upload-artifact@v2
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         with:
           name: grpc-clients
           path: .artifacts/grpc
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Publish console
         uses: actions/upload-artifact@v2
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         with:
           name: console
           path: .artifacts/console
+        working-directory: ${{env.WORKING_DIRECTORY}}
       - name: Publish go coverage
         uses: codecov/codecov-action@v1
         with:
           files: .artifacts/codecov/profile.cov
           name: go-codecov
+        working-directory: ${{env.WORKING_DIRECTORY}}
