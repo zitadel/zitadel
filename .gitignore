@@ -48,7 +48,7 @@ tmp/
 console/src/app/proto/generated/
 
 #generated filed
-**.pb.go
+#**.pb.go
 **.proto.mock.go
 **.pb.*.go
 **.gen.go 
