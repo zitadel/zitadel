@@ -463,7 +463,7 @@
     "VALIDATION": {
       "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
       "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
-      "REQUIRED": "Das Eingagefeld ist leer.",
+      "REQUIRED": "Das Eingabefeld ist leer.",
       "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
       "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
       "UPPERCASEMISSING": "Passwort muss einen Grossbuchstaben beinhalten.",
