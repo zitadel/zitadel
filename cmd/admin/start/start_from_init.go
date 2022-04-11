@@ -3,6 +3,7 @@ package start
 import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/cmd/admin/initialise"
+	"github.com/caos/zitadel/cmd/admin/key"
 	"github.com/caos/zitadel/cmd/admin/setup"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,9 +28,11 @@ Requirements:
 			setup.Setup(setupConfig, setupSteps)
 
 			startConfig := MustNewConfig(viper.GetViper())
-			startMasterKey, _ := cmd.Flags().GetString(flagMasterKey)
 
-			err := startZitadel(startConfig, startMasterKey)
+			masterKey, err := key.MasterKey(cmd)
+			logging.OnError(err).Fatal("unable to read masterkey")
+
+			err = startZitadel(startConfig, masterKey)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}
