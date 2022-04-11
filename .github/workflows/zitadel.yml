@@ -53,20 +53,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: GitHub Container Registry Login
-        if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Google Container Registry Login
-        if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: |
           echo "${{ secrets.GCR_JSON_KEY_BASE64 }}" | \
           docker login -u _json_key_base64 --password-stdin https://europe-docker.pkg.dev
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
-        if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           distribution: goreleaser
           version: v1.5.0
@@ -77,13 +77,13 @@ jobs:
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
       - name: Publish gRPC clients
         uses: actions/upload-artifact@v2
-        if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           name: grpc-clients
           path: ${{ env.WORKDIR }}/.artifacts/grpc
       - name: Publish console
         uses: actions/upload-artifact@v2
-        if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           name: console
           path: ${{ env.WORKDIR }}/.artifacts/console
