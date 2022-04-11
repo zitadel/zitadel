@@ -40,7 +40,7 @@ jobs:
           distribution: goreleaser
           version: v1.5.0
           args: build --snapshot
-          workdir: ${{env.WORKDIR}}
+          workdir: ${{ env.WORKDIR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag
@@ -49,7 +49,7 @@ jobs:
         with:
           dry_run: false
           semantic_version: 19.0.2
-          working_directory: ${{env.WORKDIR}}
+          working_directory: ${{ env.WORKDIR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: GitHub Container Registry Login
@@ -72,7 +72,7 @@ jobs:
           distribution: goreleaser
           version: v1.5.0
           args: release --rm-dist
-          workdir: ${{env.WORKDIR}}
+          workdir: ${{ env.WORKDIR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
@@ -81,15 +81,15 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         with:
           name: grpc-clients
-          path: ${{env.WORKDIR}}/.artifacts/grpc
+          path: ${{ env.WORKDIR }}/.artifacts/grpc
       - name: Publish console
         uses: actions/upload-artifact@v2
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         with:
           name: console
-          path: ${{env.WORKDIR}}/.artifacts/console
+          path: ${{ env.WORKDIR }}/.artifacts/console
       - name: Publish go coverage
         uses: codecov/codecov-action@v1
         with:
-          files: ${{env.WORKDIR}}/.artifacts/codecov/profile.cov
+          files: ${{ env.WORKDIR }}/.artifacts/codecov/profile.cov
           name: go-codecov
