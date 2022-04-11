@@ -3,7 +3,6 @@ package login
 import (
 	"net/http"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -60,9 +59,8 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).InstanceID()
 	loginName := data.LoginName
-	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, loginName, userAgentID, instanceID)
+	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, loginName, userAgentID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return

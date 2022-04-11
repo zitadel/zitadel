@@ -197,7 +197,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-5m9oL", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
+			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
 		events = append(events, removeEvent)

@@ -1,7 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/domain"
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
@@ -10,12 +12,12 @@ type InstanceIdentityProviderWriteModel struct {
 	IdentityProviderWriteModel
 }
 
-func NewInstanceIdentityProviderWriteModel(idpConfigID string) *InstanceIdentityProviderWriteModel {
+func NewInstanceIdentityProviderWriteModel(ctx context.Context, idpConfigID string) *InstanceIdentityProviderWriteModel {
 	return &InstanceIdentityProviderWriteModel{
 		IdentityProviderWriteModel: IdentityProviderWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			IDPConfigID: idpConfigID,
 		},

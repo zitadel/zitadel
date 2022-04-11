@@ -1,4 +1,4 @@
-S2DefaultInstance:
+S3DefaultInstance:
   InstanceSetup:
     Org:
       Name: ZITADEL
@@ -66,7 +66,29 @@ S2DefaultInstance:
         IncludeUpperLetters: true
         IncludeDigits: true
         IncludeSymbols: false
-
+    Features:
+      TierName: Default Tier
+      TierDescription: ""
+      State: 1 #active
+      StateDescription: ""
+      Retention: 8760h #1year
+      LoginPolicyFactors: true
+      LoginPolicyIDP: true
+      LoginPolicyPasswordless: true
+      LoginPolicyRegistration: true
+      LoginPolicyUsernameLogin: true
+      LoginPolicyPasswordReset: true
+      PasswordComplexityPolicy: true
+      LabelPolicyPrivateLabel: true
+      LabelPolicyWatermark: true
+      CustomDomain: true
+      PrivacyPolicy: true
+      MetadataUser: true
+      CustomTextMessage: true
+      CustomTextLogin: true
+      LockoutPolicy: true
+      ActionsAllowed: 2 #ActionsAllowedUnlimited
+      MaxActions: #not necessary because of ActionsAllowedUnlimited
     PasswordComplexityPolicy: 
       MinLength: 8
       HasLowercase: true 

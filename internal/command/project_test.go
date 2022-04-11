@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	id_mock "github.com/caos/zitadel/internal/id/mock"
+	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -13,9 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/instance"
-	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
@@ -61,14 +60,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewGlobalOrgSetEventEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
-								"globalorg",
-							),
-						),
-					),
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internl"),
 						[]*repository.Event{
 							eventFromEventPusher(project.NewProjectAddedEvent(
@@ -109,80 +100,10 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
-			name: "global org with project owner global, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewGlobalOrgSetEventEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
-								"globalorg",
-							),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "globalorg").Aggregate,
-								"project", true, true, true,
-								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-							),
-							),
-							eventFromEventPusher(project.NewProjectMemberAddedEvent(
-								context.Background(),
-								&project.NewAggregate("project1", "globalorg").Aggregate,
-								"user1",
-								[]string{domain.RoleProjectOwnerGlobal}...,
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectNameUniqueConstraint("project", "globalorg")),
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("project1", "user1")),
-					),
-				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
-			},
-			args: args{
-				ctx: context.Background(),
-				project: &domain.Project{
-					Name:                   "project",
-					ProjectRoleAssertion:   true,
-					ProjectRoleCheck:       true,
-					HasProjectCheck:        true,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-				},
-				resourceOwner: "globalorg",
-				ownerID:       "user1",
-			},
-			res: res{
-				want: &domain.Project{
-					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "globalorg",
-						AggregateID:   "project1",
-					},
-					Name:                   "project",
-					ProjectRoleAssertion:   true,
-					ProjectRoleCheck:       true,
-					HasProjectCheck:        true,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-				},
-			},
-		},
-		{
 			name: "org with project owner, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewGlobalOrgSetEventEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
-								"globalorg",
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(project.NewProjectAddedEvent(

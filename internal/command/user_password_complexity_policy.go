@@ -35,7 +35,7 @@ func customPasswordComplexityPolicy(ctx context.Context, filter preparation.Filt
 }
 
 func defaultPasswordComplexityPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*PasswordComplexityPolicyWriteModel, error) {
-	policy := NewInstancePasswordComplexityPolicyWriteModel()
+	policy := NewInstancePasswordComplexityPolicyWriteModel(ctx)
 	events, err := filter(ctx, policy.Query())
 	if err != nil {
 		return nil, err

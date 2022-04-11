@@ -11,7 +11,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 	if config.IDPConfigID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-9djf8", "Errors.IDMissing")
 	}
-	existingConfig := NewInstanceIDPOIDCConfigWriteModel(config.IDPConfigID)
+	existingConfig := NewInstanceIDPOIDCConfigWriteModel(ctx, config.IDPConfigID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err

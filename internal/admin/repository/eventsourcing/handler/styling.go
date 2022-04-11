@@ -163,7 +163,7 @@ func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
 	if err != nil {
 		return err
 	}
-	return m.uploadFilesToBucket(policy.AggregateID, "text/css", reader, size)
+	return m.uploadFilesToStorage(policy.InstanceID, policy.AggregateID, "text/css", reader, size)
 }
 
 func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64, error) {
@@ -245,9 +245,10 @@ const fontFaceTemplate = `
 }
 `
 
-func (m *Styling) uploadFilesToBucket(aggregateID, contentType string, reader io.Reader, size int64) error {
+func (m *Styling) uploadFilesToStorage(instanceID, aggregateID, contentType string, reader io.Reader, size int64) error {
 	fileName := domain.CssPath + "/" + domain.CssVariablesFileName
-	_, err := m.static.PutObject(context.Background(), aggregateID, fileName, contentType, reader, size, true)
+	//TODO: handle location as soon as possible
+	_, err := m.static.PutObject(context.Background(), instanceID, "", aggregateID, fileName, contentType, static.ObjectTypeStyling, reader, size)
 	return err
 }
 

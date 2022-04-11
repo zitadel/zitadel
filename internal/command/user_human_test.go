@@ -44,8 +44,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
-	instanceAgg := instance.NewAggregate()
-	_ = instanceAgg
+	instanceAgg := instance.NewAggregate("instance")
 
 	tests := []struct {
 		name   string

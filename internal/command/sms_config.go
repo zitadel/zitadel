@@ -10,12 +10,12 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *twilio.TwilioConfig) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, config *twilio.TwilioConfig) (string, *domain.ObjectDetails, error) {
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, id)
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return "", nil, err
 	}
@@ -46,11 +46,11 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *twilio.Twilio
 	return id, writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, id string, config *twilio.TwilioConfig) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id string, config *twilio.TwilioConfig) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-e9jwf", "Errors.IDMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, id)
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +82,8 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, id string, config 
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, id, token string) (*domain.ObjectDetails, error) {
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, id)
+func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, id, token string) (*domain.ObjectDetails, error) {
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -110,11 +110,11 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, id, token str
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ActivateSMSConfigTwilio(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) ActivateSMSConfigTwilio(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-dn93n", "Errors.IDMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, id)
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -140,11 +140,11 @@ func (c *Commands) ActivateSMSConfigTwilio(ctx context.Context, id string) (*dom
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-frkwf", "Errors.IDMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, id)
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -170,11 +170,11 @@ func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, id string) (*d
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveSMSConfigTwilio(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveSMSConfigTwilio(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-3j9fs", "Errors.IDMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, id)
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -196,8 +196,8 @@ func (c *Commands) RemoveSMSConfigTwilio(ctx context.Context, id string) (*domai
 	}
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
-func (c *Commands) getSMSConfig(ctx context.Context, id string) (_ *IAMSMSConfigWriteModel, err error) {
-	writeModel := NewIAMSMSConfigWriteModel(id)
+func (c *Commands) getSMSConfig(ctx context.Context, instanceID, id string) (_ *IAMSMSConfigWriteModel, err error) {
+	writeModel := NewIAMSMSConfigWriteModel(instanceID, id)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

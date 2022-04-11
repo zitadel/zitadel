@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/static"
 )
 
 func (h *Handler) UploadDefaultLabelPolicyLogo() Uploader {
@@ -44,6 +45,10 @@ func (l *labelPolicyLogoUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *labelPolicyLogoUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeStyling
+}
+
 func (l *labelPolicyLogoUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -60,27 +65,27 @@ func (l *labelPolicyLogoUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyLogoUploader) BucketName(ctxData authz.CtxData) string {
+func (l *labelPolicyLogoUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return domain.IAMID
+		return instance.InstanceID()
 	}
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyLogoUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
+func (l *labelPolicyLogoUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, info.Key)
+			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, upload)
 			return err
 		}
-		_, err := commands.AddLogoDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddLogoDefaultLabelPolicy(ctx, upload)
 		return err
 	}
 	if l.darkMode {
-		_, err := commands.AddLogoDarkLabelPolicy(ctx, orgID, info.Key)
+		_, err := commands.AddLogoDarkLabelPolicy(ctx, orgID, upload)
 		return err
 	}
-	_, err := commands.AddLogoLabelPolicy(ctx, orgID, info.Key)
+	_, err := commands.AddLogoLabelPolicy(ctx, orgID, upload)
 	return err
 }
 
@@ -134,8 +139,8 @@ func (l *labelPolicyLogoDownloader) ObjectName(ctx context.Context, path string)
 	return policy.Light.LogoURL, nil
 }
 
-func (l *labelPolicyLogoDownloader) BucketName(ctx context.Context, id string) string {
-	return getLabelPolicyBucketName(ctx, l.defaultPolicy, l.preview, l.query)
+func (l *labelPolicyLogoDownloader) ResourceOwner(ctx context.Context, _ string) string {
+	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
 func (h *Handler) UploadDefaultLabelPolicyIcon() Uploader {
@@ -171,6 +176,10 @@ func (l *labelPolicyIconUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *labelPolicyIconUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeStyling
+}
+
 func (l *labelPolicyIconUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -187,28 +196,28 @@ func (l *labelPolicyIconUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyIconUploader) BucketName(ctxData authz.CtxData) string {
+func (l *labelPolicyIconUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return domain.IAMID
+		return instance.InstanceID()
 	}
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyIconUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
+func (l *labelPolicyIconUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, info.Key)
+			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, upload)
 			return err
 		}
-		_, err := commands.AddIconDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddIconDefaultLabelPolicy(ctx, upload)
 		return err
 	}
 
 	if l.darkMode {
-		_, err := commands.AddIconDarkLabelPolicy(ctx, orgID, info.Key)
+		_, err := commands.AddIconDarkLabelPolicy(ctx, orgID, upload)
 		return err
 	}
-	_, err := commands.AddIconLabelPolicy(ctx, orgID, info.Key)
+	_, err := commands.AddIconLabelPolicy(ctx, orgID, upload)
 	return err
 }
 
@@ -262,8 +271,8 @@ func (l *labelPolicyIconDownloader) ObjectName(ctx context.Context, path string)
 	return policy.Light.IconURL, nil
 }
 
-func (l *labelPolicyIconDownloader) BucketName(ctx context.Context, id string) string {
-	return getLabelPolicyBucketName(ctx, l.defaultPolicy, l.preview, l.query)
+func (l *labelPolicyIconDownloader) ResourceOwner(ctx context.Context, _ string) string {
+	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
 func (h *Handler) UploadDefaultLabelPolicyFont() Uploader {
@@ -290,6 +299,10 @@ func (l *labelPolicyFontUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *labelPolicyFontUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeStyling
+}
+
 func (l *labelPolicyFontUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -303,19 +316,19 @@ func (l *labelPolicyFontUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyFontUploader) BucketName(ctxData authz.CtxData) string {
+func (l *labelPolicyFontUploader) ResourceOwner(instance authz.Instance, ctxData authz.CtxData) string {
 	if l.defaultPolicy {
-		return domain.IAMID
+		return instance.InstanceID()
 	}
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyFontUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
+func (l *labelPolicyFontUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
 	if l.defaultPolicy {
-		_, err := commands.AddFontDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddFontDefaultLabelPolicy(ctx, upload)
 		return err
 	}
-	_, err := commands.AddFontLabelPolicy(ctx, orgID, info.Key)
+	_, err := commands.AddFontLabelPolicy(ctx, orgID, upload)
 	return err
 }
 
@@ -349,8 +362,8 @@ func (l *labelPolicyFontDownloader) ObjectName(ctx context.Context, path string)
 	return policy.FontURL, nil
 }
 
-func (l *labelPolicyFontDownloader) BucketName(ctx context.Context, id string) string {
-	return getLabelPolicyBucketName(ctx, l.defaultPolicy, l.preview, l.query)
+func (l *labelPolicyFontDownloader) ResourceOwner(ctx context.Context, _ string) string {
+	return getLabelPolicyResourceOwner(ctx, l.defaultPolicy, l.preview, l.query)
 }
 
 func getLabelPolicy(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) (*query.LabelPolicy, error) {
@@ -366,16 +379,16 @@ func getLabelPolicy(ctx context.Context, defaultPolicy, preview bool, queries *q
 	return queries.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
-func getLabelPolicyBucketName(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) string {
+func getLabelPolicyResourceOwner(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) string {
 	if defaultPolicy {
-		return domain.IAMID
+		return authz.GetInstance(ctx).InstanceID()
 	}
 	policy, err := getLabelPolicy(ctx, defaultPolicy, preview, queries)
 	if err != nil {
 		return ""
 	}
 	if policy.IsDefault {
-		return domain.IAMID
+		return authz.GetInstance(ctx).InstanceID()
 	}
 	return authz.GetCtxData(ctx).OrgID
 }

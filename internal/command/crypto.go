@@ -47,7 +47,7 @@ func newCryptoCodeWithPlain(ctx context.Context, filter preparation.FilterToQuer
 }
 
 func secretGeneratorConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType) (*crypto.GeneratorConfig, error) {
-	wm := NewInstanceSecretGeneratorConfigWriteModel(typ)
+	wm := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
 	events, err := filter(ctx, wm.Query())
 	if err != nil {
 		return nil, err

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -40,7 +41,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -65,9 +66,10 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewDomainPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 								),
 							),
@@ -76,7 +78,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
@@ -84,8 +86,9 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 			res: res{
 				want: &domain.DomainPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						InstanceID:    "INSTANCE",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					UserLoginMustBeDomain: true,
 				},
@@ -155,7 +158,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -180,7 +183,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -203,8 +206,8 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			res: res{
 				want: &domain.DomainPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					UserLoginMustBeDomain: false,
 				},
@@ -232,7 +235,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 
 func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain bool) *instance.DomainPolicyChangedEvent {
 	event, _ := instance.NewDomainPolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.OrgPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
 		},

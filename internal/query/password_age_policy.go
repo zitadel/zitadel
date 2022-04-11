@@ -86,7 +86,7 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*Pa
 					PasswordAgeColID.identifier(): orgID,
 				},
 				sq.Eq{
-					PasswordAgeColID.identifier(): domain.IAMID,
+					PasswordAgeColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
 		}).
@@ -103,7 +103,7 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*Pa
 func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context) (*PasswordAgePolicy, error) {
 	stmt, scan := preparePasswordAgePolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		PasswordAgeColID.identifier(): domain.IAMID,
+		PasswordAgeColID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).
 		OrderBy(PasswordAgeColIsDefault.identifier()).
 		Limit(1).ToSql()

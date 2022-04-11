@@ -1,6 +1,9 @@
 package command
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -10,12 +13,12 @@ type InstanceSecondFactorWriteModel struct {
 	SecondFactorWriteModel
 }
 
-func NewInstanceSecondFactorWriteModel(factorType domain.SecondFactorType) *InstanceSecondFactorWriteModel {
+func NewInstanceSecondFactorWriteModel(ctx context.Context, factorType domain.SecondFactorType) *InstanceSecondFactorWriteModel {
 	return &InstanceSecondFactorWriteModel{
 		SecondFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			MFAType: factorType,
 		},
@@ -57,12 +60,12 @@ type InstanceMultiFactorWriteModel struct {
 	MultiFactorWriteModel
 }
 
-func NewInstanceMultiFactorWriteModel(factorType domain.MultiFactorType) *InstanceMultiFactorWriteModel {
+func NewInstanceMultiFactorWriteModel(ctx context.Context, factorType domain.MultiFactorType) *InstanceMultiFactorWriteModel {
 	return &InstanceMultiFactorWriteModel{
 		MultiFactorWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 			MFAType: factorType,
 		},

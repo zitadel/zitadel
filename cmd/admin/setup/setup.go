@@ -47,19 +47,22 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(eventstoreClient)
 
-	steps.S2DefaultInstance.es = eventstoreClient
-	steps.S2DefaultInstance.db = dbClient
-	steps.S2DefaultInstance.defaults = config.SystemDefaults
-	steps.S2DefaultInstance.masterKey = masterKey
-	steps.S2DefaultInstance.iamDomain = config.SystemDefaults.Domain
-	steps.S2DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
-	steps.S2DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
-	steps.S2DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
-	steps.S2DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
-
-	steps.S1ProjectionTable = &ProjectionTable{dbClient: dbClient}
+	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}
+	steps.s2AssetsTable = &AssetTable{dbClient: dbClient}
+	steps.S3DefaultInstance.es = eventstoreClient
+	steps.S3DefaultInstance.db = dbClient
+	steps.S3DefaultInstance.defaults = config.SystemDefaults
+	steps.S3DefaultInstance.masterKey = masterKey
+	steps.S3DefaultInstance.iamDomain = config.SystemDefaults.Domain
+	steps.S3DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
+	steps.S3DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
+	steps.S3DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
+	steps.S3DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
+	steps.S3DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
+	steps.S3DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
 	ctx := context.Background()
-	migration.Migrate(ctx, eventstoreClient, steps.S1ProjectionTable)
-	migration.Migrate(ctx, eventstoreClient, steps.S2DefaultInstance)
+	migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
+	migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
+	migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
 }

@@ -176,7 +176,7 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 		for _, userID := range claimedUserIDs {
 			userEvents, _, err := c.userDomainClaimed(ctx, userID)
 			if err != nil {
-				logging.LogWithFields("COMMAND-5m8fs", "userid", userID).WithError(err).Warn("could not claim user")
+				logging.WithFields("userid", userID).WithError(err).Warn("could not claim user")
 				continue
 			}
 			events = append(events, userEvents...)

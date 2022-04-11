@@ -35,7 +35,7 @@ func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReduce
 }
 
 func instanceDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*PolicyDomainWriteModel, error) {
-	policy := NewInstanceDomainPolicyWriteModel()
+	policy := NewInstanceDomainPolicyWriteModel(ctx)
 	events, err := filter(ctx, policy.Query())
 	if err != nil {
 		return nil, err

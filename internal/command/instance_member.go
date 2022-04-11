@@ -73,7 +73,7 @@ func (c *Commands) AddInstanceMember(ctx context.Context, member *domain.Member)
 	if member.UserID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-Mf83b", "Errors.IAM.MemberInvalid")
 	}
-	addedMember := NewInstanceMemberWriteModel(member.UserID)
+	addedMember := NewInstanceMemberWriteModel(ctx, member.UserID)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
 	err := c.checkUserExists(ctx, addedMember.UserID, "")
 	if err != nil {
@@ -184,7 +184,7 @@ func (c *Commands) instanceMemberWriteModelByID(ctx context.Context, userID stri
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceMemberWriteModel(userID)
+	writeModel := NewInstanceMemberWriteModel(ctx, userID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

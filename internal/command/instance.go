@@ -9,15 +9,13 @@ import (
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"golang.org/x/text/language"
 )
 
 const (
@@ -31,8 +29,32 @@ const (
 )
 
 type InstanceSetup struct {
-	Org              OrgSetup
-	Zitadel          ZitadelConfig
+	Org      OrgSetup
+	Zitadel  ZitadelConfig
+	Features struct {
+		TierName                 string
+		TierDescription          string
+		Retention                time.Duration
+		State                    domain.FeaturesState
+		StateDescription         string
+		LoginPolicyFactors       bool
+		LoginPolicyIDP           bool
+		LoginPolicyPasswordless  bool
+		LoginPolicyRegistration  bool
+		LoginPolicyUsernameLogin bool
+		LoginPolicyPasswordReset bool
+		PasswordComplexityPolicy bool
+		LabelPolicyPrivateLabel  bool
+		LabelPolicyWatermark     bool
+		CustomDomain             bool
+		PrivacyPolicy            bool
+		MetadataUser             bool
+		CustomTextMessage        bool
+		CustomTextLogin          bool
+		LockoutPolicy            bool
+		ActionsAllowed           domain.ActionsAllowed
+		MaxActions               int
+	}
 	SecretGenerators struct {
 		PasswordSaltCost         uint
 		ClientSecret             *crypto.GeneratorConfig
@@ -136,12 +158,11 @@ func (s *InstanceSetup) generateIDs() (err error) {
 }
 
 func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
-	// TODO
-	// instanceID, err := id.SonyFlakeGenerator.Next()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, "system"), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
+	instanceID, err := id.SonyFlakeGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -159,12 +180,37 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 
 	setup.Org.Human.PasswordChangeRequired = true
 
-	instanceAgg := instance.NewAggregate()
+	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID, orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.Zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
+		SetDefaultFeatures(
+			instanceAgg,
+			setup.Features.TierName,
+			setup.Features.TierDescription,
+			setup.Features.State,
+			setup.Features.StateDescription,
+			setup.Features.Retention,
+			setup.Features.LoginPolicyFactors,
+			setup.Features.LoginPolicyIDP,
+			setup.Features.LoginPolicyPasswordless,
+			setup.Features.LoginPolicyRegistration,
+			setup.Features.LoginPolicyUsernameLogin,
+			setup.Features.LoginPolicyPasswordReset,
+			setup.Features.PasswordComplexityPolicy,
+			setup.Features.LabelPolicyPrivateLabel,
+			setup.Features.LabelPolicyWatermark,
+			setup.Features.CustomDomain,
+			setup.Features.PrivacyPolicy,
+			setup.Features.MetadataUser,
+			setup.Features.CustomTextMessage,
+			setup.Features.CustomTextLogin,
+			setup.Features.LockoutPolicy,
+			setup.Features.ActionsAllowed,
+			setup.Features.MaxActions,
+		),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
@@ -342,23 +388,13 @@ func SetIAMConsoleID(a *instance.Aggregate, clientID *string) preparation.Valida
 	}
 }
 
-//TODO: private as soon as setup uses query
-func (c *Commands) GetInstance(ctx context.Context) (*domain.Instance, error) {
-	iamWriteModel := NewInstanceWriteModel()
-	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToInstance(iamWriteModel), nil
-}
-
 func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, orgID string) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err
 	}
 	if iamWriteModel.GlobalOrgID != "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-HGG24", "Errors.IAM.GlobalOrgAlreadySet")
+		return nil, errors.ThrowPreconditionFailed(nil, "IAM-HGG24", "Errors.IAM.GlobalOrgAlreadySet")
 	}
 	return instance.NewGlobalOrgSetEventEvent(ctx, iamAgg, orgID), nil
 }
@@ -369,37 +405,7 @@ func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggrega
 		return nil, err
 	}
 	if iamWriteModel.ProjectID != "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
+		return nil, errors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
 	}
 	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
-}
-
-func (c *Commands) SetDefaultLanguage(ctx context.Context, language language.Tag) (*domain.ObjectDetails, error) {
-	iamWriteModel, err := c.getIAMWriteModel(ctx)
-	if err != nil {
-		return nil, err
-	}
-	iamAgg := InstanceAggregateFromWriteModel(&iamWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewDefaultLanguageSetEvent(ctx, iamAgg, language))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(iamWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&iamWriteModel.WriteModel), nil
-}
-
-func (c *Commands) getIAMWriteModel(ctx context.Context) (_ *InstanceWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	writeModel := NewInstanceWriteModel()
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModel, nil
 }

@@ -1,14 +1,19 @@
 package command
 
 import (
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"golang.org/x/text/language"
 )
 
 type InstanceWriteModel struct {
 	eventstore.WriteModel
+
+	Name            string
+	State           domain.InstanceState
+	GeneratedDomain string
 
 	SetUpStarted domain.Step
 	SetUpDone    domain.Step
@@ -18,11 +23,11 @@ type InstanceWriteModel struct {
 	DefaultLanguage language.Tag
 }
 
-func NewInstanceWriteModel() *InstanceWriteModel {
+func NewInstanceWriteModel(instanceID string) *InstanceWriteModel {
 	return &InstanceWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
 		},
 	}
 }
@@ -30,6 +35,18 @@ func NewInstanceWriteModel() *InstanceWriteModel {
 func (wm *InstanceWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *instance.InstanceAddedEvent:
+			wm.Name = e.Name
+			wm.State = domain.InstanceStateActive
+		case *instance.InstanceChangedEvent:
+			wm.Name = e.Name
+		case *instance.InstanceRemovedEvent:
+			wm.State = domain.InstanceStateRemoved
+		case *instance.DomainAddedEvent:
+			if !e.Generated {
+				continue
+			}
+			wm.GeneratedDomain = e.Domain
 		case *instance.ProjectSetEvent:
 			wm.ProjectID = e.ProjectID
 		case *instance.GlobalOrgSetEvent:
@@ -54,6 +71,11 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(instance.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			instance.InstanceAddedEventType,
+			instance.InstanceChangedEventType,
+			instance.InstanceRemovedEventType,
+			instance.InstanceDomainAddedEventType,
+			instance.InstanceDomainRemovedEventType,
 			instance.ProjectSetEventType,
 			instance.GlobalOrgSetEventType,
 			instance.DefaultLanguageSetEventType,

@@ -95,7 +95,7 @@ func SetInstanceCustomTexts(
 }
 
 func existingInstanceCustomMessageText(ctx context.Context, filter preparation.FilterToQueryReducer, textType string, lang language.Tag) (*InstanceCustomMessageTextWriteModel, error) {
-	writeModel := NewInstanceCustomMessageTextWriteModel(textType, lang)
+	writeModel := NewInstanceCustomMessageTextWriteModel(ctx, textType, lang)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err

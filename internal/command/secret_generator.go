@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -12,7 +13,7 @@ import (
 )
 
 func (c *commandNew) AddSecretGeneratorConfig(ctx context.Context, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
-	agg := instance.NewAggregate()
+	agg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, addSecretGeneratorConfig(agg, typ, config))
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func addSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGeneratorT
 			return nil, errors.ThrowInvalidArgument(nil, "V2-jEqCt", "Errors.InvalidArgument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewInstanceSecretGeneratorConfigWriteModel(typ)
+			writeModel := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err

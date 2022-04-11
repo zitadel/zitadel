@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -40,7 +41,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewOIDCSettingsAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								time.Hour*1,
 								time.Hour*1,
 								time.Hour*1,
@@ -71,21 +72,23 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewOIDCSettingsAddedEvent(
-								context.Background(),
-								&instance.NewAggregate().Aggregate,
-								time.Hour*1,
-								time.Hour*1,
-								time.Hour*1,
-								time.Hour*1,
-							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewOIDCSettingsAddedEvent(
+									context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									time.Hour*1,
+									time.Hour*1,
+									time.Hour*1,
+									time.Hour*1,
+								),
 							),
 						},
 					),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
@@ -95,7 +98,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -161,7 +164,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewOIDCSettingsAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								time.Hour*1,
 								time.Hour*1,
 								time.Hour*1,
@@ -193,7 +196,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewOIDCSettingsAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								time.Hour*1,
 								time.Hour*1,
 								time.Hour*1,
@@ -225,7 +228,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -257,7 +260,7 @@ func newOIDCConfigChangedEvent(ctx context.Context, accessTokenLifetime, idToken
 		instance.ChangeOIDCSettingsRefreshTokenExpiration(refreshTokenExpiration),
 	}
 	event, _ := instance.NewOIDCSettingsChangeEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		changes,
 	)
 	return event
