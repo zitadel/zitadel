@@ -70,8 +70,8 @@ const (
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
 		" IFNULL((resource_owner), $8::VARCHAR) AS resource_owner," +
-		" $9::VARCHAR AS instance_id," +
-		" NEXTVAL(CONCAT('eventstore.', IFNULL($9, 'system'), '_seq'))," +
+		" IFNULL($9::VARCHAR, 'system') AS instance_id," +
+		" NEXTVAL(CONCAT('eventstore.', IF($9 IS NULL, 'system', CONCAT('i_', $9)), '_seq'))," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +
@@ -151,6 +151,22 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 	}
 
 	return err
+}
+
+func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
+	row := db.client.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1, '_seq')", instanceID)
+	if row.Err() != nil {
+		return caos_errs.ThrowInvalidArgument(row.Err(), "SQL-7gtFA", "Errors.InvalidArgument")
+	}
+	var sequenceName string
+	if err := row.Scan(&sequenceName); err != nil {
+		return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
+	}
+	if _, err := db.client.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
+		return caos_errs.ThrowInternal(err, "SQL-7gtFA", "Errors.Internal")
+	}
+	return nil
+
 }
 
 // handleUniqueConstraints adds or removes unique constraints

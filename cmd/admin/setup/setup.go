@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 	_ "embed"
+	"strings"
 
 	"github.com/caos/logging"
 	"github.com/spf13/cobra"
@@ -49,6 +50,12 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}
 	steps.s2AssetsTable = &AssetTable{dbClient: dbClient}
+
+	steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = strings.TrimSpace(steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address)
+	if steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address == "" {
+		steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = "admin@" + config.ExternalDomain
+	}
+
 	steps.S3DefaultInstance.es = eventstoreClient
 	steps.S3DefaultInstance.db = dbClient
 	steps.S3DefaultInstance.defaults = config.SystemDefaults

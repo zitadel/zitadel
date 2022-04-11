@@ -59,6 +59,10 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	return eventReaders, nil
 }
 
+func (es *Eventstore) NewInstance(ctx context.Context, instanceID string) error {
+	return es.repo.CreateInstance(ctx, instanceID)
+}
+
 func commandsToRepository(instanceID string, cmds []Command) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
 	events = make([]*repository.Event, len(cmds))
 	for i, cmd := range cmds {
@@ -244,8 +248,4 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 	default:
 		return repository.UniqueConstraintAdd
 	}
-}
-
-func (es *Eventstore) Step20(ctx context.Context, latestSequence uint64) error {
-	return es.repo.Step20(ctx, latestSequence)
 }

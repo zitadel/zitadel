@@ -162,6 +162,10 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	if err != nil {
 		return nil, err
 	}
+	if err = c.es.NewInstance(ctx, instanceID); err != nil {
+		return nil, err
+	}
+
 	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
