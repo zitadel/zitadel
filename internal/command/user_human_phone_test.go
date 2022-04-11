@@ -71,7 +71,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					PhoneNumber: "0711234567",
+					PhoneNumber: "+41711234567",
 				},
 				resourceOwner: "org1",
 			},
@@ -114,7 +114,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					PhoneNumber: "0711234567",
+					PhoneNumber: "+41711234567",
 				},
 				resourceOwner: "org1",
 			},
@@ -172,7 +172,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					PhoneNumber:     "0719876543",
+					PhoneNumber:     "+41719876543",
 					IsPhoneVerified: true,
 				},
 				resourceOwner: "org1",
@@ -239,7 +239,7 @@ func TestCommandSide_ChangeHumanPhone(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
-					PhoneNumber: "0711234567",
+					PhoneNumber: "+41711234567",
 				},
 				resourceOwner:   "org1",
 				secretGenerator: GetMockSecretGenerator(t),

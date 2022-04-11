@@ -21,6 +21,8 @@ func newCryptoCodeWithExpiry(ctx context.Context, filter preparation.FilterToQue
 		value, _, err = crypto.NewCode(crypto.NewHashGenerator(*config, a))
 	case crypto.EncryptionAlgorithm:
 		value, _, err = crypto.NewCode(crypto.NewEncryptionGenerator(*config, a))
+	default:
+		return nil, -1, errors.ThrowInternal(nil, "COMMA-RreV6", "Errors.Internal")
 	}
 	if err != nil {
 		return nil, -1, err

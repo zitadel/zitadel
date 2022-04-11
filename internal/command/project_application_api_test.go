@@ -56,17 +56,6 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid clientID",
-			args: args{
-				a:     agg,
-				appID: "appID",
-				name:  "name",
-			},
-			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-XXED5", "Errors.Invalid.Argument"),
-			},
-		},
-		{
 			name: "project not exists",
 			args: args{
 				a:     agg,
@@ -83,7 +72,7 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "correct",
+			name: "correct without client secret",
 			args: args{
 				a:     agg,
 				appID: "appID",
@@ -114,9 +103,9 @@ func TestAddAPIConfig(t *testing.T) {
 					),
 					project.NewAPIConfigAddedEvent(ctx, &agg.Aggregate,
 						"appID",
-						"clientID",
+						"",
 						nil,
-						domain.APIAuthMethodTypeBasic,
+						domain.APIAuthMethodTypePrivateKeyJWT,
 					),
 				},
 			},

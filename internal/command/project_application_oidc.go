@@ -77,8 +77,6 @@ func AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) pr
 				return nil, errors.ThrowInternal(err, "V2-VMSQ1", "Errors.Internal")
 			}
 
-			//requires client secret
-			// TODO(release blocking):we have to return the secret
 			if app.AuthMethodType == domain.OIDCAuthMethodTypeBasic || app.AuthMethodType == domain.OIDCAuthMethodTypePost {
 				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
 				if err != nil {

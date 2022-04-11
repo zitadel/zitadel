@@ -18,6 +18,10 @@ type Want struct {
 	Commands      []eventstore.Command
 }
 
+type CommandVerifier interface {
+	Validate(eventstore.Command) bool
+}
+
 //AssertValidation checks if the validation works as inteded
 func AssertValidation(t *testing.T, validation preparation.Validation, filter preparation.FilterToQueryReducer, want Want) {
 	t.Helper()
@@ -45,6 +49,12 @@ func AssertValidation(t *testing.T, validation preparation.Validation, filter pr
 	}
 
 	for i, cmd := range want.Commands {
+		if v, ok := cmd.(CommandVerifier); ok {
+			if verified := v.Validate(cmds[i]); !verified {
+				t.Errorf("verification failed on command: = %v, want %v", cmds[i], cmd)
+			}
+			continue
+		}
 		if !reflect.DeepEqual(cmd, cmds[i]) {
 			t.Errorf("unexpected command: = %v, want %v", cmds[i], cmd)
 		}

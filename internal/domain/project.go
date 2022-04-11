@@ -27,7 +27,7 @@ const (
 )
 
 func (s ProjectState) Valid() bool {
-	return s >= ProjectStateUnspecified && s < projectStateMax
+	return s > ProjectStateUnspecified && s < projectStateMax
 }
 
 type PrivateLabelingSetting int32

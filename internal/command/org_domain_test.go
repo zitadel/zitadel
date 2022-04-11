@@ -13,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -254,7 +253,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				domain: &domain.OrgDomain{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -288,7 +287,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: errors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -389,7 +388,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -406,7 +405,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -426,7 +425,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -455,7 +454,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -496,7 +495,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -664,7 +663,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -681,7 +680,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -710,7 +709,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -751,7 +750,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -786,7 +785,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -844,7 +843,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1122,7 +1121,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1139,7 +1138,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1168,7 +1167,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -1202,7 +1201,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1309,7 +1308,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1326,7 +1325,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1355,7 +1354,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -1401,7 +1400,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1520,7 +1519,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 }
 
 func invalidDomainVerification(domain, token, verifier string, checkType http.CheckType) error {
-	return caos_errs.ThrowInvalidArgument(nil, "HTTP-GH422", "Errors.Internal")
+	return errors.ThrowInvalidArgument(nil, "HTTP-GH422", "Errors.Internal")
 }
 
 func validDomainVerification(domain, token, verifier string, checkType http.CheckType) error {

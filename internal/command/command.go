@@ -57,8 +57,10 @@ type commandNew struct {
 	userPasswordAlg crypto.HashAlgorithm
 	iamDomain       string
 	phoneAlg        crypto.EncryptionAlgorithm
+	emailAlg        crypto.EncryptionAlgorithm
 	initCodeAlg     crypto.EncryptionAlgorithm
 	zitadelRoles    []authz.RoleMapping
+	id              id.Generator
 }
 
 type orgFeatureChecker interface {
@@ -148,7 +150,9 @@ func NewCommandV2(
 		userPasswordAlg: crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost),
 		initCodeAlg:     userAlg,
 		phoneAlg:        userAlg,
+		emailAlg:        userAlg,
 		zitadelRoles:    zitadelRoles,
+		id:              id.SonyFlakeGenerator,
 	}
 }
 
