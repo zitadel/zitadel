@@ -30,7 +30,7 @@ An action is composed of
 * an execution timeout in seconds,
 * a switch that defines if its corresponding flow should fail if the action fails.
 
-Within the JavaScript code, you can read and manipulate state.
+Within the JavaScript code, you can read and manipulate the state.
 
 ## Further reading
 
