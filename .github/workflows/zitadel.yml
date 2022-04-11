@@ -63,8 +63,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
         run: |
           echo "${{ secrets.GCR_JSON_KEY_BASE64 }}" | \
-          base64 -d | \
-          docker login -u _json_key --password-stdin https://eu.gcr.io
+          docker login -u _json_key_base64 --password-stdin https://europe-docker.pkg.dev
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: ${{ github.event_name == 'workflow_dispatch' && steps.semantic.outputs.new_release_published == 'true' }}
