@@ -99,8 +99,6 @@ zitadel start-with-init
 | Python   | ❌ | ❌ | ❌ | | Maybe you? |
 | Javascript | ❌ | ❌ | ❌ | | Maybe you? |
 
-
-
 (\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.ch/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
 (\*\*) Automatically check if the access token is valid and claims match
 
