@@ -85,8 +85,6 @@ var (
 				Email:           "",
 			},
 			SigningAlgorithm: "",
-			DigestAlgorithm:  "",
-			EncryptAlgorithm: "",
 			ErrorURL:         "",
 		},
 	}
@@ -165,8 +163,6 @@ var (
 				Email:           "email",
 			},
 			SigningAlgorithm: "sign",
-			DigestAlgorithm:  "digest",
-			EncryptAlgorithm: "encrypt",
 			ErrorURL:         "errorurl",
 		},
 	}
@@ -244,8 +240,6 @@ var (
 				Email:           "email",
 			},
 			SigningAlgorithm: "sign",
-			DigestAlgorithm:  "digest",
-			EncryptAlgorithm: "encrypt",
 			ErrorURL:         "errorurl",
 		},
 	}
@@ -341,10 +335,7 @@ func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 		"ZITADEL_SAML_CONTACT_SURNAME":        "",
 		"ZITADEL_SAML_CONTACT_TEL":            "",
 		"ZITADEL_SAML_METADATA_SIGNALG":       "",
-		"ZITADEL_SAML_METADATA_DIGALG":        "",
 		"ZITADEL_SAML_IDP_SIGNALG":            "",
-		"ZITADEL_SAML_IDP_DIGALG":             "",
-		"ZITADEL_SAML_IDP_ENCALG":             "",
 		"ZITADEL_SAML":                        "https://./saml",
 		"ZITADEL_SAML_ERRORURL":               "",
 	}
@@ -442,10 +433,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"ZITADEL_SAML_CONTACT_SURNAME":        "surname",
 		"ZITADEL_SAML_CONTACT_TEL":            "tel",
 		"ZITADEL_SAML_METADATA_SIGNALG":       "sign",
-		"ZITADEL_SAML_METADATA_DIGALG":        "digest",
 		"ZITADEL_SAML_IDP_SIGNALG":            "sign",
-		"ZITADEL_SAML_IDP_DIGALG":             "digest",
-		"ZITADEL_SAML_IDP_ENCALG":             "encrypt",
 		"ZITADEL_SAML":                        "https://accounts.domain/saml",
 		"ZITADEL_SAML_ERRORURL":               "errorurl",
 	}
