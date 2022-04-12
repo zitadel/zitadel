@@ -15,8 +15,6 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
-      GOPATH: /home/runner/work/zitadel/zitadel
-      WORKDIR: /home/runner/work/zitadel/zitadel/src/github.com/caos/zitadel
     steps:
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -24,9 +22,6 @@ jobs:
           go-version: 1.17
       - name: Source checkout
         uses: actions/checkout@v2
-        with:
-          path: src/github.com/caos/zitadel
-      - run: pwd
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -36,14 +31,12 @@ jobs:
           install: true
       - name: Test
         run: docker build -f build/grpc/Dockerfile -t zitadel-base:local . && docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
-        working-directory: ${{ env.WORKDIR }}
       - name: Tag
         id: semantic
         uses: cycjimmy/semantic-release-action@v2
         with:
           dry_run: false
           semantic_version: 19.0.2
-          working_directory: ${{ env.WORKDIR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: GitHub Container Registry Login
@@ -53,11 +46,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Google Container Registry Login
+      - name: Google Artifact Registry Login
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-        run: |
-          echo "${{ secrets.GCR_JSON_KEY_BASE64 }}" | \
-          docker login -u _json_key_base64 --password-stdin https://europe-docker.pkg.dev
+        uses: docker/login-action@v1
+        with:
+          registry: europe-docker.pkg.dev
+          username: _json_key_base64
+          password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
@@ -65,7 +60,6 @@ jobs:
           distribution: goreleaser
           version: v1.5.0
           args: release --rm-dist
-          workdir: ${{ env.WORKDIR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
@@ -74,15 +68,15 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           name: grpc-clients
-          path: ${{ env.WORKDIR }}/.artifacts/grpc
+          path: .artifacts/grpc
       - name: Publish console
         uses: actions/upload-artifact@v2
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           name: console
-          path: ${{ env.WORKDIR }}/.artifacts/console
+          path: .artifacts/console
       - name: Publish go coverage
         uses: codecov/codecov-action@v1
         with:
-          files: ${{ env.WORKDIR }}/.artifacts/codecov/profile.cov
+          files: .artifacts/codecov/profile.cov
           name: go-codecov
