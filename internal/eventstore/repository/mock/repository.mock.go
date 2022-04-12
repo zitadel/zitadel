@@ -35,6 +35,20 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
+// CreateInstance mocks base method.
+func (m *MockRepository) CreateInstance(arg0 context.Context, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateInstance", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateInstance indicates an expected call of CreateInstance.
+func (mr *MockRepositoryMockRecorder) CreateInstance(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateInstance", reflect.TypeOf((*MockRepository)(nil).CreateInstance), arg0, arg1)
+}
+
 // Filter mocks base method.
 func (m *MockRepository) Filter(arg0 context.Context, arg1 *repository.SearchQuery) ([]*repository.Event, error) {
 	m.ctrl.T.Helper()
@@ -96,18 +110,4 @@ func (mr *MockRepositoryMockRecorder) Push(arg0, arg1 interface{}, arg2 ...inter
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockRepository)(nil).Push), varargs...)
-}
-
-// Step20 mocks base method.
-func (m *MockRepository) Step20(arg0 context.Context, arg1 uint64) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Step20", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Step20 indicates an expected call of Step20.
-func (mr *MockRepositoryMockRecorder) Step20(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Step20", reflect.TypeOf((*MockRepository)(nil).Step20), arg0, arg1)
 }
