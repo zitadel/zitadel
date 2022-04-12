@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"

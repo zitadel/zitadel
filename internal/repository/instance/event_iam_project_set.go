@@ -73,7 +73,7 @@ func (e *ConsoleSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 func NewIAMConsoleSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	clientID string,
+	clientID *string,
 ) *ConsoleSetEvent {
 	return &ConsoleSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -81,7 +81,7 @@ func NewIAMConsoleSetEvent(
 			aggregate,
 			ConsoleSetEventType,
 		),
-		ClientID: clientID,
+		ClientID: *clientID,
 	}
 }
 

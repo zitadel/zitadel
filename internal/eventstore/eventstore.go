@@ -82,7 +82,7 @@ func commandsToRepository(instanceID string, cmds []Command) (events []*reposito
 			AggregateID:   cmd.Aggregate().ID,
 			AggregateType: repository.AggregateType(cmd.Aggregate().Type),
 			ResourceOwner: sql.NullString{String: cmd.Aggregate().ResourceOwner, Valid: cmd.Aggregate().ResourceOwner != ""},
-			InstanceID:    sql.NullString{String: instanceID, Valid: instanceID != ""},
+			InstanceID:    instanceID,
 			EditorService: cmd.EditorService(),
 			EditorUser:    cmd.EditorUser(),
 			Type:          repository.EventType(cmd.Type()),
@@ -178,7 +178,7 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 	return es.repo.LatestSequence(ctx, query)
 }
 
-type queryReducer interface {
+type QueryReducer interface {
 	reducer
 	//Query returns the SearchQueryFactory for the events needed in reducer
 	Query() *SearchQueryBuilder
@@ -186,7 +186,7 @@ type queryReducer interface {
 
 //FilterToQueryReducer filters the events based on the search query of the query function,
 // appends all events to the reducer and calls it's reduce function
-func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r queryReducer) error {
+func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r QueryReducer) error {
 	events, err := es.Filter(ctx, r.Query())
 	if err != nil {
 		return err

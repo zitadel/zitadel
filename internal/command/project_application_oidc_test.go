@@ -7,9 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -17,6 +18,162 @@ import (
 	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/repository/project"
 )
+
+func TestAddOIDCApp(t *testing.T) {
+	type args struct {
+		app             *addOIDCApp
+		clientSecretAlg crypto.HashAlgorithm
+		filter          preparation.FilterToQueryReducer
+	}
+
+	ctx := context.Background()
+	agg := project.NewAggregate("test", "test")
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid appID",
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "",
+						Name:      "name",
+					},
+					GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:         domain.OIDCVersionV1,
+					ApplicationType: domain.OIDCApplicationTypeWeb,
+					AuthMethodType:  domain.OIDCAuthMethodTypeNone,
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+				},
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid name",
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "id",
+						Name:      "",
+					},
+					GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:         domain.OIDCVersionV1,
+					ApplicationType: domain.OIDCApplicationTypeWeb,
+					AuthMethodType:  domain.OIDCAuthMethodTypeNone,
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+				},
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "project not exists",
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "id",
+						Name:      "name",
+					},
+					GrantTypes:      []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:   []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:         domain.OIDCVersionV1,
+					ApplicationType: domain.OIDCApplicationTypeWeb,
+					AuthMethodType:  domain.OIDCAuthMethodTypeNone,
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+				},
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return nil, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				CreateErr: errors.ThrowNotFound(nil, "PROJE-6swVG", ""),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "id",
+						Name:      "name",
+					},
+					GrantTypes:    []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes: []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:       domain.OIDCVersionV1,
+
+					ApplicationType: domain.OIDCApplicationTypeWeb,
+					AuthMethodType:  domain.OIDCAuthMethodTypeNone,
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+				},
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							project.NewProjectAddedEvent(
+								ctx,
+								&agg.Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(ctx, &agg.Aggregate,
+						"id",
+						"name",
+					),
+					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
+						domain.OIDCVersionV1,
+						"id",
+						"",
+						nil,
+						nil,
+						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+						domain.OIDCApplicationTypeWeb,
+						domain.OIDCAuthMethodTypeNone,
+						nil,
+						false,
+						domain.OIDCTokenTypeBearer,
+						false,
+						false,
+						false,
+						0,
+						nil,
+					),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t,
+				AddOIDCAppCommand(
+					tt.args.app,
+					tt.args.clientSecretAlg,
+				), tt.args.filter, tt.want)
+		})
+	}
+}
 
 func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	type fields struct {
@@ -52,7 +209,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -75,7 +232,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -105,7 +262,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -274,7 +431,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -298,7 +455,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -322,7 +479,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -347,7 +504,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -418,7 +575,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -580,7 +737,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -597,7 +754,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -615,7 +772,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{

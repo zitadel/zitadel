@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -18,13 +18,17 @@ type Want struct {
 	Commands      []eventstore.Command
 }
 
+type CommandVerifier interface {
+	Validate(eventstore.Command) bool
+}
+
 //AssertValidation checks if the validation works as inteded
 func AssertValidation(t *testing.T, validation preparation.Validation, filter preparation.FilterToQueryReducer, want Want) {
 	t.Helper()
 
 	creates, err := validation()
 	if !errors.Is(err, want.ValidationErr) {
-		t.Errorf("wrong validation err = %v, want %v", err, want.ValidationErr)
+		t.Errorf("wrong validation err = (%[1]T): %[1]v, want (%[2]T): %[2]v", err, want.ValidationErr)
 		return
 	}
 	if err != nil {
@@ -32,7 +36,7 @@ func AssertValidation(t *testing.T, validation preparation.Validation, filter pr
 	}
 	cmds, err := creates(context.Background(), filter)
 	if !errors.Is(err, want.CreateErr) {
-		t.Errorf("wrong create err = %v, want %v", err, want.CreateErr)
+		t.Errorf("wrong create err = (%[1]T): %[1]v, want (%[2]T): %[2]v", err, want.CreateErr)
 		return
 	}
 	if err != nil {
@@ -45,6 +49,12 @@ func AssertValidation(t *testing.T, validation preparation.Validation, filter pr
 	}
 
 	for i, cmd := range want.Commands {
+		if v, ok := cmd.(CommandVerifier); ok {
+			if verified := v.Validate(cmds[i]); !verified {
+				t.Errorf("verification failed on command: = %v, want %v", cmds[i], cmd)
+			}
+			continue
+		}
 		if !reflect.DeepEqual(cmd, cmds[i]) {
 			t.Errorf("unexpected command: = %v, want %v", cmds[i], cmd)
 		}

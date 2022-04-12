@@ -58,7 +58,7 @@ type Event struct {
 	ResourceOwner sql.NullString
 	//InstanceID is the instance where this event belongs to
 	// use the ID of the instance
-	InstanceID sql.NullString
+	InstanceID string
 }
 
 //EventType is the description of the change

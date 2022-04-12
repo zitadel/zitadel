@@ -3,7 +3,6 @@ package setup
 import (
 	"context"
 	"database/sql"
-	_ "embed"
 )
 
 const (

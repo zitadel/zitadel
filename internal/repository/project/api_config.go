@@ -58,6 +58,22 @@ func NewAPIConfigAddedEvent(
 	}
 }
 
+func (e *APIConfigAddedEvent) Validate(cmd eventstore.Command) bool {
+	c, ok := cmd.(*APIConfigAddedEvent)
+	if !ok {
+		return false
+	}
+
+	if e.AppID != c.AppID {
+		return false
+	}
+	if e.AuthMethodType != c.AuthMethodType {
+		return false
+	}
+
+	return true
+}
+
 func APIConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &APIConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

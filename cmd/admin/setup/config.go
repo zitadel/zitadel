@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/hook"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/database"
 )
 
@@ -21,6 +22,7 @@ type Config struct {
 	ExternalDomain string
 	ExternalSecure bool
 	Log            *logging.Config
+	EncryptionKeys *encryptionKeyConfig
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -38,6 +40,10 @@ type Steps struct {
 	s1ProjectionTable *ProjectionTable
 	s2AssetsTable     *AssetTable
 	S3DefaultInstance *DefaultInstance
+}
+
+type encryptionKeyConfig struct {
+	User *crypto.KeyConfig
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
