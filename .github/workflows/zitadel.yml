@@ -1,6 +1,7 @@
 name: ZITADEL Release
 
 on:
+  pull_request:
   push:
     tags-ignore:
       - "*"
