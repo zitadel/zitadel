@@ -6,8 +6,7 @@ import (
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -22,7 +21,7 @@ func Test_customDomainPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PolicyDomainWriteModel
+		want    *PolicyDomainWriteModel
 		wantErr bool
 	}{
 		{
@@ -58,7 +57,7 @@ func Test_customDomainPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &command.PolicyDomainWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
 					ResourceOwner: "ro",
@@ -91,7 +90,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PolicyDomainWriteModel
+		want    *PolicyDomainWriteModel
 		wantErr bool
 	}{
 		{
@@ -127,7 +126,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &command.PolicyDomainWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "INSTANCE",
 					ResourceOwner: "INSTANCE",
@@ -160,7 +159,7 @@ func Test_DomainPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PolicyDomainWriteModel
+		want    *PolicyDomainWriteModel
 		wantErr bool
 	}{
 		{
@@ -186,7 +185,7 @@ func Test_DomainPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &command.PolicyDomainWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
 					ResourceOwner: "ro",
@@ -230,7 +229,7 @@ func Test_DomainPolicy(t *testing.T) {
 					}).
 					Filter(),
 			},
-			want: &command.PolicyDomainWriteModel{
+			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "INSTANCE",
 					ResourceOwner: "INSTANCE",

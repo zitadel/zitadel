@@ -173,7 +173,7 @@ func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Comm
 		AggregateID:                   event.Aggregate().ID,
 		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
 		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
-		InstanceID:                    sql.NullString{String: instanceID, Valid: instanceID != ""},
+		InstanceID:                    instanceID,
 	}
 }
 

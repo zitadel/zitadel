@@ -22,7 +22,13 @@ const (
 	ProjectStateActive
 	ProjectStateInactive
 	ProjectStateRemoved
+
+	projectStateMax
 )
+
+func (s ProjectState) Valid() bool {
+	return s > ProjectStateUnspecified && s < projectStateMax
+}
 
 type PrivateLabelingSetting int32
 

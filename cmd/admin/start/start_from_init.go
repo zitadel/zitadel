@@ -21,16 +21,16 @@ Last ZITADEL starts.
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
+			masterKey, err := key.MasterKey(cmd)
+			logging.OnError(err).Panic("No master key provided")
+
 			initialise.InitAll(initialise.MustNewConfig(viper.GetViper()))
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
-			setup.Setup(setupConfig, setupSteps)
+			setup.Setup(setupConfig, setupSteps, masterKey)
 
 			startConfig := MustNewConfig(viper.GetViper())
-
-			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Fatal("unable to read masterkey")
 
 			err = startZitadel(startConfig, masterKey)
 			logging.OnError(err).Fatal("unable to start zitadel")

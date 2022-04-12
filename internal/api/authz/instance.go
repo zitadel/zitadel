@@ -12,6 +12,7 @@ type Instance interface {
 	InstanceID() string
 	ProjectID() string
 	ConsoleClientID() string
+	RequestedDomain() string
 }
 
 type InstanceVerifier interface {
@@ -19,7 +20,8 @@ type InstanceVerifier interface {
 }
 
 type instance struct {
-	ID string
+	ID     string
+	Domain string
 }
 
 func (i *instance) InstanceID() string {
@@ -32,6 +34,10 @@ func (i *instance) ProjectID() string {
 
 func (i *instance) ConsoleClientID() string {
 	return ""
+}
+
+func (i *instance) RequestedDomain() string {
+	return i.Domain
 }
 
 func GetInstance(ctx context.Context) Instance {
@@ -48,4 +54,14 @@ func WithInstance(ctx context.Context, instance Instance) context.Context {
 
 func WithInstanceID(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, instanceKey, &instance{ID: id})
+}
+
+func WithRequestedDomain(ctx context.Context, domain string) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+
+	i.Domain = domain
+	return context.WithValue(ctx, instanceKey, i)
 }

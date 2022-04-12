@@ -6,8 +6,7 @@ import (
 	"testing"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -22,7 +21,7 @@ func Test_customPasswordComplexityPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PasswordComplexityPolicyWriteModel
+		want    *PasswordComplexityPolicyWriteModel
 		wantErr bool
 	}{
 		{
@@ -62,7 +61,7 @@ func Test_customPasswordComplexityPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
 					ResourceOwner: "ro",
@@ -99,7 +98,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PasswordComplexityPolicyWriteModel
+		want    *PasswordComplexityPolicyWriteModel
 		wantErr bool
 	}{
 		{
@@ -139,7 +138,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "INSTANCE",
 					ResourceOwner: "INSTANCE",
@@ -176,7 +175,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *command.PasswordComplexityPolicyWriteModel
+		want    *PasswordComplexityPolicyWriteModel
 		wantErr bool
 	}{
 		{
@@ -206,7 +205,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
 					ResourceOwner: "ro",
@@ -258,7 +257,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 					}).
 					Filter(),
 			},
-			want: &command.PasswordComplexityPolicyWriteModel{
+			want: &PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "INSTANCE",
 					ResourceOwner: "INSTANCE",

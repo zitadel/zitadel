@@ -2,24 +2,84 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/id"
+	project_repo "github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
+type addAPIApp struct {
+	AddApp
+	AuthMethodType domain.APIAuthMethodType
+
+	ClientID          string
+	ClientSecret      *crypto.CryptoValue
+	ClientSecretPlain string
+}
+
+func AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if app.ID == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument")
+		}
+		if app.Name = strings.TrimSpace(app.Name); app.Name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			project, err := projectWriteModel(ctx, filter, app.Aggregate.ID, app.Aggregate.ResourceOwner)
+			if err != nil || !project.State.Valid() {
+				return nil, errors.ThrowNotFound(err, "PROJE-Sf2gb", "Errors.Project.NotFound")
+			}
+
+			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator, project.Name)
+			if err != nil {
+				return nil, errors.ThrowInternal(err, "V2-f0pgP", "Errors.Internal")
+			}
+
+			//requires client secret
+			// TODO(release blocking):we have to return the secret
+			if app.AuthMethodType == domain.APIAuthMethodTypeBasic {
+				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			return []eventstore.Command{
+				project_repo.NewApplicationAddedEvent(
+					ctx,
+					&app.Aggregate.Aggregate,
+					app.ID,
+					app.Name,
+				),
+				project_repo.NewAPIConfigAddedEvent(
+					ctx,
+					&app.Aggregate.Aggregate,
+					app.ID,
+					app.ClientID,
+					app.ClientSecret,
+					app.AuthMethodType,
+				),
+			}, nil
+		}, nil
+	}
+}
+
 func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
 	if application == nil || application.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
 	}
 	project, err := c.getProjectByID(ctx, application.AggregateID, resourceOwner)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
+		return nil, errors.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
 	}
 	addedApplication := NewAPIApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
@@ -43,7 +103,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.AP
 
 func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (events []eventstore.Command, stringPW string, err error) {
 	if !apiAppApp.IsValid() {
-		return nil, "", caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
+		return nil, "", errors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
 	apiAppApp.AppID, err = c.idGenerator.Next()
 	if err != nil {
@@ -51,7 +111,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 	}
 
 	events = []eventstore.Command{
-		project.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName),
+		project_repo.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName),
 	}
 
 	var stringPw string
@@ -63,7 +123,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 	if err != nil {
 		return nil, "", err
 	}
-	events = append(events, project.NewAPIConfigAddedEvent(ctx,
+	events = append(events, project_repo.NewAPIConfigAddedEvent(ctx,
 		projectAgg,
 		apiAppApp.AppID,
 		apiAppApp.ClientID,
@@ -75,7 +135,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 
 func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
 	if apiApp.AppID == "" || apiApp.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
 	}
 
 	existingAPI, err := c.getAPIAppWriteModel(ctx, apiApp.AggregateID, apiApp.AppID, resourceOwner)
@@ -83,10 +143,10 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 		return nil, err
 	}
 	if existingAPI.State == domain.AppStateUnspecified || existingAPI.State == domain.AppStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2n8uU", "Errors.Project.App.NotExisting")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-2n8uU", "Errors.Project.App.NotExisting")
 	}
 	if !existingAPI.IsAPI() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gnwt3", "Errors.Project.App.IsNotAPI")
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Gnwt3", "Errors.Project.App.IsNotAPI")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 	changedEvent, hasChanged, err := existingAPI.NewChangedEvent(
@@ -98,7 +158,7 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
@@ -115,7 +175,7 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 
 func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string, appSecretGenerator crypto.Generator) (*domain.APIApp, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
 
 	existingAPI, err := c.getAPIAppWriteModel(ctx, projectID, appID, resourceOwner)
@@ -123,10 +183,10 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 		return nil, err
 	}
 	if existingAPI.State == domain.AppStateUnspecified || existingAPI.State == domain.AppStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2g66f", "Errors.Project.App.NotExisting")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-2g66f", "Errors.Project.App.NotExisting")
 	}
 	if !existingAPI.IsAPI() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
 	cryptoSecret, stringPW, err := domain.NewClientSecret(appSecretGenerator)
 	if err != nil {
@@ -135,7 +195,7 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
+	pushedEvents, err := c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
 	if err != nil {
 		return nil, err
 	}
@@ -158,13 +218,13 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 		return err
 	}
 	if !app.State.Exists() {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NoExisting")
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NoExisting")
 	}
 	if !app.IsAPI() {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI")
+		return errors.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI")
 	}
 	if app.ClientSecret == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-D3t5g", "Errors.Project.App.APIConfigInvalid")
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-D3t5g", "Errors.Project.App.APIConfigInvalid")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
@@ -172,12 +232,12 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = c.eventstore.Push(ctx, project.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
+		_, err = c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
 		return err
 	}
-	_, err = c.eventstore.Push(ctx, project.NewAPIConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
+	_, err = c.eventstore.Push(ctx, project_repo.NewAPIConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
 	logging.Log("COMMAND-g3f12").OnError(err).Error("could not push event APIClientSecretCheckFailed")
-	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
+	return errors.ThrowInvalidArgument(nil, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
 }
 
 func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*APIApplicationWriteModel, error) {

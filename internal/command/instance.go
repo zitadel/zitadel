@@ -6,8 +6,10 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/ui/console"
-	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/command/preparation"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -52,6 +54,16 @@ type InstanceSetup struct {
 		LockoutPolicy            bool
 		ActionsAllowed           domain.ActionsAllowed
 		MaxActions               int
+	}
+	SecretGenerators struct {
+		PasswordSaltCost         uint
+		ClientSecret             *crypto.GeneratorConfig
+		InitializeUserCode       *crypto.GeneratorConfig
+		EmailVerificationCode    *crypto.GeneratorConfig
+		PhoneVerificationCode    *crypto.GeneratorConfig
+		PasswordVerificationCode *crypto.GeneratorConfig
+		PasswordlessInitCode     *crypto.GeneratorConfig
+		DomainVerification       *crypto.GeneratorConfig
 	}
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
@@ -110,15 +122,11 @@ type ZitadelConfig struct {
 	IsDevMode bool
 	BaseURL   string
 
-	projectID       string
-	mgmtID          string
-	mgmtClientID    string
-	adminID         string
-	adminClientID   string
-	authID          string
-	authClientID    string
-	consoleID       string
-	consoleClientID string
+	projectID    string
+	mgmtAppID    string
+	adminAppID   string
+	authAppID    string
+	consoleAppID string
 }
 
 func (s *InstanceSetup) generateIDs() (err error) {
@@ -127,50 +135,35 @@ func (s *InstanceSetup) generateIDs() (err error) {
 		return err
 	}
 
-	s.Zitadel.mgmtID, err = id.SonyFlakeGenerator.Next()
-	if err != nil {
-		return err
-	}
-	s.Zitadel.mgmtClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
+	s.Zitadel.mgmtAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.adminID, err = id.SonyFlakeGenerator.Next()
-	if err != nil {
-		return err
-	}
-	s.Zitadel.adminClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
+	s.Zitadel.adminAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.authID, err = id.SonyFlakeGenerator.Next()
-	if err != nil {
-		return err
-	}
-	s.Zitadel.authClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
+	s.Zitadel.authAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.consoleID, err = id.SonyFlakeGenerator.Next()
-	if err != nil {
-		return err
-	}
-	s.Zitadel.consoleClientID, err = domain.NewClientID(id.SonyFlakeGenerator, zitadelProjectName)
+	s.Zitadel.consoleAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
+func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
 	instanceID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
+	requestedDomain := authz.GetInstance(ctx).RequestedDomain()
+	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), requestedDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -219,6 +212,14 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			setup.Features.ActionsAllowed,
 			setup.Features.MaxActions,
 		),
+		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
+		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
+		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
+		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
+		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
+		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
+		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
+
 		AddPasswordComplexityPolicy(
 			instanceAgg,
 			setup.PasswordComplexityPolicy.MinLength,
@@ -280,72 +281,82 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
 	}
 
-	validations = append(validations,
-		AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
-		AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg),
-		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
-		AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
+	console := &addOIDCApp{
+		AddApp: AddApp{
+			Aggregate: *projectAgg,
+			ID:        setup.Zitadel.consoleAppID,
+			Name:      consoleAppName,
+		},
+		Version:                  domain.OIDCVersionV1,
+		RedirectUris:             []string{setup.Zitadel.BaseURL + consoleRedirectPath},
+		ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+		GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+		ApplicationType:          domain.OIDCApplicationTypeUserAgent,
+		AuthMethodType:           domain.OIDCAuthMethodTypeNone,
+		PostLogoutRedirectUris:   []string{setup.Zitadel.BaseURL + consolePostLogoutPath},
+		DevMode:                  setup.Zitadel.IsDevMode,
+		AccessTokenType:          domain.OIDCTokenTypeBearer,
+		AccessTokenRoleAssertion: false,
+		IDTokenRoleAssertion:     false,
+		IDTokenUserinfoAssertion: false,
+		ClockSkew:                0,
+	}
 
-		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
+	validations = append(validations,
+		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
+		addHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.phoneAlg, c.emailAlg, c.initCodeAlg),
+		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
+		c.AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
+
+		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
-		AddAPIApp(
-			*projectAgg,
-			setup.Zitadel.mgmtID,
-			mgmtAppName,
-			setup.Zitadel.mgmtClientID,
+		AddAPIAppCommand(
+			&addAPIApp{
+				AddApp: AddApp{
+					Aggregate: *projectAgg,
+					ID:        setup.Zitadel.mgmtAppID,
+					Name:      mgmtAppName,
+				},
+				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+			},
 			nil,
-			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		AddAPIApp(
-			*projectAgg,
-			setup.Zitadel.adminID,
-			adminAppName,
-			setup.Zitadel.adminClientID,
+		AddAPIAppCommand(
+			&addAPIApp{
+				AddApp: AddApp{
+					Aggregate: *projectAgg,
+					ID:        setup.Zitadel.adminAppID,
+					Name:      adminAppName,
+				},
+				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+			},
 			nil,
-			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		AddAPIApp(
-			*projectAgg,
-			setup.Zitadel.authID,
-			authAppName,
-			setup.Zitadel.authClientID,
+		AddAPIAppCommand(
+			&addAPIApp{
+				AddApp: AddApp{
+					Aggregate: *projectAgg,
+					ID:        setup.Zitadel.authAppID,
+					Name:      authAppName,
+				},
+				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+			},
 			nil,
-			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		AddOIDCApp(
-			*projectAgg,
-			domain.OIDCVersionV1,
-			setup.Zitadel.consoleID,
-			consoleAppName,
-			setup.Zitadel.consoleClientID,
-			nil,
-			[]string{setup.Zitadel.BaseURL + consoleRedirectPath},
-			[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-			[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-			domain.OIDCApplicationTypeUserAgent,
-			domain.OIDCAuthMethodTypeNone,
-			[]string{setup.Zitadel.BaseURL + consolePostLogoutPath},
-			setup.Zitadel.IsDevMode,
-			domain.OIDCTokenTypeBearer,
-			false,
-			false,
-			false,
-			0,
-			nil,
-		),
-		SetIAMConsoleID(instanceAgg, setup.Zitadel.consoleClientID),
+		AddOIDCAppCommand(console, nil),
+		SetIAMConsoleID(instanceAgg, &console.ClientID),
 	)
 
-	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter, validations...)
+	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, validations...)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := command.es.Push(ctx, cmds...)
+	events, err := c.es.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +379,7 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 }
 
 //SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
-func SetIAMConsoleID(a *instance.Aggregate, clientID string) preparation.Validation {
+func SetIAMConsoleID(a *instance.Aggregate, clientID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
@@ -376,4 +387,26 @@ func SetIAMConsoleID(a *instance.Aggregate, clientID string) preparation.Validat
 			}, nil
 		}, nil
 	}
+}
+
+func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, orgID string) (eventstore.Command, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	if iamWriteModel.GlobalOrgID != "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "IAM-HGG24", "Errors.IAM.GlobalOrgAlreadySet")
+	}
+	return instance.NewGlobalOrgSetEventEvent(ctx, iamAgg, orgID), nil
+}
+
+func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, projectID string) (eventstore.Command, error) {
+	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	if iamWriteModel.ProjectID != "" {
+		return nil, errors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
+	}
+	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
 }
