@@ -42,7 +42,7 @@ type AddHuman struct {
 	PreferredLang language.Tag
 	// Gender is required
 	Gender domain.Gender
-	//TODO: can it also be verified?
+	//Phone represents an international phone number
 	Phone Phone
 	//Password is optional
 	Password string

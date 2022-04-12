@@ -70,8 +70,8 @@ const (
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
 		" IFNULL((resource_owner), $8::VARCHAR) AS resource_owner," +
-		" IFNULL($9::VARCHAR, 'system') AS instance_id," +
-		" NEXTVAL(CONCAT('eventstore.', IF($9 IS NULL, 'system', CONCAT('i_', $9)), '_seq'))," +
+		" $9::VARCHAR AS instance_id," +
+		" NEXTVAL(CONCAT('eventstore.', IF($9 <> '', CONCAT('i_', $9), 'system'), '_seq'))," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +

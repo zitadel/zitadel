@@ -86,7 +86,7 @@ func commandsToRepository(instanceID string, cmds []Command) (events []*reposito
 			AggregateID:   cmd.Aggregate().ID,
 			AggregateType: repository.AggregateType(cmd.Aggregate().Type),
 			ResourceOwner: sql.NullString{String: cmd.Aggregate().ResourceOwner, Valid: cmd.Aggregate().ResourceOwner != ""},
-			InstanceID:    sql.NullString{String: instanceID, Valid: instanceID != ""},
+			InstanceID:    instanceID,
 			EditorService: cmd.EditorService(),
 			EditorUser:    cmd.EditorUser(),
 			Type:          repository.EventType(cmd.Type()),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -35,7 +36,7 @@ func (c *commandNew) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectD
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
 	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter,
-		AddOrgCommand(orgAgg, o.Name, c.iamDomain),
+		AddOrgCommand(ctx, orgAgg, o.Name),
 		addHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.phoneAlg, c.emailAlg, c.initCodeAlg),
 		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 	)
@@ -56,12 +57,12 @@ func (c *commandNew) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectD
 
 //AddOrgCommand defines the commands to create a new org,
 // this includes the verified default domain
-func AddOrgCommand(a *org.Aggregate, name, iamDomain string) preparation.Validation {
+func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
 		}
-		defaultDomain := domain.NewIAMDomainName(name, iamDomain)
+		defaultDomain := domain.NewIAMDomainName(name, authz.GetInstance(ctx).RequestedDomain())
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
 				org.NewOrgAddedEvent(ctx, &a.Aggregate, name),

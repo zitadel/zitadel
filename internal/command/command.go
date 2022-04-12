@@ -55,7 +55,6 @@ type Commands struct {
 type commandNew struct {
 	es              *eventstore.Eventstore
 	userPasswordAlg crypto.HashAlgorithm
-	iamDomain       string
 	phoneAlg        crypto.EncryptionAlgorithm
 	emailAlg        crypto.EncryptionAlgorithm
 	initCodeAlg     crypto.EncryptionAlgorithm
@@ -95,7 +94,7 @@ func StartCommands(es *eventstore.Eventstore,
 		smsCrypto:             smsEncryption,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
-		v2:                    NewCommandV2(es, defaults.Domain, defaults, userEncryption, authZConfig.RolePermissionMappings),
+		v2:                    NewCommandV2(es, defaults, userEncryption, authZConfig.RolePermissionMappings),
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)
@@ -131,7 +130,6 @@ func StartCommands(es *eventstore.Eventstore,
 
 func NewCommandV2(
 	es *eventstore.Eventstore,
-	iamDomain string,
 	defaults sd.SystemDefaults,
 	userAlg crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
@@ -146,7 +144,6 @@ func NewCommandV2(
 
 	return &commandNew{
 		es:              es,
-		iamDomain:       iamDomain,
 		userPasswordAlg: crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost),
 		initCodeAlg:     userAlg,
 		phoneAlg:        userAlg,

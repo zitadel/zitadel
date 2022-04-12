@@ -122,11 +122,11 @@ type ZitadelConfig struct {
 	IsDevMode bool
 	BaseURL   string
 
-	projectID string
-	mgmtID    string
-	adminID   string
-	authID    string
-	consoleID string
+	projectID    string
+	mgmtAppID    string
+	adminAppID   string
+	authAppID    string
+	consoleAppID string
 }
 
 func (s *InstanceSetup) generateIDs() (err error) {
@@ -135,22 +135,22 @@ func (s *InstanceSetup) generateIDs() (err error) {
 		return err
 	}
 
-	s.Zitadel.mgmtID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.mgmtAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.adminID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.adminAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.authID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.authAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.consoleID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.consoleAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -162,11 +162,14 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	if err != nil {
 		return nil, err
 	}
+
 	if err = c.es.NewInstance(ctx, instanceID); err != nil {
 		return nil, err
 	}
 
 	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
+	requestedDomain := authz.GetInstance(ctx).RequestedDomain()
+	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), requestedDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -287,7 +290,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	console := &addOIDCApp{
 		AddApp: AddApp{
 			Aggregate: *projectAgg,
-			ID:        setup.Zitadel.consoleID,
+			ID:        setup.Zitadel.consoleAppID,
 			Name:      consoleAppName,
 		},
 		Version:                  domain.OIDCVersionV1,
@@ -306,7 +309,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	}
 
 	validations = append(validations,
-		AddOrgCommand(orgAgg, setup.Org.Name, c.iamDomain),
+		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		addHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.phoneAlg, c.emailAlg, c.initCodeAlg),
 		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
@@ -318,7 +321,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
-					ID:        setup.Zitadel.mgmtID,
+					ID:        setup.Zitadel.mgmtAppID,
 					Name:      mgmtAppName,
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
@@ -330,7 +333,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
-					ID:        setup.Zitadel.adminID,
+					ID:        setup.Zitadel.adminAppID,
 					Name:      adminAppName,
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
@@ -342,7 +345,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
-					ID:        setup.Zitadel.authID,
+					ID:        setup.Zitadel.authAppID,
 					Name:      authAppName,
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,

@@ -10,7 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -63,7 +62,7 @@ func TestAddOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, AddOrgCommand(tt.args.a, tt.args.name, "localhost"), nil, tt.want)
+			AssertValidation(t, AddOrgCommand(authz.WithRequestedDomain(context.Background(), "localhost"), tt.args.a, tt.args.name), nil, tt.want)
 		})
 	}
 }
@@ -105,7 +104,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -149,7 +148,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -175,7 +174,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 						),
 					),
 					expectFilterOrgMemberNotFound(),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "id", "internal"),
+					expectPushFailed(errors.ThrowAlreadyExists(nil, "id", "internal"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgAddedEvent(
 								context.Background(),
@@ -218,7 +217,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: errors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -244,7 +243,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 						),
 					),
 					expectFilterOrgMemberNotFound(),
-					expectPushFailed(caos_errs.ThrowInternal(nil, "id", "internal"),
+					expectPushFailed(errors.ThrowInternal(nil, "id", "internal"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgAddedEvent(
 								context.Background(),
@@ -287,7 +286,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: errors.IsInternal,
 			},
 		},
 		{
@@ -422,7 +421,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -439,7 +438,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				name:  "org",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -457,7 +456,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 					),
 					expectFilter(),
 					expectPushFailed(
-						caos_errs.ThrowInternal(nil, "id", "message"),
+						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
@@ -473,7 +472,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				name:  "neworg",
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: errors.IsInternal,
 			},
 		},
 		{
@@ -644,7 +643,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -670,7 +669,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -686,7 +685,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 						),
 					),
 					expectPushFailed(
-						caos_errs.ThrowInternal(nil, "id", "message"),
+						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgDeactivatedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate)),
@@ -699,7 +698,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: errors.IsInternal,
 			},
 		},
 		{
@@ -779,7 +778,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -801,7 +800,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -822,7 +821,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 						),
 					),
 					expectPushFailed(
-						caos_errs.ThrowInternal(nil, "id", "message"),
+						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgReactivatedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
@@ -836,7 +835,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: errors.IsInternal,
 			},
 		},
 		{

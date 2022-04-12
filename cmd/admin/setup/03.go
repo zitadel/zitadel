@@ -20,7 +20,7 @@ type DefaultInstance struct {
 	masterKey         string
 	db                *sql.DB
 	es                *eventstore.Eventstore
-	iamDomain         string
+	domain            string
 	defaults          systemdefaults.SystemDefaults
 	zitadelRoles      []authz.RoleMapping
 }
@@ -39,8 +39,9 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		return err
 	}
 
-	cmd := command.NewCommandV2(mig.es, mig.iamDomain, mig.defaults, userAlg, mig.zitadelRoles)
+	cmd := command.NewCommandV2(mig.es, mig.defaults, userAlg, mig.zitadelRoles)
 
+	ctx = authz.WithRequestedDomain(ctx, mig.domain)
 	_, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup)
 	return err
 }
