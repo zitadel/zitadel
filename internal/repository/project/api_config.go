@@ -67,8 +67,6 @@ func (e *APIConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.AppID != c.AppID {
 		return false
 	}
-	//TODO: should we check the client secret because they are generated?
-	//TODO: should we check the client id because they are generated?
 	if e.AuthMethodType != c.AuthMethodType {
 		return false
 	}

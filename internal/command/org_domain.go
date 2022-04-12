@@ -61,7 +61,7 @@ func SetPrimaryOrgDomain(a *org.Aggregate, domain string) preparation.Validation
 				return nil, errors.ThrowPreconditionFailed(nil, "COMMA-FfoZO", "Errors.Org.DomainAlreadyPrimary")
 			}
 			if !existing.Verified {
-				return nil, errors.ThrowPreconditionFailed(nil, "COMMA-FfoZO", "Errors.Org.DomainNotVerified")
+				return nil, errors.ThrowPreconditionFailed(nil, "COMMA-yKA80", "Errors.Org.DomainNotVerified")
 			}
 			return []eventstore.Command{org.NewDomainPrimarySetEvent(ctx, &a.Aggregate, domain)}, nil
 		}, nil

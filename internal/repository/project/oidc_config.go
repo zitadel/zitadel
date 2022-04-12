@@ -179,8 +179,6 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 			return false
 		}
 	}
-	//TODO: should we check the client secret because they are generated?
-	//TODO: should we check the client id because they are generated?
 
 	return true
 }
