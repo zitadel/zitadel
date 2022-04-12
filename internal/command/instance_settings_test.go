@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -58,7 +59,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -95,25 +96,27 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instance.NewAggregate().Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								4,
-								time.Hour*1,
-								true,
-								true,
-								true,
-								true,
-							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewSecretGeneratorAddedEvent(
+									context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									domain.SecretGeneratorTypeInitCode,
+									4,
+									time.Hour*1,
+									true,
+									true,
+									true,
+									true,
+								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(instance.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
 					),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				generator: &crypto.GeneratorConfig{
 					Length:              4,
 					Expiry:              1 * time.Hour,
@@ -126,7 +129,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -158,6 +161,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 		ctx           context.Context
 		generator     *crypto.GeneratorConfig
 		generatorType domain.SecretGeneratorType
+		instanceID    string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -210,7 +214,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -222,7 +226,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewSecretGeneratorRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode),
 						),
 					),
@@ -245,7 +249,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -283,7 +287,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -324,7 +328,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -355,6 +359,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		generatorType domain.SecretGeneratorType
+		instanceID    string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -406,7 +411,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -418,7 +423,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewSecretGeneratorRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode),
 						),
 					),
@@ -441,7 +446,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								domain.SecretGeneratorTypeInitCode,
 								4,
 								time.Hour*1,
@@ -456,7 +461,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewSecretGeneratorRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									domain.SecretGeneratorTypeInitCode),
 							),
 						},
@@ -470,7 +475,7 @@ func TestCommandSide_RemoveSecretGenerator(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -504,7 +509,7 @@ func newSecretGeneratorChangedEvent(ctx context.Context, generatorType domain.Se
 		instance.ChangeSecretGeneratorIncludeSymbols(symbols),
 	}
 	event, _ := instance.NewSecretGeneratorChangeEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		generatorType,
 		changes,
 	)

@@ -4,20 +4,76 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/caos/zitadel/internal/eventstore"
-
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
+
+func (c *commandNew) AddInstanceMember(a *instance.Aggregate, userID string, roles ...string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if userID == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument")
+		}
+		if len(domain.CheckForInvalidRoles(roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Errors.IAM.MemberInvalid")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
+					return nil, errors.ThrowNotFound(err, "INSTA-GSXOn", "Errors.User.NotFound")
+				}
+				if isMember, err := IsInstanceMember(ctx, filter, a.ID, userID); err != nil || isMember {
+					return nil, errors.ThrowAlreadyExists(err, "INSTA-pFDwe", "Errors.Instance.Member.AlreadyExists")
+				}
+				return []eventstore.Command{instance.NewMemberAddedEvent(ctx, &a.Aggregate, userID, roles...)}, nil
+			},
+			nil
+	}
+}
+
+func IsInstanceMember(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, userID string) (isMember bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		OrderAsc().
+		AddQuery().
+		AggregateIDs(instanceID).
+		AggregateTypes(instance.AggregateType).
+		EventTypes(
+			instance.MemberAddedEventType,
+			instance.MemberRemovedEventType,
+			instance.MemberCascadeRemovedEventType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.MemberAddedEvent:
+			if e.UserID == userID {
+				isMember = true
+			}
+		case *instance.MemberRemovedEvent:
+			if e.UserID == userID {
+				isMember = false
+			}
+		case *instance.MemberCascadeRemovedEvent:
+			if e.UserID == userID {
+				isMember = false
+			}
+		}
+	}
+
+	return isMember, nil
+}
 
 func (c *Commands) AddInstanceMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	if member.UserID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-Mf83b", "Errors.IAM.MemberInvalid")
 	}
-	addedMember := NewInstanceMemberWriteModel(member.UserID)
+	addedMember := NewInstanceMemberWriteModel(ctx, member.UserID)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
 	err := c.checkUserExists(ctx, addedMember.UserID, "")
 	if err != nil {
@@ -128,7 +184,7 @@ func (c *Commands) instanceMemberWriteModelByID(ctx context.Context, userID stri
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceMemberWriteModel(userID)
+	writeModel := NewInstanceMemberWriteModel(ctx, userID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

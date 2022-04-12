@@ -1,10 +1,12 @@
 package model
 
 import (
+	"testing"
+
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"testing"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 func TestProjectAppendEvent(t *testing.T) {
@@ -20,7 +22,7 @@ func TestProjectAppendEvent(t *testing.T) {
 		{
 			name: "append added project event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectData(&es_model.Project{Name: "ProjectName"})},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType), ResourceOwner: "GrantedOrgID", Data: mockProjectData(&es_model.Project{Name: "ProjectName"})},
 				project: &ProjectView{},
 			},
 			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},
@@ -28,7 +30,7 @@ func TestProjectAppendEvent(t *testing.T) {
 		{
 			name: "append change project event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectChanged, ResourceOwner: "GrantedOrgID", Data: mockProjectData(&es_model.Project{Name: "ProjectNameChanged"})},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectChangedType), ResourceOwner: "GrantedOrgID", Data: mockProjectData(&es_model.Project{Name: "ProjectNameChanged"})},
 				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},
 			},
 			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", Name: "ProjectNameChanged", State: int32(model.ProjectStateActive)},
@@ -36,7 +38,7 @@ func TestProjectAppendEvent(t *testing.T) {
 		{
 			name: "append project deactivate event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectDeactivated, ResourceOwner: "GrantedOrgID"},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectDeactivatedType), ResourceOwner: "GrantedOrgID"},
 				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},
 			},
 			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", Name: "ProjectName", State: int32(model.ProjectStateInactive)},
@@ -44,7 +46,7 @@ func TestProjectAppendEvent(t *testing.T) {
 		{
 			name: "append project reactivate event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectReactivated, ResourceOwner: "GrantedOrgID"},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectReactivatedType), ResourceOwner: "GrantedOrgID"},
 				project: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", Name: "ProjectName", State: int32(model.ProjectStateInactive)},
 			},
 			result: &ProjectView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", Name: "ProjectName", State: int32(model.ProjectStateActive)},

@@ -140,7 +140,7 @@ func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domai
 		return nil, errors.ThrowInternal(err, "TEXT-M0p4s", "Errors.TranslationFile.ReadError")
 	}
 	loginText.IsDefault = true
-	loginText.AggregateID = domain.IAMID
+	loginText.AggregateID = authz.GetInstance(ctx).InstanceID()
 	return loginText, nil
 }
 
@@ -149,7 +149,7 @@ func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang str
 	if err != nil {
 		return nil, err
 	}
-	return CustomTextsToLoginDomain(aggregateID, lang, texts), err
+	return CustomTextsToLoginDomain(authz.GetInstance(ctx).InstanceID(), aggregateID, lang, texts), err
 }
 
 func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
@@ -161,7 +161,7 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.Custo
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-m0Jf3", "Errors.TranslationFile.ReadError")
 	}
-	texts, err := q.CustomTextList(ctx, domain.IAMID, domain.LoginCustomText, lang)
+	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), domain.LoginCustomText, lang)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.Custo
 	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-m93Jf", "Errors.TranslationFile.MergeError")
 	}
-	loginText.AggregateID = domain.IAMID
+	loginText.AggregateID = authz.GetInstance(ctx).InstanceID()
 	loginText.IsDefault = true
 	return loginText, nil
 }
@@ -276,7 +276,7 @@ func CustomTextToDomain(text *CustomText) *domain.CustomText {
 	}
 }
 
-func CustomTextsToLoginDomain(aggregateID, lang string, texts *CustomTexts) *domain.CustomLoginText {
+func CustomTextsToLoginDomain(instanceID, aggregateID, lang string, texts *CustomTexts) *domain.CustomLoginText {
 	langTag := language.Make(lang)
 	result := &domain.CustomLoginText{
 		ObjectRoot: models.ObjectRoot{
@@ -285,7 +285,7 @@ func CustomTextsToLoginDomain(aggregateID, lang string, texts *CustomTexts) *dom
 		Language: langTag,
 	}
 	if len(texts.CustomTexts) == 0 {
-		result.AggregateID = domain.IAMID
+		result.AggregateID = instanceID
 		result.IsDefault = true
 	}
 	for _, text := range texts.CustomTexts {

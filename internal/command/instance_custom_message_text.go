@@ -10,8 +10,8 @@ import (
 	"golang.org/x/text/language"
 )
 
-func (c *Commands) SetDefaultMessageText(ctx context.Context, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate()
+func (c *Commands) SetDefaultMessageText(ctx context.Context, instanceID string, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(instanceID)
 	events, existingMessageText, err := c.setDefaultMessageText(ctx, &instanceAgg.Aggregate, messageText)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 }
 
 func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, messageType string, lang language.Tag) (*InstanceCustomMessageTextWriteModel, error) {
-	writeModel := NewInstanceCustomMessageTextWriteModel(messageType, lang)
+	writeModel := NewInstanceCustomMessageTextWriteModel(ctx, messageType, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

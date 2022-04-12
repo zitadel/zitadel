@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -15,12 +16,12 @@ type InstanceLoginPolicyWriteModel struct {
 	LoginPolicyWriteModel
 }
 
-func NewInstanceLoginPolicyWriteModel() *InstanceLoginPolicyWriteModel {
+func NewInstanceLoginPolicyWriteModel(ctx context.Context) *InstanceLoginPolicyWriteModel {
 	return &InstanceLoginPolicyWriteModel{
 		LoginPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 		},
 	}

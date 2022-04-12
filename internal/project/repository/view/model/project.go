@@ -8,9 +8,10 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 const (
@@ -33,46 +34,22 @@ type ProjectView struct {
 	Sequence               uint64                        `json:"-" gorm:"column:sequence"`
 }
 
-func ProjectToModel(project *ProjectView) *model.ProjectView {
-	return &model.ProjectView{
-		ProjectID:              project.ProjectID,
-		Name:                   project.Name,
-		ChangeDate:             project.ChangeDate,
-		CreationDate:           project.CreationDate,
-		State:                  model.ProjectState(project.State),
-		ResourceOwner:          project.ResourceOwner,
-		ProjectRoleAssertion:   project.ProjectRoleAssertion,
-		ProjectRoleCheck:       project.ProjectRoleCheck,
-		HasProjectCheck:        project.HasProjectCheck,
-		PrivateLabelingSetting: project.PrivateLabelingSetting,
-		Sequence:               project.Sequence,
-	}
-}
-
-func ProjectsToModel(projects []*ProjectView) []*model.ProjectView {
-	result := make([]*model.ProjectView, len(projects))
-	for i, p := range projects {
-		result[i] = ProjectToModel(p)
-	}
-	return result
-}
-
 func (p *ProjectView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.ProjectAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.ProjectAddedType:
 		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setData(event)
-	case es_model.ProjectChanged:
+	case project.ProjectChangedType:
 		err = p.setData(event)
-	case es_model.ProjectDeactivated:
+	case project.ProjectDeactivatedType:
 		p.State = int32(model.ProjectStateInactive)
-	case es_model.ProjectReactivated:
+	case project.ProjectReactivatedType:
 		p.State = int32(model.ProjectStateActive)
-	case es_model.ProjectRemoved:
+	case project.ProjectRemovedType:
 		p.State = int32(model.ProjectStateRemoved)
 	}
 	return err

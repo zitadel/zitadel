@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 )
 
@@ -39,8 +38,7 @@ func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := authz.GetInstance(r.Context()).InstanceID()
-	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID, instanceID)
+	err = l.authRepo.SelectUser(r.Context(), authSession.ID, data.UserID, userAgentID)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return

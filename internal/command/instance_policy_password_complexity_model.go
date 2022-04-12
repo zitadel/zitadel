@@ -3,9 +3,9 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -14,12 +14,12 @@ type InstancePasswordComplexityPolicyWriteModel struct {
 	PasswordComplexityPolicyWriteModel
 }
 
-func NewInstancePasswordComplexityPolicyWriteModel() *InstancePasswordComplexityPolicyWriteModel {
+func NewInstancePasswordComplexityPolicyWriteModel(ctx context.Context) *InstancePasswordComplexityPolicyWriteModel {
 	return &InstancePasswordComplexityPolicyWriteModel{
 		PasswordComplexityPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   authz.GetInstance(ctx).InstanceID(),
+				ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 			},
 		},
 	}

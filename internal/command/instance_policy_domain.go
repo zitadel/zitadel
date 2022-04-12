@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
-	addedPolicy := NewInstanceDomainPolicyWriteModel()
+	addedPolicy := NewInstanceDomainPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	event, err := c.addDefaultDomainPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -83,7 +83,7 @@ func (c *Commands) defaultDomainPolicyWriteModelByID(ctx context.Context) (polic
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceDomainPolicyWriteModel()
+	writeModel := NewInstanceDomainPolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

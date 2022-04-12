@@ -8,22 +8,22 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/log"
-	"github.com/caos/zitadel/internal/notification/channels/twilio"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/channels/fs"
+	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/smtp"
+	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/notification/types"
 	"github.com/caos/zitadel/internal/query"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
@@ -96,7 +96,7 @@ func (n *Notification) Subscription() *v1.Subscription {
 }
 
 func (_ *Notification) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{es_model.UserAggregate}
+	return []models.AggregateType{user_repo.AggregateType}
 }
 
 func (n *Notification) CurrentSequence() (uint64, error) {
@@ -116,22 +116,22 @@ func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {
-	switch event.Type {
-	case es_model.InitializedUserCodeAdded,
-		es_model.InitializedHumanCodeAdded:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserV1InitialCodeAddedType,
+		user_repo.HumanInitialCodeAddedType:
 		err = n.handleInitUserCode(event)
-	case es_model.UserEmailCodeAdded,
-		es_model.HumanEmailCodeAdded:
+	case user_repo.UserV1EmailCodeAddedType,
+		user_repo.HumanEmailCodeAddedType:
 		err = n.handleEmailVerificationCode(event)
-	case es_model.UserPhoneCodeAdded,
-		es_model.HumanPhoneCodeAdded:
+	case user_repo.UserV1PhoneCodeAddedType,
+		user_repo.HumanPhoneCodeAddedType:
 		err = n.handlePhoneVerificationCode(event)
-	case es_model.UserPasswordCodeAdded,
-		es_model.HumanPasswordCodeAdded:
+	case user_repo.UserV1PasswordCodeAddedType,
+		user_repo.HumanPasswordCodeAddedType:
 		err = n.handlePasswordCode(event)
-	case es_model.DomainClaimed:
+	case user_repo.UserDomainClaimedType:
 		err = n.handleDomainClaimed(event)
-	case models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
+	case user_repo.HumanPasswordlessInitCodeRequestedType:
 		err = n.handlePasswordlessRegistrationLink(event)
 	}
 	if err != nil {
@@ -145,13 +145,13 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err := initCode.SetData(event); err != nil {
 		return err
 	}
-	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, initCode.Expiry,
-		es_model.InitializedUserCodeAdded, es_model.InitializedUserCodeSent,
-		es_model.InitializedHumanCodeAdded, es_model.InitializedHumanCodeSent)
+	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(ctx, event, initCode.Expiry,
+		user_repo.UserV1InitialCodeAddedType, user_repo.UserV1InitialCodeSentType,
+		user_repo.HumanInitialCodeAddedType, user_repo.HumanInitialCodeSentType)
 	if err != nil || alreadyHandled {
 		return err
 	}
-	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -167,7 +167,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.InitCodeMessageType)
+	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.InitCodeMessageType)
 	if err != nil {
 		return err
 	}
@@ -184,13 +184,13 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err := pwCode.SetData(event); err != nil {
 		return err
 	}
-	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, pwCode.Expiry,
-		es_model.UserPasswordCodeAdded, es_model.UserPasswordCodeSent,
-		es_model.HumanPasswordCodeAdded, es_model.HumanPasswordCodeSent)
+	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(ctx, event, pwCode.Expiry,
+		user_repo.UserV1PasswordCodeAddedType, user_repo.UserV1PasswordCodeSentType,
+		user_repo.HumanPasswordCodeAddedType, user_repo.HumanPasswordCodeSentType)
 	if err != nil || alreadyHandled {
 		return err
 	}
-	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -206,7 +206,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.PasswordResetMessageType)
+	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.PasswordResetMessageType)
 	if err != nil {
 		return err
 	}
@@ -222,13 +222,13 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err := emailCode.SetData(event); err != nil {
 		return err
 	}
-	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, emailCode.Expiry,
-		es_model.UserEmailCodeAdded, es_model.UserEmailCodeSent,
-		es_model.HumanEmailCodeAdded, es_model.HumanEmailCodeSent)
+	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(ctx, event, emailCode.Expiry,
+		user_repo.UserV1EmailCodeAddedType, user_repo.UserV1EmailCodeSentType,
+		user_repo.HumanEmailCodeAddedType, user_repo.HumanEmailCodeSentType)
 	if err != nil || alreadyHandled {
 		return nil
 	}
-	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -244,7 +244,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.VerifyEmailMessageType)
+	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyEmailMessageType)
 	if err != nil {
 		return err
 	}
@@ -261,9 +261,10 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err := phoneCode.SetData(event); err != nil {
 		return err
 	}
-	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(event, phoneCode.Expiry,
-		es_model.UserPhoneCodeAdded, es_model.UserPhoneCodeSent,
-		es_model.HumanPhoneCodeAdded, es_model.HumanPhoneCodeSent)
+	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
+	alreadyHandled, err := n.checkIfCodeAlreadyHandledOrExpired(ctx, event, phoneCode.Expiry,
+		user_repo.UserV1PhoneCodeAddedType, user_repo.UserV1PhoneCodeSentType,
+		user_repo.HumanPhoneCodeAddedType, user_repo.HumanPhoneCodeSentType)
 	if err != nil || alreadyHandled {
 		return nil
 	}
@@ -271,19 +272,20 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.VerifyPhoneMessageType)
+	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyPhoneMessageType)
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(context.Background(), translator, user, phoneCode, n.systemDefaults, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto)
+	err = types.SendPhoneVerificationCode(ctx, translator, user, phoneCode, n.systemDefaults, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto)
 	if err != nil {
 		return err
 	}
-	return n.command.HumanPhoneVerificationCodeSent(getSetNotifyContextData(event.ResourceOwner), event.ResourceOwner, event.AggregateID)
+	return n.command.HumanPhoneVerificationCodeSent(ctx, event.ResourceOwner, event.AggregateID)
 }
 
 func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
-	alreadyHandled, err := n.checkIfAlreadyHandled(event.AggregateID, event.Sequence, es_model.DomainClaimed, es_model.DomainClaimedSent)
+	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
+	alreadyHandled, err := n.checkIfAlreadyHandled(ctx, event.AggregateID, event.Sequence, user_repo.UserDomainClaimedType, user_repo.UserDomainClaimedSentType)
 	if err != nil || alreadyHandled {
 		return nil
 	}
@@ -299,7 +301,6 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if user.LastEmail == "" {
 		return nil
 	}
-	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -310,7 +311,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.DomainClaimedMessageType)
+	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.DomainClaimedMessageType)
 	if err != nil {
 		return err
 	}
@@ -327,12 +328,13 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 	if err := json.Unmarshal(event.Data, addedEvent); err != nil {
 		return err
 	}
-	events, err := n.getUserEvents(event.AggregateID, event.Sequence)
+	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
+	events, err := n.getUserEvents(ctx, event.AggregateID, event.Sequence)
 	if err != nil {
 		return err
 	}
 	for _, e := range events {
-		if e.Type == models.EventType(user_repo.HumanPasswordlessInitCodeSentType) {
+		if eventstore.EventType(e.Type) == user_repo.HumanPasswordlessInitCodeSentType {
 			sentEvent := new(user_repo.HumanPasswordlessInitCodeSentEvent)
 			if err := json.Unmarshal(e.Data, sentEvent); err != nil {
 				return err
@@ -346,7 +348,6 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 	if err != nil {
 		return err
 	}
-	ctx := getSetNotifyContextData(event.ResourceOwner)
 	colors, err := n.getLabelPolicy(ctx)
 	if err != nil {
 		return err
@@ -357,7 +358,7 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 		return err
 	}
 
-	translator, err := n.getTranslatorWithOrgTexts(user.ResourceOwner, domain.PasswordlessRegistrationMessageType)
+	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.PasswordlessRegistrationMessageType)
 	if err != nil {
 		return err
 	}
@@ -369,21 +370,21 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 	return n.command.HumanPasswordlessInitCodeSent(ctx, event.AggregateID, event.ResourceOwner, addedEvent.ID)
 }
 
-func (n *Notification) checkIfCodeAlreadyHandledOrExpired(event *models.Event, expiry time.Duration, eventTypes ...models.EventType) (bool, error) {
+func (n *Notification) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, event *models.Event, expiry time.Duration, eventTypes ...eventstore.EventType) (bool, error) {
 	if event.CreationDate.Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
-	return n.checkIfAlreadyHandled(event.AggregateID, event.Sequence, eventTypes...)
+	return n.checkIfAlreadyHandled(ctx, event.AggregateID, event.Sequence, eventTypes...)
 }
 
-func (n *Notification) checkIfAlreadyHandled(userID string, sequence uint64, eventTypes ...models.EventType) (bool, error) {
-	events, err := n.getUserEvents(userID, sequence)
+func (n *Notification) checkIfAlreadyHandled(ctx context.Context, userID string, sequence uint64, eventTypes ...eventstore.EventType) (bool, error) {
+	events, err := n.getUserEvents(ctx, userID, sequence)
 	if err != nil {
 		return false, err
 	}
 	for _, event := range events {
 		for _, eventType := range eventTypes {
-			if event.Type == eventType {
+			if eventstore.EventType(event.Type) == eventType {
 				return true, nil
 			}
 		}
@@ -391,13 +392,13 @@ func (n *Notification) checkIfAlreadyHandled(userID string, sequence uint64, eve
 	return false, nil
 }
 
-func (n *Notification) getUserEvents(userID string, sequence uint64) ([]*models.Event, error) {
+func (n *Notification) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
 	query, err := view.UserByIDQuery(userID, sequence)
 	if err != nil {
 		return nil, err
 	}
 
-	return n.es.FilterEvents(context.Background(), query)
+	return n.es.FilterEvents(ctx, query)
 }
 
 func (n *Notification) OnError(event *models.Event, err error) error {
@@ -409,8 +410,9 @@ func (n *Notification) OnSuccess() error {
 	return spooler.HandleSuccess(n.view.UpdateNotificationSpoolerRunTimestamp)
 }
 
-func getSetNotifyContextData(orgID string) context.Context {
-	return authz.SetCtxData(context.Background(), authz.CtxData{UserID: NotifyUserID, OrgID: orgID})
+func getSetNotifyContextData(instanceID, orgID string) context.Context {
+	ctx := authz.WithInstanceID(context.Background(), instanceID)
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: NotifyUserID, OrgID: orgID})
 }
 
 // Read organization specific colors
@@ -425,7 +427,7 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate
 
 // Read iam smtp config
 func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, error) {
-	config, err := n.queries.SMTPConfigByAggregateID(ctx, domain.IAMID)
+	config, err := n.queries.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -446,7 +448,7 @@ func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, er
 
 // Read iam twilio config
 func (n *Notification) getTwilioConfig(ctx context.Context) (*twilio.TwilioConfig, error) {
-	config, err := n.queries.SMSProviderConfigByID(ctx, domain.IAMID)
+	config, err := n.queries.SMSProviderConfigByID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -466,7 +468,7 @@ func (n *Notification) getTwilioConfig(ctx context.Context) (*twilio.TwilioConfi
 
 // Read iam filesystem provider config
 func (n *Notification) getFileSystemProvider(ctx context.Context) (*fs.FSConfig, error) {
-	config, err := n.queries.NotificationProviderByIDAndType(ctx, domain.IAMID, domain.NotificationProviderTypeFile)
+	config, err := n.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile)
 	if err != nil {
 		return nil, err
 	}
@@ -477,7 +479,7 @@ func (n *Notification) getFileSystemProvider(ctx context.Context) (*fs.FSConfig,
 
 // Read iam log provider config
 func (n *Notification) getLogProvider(ctx context.Context) (*log.LogConfig, error) {
-	config, err := n.queries.NotificationProviderByIDAndType(ctx, domain.IAMID, domain.NotificationProviderTypeLog)
+	config, err := n.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog)
 	if err != nil {
 		return nil, err
 	}
@@ -486,14 +488,13 @@ func (n *Notification) getLogProvider(ctx context.Context) (*log.LogConfig, erro
 	}, nil
 }
 
-func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
-	ctx := context.Background()
+func (n *Notification) getTranslatorWithOrgTexts(ctx context.Context, orgID, textType string) (*i18n.Translator, error) {
 	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.queries.GetDefaultLanguage(ctx)})
 	if err != nil {
 		return nil, err
 	}
 
-	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, domain.IAMID, textType)
+	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), textType)
 	if err != nil {
 		return translator, nil
 	}

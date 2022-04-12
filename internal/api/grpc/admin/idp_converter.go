@@ -81,13 +81,13 @@ func updateJWTConfigToDomain(req *admin_pb.UpdateIDPJWTConfigRequest) *domain.JW
 	}
 }
 
-func listIDPsToModel(req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, error) {
+func listIDPsToModel(instanceID string, req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := idpQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	iamQuery, err := query.NewIDPResourceOwnerSearchQuery(domain.IAMID)
+	iamQuery, err := query.NewIDPResourceOwnerSearchQuery(instanceID)
 	if err != nil {
 		return nil, err
 	}

@@ -39,7 +39,7 @@ func LoadKey(id string, keyStorage KeyStorage) (string, error) {
 	return key.Value, nil
 }
 
-func LoadKeys(config *KeyConfig, keyStorage KeyStorage) (map[string]string, []string, error) {
+func LoadKeys(config *KeyConfig, keyStorage KeyStorage) (Keys, []string, error) {
 	if config == nil {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "CRYPT-dJK8s", "config must not be nil")
 	}
@@ -47,7 +47,7 @@ func LoadKeys(config *KeyConfig, keyStorage KeyStorage) (map[string]string, []st
 	if err != nil {
 		return nil, nil, err
 	}
-	keys := make(map[string]string)
+	keys := make(Keys)
 	ids := make([]string, 0, len(config.DecryptionKeyIDs)+1)
 	if config.EncryptionKeyID != "" {
 		key, ok := readKeys[config.EncryptionKeyID]

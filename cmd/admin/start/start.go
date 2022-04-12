@@ -13,12 +13,14 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/oidc/pkg/op"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
+	"github.com/caos/zitadel/cmd/admin/key"
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/assets"
@@ -59,7 +61,10 @@ Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := MustNewConfig(viper.GetViper())
-			masterKey, _ := cmd.Flags().GetString(flagMasterKey)
+			masterKey, err := key.MasterKey(cmd)
+			if err != nil {
+				return err
+			}
 
 			return startZitadel(config, masterKey)
 		},
@@ -88,12 +93,6 @@ func startZitadel(config *Config, masterKey string) error {
 		return err
 	}
 
-	var storage static.Storage
-	//TODO: enable when storage is implemented again
-	//if *assetsEnabled {
-	//storage, err = config.AssetStorage.Config.NewStorage()
-	//logging.Log("MAIN-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
-	//}
 	eventstoreClient, err := eventstore.Start(dbClient)
 	if err != nil {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
@@ -108,12 +107,17 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
+
+	storage, err := config.AssetStorage.NewStorage(dbClient)
+	if err != nil {
+		return fmt.Errorf("cannot start asset storage client: %w", err)
+	}
 	webAuthNConfig := webauthn.Config{
 		ID:          config.ExternalDomain,
 		Origin:      http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure),
 		DisplayName: "ZITADEL",
 	}
-	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, webAuthNConfig, keys.IDPConfig, keys.OTP, keys.SMTP, keys.SMS, keys.DomainVerification, keys.OIDC)
+	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, webAuthNConfig, keys.IDPConfig, keys.OTP, keys.SMTP, keys.SMS, keys.User, keys.DomainVerification, keys.OIDC)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
@@ -157,13 +161,13 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return err
 	}
 
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries))
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
+	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, config.ExternalDomain, id.SonyFlakeGenerator, config.ExternalSecure)
 	if err != nil {
 		return err
 	}
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
 
 	issuer := oidc.Issuer(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, keys.OIDC, keys.OIDCKey, eventstore, dbClient, keyChan, userAgentInterceptor, instanceInterceptor.Handler)
@@ -185,7 +189,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, baseURL, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix+"/", config.ExternalDomain, baseURL, op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

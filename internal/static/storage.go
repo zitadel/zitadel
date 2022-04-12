@@ -2,25 +2,36 @@ package static
 
 import (
 	"context"
+	"database/sql"
 	"io"
-	"net/url"
 	"time"
-
-	"github.com/caos/zitadel/internal/domain"
 )
 
+type CreateStorage func(client *sql.DB, rawConfig map[string]interface{}) (Storage, error)
+
 type Storage interface {
-	CreateBucket(ctx context.Context, name, location string) error
-	RemoveBucket(ctx context.Context, name string) error
-	ListBuckets(ctx context.Context) ([]*domain.BucketInfo, error)
-	PutObject(ctx context.Context, bucketName, objectName, contentType string, object io.Reader, objectSize int64, createBucketIfNotExisting bool) (*domain.AssetInfo, error)
-	GetObjectInfo(ctx context.Context, bucketName, objectName string) (*domain.AssetInfo, error)
-	GetObject(ctx context.Context, bucketName, objectName string) (io.Reader, func() (*domain.AssetInfo, error), error)
-	ListObjectInfos(ctx context.Context, bucketName, prefix string, recursive bool) ([]*domain.AssetInfo, error)
-	GetObjectPresignedURL(ctx context.Context, bucketName, objectName string, expiration time.Duration) (*url.URL, error)
-	RemoveObject(ctx context.Context, bucketName, objectName string) error
-	RemoveObjects(ctx context.Context, bucketName, path string, recursive bool) error
+	PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType ObjectType, object io.Reader, objectSize int64) (*Asset, error)
+	GetObject(ctx context.Context, instanceID, resourceOwner, name string) ([]byte, func() (*Asset, error), error)
+	GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*Asset, error)
+	RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error
+	RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType ObjectType) error
+	//TODO: add functionality to move asset location
 }
-type Config interface {
-	NewStorage() (Storage, error)
+
+type ObjectType int32
+
+const (
+	ObjectTypeUserAvatar = iota
+	ObjectTypeStyling
+)
+
+type Asset struct {
+	InstanceID    string
+	ResourceOwner string
+	Name          string
+	Hash          string
+	Size          int64
+	LastModified  time.Time
+	Location      string
+	ContentType   string
 }

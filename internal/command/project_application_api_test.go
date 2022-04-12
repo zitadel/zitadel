@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -15,6 +16,118 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestAddAPIConfig(t *testing.T) {
+	type args struct {
+		a      *project.Aggregate
+		appID  string
+		name   string
+		filter preparation.FilterToQueryReducer
+	}
+
+	ctx := context.Background()
+	agg := project.NewAggregate("test", "test")
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid appID",
+			args: args{
+				a:     agg,
+				appID: "",
+				name:  "name",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid name",
+			args: args{
+				a:     agg,
+				appID: "appID",
+				name:  "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "project not exists",
+			args: args{
+				a:     agg,
+				appID: "id",
+				name:  "name",
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return nil, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				CreateErr: errors.ThrowNotFound(nil, "PROJE-Sf2gb", "Errors.Project.NotFound"),
+			},
+		},
+		{
+			name: "correct without client secret",
+			args: args{
+				a:     agg,
+				appID: "appID",
+				name:  "name",
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							project.NewProjectAddedEvent(
+								ctx,
+								&agg.Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(
+						ctx,
+						&agg.Aggregate,
+						"appID",
+						"name",
+					),
+					project.NewAPIConfigAddedEvent(ctx, &agg.Aggregate,
+						"appID",
+						"",
+						nil,
+						domain.APIAuthMethodTypePrivateKeyJWT,
+					),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t,
+				AddAPIAppCommand(
+					&addAPIApp{
+						AddApp: AddApp{
+							Aggregate: *tt.args.a,
+							ID:        tt.args.appID,
+							Name:      tt.args.name,
+						},
+						AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+					},
+					nil,
+				), tt.args.filter, tt.want)
+		})
+	}
+}
 
 func TestCommandSide_AddAPIApplication(t *testing.T) {
 	type fields struct {
@@ -50,7 +163,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -73,7 +186,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -103,7 +216,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -295,7 +408,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -318,7 +431,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -341,7 +454,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -381,7 +494,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -504,7 +617,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -521,7 +634,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -539,7 +652,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{

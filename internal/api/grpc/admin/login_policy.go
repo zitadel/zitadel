@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/query"
 
@@ -36,7 +37,7 @@ func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginP
 }
 
 func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLoginPolicyIDPsRequest) (*admin_pb.ListLoginPolicyIDPsResponse, error) {
-	res, err := s.query.IDPLoginPolicyLinks(ctx, domain.IAMID, ListLoginPolicyIDPsRequestToQuery(req))
+	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetInstance(ctx).InstanceID(), ListLoginPolicyIDPsRequestToQuery(req))
 	if err != nil {
 		return nil, err
 	}

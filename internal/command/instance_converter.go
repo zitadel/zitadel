@@ -8,20 +8,11 @@ import (
 
 func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot {
 	return models.ObjectRoot{
+		InstanceID:    writeModel.InstanceID,
 		AggregateID:   writeModel.AggregateID,
 		ChangeDate:    writeModel.ChangeDate,
 		ResourceOwner: writeModel.ResourceOwner,
 		Sequence:      writeModel.ProcessedSequence,
-	}
-}
-
-func writeModelToInstance(wm *InstanceWriteModel) *domain.Instance {
-	return &domain.Instance{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
-		SetUpStarted: wm.SetUpStarted,
-		SetUpDone:    wm.SetUpDone,
-		GlobalOrgID:  wm.GlobalOrgID,
-		IAMProjectID: wm.ProjectID,
 	}
 }
 

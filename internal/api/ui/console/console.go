@@ -1,8 +1,10 @@
 package console
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
@@ -26,10 +28,14 @@ type spaHandler struct {
 	fileSystem http.FileSystem
 }
 
+var (
+	//go:embed static/*
+	static embed.FS
+)
+
 const (
-	envRequestPath    = "/assets/environment.json"
-	consoleDefaultDir = "./console/"
-	HandlerPrefix     = "/ui/console"
+	envRequestPath = "/assets/environment.json"
+	HandlerPrefix  = "/ui/console"
 )
 
 var (
@@ -54,12 +60,10 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 }
 
 func Start(config Config, domain, url, issuer string, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
-	consoleDir := consoleDefaultDir
-	if config.ConsoleOverwriteDir != "" {
-		consoleDir = config.ConsoleOverwriteDir
+	fSys, err := fs.Sub(static, "static")
+	if err != nil {
+		return nil, err
 	}
-	consoleHTTPDir := http.Dir(consoleDir)
-
 	cache := assetsCacheInterceptorIgnoreManifest(
 		config.ShortCache.MaxAge,
 		config.ShortCache.SharedMaxAge,
@@ -69,7 +73,7 @@ func Start(config Config, domain, url, issuer string, instanceHandler func(http.
 	security := middleware.SecurityHeaders(csp(domain), nil)
 
 	handler := &http.ServeMux{}
-	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
+	handler.Handle("/", cache(security(http.FileServer(&spaHandler{http.FS(fSys)}))))
 	handler.Handle(envRequestPath, instanceHandler(cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		instance := authz.GetInstance(r.Context())
 		if instance.InstanceID() == "" {

@@ -8,11 +8,9 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	eventstore "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 type OrgRepository struct {
@@ -41,7 +39,7 @@ func (repo *OrgRepository) GetMyPasswordComplexityPolicy(ctx context.Context) (*
 }
 
 func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, domain.IAMID, domain.LoginCustomText)
+	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), domain.LoginCustomText)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +48,4 @@ func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*d
 		return nil, err
 	}
 	return append(query.CustomTextsToDomain(loginTexts), query.CustomTextsToDomain(orgLoginTexts)...), nil
-}
-
-func (p *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
-	return p.Eventstore.FilterEvents(ctx, models.NewSearchQuery().AggregateIDFilter(domain.IAMID).AggregateTypeFilter(instance.AggregateType))
 }

@@ -68,6 +68,7 @@ type Instance struct {
 	DefaultLanguage language.Tag
 	SetupStarted    domain.Step
 	SetupDone       domain.Step
+	Host            string
 }
 
 func (i *Instance) InstanceID() string {
@@ -80,6 +81,10 @@ func (i *Instance) ProjectID() string {
 
 func (i *Instance) ConsoleClientID() string {
 	return i.ConsoleID
+}
+
+func (i *Instance) RequestedDomain() string {
+	return i.Host
 }
 
 type InstanceSearchQueries struct {
@@ -96,7 +101,7 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 }
 
 func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
-	stmt, scan := prepareIAMQuery()
+	stmt, scan := prepareInstanceQuery(authz.GetInstance(ctx).RequestedDomain())
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -109,7 +114,7 @@ func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 }
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
-	stmt, scan := prepareIAMQuery()
+	stmt, scan := prepareInstanceQuery(host)
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): "system", //TODO: change column to domain when available
 	}).ToSql()
@@ -129,7 +134,7 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return iam.DefaultLanguage
 }
 
-func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnChangeDate.identifier(),
@@ -143,17 +148,17 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 		).
 			From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			iam := new(Instance)
+			instance := &Instance{Host: host}
 			lang := ""
 			err := row.Scan(
-				&iam.ID,
-				&iam.ChangeDate,
-				&iam.Sequence,
-				&iam.GlobalOrgID,
-				&iam.IAMProjectID,
-				&iam.ConsoleID,
-				&iam.SetupStarted,
-				&iam.SetupDone,
+				&instance.ID,
+				&instance.ChangeDate,
+				&instance.Sequence,
+				&instance.GlobalOrgID,
+				&instance.IAMProjectID,
+				&instance.ConsoleID,
+				&instance.SetupStarted,
+				&instance.SetupDone,
 				&lang,
 			)
 			if err != nil {
@@ -162,7 +167,7 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 			}
-			iam.DefaultLanguage = language.Make(lang)
-			return iam, nil
+			instance.DefaultLanguage = language.Make(lang)
+			return instance, nil
 		}
 }

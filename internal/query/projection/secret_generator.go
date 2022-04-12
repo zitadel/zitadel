@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"github.com/caos/zitadel/internal/repository/project"
 )
 
 const (
@@ -63,7 +62,7 @@ func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 func (p *SecretGeneratorProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: project.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.SecretGeneratorAddedEventType,

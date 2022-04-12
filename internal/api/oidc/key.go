@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
@@ -54,7 +53,7 @@ func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.Signing
 					<-renewTimer.C
 				}
 				checkAfter := o.resetTimer(renewTimer, true)
-				logging.Log("OIDC-dK432").Infof("requested next signing key check in %s", checkAfter)
+				logging.Infof("requested next signing key check in %s", checkAfter)
 			case <-renewTimer.C:
 				o.getSigningKey(ctx, renewTimer, keyCh)
 			}
@@ -66,7 +65,7 @@ func (o *OPStorage) getSigningKey(ctx context.Context, renewTimer *time.Timer, k
 	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(o.signingKeyGracefulPeriod))
 	if err != nil {
 		checkAfter := o.resetTimer(renewTimer, true)
-		logging.Log("OIDC-ASff").Infof("next signing key check in %s", checkAfter)
+		logging.Infof("next signing key check in %s", checkAfter)
 		return
 	}
 	if len(keys.Keys) == 0 {
@@ -76,13 +75,13 @@ func (o *OPStorage) getSigningKey(ctx context.Context, renewTimer *time.Timer, k
 		}
 		o.refreshSigningKey(ctx, keyCh, o.signingKeyAlgorithm, sequence)
 		checkAfter := o.resetTimer(renewTimer, true)
-		logging.Log("OIDC-ASDf3").Infof("next signing key check in %s", checkAfter)
+		logging.Infof("next signing key check in %s", checkAfter)
 		return
 	}
 	err = o.exchangeSigningKey(selectSigningKey(keys.Keys), keyCh)
-	logging.Log("OIDC-aDfg3").OnError(err).Error("could not exchange signing key")
+	logging.OnError(err).Error("could not exchange signing key")
 	checkAfter := o.resetTimer(renewTimer, err != nil)
-	logging.Log("OIDC-dK432").Infof("next signing key check in %s", checkAfter)
+	logging.Infof("next signing key check in %s", checkAfter)
 }
 
 func (o *OPStorage) resetTimer(timer *time.Timer, shortRefresh bool) (nextCheck time.Duration) {
@@ -100,20 +99,20 @@ func (o *OPStorage) resetTimer(timer *time.Timer, shortRefresh bool) (nextCheck 
 
 func (o *OPStorage) refreshSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, algorithm string, sequence uint64) {
 	if o.currentKey != nil && o.currentKey.Expiry().Before(time.Now().UTC()) {
-		logging.Log("OIDC-ADg26").Info("unset current signing key")
+		logging.Info("unset current signing key")
 		keyCh <- jose.SigningKey{}
 	}
 	ok, err := o.ensureIsLatestKey(ctx, sequence)
 	if err != nil {
-		logging.Log("OIDC-sdz53").WithError(err).Error("could not ensure latest key")
+		logging.New().WithError(err).Error("could not ensure latest key")
 		return
 	}
 	if !ok {
-		logging.Log("EVENT-GBD23").Warn("view not up to date, retrying later")
+		logging.Warn("view not up to date, retrying later")
 		return
 	}
 	err = o.lockAndGenerateSigningKeyPair(ctx, algorithm)
-	logging.Log("EVENT-B4d21").OnError(err).Warn("could not create signing key")
+	logging.OnError(err).Warn("could not create signing key")
 }
 
 func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (bool, error) {
@@ -126,7 +125,7 @@ func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (boo
 
 func (o *OPStorage) exchangeSigningKey(key query.PrivateKey, keyCh chan<- jose.SigningKey) (err error) {
 	if o.currentKey != nil && o.currentKey.ID() == key.ID() {
-		logging.Log("OIDC-Abb3e").Info("no new signing key")
+		logging.Info("no new signing key")
 		return nil
 	}
 	keyData, err := crypto.Decrypt(key.Key(), o.encAlg)
@@ -145,12 +144,12 @@ func (o *OPStorage) exchangeSigningKey(key query.PrivateKey, keyCh chan<- jose.S
 		},
 	}
 	o.currentKey = key
-	logging.LogWithFields("OIDC-dsg54", "keyID", key.ID()).Info("exchanged signing key")
+	logging.WithFields("keyID", key.ID()).Info("exchanged signing key")
 	return nil
 }
 
 func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm string) error {
-	logging.Log("OIDC-sdz53").Info("lock and generate signing key pair")
+	logging.Info("lock and generate signing key pair")
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -161,7 +160,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 		if errors.IsErrorAlreadyExists(err) {
 			return nil
 		}
-		logging.Log("OIDC-Dfg32").OnError(err).Warn("initial lock failed")
+		logging.OnError(err).Warn("initial lock failed")
 		return err
 	}
 
@@ -171,7 +170,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			ResourceOwner(domain.IAMID).
+			ResourceOwner("system"). //TODO: change with multi issuer
 			AddQuery().
 			AggregateTypes(keypair.AggregateType).
 			Builder(),

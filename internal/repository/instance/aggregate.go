@@ -1,7 +1,6 @@
 package instance
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -18,13 +17,13 @@ type Aggregate struct {
 	eventstore.Aggregate
 }
 
-func NewAggregate() *Aggregate {
+func NewAggregate(instanceID string) *Aggregate {
 	return &Aggregate{
 		Aggregate: eventstore.Aggregate{
 			Type:          AggregateType,
 			Version:       AggregateVersion,
-			ID:            domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			ID:            instanceID,
+			ResourceOwner: instanceID,
 		},
 	}
 }

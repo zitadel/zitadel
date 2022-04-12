@@ -1,6 +1,9 @@
 package command
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
@@ -107,9 +110,10 @@ func (wm *OrgMultiFactorWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func NewOrgAuthFactorsAllowedWriteModel(orgID string) *OrgAuthFactorsAllowedWriteModel {
+func NewOrgAuthFactorsAllowedWriteModel(ctx context.Context, orgID string) *OrgAuthFactorsAllowedWriteModel {
 	return &OrgAuthFactorsAllowedWriteModel{
 		WriteModel: eventstore.WriteModel{
+			InstanceID:    authz.GetInstance(ctx).InstanceID(),
 			AggregateID:   orgID,
 			ResourceOwner: orgID,
 		},
@@ -186,7 +190,7 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilde
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(instance.AggregateType).
-		AggregateIDs(domain.IAMID).
+		AggregateIDs(wm.InstanceID).
 		EventTypes(
 			instance.LoginPolicySecondFactorAddedEventType,
 			instance.LoginPolicySecondFactorRemovedEventType,

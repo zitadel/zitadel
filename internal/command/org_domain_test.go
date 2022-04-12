@@ -9,9 +9,10 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -20,6 +21,206 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
+
+func TestAddDomain(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
+		filter preparation.FilterToQueryReducer
+	}
+
+	agg := org.NewAggregate("test", "test")
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      agg,
+				domain: "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return nil, nil
+				},
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
+				},
+			},
+		},
+		{
+			name: "already verified",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
+						org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
+					}, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowAlreadyExists(nil, "", ""),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, AddOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
+		})
+	}
+}
+
+func TestVerifyDomain(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "domain",
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainVerifiedEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, VerifyOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+		})
+	}
+}
+
+func TestSetDomainPrimary(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
+		filter preparation.FilterToQueryReducer
+	}
+
+	agg := org.NewAggregate("test", "test")
+
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      agg,
+				domain: "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "not exists",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return nil, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowNotFound(nil, "", ""),
+			},
+		},
+		{
+			name: "not verified",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain")}, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowPreconditionFailed(nil, "", ""),
+			},
+		},
+		{
+			name: "already primary",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
+						org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainPrimarySetEvent(ctx, &agg.Aggregate, "domain"),
+					}, nil
+				},
+			},
+			want: Want{
+				CreateErr: errors.ThrowPreconditionFailed(nil, "", ""),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
+						org.NewDomainVerificationAddedEvent(ctx, &agg.Aggregate, "domain", domain.OrgDomainValidationTypeHTTP, nil),
+						org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "domain"),
+					}, nil
+				},
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainPrimarySetEvent(context.Background(), &agg.Aggregate, "domain"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, SetPrimaryOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
+		})
+	}
+}
 
 func TestCommandSide_AddOrgDomain(t *testing.T) {
 	type fields struct {
@@ -52,7 +253,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				domain: &domain.OrgDomain{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -86,7 +287,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: errors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -187,7 +388,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -204,7 +405,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -224,7 +425,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -253,7 +454,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -294,7 +495,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -462,7 +663,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -479,7 +680,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -508,7 +709,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -549,7 +750,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -584,7 +785,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -642,7 +843,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -920,7 +1121,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -937,7 +1138,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -966,7 +1167,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -1000,7 +1201,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1107,7 +1308,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1124,7 +1325,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1153,7 +1354,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -1199,7 +1400,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1318,7 +1519,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 }
 
 func invalidDomainVerification(domain, token, verifier string, checkType http.CheckType) error {
-	return caos_errs.ThrowInvalidArgument(nil, "HTTP-GH422", "Errors.Internal")
+	return errors.ThrowInvalidArgument(nil, "HTTP-GH422", "Errors.Internal")
 }
 
 func validDomainVerification(domain, token, verifier string, checkType http.CheckType) error {

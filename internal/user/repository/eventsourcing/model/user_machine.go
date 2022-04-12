@@ -5,8 +5,11 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 )
 
 type Machine struct {
@@ -26,8 +29,8 @@ func (sa *Machine) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (sa *Machine) AppendEvent(event *es_models.Event) (err error) {
-	switch event.Type {
-	case MachineAdded, MachineChanged:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.MachineAddedEventType, user_repo.MachineChangedEventType:
 		err = sa.setData(event)
 	}
 
@@ -63,13 +66,13 @@ func (key *MachineKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *MachineKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch event.Type {
-	case MachineKeyAdded:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.MachineKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {
 			return errors.ThrowInternal(err, "MODEL-SjI4S", "Errors.Internal")
 		}
-	case MachineKeyRemoved:
+	case user_repo.MachineKeyRemovedEventType:
 		key.ExpirationDate = event.CreationDate
 	}
 	return err

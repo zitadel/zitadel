@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/query"
-
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/command/preparation"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -197,7 +197,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-5m9oL", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
+			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
 		events = append(events, removeEvent)
@@ -377,4 +377,39 @@ func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string) (exists bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(resourceOwner).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(id).
+		EventTypes(
+			user.HumanRegisteredType,
+			user.UserV1RegisteredType,
+			user.HumanAddedType,
+			user.UserV1AddedType,
+			user.MachineAddedEventType,
+			user.UserRemovedType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		switch event.(type) {
+		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
+			exists = true
+		case *user.UserRemovedEvent:
+			exists = false
+		}
+	}
+
+	return exists, nil
+}
+
+func newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
+	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context) (*domain.PrivacyPolicy, error) {
-	policyWriteModel := NewInstancePrivacyPolicyWriteModel()
+	policyWriteModel := NewInstancePrivacyPolicyWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context) (*domain.Privacy
 }
 
 func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
-	addedPolicy := NewInstancePrivacyPolicyWriteModel()
+	addedPolicy := NewInstancePrivacyPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
 	events, err := c.addDefaultPrivacyPolicy(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
@@ -84,7 +84,7 @@ func (c *Commands) defaultPrivacyPolicyWriteModelByID(ctx context.Context) (poli
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstancePrivacyPolicyWriteModel()
+	writeModel := NewInstancePrivacyPolicyWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
