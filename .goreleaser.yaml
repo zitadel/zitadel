@@ -27,13 +27,17 @@ builds:
 dist: .artifacts/goreleaser
 dockers:
 - image_templates:
-  - "caos/zitadel:{{ .Version }}-amd64"
+  - ghcr.io/caos/zitadel:{{ .Tag }}-amd64
+  - ghcr.io/caos/zitadel:{{ .ShortCommit }}-amd64
+  - europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel:{{ .Tag }}-amd64
+  - europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel:{{ .ShortCommit }}-amd64
   use: buildx
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/amd64"
 - image_templates:
-  - "caos/zitadel:{{ .Version }}-arm64"
+    - ghcr.io/caos/zitadel:{{ .Tag }}-arm64
+    - ghcr.io/caos/zitadel:{{ .ShortCommit }}-arm64
   use: buildx
   dockerfile: build/Dockerfile
   build_flag_templates:
@@ -41,14 +45,9 @@ dockers:
 archives:
 - format: binary
 gomod:
-  proxy: true
-  env:
-    - GOPROXY=https://proxy.golang.org,direct
-    - GOSUMDB=sum.golang.org
+  proxy: false
 checksum:
   name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
