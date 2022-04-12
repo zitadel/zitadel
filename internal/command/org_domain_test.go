@@ -47,17 +47,37 @@ func TestAddDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "correct",
+			name: "correct (should verify domain)",
 			args: args{
 				a:      agg,
 				domain: "domain",
 				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return nil, nil
+					return []eventstore.Event{
+						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true),
+					}, nil
 				},
 			},
 			want: Want{
 				Commands: []eventstore.Command{
 					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
+				},
+			},
+		},
+		{
+			name: "correct (should not verify domain)",
+			args: args{
+				a:      agg,
+				domain: "domain",
+				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, false),
+					}, nil
+				},
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
+					org.NewDomainVerifiedEvent(context.Background(), &agg.Aggregate, "domain"),
 				},
 			},
 		},
