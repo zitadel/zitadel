@@ -122,11 +122,11 @@ type ZitadelConfig struct {
 	IsDevMode bool
 	BaseURL   string
 
-	projectID string
-	mgmtID    string
-	adminID   string
-	authID    string
-	consoleID string
+	projectID    string
+	mgmtAppID    string
+	adminAppID   string
+	authAppID    string
+	consoleAppID string
 }
 
 func (s *InstanceSetup) generateIDs() (err error) {
@@ -135,22 +135,22 @@ func (s *InstanceSetup) generateIDs() (err error) {
 		return err
 	}
 
-	s.Zitadel.mgmtID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.mgmtAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.adminID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.adminAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.authID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.authAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.Zitadel.consoleID, err = id.SonyFlakeGenerator.Next()
+	s.Zitadel.consoleAppID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -284,7 +284,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	console := &addOIDCApp{
 		AddApp: AddApp{
 			Aggregate: *projectAgg,
-			ID:        setup.Zitadel.consoleID,
+			ID:        setup.Zitadel.consoleAppID,
 			Name:      consoleAppName,
 		},
 		Version:                  domain.OIDCVersionV1,
@@ -315,7 +315,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
-					ID:        setup.Zitadel.mgmtID,
+					ID:        setup.Zitadel.mgmtAppID,
 					Name:      mgmtAppName,
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
@@ -327,7 +327,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
-					ID:        setup.Zitadel.adminID,
+					ID:        setup.Zitadel.adminAppID,
 					Name:      adminAppName,
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
@@ -339,7 +339,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
-					ID:        setup.Zitadel.authID,
+					ID:        setup.Zitadel.authAppID,
 					Name:      authAppName,
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,

@@ -134,7 +134,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 					"aggregateId", event.AggregateID,
 					"aggregateType", event.AggregateType,
 					"eventType", event.Type,
-					"instanceID", event.InstanceID.String,
+					"instanceID", event.InstanceID,
 				).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
