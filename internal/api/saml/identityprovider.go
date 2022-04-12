@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"github.com/amdonov/xmlsig"
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/key"
@@ -67,10 +68,10 @@ type IdentityProvider struct {
 	postTemplate   *template.Template
 	logoutTemplate *template.Template
 
-	EntityID   string
-	Metadata   *md.IDPSSODescriptorType
-	AAMetadata *md.AttributeAuthorityDescriptorType
-	//signer         xmlsig.Signer
+	EntityID       string
+	Metadata       *md.IDPSSODescriptorType
+	AAMetadata     *md.AttributeAuthorityDescriptorType
+	signer         xmlsig.Signer
 	signingContext *dsig.SigningContext
 
 	CertificateEndpoint           op.Endpoint
@@ -120,15 +121,13 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		return nil, err
 	}
 
-	/*
-		signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
-			SignatureAlgorithm: conf.SignatureAlgorithm,
-			DigestAlgorithm:    conf.DigestAlgorithm,
-		})
-		if err != nil {
-			return nil, err
-		}
-	*/
+	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
+		SignatureAlgorithm: signingContext.GetSignatureMethodIdentifier(),
+		DigestAlgorithm:    signingContext.GetDigestAlgorithmIdentifier(),
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	postTemplate, err := template.New("post").Parse(postTemplate)
 	if err != nil {
@@ -147,6 +146,7 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		Metadata:                      metadata,
 		AAMetadata:                    aaMetadata,
 		signingContext:                signingContext,
+		signer:                        signer,
 		CertificateEndpoint:           op.NewEndpointWithURL(conf.Endpoints.Certificate.Path, conf.Endpoints.Certificate.URL),
 		CallbackEndpoint:              op.NewEndpointWithURL(conf.Endpoints.Callback.Path, conf.Endpoints.Callback.URL),
 		SingleSignOnEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL),

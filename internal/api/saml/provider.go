@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/amdonov/xmlsig"
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	http_utils "github.com/caos/zitadel/internal/api/http"
@@ -32,8 +33,11 @@ import (
 )
 
 const (
-	locksTable = "projections.locks"
-	signingKey = "signing_key"
+	locksTable      = "projections.locks"
+	signingKey      = "signing_key"
+	PostBinding     = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+	RedirectBinding = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+	SOAPBinding     = "urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
 )
 
 type Storage interface {
@@ -101,7 +105,7 @@ type Provider struct {
 	MetadataEndpoint *op.Endpoint
 	Metadata         *md.EntityDescriptorType
 	signingContext   *dsig.SigningContext
-	//Signer           xmlsig.Signer
+	signer           xmlsig.Signer
 
 	IdentityProvider *IdentityProvider
 }
@@ -176,6 +180,14 @@ func NewProvider(
 		return nil, err
 	}
 
+	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
+		SignatureAlgorithm: signingContext.GetSignatureMethodIdentifier(),
+		DigestAlgorithm:    signingContext.GetDigestAlgorithmIdentifier(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	metadata := op.NewEndpointWithURL(conf.Metadata.Path, conf.Metadata.URL)
 	idp, err := NewIdentityProvider(
 		&metadata,
@@ -190,6 +202,7 @@ func NewProvider(
 		MetadataEndpoint: &metadata,
 		Metadata:         conf.getMetadata(idp),
 		signingContext:   signingContext,
+		signer:           signer,
 		storage:          storage,
 		IdentityProvider: idp,
 		interceptors: []HttpInterceptor{

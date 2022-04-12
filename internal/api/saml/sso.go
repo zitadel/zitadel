@@ -20,6 +20,7 @@ type AuthRequestForm struct {
 	RelayState  string
 	SigAlg      string
 	Sig         string
+	Binding     string
 }
 
 func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request) {
@@ -134,37 +135,13 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		},
 	)
 
-	/*
-		// get signature out of request if POST-binding
-		checker.WithConditionalLogicStep(
-			signatureGetNecessary(
-				func() *md.IDPSSODescriptorType { return p.Metadata },
-				func() *md.EntityDescriptorType { return sp.metadata },
-				func() string { return authRequestForm.Sig },
-				func() *xml_dsig.SignatureType { return authNRequest.Signature },
-				func() string { return authNRequest.ProtocolBinding },
-			),
-			getSignatureFromAuthRequest(
-				func() *xml_dsig.SignatureType { return authNRequest.Signature },
-				func() string { return authRequestForm.AuthRequest },
-				func(request string) { authRequestForm.AuthRequest = request },
-				func(sig string) { authRequestForm.Sig = sig },
-				func(sigAlg string) { authRequestForm.SigAlg = sigAlg },
-				func(errF error) { err = errF },
-			),
-			"SAML-i1o2mh",
-			func() {
-				response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to extract signature from request: %w", err).Error()))
-			},
-		)*/
-
 	// verify signature if necessary
 	checker.WithConditionalLogicStep(
 		signatureRedirectVerificationNecessary(
 			func() *md.IDPSSODescriptorType { return p.Metadata },
 			func() *md.EntityDescriptorType { return sp.metadata },
 			func() string { return authRequestForm.Sig },
-			func() string { return authNRequest.ProtocolBinding },
+			func() string { return authRequestForm.Binding },
 		),
 		verifyRedirectSignature(
 			func() string { return authRequestForm.AuthRequest },
@@ -186,7 +163,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			func() *md.IDPSSODescriptorType { return p.Metadata },
 			func() *md.EntityDescriptorType { return sp.metadata },
 			func() *xml_dsig.SignatureType { return authNRequest.Signature },
-			func() string { return authNRequest.ProtocolBinding },
+			func() string { return authRequestForm.Binding },
 		),
 		verifyPostSignature(
 			func() string { return authRequestForm.AuthRequest },
@@ -293,7 +270,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	}
 
 	switch response.ProtocolBinding {
-	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
+	case RedirectBinding, PostBinding:
 		http.Redirect(w, r, sp.LoginURL(authRequest.GetID()), http.StatusSeeOther)
 	default:
 		logging.Log("SAML-67722s").Error(err)
@@ -308,12 +285,20 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 		return nil, fmt.Errorf("failed to parse form: %w", err)
 	}
 
+	binding := ""
+	if _, ok := r.URL.Query()["SAMLRequest"]; ok {
+		binding = RedirectBinding
+	} else {
+		binding = PostBinding
+	}
+
 	request := &AuthRequestForm{
 		AuthRequest: r.FormValue("SAMLRequest"),
 		Encoding:    r.FormValue("SAMLEncoding"),
 		RelayState:  r.FormValue("RelayState"),
 		SigAlg:      r.FormValue("SigAlg"),
 		Sig:         r.FormValue("Signature"),
+		Binding:     binding,
 	}
 
 	return request, nil
@@ -373,11 +358,15 @@ func signatureRedirectVerificationNecessary(
 	protocolBinding func() string,
 ) func() bool {
 	return func() bool {
+		spMeta := spMetadataF()
+		idpMeta := idpMetadataF()
+		sig := signatureF()
+		binding := protocolBinding()
 
-		return (spMetadataF().SPSSODescriptor.AuthnRequestsSigned == "true" ||
-			idpMetadataF().WantAuthnRequestsSigned == "true" ||
-			signatureF() != "") &&
-			protocolBinding() == "urn:oasis:names:ts:SAML:2.0:bindings:HTTP-Redirect"
+		return (spMeta.SPSSODescriptor.AuthnRequestsSigned == "true" ||
+			idpMeta.WantAuthnRequestsSigned == "true" ||
+			sig != "") &&
+			binding == RedirectBinding
 	}
 }
 
@@ -423,13 +412,16 @@ func signaturePostVerificationNecessary(
 ) func() bool {
 	return func() bool {
 		authRequestSignature := authRequestSignatureF()
+		spMeta := spMetadataF()
+		idpMeta := idpMetadataF()
+		binding := protocolBinding()
 
-		return spMetadataF().SPSSODescriptor.AuthnRequestsSigned == "true" ||
-			idpMetadataF().WantAuthnRequestsSigned == "true" ||
+		return (spMeta.SPSSODescriptor.AuthnRequestsSigned == "true" ||
+			idpMeta.WantAuthnRequestsSigned == "true" ||
 			(authRequestSignature != nil &&
 				!reflect.DeepEqual(authRequestSignature.SignatureValue, xml_dsig.SignatureValueType{}) &&
-				authRequestSignature.SignatureValue.Text != "") &&
-				protocolBinding() == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+				authRequestSignature.SignatureValue.Text != "")) &&
+			binding == PostBinding
 	}
 }
 

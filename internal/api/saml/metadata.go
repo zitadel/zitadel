@@ -94,10 +94,10 @@ func (p *IdentityProviderConfig) getMetadata(
 			ErrorURL:                   p.Metadata.ErrorURL,
 			SingleSignOnService: []md.EndpointType{
 				{
-					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+					Binding:  RedirectBinding,
 					Location: p.Endpoints.SingleSignOn.URL,
 				}, {
-					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+					Binding:  PostBinding,
 					Location: p.Endpoints.SingleSignOn.URL,
 				},
 			},
@@ -109,20 +109,20 @@ func (p *IdentityProviderConfig) getMetadata(
 			ArtifactResolutionService: []md.IndexedEndpointType{{
 				Index:     "0",
 				IsDefault: "true",
-				Binding:   "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
+				Binding:   SOAPBinding,
 				Location:  p.Endpoints.Artifact.URL,
 			}},
 			SingleLogoutService: []md.EndpointType{
 				{
-					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
+					Binding:  SOAPBinding,
 					Location: p.Endpoints.SLOArtifact.URL,
 				},
 				{
-					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+					Binding:  RedirectBinding,
 					Location: p.Endpoints.SingleLogOut.URL,
 				},
 				{
-					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+					Binding:  PostBinding,
 					Location: p.Endpoints.SingleLogOut.URL,
 				},
 			},
@@ -233,7 +233,7 @@ func (p *ProviderConfig) getMetadata(
 
 func (p *Provider) GetMetadata() (*md.EntityDescriptorType, error) {
 	metadata := *p.Metadata
-	idpSig, err := signature.Create(p.signingContext, metadata)
+	idpSig, err := signature.Create(p.signer, metadata)
 	if err != nil {
 		return nil, err
 	}

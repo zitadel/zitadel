@@ -72,16 +72,16 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 	samlResponse := response.makeSuccessfulResponse(attrs)
 
 	switch response.ProtocolBinding {
-	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
-		sig, err := signature.Create(p.signingContext, samlResponse)
+	case PostBinding:
+		sig, err := signature.Create(p.signer, samlResponse.Assertion)
 		if err != nil {
 			logging.Log("SAML-120dk2").Error(err)
 			response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to sign response: %w", err).Error()))
 			return
 		}
 
-		samlResponse.Signature = sig
-	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
+		samlResponse.Assertion.Signature = sig
+	case RedirectBinding:
 		respStr, err := xml.Marshal(samlResponse)
 		if err != nil {
 			logging.Log("SAML-95jw3k").Error(err)

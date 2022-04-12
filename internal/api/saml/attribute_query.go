@@ -191,7 +191,7 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 
 	checker.WithLogicStep(
 		func() error {
-			signature, err := signature.Create(p.signingContext, response.Body.Response)
+			signature, err := signature.Create(p.signer, response.Body.Response)
 			if err != nil {
 				return err
 			}

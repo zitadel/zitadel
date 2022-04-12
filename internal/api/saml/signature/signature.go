@@ -2,21 +2,25 @@ package signature
 
 import (
 	"crypto/x509"
+	"encoding/xml"
+	"github.com/amdonov/xmlsig"
 	"github.com/beevik/etree"
-	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	dsig "github.com/russellhaering/goxmldsig"
 	"github.com/russellhaering/goxmldsig/etreeutils"
 )
 
+/*
+commented as russellhaering/goxmldsig produces invalid singatures for responses currently
+
 func Create(signingContext *dsig.SigningContext, element interface{}) (*xml_dsig.SignatureType, error) {
-	str, err := xml.Marshal(element)
+	data, _, err := canonicalize(element)
 	if err != nil {
 		return nil, err
 	}
 
 	doc := etree.NewDocument()
-	if err := doc.ReadFromBytes([]byte(str)); err != nil {
+	if err := doc.ReadFromBytes(data); err != nil {
 		return nil, err
 	}
 
@@ -64,9 +68,8 @@ func Create(signingContext *dsig.SigningContext, element interface{}) (*xml_dsig
 	}
 
 	return sig, nil
-}
+}*/
 
-/*
 func Create(signer xmlsig.Signer, data interface{}) (*xml_dsig.SignatureType, error) {
 	sig, err := signer.CreateSignature(data)
 	if err != nil {
@@ -118,8 +121,6 @@ func Create(signer xmlsig.Signer, data interface{}) (*xml_dsig.SignatureType, er
 		InnerXml: "",
 	}, nil
 }
-
-*/
 
 func Validate(certs []*x509.Certificate, el *etree.Element) error {
 	certificateStore := dsig.MemoryX509CertificateStore{

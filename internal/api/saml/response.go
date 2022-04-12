@@ -56,7 +56,7 @@ func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, resp
 	}
 
 	switch r.ProtocolBinding {
-	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
+	case PostBinding:
 		respData := base64.StdEncoding.EncodeToString([]byte(response))
 
 		data := AuthResponseForm{
@@ -69,7 +69,7 @@ func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, resp
 			r.ErrorFunc(err)
 			return
 		}
-	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
+	case RedirectBinding:
 		respData, err := xml.DeflateAndBase64([]byte(response))
 		if err != nil {
 			r.ErrorFunc(err)
@@ -320,7 +320,7 @@ func makeResponse(
 			StatusMessage: message,
 		},
 		InResponseTo: requestID,
-		Issuer:       getIssuer(issuer),
+		//	Issuer:       getIssuer(issuer),
 	}
 
 	if acsURL != "" {
