@@ -1,30 +1,28 @@
 name: ZITADEL Release
 
 on:
-  #pull_request:
+  pull_request:
   push:
+    tags-ignore:
+      - "*"
+  workflow_dispatch:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   Build:
     runs-on: ubuntu-20.04
+    env:
+      DOCKER_BUILDKIT: 1
     steps:
-      - name: Source checkout
-        uses: actions/checkout@v2
-      - name: Semantic Release
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v2
-        with:
-          dry_run: true
-          semantic_version: 19.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.17
+      - name: Source checkout
+        uses: actions/checkout@v2
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -32,41 +30,54 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Run GoReleaser Snapshot
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: goreleaser/goreleaser-action@v2
+      - name: Test
+        run: docker build -f build/grpc/Dockerfile -t zitadel-base:local . && docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+      - name: Tag
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
         with:
-          distribution: goreleaser
-          version: v1.5.0
-          args: release --snapshot
+          dry_run: false
+          semantic_version: 19.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run GoReleaser Release on tag
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        uses: goreleaser/goreleaser-action@v2
+      - name: GitHub Container Registry Login
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Google Artifact Registry Login
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        uses: docker/login-action@v1
+        with:
+          registry: europe-docker.pkg.dev
+          username: _json_key_base64
+          password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+      - uses: goreleaser/goreleaser-action@v2
+        name: Publish ZITADEL
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           distribution: goreleaser
           version: v1.5.0
           args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v2
-        name: Upload goreleaser dist
-        with:
-          name: goreleaser-dist
-          path: .artifacts/goreleaser
-      - uses: actions/upload-artifact@v2
-        name: Upload gRPC clients
+          RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
+      - name: Publish gRPC clients
+        uses: actions/upload-artifact@v2
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           name: grpc-clients
           path: .artifacts/grpc
-      - uses: actions/upload-artifact@v2
-        name: Upload compiled console
+      - name: Publish console
+        uses: actions/upload-artifact@v2
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           name: console
           path: .artifacts/console
-      - uses: codecov/codecov-action@v1
-        name: Upload go coverage
+      - name: Publish go coverage
+        uses: codecov/codecov-action@v1
         with:
           files: .artifacts/codecov/profile.cov
           name: go-codecov
