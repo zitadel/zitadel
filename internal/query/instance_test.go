@@ -10,6 +10,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
 )
@@ -26,8 +27,10 @@ func Test_InstancePrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareInstanceQuery no result",
-			prepare: prepareIAMQuery,
+			name: "prepareInstanceQuery no result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+				return prepareInstanceQuery("")
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT projections.instances.id,`+
@@ -53,8 +56,10 @@ func Test_InstancePrepares(t *testing.T) {
 			object: (*Instance)(nil),
 		},
 		{
-			name:    "prepareInstanceQuery found",
-			prepare: prepareIAMQuery,
+			name: "prepareInstanceQuery found",
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+				return prepareInstanceQuery("")
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(`SELECT projections.instances.id,`+
@@ -104,8 +109,10 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareInstanceQuery sql err",
-			prepare: prepareIAMQuery,
+			name: "prepareInstanceQuery sql err",
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+				return prepareInstanceQuery("")
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(`SELECT projections.instances.id,`+

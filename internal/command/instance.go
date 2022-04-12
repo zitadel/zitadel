@@ -162,7 +162,8 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	if err != nil {
 		return nil, err
 	}
-	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
+	requestedDomain := authz.GetInstance(ctx).RequestedDomain()
+	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), requestedDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -302,7 +303,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	}
 
 	validations = append(validations,
-		AddOrgCommand(orgAgg, setup.Org.Name, c.iamDomain),
+		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		addHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.phoneAlg, c.emailAlg, c.initCodeAlg),
 		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),

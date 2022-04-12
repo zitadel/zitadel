@@ -256,3 +256,7 @@ func (m *mockInstance) ProjectID() string {
 func (m *mockInstance) ConsoleClientID() string {
 	return "consoleClientID"
 }
+
+func (m *mockInstance) RequestedDomain() string {
+	return "zitadel.cloud"
+}

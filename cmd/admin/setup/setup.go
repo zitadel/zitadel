@@ -53,7 +53,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.S3DefaultInstance.db = dbClient
 	steps.S3DefaultInstance.defaults = config.SystemDefaults
 	steps.S3DefaultInstance.masterKey = masterKey
-	steps.S3DefaultInstance.iamDomain = config.SystemDefaults.Domain
+	steps.S3DefaultInstance.domain = config.SystemDefaults.Domain
 	steps.S3DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
 	steps.S3DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.S3DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
