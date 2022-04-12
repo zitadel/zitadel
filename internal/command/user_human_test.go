@@ -168,6 +168,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								true,
+								true,
 							),
 						),
 					),
@@ -179,7 +180,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								domain.SecretGeneratorTypeInitCode,
 								0,
 								1*time.Hour,
-								true,
 								true,
 								true,
 								true,
@@ -580,6 +580,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								true,
+								true,
 							),
 						),
 					),
@@ -591,7 +592,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								domain.SecretGeneratorTypeInitCode,
 								0,
 								1*time.Hour,
-								true,
 								true,
 								true,
 								true,
@@ -2899,6 +2899,7 @@ func TestAddHumanCommand(t *testing.T) {
 								context.Background(),
 								&org.NewAggregate("id", "ro").Aggregate,
 								true,
+								true,
 							),
 						}, nil
 					}).
@@ -2940,6 +2941,7 @@ func TestAddHumanCommand(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(
 								context.Background(),
 								&org.NewAggregate("id", "ro").Aggregate,
+								true,
 								true,
 							),
 						}, nil
