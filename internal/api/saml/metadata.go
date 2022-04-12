@@ -7,6 +7,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/signature"
+	saml_xml "github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/xenc"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
@@ -22,25 +23,10 @@ func (p *Provider) metadataHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := writeXML(w, metadata); err != nil {
+	if err := saml_xml.WriteXMLMarshalled(w, metadata); err != nil {
 		http.Error(w, fmt.Errorf("failed to respond with metadata").Error(), http.StatusInternalServerError)
 		return
 	}
-}
-
-func writeXML(w http.ResponseWriter, body interface{}) error {
-	_, err := w.Write([]byte(xml.Header))
-	if err != nil {
-		return err
-	}
-	encoder := xml.NewEncoder(w)
-
-	err = encoder.Encode(body)
-	if err != nil {
-		return err
-	}
-	err = encoder.Flush()
-	return err
 }
 
 func (p *IdentityProviderConfig) getMetadata(

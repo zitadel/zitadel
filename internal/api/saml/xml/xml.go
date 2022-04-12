@@ -56,18 +56,19 @@ func DeflateAndBase64(data []byte) ([]byte, error) {
 	if err := bw.Flush(); err != nil {
 		return nil, err
 	}
-	
+
 	if err := w2.Flush(); err != nil {
 		return nil, err
 	}
 	return b.Bytes(), nil
 }
 
-func WriteXML(w http.ResponseWriter, body interface{}) error {
+func WriteXMLMarshalled(w http.ResponseWriter, body interface{}) error {
 	_, err := w.Write([]byte(xml.Header))
 	if err != nil {
 		return err
 	}
+
 	encoder := xml.NewEncoder(w)
 
 	err = encoder.Encode(body)
@@ -75,6 +76,16 @@ func WriteXML(w http.ResponseWriter, body interface{}) error {
 		return err
 	}
 	err = encoder.Flush()
+	return err
+}
+
+func Write(w http.ResponseWriter, body []byte) error {
+	_, err := w.Write([]byte(xml.Header))
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(body)
 	return err
 }
 

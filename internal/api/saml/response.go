@@ -43,13 +43,7 @@ type Response struct {
 
 func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, response string) {
 	if r.AcsUrl == "" {
-		responseDecoded, err := base64.StdEncoding.DecodeString(response)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("error while writing response: %w", err), http.StatusInternalServerError)
-			return
-		}
-
-		if _, err := w.Write(responseDecoded); err != nil {
+		if err := xml.Write(w, []byte(response)); err != nil {
 			r.ErrorFunc(err)
 			return
 		}
@@ -106,6 +100,7 @@ func (r *Response) sendBackResponse(
 		r.ErrorFunc(err)
 		return
 	}
+
 	r.doResponse(req, w, respStr)
 }
 
@@ -320,7 +315,7 @@ func makeResponse(
 			StatusMessage: message,
 		},
 		InResponseTo: requestID,
-		//	Issuer:       getIssuer(issuer),
+		Issuer:       getIssuer(issuer),
 	}
 
 	if acsURL != "" {

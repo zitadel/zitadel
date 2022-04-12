@@ -209,7 +209,7 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 		return
 	}
 
-	if err := xml.WriteXML(w, response); err != nil {
+	if err := xml.WriteXMLMarshalled(w, response); err != nil {
 		logging.Log("SAML-91j12bk").Error(err)
 		http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 	}
