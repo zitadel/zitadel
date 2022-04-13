@@ -22,6 +22,7 @@ const (
 	DomainPolicySequenceCol              = "sequence"
 	DomainPolicyStateCol                 = "state"
 	DomainPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
+	DomainPolicyValidateOrgDomainsCol    = "validate_org_domains"
 	DomainPolicyIsDefaultCol             = "is_default"
 	DomainPolicyResourceOwnerCol         = "resource_owner"
 	DomainPolicyInstanceIDCol            = "instance_id"
@@ -43,6 +44,7 @@ func NewDomainPolicyProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(DomainPolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(DomainPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DomainPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(DomainPolicyValidateOrgDomainsCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(DomainPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(DomainPolicyResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DomainPolicyInstanceIDCol, crdb.ColumnTypeText),
@@ -111,6 +113,7 @@ func (p *DomainPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(DomainPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(DomainPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(DomainPolicyUserLoginMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
+			handler.NewCol(DomainPolicyValidateOrgDomainsCol, policyEvent.ValidateOrgDomains),
 			handler.NewCol(DomainPolicyIsDefaultCol, isDefault),
 			handler.NewCol(DomainPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(DomainPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
@@ -133,6 +136,9 @@ func (p *DomainPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 	}
 	if policyEvent.UserLoginMustBeDomain != nil {
 		cols = append(cols, handler.NewCol(DomainPolicyUserLoginMustBeDomainCol, *policyEvent.UserLoginMustBeDomain))
+	}
+	if policyEvent.ValidateOrgDomains != nil {
+		cols = append(cols, handler.NewCol(DomainPolicyValidateOrgDomainsCol, *policyEvent.ValidateOrgDomains))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,
