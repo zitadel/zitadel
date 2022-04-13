@@ -29,7 +29,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					repository.EventType(org.DomainPolicyAddedEventType),
 					org.AggregateType,
 					[]byte(`{
-						"userLoginMustBeDomain": true
+						"userLoginMustBeDomain": true,
+						"validateOrgDomains": true
 }`),
 				), org.DomainPolicyAddedEventMapper),
 			},
@@ -42,13 +43,14 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, validate_org_domains, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"agg-id",
 								domain.PolicyStateActive,
+								true,
 								true,
 								false,
 								"ro-id",
@@ -67,7 +69,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					repository.EventType(org.DomainPolicyChangedEventType),
 					org.AggregateType,
 					[]byte(`{
-						"userLoginMustBeDomain": true
+						"userLoginMustBeDomain": true,
+						"validateOrgDomains": true
 		}`),
 				), org.DomainPolicyChangedEventMapper),
 			},
@@ -79,10 +82,11 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								true,
 								true,
 								"agg-id",
 							},
@@ -126,7 +130,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					repository.EventType(instance.DomainPolicyAddedEventType),
 					instance.AggregateType,
 					[]byte(`{
-						"userLoginMustBeDomain": true
+						"userLoginMustBeDomain": true,
+						"validateOrgDomains": true
 					}`),
 				), instance.DomainPolicyAddedEventMapper),
 			},
@@ -138,13 +143,14 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, validate_org_domains, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"agg-id",
 								domain.PolicyStateActive,
+								true,
 								true,
 								true,
 								"ro-id",
@@ -163,7 +169,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					repository.EventType(instance.DomainPolicyChangedEventType),
 					instance.AggregateType,
 					[]byte(`{
-						"userLoginMustBeDomain": true
+						"userLoginMustBeDomain": true,
+						"validateOrgDomains": true
 					}`),
 				), instance.DomainPolicyChangedEventMapper),
 			},
@@ -175,10 +182,11 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								true,
 								true,
 								"agg-id",
 							},

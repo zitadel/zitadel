@@ -45,6 +45,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -61,6 +62,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
+								true,
 							),
 						),
 					),
@@ -71,6 +73,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -89,6 +92,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 								org.NewDomainPolicyAddedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate,
 									true,
+									true,
 								),
 							),
 						},
@@ -100,6 +104,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -109,6 +114,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 		},
@@ -162,6 +168,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -181,6 +188,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -197,6 +205,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
+								true,
 							),
 						),
 					),
@@ -207,6 +216,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -223,13 +233,14 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
+								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDomainPolicyChangedEvent(context.Background(), "org1", false),
+								newDomainPolicyChangedEvent(context.Background(), "org1", false, false),
 							),
 						},
 					),
@@ -240,6 +251,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: false,
+					ValidateOrgDomains:    false,
 				},
 			},
 			res: res{
@@ -249,6 +261,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					UserLoginMustBeDomain: false,
+					ValidateOrgDomains:    false,
 				},
 			},
 		},
@@ -330,6 +343,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
+								true,
 							),
 						),
 					),
@@ -370,11 +384,12 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 	}
 }
 
-func newDomainPolicyChangedEvent(ctx context.Context, orgID string, userLoginMustBeDomain bool) *org.DomainPolicyChangedEvent {
+func newDomainPolicyChangedEvent(ctx context.Context, orgID string, userLoginMustBeDomain, validateOrgDomains bool) *org.DomainPolicyChangedEvent {
 	event, _ := org.NewDomainPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
-		[]policy.OrgPolicyChanges{
+		[]policy.DomainPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
+			policy.ChangeValidateOrgDomains(validateOrgDomains),
 		},
 	)
 	return event

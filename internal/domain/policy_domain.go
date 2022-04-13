@@ -8,5 +8,6 @@ type DomainPolicy struct {
 	models.ObjectRoot
 
 	UserLoginMustBeDomain bool
+	ValidateOrgDomains    bool
 	Default               bool
 }

@@ -2,11 +2,10 @@ package command
 
 import (
 	"context"
+	errs "errors"
 	"strings"
 
 	"github.com/caos/logging"
-
-	errs "errors"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/command/preparation"
@@ -30,7 +29,15 @@ func AddOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
 			if existing != nil && existing.Verified {
 				return nil, errors.ThrowAlreadyExists(nil, "V2-e1wse", "Errors.Already.Exists")
 			}
-			return []eventstore.Command{org.NewDomainAddedEvent(ctx, &a.Aggregate, domain)}, nil
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			events := []eventstore.Command{org.NewDomainAddedEvent(ctx, &a.Aggregate, domain)}
+			if !domainPolicy.ValidateOrgDomains {
+				events = append(events, org.NewDomainVerifiedEvent(ctx, &a.Aggregate, domain))
+			}
+			return events, nil
 		}, nil
 	}
 }

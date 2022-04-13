@@ -1493,6 +1493,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_login_must_be_domain |  bool | the username has to end with the domain of it's organisation (uniqueness is organisation based) |  |
+| validate_org_domains |  bool | - |  |
 
 
 
@@ -3676,6 +3677,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_login_must_be_domain |  bool | - |  |
+| validate_org_domains |  bool | - |  |
 
 
 
@@ -3721,6 +3723,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_login_must_be_domain |  bool | - |  |
+| validate_org_domains |  bool | - |  |
 
 
 

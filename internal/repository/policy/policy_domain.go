@@ -20,6 +20,7 @@ type DomainPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain,omitempty"`
+	ValidateOrgDomains    bool `json:"validateOrgDomains,omitempty"`
 }
 
 func (e *DomainPolicyAddedEvent) Data() interface{} {
@@ -32,12 +33,14 @@ func (e *DomainPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 
 func NewDomainPolicyAddedEvent(
 	base *eventstore.BaseEvent,
-	userLoginMustBeDomain bool,
+	userLoginMustBeDomain,
+	validateOrgDomains bool,
 ) *DomainPolicyAddedEvent {
 
 	return &DomainPolicyAddedEvent{
 		BaseEvent:             *base,
 		UserLoginMustBeDomain: userLoginMustBeDomain,
+		ValidateOrgDomains:    validateOrgDomains,
 	}
 }
 
@@ -58,6 +61,7 @@ type DomainPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserLoginMustBeDomain *bool `json:"userLoginMustBeDomain,omitempty"`
+	ValidateOrgDomains    *bool `json:"validateOrgDomains,omitempty"`
 }
 
 func (e *DomainPolicyChangedEvent) Data() interface{} {
@@ -70,7 +74,7 @@ func (e *DomainPolicyChangedEvent) UniqueConstraints() []*eventstore.EventUnique
 
 func NewDomainPolicyChangedEvent(
 	base *eventstore.BaseEvent,
-	changes []OrgPolicyChanges,
+	changes []DomainPolicyChanges,
 ) (*DomainPolicyChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-DAf3h", "Errors.NoChangesFound")
@@ -84,11 +88,17 @@ func NewDomainPolicyChangedEvent(
 	return changeEvent, nil
 }
 
-type OrgPolicyChanges func(*DomainPolicyChangedEvent)
+type DomainPolicyChanges func(*DomainPolicyChangedEvent)
 
 func ChangeUserLoginMustBeDomain(userLoginMustBeDomain bool) func(*DomainPolicyChangedEvent) {
 	return func(e *DomainPolicyChangedEvent) {
 		e.UserLoginMustBeDomain = &userLoginMustBeDomain
+	}
+}
+
+func ChangeValidateOrgDomains(validateOrgDomain bool) func(*DomainPolicyChangedEvent) {
+	return func(e *DomainPolicyChangedEvent) {
+		e.ValidateOrgDomains = &validateOrgDomain
 	}
 }
 

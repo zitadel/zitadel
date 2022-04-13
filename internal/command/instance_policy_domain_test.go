@@ -43,6 +43,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
+								true,
 							),
 						),
 					),
@@ -52,6 +53,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -71,6 +73,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 								instance.NewDomainPolicyAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
+									true,
 								),
 							),
 						},
@@ -81,6 +84,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -91,6 +95,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 						ResourceOwner: "INSTANCE",
 					},
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 		},
@@ -144,6 +149,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -160,6 +166,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
+								true,
 							),
 						),
 					),
@@ -169,6 +176,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
+					ValidateOrgDomains:    true,
 				},
 			},
 			res: res{
@@ -185,13 +193,14 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
+								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultDomainPolicyChangedEvent(context.Background(), false),
+								newDefaultDomainPolicyChangedEvent(context.Background(), false, false),
 							),
 						},
 					),
@@ -201,6 +210,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: false,
+					ValidateOrgDomains:    false,
 				},
 			},
 			res: res{
@@ -210,6 +220,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 						ResourceOwner: "INSTANCE",
 					},
 					UserLoginMustBeDomain: false,
+					ValidateOrgDomains:    false,
 				},
 			},
 		},
@@ -233,11 +244,12 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain bool) *instance.DomainPolicyChangedEvent {
+func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain, validateOrgDomains bool) *instance.DomainPolicyChangedEvent {
 	event, _ := instance.NewDomainPolicyChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
-		[]policy.OrgPolicyChanges{
+		[]policy.DomainPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
+			policy.ChangeValidateOrgDomains(validateOrgDomains),
 		},
 	)
 	return event
