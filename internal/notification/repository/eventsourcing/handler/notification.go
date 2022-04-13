@@ -99,8 +99,8 @@ func (_ *Notification) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{user_repo.AggregateType}
 }
 
-func (n *Notification) CurrentSequence() (uint64, error) {
-	sequence, err := n.view.GetLatestNotificationSequence()
+func (n *Notification) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := n.view.GetLatestNotificationSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -108,11 +108,29 @@ func (n *Notification) CurrentSequence() (uint64, error) {
 }
 
 func (n *Notification) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := n.view.GetLatestNotificationSequence()
+	sequences, err := n.view.GetLatestNotificationSequences()
 	if err != nil {
 		return nil, err
 	}
-	return view.UserQuery(sequence.CurrentSequence), nil
+	query := models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(n.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
+		AggregateTypeFilter(n.AggregateTypes()...).
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (n *Notification) Reduce(event *models.Event) (err error) {
@@ -162,7 +180,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	user, err := n.getUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -201,7 +219,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 		return err
 	}
 
-	user, err := n.getUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -239,7 +257,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	user, err := n.getUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -268,7 +286,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil || alreadyHandled {
 		return nil
 	}
-	user, err := n.getUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -285,7 +303,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 
 func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
-	alreadyHandled, err := n.checkIfAlreadyHandled(ctx, event.AggregateID, event.Sequence, user_repo.UserDomainClaimedType, user_repo.UserDomainClaimedSentType)
+	alreadyHandled, err := n.checkIfAlreadyHandled(ctx, event.AggregateID, event.InstanceID, event.Sequence, user_repo.UserDomainClaimedType, user_repo.UserDomainClaimedSentType)
 	if err != nil || alreadyHandled {
 		return nil
 	}
@@ -294,7 +312,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		logging.Log("HANDLE-Gghq2").WithError(err).Error("could not unmarshal event data")
 		return errors.ThrowInternal(err, "HANDLE-7hgj3", "could not unmarshal event")
 	}
-	user, err := n.getUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -329,7 +347,7 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 		return err
 	}
 	ctx := getSetNotifyContextData(event.InstanceID, event.ResourceOwner)
-	events, err := n.getUserEvents(ctx, event.AggregateID, event.Sequence)
+	events, err := n.getUserEvents(ctx, event.AggregateID, event.InstanceID, event.Sequence)
 	if err != nil {
 		return err
 	}
@@ -344,7 +362,7 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 			}
 		}
 	}
-	user, err := n.getUserByID(event.AggregateID)
+	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -374,11 +392,11 @@ func (n *Notification) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, e
 	if event.CreationDate.Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
-	return n.checkIfAlreadyHandled(ctx, event.AggregateID, event.Sequence, eventTypes...)
+	return n.checkIfAlreadyHandled(ctx, event.AggregateID, event.InstanceID, event.Sequence, eventTypes...)
 }
 
-func (n *Notification) checkIfAlreadyHandled(ctx context.Context, userID string, sequence uint64, eventTypes ...eventstore.EventType) (bool, error) {
-	events, err := n.getUserEvents(ctx, userID, sequence)
+func (n *Notification) checkIfAlreadyHandled(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes ...eventstore.EventType) (bool, error) {
+	events, err := n.getUserEvents(ctx, userID, instanceID, sequence)
 	if err != nil {
 		return false, err
 	}
@@ -392,8 +410,8 @@ func (n *Notification) checkIfAlreadyHandled(ctx context.Context, userID string,
 	return false, nil
 }
 
-func (n *Notification) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := view.UserByIDQuery(userID, sequence)
+func (n *Notification) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
+	query, err := view.UserByIDQuery(userID, instanceID, sequence)
 	if err != nil {
 		return nil, err
 	}
@@ -514,6 +532,6 @@ func (n *Notification) getTranslatorWithOrgTexts(ctx context.Context, orgID, tex
 	return translator, nil
 }
 
-func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
-	return n.view.NotifyUserByID(userID)
+func (n *Notification) getUserByID(userID, instanceID string) (*model.NotifyUser, error) {
+	return n.view.NotifyUserByID(userID, instanceID)
 }

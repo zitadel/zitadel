@@ -50,7 +50,7 @@ type IDPConfigView struct {
 	JWTHeaderName              string              `json:"headerName" gorm:"jwt_header_name"`
 
 	Sequence   uint64 `json:"-" gorm:"column:sequence"`
-	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {

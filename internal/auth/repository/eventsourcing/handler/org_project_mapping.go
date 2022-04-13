@@ -8,7 +8,6 @@ import (
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/repository/project"
 )
@@ -55,8 +54,8 @@ func (_ *OrgProjectMapping) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{project.AggregateType}
 }
 
-func (p *OrgProjectMapping) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestOrgProjectMappingSequence()
+func (p *OrgProjectMapping) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := p.view.GetLatestOrgProjectMappingSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -64,11 +63,29 @@ func (p *OrgProjectMapping) CurrentSequence() (uint64, error) {
 }
 
 func (p *OrgProjectMapping) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestOrgProjectMappingSequence()
+	sequences, err := p.view.GetLatestOrgProjectMappingSequences()
 	if err != nil {
 		return nil, err
 	}
-	return proj_view.ProjectQuery(sequence.CurrentSequence), nil
+	query := es_models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(p.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
+		AggregateTypeFilter(p.AggregateTypes()...).
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
@@ -79,7 +96,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		mapping.ProjectID = event.AggregateID
 		mapping.InstanceID = event.InstanceID
 	case project.ProjectRemovedType:
-		err := p.view.DeleteOrgProjectMappingsByProjectID(event.AggregateID)
+		err := p.view.DeleteOrgProjectMappingsByProjectID(event.AggregateID, event.InstanceID)
 		if err == nil {
 			return p.view.ProcessedOrgProjectMappingSequence(event)
 		}
@@ -93,7 +110,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 	case project.GrantRemovedType:
 		projectGrant := new(view_model.ProjectGrant)
 		projectGrant.SetData(event)
-		err := p.view.DeleteOrgProjectMappingsByProjectGrantID(event.AggregateID)
+		err := p.view.DeleteOrgProjectMappingsByProjectGrantID(event.AggregateID, event.InstanceID)
 		if err == nil {
 			return p.view.ProcessedOrgProjectMappingSequence(event)
 		}

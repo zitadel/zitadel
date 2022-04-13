@@ -6,16 +6,21 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func ProjectByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {
+func ProjectByIDQuery(id, instanceID string, latestSequence uint64) (*es_models.SearchQuery, error) {
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "Errors.Project.ProjectIDMissing")
 	}
 	return ProjectQuery(latestSequence).
-		AggregateIDFilter(id), nil
+		AddQuery().
+		AggregateIDFilter(id).
+		InstanceIDFilter(instanceID).
+		SearchQuery(), nil
 }
 
 func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
+		AddQuery().
 		AggregateTypeFilter(project.AggregateType).
-		LatestSequenceFilter(latestSequence)
+		LatestSequenceFilter(latestSequence).
+		SearchQuery()
 }

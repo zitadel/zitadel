@@ -912,7 +912,7 @@ type lockMock struct {
 }
 
 func (m *lockMock) lock() Lock {
-	return func(ctx context.Context, _ time.Duration) <-chan error {
+	return func(ctx context.Context, _ time.Duration, _ string) <-chan error {
 		m.callCount++
 		errs := make(chan error)
 		go func() {
@@ -955,7 +955,7 @@ type unlockMock struct {
 }
 
 func (m *unlockMock) unlock() Unlock {
-	return func() error {
+	return func(instanceID string) error {
 		m.callCount++
 		return m.err
 	}

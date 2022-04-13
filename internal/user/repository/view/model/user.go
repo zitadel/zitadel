@@ -53,7 +53,7 @@ type UserView struct {
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	Type               userType       `json:"-" gorm:"column:user_type"`
 	UserName           string         `json:"userName" gorm:"column:user_name"`
-	InstanceID         string         `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID         string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 	*MachineView
 	*HumanView
 }

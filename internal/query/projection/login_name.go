@@ -65,7 +65,7 @@ var (
 		" , IFNULL(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
 		" FROM %[7]s users"+
 		" LEFT JOIN %[8]s policy_custom on policy_custom.%[9]s = users.%[5]s AND policy_custom.%[10]s = users.%[4]s"+
-		" LEFT JOIN %[8]s policy_default on policy_default.%[11]s = true) policy_users"+
+		" LEFT JOIN %[8]s policy_default on policy_default.%[11]s = true AND policy_default.%[10]s = users.%[4]s) policy_users"+
 		" LEFT JOIN %[12]s domains ON policy_users.%[1]s AND policy_users.%[5]s = domains.%[13]s AND policy_users.%[10]s = domains.%[14]s"+
 		");",
 		LoginNamePoliciesMustBeDomainCol,

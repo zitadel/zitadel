@@ -11,13 +11,44 @@ type SearchQuery struct {
 	Limit   uint64
 	Desc    bool
 	Filters []*Filter
+	Queries []*Query
+}
+
+type Query struct {
+	searchQuery *SearchQuery
+	Filters     []*Filter
 }
 
 //NewSearchQuery is deprecated. Use SearchQueryFactory
 func NewSearchQuery() *SearchQuery {
 	return &SearchQuery{
 		Filters: make([]*Filter, 0, 4),
+		Queries: make([]*Query, 0),
 	}
+}
+
+func (q *SearchQuery) AddQuery() *Query {
+	query := &Query{
+		searchQuery: q,
+	}
+	q.Queries = append(q.Queries, query)
+
+	return query
+}
+
+//SearchQuery returns the SearchQuery of the sub query
+func (q *Query) SearchQuery() *SearchQuery {
+	return q.searchQuery
+}
+func (q *Query) setFilter(filter *Filter) *Query {
+	for i, f := range q.Filters {
+		if f.field == filter.field && f.field != Field_LatestSequence {
+			q.Filters[i] = filter
+			return q
+		}
+	}
+	q.Filters = append(q.Filters, filter)
+	return q
 }
 
 func (q *SearchQuery) SetLimit(limit uint64) *SearchQuery {
@@ -35,23 +66,23 @@ func (q *SearchQuery) OrderAsc() *SearchQuery {
 	return q
 }
 
-func (q *SearchQuery) AggregateIDFilter(id string) *SearchQuery {
+func (q *Query) AggregateIDFilter(id string) *Query {
 	return q.setFilter(NewFilter(Field_AggregateID, id, Operation_Equals))
 }
 
-func (q *SearchQuery) AggregateIDsFilter(ids ...string) *SearchQuery {
+func (q *Query) AggregateIDsFilter(ids ...string) *Query {
 	return q.setFilter(NewFilter(Field_AggregateID, ids, Operation_In))
 }
 
-func (q *SearchQuery) AggregateTypeFilter(types ...AggregateType) *SearchQuery {
+func (q *Query) AggregateTypeFilter(types ...AggregateType) *Query {
 	return q.setFilter(NewFilter(Field_AggregateType, types, Operation_In))
 }
 
-func (q *SearchQuery) EventTypesFilter(types ...EventType) *SearchQuery {
+func (q *Query) EventTypesFilter(types ...EventType) *Query {
 	return q.setFilter(NewFilter(Field_EventType, types, Operation_In))
 }
 
-func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
+func (q *Query) LatestSequenceFilter(sequence uint64) *Query {
 	if sequence == 0 {
 		return q
 	}
@@ -59,21 +90,25 @@ func (q *SearchQuery) LatestSequenceFilter(sequence uint64) *SearchQuery {
 	return q.setFilter(NewFilter(Field_LatestSequence, sequence, sortOrder))
 }
 
-func (q *SearchQuery) SequenceBetween(from, to uint64) *SearchQuery {
+func (q *Query) SequenceBetween(from, to uint64) *Query {
 	q.setFilter(NewFilter(Field_LatestSequence, from, Operation_Greater))
 	q.setFilter(NewFilter(Field_LatestSequence, to, Operation_Less))
 	return q
 }
 
-func (q *SearchQuery) ResourceOwnerFilter(resourceOwner string) *SearchQuery {
+func (q *Query) ResourceOwnerFilter(resourceOwner string) *Query {
 	return q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
 }
 
-func (q *SearchQuery) InstanceIDFilter(instanceID string) *SearchQuery {
+func (q *Query) InstanceIDFilter(instanceID string) *Query {
 	return q.setFilter(NewFilter(Field_InstanceID, instanceID, Operation_Equals))
 }
 
-func (q *SearchQuery) CreationDateNewerFilter(time time.Time) *SearchQuery {
+func (q *Query) IgnoredInstanceIDsFilter(instanceIDs ...string) *Query {
+	return q.setFilter(NewFilter(Field_InstanceID, instanceIDs, Operation_NotIn))
+}
+
+func (q *Query) CreationDateNewerFilter(time time.Time) *Query {
 	return q.setFilter(NewFilter(Field_CreationDate, time, Operation_Greater))
 }
 
@@ -92,12 +127,14 @@ func (q *SearchQuery) Validate() error {
 	if q == nil {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-J5xQi", "search query is nil")
 	}
-	if len(q.Filters) == 0 {
+	if len(q.Queries) == 0 {
 		return errors.ThrowPreconditionFailed(nil, "MODEL-pF3DR", "no filters set")
 	}
-	for _, filter := range q.Filters {
-		if err := filter.Validate(); err != nil {
-			return err
+	for _, query := range q.Queries {
+		for _, filter := range query.Filters {
+			if err := filter.Validate(); err != nil {
+				return err
+			}
 		}
 	}
 

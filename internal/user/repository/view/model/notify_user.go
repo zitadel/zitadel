@@ -18,6 +18,7 @@ import (
 const (
 	NotifyUserKeyUserID        = "id"
 	NotifyUserKeyResourceOwner = "resource_owner"
+	NotifyUserKeyInstanceID    = "instance_id"
 )
 
 type NotifyUser struct {
@@ -41,7 +42,7 @@ type NotifyUser struct {
 	PasswordSet        bool           `json:"-" gorm:"column:password_set"`
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	State              int32          `json:"-" gorm:"-"`
-	InstanceID         string         `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID         string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string {

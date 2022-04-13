@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -97,13 +98,18 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
 				},
 				SearchQueryBuilder: eventstore.
 					NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					AddQuery().
 					AggregateTypes("testAgg").
 					SequenceGreater(5).
+					InstanceID("instanceID").
+					Or().
+					AggregateTypes("testAgg").
+					SequenceGreater(0).
+					NotInstanceID("instanceID").
 					Builder().
 					Limit(5),
 			},
@@ -225,7 +231,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -262,7 +268,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -287,6 +293,7 @@ func TestStatementHandler_Update(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         7,
 							previousSequence: 5,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -299,11 +306,11 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "agg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", "instanceID"),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
-					expectUpdateCurrentSequenceNoRows("my_sequences", "my_projection", 7, "agg"),
+					expectUpdateCurrentSequenceNoRows("my_sequences", "my_projection", 7, "agg", "instanceID"),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -328,6 +335,7 @@ func TestStatementHandler_Update(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         7,
 							previousSequence: 5,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -340,11 +348,11 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "agg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", "instanceID"),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "agg"),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "agg", "instanceID"),
 					expectCommitErr(sql.ErrConnDone),
 				},
 				isErr: func(err error) bool {
@@ -368,14 +376,15 @@ func TestStatementHandler_Update(t *testing.T) {
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 5,
+						instanceID:       "instanceID",
 					}),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -399,14 +408,15 @@ func TestStatementHandler_Update(t *testing.T) {
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 0,
+						instanceID:       "instanceID",
 					}),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -423,6 +433,7 @@ func TestStatementHandler_Update(t *testing.T) {
 							AggregateType:             "testAgg",
 							Sequence:                  6,
 							PreviousAggregateSequence: 5,
+							InstanceID:                "instanceID",
 						},
 					),
 				),
@@ -435,6 +446,7 @@ func TestStatementHandler_Update(t *testing.T) {
 						aggregateType:    "testAgg",
 						sequence:         7,
 						previousSequence: 0,
+						instanceID:       "instanceID",
 					}),
 				},
 				reduce: testReduce(),
@@ -442,8 +454,8 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg"),
-					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -537,7 +549,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				ctx:    context.Background(),
 				reduce: testReduce(),
 				sequences: currentSequences{
-					"testAgg": 5,
+					"testAgg": []*instanceSequence{
+						{sequence: 5},
+					},
 				},
 				stmtSeq: 6,
 			},
@@ -560,7 +574,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				ctx:    context.Background(),
 				reduce: testReduce(),
 				sequences: currentSequences{
-					"testAgg": 5,
+					"testAgg": []*instanceSequence{
+						{sequence: 5},
+					},
 				},
 				stmtSeq: 6,
 			},
@@ -582,7 +598,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				ctx:    context.Background(),
 				reduce: testReduce(),
 				sequences: currentSequences{
-					"testAgg": 5,
+					"testAgg": []*instanceSequence{
+						{sequence: 5},
+					},
 				},
 				stmtSeq: 10,
 			},
@@ -626,7 +644,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				ctx:    context.Background(),
 				reduce: testReduceErr(errReduce),
 				sequences: currentSequences{
-					"testAgg": 5,
+					"testAgg": []*instanceSequence{
+						{sequence: 5},
+					},
 				},
 				stmtSeq: 10,
 			},
@@ -667,7 +687,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				}),
 				aggregates: tt.fields.aggregates,
 			}
-			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, tt.args.sequences, tt.args.reduce)
+			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, "", tt.args.sequences, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
@@ -720,7 +740,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 						}),
 				},
 				sequences: currentSequences{
-					"agg": 5,
+					"agg": []*instanceSequence{
+						{sequence: 5},
+					},
 				},
 			},
 			want: want{
@@ -762,7 +784,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 						}),
 				},
 				sequences: currentSequences{
-					"agg": 2,
+					"agg": []*instanceSequence{
+						{sequence: 2},
+					},
 				},
 			},
 			want: want{
@@ -824,7 +848,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 						}),
 				},
 				sequences: currentSequences{
-					"agg": 2,
+					"agg": []*instanceSequence{
+						{sequence: 2},
+					},
 				},
 			},
 			want: want{
@@ -891,7 +917,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 						}),
 				},
 				sequences: currentSequences{
-					"agg": 2,
+					"agg": []*instanceSequence{
+						{sequence: 2},
+					},
 				},
 			},
 			want: want{
@@ -979,7 +1007,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					),
 				},
 				sequences: currentSequences{
-					"agg": 2,
+					"agg": []*instanceSequence{
+						{sequence: 2},
+					},
 				},
 			},
 			want: want{
@@ -1309,9 +1339,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				expectations: []mockExpectation{
 					expectCurrentSequenceNoRows("my_table", "my_projection"),
 				},
-				sequences: currentSequences{
-					"agg": 0,
-				},
+				sequences: currentSequences{},
 			},
 		},
 		{
@@ -1331,9 +1359,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				expectations: []mockExpectation{
 					expectCurrentSequenceScanErr("my_table", "my_projection"),
 				},
-				sequences: currentSequences{
-					"agg": 0,
-				},
+				sequences: currentSequences{},
 			},
 		},
 		{
@@ -1351,10 +1377,15 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, nil)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_table", "my_projection", 5, "agg"),
+					expectCurrentSequence("my_table", "my_projection", 5, "agg", "instanceID"),
 				},
 				sequences: currentSequences{
-					"agg": 5,
+					"agg": []*instanceSequence{
+						{
+							sequence:   5,
+							instanceID: "instanceID",
+						},
+					},
 				},
 			},
 		},
@@ -1404,9 +1435,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 			}
 
 			for _, aggregateType := range tt.fields.aggregates {
-				if seq[aggregateType] != tt.want.sequences[aggregateType] {
-					t.Errorf("unexpected sequence in aggregate type %s: want %d got %d", aggregateType, tt.want.sequences[aggregateType], seq[aggregateType])
-				}
+				assert.Equal(t, tt.want.sequences[aggregateType], seq[aggregateType])
 			}
 		})
 	}
@@ -1440,7 +1469,12 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			},
 			args: args{
 				sequences: currentSequences{
-					"agg": 5,
+					"agg": []*instanceSequence{
+						{
+							sequence:   5,
+							instanceID: "instanceID",
+						},
+					},
 				},
 			},
 			want: want{
@@ -1448,7 +1482,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return errors.Is(err, sql.ErrConnDone)
 				},
 				expectations: []mockExpectation{
-					expectUpdateCurrentSequenceErr("my_table", "my_projection", 5, sql.ErrConnDone, "agg"),
+					expectUpdateCurrentSequenceErr("my_table", "my_projection", 5, sql.ErrConnDone, "agg", "instanceID"),
 				},
 			},
 		},
@@ -1461,7 +1495,12 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			},
 			args: args{
 				sequences: currentSequences{
-					"agg": 5,
+					"agg": []*instanceSequence{
+						{
+							sequence:   5,
+							instanceID: "instanceID",
+						},
+					},
 				},
 			},
 			want: want{
@@ -1469,7 +1508,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return errors.As(err, &errSeqNotUpdated)
 				},
 				expectations: []mockExpectation{
-					expectUpdateCurrentSequenceNoRows("my_table", "my_projection", 5, "agg"),
+					expectUpdateCurrentSequenceNoRows("my_table", "my_projection", 5, "agg", "instanceID"),
 				},
 			},
 		},
@@ -1482,7 +1521,12 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			},
 			args: args{
 				sequences: currentSequences{
-					"agg": 5,
+					"agg": []*instanceSequence{
+						{
+							sequence:   5,
+							instanceID: "instanceID",
+						},
+					},
 				},
 			},
 			want: want{
@@ -1490,7 +1534,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectUpdateCurrentSequence("my_table", "my_projection", 5, "agg"),
+					expectUpdateCurrentSequence("my_table", "my_projection", 5, "agg", "instanceID"),
 				},
 			},
 		},
@@ -1503,8 +1547,18 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			},
 			args: args{
 				sequences: currentSequences{
-					"agg":  5,
-					"agg2": 6,
+					"agg": []*instanceSequence{
+						{
+							sequence:   5,
+							instanceID: "instanceID",
+						},
+					},
+					"agg2": []*instanceSequence{
+						{
+							sequence:   6,
+							instanceID: "instanceID",
+						},
+					},
 				},
 			},
 			want: want{
@@ -1513,9 +1567,19 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 				},
 				expectations: []mockExpectation{
 					expectUpdateTwoCurrentSequence("my_table", "my_projection", currentSequences{
-						"agg":  5,
-						"agg2": 6},
-					),
+						"agg": []*instanceSequence{
+							{
+								sequence:   5,
+								instanceID: "instanceID",
+							},
+						},
+						"agg2": []*instanceSequence{
+							{
+								sequence:   6,
+								instanceID: "instanceID",
+							},
+						},
+					}),
 				},
 			},
 		},

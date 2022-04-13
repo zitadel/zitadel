@@ -65,8 +65,8 @@ func (_ *User) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user_repo.AggregateType, org.AggregateType}
 }
 
-func (u *User) CurrentSequence() (uint64, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+func (u *User) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := u.view.GetLatestUserSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -74,13 +74,29 @@ func (u *User) CurrentSequence() (uint64, error) {
 }
 
 func (u *User) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+	sequences, err := u.view.GetLatestUserSequences()
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
+	query := es_models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(u.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
 		AggregateTypeFilter(u.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (u *User) Reduce(event *es_models.Event) (err error) {
@@ -146,14 +162,14 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		user_repo.HumanPasswordChangedType,
 		user_repo.HumanPasswordlessInitCodeAddedType,
 		user_repo.HumanPasswordlessInitCodeRequestedType:
-		user, err = u.view.UserByID(event.AggregateID)
+		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
 		err = user.AppendEvent(event)
 	case user_repo.UserDomainClaimedType,
 		user_repo.UserUserNameChangedType:
-		user, err = u.view.UserByID(event.AggregateID)
+		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -163,7 +179,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		}
 		err = u.fillLoginNames(user)
 	case user_repo.UserRemovedType:
-		return u.view.DeleteUser(event.AggregateID, event)
+		return u.view.DeleteUser(event.AggregateID, event.InstanceID, event)
 	default:
 		return u.view.ProcessedUserSequence(event)
 	}
@@ -203,7 +219,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	users, err := u.view.UsersByOrgID(event.AggregateID)
+	users, err := u.view.UsersByOrgID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -221,7 +237,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
 	if !userLoginMustBeDomain {
 		return nil
 	}
-	users, err := u.view.UsersByOrgID(event.AggregateID)
+	users, err := u.view.UsersByOrgID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}

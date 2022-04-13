@@ -13,16 +13,16 @@ const (
 	idpProviderTable = "auth.idp_providers"
 )
 
-func (v *View) IDPProviderByAggregateAndIDPConfigID(aggregateID, idpConfigID string) (*model.IDPProviderView, error) {
-	return view.GetIDPProviderByAggregateIDAndConfigID(v.Db, idpProviderTable, aggregateID, idpConfigID)
+func (v *View) IDPProviderByAggregateAndIDPConfigID(aggregateID, idpConfigID, instanceID string) (*model.IDPProviderView, error) {
+	return view.GetIDPProviderByAggregateIDAndConfigID(v.Db, idpProviderTable, aggregateID, idpConfigID, instanceID)
 }
 
-func (v *View) IDPProvidersByIDPConfigID(idpConfigID string) ([]*model.IDPProviderView, error) {
-	return view.IDPProvidersByIdpConfigID(v.Db, idpProviderTable, idpConfigID)
+func (v *View) IDPProvidersByIDPConfigID(idpConfigID, instanceID string) ([]*model.IDPProviderView, error) {
+	return view.IDPProvidersByIdpConfigID(v.Db, idpProviderTable, idpConfigID, instanceID)
 }
 
-func (v *View) IDPProvidersByAggregateIDAndState(aggregateID string, idpConfigState iam_model.IDPConfigState) ([]*model.IDPProviderView, error) {
-	return view.IDPProvidersByAggregateIDAndState(v.Db, idpProviderTable, aggregateID, idpConfigState)
+func (v *View) IDPProvidersByAggregateIDAndState(aggregateID, instanceID string, idpConfigState iam_model.IDPConfigState) ([]*model.IDPProviderView, error) {
+	return view.IDPProvidersByAggregateIDAndState(v.Db, idpProviderTable, aggregateID, instanceID, idpConfigState)
 }
 
 func (v *View) SearchIDPProviders(request *iam_model.IDPProviderSearchRequest) ([]*model.IDPProviderView, uint64, error) {
@@ -45,24 +45,28 @@ func (v *View) PutIDPProviders(event *models.Event, providers ...*model.IDPProvi
 	return v.ProcessedIDPProviderSequence(event)
 }
 
-func (v *View) DeleteIDPProvider(aggregateID, idpConfigID string, event *models.Event) error {
-	err := view.DeleteIDPProvider(v.Db, idpProviderTable, aggregateID, idpConfigID)
+func (v *View) DeleteIDPProvider(aggregateID, idpConfigID, instanceID string, event *models.Event) error {
+	err := view.DeleteIDPProvider(v.Db, idpProviderTable, aggregateID, idpConfigID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedIDPProviderSequence(event)
 }
 
-func (v *View) DeleteIDPProvidersByAggregateID(aggregateID string, event *models.Event) error {
-	err := view.DeleteIDPProvidersByAggregateID(v.Db, idpProviderTable, aggregateID)
+func (v *View) DeleteIDPProvidersByAggregateID(aggregateID, instanceID string, event *models.Event) error {
+	err := view.DeleteIDPProvidersByAggregateID(v.Db, idpProviderTable, aggregateID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedIDPProviderSequence(event)
 }
 
-func (v *View) GetLatestIDPProviderSequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(idpProviderTable)
+func (v *View) GetLatestIDPProviderSequence(instanceID string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(idpProviderTable, instanceID)
+}
+
+func (v *View) GetLatestIDPProviderSequences() ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(idpProviderTable)
 }
 
 func (v *View) ProcessedIDPProviderSequence(event *models.Event) error {
@@ -73,8 +77,8 @@ func (v *View) UpdateIDPProviderSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(idpProviderTable)
 }
 
-func (v *View) GetLatestIDPProviderFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
-	return v.latestFailedEvent(idpProviderTable, sequence)
+func (v *View) GetLatestIDPProviderFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {
+	return v.latestFailedEvent(idpProviderTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedIDPProviderFailedEvent(failedEvent *global_view.FailedEvent) error {

@@ -16,6 +16,8 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
+const systemID = "system"
+
 type Spooler struct {
 	handlers   []query.Handler
 	locker     Locker
@@ -26,7 +28,7 @@ type Spooler struct {
 }
 
 type Locker interface {
-	Renew(lockerID, viewModel string, waitTime time.Duration) error
+	Renew(lockerID, viewModel, instanceID string, waitTime time.Duration) error
 }
 
 type spooledHandler struct {
@@ -138,19 +140,6 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	factory := models.FactoryFromSearchQuery(query)
-	sequence, err := s.eventstore.LatestSequence(ctx, factory)
-	logging.OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
-	var processedSequence uint64
-	for _, filter := range query.Filters {
-		if filter.GetField() == models.Field_LatestSequence {
-			processedSequence = filter.GetValue().(uint64)
-		}
-	}
-	if sequence != 0 && processedSequence == sequence {
-		return nil, nil
-	}
-
 	query.Limit = s.QueryLimit()
 	return s.eventstore.FilterEvents(ctx, query)
 }
@@ -169,7 +158,7 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 			case <-ctx.Done():
 				return
 			case <-renewTimer:
-				err := s.locker.Renew(workerID, s.ViewModel(), s.LockDuration())
+				err := s.locker.Renew(workerID, s.ViewModel(), systemID, s.LockDuration())
 				firstLock.Do(func() {
 					locked <- err == nil
 				})
@@ -190,16 +179,17 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 }
 
 func HandleError(event *models.Event, failedErr error,
-	latestFailedEvent func(sequence uint64) (*repository.FailedEvent, error),
+	latestFailedEvent func(sequence uint64, instanceID string) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
 	processSequence func(*models.Event) error,
 	errorCountUntilSkip uint64) error {
-	failedEvent, err := latestFailedEvent(event.Sequence)
+	failedEvent, err := latestFailedEvent(event.Sequence, event.InstanceID)
 	if err != nil {
 		return err
 	}
 	failedEvent.FailureCount++
 	failedEvent.ErrMsg = failedErr.Error()
+	failedEvent.InstanceID = event.InstanceID
 	err = processFailedEvent(failedEvent)
 	if err != nil {
 		return err

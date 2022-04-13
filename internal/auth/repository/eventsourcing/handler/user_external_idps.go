@@ -69,8 +69,8 @@ func (_ *ExternalIDP) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, instance.AggregateType, org.AggregateType}
 }
 
-func (i *ExternalIDP) CurrentSequence() (uint64, error) {
-	sequence, err := i.view.GetLatestExternalIDPSequence()
+func (i *ExternalIDP) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := i.view.GetLatestExternalIDPSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -78,13 +78,29 @@ func (i *ExternalIDP) CurrentSequence() (uint64, error) {
 }
 
 func (i *ExternalIDP) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestExternalIDPSequence()
+	sequences, err := i.view.GetLatestExternalIDPSequences()
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
+	query := es_models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(i.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
 		AggregateTypeFilter(i.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (i *ExternalIDP) Reduce(event *es_models.Event) (err error) {
@@ -111,9 +127,9 @@ func (i *ExternalIDP) processUser(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event)
+		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, externalIDP.InstanceID, event)
 	case user.UserRemovedType:
-		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event)
+		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event.InstanceID, event)
 	default:
 		return i.view.ProcessedExternalIDPSequence(event)
 	}
@@ -133,7 +149,7 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 		} else {
 			configView.AppendEvent(iam_model.IDPProviderTypeOrg, event)
 		}
-		exterinalIDPs, err := i.view.ExternalIDPsByIDPConfigID(configView.IDPConfigID)
+		exterinalIDPs, err := i.view.ExternalIDPsByIDPConfigID(configView.IDPConfigID, configView.InstanceID)
 		if err != nil {
 			return err
 		}

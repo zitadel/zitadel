@@ -11,9 +11,12 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-func RefreshTokenByID(db *gorm.DB, table, tokenID string) (*usr_model.RefreshTokenView, error) {
+func RefreshTokenByID(db *gorm.DB, table, tokenID, instanceID string) (*usr_model.RefreshTokenView, error) {
 	token := new(usr_model.RefreshTokenView)
-	query := repository.PrepareGetByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyRefreshTokenID), tokenID)
+	query := repository.PrepareGetByQuery(table,
+		&usr_model.RefreshTokenSearchQuery{Key: model.RefreshTokenSearchKeyRefreshTokenID, Method: domain.SearchMethodEquals, Value: tokenID},
+		&usr_model.RefreshTokenSearchQuery{Key: model.RefreshTokenSearchKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID},
+	)
 	err := query(db, token)
 	if errors.IsNotFound(err) {
 		return nil, errors.ThrowNotFound(nil, "VIEW-6ub3p", "Errors.RefreshToken.NotFound")
@@ -21,15 +24,20 @@ func RefreshTokenByID(db *gorm.DB, table, tokenID string) (*usr_model.RefreshTok
 	return token, err
 }
 
-func RefreshTokensByUserID(db *gorm.DB, table, userID string) ([]*usr_model.RefreshTokenView, error) {
+func RefreshTokensByUserID(db *gorm.DB, table, userID, instanceID string) ([]*usr_model.RefreshTokenView, error) {
 	tokens := make([]*usr_model.RefreshTokenView, 0)
 	userIDQuery := &model.RefreshTokenSearchQuery{
 		Key:    model.RefreshTokenSearchKeyUserID,
 		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
+	instanceIDQuery := &model.RefreshTokenSearchQuery{
+		Key:    model.RefreshTokenSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
 	query := repository.PrepareSearchQuery(table, usr_model.RefreshTokenSearchRequest{
-		Queries: []*model.RefreshTokenSearchQuery{userIDQuery},
+		Queries: []*model.RefreshTokenSearchQuery{userIDQuery, instanceIDQuery},
 	})
 	_, err := query(db, &tokens)
 	return tokens, err
@@ -59,8 +67,11 @@ func SearchRefreshTokens(db *gorm.DB, table string, req *model.RefreshTokenSearc
 	return tokens, count, err
 }
 
-func DeleteRefreshToken(db *gorm.DB, table, tokenID string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyRefreshTokenID), tokenID)
+func DeleteRefreshToken(db *gorm.DB, table, tokenID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyRefreshTokenID), tokenID},
+		repository.Key{usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyInstanceID), instanceID},
+	)
 	return delete(db)
 }
 
@@ -72,8 +83,11 @@ func DeleteSessionRefreshTokens(db *gorm.DB, table, agentID, userID string) erro
 	return delete(db)
 }
 
-func DeleteUserRefreshTokens(db *gorm.DB, table, userID string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyUserID), userID)
+func DeleteUserRefreshTokens(db *gorm.DB, table, userID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyUserID), userID},
+		repository.Key{usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyInstanceID), instanceID},
+	)
 	return delete(db)
 }
 

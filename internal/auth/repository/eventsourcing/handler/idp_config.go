@@ -54,8 +54,8 @@ func (_ *IDPConfig) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{org.AggregateType, instance.AggregateType}
 }
 
-func (i *IDPConfig) CurrentSequence() (uint64, error) {
-	sequence, err := i.view.GetLatestIDPConfigSequence()
+func (i *IDPConfig) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := i.view.GetLatestIDPConfigSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -63,13 +63,30 @@ func (i *IDPConfig) CurrentSequence() (uint64, error) {
 }
 
 func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestIDPConfigSequence()
+	sequences, err := i.view.GetLatestIDPConfigSequences()
 	if err != nil {
 		return nil, err
 	}
-	return models.NewSearchQuery().
+
+	query := models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(i.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
 		AggregateTypeFilter(i.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (i *IDPConfig) Reduce(event *models.Event) (err error) {
@@ -97,7 +114,7 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		idp, err = i.view.IDPConfigByID(idp.IDPConfigID)
+		idp, err = i.view.IDPConfigByID(idp.IDPConfigID, idp.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -108,7 +125,7 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		idp, err = i.view.IDPConfigByID(idp.IDPConfigID)
+		idp, err = i.view.IDPConfigByID(idp.IDPConfigID, idp.InstanceID)
 		if err != nil {
 			return err
 		}

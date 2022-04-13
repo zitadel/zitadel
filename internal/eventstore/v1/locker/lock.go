@@ -7,16 +7,17 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 const (
 	insertStmtFormat = "INSERT INTO %s" +
-		" (locker_id, locked_until, view_name) VALUES ($1, now()+$2::INTERVAL, $3)" +
-		" ON CONFLICT (view_name)" +
-		" DO UPDATE SET locker_id = $4, locked_until = now()+$5::INTERVAL" +
-		" WHERE locks.view_name = $6 AND (locks.locker_id = $7 OR locks.locked_until < now())"
+		" (locker_id, locked_until, view_name, instance_id) VALUES ($1, now()+$2::INTERVAL, $3, $4)" +
+		" ON CONFLICT (view_name, instance_id)" +
+		" DO UPDATE SET locker_id = $1, locked_until = now()+$2::INTERVAL" +
+		" WHERE locks.view_name = $3 AND locks.instance_id = $4 AND (locks.locker_id = $1 OR locks.locked_until < now())"
 	millisecondsAsSeconds = int64(time.Second / time.Millisecond)
 )
 
@@ -26,13 +27,11 @@ type lock struct {
 	ViewName    string    `gorm:"column:view_name;primary_key"`
 }
 
-func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel string, waitTime time.Duration) error {
+func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel, instanceID string, waitTime time.Duration) error {
 	return crdb.ExecuteTx(context.Background(), dbClient, nil, func(tx *sql.Tx) error {
 		insert := fmt.Sprintf(insertStmtFormat, lockTable)
 		result, err := tx.Exec(insert,
-			lockerID, waitTime.Milliseconds()/millisecondsAsSeconds, viewModel,
-			lockerID, waitTime.Milliseconds()/millisecondsAsSeconds,
-			viewModel, lockerID)
+			lockerID, waitTime.Milliseconds()/millisecondsAsSeconds, viewModel, instanceID)
 
 		if err != nil {
 			tx.Rollback()

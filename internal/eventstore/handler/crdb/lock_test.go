@@ -32,6 +32,7 @@ func TestStatementHandler_handleLock(t *testing.T) {
 		lockDuration time.Duration
 		ctx          context.Context
 		errMock      *errsMock
+		instanceID   string
 	}
 	tests := []struct {
 		name string
@@ -42,9 +43,9 @@ func TestStatementHandler_handleLock(t *testing.T) {
 			name: "lock fails",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 2),
-					expectLock(lockTable, workerName, 2),
-					expectLockErr(lockTable, workerName, 2, errLock),
+					expectLock(lockTable, workerName, 2, "instanceID"),
+					expectLock(lockTable, workerName, 2, "instanceID"),
+					expectLockErr(lockTable, workerName, 2, "instanceID", errLock),
 				},
 			},
 			args: args{
@@ -55,14 +56,15 @@ func TestStatementHandler_handleLock(t *testing.T) {
 					successfulIters: 2,
 					shouldErr:       true,
 				},
+				instanceID: "instanceID",
 			},
 		},
 		{
 			name: "success",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 2),
-					expectLock(lockTable, workerName, 2),
+					expectLock(lockTable, workerName, 2, "instanceID"),
+					expectLock(lockTable, workerName, 2, "instanceID"),
 				},
 			},
 			args: args{
@@ -72,6 +74,7 @@ func TestStatementHandler_handleLock(t *testing.T) {
 					errs:            make(chan error),
 					successfulIters: 2,
 				},
+				instanceID: "instanceID",
 			},
 		},
 	}
@@ -96,7 +99,7 @@ func TestStatementHandler_handleLock(t *testing.T) {
 
 			go tt.args.errMock.handleErrs(t, cancel)
 
-			go h.handleLock(ctx, tt.args.errMock.errs, tt.args.lockDuration)
+			go h.handleLock(ctx, tt.args.errMock.errs, tt.args.lockDuration, tt.args.instanceID)
 
 			<-ctx.Done()
 
@@ -115,6 +118,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 	}
 	type args struct {
 		lockDuration time.Duration
+		instanceID   string
 	}
 	tests := []struct {
 		name string
@@ -125,7 +129,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			name: "lock fails",
 			want: want{
 				expectations: []mockExpectation{
-					expectLockErr(lockTable, workerName, 1, sql.ErrTxDone),
+					expectLockErr(lockTable, workerName, 1, "instanceID", sql.ErrTxDone),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, sql.ErrTxDone)
@@ -133,13 +137,14 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 1 * time.Second,
+				instanceID:   "instanceID",
 			},
 		},
 		{
 			name: "lock no rows",
 			want: want{
 				expectations: []mockExpectation{
-					expectLockNoRows(lockTable, workerName, 2),
+					expectLockNoRows(lockTable, workerName, 2, "instanceID"),
 				},
 				isErr: func(err error) bool {
 					return errors.As(err, &renewNoRowsAffectedErr)
@@ -147,13 +152,14 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 2 * time.Second,
+				instanceID:   "instanceID",
 			},
 		},
 		{
 			name: "success",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 3),
+					expectLock(lockTable, workerName, 3, "instanceID"),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
@@ -161,6 +167,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 3 * time.Second,
+				instanceID:   "instanceID",
 			},
 		},
 	}
@@ -181,7 +188,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 				expectation(mock)
 			}
 
-			err = h.renewLock(context.Background(), tt.args.lockDuration)
+			err = h.renewLock(context.Background(), tt.args.lockDuration, tt.args.instanceID)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error = %v", err)
 			}
@@ -199,15 +206,22 @@ func TestStatementHandler_Unlock(t *testing.T) {
 		expectations []mockExpectation
 		isErr        func(err error) bool
 	}
+	type args struct {
+		instanceID string
+	}
 	tests := []struct {
 		name string
+		args args
 		want want
 	}{
 		{
 			name: "unlock fails",
+			args: args{
+				instanceID: "instanceID",
+			},
 			want: want{
 				expectations: []mockExpectation{
-					expectLockErr(lockTable, workerName, 0, sql.ErrTxDone),
+					expectLockErr(lockTable, workerName, 0, "instanceID", sql.ErrTxDone),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, sql.ErrTxDone)
@@ -216,9 +230,12 @@ func TestStatementHandler_Unlock(t *testing.T) {
 		},
 		{
 			name: "success",
+			args: args{
+				instanceID: "instanceID",
+			},
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 0),
+					expectLock(lockTable, workerName, 0, "instanceID"),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
@@ -243,7 +260,7 @@ func TestStatementHandler_Unlock(t *testing.T) {
 				expectation(mock)
 			}
 
-			err = h.Unlock()
+			err = h.Unlock(tt.args.instanceID)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error = %v", err)
 			}

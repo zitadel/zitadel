@@ -50,6 +50,8 @@ const (
 	OperationIn
 	//OperationJSONContains checks if a stored value matches the given json
 	OperationJSONContains
+	//OperationNotIn checks if a stored value does not match one of the passed value list
+	OperationNotIn
 
 	operationCount
 )

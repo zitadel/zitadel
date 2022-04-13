@@ -45,7 +45,7 @@ type LabelPolicyView struct {
 	Default             bool   `json:"-" gorm:"-"`
 
 	Sequence   uint64 `json:"-" gorm:"column:sequence"`
-	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 type AssetView struct {

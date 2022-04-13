@@ -67,8 +67,8 @@ func (_ *Styling) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{org.AggregateType, instance.AggregateType}
 }
 
-func (m *Styling) CurrentSequence() (uint64, error) {
-	sequence, err := m.view.GetLatestStylingSequence()
+func (m *Styling) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := m.view.GetLatestStylingSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -76,13 +76,29 @@ func (m *Styling) CurrentSequence() (uint64, error) {
 }
 
 func (m *Styling) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestStylingSequence()
+	sequences, err := m.view.GetLatestStylingSequences()
 	if err != nil {
 		return nil, err
 	}
-	return models.NewSearchQuery().
+	query := models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(m.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
 		AggregateTypeFilter(m.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (m *Styling) Reduce(event *models.Event) (err error) {
@@ -123,7 +139,7 @@ func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 		org.LabelPolicyFontRemovedEventType,
 		instance.LabelPolicyAssetsRemovedEventType,
 		org.LabelPolicyAssetsRemovedEventType:
-		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
+		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, event.InstanceID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
 		}
@@ -131,7 +147,7 @@ func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 
 	case instance.LabelPolicyActivatedEventType,
 		org.LabelPolicyActivatedEventType:
-		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
+		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, event.InstanceID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
 		}

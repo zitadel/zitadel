@@ -55,6 +55,8 @@ func (key NotifyUserSearchKey) ToColumnName() string {
 		return NotifyUserKeyUserID
 	case usr_model.NotifyUserSearchKeyResourceOwner:
 		return NotifyUserKeyResourceOwner
+	case usr_model.NotifyUserSearchKeyInstanceID:
+		return NotifyUserKeyInstanceID
 	default:
 		return ""
 	}

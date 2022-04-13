@@ -67,8 +67,8 @@ func (_ *NotifyUser) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, org.AggregateType}
 }
 
-func (p *NotifyUser) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestNotifyUserSequence()
+func (p *NotifyUser) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := p.view.GetLatestNotifyUserSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -76,13 +76,29 @@ func (p *NotifyUser) CurrentSequence() (uint64, error) {
 }
 
 func (p *NotifyUser) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := p.view.GetLatestNotifyUserSequence()
+	sequences, err := p.view.GetLatestNotifyUserSequences()
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
+	query := es_models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(p.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
 		AggregateTypeFilter(p.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (u *NotifyUser) Reduce(event *es_models.Event) (err error) {
@@ -122,14 +138,14 @@ func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
 		user.HumanPhoneVerifiedType,
 		user.HumanPhoneRemovedType,
 		user.MachineChangedEventType:
-		notifyUser, err = u.view.NotifyUserByID(event.AggregateID)
+		notifyUser, err = u.view.NotifyUserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
 		err = notifyUser.AppendEvent(event)
 	case user.UserDomainClaimedType,
 		user.UserUserNameChangedType:
-		notifyUser, err = u.view.NotifyUserByID(event.AggregateID)
+		notifyUser, err = u.view.NotifyUserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -139,7 +155,7 @@ func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
 		}
 		err = u.fillLoginNames(notifyUser)
 	case user.UserRemovedType:
-		return u.view.DeleteNotifyUser(event.AggregateID, event)
+		return u.view.DeleteNotifyUser(event.AggregateID, event.InstanceID, event)
 	default:
 		return u.view.ProcessedNotifyUserSequence(event)
 	}
@@ -169,7 +185,7 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	users, err := u.view.NotifyUsersByOrgID(event.AggregateID)
+	users, err := u.view.NotifyUsersByOrgID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -191,7 +207,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 	if !userLoginMustBeDomain {
 		return nil
 	}
-	users, err := u.view.NotifyUsersByOrgID(event.AggregateID)
+	users, err := u.view.NotifyUsersByOrgID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}

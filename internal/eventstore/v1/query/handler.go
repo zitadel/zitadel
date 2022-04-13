@@ -26,7 +26,7 @@ type Handler interface {
 	QueryLimit() uint64
 
 	AggregateTypes() []models.AggregateType
-	CurrentSequence() (uint64, error)
+	CurrentSequence(instanceID string) (uint64, error)
 	Eventstore() v1.Eventstore
 
 	Subscription() *v1.Subscription
@@ -41,15 +41,18 @@ func ReduceEvent(handler Handler, event *models.Event) {
 			handler.Subscription().Unsubscribe()
 		}
 	}()
-	currentSequence, err := handler.CurrentSequence()
+	currentSequence, err := handler.CurrentSequence(event.InstanceID)
 	if err != nil {
 		logging.New().WithError(err).Warn("unable to get current sequence")
 		return
 	}
 
 	searchQuery := models.NewSearchQuery().
+		AddQuery().
 		AggregateTypeFilter(handler.AggregateTypes()...).
 		SequenceBetween(currentSequence, event.Sequence).
+		InstanceIDFilter(event.InstanceID).
+		SearchQuery().
 		SetLimit(eventLimit)
 
 	unprocessedEvents, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
@@ -59,7 +62,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 	}
 
 	for _, unprocessedEvent := range unprocessedEvents {
-		currentSequence, err := handler.CurrentSequence()
+		currentSequence, err := handler.CurrentSequence(unprocessedEvent.InstanceID)
 		if err != nil {
 			logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
 			return

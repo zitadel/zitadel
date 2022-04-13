@@ -17,6 +17,7 @@ const (
 	ExternalIDPKeyUserID         = "user_id"
 	ExternalIDPKeyIDPConfigID    = "idp_config_id"
 	ExternalIDPKeyResourceOwner  = "resource_owner"
+	ExternalIDPKeyInstanceID     = "instance_id"
 )
 
 type ExternalIDPView struct {
@@ -29,7 +30,7 @@ type ExternalIDPView struct {
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	ResourceOwner   string    `json:"-" gorm:"column:resource_owner"`
 	Sequence        uint64    `json:"-" gorm:"column:sequence"`
-	InstanceID      string    `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID      string    `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func (i *ExternalIDPView) AppendEvent(event *models.Event) (err error) {

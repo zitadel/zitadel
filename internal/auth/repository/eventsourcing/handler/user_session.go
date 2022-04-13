@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/user/repository/view"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -57,8 +56,8 @@ func (_ *UserSession) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{user.AggregateType}
 }
 
-func (u *UserSession) CurrentSequence() (uint64, error) {
-	sequence, err := u.view.GetLatestUserSessionSequence()
+func (u *UserSession) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := u.view.GetLatestUserSessionSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -66,11 +65,29 @@ func (u *UserSession) CurrentSequence() (uint64, error) {
 }
 
 func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSessionSequence()
+	sequences, err := u.view.GetLatestUserSessionSequences()
 	if err != nil {
 		return nil, err
 	}
-	return view.UserQuery(sequence.CurrentSequence), nil
+	query := models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(u.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
+		AggregateTypeFilter(u.AggregateTypes()...).
+		LatestSequenceFilter(0).
+		IgnoredInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (u *UserSession) Reduce(event *models.Event) (err error) {
@@ -95,7 +112,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.AggregateID)
+		session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.AggregateID, event.InstanceID)
 		if err != nil {
 			if !errors.IsNotFound(err) {
 				return err
@@ -126,7 +143,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		user.UserIDPLinkCascadeRemovedType,
 		user.HumanPasswordlessTokenRemovedType,
 		user.HumanU2FTokenRemovedType:
-		sessions, err := u.view.UserSessionsByUserID(event.AggregateID)
+		sessions, err := u.view.UserSessionsByUserID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -143,7 +160,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		}
 		return u.view.PutUserSessions(sessions, event)
 	case user.UserRemovedType:
-		return u.view.DeleteUserSessions(event.AggregateID, event)
+		return u.view.DeleteUserSessions(event.AggregateID, event.InstanceID, event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event)
 	}
@@ -169,7 +186,7 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event *
 }
 
 func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, id string) error {
-	user, err := u.view.UserByID(id)
+	user, err := u.view.UserByID(id, session.InstanceID)
 	if err != nil {
 		return err
 	}
