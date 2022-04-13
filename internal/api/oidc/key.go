@@ -154,7 +154,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	errs := o.locker.Lock(ctx, o.signingKeyRotationCheck*2)
+	errs := o.locker.Lock(ctx, o.signingKeyRotationCheck*2, authz.GetInstance(ctx).InstanceID())
 	err, ok := <-errs
 	if err != nil || !ok {
 		if errors.IsErrorAlreadyExists(err) {
