@@ -21,7 +21,7 @@ type SearchQuery struct {
 	aggregateTypes       []AggregateType
 	aggregateIDs         []string
 	instanceID           string
-	ignoredInstanceIDs   []string
+	excludedInstanceIDs  []string
 	eventSequenceGreater uint64
 	eventSequenceLess    uint64
 	eventTypes           []EventType
@@ -157,9 +157,9 @@ func (query *SearchQuery) InstanceID(instanceID string) *SearchQuery {
 	return query
 }
 
-//NotInstanceID filters for events not having the given instanceIDs
-func (query *SearchQuery) NotInstanceID(instanceIDs ...string) *SearchQuery {
-	query.ignoredInstanceIDs = instanceIDs
+//ExcludedInstanceID filters for events not having the given instanceIDs
+func (query *SearchQuery) ExcludedInstanceID(instanceIDs ...string) *SearchQuery {
+	query.excludedInstanceIDs = instanceIDs
 	return query
 }
 
@@ -221,7 +221,7 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 			query.eventSequenceGreaterFilter,
 			query.eventSequenceLessFilter,
 			query.instanceIDFilter,
-			query.ignoredInstanceIDFilter,
+			query.excludedInstanceIDFilter,
 			query.builder.resourceOwnerFilter,
 			query.builder.instanceIDFilter,
 		} {
@@ -307,11 +307,11 @@ func (query *SearchQuery) instanceIDFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldInstanceID, query.instanceID, repository.OperationEquals)
 }
 
-func (query *SearchQuery) ignoredInstanceIDFilter() *repository.Filter {
-	if len(query.ignoredInstanceIDs) == 0 {
+func (query *SearchQuery) excludedInstanceIDFilter() *repository.Filter {
+	if len(query.excludedInstanceIDs) == 0 {
 		return nil
 	}
-	return repository.NewFilter(repository.FieldInstanceID, query.ignoredInstanceIDs, repository.OperationNotIn)
+	return repository.NewFilter(repository.FieldInstanceID, query.excludedInstanceIDs, repository.OperationNotIn)
 }
 
 func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {

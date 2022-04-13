@@ -114,7 +114,7 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 			AddQuery().
 			AggregateTypes(aggregateType).
 			SequenceGreater(0).
-			NotInstanceID(instances...)
+			ExcludedInstanceID(instances...)
 	}
 
 	return queryBuilder, h.bulkLimit, nil

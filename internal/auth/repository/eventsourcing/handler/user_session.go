@@ -86,7 +86,7 @@ func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
 	return query.AddQuery().
 		AggregateTypeFilter(u.AggregateTypes()...).
 		LatestSequenceFilter(0).
-		IgnoredInstanceIDsFilter(instances...).
+		ExcludedInstanceIDsFilter(instances...).
 		SearchQuery(), nil
 }
 

@@ -129,7 +129,7 @@ func (n *Notification) EventQuery() (*models.SearchQuery, error) {
 	return query.AddQuery().
 		AggregateTypeFilter(n.AggregateTypes()...).
 		LatestSequenceFilter(0).
-		IgnoredInstanceIDsFilter(instances...).
+		ExcludedInstanceIDsFilter(instances...).
 		SearchQuery(), nil
 }
 

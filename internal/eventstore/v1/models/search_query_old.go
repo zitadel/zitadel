@@ -104,7 +104,7 @@ func (q *Query) InstanceIDFilter(instanceID string) *Query {
 	return q.setFilter(NewFilter(Field_InstanceID, instanceID, Operation_Equals))
 }
 
-func (q *Query) IgnoredInstanceIDsFilter(instanceIDs ...string) *Query {
+func (q *Query) ExcludedInstanceIDsFilter(instanceIDs ...string) *Query {
 	return q.setFilter(NewFilter(Field_InstanceID, instanceIDs, Operation_NotIn))
 }
 

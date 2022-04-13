@@ -109,7 +109,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 					Or().
 					AggregateTypes("testAgg").
 					SequenceGreater(0).
-					NotInstanceID("instanceID").
+					ExcludedInstanceID("instanceID").
 					Builder().
 					Limit(5),
 			},

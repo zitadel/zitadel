@@ -85,7 +85,7 @@ func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
 	return query.AddQuery().
 		AggregateTypeFilter(i.AggregateTypes()...).
 		LatestSequenceFilter(0).
-		IgnoredInstanceIDsFilter(instances...).
+		ExcludedInstanceIDsFilter(instances...).
 		SearchQuery(), nil
 }
 

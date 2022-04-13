@@ -97,7 +97,7 @@ func (m *Styling) EventQuery() (*models.SearchQuery, error) {
 	return query.AddQuery().
 		AggregateTypeFilter(m.AggregateTypes()...).
 		LatestSequenceFilter(0).
-		IgnoredInstanceIDsFilter(instances...).
+		ExcludedInstanceIDsFilter(instances...).
 		SearchQuery(), nil
 }
 

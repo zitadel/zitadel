@@ -88,7 +88,7 @@ func (t *RefreshToken) EventQuery() (*es_models.SearchQuery, error) {
 	return query.AddQuery().
 		AggregateTypeFilter(t.AggregateTypes()...).
 		LatestSequenceFilter(0).
-		IgnoredInstanceIDsFilter(instances...).
+		ExcludedInstanceIDsFilter(instances...).
 		SearchQuery(), nil
 }
 
