@@ -31,6 +31,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						` projections.instance_domains.domain,`+
 						` projections.instance_domains.instance_id,`+
 						` projections.instance_domains.is_generated,`+
+						` projections.instance_domains.is_primary,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.instance_domains`),
 					nil,
@@ -50,6 +51,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						` projections.instance_domains.domain,`+
 						` projections.instance_domains.instance_id,`+
 						` projections.instance_domains.is_generated,`+
+						` projections.instance_domains.is_primary,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.instance_domains`),
 					[]string{
@@ -59,6 +61,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						"domain",
 						"instance_id",
 						"is_generated",
+						"is_primary",
 						"count",
 					},
 					[][]driver.Value{
@@ -68,6 +71,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 							uint64(20211109),
 							"zitadel.ch",
 							"inst-id",
+							true,
 							true,
 						},
 					},
@@ -85,6 +89,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						Domain:       "zitadel.ch",
 						InstanceID:   "inst-id",
 						IsGenerated:  true,
+						IsPrimary:    true,
 					},
 				},
 			},
@@ -100,6 +105,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						` projections.instance_domains.domain,`+
 						` projections.instance_domains.instance_id,`+
 						` projections.instance_domains.is_generated,`+
+						` projections.instance_domains.is_primary,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.instance_domains`),
 					[]string{
@@ -109,6 +115,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						"domain",
 						"instance_id",
 						"is_generated",
+						"is_primary",
 						"count",
 					},
 					[][]driver.Value{
@@ -119,6 +126,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 							"zitadel.ch",
 							"inst-id",
 							true,
+							true,
 						},
 						{
 							testNow,
@@ -126,6 +134,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 							uint64(20211109),
 							"zitadel.com",
 							"inst-id",
+							false,
 							false,
 						},
 					},
@@ -143,6 +152,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						Domain:       "zitadel.ch",
 						InstanceID:   "inst-id",
 						IsGenerated:  true,
+						IsPrimary:    true,
 					},
 					{
 						CreationDate: testNow,
@@ -151,6 +161,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						Domain:       "zitadel.com",
 						InstanceID:   "inst-id",
 						IsGenerated:  false,
+						IsPrimary:    false,
 					},
 				},
 			},
@@ -166,6 +177,7 @@ func Test_InstanceDomainPrepares(t *testing.T) {
 						` projections.instance_domains.domain,`+
 						` projections.instance_domains.instance_id,`+
 						` projections.instance_domains.is_generated,`+
+						` projections.instance_domains.is_primary,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.instance_domains`),
 					sql.ErrConnDone,
