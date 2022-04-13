@@ -79,6 +79,10 @@ func (m *mockInstance) ConsoleClientID() string {
 	return "consoleID"
 }
 
+func (m *mockInstance) ConsoleApplicationID() string {
+	return "appID"
+}
+
 func (m *mockInstance) RequestedDomain() string {
 	return "zitadel.cloud"
 }

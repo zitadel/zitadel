@@ -79,7 +79,36 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			if domainWriteModel.State == domain.InstanceDomainStateActive {
 				return nil, errors.ThrowAlreadyExists(nil, "INST-i2nl", "Errors.Instance.Domain.AlreadyExists")
 			}
-			return []eventstore.Command{instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated)}, nil
+			appWriteModel, err := c.getOIDCAppWriteModel(ctx, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID(), "")
+			if err != nil {
+				return nil, err
+			}
+			events := []eventstore.Command{instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated)}
+
+			redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
+			logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
+			changedEvent, hasChanged, err := appWriteModel.NewChangedEvent(
+				ctx,
+				ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
+				appWriteModel.AppID,
+				redirectUrls,
+				logoutUrls,
+				appWriteModel.ResponseTypes,
+				appWriteModel.GrantTypes,
+				appWriteModel.ApplicationType,
+				appWriteModel.AuthMethodType,
+				appWriteModel.OIDCVersion,
+				appWriteModel.AccessTokenType,
+				appWriteModel.DevMode,
+				appWriteModel.AccessTokenRoleAssertion,
+				appWriteModel.IDTokenRoleAssertion,
+				appWriteModel.IDTokenUserinfoAssertion,
+				appWriteModel.ClockSkew,
+				appWriteModel.AdditionalOrigins)
+			if hasChanged {
+				events = append(events, changedEvent)
+			}
+			return events, nil
 		}, nil
 	}
 }
