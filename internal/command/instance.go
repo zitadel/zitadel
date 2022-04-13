@@ -163,6 +163,12 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	if err != nil {
 		return nil, err
 	}
+
+	if err = c.es.NewInstance(ctx, instanceID); err != nil {
+		return nil, err
+	}
+
+	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 	requestedDomain := authz.GetInstance(ctx).RequestedDomain()
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), requestedDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
