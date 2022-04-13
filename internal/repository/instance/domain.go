@@ -11,10 +11,11 @@ import (
 )
 
 const (
-	UniqueInstanceDomain           = "instance_domain"
-	domainEventPrefix              = instanceEventTypePrefix + "domain."
-	InstanceDomainAddedEventType   = domainEventPrefix + "added"
-	InstanceDomainRemovedEventType = domainEventPrefix + "removed"
+	UniqueInstanceDomain              = "instance_domain"
+	domainEventPrefix                 = instanceEventTypePrefix + "domain."
+	InstanceDomainAddedEventType      = domainEventPrefix + "added"
+	InstanceDomainPrimarySetEventType = domainEventPrefix + "primary.set"
+	InstanceDomainRemovedEventType    = domainEventPrefix + "removed"
 )
 
 func NewAddInstanceDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
@@ -64,6 +65,43 @@ func DomainAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	err := json.Unmarshal(event.Data, orgDomainAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "INSTANCE-3noij", "unable to unmarshal instance domain added")
+	}
+
+	return orgDomainAdded, nil
+}
+
+type DomainPrimarySetEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Domain string `json:"domain,omitempty"`
+}
+
+func (e *DomainPrimarySetEvent) Data() interface{} {
+	return e
+}
+
+func (e *DomainPrimarySetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewDomainPrimarySetEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainPrimarySetEvent {
+	return &DomainPrimarySetEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			InstanceDomainPrimarySetEventType,
+		),
+		Domain: domain,
+	}
+}
+
+func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.Event, error) {
+	orgDomainAdded := &DomainAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, orgDomainAdded)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "INSTANCE-29jöF", "unable to unmarshal instance domain added")
 	}
 
 	return orgDomainAdded, nil

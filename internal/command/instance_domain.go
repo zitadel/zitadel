@@ -30,6 +30,24 @@ func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string)
 	}, nil
 }
 
+func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.setPrimaryInstanceDomain(instanceAgg, instanceDomain)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
 func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.removeInstanceDomain(instanceAgg, instanceDomain)
@@ -62,6 +80,24 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 				return nil, errors.ThrowAlreadyExists(nil, "INST-i2nl", "Errors.Instance.Domain.AlreadyExists")
 			}
 			return []eventstore.Command{instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated)}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-9mWjf", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, instanceDomain)
+			if err != nil {
+				return nil, err
+			}
+			if !domainWriteModel.State.Exists() {
+				return nil, errors.ThrowNotFound(nil, "INSTANCE-9nkWf", "Errors.Instance.Domain.NotFound")
+			}
+			return []eventstore.Command{instance.NewDomainPrimarySetEvent(ctx, &a.Aggregate, instanceDomain)}, nil
 		}, nil
 	}
 }
