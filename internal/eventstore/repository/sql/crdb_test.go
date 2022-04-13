@@ -561,6 +561,84 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 }
 
+func TestCRDB_CreateInstance(t *testing.T) {
+	type args struct {
+		instanceID string
+	}
+	type res struct {
+		wantErr bool
+		exists  bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no number",
+			args: args{
+				instanceID: "asdf;use defaultdb;DROP DATABASE zitadel;--",
+			},
+			res: res{
+				wantErr: true,
+				exists:  false,
+			},
+		},
+		{
+			name: "no instance id",
+			args: args{
+				instanceID: "",
+			},
+			res: res{
+				wantErr: true,
+				exists:  false,
+			},
+		},
+		{
+			name: "correct number",
+			args: args{
+				instanceID: "1235",
+			},
+			res: res{
+				wantErr: false,
+				exists:  true,
+			},
+		},
+		{
+			name: "correct text",
+			args: args{
+				instanceID: "system",
+			},
+			res: res{
+				wantErr: false,
+				exists:  true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &CRDB{
+				client: testCRDBClient,
+			}
+
+			if err := db.CreateInstance(context.Background(), tt.args.instanceID); (err != nil) != tt.res.wantErr {
+				t.Errorf("CRDB.CreateInstance() error = %v, wantErr %v", err, tt.res.wantErr)
+			}
+
+			sequenceRow := testCRDBClient.QueryRow("SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES FROM eventstore] WHERE sequence_name like $1)", "i_"+tt.args.instanceID+"%")
+			var exists bool
+			err := sequenceRow.Scan(&exists)
+			if err != nil {
+				t.Error("unable to query inserted rows: ", err)
+				return
+			}
+			if exists != tt.res.exists {
+				t.Errorf("expected exists %v got %v", tt.res.exists, exists)
+			}
+		})
+	}
+}
+
 func TestCRDB_Push_Parallel(t *testing.T) {
 	type args struct {
 		events [][]*repository.Event

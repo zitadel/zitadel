@@ -16,6 +16,6 @@ type Repository interface {
 	Filter(ctx context.Context, searchQuery *SearchQuery) (events []*Event, err error)
 	//LatestSequence returns the latests sequence found by the the search query
 	LatestSequence(ctx context.Context, queryFactory *SearchQuery) (uint64, error)
-
-	Step20(ctx context.Context, latestSequence uint64) error
+	//CreateInstance creates a new sequence for the given instance
+	CreateInstance(ctx context.Context, instanceID string) error
 }
