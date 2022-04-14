@@ -83,32 +83,24 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			if err != nil {
 				return nil, err
 			}
-			events := []eventstore.Command{instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated)}
-
 			redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
 			logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
-			changedEvent, hasChanged, err := appWriteModel.NewChangedEvent(
+			consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(
 				ctx,
 				ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
 				appWriteModel.AppID,
-				redirectUrls,
-				logoutUrls,
-				appWriteModel.ResponseTypes,
-				appWriteModel.GrantTypes,
-				appWriteModel.ApplicationType,
-				appWriteModel.AuthMethodType,
-				appWriteModel.OIDCVersion,
-				appWriteModel.AccessTokenType,
-				appWriteModel.DevMode,
-				appWriteModel.AccessTokenRoleAssertion,
-				appWriteModel.IDTokenRoleAssertion,
-				appWriteModel.IDTokenUserinfoAssertion,
-				appWriteModel.ClockSkew,
-				appWriteModel.AdditionalOrigins)
-			if hasChanged {
-				events = append(events, changedEvent)
+				[]project.OIDCConfigChanges{
+					project.ChangeRedirectURIs(redirectUrls),
+					project.ChangePostLogoutRedirectURIs(logoutUrls),
+				},
+			)
+			if err != nil {
+				return nil, err
 			}
-			return events, nil
+			return []eventstore.Command{
+				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
+				consoleChangeEvent
+			}, nil
 		}, nil
 	}
 }
