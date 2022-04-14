@@ -10,8 +10,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://zitadel.ch/chat)
 [![follow us](https://badgen.net/twitter/follow/zitadel)](https://twitter.com/zitadel)
-<a href="https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL"></a>[![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
-
+<a href="https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL"><img src="./docs/static/logos/oidc-cert.png" alt="OpenID certification" height="35px" width="auto" /></a>
 ## What Is ZITADEL
 
 **ZITADEL** is a "Cloud Native Identity and Access Management" solution built for the cloud era. ZITADEL uses a modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and  [**CockroachDB**](https://www.cockroachlabs.com/) as sole storage and follows an event sourced pattern.
