@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
@@ -99,7 +100,7 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			}
 			return []eventstore.Command{
 				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
-				consoleChangeEvent
+				consoleChangeEvent,
 			}, nil
 		}, nil
 	}
