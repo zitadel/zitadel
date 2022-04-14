@@ -6,7 +6,7 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 )
@@ -46,6 +46,7 @@ func NewCreateStatement(event eventstore.Event, values []handler.Column, opts ..
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		InstanceID:       event.Aggregate().InstanceID,
 		Execute:          exec(config, q, opts),
 	}
 }
@@ -71,6 +72,7 @@ func NewUpsertStatement(event eventstore.Event, values []handler.Column, opts ..
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		InstanceID:       event.Aggregate().InstanceID,
 		Execute:          exec(config, q, opts),
 	}
 }
@@ -104,6 +106,7 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		InstanceID:       event.Aggregate().InstanceID,
 		Execute:          exec(config, q, opts),
 	}
 }
@@ -129,6 +132,7 @@ func NewDeleteStatement(event eventstore.Event, conditions []handler.Condition, 
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		InstanceID:       event.Aggregate().InstanceID,
 		Execute:          exec(config, q, opts),
 	}
 }
@@ -138,6 +142,7 @@ func NewNoOpStatement(event eventstore.Event) *handler.Statement {
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		InstanceID:       event.Aggregate().InstanceID,
 	}
 }
 
@@ -153,6 +158,7 @@ func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Ex
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		InstanceID:       event.Aggregate().InstanceID,
 		Execute:          multiExec(execs),
 	}
 }
@@ -278,6 +284,7 @@ func NewCopyStatement(event eventstore.Event, cols []handler.Column, conds []han
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		InstanceID:       event.Aggregate().InstanceID,
 		Execute:          exec(config, q, opts),
 	}
 }
@@ -327,7 +334,7 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 		}
 
 		if _, err := ex.Exec(q(config), config.args...); err != nil {
-			return errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
+			return caos_errs.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 
 		return nil

@@ -8,6 +8,9 @@ type UniqueConstraint struct {
 	//UniqueType is the type of the unique field
 	UniqueType string
 
+	//InstanceID represents the instance
+	InstanceID string
+
 	//Action defines if unique constraint should be added or removed
 	Action UniqueConstraintAction
 

@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-
-	"github.com/lib/pq"
 )
 
 const (
@@ -23,6 +22,7 @@ const (
 	TokenKeyUserAgentID    = "user_agent_id"
 	TokenKeyExpiration     = "expiration"
 	TokenKeyResourceOwner  = "resource_owner"
+	TokenKeyInstanceID     = "instance_id"
 )
 
 type TokenView struct {
@@ -41,6 +41,7 @@ type TokenView struct {
 	RefreshTokenID    string         `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
 	IsPAT             bool           `json:"-" gorm:"is_pat"`
 	Deactivated       bool           `json:"-" gorm:"-"`
+	InstanceID        string         `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {
@@ -64,16 +65,16 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 
 func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 	view := new(TokenView)
-	switch event.Type {
-	case usr_es_model.UserTokenAdded:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserTokenAddedType:
 		view.setRootData(event)
 		err = view.setData(event)
-	case es_models.EventType(user_repo.UserTokenRemovedType):
+	case user_repo.UserTokenRemovedType:
 		return t.appendTokenRemoved(event)
-	case es_models.EventType(user_repo.HumanRefreshTokenRemovedType):
+	case user_repo.HumanRefreshTokenRemovedType:
 		return t.appendRefreshTokenRemoved(event)
-	case usr_es_model.SignedOut,
-		usr_es_model.HumanSignedOut:
+	case user_repo.UserV1SignedOutType,
+		user_repo.HumanSignedOutType:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return err
@@ -82,13 +83,13 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 			t.Deactivated = true
 		}
 		return nil
-	case usr_es_model.UserRemoved,
-		usr_es_model.UserDeactivated,
-		usr_es_model.UserLocked:
+	case user_repo.UserRemovedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserLockedType:
 		t.Deactivated = true
 		return nil
-	case usr_es_model.UserUnlocked,
-		usr_es_model.UserReactivated:
+	case user_repo.UserUnlockedType,
+		user_repo.UserReactivatedType:
 		if t.ID != "" && event.CreationDate.Before(t.CreationDate) {
 			t.Deactivated = false
 		}
@@ -108,16 +109,16 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 func (t *TokenView) AppendEvent(event *es_models.Event) error {
 	t.ChangeDate = event.CreationDate
 	t.Sequence = event.Sequence
-	switch event.Type {
-	case usr_es_model.UserTokenAdded,
-		es_models.EventType(user_repo.PersonalAccessTokenAddedType):
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserTokenAddedType,
+		user_repo.PersonalAccessTokenAddedType:
 		t.setRootData(event)
 		err := t.setData(event)
 		if err != nil {
 			return err
 		}
 		t.CreationDate = event.CreationDate
-		t.IsPAT = event.Type == es_models.EventType(user_repo.PersonalAccessTokenAddedType)
+		t.IsPAT = eventstore.EventType(event.Type) == user_repo.PersonalAccessTokenAddedType
 	}
 	return nil
 }
@@ -125,6 +126,7 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 func (t *TokenView) setRootData(event *es_models.Event) {
 	t.UserID = event.AggregateID
 	t.ResourceOwner = event.ResourceOwner
+	t.InstanceID = event.InstanceID
 }
 
 func (t *TokenView) setData(event *es_models.Event) error {

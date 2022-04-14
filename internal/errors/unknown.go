@@ -32,3 +32,11 @@ func IsUnknown(err error) bool {
 	_, ok := err.(Unknown)
 	return ok
 }
+
+func (err *UnknownError) Is(target error) bool {
+	t, ok := target.(*UnknownError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}

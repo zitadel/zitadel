@@ -126,9 +126,9 @@ func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregat
 	return eventstore.AggregateFromWriteModel(wm, user.AggregateType, user.AggregateVersion)
 }
 
-func CheckOrgIAMPolicyForUserName(userName string, policy *domain.OrgIAMPolicy) error {
+func CheckDomainPolicyForUserName(userName string, policy *domain.DomainPolicy) error {
 	if policy == nil {
-		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-3Mb9s", "Errors.Users.OrgIamPolicyNil")
+		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-3Mb9s", "Errors.Users.DomainPolicyNil")
 	}
 	if policy.UserLoginMustBeDomain && strings.Contains(userName, "@") {
 		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-4M9vs", "Errors.User.EmailAsUsernameNotAllowed")

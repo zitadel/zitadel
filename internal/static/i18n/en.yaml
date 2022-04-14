@@ -22,6 +22,7 @@ Errors:
     Object:
       PutFailed: Object not created
       GetFailed: Object could not be read
+      NotFound: Object could not be found
       PresignedTokenFailed: Signed token could not be created
       ListFailed: Objectlist could not be read
       RemoveFailed: Object could not be removed
@@ -49,7 +50,7 @@ Errors:
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing
-    OrgIamPolicyNil: Organisation Policy is empty
+    DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
@@ -193,22 +194,22 @@ Errors:
       NotChanged: Default Message Text has not been changed
       AlreadyExists: Default Message Text already exists
       Invalid: Default Message Text is invalid
-    PasswordComplexity:
+    PasswordComplexityPolicy:
       NotFound: Password Complexity Policy not found
       Empty: Password Complexity Policy is empty
       NotExisting: Password Complexity Policy doesn't exist
       AlreadyExists: Password Complexity Policy already exists
-    PasswordLockout:
+    PasswordLockoutPolicy:
       NotFound: Password Lockout Policy not found
       Empty: Password Lockout Policy is empty
       NotExisting: Password Lockout Policy doesn't exist
       AlreadyExists: Password Lockout Policy already exists
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Password Age Policy not found
       Empty: Password Age Policy is empty
       NotExisting: Password Age Policy doesn't exist
       AlreadyExists: Password Age Policy already exists
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy doesn't exist
       AlreadyExists: Org IAM Policy already exists
@@ -325,7 +326,7 @@ Errors:
       AlreadyExists: Default Password Lockout Policy already existing
       Empty: Default Password Lockout Policy empty
       NotChanged: Default Password Lockout Policy has not been changed
-    OrgIAMPolicy:
+    DomainPolicy:
       NotFound: Org IAM Policy not found
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy not existing
@@ -589,6 +590,10 @@ EventTypes:
       cascade:
         removed: Authorization removed
         changed: Authorization changed
+    metadata:
+      set: User metadata set
+      removed: User metadata removed
+      removed.all: All user metadata removed
   org:
     added: Organization added
     changed: Organization changed

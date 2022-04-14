@@ -6,20 +6,23 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -62,7 +65,7 @@ func (m *UserMembership) Subscription() *v1.Subscription {
 }
 
 func (_ *UserMembership) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{iam_es_model.IAMAggregate, org_es_model.OrgAggregate, proj_es_model.ProjectAggregate, model.UserAggregate}
+	return []es_models.AggregateType{instance.AggregateType, org.AggregateType, project.AggregateType, user.AggregateType}
 }
 
 func (m *UserMembership) CurrentSequence() (uint64, error) {
@@ -85,13 +88,13 @@ func (m *UserMembership) EventQuery() (*es_models.SearchQuery, error) {
 
 func (m *UserMembership) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case iam_es_model.IAMAggregate:
+	case instance.AggregateType:
 		err = m.processIAM(event)
-	case org_es_model.OrgAggregate:
+	case org.AggregateType:
 		err = m.processOrg(event)
-	case proj_es_model.ProjectAggregate:
+	case project.AggregateType:
 		err = m.processProject(event)
-	case model.UserAggregate:
+	case user.AggregateType:
 		err = m.processUser(event)
 	}
 	return err
@@ -103,17 +106,17 @@ func (m *UserMembership) processIAM(event *es_models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	switch event.Type {
-	case iam_es_model.IAMMemberAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.MemberAddedEventType:
 		m.fillIamDisplayName(member)
-	case iam_es_model.IAMMemberChanged:
+	case instance.MemberChangedEventType:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam)
 		if err != nil {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case iam_es_model.IAMMemberRemoved,
-		iam_es_model.IAMMemberCascadeRemoved:
+	case instance.MemberRemovedEventType,
+		instance.MemberCascadeRemovedEventType:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeIam, event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event)
@@ -135,19 +138,19 @@ func (m *UserMembership) processOrg(event *es_models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	switch event.Type {
-	case org_es_model.OrgMemberAdded:
+	switch eventstore.EventType(event.Type) {
+	case org.MemberAddedEventType:
 		err = m.fillOrgName(member)
-	case org_es_model.OrgMemberChanged:
+	case org.MemberChangedEventType:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation)
 		if err != nil {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case org_es_model.OrgMemberRemoved,
-		org_es_model.OrgMemberCascadeRemoved:
+	case org.MemberRemovedEventType,
+		org.MemberCascadeRemovedEventType:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeOrganisation, event)
-	case org_es_model.OrgChanged:
+	case org.OrgChangedEventType:
 		return m.updateOrgName(event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event)
@@ -195,35 +198,35 @@ func (m *UserMembership) processProject(event *es_models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	switch event.Type {
-	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectGrantMemberAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.MemberAddedType, project.GrantMemberAddedType:
 		err = m.fillProjectDisplayName(member)
 		if err != nil {
 			return err
 		}
 		err = m.fillOrgName(member)
-	case proj_es_model.ProjectMemberChanged:
+	case project.MemberChangedType:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject)
 		if err != nil {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
+	case project.MemberRemovedType, project.MemberCascadeRemovedType:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, event.AggregateID, usr_model.MemberTypeProject, event)
-	case proj_es_model.ProjectGrantMemberChanged:
+	case project.GrantMemberChangedType:
 		member, err = m.view.UserMembershipByIDs(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant)
 		if err != nil {
 			return err
 		}
 		err = member.AppendEvent(event)
-	case proj_es_model.ProjectGrantMemberRemoved,
-		proj_es_model.ProjectGrantMemberCascadeRemoved:
+	case project.GrantMemberRemovedType,
+		project.GrantMemberCascadeRemovedType:
 		return m.view.DeleteUserMembership(member.UserID, event.AggregateID, member.ObjectID, usr_model.MemberTypeProjectGrant, event)
-	case proj_es_model.ProjectChanged:
+	case project.ProjectChangedType:
 		return m.updateProjectDisplayName(event)
-	case proj_es_model.ProjectRemoved:
+	case project.ProjectRemovedType:
 		return m.view.DeleteUserMembershipsByAggregateID(event.AggregateID, event)
-	case proj_es_model.ProjectGrantRemoved:
+	case project.GrantRemovedType:
 		return m.view.DeleteUserMembershipsByAggregateIDAndObjectID(event.AggregateID, member.ObjectID, event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event)
@@ -264,8 +267,8 @@ func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error 
 }
 
 func (m *UserMembership) processUser(event *es_models.Event) (err error) {
-	switch event.Type {
-	case model.UserRemoved:
+	switch eventstore.EventType(event.Type) {
+	case user.UserRemovedType:
 		return m.view.DeleteUserMembershipsByUserID(event.AggregateID, event)
 	default:
 		return m.view.ProcessedUserMembershipSequence(event)
@@ -273,7 +276,7 @@ func (m *UserMembership) processUser(event *es_models.Event) (err error) {
 }
 
 func (m *UserMembership) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Ms3fj", "id", event.AggregateID).WithError(err).Warn("something went wrong in user membership handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in user membership handler")
 	return spooler.HandleError(event, err, m.view.GetLatestUserMembershipFailedEvent, m.view.ProcessedUserMembershipFailedEvent, m.view.ProcessedUserMembershipSequence, m.errorCountUntilSkip)
 }
 

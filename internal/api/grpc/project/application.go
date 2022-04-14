@@ -6,7 +6,6 @@ import (
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/query"
 	app_pb "github.com/caos/zitadel/pkg/grpc/app"
 	message_pb "github.com/caos/zitadel/pkg/grpc/message"
@@ -290,13 +289,5 @@ func AppQueryToModel(appQuery *app_pb.AppQuery) (query.SearchQuery, error) {
 		return query.NewAppNameSearchQuery(object_grpc.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "APP-Add46", "List.Query.Invalid")
-	}
-}
-
-func AppQueryNameToModel(query *app_pb.AppNameQuery) *proj_model.ApplicationSearchQuery {
-	return &proj_model.ApplicationSearchQuery{
-		Key:    proj_model.AppSearchKeyName,
-		Method: object_grpc.TextMethodToModel(query.Method),
-		Value:  query.Name,
 	}
 }

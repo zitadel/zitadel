@@ -8,6 +8,7 @@ package zitadel.policy.v1;
 
 option go_package ="github.com/caos/zitadel/pkg/grpc/policy";
 
+//deprecated: please use DomainPolicy instead
 message OrgIAMPolicy {
     zitadel.v1.ObjectDetails details = 1;
     bool user_login_must_be_domain = 2 [
@@ -18,6 +19,25 @@ message OrgIAMPolicy {
     bool is_default = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the organisation's admin changed the policy"
+        }
+    ];
+}
+
+message DomainPolicy {
+    zitadel.v1.ObjectDetails details = 1;
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ];
+    bool is_default = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
+    bool validate_org_domains = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if organisation domains should be validated org count as validated automatically"
         }
     ];
 }
@@ -229,4 +249,5 @@ message PrivacyPolicy {
     string tos_link = 2;
     string privacy_link = 3;
     bool is_default = 4;
+    string help_link = 5;
 }

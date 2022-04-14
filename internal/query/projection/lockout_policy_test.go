@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -43,7 +43,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.lockout_policies (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.lockout_policies (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -54,6 +54,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 								true,
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -81,7 +82,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -112,7 +113,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.lockout_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.lockout_policies WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -122,27 +123,27 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&LockoutPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LockoutPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LockoutPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"maxPasswordAttempts": 10,
 						"showLockOutFailures": true
 					}`),
-				), iam.LockoutPolicyAddedEventMapper),
+				), instance.LockoutPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.lockout_policies (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.lockout_policies (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -153,6 +154,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -160,27 +162,27 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&LockoutPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LockoutPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LockoutPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"maxPasswordAttempts": 10,
 						"showLockOutFailures": true
 					}`),
-				), iam.LockoutPolicyChangedEventMapper),
+				), instance.LockoutPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

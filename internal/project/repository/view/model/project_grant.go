@@ -2,13 +2,16 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
-	"time"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 const (
@@ -39,64 +42,23 @@ type ProjectGrant struct {
 	GrantID      string   `json:"grantId"`
 	GrantedOrgID string   `json:"grantedOrgId"`
 	RoleKeys     []string `json:"roleKeys"`
-}
-
-func ProjectGrantFromModel(project *model.ProjectGrantView) *ProjectGrantView {
-	return &ProjectGrantView{
-		ProjectID:         project.ProjectID,
-		OrgID:             project.OrgID,
-		Name:              project.Name,
-		ChangeDate:        project.ChangeDate,
-		CreationDate:      project.CreationDate,
-		State:             int32(project.State),
-		ResourceOwner:     project.ResourceOwner,
-		ResourceOwnerName: project.ResourceOwnerName,
-		OrgName:           project.OrgName,
-		GrantID:           project.GrantID,
-		GrantedRoleKeys:   project.GrantedRoleKeys,
-		Sequence:          project.Sequence,
-	}
-}
-
-func ProjectGrantToModel(project *ProjectGrantView) *model.ProjectGrantView {
-	return &model.ProjectGrantView{
-		ProjectID:         project.ProjectID,
-		OrgID:             project.OrgID,
-		Name:              project.Name,
-		ChangeDate:        project.ChangeDate,
-		CreationDate:      project.CreationDate,
-		State:             model.ProjectState(project.State),
-		ResourceOwner:     project.ResourceOwner,
-		ResourceOwnerName: project.ResourceOwnerName,
-		OrgName:           project.OrgName,
-		GrantID:           project.GrantID,
-		Sequence:          project.Sequence,
-		GrantedRoleKeys:   project.GrantedRoleKeys,
-	}
-}
-
-func ProjectGrantsToModel(projects []*ProjectGrantView) []*model.ProjectGrantView {
-	result := make([]*model.ProjectGrantView, len(projects))
-	for i, p := range projects {
-		result[i] = ProjectGrantToModel(p)
-	}
-	return result
+	InstanceID   string   `json:"instanceID"`
 }
 
 func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
 	p.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.ProjectGrantAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.GrantAddedType:
 		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate
 		p.setRootData(event)
 		err = p.setProjectGrantData(event)
-	case es_model.ProjectGrantChanged, es_model.ProjectGrantCascadeChanged:
+	case project.GrantChangedType, project.GrantCascadeChangedType:
 		err = p.setProjectGrantData(event)
-	case es_model.ProjectGrantDeactivated:
+	case project.GrantDeactivatedType:
 		p.State = int32(model.ProjectStateInactive)
-	case es_model.ProjectGrantReactivated:
+	case project.GrantReactivatedType:
 		p.State = int32(model.ProjectStateActive)
 	}
 	return err

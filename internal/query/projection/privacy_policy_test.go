@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -30,7 +30,8 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					org.AggregateType,
 					[]byte(`{
 						"tosLink": "http://tos.link",
-						"privacyLink": "http://privacy.link"
+						"privacyLink": "http://privacy.link",
+						"helpLink": "http://help.link"
 }`),
 				), org.PrivacyPolicyAddedEventMapper),
 			},
@@ -43,7 +44,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, help_link, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -52,8 +53,10 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 								domain.PolicyStateActive,
 								"http://privacy.link",
 								"http://tos.link",
+								"http://help.link",
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -69,7 +72,8 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					org.AggregateType,
 					[]byte(`{
 						"tosLink": "http://tos.link",
-						"privacyLink": "http://privacy.link"
+						"privacyLink": "http://privacy.link",
+						"helpLink": "http://help.link"
 		}`),
 				), org.PrivacyPolicyChangedEventMapper),
 			},
@@ -81,12 +85,13 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"http://privacy.link",
 								"http://tos.link",
+								"http://help.link",
 								"agg-id",
 							},
 						},
@@ -112,7 +117,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.privacy_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.privacy_policies WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -122,27 +127,28 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&PrivacyPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PrivacyPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PrivacyPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"tosLink": "http://tos.link",
-						"privacyLink": "http://privacy.link"
+						"privacyLink": "http://privacy.link",
+						"helpLink": "http://help.link"
 					}`),
-				), iam.PrivacyPolicyAddedEventMapper),
+				), instance.PrivacyPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PrivacyPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, help_link, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -151,8 +157,10 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 								domain.PolicyStateActive,
 								"http://privacy.link",
 								"http://tos.link",
+								"http://help.link",
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -160,32 +168,34 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&PrivacyPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PrivacyPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PrivacyPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"tosLink": "http://tos.link",
-						"privacyLink": "http://privacy.link"
+						"privacyLink": "http://privacy.link",
+						"helpLink": "http://help.link"
 					}`),
-				), iam.PrivacyPolicyChangedEventMapper),
+				), instance.PrivacyPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PrivacyPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"http://privacy.link",
 								"http://tos.link",
+								"http://help.link",
 								"agg-id",
 							},
 						},

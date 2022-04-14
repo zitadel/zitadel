@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/caos/zitadel/internal/actions"
 	"github.com/caos/zitadel/internal/domain"
@@ -15,8 +16,8 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	if resourceOwner == "" {
 		resourceOwner = config.AggregateID
 	}
-	if resourceOwner == domain.IAMID {
-		iam, err := l.query.IAMByID(ctx, domain.IAMID)
+	if resourceOwner == authz.GetInstance(ctx).InstanceID() {
+		iam, err := l.query.Instance(ctx)
 		if err != nil {
 			return nil, err
 		}

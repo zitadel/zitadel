@@ -7,9 +7,10 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -34,6 +35,10 @@ var (
 	}
 	ProjectGrantColumnResourceOwner = Column{
 		name:  projection.ProjectGrantColumnResourceOwner,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnInstanceID = Column{
+		name:  projection.ProjectGrantColumnInstanceID,
 		table: projectGrantsTable,
 	}
 	ProjectGrantColumnState = Column{
@@ -103,7 +108,8 @@ type ProjectGrantSearchQueries struct {
 func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGrant, error) {
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		ProjectGrantColumnGrantID.identifier(): id,
+		ProjectGrantColumnGrantID.identifier():    id,
+		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
@@ -118,6 +124,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectGrantColumnGrantID.identifier():      id,
 		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
+		ProjectGrantColumnInstanceID.identifier():   authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
@@ -134,7 +141,10 @@ func (q *Queries) ExistsProjectGrant(ctx context.Context, id string) (err error)
 
 func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries) (projects *ProjectGrants, err error) {
 	query, scan := prepareProjectGrantsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")
 	}

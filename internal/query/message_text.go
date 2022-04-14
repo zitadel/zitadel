@@ -15,6 +15,8 @@ import (
 	"golang.org/x/text/language"
 	"sigs.k8s.io/yaml"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -55,6 +57,10 @@ var (
 	}
 	MessageTextColAggregateID = Column{
 		name:  projection.MessageTextAggregateIDCol,
+		table: messageTextTable,
+	}
+	MessageTextColInstanceID = Column{
+		name:  projection.MessageTextInstanceIDCol,
 		table: messageTextTable,
 	}
 	MessageTextColSequence = Column{
@@ -114,12 +120,17 @@ var (
 func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				MessageTextColAggregateID.identifier(): orgID,
+				MessageTextColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
-			sq.Eq{
-				MessageTextColAggregateID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					MessageTextColAggregateID.identifier(): orgID,
+				},
+				sq.Eq{
+					MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				},
 			},
 		}).
 		OrderBy(MessageTextColAggregateID.identifier()).
@@ -135,7 +146,8 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		MessageTextColAggregateID.identifier(): domain.IAMID,
+		MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).
 		Limit(1).ToSql()
 	if err != nil {
@@ -161,16 +173,11 @@ func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(messageType,
 func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(
-		sq.And{
-			sq.Eq{
-				MessageTextColLanguage.identifier(): language,
-			},
-			sq.Eq{
-				MessageTextColType.identifier(): messageType,
-			},
-			sq.Eq{
-				MessageTextColAggregateID.identifier(): aggregateID,
-			},
+		sq.Eq{
+			MessageTextColLanguage.identifier():    language,
+			MessageTextColType.identifier():        messageType,
+			MessageTextColAggregateID.identifier(): aggregateID,
+			MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 		},
 	).
 		OrderBy(MessageTextColAggregateID.identifier()).
@@ -196,7 +203,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ekjFF", "Errors.TranslationFile.ReadError")
 	}
-	texts, err := q.CustomTextList(ctx, domain.IAMID, messageType, language)
+	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), messageType, language)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +225,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	}
 	result := notificationText.GetMessageTextByType(messageType)
 	result.IsDefault = true
-	result.AggregateID = domain.IAMID
+	result.AggregateID = authz.GetInstance(ctx).InstanceID()
 	return result, nil
 }
 

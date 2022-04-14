@@ -4,13 +4,13 @@
 *.dll
 *.so
 *.dylib
-zitadelctl
 
 # Test binary, build with `go test -c`
 *.test
 
 # Coverage
 coverage.txt
+profile.cov
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
@@ -40,7 +40,8 @@ cockroach-data/*
 #binaries
 cmd/zitadel/zitadel
 **/statik/statik.go
-zitadelctl
+/zitadelctl
+/zitadel
 
 # buildfolders and generated js
 tmp/
@@ -54,10 +55,12 @@ console/src/app/proto/generated/
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
+/internal/api/ui/console/static/*
 
 # local
 build/local/cloud.env
 migrations/cockroach/migrate_cloud.go
 .notifications
-
 .artifacts
+/zitadel
+

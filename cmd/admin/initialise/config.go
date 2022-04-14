@@ -1,13 +1,29 @@
 package initialise
 
-import "github.com/caos/zitadel/internal/database"
+import (
+	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/database"
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	Database  database.Config
 	AdminUser database.User
+	Log       *logging.Config
 }
 
-func adminConfig(config Config) database.Config {
+func MustNewConfig(v *viper.Viper) *Config {
+	config := new(Config)
+	err := v.Unmarshal(config)
+	logging.OnError(err).Fatal("unable to read config")
+
+	err = config.Log.SetLogger()
+	logging.OnError(err).Fatal("unable to set logger")
+
+	return config
+}
+
+func adminConfig(config *Config) database.Config {
 	adminConfig := config.Database
 	adminConfig.Username = config.AdminUser.Username
 	adminConfig.Password = config.AdminUser.Password

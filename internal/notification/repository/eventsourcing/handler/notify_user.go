@@ -3,20 +3,22 @@ package handler
 import (
 	"context"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	query2 "github.com/caos/zitadel/internal/query"
-
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	query2 "github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/user"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -62,7 +64,7 @@ func (p *NotifyUser) Subscription() *v1.Subscription {
 }
 
 func (_ *NotifyUser) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+	return []es_models.AggregateType{user.AggregateType, org.AggregateType}
 }
 
 func (p *NotifyUser) CurrentSequence() (uint64, error) {
@@ -85,9 +87,9 @@ func (p *NotifyUser) EventQuery() (*es_models.SearchQuery, error) {
 
 func (u *NotifyUser) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case es_model.UserAggregate:
+	case user.AggregateType:
 		return u.ProcessUser(event)
-	case org_es_model.OrgAggregate:
+	case org.AggregateType:
 		return u.ProcessOrg(event)
 	default:
 		return nil
@@ -95,48 +97,48 @@ func (u *NotifyUser) Reduce(event *es_models.Event) (err error) {
 }
 
 func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
-	user := new(view_model.NotifyUser)
-	switch event.Type {
-	case es_model.UserAdded,
-		es_model.UserRegistered,
-		es_model.HumanRegistered,
-		es_model.HumanAdded,
-		es_model.MachineAdded:
-		err := user.AppendEvent(event)
+	notifyUser := new(view_model.NotifyUser)
+	switch eventstore.EventType(event.Type) {
+	case user.UserV1AddedType,
+		user.UserV1RegisteredType,
+		user.HumanRegisteredType,
+		user.HumanAddedType,
+		user.MachineAddedEventType:
+		err := notifyUser.AppendEvent(event)
 		if err != nil {
 			return err
 		}
-		err = u.fillLoginNames(user)
-	case es_model.UserProfileChanged,
-		es_model.UserEmailChanged,
-		es_model.UserEmailVerified,
-		es_model.UserPhoneChanged,
-		es_model.UserPhoneVerified,
-		es_model.UserPhoneRemoved,
-		es_model.HumanProfileChanged,
-		es_model.HumanEmailChanged,
-		es_model.HumanEmailVerified,
-		es_model.HumanPhoneChanged,
-		es_model.HumanPhoneVerified,
-		es_model.HumanPhoneRemoved,
-		es_model.MachineChanged:
-		user, err = u.view.NotifyUserByID(event.AggregateID)
+		err = u.fillLoginNames(notifyUser)
+	case user.UserV1ProfileChangedType,
+		user.UserV1EmailChangedType,
+		user.UserV1EmailVerifiedType,
+		user.UserV1PhoneChangedType,
+		user.UserV1PhoneVerifiedType,
+		user.UserV1PhoneRemovedType,
+		user.HumanProfileChangedType,
+		user.HumanEmailChangedType,
+		user.HumanEmailVerifiedType,
+		user.HumanPhoneChangedType,
+		user.HumanPhoneVerifiedType,
+		user.HumanPhoneRemovedType,
+		user.MachineChangedEventType:
+		notifyUser, err = u.view.NotifyUserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
-		err = user.AppendEvent(event)
-	case es_model.DomainClaimed,
-		es_model.UserUserNameChanged:
-		user, err = u.view.NotifyUserByID(event.AggregateID)
+		err = notifyUser.AppendEvent(event)
+	case user.UserDomainClaimedType,
+		user.UserUserNameChangedType:
+		notifyUser, err = u.view.NotifyUserByID(event.AggregateID)
 		if err != nil {
 			return err
 		}
-		err = user.AppendEvent(event)
+		err = notifyUser.AppendEvent(event)
 		if err != nil {
 			return err
 		}
-		err = u.fillLoginNames(user)
-	case es_model.UserRemoved:
+		err = u.fillLoginNames(notifyUser)
+	case user.UserRemovedType:
 		return u.view.DeleteNotifyUser(event.AggregateID, event)
 	default:
 		return u.view.ProcessedNotifyUserSequence(event)
@@ -144,18 +146,18 @@ func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	return u.view.PutNotifyUser(user, event)
+	return u.view.PutNotifyUser(notifyUser, event)
 }
 
 func (u *NotifyUser) ProcessOrg(event *es_models.Event) (err error) {
-	switch event.Type {
-	case org_es_model.OrgDomainVerified,
-		org_es_model.OrgDomainRemoved,
-		org_es_model.OrgIAMPolicyAdded,
-		org_es_model.OrgIAMPolicyChanged,
-		org_es_model.OrgIAMPolicyRemoved:
+	switch eventstore.EventType(event.Type) {
+	case org.OrgDomainVerifiedEventType,
+		org.OrgDomainRemovedEventType,
+		org.DomainPolicyAddedEventType,
+		org.DomainPolicyChangedEventType,
+		org.DomainPolicyRemovedEventType:
 		return u.fillLoginNamesOnOrgUsers(event)
-	case org_es_model.OrgDomainPrimarySet:
+	case org.OrgDomainPrimarySetEventType:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
 		return u.view.ProcessedNotifyUserSequence(event)
@@ -163,23 +165,16 @@ func (u *NotifyUser) ProcessOrg(event *es_models.Event) (err error) {
 }
 
 func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
-	}
-	policy := new(query2.OrgIAMPolicy)
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
 	}
 	users, err := u.view.NotifyUsersByOrgID(event.AggregateID)
 	if err != nil {
 		return err
 	}
 	for _, user := range users {
-		user.SetLoginNames(policy, org.Domains)
+		user.SetLoginNames(userLoginMustBeDomain, domains)
 		err := u.view.PutNotifyUser(user, event)
 		if err != nil {
 			return err
@@ -189,16 +184,11 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 }
 
 func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
-
-	policy, err := u.getDefaultOrgIAMPolicy(context.Background())
-	if err != nil {
-		return err
-	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		return nil
 	}
 	users, err := u.view.NotifyUsersByOrgID(event.AggregateID)
@@ -206,7 +196,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 		return err
 	}
 	for _, user := range users {
-		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+		user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 		err := u.view.PutNotifyUser(user, event)
 		if err != nil {
 			return err
@@ -216,17 +206,12 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 }
 
 func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
-	org, err := u.getOrgByID(context.Background(), user.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
-
-	policy, err := u.getDefaultOrgIAMPolicy(context.Background())
-	if err != nil {
-		return err
-	}
-	user.SetLoginNames(policy, org.Domains)
-	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	user.SetLoginNames(userLoginMustBeDomain, domains)
+	user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 	return nil
 }
 
@@ -261,6 +246,17 @@ func (u *NotifyUser) getOrgByID(ctx context.Context, orgID string) (*org_model.O
 	return org_es_model.OrgToModel(esOrg), nil
 }
 
-func (u *NotifyUser) getDefaultOrgIAMPolicy(ctx context.Context) (*query2.OrgIAMPolicy, error) {
-	return u.queries.DefaultOrgIAMPolicy(ctx)
+func (u *NotifyUser) loginNameInformation(ctx context.Context, orgID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
+	org, err := u.getOrgByID(ctx, orgID)
+	if err != nil {
+		return false, "", nil, err
+	}
+	if org.DomainPolicy == nil {
+		policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
+		if err != nil {
+			return false, "", nil, err
+		}
+		userLoginMustBeDomain = policy.UserLoginMustBeDomain
+	}
+	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 }

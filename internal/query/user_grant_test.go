@@ -16,32 +16,35 @@ import (
 
 var (
 	userGrantStmt = regexp.QuoteMeta(
-		"SELECT zitadel.projections.user_grants.id" +
-			", zitadel.projections.user_grants.creation_date" +
-			", zitadel.projections.user_grants.change_date" +
-			", zitadel.projections.user_grants.sequence" +
-			", zitadel.projections.user_grants.grant_id" +
-			", zitadel.projections.user_grants.roles" +
-			", zitadel.projections.user_grants.state" +
-			", zitadel.projections.user_grants.user_id" +
-			", zitadel.projections.users.username" +
-			", zitadel.projections.users.type" +
-			", zitadel.projections.users.resource_owner" +
-			", zitadel.projections.users_humans.first_name" +
-			", zitadel.projections.users_humans.last_name" +
-			", zitadel.projections.users_humans.email" +
-			", zitadel.projections.users_humans.display_name" +
-			", zitadel.projections.users_humans.avatar_key" +
-			", zitadel.projections.user_grants.resource_owner" +
-			", zitadel.projections.orgs.name" +
-			", zitadel.projections.orgs.primary_domain" +
-			", zitadel.projections.user_grants.project_id" +
-			", zitadel.projections.projects.name" +
-			" FROM zitadel.projections.user_grants" +
-			" LEFT JOIN zitadel.projections.users ON zitadel.projections.user_grants.user_id = zitadel.projections.users.id" +
-			" LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.user_grants.user_id = zitadel.projections.users_humans.user_id" +
-			" LEFT JOIN zitadel.projections.orgs ON zitadel.projections.user_grants.resource_owner = zitadel.projections.orgs.id" +
-			" LEFT JOIN zitadel.projections.projects ON zitadel.projections.user_grants.project_id = zitadel.projections.projects.id")
+		"SELECT projections.user_grants.id" +
+			", projections.user_grants.creation_date" +
+			", projections.user_grants.change_date" +
+			", projections.user_grants.sequence" +
+			", projections.user_grants.grant_id" +
+			", projections.user_grants.roles" +
+			", projections.user_grants.state" +
+			", projections.user_grants.user_id" +
+			", projections.users.username" +
+			", projections.users.type" +
+			", projections.users.resource_owner" +
+			", projections.users_humans.first_name" +
+			", projections.users_humans.last_name" +
+			", projections.users_humans.email" +
+			", projections.users_humans.display_name" +
+			", projections.users_humans.avatar_key" +
+			", projections.login_names.login_name" +
+			", projections.user_grants.resource_owner" +
+			", projections.orgs.name" +
+			", projections.orgs.primary_domain" +
+			", projections.user_grants.project_id" +
+			", projections.projects.name" +
+			" FROM projections.user_grants" +
+			" LEFT JOIN projections.users ON projections.user_grants.user_id = projections.users.id" +
+			" LEFT JOIN projections.users_humans ON projections.user_grants.user_id = projections.users_humans.user_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
+			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id" +
+			" LEFT JOIN projections.login_names ON projections.user_grants.user_id = projections.login_names.user_id" +
+			" WHERE projections.login_names.is_primary = $1")
 	userGrantCols = []string{
 		"id",
 		"creation_date",
@@ -59,6 +62,7 @@ var (
 		"email",
 		"display_name",
 		"avatar_key",
+		"login_name",
 		"resource_owner", //user_grant resource owner
 		"name",           //org name
 		"primary_domain",
@@ -66,33 +70,36 @@ var (
 		"name", //project name
 	}
 	userGrantsStmt = regexp.QuoteMeta(
-		"SELECT zitadel.projections.user_grants.id" +
-			", zitadel.projections.user_grants.creation_date" +
-			", zitadel.projections.user_grants.change_date" +
-			", zitadel.projections.user_grants.sequence" +
-			", zitadel.projections.user_grants.grant_id" +
-			", zitadel.projections.user_grants.roles" +
-			", zitadel.projections.user_grants.state" +
-			", zitadel.projections.user_grants.user_id" +
-			", zitadel.projections.users.username" +
-			", zitadel.projections.users.type" +
-			", zitadel.projections.users.resource_owner" +
-			", zitadel.projections.users_humans.first_name" +
-			", zitadel.projections.users_humans.last_name" +
-			", zitadel.projections.users_humans.email" +
-			", zitadel.projections.users_humans.display_name" +
-			", zitadel.projections.users_humans.avatar_key" +
-			", zitadel.projections.user_grants.resource_owner" +
-			", zitadel.projections.orgs.name" +
-			", zitadel.projections.orgs.primary_domain" +
-			", zitadel.projections.user_grants.project_id" +
-			", zitadel.projections.projects.name" +
+		"SELECT projections.user_grants.id" +
+			", projections.user_grants.creation_date" +
+			", projections.user_grants.change_date" +
+			", projections.user_grants.sequence" +
+			", projections.user_grants.grant_id" +
+			", projections.user_grants.roles" +
+			", projections.user_grants.state" +
+			", projections.user_grants.user_id" +
+			", projections.users.username" +
+			", projections.users.type" +
+			", projections.users.resource_owner" +
+			", projections.users_humans.first_name" +
+			", projections.users_humans.last_name" +
+			", projections.users_humans.email" +
+			", projections.users_humans.display_name" +
+			", projections.users_humans.avatar_key" +
+			", projections.login_names.login_name" +
+			", projections.user_grants.resource_owner" +
+			", projections.orgs.name" +
+			", projections.orgs.primary_domain" +
+			", projections.user_grants.project_id" +
+			", projections.projects.name" +
 			", COUNT(*) OVER ()" +
-			" FROM zitadel.projections.user_grants" +
-			" LEFT JOIN zitadel.projections.users ON zitadel.projections.user_grants.user_id = zitadel.projections.users.id" +
-			" LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.user_grants.user_id = zitadel.projections.users_humans.user_id" +
-			" LEFT JOIN zitadel.projections.orgs ON zitadel.projections.user_grants.resource_owner = zitadel.projections.orgs.id" +
-			" LEFT JOIN zitadel.projections.projects ON zitadel.projections.user_grants.project_id = zitadel.projections.projects.id")
+			" FROM projections.user_grants" +
+			" LEFT JOIN projections.users ON projections.user_grants.user_id = projections.users.id" +
+			" LEFT JOIN projections.users_humans ON projections.user_grants.user_id = projections.users_humans.user_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
+			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id" +
+			" LEFT JOIN projections.login_names ON projections.user_grants.user_id = projections.login_names.user_id" +
+			" WHERE projections.login_names.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
 		"count",
@@ -152,6 +159,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						"email",
 						"display-name",
 						"avatar-key",
+						"login-name",
 						"ro",
 						"org-name",
 						"primary-domain",
@@ -161,27 +169,28 @@ func Test_UserGrantPrepares(t *testing.T) {
 				),
 			},
 			object: &UserGrant{
-				ID:                "id",
-				CreationDate:      testNow,
-				ChangeDate:        testNow,
-				Sequence:          20211111,
-				Roles:             []string{"role-key"},
-				GrantID:           "grant-id",
-				State:             domain.UserGrantStateActive,
-				UserID:            "user-id",
-				Username:          "username",
-				UserType:          domain.UserTypeHuman,
-				UserResourceOwner: "resource-owner",
-				FirstName:         "first-name",
-				LastName:          "last-name",
-				Email:             "email",
-				DisplayName:       "display-name",
-				AvatarURL:         "avatar-key",
-				ResourceOwner:     "ro",
-				OrgName:           "org-name",
-				OrgPrimaryDomain:  "primary-domain",
-				ProjectID:         "project-id",
-				ProjectName:       "project-name",
+				ID:                 "id",
+				CreationDate:       testNow,
+				ChangeDate:         testNow,
+				Sequence:           20211111,
+				Roles:              []string{"role-key"},
+				GrantID:            "grant-id",
+				State:              domain.UserGrantStateActive,
+				UserID:             "user-id",
+				Username:           "username",
+				UserType:           domain.UserTypeHuman,
+				UserResourceOwner:  "resource-owner",
+				FirstName:          "first-name",
+				LastName:           "last-name",
+				Email:              "email",
+				DisplayName:        "display-name",
+				AvatarURL:          "avatar-key",
+				PreferredLoginName: "login-name",
+				ResourceOwner:      "ro",
+				OrgName:            "org-name",
+				OrgPrimaryDomain:   "primary-domain",
+				ProjectID:          "project-id",
+				ProjectName:        "project-name",
 			},
 		},
 		{
@@ -208,6 +217,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						"login-name",
 						"ro",
 						"org-name",
 						"primary-domain",
@@ -217,27 +227,28 @@ func Test_UserGrantPrepares(t *testing.T) {
 				),
 			},
 			object: &UserGrant{
-				ID:                "id",
-				CreationDate:      testNow,
-				ChangeDate:        testNow,
-				Sequence:          20211111,
-				Roles:             []string{"role-key"},
-				GrantID:           "grant-id",
-				State:             domain.UserGrantStateActive,
-				UserID:            "user-id",
-				Username:          "username",
-				UserType:          domain.UserTypeMachine,
-				UserResourceOwner: "resource-owner",
-				FirstName:         "",
-				LastName:          "",
-				Email:             "",
-				DisplayName:       "",
-				AvatarURL:         "",
-				ResourceOwner:     "ro",
-				OrgName:           "org-name",
-				OrgPrimaryDomain:  "primary-domain",
-				ProjectID:         "project-id",
-				ProjectName:       "project-name",
+				ID:                 "id",
+				CreationDate:       testNow,
+				ChangeDate:         testNow,
+				Sequence:           20211111,
+				Roles:              []string{"role-key"},
+				GrantID:            "grant-id",
+				State:              domain.UserGrantStateActive,
+				UserID:             "user-id",
+				Username:           "username",
+				UserType:           domain.UserTypeMachine,
+				UserResourceOwner:  "resource-owner",
+				FirstName:          "",
+				LastName:           "",
+				Email:              "",
+				DisplayName:        "",
+				AvatarURL:          "",
+				PreferredLoginName: "login-name",
+				ResourceOwner:      "ro",
+				OrgName:            "org-name",
+				OrgPrimaryDomain:   "primary-domain",
+				ProjectID:          "project-id",
+				ProjectName:        "project-name",
 			},
 		},
 		{
@@ -264,6 +275,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						"email",
 						"display-name",
 						"avatar-key",
+						"login-name",
 						"ro",
 						nil,
 						nil,
@@ -273,27 +285,28 @@ func Test_UserGrantPrepares(t *testing.T) {
 				),
 			},
 			object: &UserGrant{
-				ID:                "id",
-				CreationDate:      testNow,
-				ChangeDate:        testNow,
-				Sequence:          20211111,
-				Roles:             []string{"role-key"},
-				GrantID:           "grant-id",
-				State:             domain.UserGrantStateActive,
-				UserID:            "user-id",
-				Username:          "username",
-				UserType:          domain.UserTypeHuman,
-				UserResourceOwner: "resource-owner",
-				FirstName:         "first-name",
-				LastName:          "last-name",
-				Email:             "email",
-				DisplayName:       "display-name",
-				AvatarURL:         "avatar-key",
-				ResourceOwner:     "ro",
-				OrgName:           "",
-				OrgPrimaryDomain:  "",
-				ProjectID:         "project-id",
-				ProjectName:       "project-name",
+				ID:                 "id",
+				CreationDate:       testNow,
+				ChangeDate:         testNow,
+				Sequence:           20211111,
+				Roles:              []string{"role-key"},
+				GrantID:            "grant-id",
+				State:              domain.UserGrantStateActive,
+				UserID:             "user-id",
+				Username:           "username",
+				UserType:           domain.UserTypeHuman,
+				UserResourceOwner:  "resource-owner",
+				FirstName:          "first-name",
+				LastName:           "last-name",
+				Email:              "email",
+				DisplayName:        "display-name",
+				AvatarURL:          "avatar-key",
+				PreferredLoginName: "login-name",
+				ResourceOwner:      "ro",
+				OrgName:            "",
+				OrgPrimaryDomain:   "",
+				ProjectID:          "project-id",
+				ProjectName:        "project-name",
 			},
 		},
 		{
@@ -320,6 +333,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						"email",
 						"display-name",
 						"avatar-key",
+						"login-name",
 						"ro",
 						"org-name",
 						"primary-domain",
@@ -329,27 +343,86 @@ func Test_UserGrantPrepares(t *testing.T) {
 				),
 			},
 			object: &UserGrant{
-				ID:                "id",
-				CreationDate:      testNow,
-				ChangeDate:        testNow,
-				Sequence:          20211111,
-				Roles:             []string{"role-key"},
-				GrantID:           "grant-id",
-				State:             domain.UserGrantStateActive,
-				UserID:            "user-id",
-				Username:          "username",
-				UserType:          domain.UserTypeHuman,
-				UserResourceOwner: "resource-owner",
-				FirstName:         "first-name",
-				LastName:          "last-name",
-				Email:             "email",
-				DisplayName:       "display-name",
-				AvatarURL:         "avatar-key",
-				ResourceOwner:     "ro",
-				OrgName:           "org-name",
-				OrgPrimaryDomain:  "primary-domain",
-				ProjectID:         "project-id",
-				ProjectName:       "",
+				ID:                 "id",
+				CreationDate:       testNow,
+				ChangeDate:         testNow,
+				Sequence:           20211111,
+				Roles:              []string{"role-key"},
+				GrantID:            "grant-id",
+				State:              domain.UserGrantStateActive,
+				UserID:             "user-id",
+				Username:           "username",
+				UserType:           domain.UserTypeHuman,
+				UserResourceOwner:  "resource-owner",
+				FirstName:          "first-name",
+				LastName:           "last-name",
+				Email:              "email",
+				DisplayName:        "display-name",
+				AvatarURL:          "avatar-key",
+				PreferredLoginName: "login-name",
+				ResourceOwner:      "ro",
+				OrgName:            "org-name",
+				OrgPrimaryDomain:   "primary-domain",
+				ProjectID:          "project-id",
+				ProjectName:        "",
+			},
+		},
+		{
+			name:    "prepareUserGrantQuery (no loginname) found",
+			prepare: prepareUserGrantQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					userGrantStmt,
+					userGrantCols,
+					[]driver.Value{
+						"id",
+						testNow,
+						testNow,
+						20211111,
+						"grant-id",
+						pq.StringArray{"role-key"},
+						domain.UserGrantStateActive,
+						"user-id",
+						"username",
+						domain.UserTypeHuman,
+						"resource-owner",
+						"first-name",
+						"last-name",
+						"email",
+						"display-name",
+						"avatar-key",
+						nil,
+						"ro",
+						"org-name",
+						"primary-domain",
+						"project-id",
+						"project-name",
+					},
+				),
+			},
+			object: &UserGrant{
+				ID:                 "id",
+				CreationDate:       testNow,
+				ChangeDate:         testNow,
+				Sequence:           20211111,
+				Roles:              []string{"role-key"},
+				GrantID:            "grant-id",
+				State:              domain.UserGrantStateActive,
+				UserID:             "user-id",
+				Username:           "username",
+				UserType:           domain.UserTypeHuman,
+				UserResourceOwner:  "resource-owner",
+				FirstName:          "first-name",
+				LastName:           "last-name",
+				Email:              "email",
+				DisplayName:        "display-name",
+				AvatarURL:          "avatar-key",
+				PreferredLoginName: "",
+				ResourceOwner:      "ro",
+				OrgName:            "org-name",
+				OrgPrimaryDomain:   "primary-domain",
+				ProjectID:          "project-id",
+				ProjectName:        "project-name",
 			},
 		},
 		{
@@ -406,6 +479,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							"email",
 							"display-name",
 							"avatar-key",
+							"login-name",
 							"ro",
 							"org-name",
 							"primary-domain",
@@ -421,27 +495,28 @@ func Test_UserGrantPrepares(t *testing.T) {
 				},
 				UserGrants: []*UserGrant{
 					{
-						ID:                "id",
-						CreationDate:      testNow,
-						ChangeDate:        testNow,
-						Sequence:          20211111,
-						Roles:             []string{"role-key"},
-						GrantID:           "grant-id",
-						State:             domain.UserGrantStateActive,
-						UserID:            "user-id",
-						Username:          "username",
-						UserType:          domain.UserTypeHuman,
-						UserResourceOwner: "resource-owner",
-						FirstName:         "first-name",
-						LastName:          "last-name",
-						Email:             "email",
-						DisplayName:       "display-name",
-						AvatarURL:         "avatar-key",
-						ResourceOwner:     "ro",
-						OrgName:           "org-name",
-						OrgPrimaryDomain:  "primary-domain",
-						ProjectID:         "project-id",
-						ProjectName:       "project-name",
+						ID:                 "id",
+						CreationDate:       testNow,
+						ChangeDate:         testNow,
+						Sequence:           20211111,
+						Roles:              []string{"role-key"},
+						GrantID:            "grant-id",
+						State:              domain.UserGrantStateActive,
+						UserID:             "user-id",
+						Username:           "username",
+						UserType:           domain.UserTypeHuman,
+						UserResourceOwner:  "resource-owner",
+						FirstName:          "first-name",
+						LastName:           "last-name",
+						Email:              "email",
+						DisplayName:        "display-name",
+						AvatarURL:          "avatar-key",
+						PreferredLoginName: "login-name",
+						ResourceOwner:      "ro",
+						OrgName:            "org-name",
+						OrgPrimaryDomain:   "primary-domain",
+						ProjectID:          "project-id",
+						ProjectName:        "project-name",
 					},
 				},
 			},
@@ -471,6 +546,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							"login-name",
 							"ro",
 							"org-name",
 							"primary-domain",
@@ -486,27 +562,28 @@ func Test_UserGrantPrepares(t *testing.T) {
 				},
 				UserGrants: []*UserGrant{
 					{
-						ID:                "id",
-						CreationDate:      testNow,
-						ChangeDate:        testNow,
-						Sequence:          20211111,
-						Roles:             []string{"role-key"},
-						GrantID:           "grant-id",
-						State:             domain.UserGrantStateActive,
-						UserID:            "user-id",
-						Username:          "username",
-						UserType:          domain.UserTypeMachine,
-						UserResourceOwner: "resource-owner",
-						FirstName:         "",
-						LastName:          "",
-						Email:             "",
-						DisplayName:       "",
-						AvatarURL:         "",
-						ResourceOwner:     "ro",
-						OrgName:           "org-name",
-						OrgPrimaryDomain:  "primary-domain",
-						ProjectID:         "project-id",
-						ProjectName:       "project-name",
+						ID:                 "id",
+						CreationDate:       testNow,
+						ChangeDate:         testNow,
+						Sequence:           20211111,
+						Roles:              []string{"role-key"},
+						GrantID:            "grant-id",
+						State:              domain.UserGrantStateActive,
+						UserID:             "user-id",
+						Username:           "username",
+						UserType:           domain.UserTypeMachine,
+						UserResourceOwner:  "resource-owner",
+						FirstName:          "",
+						LastName:           "",
+						Email:              "",
+						DisplayName:        "",
+						AvatarURL:          "",
+						PreferredLoginName: "login-name",
+						ResourceOwner:      "ro",
+						OrgName:            "org-name",
+						OrgPrimaryDomain:   "primary-domain",
+						ProjectID:          "project-id",
+						ProjectName:        "project-name",
 					},
 				},
 			},
@@ -536,6 +613,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							"email",
 							"display-name",
 							"avatar-key",
+							"login-name",
 							"ro",
 							nil,
 							nil,
@@ -551,27 +629,28 @@ func Test_UserGrantPrepares(t *testing.T) {
 				},
 				UserGrants: []*UserGrant{
 					{
-						ID:                "id",
-						CreationDate:      testNow,
-						ChangeDate:        testNow,
-						Sequence:          20211111,
-						Roles:             []string{"role-key"},
-						GrantID:           "grant-id",
-						State:             domain.UserGrantStateActive,
-						UserID:            "user-id",
-						Username:          "username",
-						UserType:          domain.UserTypeMachine,
-						UserResourceOwner: "resource-owner",
-						FirstName:         "first-name",
-						LastName:          "last-name",
-						Email:             "email",
-						DisplayName:       "display-name",
-						AvatarURL:         "avatar-key",
-						ResourceOwner:     "ro",
-						OrgName:           "",
-						OrgPrimaryDomain:  "",
-						ProjectID:         "project-id",
-						ProjectName:       "project-name",
+						ID:                 "id",
+						CreationDate:       testNow,
+						ChangeDate:         testNow,
+						Sequence:           20211111,
+						Roles:              []string{"role-key"},
+						GrantID:            "grant-id",
+						State:              domain.UserGrantStateActive,
+						UserID:             "user-id",
+						Username:           "username",
+						UserType:           domain.UserTypeMachine,
+						UserResourceOwner:  "resource-owner",
+						FirstName:          "first-name",
+						LastName:           "last-name",
+						Email:              "email",
+						DisplayName:        "display-name",
+						AvatarURL:          "avatar-key",
+						PreferredLoginName: "login-name",
+						ResourceOwner:      "ro",
+						OrgName:            "",
+						OrgPrimaryDomain:   "",
+						ProjectID:          "project-id",
+						ProjectName:        "project-name",
 					},
 				},
 			},
@@ -601,6 +680,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							"email",
 							"display-name",
 							"avatar-key",
+							"login-name",
 							"ro",
 							"org-name",
 							"primary-domain",
@@ -616,27 +696,95 @@ func Test_UserGrantPrepares(t *testing.T) {
 				},
 				UserGrants: []*UserGrant{
 					{
-						ID:                "id",
-						CreationDate:      testNow,
-						ChangeDate:        testNow,
-						Sequence:          20211111,
-						Roles:             []string{"role-key"},
-						GrantID:           "grant-id",
-						State:             domain.UserGrantStateActive,
-						UserID:            "user-id",
-						Username:          "username",
-						UserType:          domain.UserTypeHuman,
-						UserResourceOwner: "resource-owner",
-						FirstName:         "first-name",
-						LastName:          "last-name",
-						Email:             "email",
-						DisplayName:       "display-name",
-						AvatarURL:         "avatar-key",
-						ResourceOwner:     "ro",
-						OrgName:           "org-name",
-						OrgPrimaryDomain:  "primary-domain",
-						ProjectID:         "project-id",
-						ProjectName:       "",
+						ID:                 "id",
+						CreationDate:       testNow,
+						ChangeDate:         testNow,
+						Sequence:           20211111,
+						Roles:              []string{"role-key"},
+						GrantID:            "grant-id",
+						State:              domain.UserGrantStateActive,
+						UserID:             "user-id",
+						Username:           "username",
+						UserType:           domain.UserTypeHuman,
+						UserResourceOwner:  "resource-owner",
+						FirstName:          "first-name",
+						LastName:           "last-name",
+						Email:              "email",
+						DisplayName:        "display-name",
+						AvatarURL:          "avatar-key",
+						PreferredLoginName: "login-name",
+						ResourceOwner:      "ro",
+						OrgName:            "org-name",
+						OrgPrimaryDomain:   "primary-domain",
+						ProjectID:          "project-id",
+						ProjectName:        "",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareUserGrantsQuery one grant (no loginname)",
+			prepare: prepareUserGrantsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					userGrantsStmt,
+					userGrantsCols,
+					[][]driver.Value{
+						{
+							"id",
+							testNow,
+							testNow,
+							20211111,
+							"grant-id",
+							pq.StringArray{"role-key"},
+							domain.UserGrantStateActive,
+							"user-id",
+							"username",
+							domain.UserTypeHuman,
+							"resource-owner",
+							"first-name",
+							"last-name",
+							"email",
+							"display-name",
+							"avatar-key",
+							nil,
+							"ro",
+							"org-name",
+							"primary-domain",
+							"project-id",
+							"project-name",
+						},
+					},
+				),
+			},
+			object: &UserGrants{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				UserGrants: []*UserGrant{
+					{
+						ID:                 "id",
+						CreationDate:       testNow,
+						ChangeDate:         testNow,
+						Sequence:           20211111,
+						Roles:              []string{"role-key"},
+						GrantID:            "grant-id",
+						State:              domain.UserGrantStateActive,
+						UserID:             "user-id",
+						Username:           "username",
+						UserType:           domain.UserTypeHuman,
+						UserResourceOwner:  "resource-owner",
+						FirstName:          "first-name",
+						LastName:           "last-name",
+						Email:              "email",
+						DisplayName:        "display-name",
+						AvatarURL:          "avatar-key",
+						PreferredLoginName: "",
+						ResourceOwner:      "ro",
+						OrgName:            "org-name",
+						OrgPrimaryDomain:   "primary-domain",
+						ProjectID:          "project-id",
+						ProjectName:        "project-name",
 					},
 				},
 			},
@@ -666,6 +814,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							"email",
 							"display-name",
 							"avatar-key",
+							"login-name",
 							"ro",
 							"org-name",
 							"primary-domain",
@@ -689,6 +838,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							"email",
 							"display-name",
 							"avatar-key",
+							"login-name",
 							"ro",
 							"org-name",
 							"primary-domain",
@@ -704,50 +854,52 @@ func Test_UserGrantPrepares(t *testing.T) {
 				},
 				UserGrants: []*UserGrant{
 					{
-						ID:                "id",
-						CreationDate:      testNow,
-						ChangeDate:        testNow,
-						Sequence:          20211111,
-						Roles:             []string{"role-key"},
-						GrantID:           "grant-id",
-						State:             domain.UserGrantStateActive,
-						UserID:            "user-id",
-						Username:          "username",
-						UserType:          domain.UserTypeHuman,
-						UserResourceOwner: "resource-owner",
-						FirstName:         "first-name",
-						LastName:          "last-name",
-						Email:             "email",
-						DisplayName:       "display-name",
-						AvatarURL:         "avatar-key",
-						ResourceOwner:     "ro",
-						OrgName:           "org-name",
-						OrgPrimaryDomain:  "primary-domain",
-						ProjectID:         "project-id",
-						ProjectName:       "project-name",
+						ID:                 "id",
+						CreationDate:       testNow,
+						ChangeDate:         testNow,
+						Sequence:           20211111,
+						Roles:              []string{"role-key"},
+						GrantID:            "grant-id",
+						State:              domain.UserGrantStateActive,
+						UserID:             "user-id",
+						Username:           "username",
+						UserType:           domain.UserTypeHuman,
+						UserResourceOwner:  "resource-owner",
+						FirstName:          "first-name",
+						LastName:           "last-name",
+						Email:              "email",
+						DisplayName:        "display-name",
+						AvatarURL:          "avatar-key",
+						PreferredLoginName: "login-name",
+						ResourceOwner:      "ro",
+						OrgName:            "org-name",
+						OrgPrimaryDomain:   "primary-domain",
+						ProjectID:          "project-id",
+						ProjectName:        "project-name",
 					},
 					{
-						ID:                "id",
-						CreationDate:      testNow,
-						ChangeDate:        testNow,
-						Sequence:          20211111,
-						Roles:             []string{"role-key"},
-						GrantID:           "grant-id",
-						State:             domain.UserGrantStateActive,
-						UserID:            "user-id",
-						Username:          "username",
-						UserType:          domain.UserTypeHuman,
-						UserResourceOwner: "resource-owner",
-						FirstName:         "first-name",
-						LastName:          "last-name",
-						Email:             "email",
-						DisplayName:       "display-name",
-						AvatarURL:         "avatar-key",
-						ResourceOwner:     "ro",
-						OrgName:           "org-name",
-						OrgPrimaryDomain:  "primary-domain",
-						ProjectID:         "project-id",
-						ProjectName:       "project-name",
+						ID:                 "id",
+						CreationDate:       testNow,
+						ChangeDate:         testNow,
+						Sequence:           20211111,
+						Roles:              []string{"role-key"},
+						GrantID:            "grant-id",
+						State:              domain.UserGrantStateActive,
+						UserID:             "user-id",
+						Username:           "username",
+						UserType:           domain.UserTypeHuman,
+						UserResourceOwner:  "resource-owner",
+						FirstName:          "first-name",
+						LastName:           "last-name",
+						Email:              "email",
+						DisplayName:        "display-name",
+						AvatarURL:          "avatar-key",
+						PreferredLoginName: "login-name",
+						ResourceOwner:      "ro",
+						OrgName:            "org-name",
+						OrgPrimaryDomain:   "primary-domain",
+						ProjectID:          "project-id",
+						ProjectName:        "project-name",
 					},
 				},
 			},

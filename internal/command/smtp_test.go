@@ -13,7 +13,7 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func TestCommandSide_AddSMTPConfig(t *testing.T) {
@@ -22,8 +22,9 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		alg        crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx  context.Context
-		smtp *smtp.EmailConfig
+		ctx        context.Context
+		instanceID string
+		smtp       *smtp.EmailConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -42,8 +43,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewSMTPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -56,7 +57,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				smtp: &smtp.EmailConfig{
 					Tls: true,
 				},
@@ -73,9 +75,9 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(iam.NewSMTPConfigAddedEvent(
+							eventFromEventPusher(instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -95,7 +97,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				smtp: &smtp.EmailConfig{
 					Tls:      true,
 					From:     "from",
@@ -109,7 +112,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -120,7 +123,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				eventstore:         tt.fields.eventstore,
 				smtpPasswordCrypto: tt.fields.alg,
 			}
-			got, err := r.AddSMTPConfig(tt.args.ctx, tt.args.smtp)
+			got, err := r.AddSMTPConfig(tt.args.ctx, tt.args.instanceID, tt.args.smtp)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -139,8 +142,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx  context.Context
-		smtp *smtp.EmailConfig
+		ctx        context.Context
+		instanceID string
+		smtp       *smtp.EmailConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -176,9 +180,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(
+							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -191,7 +195,8 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				smtp: &smtp.EmailConfig{
 					Tls:      true,
 					From:     "from",
@@ -213,9 +218,9 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(
+							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -255,7 +260,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -265,7 +270,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeSMTPConfig(tt.args.ctx, tt.args.smtp)
+			got, err := r.ChangeSMTPConfig(tt.args.ctx, tt.args.instanceID, tt.args.smtp)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -285,8 +290,9 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 		alg        crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx      context.Context
-		password string
+		ctx        context.Context
+		instanceID string
+		password   string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -321,9 +327,9 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewSMTPConfigAddedEvent(
+							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								"from",
 								"name",
@@ -335,9 +341,9 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(iam.NewSMTPConfigPasswordChangedEvent(
+							eventFromEventPusher(instance.NewSMTPConfigPasswordChangedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -352,12 +358,13 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:      context.Background(),
-				password: "password",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				password:   "password",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -368,7 +375,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 				eventstore:         tt.fields.eventstore,
 				smtpPasswordCrypto: tt.fields.alg,
 			}
-			got, err := r.ChangeSMTPConfigPassword(tt.args.ctx, tt.args.password)
+			got, err := r.ChangeSMTPConfigPassword(tt.args.ctx, tt.args.instanceID, tt.args.password)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -382,16 +389,16 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 	}
 }
 
-func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, host, user string) *iam.SMTPConfigChangedEvent {
-	changes := []iam.SMTPConfigChanges{
-		iam.ChangeSMTPConfigTLS(tls),
-		iam.ChangeSMTPConfigFromAddress(fromAddress),
-		iam.ChangeSMTPConfigFromName(fromName),
-		iam.ChangeSMTPConfigSMTPHost(host),
-		iam.ChangeSMTPConfigSMTPUser(user),
+func newSMTPConfigChangedEvent(ctx context.Context, tls bool, fromAddress, fromName, host, user string) *instance.SMTPConfigChangedEvent {
+	changes := []instance.SMTPConfigChanges{
+		instance.ChangeSMTPConfigTLS(tls),
+		instance.ChangeSMTPConfigFromAddress(fromAddress),
+		instance.ChangeSMTPConfigFromName(fromName),
+		instance.ChangeSMTPConfigSMTPHost(host),
+		instance.ChangeSMTPConfigSMTPUser(user),
 	}
-	event, _ := iam.NewSMTPConfigChangeEvent(ctx,
-		&iam.NewAggregate().Aggregate,
+	event, _ := instance.NewSMTPConfigChangeEvent(ctx,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		changes,
 	)
 	return event

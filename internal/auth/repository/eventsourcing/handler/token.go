@@ -7,6 +7,7 @@ import (
 	"github.com/caos/logging"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -15,8 +16,9 @@ import (
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
+	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
-	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -59,7 +61,7 @@ func (t *Token) Subscription() *v1.Subscription {
 }
 
 func (_ *Token) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user_es_model.UserAggregate, project_es_model.ProjectAggregate}
+	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
 }
 
 func (p *Token) CurrentSequence() (uint64, error) {
@@ -76,22 +78,22 @@ func (t *Token) EventQuery() (*es_models.SearchQuery, error) {
 		return nil, err
 	}
 	return es_models.NewSearchQuery().
-		AggregateTypeFilter(user_es_model.UserAggregate, project_es_model.ProjectAggregate).
+		AggregateTypeFilter(user.AggregateType, project.AggregateType).
 		LatestSequenceFilter(sequence.CurrentSequence), nil
 }
 
 func (t *Token) Reduce(event *es_models.Event) (err error) {
-	switch event.Type {
-	case user_es_model.UserTokenAdded,
-		es_models.EventType(user_repo.PersonalAccessTokenAddedType):
+	switch eventstore.EventType(event.Type) {
+	case user.UserTokenAddedType,
+		user_repo.PersonalAccessTokenAddedType:
 		token := new(view_model.TokenView)
 		err := token.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		return t.view.PutToken(token, event)
-	case user_es_model.UserProfileChanged,
-		user_es_model.HumanProfileChanged:
+	case user.UserV1ProfileChangedType,
+		user.HumanProfileChangedType:
 		user := new(view_model.UserView)
 		user.AppendEvent(event)
 		tokens, err := t.view.TokensByUserID(event.AggregateID)
@@ -102,39 +104,39 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 			token.PreferredLanguage = user.PreferredLanguage
 		}
 		return t.view.PutTokens(tokens, event)
-	case user_es_model.SignedOut,
-		user_es_model.HumanSignedOut:
+	case user.UserV1SignedOutType,
+		user.HumanSignedOutType:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return err
 		}
 		return t.view.DeleteSessionTokens(id, event.AggregateID, event)
-	case user_es_model.UserLocked,
-		user_es_model.UserDeactivated,
-		user_es_model.UserRemoved:
+	case user.UserLockedType,
+		user.UserDeactivatedType,
+		user.UserRemovedType:
 		return t.view.DeleteUserTokens(event.AggregateID, event)
-	case es_models.EventType(user_repo.UserTokenRemovedType),
-		es_models.EventType(user_repo.PersonalAccessTokenRemovedType):
+	case user_repo.UserTokenRemovedType,
+		user_repo.PersonalAccessTokenRemovedType:
 		id, err := tokenIDFromRemovedEvent(event)
 		if err != nil {
 			return err
 		}
 		return t.view.DeleteToken(id, event)
-	case es_models.EventType(user_repo.HumanRefreshTokenRemovedType):
+	case user_repo.HumanRefreshTokenRemovedType:
 		id, err := refreshTokenIDFromRemovedEvent(event)
 		if err != nil {
 			return err
 		}
 		return t.view.DeleteTokensFromRefreshToken(id, event)
-	case project_es_model.ApplicationDeactivated,
-		project_es_model.ApplicationRemoved:
+	case project.ApplicationDeactivatedType,
+		project.ApplicationRemovedType:
 		application, err := applicationFromSession(event)
 		if err != nil {
 			return err
 		}
 		return t.view.DeleteApplicationTokens(event, application.AppID)
-	case project_es_model.ProjectDeactivated,
-		project_es_model.ProjectRemoved:
+	case project.ProjectDeactivatedType,
+		project.ProjectRemovedType:
 		project, err := t.getProjectByID(context.Background(), event.AggregateID)
 		if err != nil {
 			return err

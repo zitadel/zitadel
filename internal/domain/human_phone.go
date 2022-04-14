@@ -1,11 +1,12 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/ttacon/libphonenumber"
-	"time"
 )
 
 const (

@@ -2,9 +2,7 @@ package projection
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,18 +11,43 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
+const (
+	OrgDomainTable = "projections.org_domains"
+
+	OrgDomainOrgIDCol          = "org_id"
+	OrgDomainInstanceIDCol     = "instance_id"
+	OrgDomainCreationDateCol   = "creation_date"
+	OrgDomainChangeDateCol     = "change_date"
+	OrgDomainSequenceCol       = "sequence"
+	OrgDomainDomainCol         = "domain"
+	OrgDomainIsVerifiedCol     = "is_verified"
+	OrgDomainIsPrimaryCol      = "is_primary"
+	OrgDomainValidationTypeCol = "validation_type"
+)
+
 type OrgDomainProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	OrgDomainTable = "zitadel.projections.org_domains"
-)
 
 func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgDomainProjection {
 	p := new(OrgDomainProjection)
 	config.ProjectionName = OrgDomainTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OrgDomainOrgIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgDomainChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgDomainSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OrgDomainDomainCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainIsVerifiedCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(OrgDomainIsPrimaryCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(OrgDomainValidationTypeCol, crdb.ColumnTypeEnum),
+		},
+			crdb.NewPrimaryKey(OrgDomainInstanceIDCol, OrgDomainOrgIDCol),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -59,22 +82,10 @@ func (p *OrgDomainProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	OrgDomainCreationDateCol   = "creation_date"
-	OrgDomainChangeDateCol     = "change_date"
-	OrgDomainSequenceCol       = "sequence"
-	OrgDomainDomainCol         = "domain"
-	OrgDomainOrgIDCol          = "org_id"
-	OrgDomainIsVerifiedCol     = "is_verified"
-	OrgDomainIsPrimaryCol      = "is_primary"
-	OrgDomainValidationTypeCol = "validation_type"
-)
-
 func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainAddedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-6fXKf", "seq", event.Sequence(), "expectedType", org.OrgDomainAddedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-DM2DI", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DM2DI", "reduce.wrong.event.type %s", org.OrgDomainAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -84,6 +95,7 @@ func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handle
 			handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
 			handler.NewCol(OrgDomainDomainCol, e.Domain),
 			handler.NewCol(OrgDomainOrgIDCol, e.Aggregate().ID),
+			handler.NewCol(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCol(OrgDomainIsVerifiedCol, false),
 			handler.NewCol(OrgDomainIsPrimaryCol, false),
 			handler.NewCol(OrgDomainValidationTypeCol, domain.OrgDomainValidationTypeUnspecified),
@@ -94,8 +106,7 @@ func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handle
 func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerificationAddedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-2gGSs", "seq", event.Sequence(), "expectedType", org.OrgDomainVerificationAddedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-EBzyu", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-EBzyu", "reduce.wrong.event.type %s", org.OrgDomainVerificationAddedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -114,8 +125,7 @@ func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Eve
 func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-aeGCA", "seq", event.Sequence(), "expectedType", org.OrgDomainVerifiedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-3Rvkr", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3Rvkr", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -134,8 +144,7 @@ func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.Event) (*han
 func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-6YjHo", "seq", event.Sequence(), "expectedType", org.OrgDomainPrimarySetEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-aIuei", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-aIuei", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
 	}
 	return crdb.NewMultiStatement(
 		e,
@@ -167,8 +176,7 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 func (p *OrgDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-dDnps", "seq", event.Sequence(), "expectedType", org.OrgDomainRemovedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-gh1Mx", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gh1Mx", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

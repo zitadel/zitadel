@@ -39,27 +39,34 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.flows_triggers WHERE (flow_type = $1) AND (trigger_type = $2)",
+							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1) AND (trigger_type = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
+								"ro-id",
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.flows_triggers (resource_owner, flow_type, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.flows_triggers (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"ro-id",
+								"instance-id",
 								domain.FlowTypeExternalAuthentication,
+								anyArg{},
+								uint64(15),
 								domain.TriggerTypePostAuthentication,
 								"id1",
 								0,
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.flows_triggers (resource_owner, flow_type, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.flows_triggers (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"ro-id",
+								"instance-id",
 								domain.FlowTypeExternalAuthentication,
+								anyArg{},
+								uint64(15),
 								domain.TriggerTypePostAuthentication,
 								"id2",
 								1,
@@ -87,9 +94,10 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.flows_triggers WHERE (flow_type = $1)",
+							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
+								"ro-id",
 							},
 						},
 					},

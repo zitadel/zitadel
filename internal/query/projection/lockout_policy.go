@@ -3,39 +3,55 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
+)
+
+const (
+	LockoutPolicyTable = "projections.lockout_policies"
+
+	LockoutPolicyIDCol                  = "id"
+	LockoutPolicyCreationDateCol        = "creation_date"
+	LockoutPolicyChangeDateCol          = "change_date"
+	LockoutPolicySequenceCol            = "sequence"
+	LockoutPolicyStateCol               = "state"
+	LockoutPolicyIsDefaultCol           = "is_default"
+	LockoutPolicyResourceOwnerCol       = "resource_owner"
+	LockoutPolicyInstanceIDCol          = "instance_id"
+	LockoutPolicyMaxPasswordAttemptsCol = "max_password_attempts"
+	LockoutPolicyShowLockOutFailuresCol = "show_failure"
 )
 
 type LockoutPolicyProjection struct {
 	crdb.StatementHandler
 }
 
-const (
-	LockoutPolicyTable = "zitadel.projections.lockout_policies"
-
-	LockoutPolicyCreationDateCol        = "creation_date"
-	LockoutPolicyChangeDateCol          = "change_date"
-	LockoutPolicySequenceCol            = "sequence"
-	LockoutPolicyIDCol                  = "id"
-	LockoutPolicyStateCol               = "state"
-	LockoutPolicyMaxPasswordAttemptsCol = "max_password_attempts"
-	LockoutPolicyShowLockOutFailuresCol = "show_failure"
-	LockoutPolicyIsDefaultCol           = "is_default"
-	LockoutPolicyResourceOwnerCol       = "resource_owner"
-)
-
 func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LockoutPolicyProjection {
 	p := new(LockoutPolicyProjection)
 	config.ProjectionName = LockoutPolicyTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(LockoutPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LockoutPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LockoutPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LockoutPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LockoutPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(LockoutPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(LockoutPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LockoutPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LockoutPolicyMaxPasswordAttemptsCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LockoutPolicyShowLockOutFailuresCol, crdb.ColumnTypeBool),
+		},
+			crdb.NewPrimaryKey(LockoutPolicyInstanceIDCol, LockoutPolicyIDCol),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -60,14 +76,14 @@ func (p *LockoutPolicyProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.LockoutPolicyAddedEventType,
+					Event:  instance.LockoutPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.LockoutPolicyChangedEventType,
+					Event:  instance.LockoutPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -82,12 +98,11 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 	case *org.LockoutPolicyAddedEvent:
 		policyEvent = e.LockoutPolicyAddedEvent
 		isDefault = false
-	case *iam.LockoutPolicyAddedEvent:
+	case *instance.LockoutPolicyAddedEvent:
 		policyEvent = e.LockoutPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-uFqFM", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LockoutPolicyAddedEventType, iam.LockoutPolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-d8mZO", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, instance.LockoutPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -101,6 +116,7 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(LockoutPolicyShowLockOutFailuresCol, policyEvent.ShowLockOutFailures),
 			handler.NewCol(LockoutPolicyIsDefaultCol, isDefault),
 			handler.NewCol(LockoutPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(LockoutPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -109,11 +125,10 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
-	case *iam.LockoutPolicyChangedEvent:
+	case *instance.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-iIkej", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LockoutPolicyChangedEventType, iam.LockoutPolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-pT3mQ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pT3mQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, instance.LockoutPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(LockoutPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -136,8 +151,7 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 func (p *LockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LockoutPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-U5cys", "seq", event.Sequence(), "expectedType", org.LockoutPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bqut9", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Bqut9", "reduce.wrong.event.type %s", org.LockoutPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

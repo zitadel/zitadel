@@ -9,6 +9,20 @@ title: zitadel/policy.proto
 ## Messages
 
 
+### DomainPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| user_login_must_be_domain |  bool | - |  |
+| is_default |  bool | - |  |
+| validate_org_domains |  bool | - |  |
+
+
+
+
 ### LabelPolicy
 
 
@@ -73,7 +87,7 @@ title: zitadel/policy.proto
 
 
 ### OrgIAMPolicy
-
+deprecated: please use DomainPolicy instead
 
 
 | Field | Type | Description | Validation |
@@ -126,6 +140,7 @@ title: zitadel/policy.proto
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
 | is_default |  bool | - |  |
+| help_link |  string | - |  |
 
 
 

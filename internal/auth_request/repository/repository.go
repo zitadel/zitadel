@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 )
 

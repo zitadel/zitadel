@@ -28,16 +28,16 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT zitadel.projections.oidc_settings.aggregate_id,`+
-						` zitadel.projections.oidc_settings.creation_date,`+
-						` zitadel.projections.oidc_settings.change_date,`+
-						` zitadel.projections.oidc_settings.resource_owner,`+
-						` zitadel.projections.oidc_settings.sequence,`+
-						` zitadel.projections.oidc_settings.access_token_lifetime,`+
-						` zitadel.projections.oidc_settings.id_token_lifetime,`+
-						` zitadel.projections.oidc_settings.refresh_token_idle_expiration,`+
-						` zitadel.projections.oidc_settings.refresh_token_expiration`+
-						` FROM zitadel.projections.oidc_settings`,
+					`SELECT projections.oidc_settings.aggregate_id,`+
+						` projections.oidc_settings.creation_date,`+
+						` projections.oidc_settings.change_date,`+
+						` projections.oidc_settings.resource_owner,`+
+						` projections.oidc_settings.sequence,`+
+						` projections.oidc_settings.access_token_lifetime,`+
+						` projections.oidc_settings.id_token_lifetime,`+
+						` projections.oidc_settings.refresh_token_idle_expiration,`+
+						` projections.oidc_settings.refresh_token_expiration`+
+						` FROM projections.oidc_settings`,
 					nil,
 					nil,
 				),
@@ -55,16 +55,16 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.oidc_settings.aggregate_id,`+
-						` zitadel.projections.oidc_settings.creation_date,`+
-						` zitadel.projections.oidc_settings.change_date,`+
-						` zitadel.projections.oidc_settings.resource_owner,`+
-						` zitadel.projections.oidc_settings.sequence,`+
-						` zitadel.projections.oidc_settings.access_token_lifetime,`+
-						` zitadel.projections.oidc_settings.id_token_lifetime,`+
-						` zitadel.projections.oidc_settings.refresh_token_idle_expiration,`+
-						` zitadel.projections.oidc_settings.refresh_token_expiration`+
-						` FROM zitadel.projections.oidc_settings`),
+					regexp.QuoteMeta(`SELECT projections.oidc_settings.aggregate_id,`+
+						` projections.oidc_settings.creation_date,`+
+						` projections.oidc_settings.change_date,`+
+						` projections.oidc_settings.resource_owner,`+
+						` projections.oidc_settings.sequence,`+
+						` projections.oidc_settings.access_token_lifetime,`+
+						` projections.oidc_settings.id_token_lifetime,`+
+						` projections.oidc_settings.refresh_token_idle_expiration,`+
+						` projections.oidc_settings.refresh_token_expiration`+
+						` FROM projections.oidc_settings`),
 					[]string{
 						"aggregate_id",
 						"creation_date",
@@ -106,16 +106,16 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.oidc_settings.aggregate_id,`+
-						` zitadel.projections.oidc_settings.creation_date,`+
-						` zitadel.projections.oidc_settings.change_date,`+
-						` zitadel.projections.oidc_settings.resource_owner,`+
-						` zitadel.projections.oidc_settings.sequence,`+
-						` zitadel.projections.oidc_settings.access_token_lifetime,`+
-						` zitadel.projections.oidc_settings.id_token_lifetime,`+
-						` zitadel.projections.oidc_settings.refresh_token_idle_expiration,`+
-						` zitadel.projections.oidc_settings.refresh_token_expiration`+
-						` FROM zitadel.projections.oidc_settings`),
+					regexp.QuoteMeta(`SELECT projections.oidc_settings.aggregate_id,`+
+						` projections.oidc_settings.creation_date,`+
+						` projections.oidc_settings.change_date,`+
+						` projections.oidc_settings.resource_owner,`+
+						` projections.oidc_settings.sequence,`+
+						` projections.oidc_settings.access_token_lifetime,`+
+						` projections.oidc_settings.id_token_lifetime,`+
+						` projections.oidc_settings.refresh_token_idle_expiration,`+
+						` projections.oidc_settings.refresh_token_expiration`+
+						` FROM projections.oidc_settings`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

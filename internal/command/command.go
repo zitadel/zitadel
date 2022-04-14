@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/action"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	instance_repo "github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
 	proj_repo "github.com/caos/zitadel/internal/repository/project"
@@ -48,6 +48,18 @@ type Commands struct {
 	privateKeyLifetime time.Duration
 	publicKeyLifetime  time.Duration
 	tokenVerifier      orgFeatureChecker
+
+	v2 *commandNew
+}
+
+type commandNew struct {
+	es              *eventstore.Eventstore
+	userPasswordAlg crypto.HashAlgorithm
+	phoneAlg        crypto.EncryptionAlgorithm
+	emailAlg        crypto.EncryptionAlgorithm
+	initCodeAlg     crypto.EncryptionAlgorithm
+	zitadelRoles    []authz.RoleMapping
+	id              id.Generator
 }
 
 type orgFeatureChecker interface {
@@ -64,6 +76,7 @@ func StartCommands(es *eventstore.Eventstore,
 	otpEncryption,
 	smtpEncryption,
 	smsEncryption,
+	userEncryption,
 	domainVerificationEncryption,
 	oidcEncryption crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
@@ -81,8 +94,10 @@ func StartCommands(es *eventstore.Eventstore,
 		smsCrypto:             smsEncryption,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
+		v2:                    NewCommandV2(es, defaults, userEncryption, authZConfig.RolePermissionMappings),
 	}
-	iam_repo.RegisterEventMappers(repo.eventstore)
+
+	instance_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 	usr_grant_repo.RegisterEventMappers(repo.eventstore)
@@ -111,6 +126,31 @@ func StartCommands(es *eventstore.Eventstore,
 
 	repo.tokenVerifier = authZRepo
 	return repo, nil
+}
+
+func NewCommandV2(
+	es *eventstore.Eventstore,
+	defaults sd.SystemDefaults,
+	userAlg crypto.EncryptionAlgorithm,
+	zitadelRoles []authz.RoleMapping,
+) *commandNew {
+	instance_repo.RegisterEventMappers(es)
+	org.RegisterEventMappers(es)
+	usr_repo.RegisterEventMappers(es)
+	usr_grant_repo.RegisterEventMappers(es)
+	proj_repo.RegisterEventMappers(es)
+	keypair.RegisterEventMappers(es)
+	action.RegisterEventMappers(es)
+
+	return &commandNew{
+		es:              es,
+		userPasswordAlg: crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost),
+		initCodeAlg:     userAlg,
+		phoneAlg:        userAlg,
+		emailAlg:        userAlg,
+		zitadelRoles:    zitadelRoles,
+		id:              id.SonyFlakeGenerator,
+	}
 }
 
 func AppendAndReduce(object interface {

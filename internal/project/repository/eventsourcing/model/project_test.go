@@ -6,6 +6,7 @@ import (
 
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/repository/project"
 )
 
 func TestProjectFromEvents(t *testing.T) {
@@ -22,7 +23,7 @@ func TestProjectFromEvents(t *testing.T) {
 			name: "project from events, ok",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
+					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
 				},
 				project: &Project{Name: "ProjectName"},
 			},
@@ -32,7 +33,7 @@ func TestProjectFromEvents(t *testing.T) {
 			name: "project from events, nil project",
 			args: args{
 				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
+					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
 				},
 				project: nil,
 			},
@@ -66,7 +67,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append added event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectAdded},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -74,7 +75,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectChanged},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectChangedType)},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -82,14 +83,14 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectDeactivated},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectDeactivatedType)},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: ProjectReactivated},
+				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectReactivatedType)},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
 		},

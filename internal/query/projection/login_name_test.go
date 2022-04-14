@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
@@ -42,11 +42,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-added",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -73,11 +74,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-registered",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -104,11 +106,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"machine-added",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -133,7 +136,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_names_users WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names_users WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -162,7 +165,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								"changed",
 								"agg-id",
@@ -192,7 +195,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								"claimed",
 								"agg-id",
@@ -203,15 +206,15 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgIAMPolicyAddedEventType",
+			name: "org.OrgDomainPolicyAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgIAMPolicyAddedEventType),
+					repository.EventType(org.DomainPolicyAddedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": true
 				}`),
-				), org.OrgIAMPolicyAddedEventMapper),
+				), org.DomainPolicyAddedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
@@ -222,11 +225,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -234,17 +238,17 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgIAMPolicyChangedEventType",
+			name: "org.OrgDomainPolicyChangedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgIAMPolicyChangedEventType),
+					repository.EventType(org.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": false
 				}`),
-				), org.OrgIAMPolicyChangedEventMapper),
+				), org.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyChanged,
+			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -253,7 +257,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -264,15 +268,15 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgIAMPolicyChangedEventType no change",
+			name: "org.OrgDomainPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgIAMPolicyChangedEventType),
+					repository.EventType(org.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{}`),
-				), org.OrgIAMPolicyChangedEventMapper),
+				), org.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyChanged,
+			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -284,15 +288,15 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgIAMPolicyRemovedEventType",
+			name: "org.OrgDomainPolicyRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgIAMPolicyRemovedEventType),
+					repository.EventType(org.DomainPolicyRemovedEventType),
 					user.AggregateType,
 					[]byte(`{}`),
-				), org.OrgIAMPolicyRemovedEventMapper),
+				), org.DomainPolicyRemovedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyRemoved,
+			reduce: (&LoginNameProjection{}).reduceDomainPolicyRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -301,7 +305,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_names_policies WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.login_names_policies WHERE (resource_owner = $1)",
 							expectedArgs: []interface{}{
 								"ro-id",
 							},
@@ -330,10 +334,11 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_domains (name, resource_owner) VALUES ($1, $2)",
+							expectedStmt: "INSERT INTO projections.login_names_domains (name, resource_owner, instance_id) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"verified",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -360,7 +365,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_names_domains WHERE (name = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.login_names_domains WHERE (name = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"remove",
 								"ro-id",
@@ -390,7 +395,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_domains SET (is_primary) = ($1) WHERE (resource_owner = $2) AND (is_primary = $3)",
+							expectedStmt: "UPDATE projections.login_names_domains SET (is_primary) = ($1) WHERE (resource_owner = $2) AND (is_primary = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -398,7 +403,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_domains SET (is_primary) = ($1) WHERE (name = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.login_names_domains SET (is_primary) = ($1) WHERE (name = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"primary",
@@ -410,15 +415,15 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.OrgIAMPolicyAddedEventType",
+			name: "iam.OrgDomainPolicyAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyAddedEventType),
+					repository.EventType(instance.DomainPolicyAddedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": true
 				}`),
-				), iam.OrgIAMPolicyAddedEventMapper),
+				), instance.DomainPolicyAddedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
@@ -429,11 +434,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -441,17 +447,17 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.OrgIAMPolicyChangedEventType",
+			name: "iam.OrgDomainPolicyChangedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyChangedEventType),
+					repository.EventType(instance.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": false
 				}`),
-				), iam.OrgIAMPolicyChangedEventMapper),
+				), instance.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyChanged,
+			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -460,7 +466,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -471,15 +477,15 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.OrgIAMPolicyChangedEventType no change",
+			name: "iam.OrgDomainPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyChangedEventType),
+					repository.EventType(instance.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{}`),
-				), iam.OrgIAMPolicyChangedEventMapper),
+				), instance.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyChanged,
+			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,

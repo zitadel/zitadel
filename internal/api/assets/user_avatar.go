@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/static"
 )
 
 func (h *Handler) UploadMyUserAvatar() Uploader {
@@ -27,6 +28,10 @@ func (l *myHumanAvatarUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *myHumanAvatarUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeUserAvatar
+}
+
 func (l *myHumanAvatarUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -35,12 +40,12 @@ func (l *myHumanAvatarUploader) ObjectName(ctxData authz.CtxData) (string, error
 	return domain.GetHumanAvatarAssetPath(ctxData.UserID), nil
 }
 
-func (l *myHumanAvatarUploader) BucketName(ctxData authz.CtxData) string {
-	return ctxData.OrgID
+func (l *myHumanAvatarUploader) ResourceOwner(_ authz.Instance, ctxData authz.CtxData) string {
+	return ctxData.ResourceOwner
 }
 
-func (l *myHumanAvatarUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
-	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, info.Key)
+func (l *myHumanAvatarUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
+	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, upload)
 	return err
 }
 
@@ -54,6 +59,6 @@ func (l *myHumanAvatarDownloader) ObjectName(ctx context.Context, path string) (
 	return domain.GetHumanAvatarAssetPath(authz.GetCtxData(ctx).UserID), nil
 }
 
-func (l *myHumanAvatarDownloader) BucketName(ctx context.Context, id string) string {
-	return authz.GetCtxData(ctx).OrgID
+func (l *myHumanAvatarDownloader) ResourceOwner(ctx context.Context, _ string) string {
+	return authz.GetCtxData(ctx).ResourceOwner
 }

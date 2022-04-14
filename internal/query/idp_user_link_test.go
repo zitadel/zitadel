@@ -12,16 +12,16 @@ import (
 )
 
 var (
-	idpUserLinksQuery = regexp.QuoteMeta(`SELECT zitadel.projections.idp_user_links.idp_id,` +
-		` zitadel.projections.idp_user_links.user_id,` +
-		` zitadel.projections.idps.name,` +
-		` zitadel.projections.idp_user_links.external_user_id,` +
-		` zitadel.projections.idp_user_links.display_name,` +
-		` zitadel.projections.idps.type,` +
-		` zitadel.projections.idp_user_links.resource_owner,` +
+	idpUserLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_user_links.idp_id,` +
+		` projections.idp_user_links.user_id,` +
+		` projections.idps.name,` +
+		` projections.idp_user_links.external_user_id,` +
+		` projections.idp_user_links.display_name,` +
+		` projections.idps.type,` +
+		` projections.idp_user_links.resource_owner,` +
 		` COUNT(*) OVER ()` +
-		` FROM zitadel.projections.idp_user_links` +
-		` LEFT JOIN zitadel.projections.idps ON zitadel.projections.idp_user_links.idp_id = zitadel.projections.idps.id`)
+		` FROM projections.idp_user_links` +
+		` LEFT JOIN projections.idps ON projections.idp_user_links.idp_id = projections.idps.id`)
 	idpUserLinksCols = []string{
 		"idp_id",
 		"user_id",

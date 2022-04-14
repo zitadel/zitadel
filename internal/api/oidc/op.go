@@ -29,7 +29,6 @@ import (
 
 const (
 	HandlerPrefix = "/oauth/v2"
-	AuthCallback  = HandlerPrefix + "/authorize/callback?id="
 )
 
 type Config struct {
@@ -83,13 +82,13 @@ type OPStorage struct {
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, userAgentCookie func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, userAgentCookie, instanceHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
 	opConfig, err := createOPConfig(config, issuer, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, keyConfig, encryptionAlg, es, projections, keyChan)
-	options, err := createOptions(config, userAgentCookie)
+	options, err := createOptions(config, userAgentCookie, instanceHandler)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
@@ -100,7 +99,7 @@ func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedire
 		options...,
 	)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider: %w")
+		return nil, caos_errs.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
 	}
 	return provider, nil
 }
@@ -131,12 +130,13 @@ func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string, cryp
 	return opConfig, nil
 }
 
-func createOptions(config Config, userAgentCookie func(http.Handler) http.Handler) ([]op.Option, error) {
+func createOptions(config Config, userAgentCookie, instanceHandler func(http.Handler) http.Handler) ([]op.Option, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	interceptor := op.WithHttpInterceptors(
 		middleware.MetricsHandler(metricTypes),
 		middleware.TelemetryHandler(),
 		middleware.NoCacheInterceptor,
+		instanceHandler,
 		userAgentCookie,
 		http_utils.CopyHeadersToContext,
 	)

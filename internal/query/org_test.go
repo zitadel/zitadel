@@ -28,16 +28,16 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.orgs.id,`+
-						` zitadel.projections.orgs.creation_date,`+
-						` zitadel.projections.orgs.change_date,`+
-						` zitadel.projections.orgs.resource_owner,`+
-						` zitadel.projections.orgs.org_state,`+
-						` zitadel.projections.orgs.sequence,`+
-						` zitadel.projections.orgs.name,`+
-						` zitadel.projections.orgs.primary_domain,`+
+					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
+						` projections.orgs.creation_date,`+
+						` projections.orgs.change_date,`+
+						` projections.orgs.resource_owner,`+
+						` projections.orgs.org_state,`+
+						` projections.orgs.sequence,`+
+						` projections.orgs.name,`+
+						` projections.orgs.primary_domain,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.orgs`),
+						` FROM projections.orgs`),
 					nil,
 					nil,
 				),
@@ -49,16 +49,16 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.orgs.id,`+
-						` zitadel.projections.orgs.creation_date,`+
-						` zitadel.projections.orgs.change_date,`+
-						` zitadel.projections.orgs.resource_owner,`+
-						` zitadel.projections.orgs.org_state,`+
-						` zitadel.projections.orgs.sequence,`+
-						` zitadel.projections.orgs.name,`+
-						` zitadel.projections.orgs.primary_domain,`+
+					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
+						` projections.orgs.creation_date,`+
+						` projections.orgs.change_date,`+
+						` projections.orgs.resource_owner,`+
+						` projections.orgs.org_state,`+
+						` projections.orgs.sequence,`+
+						` projections.orgs.name,`+
+						` projections.orgs.primary_domain,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.orgs`),
+						` FROM projections.orgs`),
 					[]string{
 						"id",
 						"creation_date",
@@ -107,16 +107,16 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.orgs.id,`+
-						` zitadel.projections.orgs.creation_date,`+
-						` zitadel.projections.orgs.change_date,`+
-						` zitadel.projections.orgs.resource_owner,`+
-						` zitadel.projections.orgs.org_state,`+
-						` zitadel.projections.orgs.sequence,`+
-						` zitadel.projections.orgs.name,`+
-						` zitadel.projections.orgs.primary_domain,`+
+					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
+						` projections.orgs.creation_date,`+
+						` projections.orgs.change_date,`+
+						` projections.orgs.resource_owner,`+
+						` projections.orgs.org_state,`+
+						` projections.orgs.sequence,`+
+						` projections.orgs.name,`+
+						` projections.orgs.primary_domain,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.orgs`),
+						` FROM projections.orgs`),
 					[]string{
 						"id",
 						"creation_date",
@@ -185,16 +185,16 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.orgs.id,`+
-						` zitadel.projections.orgs.creation_date,`+
-						` zitadel.projections.orgs.change_date,`+
-						` zitadel.projections.orgs.resource_owner,`+
-						` zitadel.projections.orgs.org_state,`+
-						` zitadel.projections.orgs.sequence,`+
-						` zitadel.projections.orgs.name,`+
-						` zitadel.projections.orgs.primary_domain,`+
+					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
+						` projections.orgs.creation_date,`+
+						` projections.orgs.change_date,`+
+						` projections.orgs.resource_owner,`+
+						` projections.orgs.org_state,`+
+						` projections.orgs.sequence,`+
+						` projections.orgs.name,`+
+						` projections.orgs.primary_domain,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.orgs`),
+						` FROM projections.orgs`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -211,15 +211,15 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.orgs.id,`+
-						` zitadel.projections.orgs.creation_date,`+
-						` zitadel.projections.orgs.change_date,`+
-						` zitadel.projections.orgs.resource_owner,`+
-						` zitadel.projections.orgs.org_state,`+
-						` zitadel.projections.orgs.sequence,`+
-						` zitadel.projections.orgs.name,`+
-						` zitadel.projections.orgs.primary_domain`+
-						` FROM zitadel.projections.orgs`),
+					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
+						` projections.orgs.creation_date,`+
+						` projections.orgs.change_date,`+
+						` projections.orgs.resource_owner,`+
+						` projections.orgs.org_state,`+
+						` projections.orgs.sequence,`+
+						` projections.orgs.name,`+
+						` projections.orgs.primary_domain`+
+						` FROM projections.orgs`),
 					nil,
 					nil,
 				),
@@ -237,15 +237,15 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.orgs.id,`+
-						` zitadel.projections.orgs.creation_date,`+
-						` zitadel.projections.orgs.change_date,`+
-						` zitadel.projections.orgs.resource_owner,`+
-						` zitadel.projections.orgs.org_state,`+
-						` zitadel.projections.orgs.sequence,`+
-						` zitadel.projections.orgs.name,`+
-						` zitadel.projections.orgs.primary_domain`+
-						` FROM zitadel.projections.orgs`),
+					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
+						` projections.orgs.creation_date,`+
+						` projections.orgs.change_date,`+
+						` projections.orgs.resource_owner,`+
+						` projections.orgs.org_state,`+
+						` projections.orgs.sequence,`+
+						` projections.orgs.name,`+
+						` projections.orgs.primary_domain`+
+						` FROM projections.orgs`),
 					[]string{
 						"id",
 						"creation_date",
@@ -284,15 +284,15 @@ func Test_OrgPrepares(t *testing.T) {
 			prepare: prepareOrgQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.orgs.id,`+
-						` zitadel.projections.orgs.creation_date,`+
-						` zitadel.projections.orgs.change_date,`+
-						` zitadel.projections.orgs.resource_owner,`+
-						` zitadel.projections.orgs.org_state,`+
-						` zitadel.projections.orgs.sequence,`+
-						` zitadel.projections.orgs.name,`+
-						` zitadel.projections.orgs.primary_domain`+
-						` FROM zitadel.projections.orgs`),
+					regexp.QuoteMeta(`SELECT projections.orgs.id,`+
+						` projections.orgs.creation_date,`+
+						` projections.orgs.change_date,`+
+						` projections.orgs.resource_owner,`+
+						` projections.orgs.org_state,`+
+						` projections.orgs.sequence,`+
+						` projections.orgs.name,`+
+						` projections.orgs.primary_domain`+
+						` FROM projections.orgs`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -310,7 +310,7 @@ func Test_OrgPrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT COUNT(*) = 0`+
-						` FROM zitadel.projections.orgs`),
+						` FROM projections.orgs`),
 					nil,
 					nil,
 				),
@@ -329,7 +329,7 @@ func Test_OrgPrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(`SELECT COUNT(*) = 0`+
-						` FROM zitadel.projections.orgs`),
+						` FROM projections.orgs`),
 					[]string{
 						"count",
 					},
@@ -346,7 +346,7 @@ func Test_OrgPrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(`SELECT COUNT(*) = 0`+
-						` FROM zitadel.projections.orgs`),
+						` FROM projections.orgs`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

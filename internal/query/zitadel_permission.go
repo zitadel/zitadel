@@ -3,16 +3,21 @@ package query
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 )
 
-func (q *Queries) MyZitadelPermissions(ctx context.Context, userID string) (*domain.Permissions, error) {
+func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string) (*domain.Permissions, error) {
 	userIDQuery, err := NewMembershipUserIDQuery(userID)
 	if err != nil {
 		return nil, err
 	}
+	orgIDsQuery, err := NewMembershipResourceOwnersSearchQuery(orgID, authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
 	memberships, err := q.Memberships(ctx, &MembershipSearchQuery{
-		Queries: []SearchQuery{userIDQuery},
+		Queries: []SearchQuery{userIDQuery, orgIDsQuery},
 	})
 	if err != nil {
 		return nil, err

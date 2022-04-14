@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/query"
-
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/command/preparation"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -36,18 +36,18 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.OrgIAM.NotExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
 
-	if err := CheckOrgIAMPolicyForUserName(userName, orgIAMPolicy); err != nil {
+	if err := CheckDomainPolicyForUserName(userName, domainPolicy); err != nil {
 		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
 	pushedEvents, err := c.eventstore.Push(ctx,
-		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, orgIAMPolicy.UserLoginMustBeDomain))
+		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, domainPolicy.UserLoginMustBeDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -186,18 +186,18 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-m9od", "Errors.User.NotFound")
 	}
 
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.OrgIAM.NotExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotExisting")
 	}
 	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, orgIAMPolicy.UserLoginMustBeDomain))
+	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
 		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-5m9oL", "usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
+			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
 		}
 		events = append(events, removeEvent)
@@ -320,7 +320,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -335,7 +335,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 			userAgg,
 			fmt.Sprintf("%s@temporary.%s", id, c.iamDomain),
 			existingUser.UserName,
-			orgIAMPolicy.UserLoginMustBeDomain),
+			domainPolicy.UserLoginMustBeDomain),
 	}, changedUserGrant, nil
 }
 
@@ -377,4 +377,39 @@ func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string) (exists bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(resourceOwner).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(id).
+		EventTypes(
+			user.HumanRegisteredType,
+			user.UserV1RegisteredType,
+			user.HumanAddedType,
+			user.UserV1AddedType,
+			user.MachineAddedEventType,
+			user.UserRemovedType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		switch event.(type) {
+		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
+			exists = true
+		case *user.UserRemovedEvent:
+			exists = false
+		}
+	}
+
+	return exists, nil
+}
+
+func newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (value *crypto.CryptoValue, expiry time.Duration, err error) {
+	return newCryptoCodeWithExpiry(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
 }

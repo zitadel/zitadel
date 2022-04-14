@@ -4,7 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/oidc"
+	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -13,9 +15,9 @@ import (
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/metadata"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	z_oidc "github.com/caos/zitadel/internal/api/oidc"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
@@ -90,7 +92,7 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	policy, err := s.query.OrgIAMPolicyByOrg(ctx, orgID)
+	policy, err := s.query.DomainPolicyByOrg(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -192,24 +194,40 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
-	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
-	}
-	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
-	}
-	human, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req), initCodeGenerator, phoneCodeGenerator)
+	lang, err := language.Parse(req.Profile.PreferredLanguage)
+	logging.OnError(err).Debug("unable to parse language")
+
+	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, &command.AddHuman{
+		Username:    req.UserName,
+		FirstName:   req.Profile.FirstName,
+		LastName:    req.Profile.LastName,
+		NickName:    req.Profile.NickName,
+		DisplayName: req.Profile.DisplayName,
+		Email: command.Email{
+			Address:  req.Email.Email,
+			Verified: req.Email.IsEmailVerified,
+		},
+		PreferredLang: lang,
+		Gender:        user_grpc.GenderToDomain(req.Profile.Gender),
+		Phone: command.Phone{
+			Number:   req.Phone.Phone,
+			Verified: req.Phone.IsPhoneVerified,
+		},
+		Password:               req.InitialPassword,
+		PasswordChangeRequired: true,
+		Passwordless:           false,
+		Register:               false,
+		ExternalIDP:            false,
+	})
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddHumanUserResponse{
-		UserId: human.AggregateID,
+		UserId: details.ID,
 		Details: obj_grpc.AddToDetailsPb(
-			human.Sequence,
-			human.ChangeDate,
-			human.ResourceOwner,
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner,
 		),
 	}, nil
 }
@@ -763,7 +781,7 @@ func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.G
 		return nil, err
 	}
 	return &mgmt_pb.GetPersonalAccessTokenByIDsResponse{
-		Token: user.PersonalAccessTokenToPb(token),
+		Token: user_grpc.PersonalAccessTokenToPb(token),
 	}, nil
 }
 

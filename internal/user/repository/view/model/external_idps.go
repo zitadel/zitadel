@@ -2,12 +2,14 @@ package model
 
 import (
 	"encoding/json"
-	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"time"
+
+	"github.com/caos/logging"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 )
 
 const (
@@ -27,49 +29,14 @@ type ExternalIDPView struct {
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	ResourceOwner   string    `json:"-" gorm:"column:resource_owner"`
 	Sequence        uint64    `json:"-" gorm:"column:sequence"`
-}
-
-func ExternalIDPViewFromModel(externalIDP *model.ExternalIDPView) *ExternalIDPView {
-	return &ExternalIDPView{
-		UserID:          externalIDP.UserID,
-		IDPConfigID:     externalIDP.IDPConfigID,
-		ExternalUserID:  externalIDP.ExternalUserID,
-		IDPName:         externalIDP.IDPName,
-		UserDisplayName: externalIDP.UserDisplayName,
-		Sequence:        externalIDP.Sequence,
-		CreationDate:    externalIDP.CreationDate,
-		ChangeDate:      externalIDP.ChangeDate,
-		ResourceOwner:   externalIDP.ResourceOwner,
-	}
-}
-
-func ExternalIDPViewToModel(externalIDP *ExternalIDPView) *model.ExternalIDPView {
-	return &model.ExternalIDPView{
-		UserID:          externalIDP.UserID,
-		IDPConfigID:     externalIDP.IDPConfigID,
-		ExternalUserID:  externalIDP.ExternalUserID,
-		IDPName:         externalIDP.IDPName,
-		UserDisplayName: externalIDP.UserDisplayName,
-		Sequence:        externalIDP.Sequence,
-		CreationDate:    externalIDP.CreationDate,
-		ChangeDate:      externalIDP.ChangeDate,
-		ResourceOwner:   externalIDP.ResourceOwner,
-	}
-}
-
-func ExternalIDPViewsToModel(externalIDPs []*ExternalIDPView) []*model.ExternalIDPView {
-	result := make([]*model.ExternalIDPView, len(externalIDPs))
-	for i, r := range externalIDPs {
-		result[i] = ExternalIDPViewToModel(r)
-	}
-	return result
+	InstanceID      string    `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func (i *ExternalIDPView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.HumanExternalIDPAdded:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserIDPLinkAddedType:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
@@ -80,6 +47,7 @@ func (i *ExternalIDPView) AppendEvent(event *models.Event) (err error) {
 func (r *ExternalIDPView) setRootData(event *models.Event) {
 	r.UserID = event.AggregateID
 	r.ResourceOwner = event.ResourceOwner
+	r.InstanceID = event.InstanceID
 }
 
 func (r *ExternalIDPView) SetData(event *models.Event) error {

@@ -3,26 +3,21 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type MessageTextProjection struct {
-	crdb.StatementHandler
-}
-
 const (
-	MessageTextTable = "zitadel.projections.message_texts"
+	MessageTextTable = "projections.message_texts"
 
 	MessageTextAggregateIDCol  = "aggregate_id"
+	MessageTextInstanceIDCol   = "instance_id"
 	MessageTextCreationDateCol = "creation_date"
 	MessageTextChangeDateCol   = "change_date"
 	MessageTextSequenceCol     = "sequence"
@@ -38,10 +33,35 @@ const (
 	MessageTextFooterCol       = "footer_text"
 )
 
+type MessageTextProjection struct {
+	crdb.StatementHandler
+}
+
 func NewMessageTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *MessageTextProjection {
 	p := new(MessageTextProjection)
 	config.ProjectionName = MessageTextTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(MessageTextAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MessageTextChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MessageTextSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MessageTextStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(MessageTextTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextLanguageCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextTitleCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextPreHeaderCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextSubjectCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextGreetingCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextTextCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextButtonTextCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextFooterCol, crdb.ColumnTypeText, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(MessageTextInstanceIDCol, MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -66,18 +86,18 @@ func (p *MessageTextProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.CustomTextSetEventType,
+					Event:  instance.CustomTextSetEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.CustomTextRemovedEventType,
+					Event:  instance.CustomTextRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 				{
-					Event:  iam.CustomTextTemplateRemovedEventType,
+					Event:  instance.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
 				},
 			},
@@ -90,11 +110,10 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	switch e := event.(type) {
 	case *org.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
-	case *iam.CustomTextSetEvent:
+	case *instance.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
 	default:
-		logging.LogWithFields("PROJE-2N9fg", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n90r", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil
@@ -102,6 +121,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 
 	cols := []handler.Column{
 		handler.NewCol(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
+		handler.NewCol(MessageTextInstanceIDCol, templateEvent.Aggregate().InstanceID),
 		handler.NewCol(MessageTextCreationDateCol, templateEvent.CreationDate()),
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
 		handler.NewCol(MessageTextSequenceCol, templateEvent.Sequence()),
@@ -140,11 +160,10 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	switch e := event.(type) {
 	case *org.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
-	case *iam.CustomTextRemovedEvent:
+	case *instance.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-3m022", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-fm0ge", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil
@@ -190,11 +209,10 @@ func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 	switch e := event.(type) {
 	case *org.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
-	case *iam.CustomTextTemplateRemovedEvent:
+	case *instance.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-m03ng", "seq", event.Sequence(), "expectedType", org.CustomTextTemplateRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n9rs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n9rs", "reduce.wrong.event.type %s", org.CustomTextTemplateRemovedEventType)
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil

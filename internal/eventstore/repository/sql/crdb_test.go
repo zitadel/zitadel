@@ -267,11 +267,12 @@ func TestCRDB_columnName(t *testing.T) {
 
 func TestCRDB_Push_OneAggregate(t *testing.T) {
 	type args struct {
-		ctx               context.Context
-		events            []*repository.Event
-		uniqueConstraints *repository.UniqueConstraint
-		uniqueDataType    string
-		uniqueDataField   string
+		ctx                  context.Context
+		events               []*repository.Event
+		uniqueConstraints    *repository.UniqueConstraint
+		uniqueDataType       string
+		uniqueDataField      string
+		uniqueDataInstanceID string
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -419,7 +420,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				client: testCRDBClient,
 			}
 			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
-				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField)
+				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField, tt.args.uniqueDataInstanceID)
 				if err != nil {
 					t.Error("unable to prefill insert unique data: ", err)
 					return
@@ -440,7 +441,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
 			}
 			if tt.args.uniqueConstraints != nil {
-				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField)
+				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2 AND instance_id = $3", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField, tt.args.uniqueConstraints.InstanceID)
 				var uniqueCount int
 				err := countUniqueRow.Scan(&uniqueCount)
 				if err != nil {
@@ -555,6 +556,84 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 			}
 			if count != tt.res.eventsRes.pushedEventsCount {
 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, count)
+			}
+		})
+	}
+}
+
+func TestCRDB_CreateInstance(t *testing.T) {
+	type args struct {
+		instanceID string
+	}
+	type res struct {
+		wantErr bool
+		exists  bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no number",
+			args: args{
+				instanceID: "asdf;use defaultdb;DROP DATABASE zitadel;--",
+			},
+			res: res{
+				wantErr: true,
+				exists:  false,
+			},
+		},
+		{
+			name: "no instance id",
+			args: args{
+				instanceID: "",
+			},
+			res: res{
+				wantErr: true,
+				exists:  false,
+			},
+		},
+		{
+			name: "correct number",
+			args: args{
+				instanceID: "1235",
+			},
+			res: res{
+				wantErr: false,
+				exists:  true,
+			},
+		},
+		{
+			name: "correct text",
+			args: args{
+				instanceID: "system",
+			},
+			res: res{
+				wantErr: false,
+				exists:  true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &CRDB{
+				client: testCRDBClient,
+			}
+
+			if err := db.CreateInstance(context.Background(), tt.args.instanceID); (err != nil) != tt.res.wantErr {
+				t.Errorf("CRDB.CreateInstance() error = %v, wantErr %v", err, tt.res.wantErr)
+			}
+
+			sequenceRow := testCRDBClient.QueryRow("SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES FROM eventstore] WHERE sequence_name like $1)", "i_"+tt.args.instanceID+"%")
+			var exists bool
+			err := sequenceRow.Scan(&exists)
+			if err != nil {
+				t.Error("unable to query inserted rows: ", err)
+				return
+			}
+			if exists != tt.res.exists {
+				t.Errorf("expected exists %v got %v", tt.res.exists, exists)
 			}
 		})
 	}
@@ -1117,6 +1196,7 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 	e := &repository.UniqueConstraint{
 		UniqueType:  table,
 		UniqueField: uniqueField,
+		InstanceID:  "",
 		Action:      repository.UniqueConstraintRemoved,
 	}
 

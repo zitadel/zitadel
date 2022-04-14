@@ -29,18 +29,18 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.actions.timeout,`+
-						` zitadel.projections.actions.allowed_to_fail,`+
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.sequence,`+
+						` projections.actions.action_state,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.actions.timeout,`+
+						` projections.actions.allowed_to_fail,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.actions`),
+						` FROM projections.actions`),
 					nil,
 					nil,
 				),
@@ -52,18 +52,18 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.actions.timeout,`+
-						` zitadel.projections.actions.allowed_to_fail,`+
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.sequence,`+
+						` projections.actions.action_state,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.actions.timeout,`+
+						` projections.actions.allowed_to_fail,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.actions`),
+						` FROM projections.actions`),
 					[]string{
 						"id",
 						"creation_date",
@@ -118,18 +118,18 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.actions.timeout,`+
-						` zitadel.projections.actions.allowed_to_fail,`+
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.sequence,`+
+						` projections.actions.action_state,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.actions.timeout,`+
+						` projections.actions.allowed_to_fail,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.actions`),
+						` FROM projections.actions`),
 					[]string{
 						"id",
 						"creation_date",
@@ -208,18 +208,18 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.actions.timeout,`+
-						` zitadel.projections.actions.allowed_to_fail,`+
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.sequence,`+
+						` projections.actions.action_state,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.actions.timeout,`+
+						` projections.actions.allowed_to_fail,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.actions`),
+						` FROM projections.actions`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -236,17 +236,17 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.actions.timeout,`+
-						` zitadel.projections.actions.allowed_to_fail`+
-						` FROM zitadel.projections.actions`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.sequence,`+
+						` projections.actions.action_state,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.actions.timeout,`+
+						` projections.actions.allowed_to_fail`+
+						` FROM projections.actions`),
 					nil,
 					nil,
 				),
@@ -264,17 +264,17 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.actions.timeout,`+
-						` zitadel.projections.actions.allowed_to_fail`+
-						` FROM zitadel.projections.actions`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.sequence,`+
+						` projections.actions.action_state,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.actions.timeout,`+
+						` projections.actions.allowed_to_fail`+
+						` FROM projections.actions`),
 					[]string{
 						"id",
 						"creation_date",
@@ -319,17 +319,17 @@ func Test_ActionPrepares(t *testing.T) {
 			prepare: prepareActionQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.actions.id,`+
-						` zitadel.projections.actions.creation_date,`+
-						` zitadel.projections.actions.change_date,`+
-						` zitadel.projections.actions.resource_owner,`+
-						` zitadel.projections.actions.sequence,`+
-						` zitadel.projections.actions.action_state,`+
-						` zitadel.projections.actions.name,`+
-						` zitadel.projections.actions.script,`+
-						` zitadel.projections.actions.timeout,`+
-						` zitadel.projections.actions.allowed_to_fail`+
-						` FROM zitadel.projections.actions`),
+					regexp.QuoteMeta(`SELECT projections.actions.id,`+
+						` projections.actions.creation_date,`+
+						` projections.actions.change_date,`+
+						` projections.actions.resource_owner,`+
+						` projections.actions.sequence,`+
+						` projections.actions.action_state,`+
+						` projections.actions.name,`+
+						` projections.actions.script,`+
+						` projections.actions.timeout,`+
+						` projections.actions.allowed_to_fail`+
+						` FROM projections.actions`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

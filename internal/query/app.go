@@ -9,6 +9,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -100,6 +102,10 @@ var (
 	}
 	AppColumnResourceOwner = Column{
 		name:  projection.AppColumnResourceOwner,
+		table: appsTable,
+	}
+	AppColumnInstanceID = Column{
+		name:  projection.AppColumnInstanceID,
 		table: appsTable,
 	}
 	AppColumnState = Column{
@@ -204,8 +210,9 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID str
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			AppColumnID.identifier():        appID,
-			AppColumnProjectID.identifier(): projectID,
+			AppColumnID.identifier():         appID,
+			AppColumnProjectID.identifier():  projectID,
+			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -219,7 +226,10 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID str
 func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{AppColumnID.identifier(): appID},
+		sq.Eq{
+			AppColumnID.identifier():         appID,
+			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		},
 	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
@@ -232,7 +242,10 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+		sq.Eq{
+			AppOIDCConfigColumnClientID.identifier(): appID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
+		},
 	).ToSql()
 	if err != nil {
 		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
@@ -245,9 +258,12 @@ func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (
 func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (string, error) {
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
-			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
-			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+		sq.And{
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+			sq.Or{
+				sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+			},
 		},
 	).ToSql()
 	if err != nil {
@@ -261,7 +277,10 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (stri
 func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (*Project, error) {
 	stmt, scan := prepareProjectByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{AppOIDCConfigColumnClientID.identifier(): id},
+		sq.Eq{
+			AppOIDCConfigColumnClientID.identifier(): id,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
+		},
 	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
@@ -276,6 +295,7 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App,
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppOIDCConfigColumnClientID.identifier(): clientID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -289,9 +309,12 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App,
 func (q *Queries) AppByClientID(ctx context.Context, clientID string) (*App, error) {
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
-			sq.Eq{AppOIDCConfigColumnClientID.identifier(): clientID},
-			sq.Eq{AppAPIConfigColumnClientID.identifier(): clientID},
+		sq.And{
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+			sq.Or{
+				sq.Eq{AppOIDCConfigColumnClientID.identifier(): clientID},
+				sq.Eq{AppAPIConfigColumnClientID.identifier(): clientID},
+			},
 		},
 	).ToSql()
 	if err != nil {
@@ -304,7 +327,10 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (*App, err
 
 func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (*Apps, error) {
 	query, scan := prepareAppsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+		).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}
@@ -323,7 +349,10 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (*A
 
 func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries) ([]string, error) {
 	query, scan := prepareClientIDsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+		).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}

@@ -8,12 +8,9 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func (c *Commands) AddHumanAvatar(ctx context.Context, orgID, userID, storageKey string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddHumanAvatar(ctx context.Context, orgID, userID string, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "USER-Ba5Ds", "Errors.IDMissing")
-	}
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "USER-1Xyud", "Errors.Assets.EmptyKey")
 	}
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
@@ -23,8 +20,12 @@ func (c *Commands) AddHumanAvatar(ctx context.Context, orgID, userID, storageKey
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "USER-vJ3fS", "Errors.Users.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "USER-1Xyud", "Errors.Assets.Object.PutFailed")
+	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanAvatarAddedEvent(ctx, userAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanAvatarAddedEvent(ctx, userAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func (c *Commands) RemoveHumanAvatar(ctx context.Context, orgID, userID string) 
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "USER-35N8f", "Errors.Users.NotFound")
 	}
-	err = c.RemoveAsset(ctx, orgID, existingUser.Avatar)
+	err = c.removeAsset(ctx, orgID, existingUser.Avatar)
 	if err != nil {
 		return nil, err
 	}

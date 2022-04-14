@@ -196,7 +196,7 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
 		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
 	} else {
-		_, err = c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
+		_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	}
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
@@ -432,7 +432,7 @@ func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewOrgAuthFactorsAllowedWriteModel(orgID)
+	writeModel := NewOrgAuthFactorsAllowedWriteModel(ctx, orgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

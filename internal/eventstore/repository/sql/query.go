@@ -109,7 +109,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		&event.EditorService,
 		&event.EditorUser,
 		&event.ResourceOwner,
-		&event.Tenant,
+		&event.InstanceID,
 		&event.AggregateType,
 		&event.AggregateID,
 		&event.Version,
