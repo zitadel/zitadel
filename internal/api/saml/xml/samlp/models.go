@@ -16,12 +16,12 @@ type RequestAbstractType struct {
 	Issuer       *saml.NameIDType        `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type ExtensionsType struct {
-	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol Extensions"`
-	InnerXml string   `xml:",innerxml"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol Extensions"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type StatusResponseType struct {
@@ -36,7 +36,7 @@ type StatusResponseType struct {
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
 	Status       StatusType              `xml:"Status"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type StatusType struct {
@@ -44,19 +44,19 @@ type StatusType struct {
 	StatusCode    StatusCodeType    `xml:"StatusCode"`
 	StatusMessage string            `xml:"StatusMessage"`
 	StatusDetail  *StatusDetailType `xml:"StatusDetail"`
-	InnerXml      string            `xml:",innerxml"`
+	//InnerXml      string            `xml:",innerxml"`
 }
 
 type StatusCodeType struct {
 	XMLName    xml.Name        `xml:"urn:oasis:names:tc:SAML:2.0:protocol StatusCode"`
 	Value      string          `xml:"Value,attr"`
 	StatusCode *StatusCodeType `xml:",any"`
-	InnerXml   string          `xml:",innerxml"`
+	//InnerXml   string          `xml:",innerxml"`
 }
 
 type StatusDetailType struct {
-	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol StatusDetail"`
-	InnerXml string   `xml:",innerxml"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol StatusDetail"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type AssertionIDRequestType struct {
@@ -70,7 +70,7 @@ type AssertionIDRequestType struct {
 	Issuer         *saml.NameIDType        `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature      *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions     *ExtensionsType         `xml:"Extensions"`
-	InnerXml       string                  `xml:",innerxml"`
+	//InnerXml       string                  `xml:",innerxml"`
 }
 
 type SubjectQueryAbstractType struct {
@@ -84,7 +84,7 @@ type SubjectQueryAbstractType struct {
 	Issuer       *saml.NameIDType        `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type AuthnQueryType struct {
@@ -100,7 +100,7 @@ type AuthnQueryType struct {
 	Issuer                *saml.NameIDType           `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature             *xml_dsig.SignatureType    `xml:"Signature"`
 	Extensions            *ExtensionsType            `xml:"Extensions"`
-	InnerXml              string                     `xml:",innerxml"`
+	//InnerXml              string                     `xml:",innerxml"`
 }
 
 type RequestedAuthnContextType struct {
@@ -108,7 +108,7 @@ type RequestedAuthnContextType struct {
 	Comparison           AuthnContextComparisonType `xml:"Comparison,attr,omitempty"`
 	AuthnContextClassRef []string                   `xml:"AuthnContextClassRef"`
 	AuthnContextDeclRef  []string                   `xml:"AuthnContextDeclRef"`
-	InnerXml             string                     `xml:",innerxml"`
+	//InnerXml             string                     `xml:",innerxml"`
 }
 
 type AttributeQueryType struct {
@@ -123,7 +123,7 @@ type AttributeQueryType struct {
 	Issuer       *saml.NameIDType        `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type AuthzDecisionQueryType struct {
@@ -140,7 +140,7 @@ type AuthzDecisionQueryType struct {
 	Issuer       *saml.NameIDType        `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type AuthnRequestType struct {
@@ -165,7 +165,7 @@ type AuthnRequestType struct {
 	Issuer                         *saml.NameIDType           `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature                      *xml_dsig.SignatureType    `xml:"Signature"`
 	Extensions                     *ExtensionsType            `xml:"Extensions"`
-	InnerXml                       string                     `xml:",innerxml"`
+	//InnerXml                       string                     `xml:",innerxml"`
 }
 
 type NameIDPolicyType struct {
@@ -173,7 +173,7 @@ type NameIDPolicyType struct {
 	Format          string   `xml:"Format,attr,omitempty"`
 	SPNameQualifier string   `xml:"SPNameQualifier,attr,omitempty"`
 	AllowCreate     bool     `xml:"AllowCreate,attr,omitempty"`
-	InnerXml        string   `xml:",innerxml"`
+	//	InnerXml        string   `xml:",innerxml"`
 }
 
 type ScopingType struct {
@@ -181,14 +181,14 @@ type ScopingType struct {
 	ProxyCount  int          `xml:"ProxyCount,attr,omitempty"`
 	IDPList     *IDPListType `xml:"IDPList"`
 	RequesterID []string     `xml:"RequesterID"`
-	InnerXml    string       `xml:",innerxml"`
+	//InnerXml    string       `xml:",innerxml"`
 }
 
 type IDPListType struct {
 	XMLName     xml.Name       `xml:"urn:oasis:names:tc:SAML:2.0:protocol IDPList"`
 	IDPEntry    []IDPEntryType `xml:"IDPEntry"`
 	GetComplete string         `xml:"GetComplete"`
-	InnerXml    string         `xml:",innerxml"`
+	//InnerXml    string         `xml:",innerxml"`
 }
 
 type IDPEntryType struct {
@@ -196,7 +196,7 @@ type IDPEntryType struct {
 	ProviderID string   `xml:"ProviderID,attr"`
 	Name       string   `xml:"Name,attr,omitempty"`
 	Loc        string   `xml:"Loc,attr,omitempty"`
-	InnerXml   string   `xml:",innerxml"`
+	//InnerXml   string   `xml:",innerxml"`
 }
 
 type ResponseType struct {
@@ -212,7 +212,7 @@ type ResponseType struct {
 	Extensions   *ExtensionsType         `xml:"Extensions"`
 	Status       StatusType              `xml:"Status"`
 	Assertion    saml.AssertionType      `xml:"Assertion"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type ArtifactResolveType struct {
@@ -226,7 +226,7 @@ type ArtifactResolveType struct {
 	Issuer       *saml.NameIDType        `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type ArtifactResponseType struct {
@@ -241,7 +241,7 @@ type ArtifactResponseType struct {
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
 	Status       StatusType              `xml:"Status"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 type ManageNameIDRequestType struct {
@@ -259,12 +259,12 @@ type ManageNameIDRequestType struct {
 	Issuer         *saml.NameIDType           `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature      *xml_dsig.SignatureType    `xml:"Signature"`
 	Extensions     *ExtensionsType            `xml:"Extensions"`
-	InnerXml       string                     `xml:",innerxml"`
+	//InnerXml       string                     `xml:",innerxml"`
 }
 
 type TerminateType struct {
-	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol Terminate"`
-	InnerXml string   `xml:",innerxml"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol Terminate"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type LogoutRequestType struct {
@@ -283,7 +283,7 @@ type LogoutRequestType struct {
 	Issuer       *saml.NameIDType           `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *xml_dsig.SignatureType    `xml:"Signature"`
 	Extensions   *ExtensionsType            `xml:"Extensions"`
-	InnerXml     string                     `xml:",innerxml"`
+	//	InnerXml     string                     `xml:",innerxml"`
 }
 
 type LogoutResponseType struct {
@@ -298,6 +298,7 @@ type LogoutResponseType struct {
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
 	Status       StatusType              `xml:"Status"`
+	//InnerXml     string                     `xml:",innerxml"`
 }
 
 type NameIDMappingRequestType struct {
@@ -314,7 +315,7 @@ type NameIDMappingRequestType struct {
 	Issuer       *saml.NameIDType           `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 	Signature    *xml_dsig.SignatureType    `xml:"Signature"`
 	Extensions   *ExtensionsType            `xml:"Extensions"`
-	InnerXml     string                     `xml:",innerxml"`
+	//InnerXml     string                     `xml:",innerxml"`
 }
 
 type NameIDMappingResponseType struct {
@@ -329,7 +330,7 @@ type NameIDMappingResponseType struct {
 	Signature    *xml_dsig.SignatureType `xml:"Signature"`
 	Extensions   *ExtensionsType         `xml:"Extensions"`
 	Status       StatusType              `xml:"Status"`
-	InnerXml     string                  `xml:",innerxml"`
+	//InnerXml     string                  `xml:",innerxml"`
 }
 
 // XSD SimpleType declarations

@@ -8,22 +8,22 @@ import (
 )
 
 type LocalizedNameType struct {
-	XMLName  xml.Name
-	XmlLang  string `xml:"lang,attr"`
-	Text     string `xml:",chardata"`
-	InnerXml string `xml:",innerxml"`
+	XMLName xml.Name
+	XmlLang string `xml:"lang,attr"`
+	Text    string `xml:",chardata"`
+	//InnerXml string `xml:",innerxml"`
 }
 
 type LocalizedURIType struct {
-	XMLName  xml.Name
-	XmlLang  string `xml:"lang,attr"`
-	Text     string `xml:",chardata"`
-	InnerXml string `xml:",innerxml"`
+	XMLName xml.Name
+	XmlLang string `xml:"lang,attr"`
+	Text    string `xml:",chardata"`
+	//InnerXml string `xml:",innerxml"`
 }
 
 type ExtensionsType struct {
-	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:metadata Extensions"`
-	InnerXml string   `xml:",innerxml"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:metadata Extensions"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type EndpointType struct {
@@ -31,7 +31,7 @@ type EndpointType struct {
 	Binding          string `xml:"Binding,attr"`
 	Location         string `xml:"Location,attr"`
 	ResponseLocation string `xml:"ResponseLocation,attr,omitempty"`
-	InnerXml         string `xml:",innerxml"`
+	//InnerXml         string `xml:",innerxml"`
 }
 
 type IndexedEndpointType struct {
@@ -41,7 +41,7 @@ type IndexedEndpointType struct {
 	Binding          string `xml:"Binding,attr"`
 	Location         string `xml:"Location,attr"`
 	ResponseLocation string `xml:"ResponseLocation,attr,omitempty"`
-	InnerXml         string `xml:",innerxml"`
+	//InnerXml         string `xml:",innerxml"`
 }
 
 type EntitiesDescriptorType struct {
@@ -54,7 +54,7 @@ type EntitiesDescriptorType struct {
 	Extensions         *ExtensionsType          `xml:"Extensions"`
 	EntityDescriptor   []EntityDescriptorType   `xml:"EntityDescriptor"`
 	EntitiesDescriptor []EntitiesDescriptorType `xml:"EntitiesDescriptor"`
-	InnerXml           string                   `xml:",innerxml"`
+	//InnerXml           string                   `xml:",innerxml"`
 }
 
 type EntityDescriptorType struct {
@@ -75,7 +75,7 @@ type EntityDescriptorType struct {
 	AttributeAuthorityDescriptor *AttributeAuthorityDescriptorType `xml:"AttributeAuthorityDescriptor,omitempty"`
 	PDPDescriptor                *PDPDescriptorType                `xml:"PDPDescriptor,omitempty"`
 	AffiliationDescriptor        *AffiliationDescriptorType        `xml:"AffiliationDescriptor"`
-	InnerXml                     string                            `xml:",innerxml"`
+	//InnerXml                     string                            `xml:",innerxml"`
 }
 
 type OrganizationType struct {
@@ -84,7 +84,7 @@ type OrganizationType struct {
 	OrganizationName        []LocalizedNameType `xml:"urn:oasis:names:tc:SAML:2.0:metadata OrganizationName,omitempty"`
 	OrganizationDisplayName []LocalizedNameType `xml:"urn:oasis:names:tc:SAML:2.0:metadata OrganizationDisplayName,omitempty"`
 	OrganizationURL         []LocalizedURIType  `xml:"urn:oasis:names:tc:SAML:2.0:metadata OrganizationURL,omitempty"`
-	InnerXml                string              `xml:",innerxml"`
+	//InnerXml                string              `xml:",innerxml"`
 }
 
 type ContactType struct {
@@ -96,14 +96,14 @@ type ContactType struct {
 	SurName         string          `xml:"SurName,omitempty"`
 	EmailAddress    []string        `xml:"EmailAddress,omitempty"`
 	TelephoneNumber []string        `xml:"TelephoneNumber,omitempty"`
-	InnerXml        string          `xml:",innerxml"`
+	//InnerXml        string          `xml:",innerxml"`
 }
 
 type AdditionalMetadataLocationType struct {
 	XMLName   xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:metadata AdditionalMetadataLocation"`
 	Namespace string   `xml:"namespace,attr"`
 	Text      string   `xml:",chardata"`
-	InnerXml  string   `xml:",innerxml"`
+	//	InnerXml  string   `xml:",innerxml"`
 }
 
 type RoleDescriptorType struct {
@@ -118,7 +118,7 @@ type RoleDescriptorType struct {
 	KeyDescriptor              []KeyDescriptorType     `xml:"KeyDescriptor"`
 	Organization               *OrganizationType       `xml:"Organization"`
 	ContactPerson              []ContactType           `xml:"ContactPerson"`
-	InnerXml                   string                  `xml:",innerxml"`
+	//InnerXml                   string                  `xml:",innerxml"`
 }
 
 type KeyDescriptorType struct {
@@ -126,7 +126,7 @@ type KeyDescriptorType struct {
 	Use              KeyTypes                    `xml:"use,attr,omitempty"`
 	KeyInfo          xml_dsig.KeyInfoType        `xml:"http://www.w3.org/2000/09/xmldsig# KeyInfo"`
 	EncryptionMethod []xenc.EncryptionMethodType `xml:"EncryptionMethod"`
-	InnerXml         string                      `xml:",innerxml"`
+	//InnerXml         string                      `xml:",innerxml"`
 }
 
 type SSODescriptorType struct {
@@ -145,7 +145,7 @@ type SSODescriptorType struct {
 	KeyDescriptor              []KeyDescriptorType     `xml:"KeyDescriptor"`
 	Organization               *OrganizationType       `xml:"Organization"`
 	ContactPerson              []ContactType           `xml:"ContactPerson"`
-	InnerXml                   string                  `xml:",innerxml"`
+	//	InnerXml                   string                  `xml:",innerxml"`
 }
 
 type IDPSSODescriptorType struct {
@@ -170,7 +170,7 @@ type IDPSSODescriptorType struct {
 	KeyDescriptor              []KeyDescriptorType     `xml:"KeyDescriptor"`
 	Organization               *OrganizationType       `xml:"Organization"`
 	ContactPerson              []ContactType           `xml:"ContactPerson"`
-	InnerXml                   string                  `xml:",innerxml"`
+	//InnerXml                   string                  `xml:",innerxml"`
 }
 
 type SPSSODescriptorType struct {
@@ -193,7 +193,7 @@ type SPSSODescriptorType struct {
 	KeyDescriptor              []KeyDescriptorType             `xml:"KeyDescriptor"`
 	Organization               *OrganizationType               `xml:"Organization"`
 	ContactPerson              []ContactType                   `xml:"ContactPerson"`
-	InnerXml                   string                          `xml:",innerxml"`
+	//	InnerXml                   string                          `xml:",innerxml"`
 }
 
 type AttributeConsumingServiceType struct {
@@ -203,7 +203,7 @@ type AttributeConsumingServiceType struct {
 	ServiceName        []LocalizedNameType      `xml:"urn:oasis:names:tc:SAML:2.0:metadata ServiceName"`
 	ServiceDescription []LocalizedNameType      `xml:"urn:oasis:names:tc:SAML:2.0:metadata ServiceDescription"`
 	RequestedAttribute []RequestedAttributeType `xml:"RequestedAttribute"`
-	InnerXml           string                   `xml:",innerxml"`
+	//InnerXml           string                   `xml:",innerxml"`
 }
 
 type RequestedAttributeType struct {
@@ -213,7 +213,7 @@ type RequestedAttributeType struct {
 	NameFormat     string   `xml:"NameFormat,attr,omitempty"`
 	FriendlyName   string   `xml:"FriendlyName,attr,omitempty"`
 	AttributeValue []string `xml:",any"`
-	InnerXml       string   `xml:",innerxml"`
+	//InnerXml       string   `xml:",innerxml"`
 }
 
 type AuthnAuthorityDescriptorType struct {
@@ -231,7 +231,7 @@ type AuthnAuthorityDescriptorType struct {
 	KeyDescriptor              []KeyDescriptorType     `xml:"KeyDescriptor"`
 	Organization               *OrganizationType       `xml:"Organization"`
 	ContactPerson              []ContactType           `xml:"ContactPerson"`
-	InnerXml                   string                  `xml:",innerxml"`
+	//InnerXml                   string                  `xml:",innerxml"`
 }
 
 type PDPDescriptorType struct {
@@ -249,7 +249,7 @@ type PDPDescriptorType struct {
 	KeyDescriptor              []KeyDescriptorType     `xml:"KeyDescriptor"`
 	Organization               *OrganizationType       `xml:"Organization"`
 	ContactPerson              []ContactType           `xml:"ContactPerson"`
-	InnerXml                   string                  `xml:",innerxml"`
+	//InnerXml                   string                  `xml:",innerxml"`
 }
 
 type AttributeAuthorityDescriptorType struct {
@@ -269,7 +269,7 @@ type AttributeAuthorityDescriptorType struct {
 	KeyDescriptor              []KeyDescriptorType     `xml:"KeyDescriptor"`
 	Organization               *OrganizationType       `xml:"Organization"`
 	ContactPerson              []ContactType           `xml:"ContactPerson"`
-	InnerXml                   string                  `xml:",innerxml"`
+	//InnerXml                   string                  `xml:",innerxml"`
 }
 
 type AffiliationDescriptorType struct {
@@ -282,7 +282,7 @@ type AffiliationDescriptorType struct {
 	Extensions         *ExtensionsType         `xml:"Extensions"`
 	AffiliateMember    []EntityIDType          `xml:"AffiliateMember"`
 	KeyDescriptor      []KeyDescriptorType     `xml:"KeyDescriptor"`
-	InnerXml           string                  `xml:",innerxml"`
+	//InnerXml           string                  `xml:",innerxml"`
 }
 
 // XSD SimpleType declarations

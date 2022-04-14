@@ -8,6 +8,10 @@ type Checker struct {
 
 type step func() bool
 
+func (c *Checker) StepCount() int {
+	return len(c.steps)
+}
+
 func (c *Checker) CheckFailed() bool {
 	for _, step := range c.steps {
 		if step() {

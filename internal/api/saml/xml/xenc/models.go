@@ -15,7 +15,7 @@ type EncryptedType struct {
 	KeyInfo              *xml_dsig.KeyInfoType     `xml:"http://www.w3.org/2000/09/xmldsig# KeyInfo"`
 	CipherData           CipherDataType            `xml:"CipherData"`
 	EncryptionProperties *EncryptionPropertiesType `xml:"EncryptionProperties"`
-	InnerXml             string                    `xml:",innerxml"`
+	//InnerXml             string                    `xml:",innerxml"`
 }
 
 type EncryptionMethodType struct {
@@ -23,27 +23,27 @@ type EncryptionMethodType struct {
 	Algorithm  string       `xml:"Algorithm,attr"`
 	KeySize    *KeySizeType `xml:"KeySize"`
 	OAEPparams string       `xml:"OAEPparams"`
-	InnerXml   string       `xml:",innerxml"`
+	//InnerXml   string       `xml:",innerxml"`
 }
 
 type CipherDataType struct {
 	XMLName         xml.Name
 	CipherValue     string               `xml:"CipherValue"`
 	CipherReference *CipherReferenceType `xml:"CipherReference"`
-	InnerXml        string               `xml:",innerxml"`
+	//InnerXml        string               `xml:",innerxml"`
 }
 
 type CipherReferenceType struct {
 	XMLName    xml.Name
 	URI        string          `xml:"URI,attr"`
 	Transforms *TransformsType `xml:"Transforms"`
-	InnerXml   string          `xml:",innerxml"`
+	//InnerXml   string          `xml:",innerxml"`
 }
 
 type TransformsType struct {
 	XMLName   xml.Name
 	Transform []xml_dsig.TransformType `xml:",any"`
-	InnerXml  string                   `xml:",innerxml"`
+	//InnerXml  string                   `xml:",innerxml"`
 }
 
 type EncryptedDataType struct {
@@ -56,7 +56,7 @@ type EncryptedDataType struct {
 	KeyInfo              *xml_dsig.KeyInfoType     `xml:"http://www.w3.org/2000/09/xmldsig# KeyInfo"`
 	CipherData           CipherDataType            `xml:"CipherData"`
 	EncryptionProperties *EncryptionPropertiesType `xml:"EncryptionProperties"`
-	InnerXml             string                    `xml:",innerxml"`
+	//InnerXml             string                    `xml:",innerxml"`
 }
 
 type EncryptedKeyType struct {
@@ -72,7 +72,7 @@ type EncryptedKeyType struct {
 	KeyInfo              *xml_dsig.KeyInfoType     `xml:"http://www.w3.org/2000/09/xmldsig# KeyInfo"`
 	CipherData           CipherDataType            `xml:"CipherData"`
 	EncryptionProperties *EncryptionPropertiesType `xml:"EncryptionProperties"`
-	InnerXml             string                    `xml:",innerxml"`
+	//InnerXml             string                    `xml:",innerxml"`
 }
 
 type AgreementMethodType struct {
@@ -81,27 +81,27 @@ type AgreementMethodType struct {
 	KANonce           string                `xml:"KA-Nonce"`
 	OriginatorKeyInfo *xml_dsig.KeyInfoType `xml:"http://www.w3.org/2000/09/xmldsig# OriginatorKeyInfo"`
 	RecipientKeyInfo  *xml_dsig.KeyInfoType `xml:"http://www.w3.org/2000/09/xmldsig# RecipientKeyInfo"`
-	InnerXml          string                `xml:",innerxml"`
+	//InnerXml          string                `xml:",innerxml"`
 }
 
 type ReferenceType struct {
-	XMLName  xml.Name
-	URI      string `xml:"URI,attr"`
-	InnerXml string `xml:",innerxml"`
+	XMLName xml.Name
+	URI     string `xml:"URI,attr"`
+	//InnerXml string `xml:",innerxml"`
 }
 
 type EncryptionPropertiesType struct {
 	XMLName            xml.Name
 	Id                 string                   `xml:"Id,attr,omitempty"`
 	EncryptionProperty []EncryptionPropertyType `xml:",any"`
-	InnerXml           string                   `xml:",innerxml"`
+	//InnerXml           string                   `xml:",innerxml"`
 }
 
 type EncryptionPropertyType struct {
-	XMLName  xml.Name
-	Target   string `xml:"Target,attr,omitempty"`
-	Id       string `xml:"Id,attr,omitempty"`
-	InnerXml string `xml:",innerxml"`
+	XMLName xml.Name
+	Target  string `xml:"Target,attr,omitempty"`
+	Id      string `xml:"Id,attr,omitempty"`
+	//	InnerXml string `xml:",innerxml"`
 }
 
 type ReferenceListType struct {

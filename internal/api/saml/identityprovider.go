@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/rsa"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
@@ -13,6 +11,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/key"
+	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	dsig "github.com/russellhaering/goxmldsig"
@@ -89,42 +88,7 @@ type IdentityProvider struct {
 func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
 	cert, key := getResponseCert(storage)
 
-	if conf.SignatureAlgorithm != dsig.RSASHA1SignatureMethod &&
-		conf.SignatureAlgorithm != dsig.RSASHA256SignatureMethod &&
-		conf.SignatureAlgorithm != dsig.RSASHA512SignatureMethod {
-		return nil, fmt.Errorf("invalid signing method %s", conf.SignatureAlgorithm)
-	}
-
-	certPem := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: cert,
-		},
-	)
-
-	keyPem := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: x509.MarshalPKCS1PrivateKey(key),
-		},
-	)
-	tlsCert, err := tls.X509KeyPair(certPem, keyPem)
-	if err != nil {
-		return nil, err
-	}
-
-	keyStore := dsig.TLSCertKeyStore(tlsCert)
-
-	signingContext := dsig.NewDefaultSigningContext(keyStore)
-	signingContext.Canonicalizer = dsig.MakeC14N10ExclusiveCanonicalizerWithPrefixList("")
-	if err := signingContext.SetSignatureMethod(conf.SignatureAlgorithm); err != nil {
-		return nil, err
-	}
-
-	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
-		SignatureAlgorithm: signingContext.GetSignatureMethodIdentifier(),
-		DigestAlgorithm:    signingContext.GetDigestAlgorithmIdentifier(),
-	})
+	signingContext, signer, err := signature.GetSigningContextAndSigner(cert, key, conf.SignatureAlgorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +98,12 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		return nil, err
 	}
 
-	logoutTemplate, err := template.New("post").Parse(logoutTemplate)
+	logoutTemplate, err := template.New("logout").Parse(logoutTemplate)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsCert, err := signature.ParseTlsKeyPair(cert, key)
 	if err != nil {
 		return nil, err
 	}

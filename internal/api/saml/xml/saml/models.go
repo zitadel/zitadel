@@ -18,14 +18,14 @@ type NameIDType struct {
 	NameQualifier   string `xml:"NameQualifier,attr,omitempty"`
 	SPNameQualifier string `xml:"SPNameQualifier,attr,omitempty"`
 	Text            string `xml:",chardata"`
-	InnerXml        string `xml:",innerxml"`
+	//InnerXml        string `xml:",innerxml"`
 }
 
 type EncryptedElementType struct {
 	XMLName       xml.Name
 	EncryptedData xenc.EncryptedDataType  `xml:"EncryptedData"`
 	EncryptedKey  []xenc.EncryptedKeyType `xml:"EncryptedKey"`
-	InnerXml      string                  `xml:",innerxml"`
+	//InnerXml      string                  `xml:",innerxml"`
 }
 
 type AssertionType struct {
@@ -42,7 +42,7 @@ type AssertionType struct {
 	AuthnStatement         []AuthnStatementType         `xml:"AuthnStatement"`
 	AuthzDecisionStatement []AuthzDecisionStatementType `xml:"AuthzDecisionStatement"`
 	AttributeStatement     []AttributeStatementType     `xml:"AttributeStatement"`
-	InnerXml               string                       `xml:",innerxml"`
+	//InnerXml               string                       `xml:",innerxml"`
 }
 
 type SubjectType struct {
@@ -51,7 +51,7 @@ type SubjectType struct {
 	NameID              *NameIDType               `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
 	EncryptedID         *EncryptedElementType     `xml:"urn:oasis:names:tc:SAML:2.0:assertion EncryptedID"`
 	SubjectConfirmation []SubjectConfirmationType `xml:"SubjectConfirmation"`
-	InnerXml            string                    `xml:",innerxml"`
+	//InnerXml            string                    `xml:",innerxml"`
 }
 
 type SubjectConfirmationType struct {
@@ -61,7 +61,7 @@ type SubjectConfirmationType struct {
 	BaseID                  *BaseIDAbstractType          `xml:"BaseID"`
 	NameID                  *NameIDType                  `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
 	EncryptedID             *EncryptedElementType        `xml:"urn:oasis:names:tc:SAML:2.0:assertion EncryptedID"`
-	InnerXml                string                       `xml:",innerxml"`
+	//InnerXml                string                       `xml:",innerxml"`
 }
 
 type SubjectConfirmationDataType struct {
@@ -71,7 +71,7 @@ type SubjectConfirmationDataType struct {
 	Recipient    string   `xml:"Recipient,attr,omitempty"`
 	InResponseTo string   `xml:"InResponseTo,attr,omitempty"`
 	Address      string   `xml:"Address,attr,omitempty"`
-	InnerXml     string   `xml:",innerxml"`
+	//InnerXml     string   `xml:",innerxml"`
 }
 
 type KeyInfoConfirmationDataType struct {
@@ -81,7 +81,7 @@ type KeyInfoConfirmationDataType struct {
 	Recipient    string   `xml:"Recipient,attr,omitempty"`
 	InResponseTo string   `xml:"InResponseTo,attr,omitempty"`
 	Address      string   `xml:"Address,attr,omitempty"`
-	InnerXml     string   `xml:",innerxml"`
+	//InnerXml     string   `xml:",innerxml"`
 }
 
 type ConditionsType struct {
@@ -92,30 +92,30 @@ type ConditionsType struct {
 	AudienceRestriction []AudienceRestrictionType `xml:"AudienceRestriction"`
 	OneTimeUse          []OneTimeUseType          `xml:"OneTimeUse"`
 	ProxyRestriction    []ProxyRestrictionType    `xml:"ProxyRestriction"`
-	InnerXml            string                    `xml:",innerxml"`
+	//InnerXml            string                    `xml:",innerxml"`
 }
 
 type ConditionAbstractType struct {
-	XMLName  xml.Name
-	InnerXml string `xml:",innerxml"`
+	XMLName xml.Name
+	//InnerXml string `xml:",innerxml"`
 }
 
 type AudienceRestrictionType struct {
 	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion AudienceRestriction"`
 	Audience []string `xml:",any"`
-	InnerXml string   `xml:",innerxml"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type OneTimeUseType struct {
-	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion OneTimeUse"`
-	InnerXml string   `xml:",innerxml"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion OneTimeUse"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type ProxyRestrictionType struct {
 	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion ProxyRestriction"`
 	Count    int      `xml:"Count,attr,omitempty"`
 	Audience []string `xml:",any"`
-	InnerXml string   `xml:",innerxml"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type AdviceType struct {
@@ -124,12 +124,12 @@ type AdviceType struct {
 	AssertionURIRef    []string               `xml:"AssertionURIRef"`
 	Assertion          []AssertionType        `xml:"Assertion"`
 	EncryptedAssertion []EncryptedElementType `xml:"urn:oasis:names:tc:SAML:2.0:assertion EncryptedAssertion"`
-	InnerXml           string                 `xml:",innerxml"`
+	//InnerXml           string                 `xml:",innerxml"`
 }
 
 type StatementAbstractType struct {
-	XMLName  xml.Name
-	InnerXml string `xml:",innerxml"`
+	XMLName xml.Name
+	//InnerXml string `xml:",innerxml"`
 }
 
 type AuthnStatementType struct {
@@ -139,14 +139,14 @@ type AuthnStatementType struct {
 	SessionNotOnOrAfter string               `xml:"SessionNotOnOrAfter,attr,omitempty"`
 	SubjectLocality     *SubjectLocalityType `xml:"SubjectLocality"`
 	AuthnContext        AuthnContextType     `xml:"AuthnContext"`
-	InnerXml            string               `xml:",innerxml"`
+	//InnerXml            string               `xml:",innerxml"`
 }
 
 type SubjectLocalityType struct {
-	XMLName  xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion SubjectLocality"`
-	Address  string   `xml:"Address,attr,omitempty"`
-	DNSName  string   `xml:"DNSName,attr,omitempty"`
-	InnerXml string   `xml:",innerxml"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion SubjectLocality"`
+	Address string   `xml:"Address,attr,omitempty"`
+	DNSName string   `xml:"DNSName,attr,omitempty"`
+	//InnerXml string   `xml:",innerxml"`
 }
 
 type AuthnContextType struct {
@@ -155,7 +155,7 @@ type AuthnContextType struct {
 	AuthnContextClassRef    string   `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContextClassRef,omitempty"`
 	AuthnContextDecl        string   `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContextDecl,omitempty"`
 	AuthnContextDeclRef     string   `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContextDeclRef,omitempty"`
-	InnerXml                string   `xml:",innerxml"`
+	//InnerXml                string   `xml:",innerxml"`
 }
 
 type AuthzDecisionStatementType struct {
@@ -164,14 +164,14 @@ type AuthzDecisionStatementType struct {
 	Decision DecisionType  `xml:"Decision,attr"`
 	Action   []ActionType  `xml:"Action"`
 	Evidence *EvidenceType `xml:"Evidence"`
-	InnerXml string        `xml:",innerxml"`
+	//	InnerXml string        `xml:",innerxml"`
 }
 
 type ActionType struct {
 	XMLName   xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Action"`
 	Namespace string   `xml:"Namespace,attr"`
 	Text      string   `xml:",chardata"`
-	InnerXml  string   `xml:",innerxml"`
+	//	InnerXml  string   `xml:",innerxml"`
 }
 
 type EvidenceType struct {
@@ -180,13 +180,13 @@ type EvidenceType struct {
 	AssertionURIRef    []string               `xml:"AssertionURIRef"`
 	Assertion          []AssertionType        `xml:"Assertion"`
 	EncryptedAssertion []EncryptedElementType `xml:"urn:oasis:names:tc:SAML:2.0:assertion EncryptedAssertion"`
-	InnerXml           string                 `xml:",innerxml"`
+	//	InnerXml           string                 `xml:",innerxml"`
 }
 
 type AttributeStatementType struct {
 	XMLName   xml.Name         `xml:"urn:oasis:names:tc:SAML:2.0:assertion AttributeStatement"`
 	Attribute []*AttributeType `xml:"Attribute"`
-	InnerXml  string           `xml:",innerxml"`
+	//InnerXml  string           `xml:",innerxml"`
 }
 
 type AttributeType struct {
@@ -195,7 +195,7 @@ type AttributeType struct {
 	NameFormat     string   `xml:"NameFormat,attr,omitempty"`
 	FriendlyName   string   `xml:"FriendlyName,attr,omitempty"`
 	AttributeValue []string `xml:",any"`
-	InnerXml       string   `xml:",innerxml"`
+	//InnerXml       string   `xml:",innerxml"`
 }
 
 // XSD SimpleType declarations

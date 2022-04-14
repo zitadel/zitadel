@@ -3,9 +3,6 @@ package saml
 import (
 	"context"
 	"crypto/rsa"
-	"crypto/tls"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"github.com/amdonov/xmlsig"
 	"github.com/caos/logging"
@@ -13,6 +10,7 @@ import (
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/key"
+	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
@@ -152,41 +150,7 @@ func NewProvider(
 
 	getCACert(storage)
 	cert, key := getMetadataCert(storage)
-
-	certPem := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: cert,
-		},
-	)
-
-	keyPem := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: x509.MarshalPKCS1PrivateKey(key),
-		},
-	)
-
-	tlsCert, err := tls.X509KeyPair(certPem, keyPem)
-	if err != nil {
-		return nil, err
-	}
-
-	keyStore := dsig.TLSCertKeyStore(tlsCert)
-
-	signingContext := dsig.NewDefaultSigningContext(keyStore)
-	signingContext.Canonicalizer = dsig.MakeC14N10ExclusiveCanonicalizerWithPrefixList("")
-	if err := signingContext.SetSignatureMethod(conf.Metadata.SignatureAlgorithm); err != nil {
-		return nil, err
-	}
-
-	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
-		SignatureAlgorithm: signingContext.GetSignatureMethodIdentifier(),
-		DigestAlgorithm:    signingContext.GetDigestAlgorithmIdentifier(),
-	})
-	if err != nil {
-		return nil, err
-	}
+	signingContext, signer, err := signature.GetSigningContextAndSigner(cert, key, conf.Metadata.SignatureAlgorithm)
 
 	metadata := op.NewEndpointWithURL(conf.Metadata.Path, conf.Metadata.URL)
 	idp, err := NewIdentityProvider(

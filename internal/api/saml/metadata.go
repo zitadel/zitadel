@@ -123,7 +123,6 @@ func (p *IdentityProviderConfig) getMetadata(
 				AssertionIDRequestService: nil,
 				ManageNameIDService: nil,
 			*/
-			InnerXml: "",
 		},
 		&md.AttributeAuthorityDescriptorType{
 			XMLName:                    xml.Name{},
@@ -151,7 +150,6 @@ func (p *IdentityProviderConfig) getMetadata(
 			/*
 				AssertionIDRequestService: nil,
 			*/
-			InnerXml: "",
 		}
 }
 
@@ -191,7 +189,6 @@ func (p *ProviderConfig) getMetadata(
 			OrganizationURL: []md.LocalizedURIType{
 				{Text: p.Organisation.URL},
 			},
-			InnerXml: "",
 		}
 		entity.AttributeAuthorityDescriptor.Organization = org
 		entity.IDPSSODescriptor.Organization = org
@@ -207,7 +204,6 @@ func (p *ProviderConfig) getMetadata(
 				SurName:         p.ContactPerson.SurName,
 				EmailAddress:    []string{p.ContactPerson.EmailAddress},
 				TelephoneNumber: []string{p.ContactPerson.TelephoneNumber},
-				InnerXml:        "",
 			},
 		}
 		entity.AttributeAuthorityDescriptor.ContactPerson = contactPerson

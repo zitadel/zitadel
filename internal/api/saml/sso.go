@@ -393,7 +393,7 @@ func verifyRedirectSignature(
 		}
 
 		spInstance := sp()
-		err := spInstance.verifyRedirectSignature(
+		err := spInstance.validateRedirectSignature(
 			authRequest(),
 			relayState(),
 			sigAlg(),
@@ -439,7 +439,7 @@ func verifyPostSignature(
 			return err
 		}
 
-		if err := sp.verifyPostSignature(string(data)); err != nil {
+		if err := sp.validatePostSignature(string(data)); err != nil {
 			errF(err)
 			return err
 		}
