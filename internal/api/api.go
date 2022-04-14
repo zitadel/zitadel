@@ -62,6 +62,31 @@ func New(
 	return api
 }
 
+func NewWithoutAuth(
+	port uint16,
+	router *mux.Router,
+	repo *struct {
+		repository.Repository
+		*query.Queries
+	},
+	externalSecure bool,
+) *API {
+	verifier := internal_authz.Start(repo)
+	api := &API{
+		port:           port,
+		verifier:       verifier,
+		health:         repo,
+		router:         router,
+		externalSecure: externalSecure,
+	}
+	api.grpcServer = server.CreateServerWithoutAuth(repo.Queries)
+	api.routeGRPC()
+
+	api.RegisterHandler("/debug", api.healthHandler())
+
+	return api
+}
+
 func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) error {
 	grpcServer.RegisterServer(a.grpcServer)
 	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port)

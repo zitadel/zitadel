@@ -23,6 +23,10 @@ var (
 		name:  projection.InstanceColumnID,
 		table: instanceTable,
 	}
+	InstanceColumnCreationDate = Column{
+		name:  projection.InstanceColumnCreationDate,
+		table: instanceTable,
+	}
 	InstanceColumnChangeDate = Column{
 		name:  projection.InstanceColumnChangeDate,
 		table: instanceTable,
@@ -62,9 +66,10 @@ var (
 )
 
 type Instance struct {
-	ID         string
-	ChangeDate time.Time
-	Sequence   uint64
+	ID           string
+	ChangeDate   time.Time
+	CreationDate time.Time
+	Sequence     uint64
 
 	GlobalOrgID     string
 	IAMProjectID    string
@@ -146,6 +151,7 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
+			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
 			InstanceColumnGlobalOrgID.identifier(),
@@ -162,6 +168,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			lang := ""
 			err := row.Scan(
 				&instance.ID,
+				&instance.CreationDate,
 				&instance.ChangeDate,
 				&instance.Sequence,
 				&instance.GlobalOrgID,

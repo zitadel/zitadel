@@ -7,6 +7,18 @@ import (
 	instance_pb "github.com/caos/zitadel/pkg/grpc/instance"
 )
 
+func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
+	return &instance_pb.Instance{
+		Details: object.ToViewDetailsPb(
+			instance.Sequence,
+			instance.CreationDate,
+			instance.ChangeDate,
+			instance.InstanceID(),
+		),
+		Id: instance.InstanceID(),
+	}
+}
+
 func DomainQueriesToModel(queries []*instance_pb.DomainSearchQuery) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {

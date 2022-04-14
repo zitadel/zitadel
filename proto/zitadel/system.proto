@@ -134,13 +134,6 @@ service SystemService {
         };
     }
 
-    // Returns the usage metrics of an instance
-    rpc GetUsage(GetUsageRequest) returns (GetUsageResponse) {
-        option (google.api.http) = {
-            get: "/instances/{id}/usage";
-        };
-    }
-
     // Returns the custom domains of an instance
     rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
         option (google.api.http) = {

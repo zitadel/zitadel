@@ -70,18 +70,6 @@ This might take some time
     DELETE: /instances/{id}
 
 
-### GetUsage
-
-> **rpc** GetUsage([GetUsageRequest](#getusagerequest))
-[GetUsageResponse](#getusageresponse)
-
-Returns the usage metrics of an instance
-
-
-
-    GET: /instances/{id}/usage
-
-
 ### ListDomains
 
 > **rpc** ListDomains([ListDomainsRequest](#listdomainsrequest))

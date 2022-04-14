@@ -34,6 +34,7 @@ func Test_InstancePrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT projections.instances.id,`+
+						` projections.instances.creation_date,`+
 						` projections.instances.change_date,`+
 						` projections.instances.sequence,`+
 						` projections.instances.global_org_id,`+
@@ -64,6 +65,7 @@ func Test_InstancePrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(`SELECT projections.instances.id,`+
+						` projections.instances.creation_date,`+
 						` projections.instances.change_date,`+
 						` projections.instances.sequence,`+
 						` projections.instances.global_org_id,`+
@@ -76,6 +78,7 @@ func Test_InstancePrepares(t *testing.T) {
 						` FROM projections.instances`),
 					[]string{
 						"id",
+						"creation_date",
 						"change_date",
 						"sequence",
 						"global_org_id",
@@ -88,6 +91,7 @@ func Test_InstancePrepares(t *testing.T) {
 					},
 					[]driver.Value{
 						"id",
+						testNow,
 						testNow,
 						uint64(20211108),
 						"global-org-id",
@@ -102,6 +106,7 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			object: &Instance{
 				ID:              "id",
+				CreationDate:    testNow,
 				ChangeDate:      testNow,
 				Sequence:        20211108,
 				GlobalOrgID:     "global-org-id",
@@ -121,6 +126,7 @@ func Test_InstancePrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(`SELECT projections.instances.id,`+
+						` projections.instances.creation_date,`+
 						` projections.instances.change_date,`+
 						` projections.instances.sequence,`+
 						` projections.instances.global_org_id,`+
