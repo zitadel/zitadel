@@ -12,7 +12,6 @@
 [![follow us](https://badgen.net/twitter/follow/zitadel)](https://twitter.com/zitadel)
 <a href="https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL"></a>[![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
 
-
 ## What Is ZITADEL
 
 **ZITADEL** is a "Cloud Native Identity and Access Management" solution built for the cloud era. ZITADEL uses a modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and  [**CockroachDB**](https://www.cockroachlabs.com/) as sole storage and follows an event sourced pattern.
@@ -25,7 +24,13 @@ We built **ZITADEL** around the idea that the IAM should be easy to deploy and s
 For example, **ZITADEL** is event sourced but it does not rely on a pub/sub system to function. Instead we built all the functionality right into one binary.
 **ZITADEL** only needs [**Kubernetes**](https://kubernetes.io/) for orchestration and [**CockroachDB**](https://www.cockroachlabs.com/) as storage.
 
+## Contributors
 
+<a href="https://github.com/caos/zitadel/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=caos/zitadel" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## Run ZITADEL anywhere
 
@@ -50,11 +55,16 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 
 ### Client libraries
 
-* [Go](https://github.com/caos/zitadel-go) 
-* [.NET](https://github.com/caos/zitadel-net) 
-* [Dart](https://github.com/caos/zitadel-dart)
-* [Elixir](https://github.com/jshmrtn/zitadel_api) (maintained by [jshmrtn]((https://github.com/jshmrtn)))
-* [Rust](https://crates.io/crates/zitadel) (maintained by [buehler](https://github.com/buehler))
+| Language | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
+|----------|--------|--------------|----------|---------|---------------------------|
+| .NET     | [zitadel-net](https://github.com/caos/zitadel-net) | GRPC | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
+| Dart     | [zitadel-dart](https://github.com/caos/zitadel-dart) | GRPC | ✔️ | | [buehler 👑](https://github.com/buehler) |
+| Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
+| Go       | [zitadel-go](https://github.com/caos/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
+| Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | | [buehler 👑](https://github.com/buehler) |
+| JVM      | ❌ | ❌ | ❌ | | Maybe you? |
+| Python   | ❌ | ❌ | ❌ | | Maybe you? |
+| Javascript | ❌ | ❌ | ❌ | | Maybe you? |
 
 ## Help and Documentation
 
