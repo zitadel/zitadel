@@ -35,45 +35,45 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "invalid domain, error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		domain: "",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "domain already exists, precondition error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(
-		//			t,
-		//			expectFilter(
-		//				eventFromEventPusher(
-		//					instance.NewDomainAddedEvent(context.Background(),
-		//						&instance.NewAggregate("INSTANCE").Aggregate,
-		//						"domain.ch",
-		//						false,
-		//					),
-		//				),
-		//			),
-		//		),
-		//	},
-		//	args: args{
-		//		ctx:    context.Background(),
-		//		domain: "domain.ch",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsErrorAlreadyExists,
-		//	},
-		//},
+		{
+			name: "invalid domain, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				domain: "",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "domain already exists, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				domain: "domain.ch",
+			},
+			res: res{
+				err: caos_errs.IsErrorAlreadyExists,
+			},
+		},
 		{
 			name: "domain add, ok",
 			fields: fields{

@@ -2,11 +2,9 @@ package org
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	instance_pb "github.com/caos/zitadel/pkg/grpc/instance"
-	org_pb "github.com/caos/zitadel/pkg/grpc/org"
 )
 
 func DomainQueriesToModel(queries []*instance_pb.DomainSearchQuery) (_ []query.SearchQuery, err error) {
@@ -52,27 +50,5 @@ func DomainToPb(d *query.InstanceDomain) *instance_pb.Domain {
 			d.ChangeDate,
 			d.InstanceID,
 		),
-	}
-}
-
-func DomainValidationTypeToDomain(validationType org_pb.DomainValidationType) domain.OrgDomainValidationType {
-	switch validationType {
-	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP:
-		return domain.OrgDomainValidationTypeHTTP
-	case org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS:
-		return domain.OrgDomainValidationTypeDNS
-	default:
-		return domain.OrgDomainValidationTypeUnspecified
-	}
-}
-
-func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType) org_pb.DomainValidationType {
-	switch validationType {
-	case domain.OrgDomainValidationTypeDNS:
-		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS
-	case domain.OrgDomainValidationTypeHTTP:
-		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP
-	default:
-		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
 	}
 }
