@@ -60,6 +60,7 @@ type ConsoleSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ClientID string `json:"clientId"`
+	AppID    string `json:"appId"`
 }
 
 func (e *ConsoleSetEvent) Data() interface{} {
@@ -73,7 +74,8 @@ func (e *ConsoleSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 func NewIAMConsoleSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	clientID *string,
+	clientID,
+	appID *string,
 ) *ConsoleSetEvent {
 	return &ConsoleSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -82,6 +84,7 @@ func NewIAMConsoleSetEvent(
 			ConsoleSetEventType,
 		),
 		ClientID: *clientID,
+		AppID:    *appID,
 	}
 }
 

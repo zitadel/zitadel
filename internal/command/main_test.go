@@ -256,3 +256,25 @@ func (v *testVerifier) CheckOrgFeatures(ctx context.Context, orgID string, requi
 	}
 	return nil
 }
+
+type mockInstance struct{}
+
+func (m *mockInstance) InstanceID() string {
+	return "INSTANCE"
+}
+
+func (m *mockInstance) ProjectID() string {
+	return "projectID"
+}
+
+func (m *mockInstance) ConsoleClientID() string {
+	return "consoleID"
+}
+
+func (m *mockInstance) ConsoleApplicationID() string {
+	return "consoleApplicationID"
+}
+
+func (m *mockInstance) RequestedDomain() string {
+	return "zitadel.cloud"
+}

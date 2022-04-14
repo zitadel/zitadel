@@ -9,14 +9,63 @@ title: zitadel/instance.proto
 ## Messages
 
 
-### DomainsQuery
+### Domain
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| domains | repeated string | - | string.max_len: 200<br />  |
-| method |  zitadel.v1.ListQueryMethod | - | enum.defined_only: true<br />  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| domain |  string | - |  |
+| primary |  bool | - |  |
+| generated |  bool | - |  |
+
+
+
+
+### DomainGeneratedQuery
+DomainGeneratedQuery is always equals
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generated |  bool | - |  |
+
+
+
+
+### DomainPrimaryQuery
+DomainPrimaryQuery is always equals
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| primary |  bool | - |  |
+
+
+
+
+### DomainQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### DomainSearchQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.domain_query |  DomainQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.generated_query |  DomainGeneratedQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.primary_query |  DomainPrimaryQuery | - |  |
 
 
 
@@ -41,8 +90,6 @@ IdQuery is always equals
 | id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  State | - |  |
-| generated_domain |  string | - |  |
-| custom_domains | repeated string | - |  |
 | name |  string | - |  |
 | version |  string | - |  |
 
@@ -56,7 +103,6 @@ IdQuery is always equals
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.id_query |  IdQuery | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.domains_query |  DomainsQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.state_query |  StateQuery | - |  |
 
 
@@ -78,6 +124,20 @@ StateQuery is always equals
 ## Enums
 
 
+### DomainFieldName {#domainfieldname}
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DOMAIN_FIELD_NAME_UNSPECIFIED | 0 | - |
+| DOMAIN_FIELD_NAME_DOMAIN | 1 | - |
+| DOMAIN_FIELD_NAME_PRIMARY | 2 | - |
+| DOMAIN_FIELD_NAME_GENERATED | 3 | - |
+| DOMAIN_FIELD_NAME_CREATION_DATE | 4 | - |
+
+
+
+
 ### FieldName {#fieldname}
 
 
@@ -85,9 +145,8 @@ StateQuery is always equals
 | ---- | ------ | ----------- |
 | FIELD_NAME_UNSPECIFIED | 0 | - |
 | FIELD_NAME_ID | 1 | - |
-| FIELD_NAME_GENERATED_DOMAIN | 2 | - |
-| FIELD_NAME_NAME | 3 | - |
-| FIELD_NAME_CREATION_DATE | 4 | - |
+| FIELD_NAME_NAME | 2 | - |
+| FIELD_NAME_CREATION_DATE | 3 | - |
 
 
 

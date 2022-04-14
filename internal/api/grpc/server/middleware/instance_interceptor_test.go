@@ -173,6 +173,10 @@ func (m *mockInstance) ConsoleClientID() string {
 	return "consoleClientID"
 }
 
+func (m *mockInstance) ConsoleApplicationID() string {
+	return "consoleApplicationID"
+}
+
 func (m *mockInstance) RequestedDomain() string {
 	return "localhost"
 }

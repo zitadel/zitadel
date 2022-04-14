@@ -39,6 +39,7 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.global_org_id,`+
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
+						` projections.instances.console_app_id,`+
 						` projections.instances.setup_started,`+
 						` projections.instances.setup_done,`+
 						` projections.instances.default_language`+
@@ -68,6 +69,7 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.global_org_id,`+
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
+						` projections.instances.console_app_id,`+
 						` projections.instances.setup_started,`+
 						` projections.instances.setup_done,`+
 						` projections.instances.default_language`+
@@ -79,6 +81,7 @@ func Test_InstancePrepares(t *testing.T) {
 						"global_org_id",
 						"iam_project_id",
 						"console_client_id",
+						"console_app_id",
 						"setup_started",
 						"setup_done",
 						"default_language",
@@ -90,6 +93,7 @@ func Test_InstancePrepares(t *testing.T) {
 						"global-org-id",
 						"project-id",
 						"client-id",
+						"app-id",
 						domain.Step2,
 						domain.Step1,
 						"en",
@@ -103,6 +107,7 @@ func Test_InstancePrepares(t *testing.T) {
 				GlobalOrgID:     "global-org-id",
 				IAMProjectID:    "project-id",
 				ConsoleID:       "client-id",
+				ConsoleAppID:    "app-id",
 				SetupStarted:    domain.Step2,
 				SetupDone:       domain.Step1,
 				DefaultLanguage: language.English,
@@ -121,6 +126,7 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.global_org_id,`+
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
+						` projections.instances.console_app_id,`+
 						` projections.instances.setup_started,`+
 						` projections.instances.setup_done,`+
 						` projections.instances.default_language`+

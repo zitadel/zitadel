@@ -12,6 +12,7 @@ type Instance interface {
 	InstanceID() string
 	ProjectID() string
 	ConsoleClientID() string
+	ConsoleApplicationID() string
 	RequestedDomain() string
 }
 
@@ -33,6 +34,10 @@ func (i *instance) ProjectID() string {
 }
 
 func (i *instance) ConsoleClientID() string {
+	return ""
+}
+
+func (i *instance) ConsoleApplicationID() string {
 	return ""
 }
 

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/idp.proto";
+import "zitadel/instance.proto";
 import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
@@ -181,6 +182,13 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
+        };
+    }
+
+    // Returns the domains of an instance
+    rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
+        option (google.api.http) = {
+            get: "/domains";
         };
     }
 
@@ -2640,6 +2648,20 @@ message GetDefaultLanguageRequest {}
 
 message GetDefaultLanguageResponse {
     string language = 1;
+}
+
+message ListInstanceDomainsRequest {
+    zitadel.v1.ListQuery query = 1;
+    // the field the result is sorted
+    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    //criterias the client is looking for
+    repeated zitadel.instance.v1.DomainSearchQuery queries = 3;
+}
+
+message ListInstanceDomainsResponse {
+    zitadel.v1.ListDetails details = 1;
+    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    repeated zitadel.instance.v1.Domain result = 3;
 }
 
 message ListSecretGeneratorsRequest {
