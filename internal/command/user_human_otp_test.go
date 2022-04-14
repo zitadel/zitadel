@@ -179,6 +179,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
+								true,
 							),
 						),
 					),

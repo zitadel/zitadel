@@ -86,6 +86,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								false,
+								true,
 							),
 						),
 					),
@@ -112,6 +113,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 							),
 						),

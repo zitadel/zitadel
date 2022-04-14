@@ -18,6 +18,7 @@ title: zitadel/policy.proto
 | details |  zitadel.v1.ObjectDetails | - |  |
 | user_login_must_be_domain |  bool | - |  |
 | is_default |  bool | - |  |
+| validate_org_domains |  bool | - |  |
 
 
 

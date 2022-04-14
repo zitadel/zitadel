@@ -56,10 +56,14 @@ func (wm *OrgDomainPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *OrgDomainPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userLoginMustBeDomain bool) (*org.DomainPolicyChangedEvent, bool) {
-	changes := make([]policy.OrgPolicyChanges, 0)
+	userLoginMustBeDomain,
+	validateOrgDomains bool) (*org.DomainPolicyChangedEvent, bool) {
+	changes := make([]policy.DomainPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
+	}
+	if wm.ValidateOrgDomains != validateOrgDomains {
+		changes = append(changes, policy.ChangeValidateOrgDomains(validateOrgDomains))
 	}
 	if len(changes) == 0 {
 		return nil, false

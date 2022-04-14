@@ -21,7 +21,8 @@ type DomainPolicyAddedEvent struct {
 func NewDomainPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userLoginMustBeDomain bool,
+	userLoginMustBeDomain,
+	validateOrgDomain bool,
 ) *DomainPolicyAddedEvent {
 	return &DomainPolicyAddedEvent{
 		DomainPolicyAddedEvent: *policy.NewDomainPolicyAddedEvent(
@@ -30,6 +31,7 @@ func NewDomainPolicyAddedEvent(
 				aggregate,
 				DomainPolicyAddedEventType),
 			userLoginMustBeDomain,
+			validateOrgDomain,
 		),
 	}
 }
@@ -50,7 +52,7 @@ type DomainPolicyChangedEvent struct {
 func NewDomainPolicyChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	changes []policy.OrgPolicyChanges,
+	changes []policy.DomainPolicyChanges,
 ) (*DomainPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewDomainPolicyChangedEvent(
 		eventstore.NewBaseEventForPush(

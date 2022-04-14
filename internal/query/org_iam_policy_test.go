@@ -34,6 +34,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						` projections.domain_policies.change_date,`+
 						` projections.domain_policies.resource_owner,`+
 						` projections.domain_policies.user_login_must_be_domain,`+
+						` projections.domain_policies.validate_org_domains,`+
 						` projections.domain_policies.is_default,`+
 						` projections.domain_policies.state`+
 						` FROM projections.domain_policies`),
@@ -60,6 +61,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						` projections.domain_policies.change_date,`+
 						` projections.domain_policies.resource_owner,`+
 						` projections.domain_policies.user_login_must_be_domain,`+
+						` projections.domain_policies.validate_org_domains,`+
 						` projections.domain_policies.is_default,`+
 						` projections.domain_policies.state`+
 						` FROM projections.domain_policies`),
@@ -70,6 +72,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						"change_date",
 						"resource_owner",
 						"user_login_must_be_domain",
+						"validate_org_domains",
 						"is_default",
 						"state",
 					},
@@ -79,6 +82,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						testNow,
 						testNow,
 						"ro",
+						true,
 						true,
 						true,
 						domain.PolicyStateActive,
@@ -93,6 +97,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 				ResourceOwner:         "ro",
 				State:                 domain.PolicyStateActive,
 				UserLoginMustBeDomain: true,
+				ValidateOrgDomains:    true,
 				IsDefault:             true,
 			},
 		},
@@ -107,6 +112,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						` projections.domain_policies.change_date,`+
 						` projections.domain_policies.resource_owner,`+
 						` projections.domain_policies.user_login_must_be_domain,`+
+						` projections.domain_policies.validate_org_domains,`+
 						` projections.domain_policies.is_default,`+
 						` projections.domain_policies.state`+
 						` FROM projections.domain_policies`),

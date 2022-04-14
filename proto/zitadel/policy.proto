@@ -35,6 +35,11 @@ message DomainPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
+    bool validate_org_domains = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if organisation domains should be validated org count as validated automatically"
+        }
+    ];
 }
 
 message LabelPolicy {
