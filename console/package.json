@@ -23,7 +23,7 @@
     "@angular/platform-browser": "~13.3.1",
     "@angular/platform-browser-dynamic": "~13.3.1",
     "@angular/router": "~13.3.1",
-    "@angular/service-worker": "~13.3.1",
+    "@angular/service-worker": "~13.3.3",
     "@ctrl/ngx-codemirror": "^5.1.1",
     "@grpc/grpc-js": "^1.5.7",
     "@ngx-translate/core": "^14.0.0",
