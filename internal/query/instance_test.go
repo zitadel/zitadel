@@ -34,8 +34,8 @@ func Test_InstancePrepares(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT projections.instances.id,`+
-						` projections.instances.creation_date,`+
-						//` projections.instances.change_date,`+
+						//` projections.instances.creation_date,`+
+						` projections.instances.change_date,`+
 						` projections.instances.sequence,`+
 						` projections.instances.global_org_id,`+
 						` projections.instances.iam_project_id,`+
