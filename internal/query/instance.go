@@ -81,6 +81,11 @@ type Instance struct {
 	Host            string
 }
 
+type Instances struct {
+	SearchResponse
+	Instances []*Instance
+}
+
 func (i *Instance) InstanceID() string {
 	return i.ID
 }
@@ -106,12 +111,38 @@ type InstanceSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func NewInstanceIDsListSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(InstanceColumnID, list, ListIn)
+}
+
 func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
 		query = q.toQuery(query)
 	}
 	return query
+}
+
+func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
+	query, scan := prepareInstancesQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-3j98f", "Errors.Internal")
+	}
+	instances, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	return instances, err
 }
 
 func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
@@ -187,5 +218,60 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			}
 			instance.DefaultLanguage = language.Make(lang)
 			return instance, nil
+		}
+}
+
+func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+	return sq.Select(
+			InstanceColumnID.identifier(),
+			//InstanceColumnCreationDate.identifier(),
+			InstanceColumnChangeDate.identifier(),
+			InstanceColumnSequence.identifier(),
+			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnProjectID.identifier(),
+			InstanceColumnConsoleID.identifier(),
+			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnSetupStarted.identifier(),
+			InstanceColumnSetupDone.identifier(),
+			InstanceColumnDefaultLanguage.identifier(),
+			countColumn.identifier(),
+		).From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*Instances, error) {
+			instances := make([]*Instance, 0)
+			var count uint64
+			for rows.Next() {
+				instance := new(Instance)
+				lang := ""
+				//TODO: Get Host
+				err := rows.Scan(
+					&instance.ID,
+					//&instance.CreationDate,
+					&instance.ChangeDate,
+					&instance.Sequence,
+					&instance.GlobalOrgID,
+					&instance.IAMProjectID,
+					&instance.ConsoleID,
+					&instance.ConsoleAppID,
+					&instance.SetupStarted,
+					&instance.SetupDone,
+					&lang,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				instances = append(instances, instance)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-8nlWW", "Errors.Query.CloseRows")
+			}
+
+			return &Instances{
+				Instances: instances,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
 		}
 }

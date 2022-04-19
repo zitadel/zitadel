@@ -7,6 +7,14 @@ import (
 	instance_pb "github.com/caos/zitadel/pkg/grpc/instance"
 )
 
+func InstancesToPb(instances []*query.Instance) []*instance_pb.Instance {
+	list := make([]*instance_pb.Instance, len(instances))
+	for i, instance := range instances {
+		list[i] = InstanceToPb(instance)
+	}
+	return list
+}
+
 func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 	return &instance_pb.Instance{
 		Details: object.ToViewDetailsPb(
@@ -16,6 +24,26 @@ func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 			instance.InstanceID(),
 		),
 		Id: instance.InstanceID(),
+	}
+}
+
+func InstanceQueriesToModel(queries []*instance_pb.Query) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = InstanceQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func InstanceQueryToModel(searchQuery *instance_pb.Query) (query.SearchQuery, error) {
+	switch q := searchQuery.Query.(type) {
+	case *instance_pb.Query_IdQuery:
+		return query.NewInstanceIDsListSearchQuery(q.IdQuery.Ids...)
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "INST-3m0se", "List.Query.Invalid")
 	}
 }
 
@@ -39,7 +67,7 @@ func DomainQueryToModel(searchQuery *instance_pb.DomainSearchQuery) (query.Searc
 	case *instance_pb.DomainSearchQuery_PrimaryQuery:
 		return query.NewInstanceDomainPrimarySearchQuery(q.PrimaryQuery.Primary)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
 	}
 }
 

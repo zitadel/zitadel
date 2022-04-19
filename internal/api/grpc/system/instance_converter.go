@@ -9,7 +9,10 @@ import (
 
 func ListInstancesRequestToModel(req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	//TODO: convert queries
+	queries, err := instance_grpc.InstanceQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
+	}
 	return &query.InstanceSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
@@ -17,7 +20,7 @@ func ListInstancesRequestToModel(req *system_pb.ListInstancesRequest) (*query.In
 			Asc:    asc,
 		},
 		//SortingColumn: //TODO: sorting
-		//Queries: queries,
+		Queries: queries,
 	}, nil
 }
 

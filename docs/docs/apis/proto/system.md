@@ -29,7 +29,7 @@ Returns a list of ZITADEL instances/tenants
 
 
 
-    POST: /instances
+    POST: /instances/_search
 
 
 ### GetInstance
@@ -79,7 +79,7 @@ Returns the custom domains of an instance
 
 
 
-    GET: /instances/{id}/domains
+    POST: /instances/{id}/domains
 
 
 ### AddDomain

@@ -105,7 +105,7 @@ service SystemService {
     // Returns a list of ZITADEL instances/tenants
     rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
         option (google.api.http) = {
-            post: "/instances"
+            post: "/instances/_search"
             body: "*"
         };
     }
@@ -137,7 +137,8 @@ service SystemService {
     // Returns the custom domains of an instance
     rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
         option (google.api.http) = {
-            get: "/instances/{id}/domains";
+            post: "/instances/{id}/domains";
+            body: "*"
         };
     }
 
@@ -171,6 +172,7 @@ service SystemService {
     rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
         option (google.api.http) = {
             post: "/views/_search";
+            body: "*"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -222,6 +224,7 @@ service SystemService {
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
             post: "/failedevents/_search";
+            body: "*"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
