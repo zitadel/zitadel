@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -16,13 +17,19 @@ type InstanceVerifier interface {
 	GetInstance(ctx context.Context)
 }
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string) grpc.UnaryServerInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, ignoredServices ...string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return setInstance(ctx, req, info, handler, verifier, headerName)
+		return setInstance(ctx, req, info, handler, verifier, headerName, ignoredServices...)
 	}
 }
 
-func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string) (_ interface{}, err error) {
+func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string, ignoredServices ...string) (_ interface{}, err error) {
+	for _, service := range ignoredServices {
+		if strings.HasPrefix(info.FullMethod, service) {
+			return handler(ctx, req)
+		}
+	}
+
 	host, err := hostNameFromContext(ctx, headerName)
 	if err != nil {
 		return nil, status.Error(codes.PermissionDenied, err.Error())

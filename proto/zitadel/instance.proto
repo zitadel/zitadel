@@ -25,11 +25,6 @@ message Instance {
             example: "\"ZITADEL\"";
         }
     ];
-    string version = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"v1.0.0\"";
-        }
-    ];
 }
 
 enum State {

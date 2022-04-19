@@ -91,7 +91,6 @@ IdQuery is always equals
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  State | - |  |
 | name |  string | - |  |
-| version |  string | - |  |
 
 
 

@@ -30,26 +30,9 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 				middleware.SentryHandler(),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
-				middleware.InstanceInterceptor(queries, hostHeaderName),
+				//TODO: Handle Ignored Services
+				middleware.InstanceInterceptor(queries, hostHeaderName, "/zitadel.system.v1.SystemService"),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
-				middleware.TranslationHandler(queries),
-				middleware.ValidationHandler(),
-				middleware.ServiceHandler(),
-			),
-		),
-	)
-}
-
-func CreateServerWithoutAuth(queries *query.Queries) *grpc.Server {
-	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
-	return grpc.NewServer(
-		grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(
-				middleware.DefaultTracingServer(),
-				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
-				middleware.SentryHandler(),
-				middleware.NoCacheInterceptor(),
-				middleware.ErrorHandler(),
 				middleware.TranslationHandler(queries),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),

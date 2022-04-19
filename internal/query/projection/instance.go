@@ -13,9 +13,9 @@ import (
 const (
 	InstanceProjectionTable = "projections.instances"
 
-	InstanceColumnID              = "id"
-	InstanceColumnChangeDate      = "change_date"
-	InstanceColumnCreationDate    = "creation_date"
+	InstanceColumnID         = "id"
+	InstanceColumnChangeDate = "change_date"
+	//InstanceColumnCreationDate    = "creation_date"
 	InstanceColumnGlobalOrgID     = "global_org_id"
 	InstanceColumnProjectID       = "iam_project_id"
 	InstanceColumnConsoleID       = "console_client_id"
@@ -38,10 +38,11 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
+			//crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(InstanceColumnConsoleAppID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(InstanceColumnSetUpStarted, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(InstanceColumnSetUpDone, crdb.ColumnTypeInt64, crdb.Default(0)),
