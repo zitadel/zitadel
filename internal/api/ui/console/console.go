@@ -8,13 +8,13 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/oidc/pkg/op"
 
 	"github.com/caos/zitadel/internal/api/authz"
-
+	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 )
 
@@ -59,7 +59,7 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(config Config, domain, url, issuer string, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
+func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func Start(config Config, domain, url, issuer string, instanceHandler func(http.
 		config.LongCache.MaxAge,
 		config.LongCache.SharedMaxAge,
 	)
-	security := middleware.SecurityHeaders(csp(domain), nil)
+	security := middleware.SecurityHeaders(csp(), nil)
 
 	handler := &http.ServeMux{}
 	handler.Handle("/", cache(security(http.FileServer(&spaHandler{http.FS(fSys)}))))
@@ -80,7 +80,8 @@ func Start(config Config, domain, url, issuer string, instanceHandler func(http.
 			http.Error(w, "empty instanceID", http.StatusInternalServerError)
 			return
 		}
-		environmentJSON, err := createEnvironmentJSON(url, issuer, instance.ConsoleClientID())
+		url := http_util.BuildOrigin(r.Host, externalSecure)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID())
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
@@ -91,15 +92,12 @@ func Start(config Config, domain, url, issuer string, instanceHandler func(http.
 	return handler, nil
 }
 
-func csp(zitadelDomain string) *middleware.CSP {
-	if !strings.HasPrefix(zitadelDomain, "*.") {
-		zitadelDomain = "*." + zitadelDomain
-	}
+func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.StyleSrc = csp.StyleSrc.AddInline()
 	csp.ScriptSrc = csp.ScriptSrc.AddEval()
-	csp.ConnectSrc = csp.ConnectSrc.AddHost(zitadelDomain)
-	csp.ImgSrc = csp.ImgSrc.AddHost(zitadelDomain).AddScheme("blob")
+	csp.ConnectSrc = csp.ConnectSrc.AddOwnHost()
+	csp.ImgSrc = csp.ImgSrc.AddOwnHost().AddScheme("blob")
 	return &csp
 }
 

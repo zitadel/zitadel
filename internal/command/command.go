@@ -42,7 +42,7 @@ type Commands struct {
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 
 	multifactors       domain.MultifactorConfigs
-	webauthn           *webauthn_helper.WebAuthN
+	webauthnConfig     *webauthn_helper.Config
 	keySize            int
 	keyAlgorithm       crypto.EncryptionAlgorithm
 	privateKeyLifetime time.Duration
@@ -60,7 +60,7 @@ func StartCommands(es *eventstore.Eventstore,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
-	webAuthN webauthn_helper.Config,
+	webAuthN *webauthn_helper.Config,
 	idpConfigEncryption,
 	otpEncryption,
 	smtpEncryption,
@@ -84,6 +84,7 @@ func StartCommands(es *eventstore.Eventstore,
 		userEncryption:        userEncryption,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
+		webauthnConfig:        webAuthN,
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)
@@ -107,11 +108,6 @@ func StartCommands(es *eventstore.Eventstore,
 
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
-	web, err := webauthn_helper.StartServer(webAuthN)
-	if err != nil {
-		return nil, err
-	}
-	repo.webauthn = web
 
 	repo.tokenVerifier = authZRepo
 	return repo, nil

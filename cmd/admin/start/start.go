@@ -113,10 +113,9 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
-	webAuthNConfig := webauthn.Config{
-		ID:          config.ExternalDomain,
-		Origin:      http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure),
-		DisplayName: "ZITADEL",
+	webAuthNConfig := &webauthn.Config{
+		DisplayName:    "ZITADEL",
+		ExternalSecure: config.ExternalSecure,
 	}
 	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ.RolePermissionMappings, storage, authZRepo, webAuthNConfig, keys.IDPConfig, keys.OTP, keys.SMTP, keys.SMS, keys.User, keys.DomainVerification, keys.OIDC)
 	if err != nil {
@@ -168,7 +167,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
 	authenticatedAPIs.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, config.ExternalDomain, id.SonyFlakeGenerator, config.ExternalSecure)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator, config.ExternalSecure)
 	if err != nil {
 		return err
 	}

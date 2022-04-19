@@ -145,8 +145,8 @@ func (t *Translator) Lang(r *http.Request) language.Tag {
 	return tag
 }
 
-func (t *Translator) SetLangCookie(w http.ResponseWriter, lang language.Tag) {
-	t.cookieHandler.SetCookie(w, t.cookieName, lang.String())
+func (t *Translator) SetLangCookie(w http.ResponseWriter, r *http.Request, lang language.Tag) {
+	t.cookieHandler.SetCookie(w, t.cookieName, r.Host, lang.String())
 }
 
 func (t *Translator) localizerFromRequest(r *http.Request) *i18n.Localizer {
@@ -177,7 +177,7 @@ func (t *Translator) langsFromCtx(ctx context.Context) []string {
 	langs := t.preferredLanguages
 	if ctx != nil {
 		ctxData := authz.GetCtxData(ctx)
-		if ctxData.PreferredLanguage != "" {
+		if ctxData.PreferredLanguage != language.Und.String() {
 			langs = append(langs, authz.GetCtxData(ctx).PreferredLanguage)
 		}
 		langs = append(langs, getAcceptLanguageHeader(ctx))
@@ -190,6 +190,10 @@ func (t *Translator) SetPreferredLanguages(langs ...string) {
 }
 
 func getAcceptLanguageHeader(ctx context.Context) string {
+	acceptLanguage := metautils.ExtractIncoming(ctx).Get("accept-language")
+	if acceptLanguage != "" {
+		return acceptLanguage
+	}
 	return metautils.ExtractIncoming(ctx).Get("grpcgateway-accept-language")
 }
 
@@ -199,7 +203,7 @@ func localize(localizer *i18n.Localizer, id string, args map[string]interface{})
 		TemplateData: args,
 	})
 	if err != nil {
-		logging.LogWithFields("I18N-MsF5sx", "id", id, "args", args).WithError(err).Warnf("missing translation")
+		logging.WithFields("id", id, "args", args).WithError(err).Warnf("missing translation")
 		return id
 	}
 	return s
