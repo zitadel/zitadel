@@ -68,7 +68,10 @@ To start the backend with a debugger run the [`main.go`-file](./main.go) located
 
 Ensure the provided code meets the [offical style guide](https://developers.google.com/protocol-buffers/docs/style).
 
-<!-- TODO: docker command to generate stub-->
+```bash
+docker build -f build/grpc/Dockerfile -t zitadel-base:local . \
+    && docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .
+```
 
 ## Contribute Docs
 

@@ -72,7 +72,6 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/doc
 
 <!-- TODO: download/install zitadel  -->
 
-<!-- TODO: add basic start-with-init command -->
 <!-- TODO: insecure, should we write logs to a file? -->
 <!-- TODO: what will be printed? is it possible to open the browser and show the login screen? -->
 
@@ -81,7 +80,7 @@ First of all you need to start the cockroach database [using their guide to star
 After the database is up and running you can start ZITADEL:
 
 ```bash
-zitadel start-with-init
+zitadel admin start-with-init
 ```
 
 ### Client libraries
