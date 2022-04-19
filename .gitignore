@@ -59,6 +59,7 @@ openapi/**/*.json
 
 # local
 build/local/cloud.env
+build/local/cloud_new.env
 migrations/cockroach/migrate_cloud.go
 .notifications
 .artifacts
