@@ -24,11 +24,11 @@ import (
 
 type mockViewNoUserSession struct{}
 
-func (m *mockViewNoUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
+func (m *mockViewNoUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowNotFound(nil, "id", "user session not found")
 }
 
-func (m *mockViewNoUserSession) UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error) {
+func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, nil
 }
 
@@ -38,11 +38,11 @@ func (m *mockViewNoUserSession) PrefixAvatarURL() string {
 
 type mockViewErrUserSession struct{}
 
-func (m *mockViewErrUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
+func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
-func (m *mockViewErrUserSession) UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error) {
+func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -65,7 +65,7 @@ type mockUser struct {
 	ResourceOwner string
 }
 
-func (m *mockViewUserSession) UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error) {
+func (m *mockViewUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
 		ExternalLoginVerification: m.ExternalLoginVerification,
 		PasswordlessVerification:  m.PasswordlessVerification,
@@ -75,7 +75,7 @@ func (m *mockViewUserSession) UserSessionByIDs(string, string) (*user_view_model
 	}, nil
 }
 
-func (m *mockViewUserSession) UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error) {
+func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	sessions := make([]*user_view_model.UserSessionView, len(m.Users))
 	for i, user := range m.Users {
 		sessions[i] = &user_view_model.UserSessionView{
@@ -93,7 +93,7 @@ func (m *mockViewUserSession) PrefixAvatarURL() string {
 
 type mockViewNoUser struct{}
 
-func (m *mockViewNoUser) UserByID(string) (*user_view_model.UserView, error) {
+func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, error) {
 	return nil, errors.ThrowNotFound(nil, "id", "user not found")
 }
 
@@ -156,7 +156,7 @@ func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, string) (*query.
 	return m.policy, nil
 }
 
-func (m *mockViewUser) UserByID(string) (*user_view_model.UserView, error) {
+func (m *mockViewUser) UserByID(string, string) (*user_view_model.UserView, error) {
 	return &user_view_model.UserView{
 		State:    int32(user_model.UserStateActive),
 		UserName: "UserName",
@@ -232,7 +232,7 @@ func (m *mockProject) ProjectByOIDCClientID(ctx context.Context, s string) (*que
 	return &query.Project{HasProjectCheck: m.projectCheck}, nil
 }
 
-func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID string) (*proj_view_model.OrgProjectMapping, error) {
+func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*proj_view_model.OrgProjectMapping, error) {
 	if m.hasProject {
 		return &proj_view_model.OrgProjectMapping{OrgID: orgID, ProjectID: projectID}, nil
 	}

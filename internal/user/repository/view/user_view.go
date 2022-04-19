@@ -11,9 +11,19 @@ import (
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
+func UserByID(db *gorm.DB, table, userID, instanceID string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserID), userID)
+	userIDQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyUserID,
+		Method: domain.SearchMethodEquals,
+		Value:  userID,
+	}
+	instanceIDQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
+	query := repository.PrepareGetByQuery(table, userIDQuery, instanceIDQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
@@ -22,9 +32,19 @@ func UserByID(db *gorm.DB, table, userID string) (*model.UserView, error) {
 	return user, err
 }
 
-func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error) {
+func UserByUserName(db *gorm.DB, table, userName, instanceID string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
+	userNameQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyUserName,
+		Method: domain.SearchMethodEquals,
+		Value:  userName,
+	}
+	instanceIDQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
+	query := repository.PrepareGetByQuery(table, userNameQuery, instanceIDQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso9s", "Errors.User.NotFound")
@@ -33,14 +53,19 @@ func UserByUserName(db *gorm.DB, table, userName string) (*model.UserView, error
 	return user, err
 }
 
-func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, error) {
+func UserByLoginName(db *gorm.DB, table, loginName, instanceID string) (*model.UserView, error) {
 	user := new(model.UserView)
 	loginNameQuery := &model.UserSearchQuery{
 		Key:    usr_model.UserSearchKeyLoginNames,
 		Method: domain.SearchMethodListContains,
 		Value:  loginName,
 	}
-	query := repository.PrepareGetByQuery(table, loginNameQuery)
+	instanceIDQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
+	query := repository.PrepareGetByQuery(table, loginNameQuery, instanceIDQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFound")
@@ -49,7 +74,7 @@ func UserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, err
 	return user, err
 }
 
-func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwner string) (*model.UserView, error) {
+func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
 	user := new(model.UserView)
 	loginNameQuery := &model.UserSearchQuery{
 		Key:    usr_model.UserSearchKeyLoginNames,
@@ -61,7 +86,12 @@ func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwne
 		Method: domain.SearchMethodEquals,
 		Value:  resourceOwner,
 	}
-	query := repository.PrepareGetByQuery(table, loginNameQuery, resourceOwnerQuery)
+	instanceIDQuery := &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
+	query := repository.PrepareGetByQuery(table, loginNameQuery, resourceOwnerQuery, instanceIDQuery)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFoundOnOrg")
@@ -70,21 +100,26 @@ func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwne
 	return user, err
 }
 
-func UsersByOrgID(db *gorm.DB, table, orgID string) ([]*model.UserView, error) {
+func UsersByOrgID(db *gorm.DB, table, orgID, instanceID string) ([]*model.UserView, error) {
 	users := make([]*model.UserView, 0)
 	orgIDQuery := &usr_model.UserSearchQuery{
 		Key:    usr_model.UserSearchKeyResourceOwner,
 		Method: domain.SearchMethodEquals,
 		Value:  orgID,
 	}
+	instanceIDQuery := &usr_model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
 	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{
-		Queries: []*usr_model.UserSearchQuery{orgIDQuery},
+		Queries: []*usr_model.UserSearchQuery{orgIDQuery, instanceIDQuery},
 	})
 	_, err := query(db, &users)
 	return users, err
 }
 
-func UserIDsByDomain(db *gorm.DB, table, orgDomain string) ([]string, error) {
+func UserIDsByDomain(db *gorm.DB, table, orgDomain, instanceID string) ([]string, error) {
 	type id struct {
 		Id string
 	}
@@ -94,8 +129,13 @@ func UserIDsByDomain(db *gorm.DB, table, orgDomain string) ([]string, error) {
 		Method: domain.SearchMethodEndsWithIgnoreCase,
 		Value:  "%" + orgDomain,
 	}
+	instanceIDQuery := &usr_model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
 	query := repository.PrepareSearchQuery(table, model.UserSearchRequest{
-		Queries: []*usr_model.UserSearchQuery{orgIDQuery},
+		Queries: []*usr_model.UserSearchQuery{orgIDQuery, instanceIDQuery},
 	})
 	_, err := query(db, &ids)
 	if err != nil {
@@ -118,9 +158,12 @@ func SearchUsers(db *gorm.DB, table string, req *usr_model.UserSearchRequest) ([
 	return users, count, nil
 }
 
-func GetGlobalUserByLoginName(db *gorm.DB, table, loginName string) (*model.UserView, error) {
+func GetGlobalUserByLoginName(db *gorm.DB, table, loginName, instanceID string) (*model.UserView, error) {
 	user := new(model.UserView)
-	query := repository.PrepareGetByQuery(table, &model.UserSearchQuery{Key: usr_model.UserSearchKeyLoginNames, Value: loginName, Method: domain.SearchMethodListContains})
+	query := repository.PrepareGetByQuery(table,
+		&model.UserSearchQuery{Key: usr_model.UserSearchKeyLoginNames, Value: loginName, Method: domain.SearchMethodListContains},
+		&model.UserSearchQuery{Key: usr_model.UserSearchKeyInstanceID, Value: instanceID, Method: domain.SearchMethodEquals},
+	)
 	err := query(db, user)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-8uWer", "Errors.User.NotFound")
@@ -129,8 +172,8 @@ func GetGlobalUserByLoginName(db *gorm.DB, table, loginName string) (*model.User
 	return user, err
 }
 
-func UserMFAs(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {
-	user, err := UserByID(db, table, userID)
+func UserMFAs(db *gorm.DB, table, userID, instanceID string) ([]*usr_model.MultiFactor, error) {
+	user, err := UserByID(db, table, userID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +197,10 @@ func PutUser(db *gorm.DB, table string, user *model.UserView) error {
 	return save(db, user)
 }
 
-func DeleteUser(db *gorm.DB, table, userID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserID), userID)
+func DeleteUser(db *gorm.DB, table, userID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{model.UserSearchKey(usr_model.UserSearchKeyUserID), userID},
+		repository.Key{model.UserSearchKey(usr_model.UserSearchKeyInstanceID), instanceID},
+	)
 	return delete(db)
 }

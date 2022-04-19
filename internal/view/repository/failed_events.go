@@ -1,17 +1,13 @@
 package repository
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"strings"
 
+	"github.com/jinzhu/gorm"
+
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	view_model "github.com/caos/zitadel/internal/view/model"
-	"github.com/jinzhu/gorm"
-)
-
-const (
-	errViewNameKey  = "view_name"
-	errFailedSeqKey = "failed_sequence"
 )
 
 type FailedEvent struct {
@@ -19,6 +15,7 @@ type FailedEvent struct {
 	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key"`
 	FailureCount   uint64 `gorm:"column:failure_count"`
 	ErrMsg         string `gorm:"column:err_msg"`
+	InstanceID     string `gorm:"column:instance_id"`
 }
 
 type FailedEventSearchQuery struct {
@@ -45,6 +42,7 @@ const (
 	FailedEventKeyUndefined FailedEventSearchKey = iota
 	FailedEventKeyViewName
 	FailedEventKeyFailedSequence
+	FailedEventKeyInstanceID
 )
 
 type failedEventSearchKey FailedEventSearchKey
@@ -55,6 +53,8 @@ func (key failedEventSearchKey) ToColumnName() string {
 		return "view_name"
 	case FailedEventKeyFailedSequence:
 		return "failed_sequence"
+	case FailedEventKeyInstanceID:
+		return "instance_id"
 	default:
 		return ""
 	}
@@ -93,15 +93,17 @@ func RemoveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) erro
 	delete := PrepareDeleteByKeys(table,
 		Key{Key: failedEventSearchKey(FailedEventKeyViewName), Value: failedEvent.ViewName},
 		Key{Key: failedEventSearchKey(FailedEventKeyFailedSequence), Value: failedEvent.FailedSequence},
+		Key{Key: failedEventSearchKey(FailedEventKeyInstanceID), Value: failedEvent.InstanceID},
 	)
 	return delete(db)
 }
 
-func LatestFailedEvent(db *gorm.DB, table, viewName string, sequence uint64) (*FailedEvent, error) {
+func LatestFailedEvent(db *gorm.DB, table, viewName, instanceID string, sequence uint64) (*FailedEvent, error) {
 	failedEvent := new(FailedEvent)
 	queries := []SearchQuery{
 		FailedEventSearchQuery{Key: FailedEventKeyViewName, Method: domain.SearchMethodEqualsIgnoreCase, Value: viewName},
 		FailedEventSearchQuery{Key: FailedEventKeyFailedSequence, Method: domain.SearchMethodEquals, Value: sequence},
+		FailedEventSearchQuery{Key: FailedEventKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID},
 	}
 	query := PrepareGetByQuery(table, queries...)
 	err := query(db, failedEvent)

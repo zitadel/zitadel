@@ -61,27 +61,31 @@ func buildQuery(queryFactory *es_models.SearchQueryFactory) (query string, limit
 	return query, searchQuery.Limit, values, rowScanner
 }
 
-func prepareCondition(filters []*es_models.Filter) (clause string, values []interface{}) {
-	values = make([]interface{}, len(filters))
+func prepareCondition(filters [][]*es_models.Filter) (clause string, values []interface{}) {
+	values = make([]interface{}, 0, len(filters))
 	clauses := make([]string, len(filters))
 
 	if len(filters) == 0 {
 		return clause, values
 	}
 	for i, filter := range filters {
-		value := filter.GetValue()
-		switch value.(type) {
-		case []bool, []float64, []int64, []string, []es_models.AggregateType, []es_models.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]es_models.AggregateType, *[]es_models.EventType:
-			value = pq.Array(value)
-		}
+		subClauses := make([]string, 0, len(filter))
+		for _, f := range filter {
+			value := f.GetValue()
+			switch value.(type) {
+			case []bool, []float64, []int64, []string, []es_models.AggregateType, []es_models.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]es_models.AggregateType, *[]es_models.EventType:
+				value = pq.Array(value)
+			}
 
-		clauses[i] = getCondition(filter)
-		if clauses[i] == "" {
-			return "", nil
+			subClauses = append(subClauses, getCondition(f))
+			if subClauses[len(subClauses)-1] == "" {
+				return "", nil
+			}
+			values = append(values, value)
 		}
-		values[i] = value
+		clauses[i] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	return " WHERE " + strings.Join(clauses, " AND "), values
+	return " WHERE " + strings.Join(clauses, " OR "), values
 }
 
 type scan func(dest ...interface{}) error
@@ -162,8 +166,11 @@ func getCondition(filter *es_models.Filter) (condition string) {
 }
 
 func getConditionFormat(operation es_models.Operation) string {
-	if operation == es_models.Operation_In {
+	switch operation {
+	case es_models.Operation_In:
 		return "%s %s ANY(?)"
+	case es_models.Operation_NotIn:
+		return "%s %s ALL(?)"
 	}
 	return "%s %s ?"
 }
@@ -200,6 +207,8 @@ func getOperation(operation es_models.Operation) string {
 		return ">"
 	case es_models.Operation_Less:
 		return "<"
+	case es_models.Operation_NotIn:
+		return "<>"
 	}
 	return ""
 }

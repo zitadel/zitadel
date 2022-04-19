@@ -13,40 +13,40 @@ const (
 	userTable = "auth.users"
 )
 
-func (v *View) UserByID(userID string) (*model.UserView, error) {
-	return view.UserByID(v.Db, userTable, userID)
+func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
+	return view.UserByID(v.Db, userTable, userID, instanceID)
 }
 
-func (v *View) UserByUsername(userName string) (*model.UserView, error) {
-	return view.UserByUserName(v.Db, userTable, userName)
+func (v *View) UserByUsername(userName, instanceID string) (*model.UserView, error) {
+	return view.UserByUserName(v.Db, userTable, userName, instanceID)
 }
 
-func (v *View) UserByLoginName(loginName string) (*model.UserView, error) {
-	return view.UserByLoginName(v.Db, userTable, loginName)
+func (v *View) UserByLoginName(loginName, instanceID string) (*model.UserView, error) {
+	return view.UserByLoginName(v.Db, userTable, loginName, instanceID)
 }
 
-func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner string) (*model.UserView, error) {
-	return view.UserByLoginNameAndResourceOwner(v.Db, userTable, loginName, resourceOwner)
+func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanceID string) (*model.UserView, error) {
+	return view.UserByLoginNameAndResourceOwner(v.Db, userTable, loginName, resourceOwner, instanceID)
 }
 
-func (v *View) UsersByOrgID(orgID string) ([]*model.UserView, error) {
-	return view.UsersByOrgID(v.Db, userTable, orgID)
+func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error) {
+	return view.UsersByOrgID(v.Db, userTable, orgID, instanceID)
 }
 
-func (v *View) UserIDsByDomain(domain string) ([]string, error) {
-	return view.UserIDsByDomain(v.Db, userTable, domain)
+func (v *View) UserIDsByDomain(domain, instanceID string) ([]string, error) {
+	return view.UserIDsByDomain(v.Db, userTable, domain, instanceID)
 }
 
 func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	return view.SearchUsers(v.Db, userTable, request)
 }
 
-func (v *View) GetGlobalUserByLoginName(email string) (*model.UserView, error) {
-	return view.GetGlobalUserByLoginName(v.Db, userTable, email)
+func (v *View) GetGlobalUserByLoginName(email, instanceID string) (*model.UserView, error) {
+	return view.GetGlobalUserByLoginName(v.Db, userTable, email, instanceID)
 }
 
-func (v *View) UserMFAs(userID string) ([]*usr_model.MultiFactor, error) {
-	return view.UserMFAs(v.Db, userTable, userID)
+func (v *View) UserMFAs(userID, instanceID string) ([]*usr_model.MultiFactor, error) {
+	return view.UserMFAs(v.Db, userTable, userID, instanceID)
 }
 
 func (v *View) PutUser(user *model.UserView, event *models.Event) error {
@@ -65,16 +65,20 @@ func (v *View) PutUsers(users []*model.UserView, event *models.Event) error {
 	return v.ProcessedUserSequence(event)
 }
 
-func (v *View) DeleteUser(userID string, event *models.Event) error {
-	err := view.DeleteUser(v.Db, userTable, userID)
+func (v *View) DeleteUser(userID, instanceID string, event *models.Event) error {
+	err := view.DeleteUser(v.Db, userTable, userID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedUserSequence(event)
 }
 
-func (v *View) GetLatestUserSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(userTable)
+func (v *View) GetLatestUserSequence(instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(userTable, instanceID)
+}
+
+func (v *View) GetLatestUserSequences() ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userTable)
 }
 
 func (v *View) ProcessedUserSequence(event *models.Event) error {
@@ -85,8 +89,8 @@ func (v *View) UpdateUserSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(userTable)
 }
 
-func (v *View) GetLatestUserFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(userTable, sequence)
+func (v *View) GetLatestUserFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(userTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedUserFailedEvent(failedEvent *repository.FailedEvent) error {

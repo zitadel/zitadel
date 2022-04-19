@@ -18,6 +18,10 @@ func (f InstanceDomainState) Valid() bool {
 	return f >= 0 && f < instanceDomainStateCount
 }
 
+func (f InstanceDomainState) Exists() bool {
+	return f == InstanceDomainStateActive
+}
+
 func NewGeneratedInstanceDomain(instanceName, iamDomain string) string {
 	return strings.ToLower(strings.ReplaceAll(instanceName, " ", "-") + "." + iamDomain)
 }

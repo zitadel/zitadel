@@ -4,8 +4,9 @@ CREATE TABLE notification.locks (
     locker_id TEXT,
     locked_until TIMESTAMPTZ(3),
     view_name TEXT,
+    instance_id TEXT NOT NULL,
 
-    PRIMARY KEY (view_name)
+    PRIMARY KEY (view_name, instance_id)
 );
 
 CREATE TABLE notification.current_sequences (
@@ -13,8 +14,9 @@ CREATE TABLE notification.current_sequences (
     current_sequence BIGINT,
     event_timestamp TIMESTAMPTZ,
     last_successful_spooler_run TIMESTAMPTZ,
+    instance_id TEXT NOT NULL,
 
-    PRIMARY KEY (view_name)
+    PRIMARY KEY (view_name, instance_id)
 );
 
 CREATE TABLE notification.failed_events (
@@ -22,8 +24,9 @@ CREATE TABLE notification.failed_events (
     failed_sequence BIGINT,
     failure_count SMALLINT,
     err_msg TEXT,
+    instance_id TEXT NOT NULL,
 
-    PRIMARY KEY (view_name, failed_sequence)
+    PRIMARY KEY (view_name, failed_sequence, instance_id)
 );
 
 CREATE TABLE notification.notify_users (

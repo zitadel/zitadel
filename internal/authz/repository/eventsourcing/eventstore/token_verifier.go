@@ -8,6 +8,7 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -30,7 +31,7 @@ type TokenVerifierRepo struct {
 }
 
 func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
-	token, viewErr := repo.View.TokenByID(tokenID)
+	token, viewErr := repo.View.TokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
@@ -40,7 +41,7 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		token.UserID = userID
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -251,8 +252,8 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, sequence)
+func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
 	if err != nil {
 		return nil, err
 	}

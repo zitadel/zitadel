@@ -19,6 +19,7 @@ const (
 	InstanceDomainSequenceCol     = "sequence"
 	InstanceDomainDomainCol       = "domain"
 	InstanceDomainIsGeneratedCol  = "is_generated"
+	InstanceDomainIsPrimaryCol    = "is_primary"
 )
 
 type InstanceDomainProjection struct {
@@ -37,6 +38,7 @@ func NewInstanceDomainProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(InstanceDomainSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(InstanceDomainDomainCol, crdb.ColumnTypeText),
 			crdb.NewColumn(InstanceDomainIsGeneratedCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(InstanceDomainIsPrimaryCol, crdb.ColumnTypeBool),
 		},
 			crdb.NewPrimaryKey(InstanceDomainInstanceIDCol, InstanceDomainDomainCol),
 		),
@@ -53,6 +55,10 @@ func (p *InstanceDomainProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.InstanceDomainAddedEventType,
 					Reduce: p.reduceDomainAdded,
+				},
+				{
+					Event:  instance.InstanceDomainAddedEventType,
+					Reduce: p.reduceDomainPrimarySet,
 				},
 				{
 					Event:  instance.InstanceDomainRemovedEventType,
@@ -77,7 +83,40 @@ func (p *InstanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*h
 			handler.NewCol(InstanceDomainDomainCol, e.Domain),
 			handler.NewCol(InstanceDomainInstanceIDCol, e.Aggregate().ID),
 			handler.NewCol(InstanceDomainIsGeneratedCol, e.Generated),
+			handler.NewCol(InstanceDomainIsPrimaryCol, false),
 		},
+	), nil
+}
+
+func (p *InstanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.DomainPrimarySetEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f8nlw", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
+	}
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(InstanceDomainChangeDateCol, e.CreationDate()),
+				handler.NewCol(InstanceDomainSequenceCol, e.Sequence()),
+				handler.NewCol(InstanceDomainIsPrimaryCol, false),
+			},
+			[]handler.Condition{
+				handler.NewCond(InstanceDomainInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(InstanceDomainIsPrimaryCol, true),
+			},
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(InstanceDomainChangeDateCol, e.CreationDate()),
+				handler.NewCol(InstanceDomainSequenceCol, e.Sequence()),
+				handler.NewCol(InstanceDomainIsPrimaryCol, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(InstanceDomainDomainCol, e.Domain),
+				handler.NewCond(InstanceDomainInstanceIDCol, e.Aggregate().ID),
+			},
+		),
 	), nil
 }
 

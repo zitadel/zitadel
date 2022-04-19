@@ -6,16 +6,16 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -31,7 +31,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, refreshToken st
 	if err != nil {
 		return nil, err
 	}
-	tokenView, viewErr := r.View.RefreshTokenByID(tokenID)
+	tokenView, viewErr := r.View.RefreshTokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
@@ -41,7 +41,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, refreshToken st
 		tokenView.UserID = userID
 	}
 
-	events, esErr := r.getUserEvents(ctx, userID, tokenView.Sequence)
+	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
 	}
@@ -68,7 +68,7 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 	if err != nil {
 		return nil, err
 	}
-	sequence, err := r.View.GetLatestRefreshTokenSequence()
+	sequence, err := r.View.GetLatestRefreshTokenSequence(authz.GetInstance(ctx).InstanceID())
 	logging.Log("EVENT-GBdn4").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest refresh token sequence")
 	request.Queries = append(request.Queries, &usr_model.RefreshTokenSearchQuery{Key: usr_model.RefreshTokenSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID})
 	tokens, count, err := r.View.SearchRefreshTokens(request)
@@ -85,8 +85,8 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 	}, nil
 }
 
-func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, sequence)
+func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
 	if err != nil {
 		return nil, err
 	}

@@ -38,7 +38,7 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.instance_domains (creation_date, change_date, sequence, domain, instance_id, is_generated) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO projections.instance_domains (creation_date, change_date, sequence, domain, instance_id, is_generated, is_primary) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -46,6 +46,7 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 								"domain.new",
 								"agg-id",
 								true,
+								false,
 							},
 						},
 					},

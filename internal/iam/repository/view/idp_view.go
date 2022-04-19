@@ -1,18 +1,20 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
 )
 
-func IDPByID(db *gorm.DB, table, idpID string) (*model.IDPConfigView, error) {
+func IDPByID(db *gorm.DB, table, idpID, instanceID string) (*model.IDPConfigView, error) {
 	idp := new(model.IDPConfigView)
 	idpIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyIdpConfigID, Value: idpID, Method: domain.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, idpIDQuery)
+	instanceIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyInstanceID, Value: instanceID, Method: domain.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, idpIDQuery, instanceIDQuery)
 	err := query(db, idp)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.IDP.NotExisting")
@@ -20,12 +22,16 @@ func IDPByID(db *gorm.DB, table, idpID string) (*model.IDPConfigView, error) {
 	return idp, err
 }
 
-func GetIDPConfigsByAggregateID(db *gorm.DB, table string, aggregateID string) ([]*model.IDPConfigView, error) {
+func GetIDPConfigsByAggregateID(db *gorm.DB, table string, aggregateID, instanceID string) ([]*model.IDPConfigView, error) {
 	idps := make([]*model.IDPConfigView, 0)
 	queries := []*iam_model.IDPConfigSearchQuery{
 		{
 			Key:    iam_model.IDPConfigSearchKeyAggregateID,
 			Value:  aggregateID,
+			Method: domain.SearchMethodEquals,
+		}, {
+			Key:    iam_model.IDPConfigSearchKeyInstanceID,
+			Value:  instanceID,
 			Method: domain.SearchMethodEquals,
 		},
 	}
@@ -52,8 +58,11 @@ func PutIDP(db *gorm.DB, table string, idp *model.IDPConfigView) error {
 	return save(db, idp)
 }
 
-func DeleteIDP(db *gorm.DB, table, idpID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyIdpConfigID), idpID)
+func DeleteIDP(db *gorm.DB, table, idpID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyIdpConfigID), idpID},
+		repository.Key{model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyInstanceID), instanceID},
+	)
 
 	return delete(db)
 }

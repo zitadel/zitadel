@@ -190,7 +190,7 @@ func TestAggregate_Validate(t *testing.T) {
 				resourceOwner:    "org",
 				PreviousSequence: 5,
 				Precondition: &precondition{
-					Query: NewSearchQuery().AggregateIDFilter("hodor"),
+					Query: NewSearchQuery().AddQuery().AggregateIDFilter("hodor").SearchQuery(),
 				},
 				Events: []*Event{
 					{
@@ -240,7 +240,7 @@ func TestAggregate_Validate(t *testing.T) {
 				PreviousSequence: 5,
 				Precondition: &precondition{
 					Validation: func(...*Event) error { return nil },
-					Query:      NewSearchQuery().AggregateIDFilter("hodor"),
+					Query:      NewSearchQuery().AddQuery().AggregateIDFilter("hodor").SearchQuery(),
 				},
 				Events: []*Event{
 					{

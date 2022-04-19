@@ -46,6 +46,7 @@ const (
 	UserSessionSearchKeyUserID
 	UserSessionSearchKeyState
 	UserSessionSearchKeyResourceOwner
+	UserSessionSearchKeyInstanceID
 )
 
 type UserSessionSearchQuery struct {

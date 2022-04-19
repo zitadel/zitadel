@@ -41,7 +41,7 @@ type TokenView struct {
 	RefreshTokenID    string         `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
 	IsPAT             bool           `json:"-" gorm:"is_pat"`
 	Deactivated       bool           `json:"-" gorm:"-"`
-	InstanceID        string         `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID        string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {

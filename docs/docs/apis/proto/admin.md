@@ -56,6 +56,18 @@ Set the default language
     GET: /languages/default
 
 
+### ListInstanceDomains
+
+> **rpc** ListInstanceDomains([ListInstanceDomainsRequest](#listinstancedomainsrequest))
+[ListInstanceDomainsResponse](#listinstancedomainsresponse)
+
+Returns the domains of an instance
+
+
+
+    GET: /domains
+
+
 ### ListSecretGenerators
 
 > **rpc** ListSecretGenerators([ListSecretGeneratorsRequest](#listsecretgeneratorsrequest))
@@ -2625,6 +2637,32 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.idp.v1.IDPFieldName | - |  |
 | result | repeated zitadel.idp.v1.IDP | - |  |
+
+
+
+
+### ListInstanceDomainsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| sorting_column |  zitadel.instance.v1.DomainFieldName | the field the result is sorted |  |
+| queries | repeated zitadel.instance.v1.DomainSearchQuery | criterias the client is looking for |  |
+
+
+
+
+### ListInstanceDomainsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| sorting_column |  zitadel.instance.v1.DomainFieldName | - |  |
+| result | repeated zitadel.instance.v1.Domain | - |  |
 
 
 

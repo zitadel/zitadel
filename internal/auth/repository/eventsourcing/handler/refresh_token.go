@@ -58,8 +58,8 @@ func (t *RefreshToken) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
 }
 
-func (t *RefreshToken) CurrentSequence() (uint64, error) {
-	sequence, err := t.view.GetLatestRefreshTokenSequence()
+func (t *RefreshToken) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := t.view.GetLatestRefreshTokenSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -67,13 +67,29 @@ func (t *RefreshToken) CurrentSequence() (uint64, error) {
 }
 
 func (t *RefreshToken) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := t.view.GetLatestRefreshTokenSequence()
+	sequences, err := t.view.GetLatestRefreshTokenSequences()
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(user.AggregateType, project.AggregateType).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+	query := es_models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(t.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
+		AggregateTypeFilter(t.AggregateTypes()...).
+		LatestSequenceFilter(0).
+		ExcludedInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
@@ -91,7 +107,7 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 			logging.Log("EVEN-DBbn4").WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
 		}
-		token, err := t.view.RefreshTokenByID(e.TokenID)
+		token, err := t.view.RefreshTokenByID(e.TokenID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -106,11 +122,11 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 			logging.Log("EVEN-BDbh3").WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
 		}
-		return t.view.DeleteRefreshToken(e.TokenID, event)
+		return t.view.DeleteRefreshToken(e.TokenID, event.InstanceID, event)
 	case user.UserLockedType,
 		user.UserDeactivatedType,
 		user.UserRemovedType:
-		return t.view.DeleteUserRefreshTokens(event.AggregateID, event)
+		return t.view.DeleteUserRefreshTokens(event.AggregateID, event.InstanceID, event)
 	default:
 		return t.view.ProcessedRefreshTokenSequence(event)
 	}

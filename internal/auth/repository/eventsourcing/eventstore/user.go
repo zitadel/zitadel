@@ -3,6 +3,7 @@ package eventstore
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
@@ -26,7 +27,7 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 }
 
 func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {
-	userSessions, err := repo.View.UserSessionsByAgentID(agentID)
+	userSessions, err := repo.View.UserSessionsByAgentID(agentID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +45,7 @@ func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence ui
 }
 
 func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, sequence)
+	query, err := usr_view.UserByIDQuery(userID, authz.GetInstance(ctx).InstanceID(), sequence)
 	if err != nil {
 		return nil, err
 	}

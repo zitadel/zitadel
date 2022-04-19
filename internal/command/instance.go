@@ -356,7 +356,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 		),
 
 		AddOIDCAppCommand(console, nil),
-		SetIAMConsoleID(instanceAgg, &console.ClientID),
+		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.Zitadel.consoleAppID),
 	)
 
 	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, validations...)
@@ -387,11 +387,11 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 }
 
 //SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
-func SetIAMConsoleID(a *instance.Aggregate, clientID *string) preparation.Validation {
+func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID),
+				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID, appID),
 			}, nil
 		}, nil
 	}

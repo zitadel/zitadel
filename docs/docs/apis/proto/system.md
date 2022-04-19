@@ -82,40 +82,52 @@ Returns the usage metrics of an instance
     GET: /instances/{id}/usage
 
 
-### GetGeneratedDomain
+### ListDomains
 
-> **rpc** GetGeneratedDomain([GetGeneratedDomainRequest](#getgenerateddomainrequest))
-[GetGeneratedDomainResponse](#getgenerateddomainresponse)
-
-Returns the domain of an instance
-
-
-
-    GET: /instances/{id}/domains/generated
-
-
-### GetCustomDomains
-
-> **rpc** GetCustomDomains([GetCustomDomainsRequest](#getcustomdomainsrequest))
-[GetCustomDomainsResponse](#getcustomdomainsresponse)
+> **rpc** ListDomains([ListDomainsRequest](#listdomainsrequest))
+[ListDomainsResponse](#listdomainsresponse)
 
 Returns the custom domains of an instance
 
 
 
-    GET: /instances/{id}/domains/custom
+    GET: /instances/{id}/domains
 
 
-### AddCustomDomain
+### AddDomain
 
-> **rpc** AddCustomDomain([AddCustomDomainRequest](#addcustomdomainrequest))
-[AddCustomDomainResponse](#addcustomdomainresponse)
+> **rpc** AddDomain([AddDomainRequest](#adddomainrequest))
+[AddDomainResponse](#adddomainresponse)
 
 Returns the domain of an instance
 
 
 
-    POST: /instances/{id}/domains/custom
+    POST: /instances/{id}/domains
+
+
+### RemoveDomain
+
+> **rpc** RemoveDomain([RemoveDomainRequest](#removedomainrequest))
+[RemoveDomainResponse](#removedomainresponse)
+
+Returns the domain of an instance
+
+
+
+    DELETE: /instances/{id}/domains/{domain}
+
+
+### SetPrimaryDomain
+
+> **rpc** SetPrimaryDomain([SetPrimaryDomainRequest](#setprimarydomainrequest))
+[SetPrimaryDomainResponse](#setprimarydomainresponse)
+
+Returns the domain of an instance
+
+
+
+    POST: /instances/{id}/domains/_set_primary
 
 
 ### ListViews
@@ -185,19 +197,19 @@ failed event. You can find out if it worked on the `failure_count`
 ## Messages
 
 
-### AddCustomDomainRequest
+### AddDomainRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| custom_domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 
-### AddCustomDomainResponse
+### AddDomainResponse
 
 
 
@@ -297,52 +309,6 @@ This is an empty response
 
 
 
-### GetCustomDomainsRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetCustomDomainsResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| domains | repeated string | - |  |
-
-
-
-
-### GetGeneratedDomainRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetGeneratedDomainResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| domain |  string | - |  |
-
-
-
-
 ### GetInstanceRequest
 
 
@@ -397,6 +363,33 @@ This is an empty request
 
 ### HealthzResponse
 This is an empty response
+
+
+
+
+### ListDomainsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | list limitations and ordering | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | - |  |
+| sorting_column |  zitadel.instance.v1.DomainFieldName | the field the result is sorted |  |
+| queries | repeated zitadel.instance.v1.DomainSearchQuery | criterias the client is looking for |  |
+
+
+
+
+### ListDomainsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| sorting_column |  zitadel.instance.v1.DomainFieldName | - |  |
+| result | repeated zitadel.instance.v1.Domain | - |  |
 
 
 
@@ -461,6 +454,29 @@ This is an empty request
 
 
 
+### RemoveDomainRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveDomainResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveFailedEventRequest
 
 
@@ -492,6 +508,29 @@ This is an empty response
 
 
 ### RemoveInstanceResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetPrimaryDomainRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### SetPrimaryDomainResponse
 
 
 
