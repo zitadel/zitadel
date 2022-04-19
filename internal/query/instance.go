@@ -43,6 +43,10 @@ var (
 		name:  projection.InstanceColumnConsoleID,
 		table: instanceTable,
 	}
+	InstanceColumnConsoleAppID = Column{
+		name:  projection.InstanceColumnConsoleAppID,
+		table: instanceTable,
+	}
 	InstanceColumnSetupStarted = Column{
 		name:  projection.InstanceColumnSetUpStarted,
 		table: instanceTable,
@@ -65,6 +69,7 @@ type Instance struct {
 	GlobalOrgID     string
 	IAMProjectID    string
 	ConsoleID       string
+	ConsoleAppID    string
 	DefaultLanguage language.Tag
 	SetupStarted    domain.Step
 	SetupDone       domain.Step
@@ -81,6 +86,10 @@ func (i *Instance) ProjectID() string {
 
 func (i *Instance) ConsoleClientID() string {
 	return i.ConsoleID
+}
+
+func (i *Instance) ConsoleApplicationID() string {
+	return i.ConsoleAppID
 }
 
 func (i *Instance) RequestedDomain() string {
@@ -142,6 +151,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			InstanceColumnGlobalOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
+			InstanceColumnConsoleAppID.identifier(),
 			InstanceColumnSetupStarted.identifier(),
 			InstanceColumnSetupDone.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
@@ -157,6 +167,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				&instance.GlobalOrgID,
 				&instance.IAMProjectID,
 				&instance.ConsoleID,
+				&instance.ConsoleAppID,
 				&instance.SetupStarted,
 				&instance.SetupDone,
 				&lang,

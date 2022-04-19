@@ -20,22 +20,12 @@ message Instance {
             description: "current state of the instance";
         }
     ];
-    string generated_domain = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"organization.zitadel.com\"";
-        }
-    ];
-    repeated string custom_domains = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"zitadel.com\", \"zitadel.cloud\", \"zitadel.ch\"]";
-        }
-    ];
-    string name = 6 [
+    string name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL\"";
         }
     ];
-    string version = 7 [
+    string version = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"v1.0.0\"";
         }
@@ -55,8 +45,7 @@ message Query {
         option (validate.required) = true;
 
         IdQuery id_query = 1;
-        DomainsQuery domains_query = 2;
-        StateQuery state_query = 3;
+        StateQuery state_query = 2;
     }
 }
 
@@ -66,21 +55,6 @@ message IdQuery {
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "4820840938402429";
-        }
-    ];
-}
-
-message DomainsQuery {
-    repeated string domains = 1 [
-        (validate.rules).string = {max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
-        }
-    ];
-    zitadel.v1.ListQueryMethod method = 2 [
-        (validate.rules).enum.defined_only = true,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines which list equality method is used";
         }
     ];
 }
@@ -98,7 +72,68 @@ message StateQuery {
 enum FieldName {
     FIELD_NAME_UNSPECIFIED = 0;
     FIELD_NAME_ID = 1;
-    FIELD_NAME_GENERATED_DOMAIN = 2;
-    FIELD_NAME_NAME = 3;
-    FIELD_NAME_CREATION_DATE = 4;
+    FIELD_NAME_NAME = 2;
+    FIELD_NAME_CREATION_DATE = 3;
+}
+
+message Domain {
+    zitadel.v1.ObjectDetails details = 1;
+    string domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.com\""
+        }
+    ];
+    bool primary = 3;
+    bool generated = 4;
+}
+
+message DomainSearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        DomainQuery domain_query = 1;
+        DomainGeneratedQuery generated_query = 2;
+        DomainPrimaryQuery primary_query = 3;
+    }
+}
+
+message DomainQuery {
+    string domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "zitadel.com";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+//DomainGeneratedQuery is always equals
+message DomainGeneratedQuery {
+    bool generated = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "generated domains";
+        }
+    ];
+}
+
+//DomainPrimaryQuery is always equals
+message DomainPrimaryQuery {
+    bool primary = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "primary domains";
+        }
+    ];
+}
+
+enum DomainFieldName {
+    DOMAIN_FIELD_NAME_UNSPECIFIED = 0;
+    DOMAIN_FIELD_NAME_DOMAIN = 1;
+    DOMAIN_FIELD_NAME_PRIMARY = 2;
+    DOMAIN_FIELD_NAME_GENERATED = 3;
+    DOMAIN_FIELD_NAME_CREATION_DATE = 4;
 }

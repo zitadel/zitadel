@@ -18,6 +18,7 @@ const (
 	InstanceColumnGlobalOrgID     = "global_org_id"
 	InstanceColumnProjectID       = "iam_project_id"
 	InstanceColumnConsoleID       = "console_client_id"
+	InstanceColumnConsoleAppID    = "console_app_id"
 	InstanceColumnSequence        = "sequence"
 	InstanceColumnSetUpStarted    = "setup_started"
 	InstanceColumnSetUpDone       = "setup_done"
@@ -129,6 +130,7 @@ func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnConsoleID, e.ClientID),
+			handler.NewCol(InstanceColumnConsoleAppID, e.AppID),
 		},
 	), nil
 }

@@ -19,6 +19,7 @@ type InstanceDomain struct {
 	Domain       string
 	InstanceID   string
 	IsGenerated  bool
+	IsPrimary    bool
 }
 
 type InstanceDomains struct {
@@ -47,8 +48,12 @@ func NewInstanceDomainInstanceIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(InstanceDomainInstanceIDCol, value, TextEquals)
 }
 
-func NewInstanceDomainGeneratedSearchQuery(verified bool) (SearchQuery, error) {
-	return NewBoolQuery(InstanceDomainIsGeneratedCol, verified)
+func NewInstanceDomainGeneratedSearchQuery(generated bool) (SearchQuery, error) {
+	return NewBoolQuery(InstanceDomainIsGeneratedCol, generated)
+}
+
+func NewInstanceDomainPrimarySearchQuery(primary bool) (SearchQuery, error) {
+	return NewBoolQuery(InstanceDomainIsPrimaryCol, primary)
 }
 
 func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDomainSearchQueries) (domains *InstanceDomains, err error) {
@@ -81,6 +86,7 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 			InstanceDomainDomainCol.identifier(),
 			InstanceDomainInstanceIDCol.identifier(),
 			InstanceDomainIsGeneratedCol.identifier(),
+			InstanceDomainIsPrimaryCol.identifier(),
 			countColumn.identifier(),
 		).From(instanceDomainsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*InstanceDomains, error) {
@@ -95,6 +101,7 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 					&domain.Domain,
 					&domain.InstanceID,
 					&domain.IsGenerated,
+					&domain.IsPrimary,
 					&count,
 				)
 				if err != nil {
@@ -143,6 +150,10 @@ var (
 	}
 	InstanceDomainIsGeneratedCol = Column{
 		name:  projection.InstanceDomainIsGeneratedCol,
+		table: instanceDomainsTable,
+	}
+	InstanceDomainIsPrimaryCol = Column{
+		name:  projection.InstanceDomainIsPrimaryCol,
 		table: instanceDomainsTable,
 	}
 )

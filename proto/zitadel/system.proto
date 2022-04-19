@@ -141,27 +141,36 @@ service SystemService {
         };
     }
 
-    // Returns the domain of an instance
-    rpc GetGeneratedDomain(GetGeneratedDomainRequest) returns (GetGeneratedDomainResponse) {
-        option (google.api.http) = {
-            get: "/instances/{id}/domains/generated";
-        };
-    }
-
     // Returns the custom domains of an instance
-    rpc GetCustomDomains(GetCustomDomainsRequest) returns (GetCustomDomainsResponse) {
+    rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
         option (google.api.http) = {
-            get: "/instances/{id}/domains/custom";
+            get: "/instances/{id}/domains";
         };
     }
 
     // Returns the domain of an instance
-    rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
+    rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
         option (google.api.http) = {
-            post: "/instances/{id}/domains/custom";
+            post: "/instances/{id}/domains";
             body: "*"
         };
     }
+
+    // Returns the domain of an instance
+    rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
+        option (google.api.http) = {
+            delete: "/instances/{id}/domains/{domain}";
+        };
+    }
+
+    // Returns the domain of an instance
+    rpc SetPrimaryDomain(SetPrimaryDomainRequest) returns (SetPrimaryDomainResponse) {
+        option (google.api.http) = {
+            post: "/instances/{id}/domains/_set_primary";
+            body: "*"
+        };
+    }
+
 
     //Returns all stored read models of ZITADEL
     // views are used for search optimisation and optimise request latencies
@@ -346,30 +355,45 @@ message GetUsageResponse {
     uint64 executed_action_mins = 3;
 }
 
-message GetGeneratedDomainRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+message ListDomainsRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];//list limitations and ordering
+    zitadel.v1.ListQuery query = 2;
+    // the field the result is sorted
+    zitadel.instance.v1.DomainFieldName sorting_column = 3;
+    //criterias the client is looking for
+    repeated zitadel.instance.v1.DomainSearchQuery queries = 4;
 }
 
-message GetGeneratedDomainResponse {
+message ListDomainsResponse {
+    zitadel.v1.ListDetails details = 1;
+    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    repeated zitadel.instance.v1.Domain result = 3;
+}
+
+message AddDomainRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
-    string domain = 2;
 }
 
-message GetCustomDomainsRequest {
+message RemoveDomainRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetCustomDomainsResponse {
+message RemoveDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
-    repeated string domains = 2;
 }
 
-message AddCustomDomainRequest {
+message SetPrimaryDomainRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string custom_domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message AddCustomDomainResponse {
+message SetPrimaryDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
