@@ -41,7 +41,7 @@ type UserMembershipView struct {
 	ResourceOwner     string         `json:"-" gorm:"column:resource_owner"`
 	ResourceOwnerName string         `json:"-" gorm:"column:resource_owner_name"`
 	Sequence          uint64         `json:"-" gorm:"column:sequence"`
-	InstanceID        string         `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID        string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {

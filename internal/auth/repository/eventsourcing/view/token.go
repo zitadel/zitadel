@@ -12,12 +12,12 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(tokenID string) (*model.TokenView, error) {
-	return usr_view.TokenByID(v.Db, tokenTable, tokenID)
+func (v *View) TokenByID(tokenID, instanceID string) (*model.TokenView, error) {
+	return usr_view.TokenByID(v.Db, tokenTable, tokenID, instanceID)
 }
 
-func (v *View) TokensByUserID(userID string) ([]*model.TokenView, error) {
-	return usr_view.TokensByUserID(v.Db, tokenTable, userID)
+func (v *View) TokensByUserID(userID, instanceID string) ([]*model.TokenView, error) {
+	return usr_view.TokensByUserID(v.Db, tokenTable, userID, instanceID)
 }
 
 func (v *View) PutToken(token *model.TokenView, event *models.Event) error {
@@ -36,24 +36,24 @@ func (v *View) PutTokens(token []*model.TokenView, event *models.Event) error {
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) DeleteToken(tokenID string, event *models.Event) error {
-	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID)
+func (v *View) DeleteToken(tokenID, instanceID string, event *models.Event) error {
+	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) DeleteSessionTokens(agentID, userID string, event *models.Event) error {
-	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
+func (v *View) DeleteSessionTokens(agentID, userID, instanceID string, event *models.Event) error {
+	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) DeleteUserTokens(userID string, event *models.Event) error {
-	err := usr_view.DeleteUserTokens(v.Db, tokenTable, userID)
+func (v *View) DeleteUserTokens(userID, instanceID string, event *models.Event) error {
+	err := usr_view.DeleteUserTokens(v.Db, tokenTable, userID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
@@ -61,23 +61,27 @@ func (v *View) DeleteUserTokens(userID string, event *models.Event) error {
 }
 
 func (v *View) DeleteApplicationTokens(event *models.Event, ids ...string) error {
-	err := usr_view.DeleteApplicationTokens(v.Db, tokenTable, ids)
+	err := usr_view.DeleteApplicationTokens(v.Db, tokenTable, event.InstanceID, ids)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) DeleteTokensFromRefreshToken(refreshTokenID string, event *models.Event) error {
-	err := usr_view.DeleteTokensFromRefreshToken(v.Db, tokenTable, refreshTokenID)
+func (v *View) DeleteTokensFromRefreshToken(refreshTokenID, instanceID string, event *models.Event) error {
+	err := usr_view.DeleteTokensFromRefreshToken(v.Db, tokenTable, refreshTokenID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) GetLatestTokenSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(tokenTable)
+func (v *View) GetLatestTokenSequence(instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(tokenTable, instanceID)
+}
+
+func (v *View) GetLatestTokenSequences() ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(tokenTable)
 }
 
 func (v *View) ProcessedTokenSequence(event *models.Event) error {
@@ -88,8 +92,8 @@ func (v *View) UpdateTokenSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(tokenTable)
 }
 
-func (v *View) GetLatestTokenFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(tokenTable, sequence)
+func (v *View) GetLatestTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(tokenTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedTokenFailedEvent(failedEvent *repository.FailedEvent) error {

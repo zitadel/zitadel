@@ -64,8 +64,8 @@ func (_ *Token) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
 }
 
-func (p *Token) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestTokenSequence()
+func (p *Token) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := p.view.GetLatestTokenSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -73,13 +73,29 @@ func (p *Token) CurrentSequence() (uint64, error) {
 }
 
 func (t *Token) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := t.view.GetLatestTokenSequence()
+	sequences, err := t.view.GetLatestTokenSequences()
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(user.AggregateType, project.AggregateType).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+	query := es_models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(t.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
+		AggregateTypeFilter(t.AggregateTypes()...).
+		LatestSequenceFilter(0).
+		ExcludedInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (t *Token) Reduce(event *es_models.Event) (err error) {
@@ -96,7 +112,7 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		user.HumanProfileChangedType:
 		user := new(view_model.UserView)
 		user.AppendEvent(event)
-		tokens, err := t.view.TokensByUserID(event.AggregateID)
+		tokens, err := t.view.TokensByUserID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -110,24 +126,24 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteSessionTokens(id, event.AggregateID, event)
+		return t.view.DeleteSessionTokens(id, event.AggregateID, event.InstanceID, event)
 	case user.UserLockedType,
 		user.UserDeactivatedType,
 		user.UserRemovedType:
-		return t.view.DeleteUserTokens(event.AggregateID, event)
+		return t.view.DeleteUserTokens(event.AggregateID, event.InstanceID, event)
 	case user_repo.UserTokenRemovedType,
 		user_repo.PersonalAccessTokenRemovedType:
 		id, err := tokenIDFromRemovedEvent(event)
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteToken(id, event)
+		return t.view.DeleteToken(id, event.InstanceID, event)
 	case user_repo.HumanRefreshTokenRemovedType:
 		id, err := refreshTokenIDFromRemovedEvent(event)
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteTokensFromRefreshToken(id, event)
+		return t.view.DeleteTokensFromRefreshToken(id, event.InstanceID, event)
 	case project.ApplicationDeactivatedType,
 		project.ApplicationRemovedType:
 		application, err := applicationFromSession(event)
@@ -137,7 +153,7 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		return t.view.DeleteApplicationTokens(event, application.AppID)
 	case project.ProjectDeactivatedType,
 		project.ProjectRemovedType:
-		project, err := t.getProjectByID(context.Background(), event.AggregateID)
+		project, err := t.getProjectByID(context.Background(), event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -196,8 +212,8 @@ func (t *Token) OnSuccess() error {
 	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp)
 }
 
-func (t *Token) getProjectByID(ctx context.Context, projID string) (*proj_model.Project, error) {
-	query, err := proj_view.ProjectByIDQuery(projID, 0)
+func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {
+	query, err := proj_view.ProjectByIDQuery(projID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}

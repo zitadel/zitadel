@@ -13,16 +13,16 @@ const (
 	userMembershipTable = "authz.user_memberships"
 )
 
-func (v *View) UserMembershipByIDs(userID, aggregateID, objectID string, memberType usr_model.MemberType) (*model.UserMembershipView, error) {
-	return view.UserMembershipByIDs(v.Db, userMembershipTable, userID, aggregateID, objectID, memberType)
+func (v *View) UserMembershipByIDs(userID, aggregateID, objectID, instanceID string, memberType usr_model.MemberType) (*model.UserMembershipView, error) {
+	return view.UserMembershipByIDs(v.Db, userMembershipTable, userID, aggregateID, objectID, instanceID, memberType)
 }
 
-func (v *View) UserMembershipsByAggregateID(aggregateID string) ([]*model.UserMembershipView, error) {
-	return view.UserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
+func (v *View) UserMembershipsByAggregateID(aggregateID, instanceID string) ([]*model.UserMembershipView, error) {
+	return view.UserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID, instanceID)
 }
 
-func (v *View) UserMembershipsByResourceOwner(resourceOwner string) ([]*model.UserMembershipView, error) {
-	return view.UserMembershipsByResourceOwner(v.Db, userMembershipTable, resourceOwner)
+func (v *View) UserMembershipsByResourceOwner(resourceOwner, instanceID string) ([]*model.UserMembershipView, error) {
+	return view.UserMembershipsByResourceOwner(v.Db, userMembershipTable, resourceOwner, instanceID)
 }
 
 func (v *View) SearchUserMemberships(request *usr_model.UserMembershipSearchRequest) ([]*model.UserMembershipView, uint64, error) {
@@ -45,40 +45,44 @@ func (v *View) BulkPutUserMemberships(memberships []*model.UserMembershipView, e
 	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembership(userID, aggregateID, objectID string, memberType usr_model.MemberType, event *models.Event) error {
-	err := view.DeleteUserMembership(v.Db, userMembershipTable, userID, aggregateID, objectID, memberType)
+func (v *View) DeleteUserMembership(userID, aggregateID, objectID, instanceID string, memberType usr_model.MemberType, event *models.Event) error {
+	err := view.DeleteUserMembership(v.Db, userMembershipTable, userID, aggregateID, objectID, instanceID, memberType)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembershipsByUserID(userID string, event *models.Event) error {
-	err := view.DeleteUserMembershipsByUserID(v.Db, userMembershipTable, userID)
+func (v *View) DeleteUserMembershipsByUserID(userID, instanceID string, event *models.Event) error {
+	err := view.DeleteUserMembershipsByUserID(v.Db, userMembershipTable, userID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembershipsByAggregateID(aggregateID string, event *models.Event) error {
-	err := view.DeleteUserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
+func (v *View) DeleteUserMembershipsByAggregateID(aggregateID, instanceID string, event *models.Event) error {
+	err := view.DeleteUserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, objectID string, event *models.Event) error {
-	err := view.DeleteUserMembershipsByAggregateIDAndObjectID(v.Db, userMembershipTable, aggregateID, objectID)
+func (v *View) DeleteUserMembershipsByAggregateIDAndObjectID(aggregateID, objectID, instanceID string, event *models.Event) error {
+	err := view.DeleteUserMembershipsByAggregateIDAndObjectID(v.Db, userMembershipTable, aggregateID, objectID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedUserMembershipSequence(event)
 }
 
-func (v *View) GetLatestUserMembershipSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(userMembershipTable)
+func (v *View) GetLatestUserMembershipSequence(instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(userMembershipTable, instanceID)
+}
+
+func (v *View) GetLatestUserMembershipSequences() ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userMembershipTable)
 }
 
 func (v *View) ProcessedUserMembershipSequence(event *models.Event) error {
@@ -89,8 +93,8 @@ func (v *View) UpdateUserMembershipSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(userMembershipTable)
 }
 
-func (v *View) GetLatestUserMembershipFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(userMembershipTable, sequence)
+func (v *View) GetLatestUserMembershipFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(userMembershipTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedUserMembershipFailedEvent(failedEvent *repository.FailedEvent) error {

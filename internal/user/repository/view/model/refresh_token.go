@@ -40,7 +40,7 @@ type RefreshTokenView struct {
 	IdleExpiration        time.Time      `json:"-" gorm:"column:idle_expiration"`
 	Expiration            time.Time      `json:"-" gorm:"column:expiration"`
 	Sequence              uint64         `json:"-" gorm:"column:sequence"`
-	InstanceID            string         `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID            string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTokenView {

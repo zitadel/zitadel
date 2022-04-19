@@ -1,19 +1,21 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
 )
 
-func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idpConfigID string) (*model.IDPProviderView, error) {
+func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idpConfigID, instanceID string) (*model.IDPProviderView, error) {
 	policy := new(model.IDPProviderView)
 	aggIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	idpConfigIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyIdpConfigID, Value: idpConfigID, Method: domain.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, aggIDQuery, idpConfigIDQuery)
+	instanceIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyInstanceID, Value: instanceID, Method: domain.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggIDQuery, idpConfigIDQuery, instanceIDQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Skvi8", "Errors.IAM.LoginPolicy.IDP.NotExisting")
@@ -21,12 +23,17 @@ func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idp
 	return policy, err
 }
 
-func IDPProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([]*model.IDPProviderView, error) {
+func IDPProvidersByIdpConfigID(db *gorm.DB, table, idpConfigID, instanceID string) ([]*model.IDPProviderView, error) {
 	providers := make([]*model.IDPProviderView, 0)
 	queries := []*iam_model.IDPProviderSearchQuery{
 		{
 			Key:    iam_model.IDPProviderSearchKeyIdpConfigID,
 			Value:  idpConfigID,
+			Method: domain.SearchMethodEquals,
+		},
+		{
+			Key:    iam_model.IDPProviderSearchKeyInstanceID,
+			Value:  instanceID,
 			Method: domain.SearchMethodEquals,
 		},
 	}
@@ -38,7 +45,7 @@ func IDPProvidersByIdpConfigID(db *gorm.DB, table string, idpConfigID string) ([
 	return providers, nil
 }
 
-func IDPProvidersByAggregateIDAndState(db *gorm.DB, table string, aggregateID string, idpConfigState iam_model.IDPConfigState) ([]*model.IDPProviderView, error) {
+func IDPProvidersByAggregateIDAndState(db *gorm.DB, table string, aggregateID, instanceID string, idpConfigState iam_model.IDPConfigState) ([]*model.IDPProviderView, error) {
 	providers := make([]*model.IDPProviderView, 0)
 	queries := []*iam_model.IDPProviderSearchQuery{
 		{
@@ -49,6 +56,11 @@ func IDPProvidersByAggregateIDAndState(db *gorm.DB, table string, aggregateID st
 		{
 			Key:    iam_model.IDPProviderSearchKeyState,
 			Value:  int(idpConfigState),
+			Method: domain.SearchMethodEquals,
+		},
+		{
+			Key:    iam_model.IDPProviderSearchKeyInstanceID,
+			Value:  instanceID,
 			Method: domain.SearchMethodEquals,
 		},
 	}
@@ -84,17 +96,19 @@ func PutIDPProviders(db *gorm.DB, table string, providers ...*model.IDPProviderV
 	return save(db, p...)
 }
 
-func DeleteIDPProvider(db *gorm.DB, table, aggregateID, idpConfigID string) error {
+func DeleteIDPProvider(db *gorm.DB, table, aggregateID, idpConfigID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
 		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyAggregateID), Value: aggregateID},
 		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyIdpConfigID), Value: idpConfigID},
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }
 
-func DeleteIDPProvidersByAggregateID(db *gorm.DB, table, aggregateID string) error {
+func DeleteIDPProvidersByAggregateID(db *gorm.DB, table, aggregateID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
 		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyAggregateID), Value: aggregateID},
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }

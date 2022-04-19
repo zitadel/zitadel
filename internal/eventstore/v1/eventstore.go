@@ -12,7 +12,6 @@ import (
 type Eventstore interface {
 	Health(ctx context.Context) error
 	FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error)
-	LatestSequence(ctx context.Context, searchQuery *models.SearchQueryFactory) (uint64, error)
 	Subscribe(aggregates ...models.AggregateType) *Subscription
 }
 
@@ -33,13 +32,6 @@ func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.Sear
 		return nil, err
 	}
 	return es.repo.Filter(ctx, models.FactoryFromSearchQuery(searchQuery))
-}
-
-func (es *eventstore) LatestSequence(ctx context.Context, queryFactory *models.SearchQueryFactory) (uint64, error) {
-	sequenceFactory := *queryFactory
-	sequenceFactory = *(&sequenceFactory).Columns(models.Columns_Max_Sequence)
-	sequenceFactory = *(&sequenceFactory).SequenceGreater(0)
-	return es.repo.LatestSequence(ctx, &sequenceFactory)
 }
 
 func (es *eventstore) Health(ctx context.Context) error {

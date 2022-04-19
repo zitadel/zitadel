@@ -2,18 +2,18 @@ package eventstore
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
-
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -34,7 +34,7 @@ func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string)
 }
 
 func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
-	token, viewErr := repo.View.TokenByID(tokenID)
+	token, viewErr := repo.View.TokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
@@ -44,7 +44,7 @@ func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*
 		token.UserID = userID
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -66,8 +66,8 @@ func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*
 	return model.TokenViewToModel(token), nil
 }
 
-func (r *TokenRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, sequence)
+func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
 	if err != nil {
 		return nil, err
 	}

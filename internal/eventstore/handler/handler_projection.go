@@ -12,6 +12,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
+const systemID = "system"
+
 type ProjectionHandlerConfig struct {
 	HandlerConfig
 	ProjectionName   string
@@ -27,10 +29,10 @@ type Update func(context.Context, []*Statement, Reduce) (unexecutedStmts []*Stat
 type Reduce func(eventstore.Event) (*Statement, error)
 
 //Lock is used for mutex handling if needed on the projection
-type Lock func(context.Context, time.Duration) <-chan error
+type Lock func(context.Context, time.Duration, string) <-chan error
 
 //Unlock releases the mutex of the projection
-type Unlock func() error
+type Unlock func(string) error
 
 //SearchQuery generates the search query to lookup for events
 type SearchQuery func() (query *eventstore.SearchQueryBuilder, queryLimit uint64, err error)
@@ -183,7 +185,7 @@ func (h *ProjectionHandler) bulk(
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	errs := lock(ctx, h.requeueAfter)
+	errs := lock(ctx, h.requeueAfter, systemID)
 	//wait until projection is locked
 	if err, ok := <-errs; err != nil || !ok {
 		logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
@@ -194,7 +196,7 @@ func (h *ProjectionHandler) bulk(
 	execErr := executeBulk(ctx)
 	logging.WithFields("projection", h.ProjectionName).OnError(execErr).Warn("unable to execute")
 
-	unlockErr := unlock()
+	unlockErr := unlock(systemID)
 	logging.WithFields("projection", h.ProjectionName).OnError(unlockErr).Warn("unable to unlock")
 
 	if execErr != nil {

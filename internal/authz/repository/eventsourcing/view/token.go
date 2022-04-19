@@ -12,8 +12,8 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(tokenID string) (*usr_view_model.TokenView, error) {
-	return usr_view.TokenByID(v.Db, tokenTable, tokenID)
+func (v *View) TokenByID(tokenID, instanceID string) (*usr_view_model.TokenView, error) {
+	return usr_view.TokenByID(v.Db, tokenTable, tokenID, instanceID)
 }
 
 func (v *View) PutToken(token *usr_view_model.TokenView, event *models.Event) error {
@@ -24,24 +24,24 @@ func (v *View) PutToken(token *usr_view_model.TokenView, event *models.Event) er
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) DeleteToken(tokenID string, event *models.Event) error {
-	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID)
+func (v *View) DeleteToken(tokenID, instanceID string, event *models.Event) error {
+	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) DeleteSessionTokens(agentID, userID string, event *models.Event) error {
-	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID)
+func (v *View) DeleteSessionTokens(agentID, userID, instanceID string, event *models.Event) error {
+	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedTokenSequence(event)
 }
 
-func (v *View) GetLatestTokenSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(tokenTable)
+func (v *View) GetLatestTokenSequence(instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(tokenTable, instanceID)
 }
 
 func (v *View) ProcessedTokenSequence(event *models.Event) error {
@@ -52,8 +52,8 @@ func (v *View) UpdateTokenSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(tokenTable)
 }
 
-func (v *View) GetLatestTokenFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(tokenTable, sequence)
+func (v *View) GetLatestTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(tokenTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedTokenFailedEvent(failedEvent *repository.FailedEvent) error {

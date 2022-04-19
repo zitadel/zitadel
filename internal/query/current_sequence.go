@@ -9,6 +9,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -72,6 +73,7 @@ func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*La
 	}
 	stmt, args, err := query.
 		Where(or).
+		Where(sq.Eq{CurrentSequenceColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).
 		OrderBy(CurrentSequenceColCurrentSequence.identifier()).
 		ToSql()
 	if err != nil {
@@ -267,6 +269,10 @@ var (
 	}
 	CurrentSequenceColProjectionName = Column{
 		name:  "projection_name",
+		table: currentSequencesTable,
+	}
+	CurrentSequenceColInstanceID = Column{
+		name:  "instance_id",
 		table: currentSequencesTable,
 	}
 )

@@ -61,12 +61,12 @@ type privacyPolicyProvider interface {
 }
 
 type userSessionViewProvider interface {
-	UserSessionByIDs(string, string) (*user_view_model.UserSessionView, error)
-	UserSessionsByAgentID(string) ([]*user_view_model.UserSessionView, error)
+	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
+	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
 	PrefixAvatarURL() string
 }
 type userViewProvider interface {
-	UserByID(string) (*user_view_model.UserView, error)
+	UserByID(string, string) (*user_view_model.UserView, error)
 	PrefixAvatarURL() string
 }
 
@@ -79,7 +79,7 @@ type lockoutPolicyViewProvider interface {
 }
 
 type idpProviderViewProvider interface {
-	IDPProvidersByAggregateIDAndState(string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
+	IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
 }
 
 type userEventProvider interface {
@@ -102,7 +102,7 @@ type userGrantProvider interface {
 
 type projectProvider interface {
 	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
-	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
+	OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*project_view_model.OrgProjectMapping, error)
 }
 
 type applicationProvider interface {
@@ -596,7 +596,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 }
 
 func (repo *AuthRequestRepo) tryUsingOnlyUserSession(request *domain.AuthRequest) error {
-	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
+	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID, request.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -618,9 +618,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		if request.RequestedOrgID != "" {
 			preferredLoginName += "@" + request.RequestedPrimaryDomain
 		}
-		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID)
+		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID, request.InstanceID)
 	} else {
-		user, err = repo.View.UserByLoginName(loginName)
+		user, err = repo.View.UserByLoginName(loginName, request.InstanceID)
 		if err == nil {
 			err = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
 			if err != nil {
@@ -696,9 +696,9 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
 	externalIDP := new(user_view_model.ExternalIDPView)
 	if request.RequestedOrgID != "" {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID)
+		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID, request.InstanceID)
 	} else {
-		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID)
+		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, request.InstanceID)
 	}
 	if err != nil {
 		return err
@@ -828,7 +828,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) ([]domain.UserSelection, error) {
-	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
+	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID, request.InstanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -1044,13 +1044,13 @@ func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) erro
 
 func getLoginPolicyIDPProviders(provider idpProviderViewProvider, iamID, orgID string, defaultPolicy bool) ([]*iam_model.IDPProviderView, error) {
 	if defaultPolicy {
-		idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iam_model.IDPConfigStateActive)
+		idpProviders, err := provider.IDPProvidersByAggregateIDAndState(iamID, iamID, iam_model.IDPConfigStateActive)
 		if err != nil {
 			return nil, err
 		}
 		return iam_view_model.IDPProviderViewsToModel(idpProviders), nil
 	}
-	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iam_model.IDPConfigStateActive)
+	idpProviders, err := provider.IDPProvidersByAggregateIDAndState(orgID, iamID, iam_model.IDPConfigStateActive)
 	if err != nil {
 		return nil, err
 	}
@@ -1071,8 +1071,8 @@ func checkVerificationTime(verificationTime time.Time, lifetime time.Duration) b
 	return verificationTime.Add(lifetime).After(time.Now().UTC())
 }
 
-func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string) ([]*user_model.UserSessionView, error) {
-	session, err := provider.UserSessionsByAgentID(agentID)
+func userSessionsByUserAgentID(provider userSessionViewProvider, agentID, instanceID string) ([]*user_model.UserSessionView, error) {
+	session, err := provider.UserSessionsByAgentID(agentID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -1080,7 +1080,7 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID string)
 }
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
-	session, err := provider.UserSessionByIDs(agentID, user.ID)
+	session, err := provider.UserSessionByIDs(agentID, user.ID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return nil, err
@@ -1156,7 +1156,7 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 }
 
 func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider userEventProvider, userID string) (*user_model.UserView, error) {
-	user, viewErr := viewProvider.UserByID(userID)
+	user, viewErr := viewProvider.UserByID(userID, authz.GetInstance(ctx).InstanceID())
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	} else if user == nil {
@@ -1254,7 +1254,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	if !project.HasProjectCheck {
 		return false, nil
 	}
-	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, project.ID)
+	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, project.ID, request.InstanceID)
 	if errors.IsNotFound(err) {
 		return true, nil
 	}

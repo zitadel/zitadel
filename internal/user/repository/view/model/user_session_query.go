@@ -59,6 +59,8 @@ func (key UserSessionSearchKey) ToColumnName() string {
 		return UserSessionKeyState
 	case usr_model.UserSessionSearchKeyResourceOwner:
 		return UserSessionKeyResourceOwner
+	case usr_model.UserSessionSearchKeyInstanceID:
+		return UserSessionKeyInstanceID
 	default:
 		return ""
 	}

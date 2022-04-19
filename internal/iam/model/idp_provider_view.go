@@ -36,6 +36,7 @@ const (
 	IDPProviderSearchKeyAggregateID
 	IDPProviderSearchKeyIdpConfigID
 	IDPProviderSearchKeyState
+	IDPProviderSearchKeyInstanceID
 )
 
 type IDPProviderSearchQuery struct {

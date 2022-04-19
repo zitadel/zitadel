@@ -59,6 +59,8 @@ func (key ExternalIDPSearchKey) ToColumnName() string {
 		return ExternalIDPKeyIDPConfigID
 	case usr_model.ExternalIDPSearchKeyResourceOwner:
 		return ExternalIDPKeyResourceOwner
+	case usr_model.ExternalIDPSearchKeyInstanceID:
+		return ExternalIDPKeyInstanceID
 	default:
 		return ""
 	}

@@ -12,16 +12,16 @@ import (
 )
 
 const (
-	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE aggregate_type = \$1`
+	selectEscaped = `SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore\.events WHERE \( aggregate_type = \$1`
 )
 
 var (
 	eventColumns                             = []string{"creation_date", "event_type", "event_sequence", "previous_aggregate_sequence", "event_data", "editor_service", "editor_user", "resource_owner", "instance_id", "aggregate_type", "aggregate_id", "aggregate_version"}
-	expectedFilterEventsLimitFormat          = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence LIMIT \$2`).String()
-	expectedFilterEventsDescFormat           = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence DESC`).String()
-	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(selectEscaped + ` AND aggregate_id = \$2 ORDER BY event_sequence LIMIT \$3`).String()
-	expectedFilterEventsAggregateIDTypeLimit = regexp.MustCompile(selectEscaped + ` AND aggregate_id = \$2 ORDER BY event_sequence LIMIT \$3`).String()
-	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` ORDER BY event_sequence`).String()
+	expectedFilterEventsLimitFormat          = regexp.MustCompile(selectEscaped + ` \) ORDER BY event_sequence LIMIT \$2`).String()
+	expectedFilterEventsDescFormat           = regexp.MustCompile(selectEscaped + ` \) ORDER BY event_sequence DESC`).String()
+	expectedFilterEventsAggregateIDLimit     = regexp.MustCompile(selectEscaped + ` AND aggregate_id = \$2 \) ORDER BY event_sequence LIMIT \$3`).String()
+	expectedFilterEventsAggregateIDTypeLimit = regexp.MustCompile(selectEscaped + ` AND aggregate_id = \$2 \) ORDER BY event_sequence LIMIT \$3`).String()
+	expectedGetAllEvents                     = regexp.MustCompile(selectEscaped + ` \) ORDER BY event_sequence`).String()
 
 	expectedInsertStatement = regexp.MustCompile(`INSERT INTO eventstore\.events ` +
 		`\(event_type, aggregate_type, aggregate_id, aggregate_version, creation_date, event_data, editor_user, editor_service, resource_owner, instance_id, previous_aggregate_sequence, previous_aggregate_type_sequence\) ` +
@@ -172,14 +172,14 @@ func (db *dbMock) expectFilterEventsError(returnedErr error) *dbMock {
 }
 
 func (db *dbMock) expectLatestSequenceFilter(aggregateType string, sequence Sequence) *dbMock {
-	db.mock.ExpectQuery(`SELECT MAX\(event_sequence\) FROM eventstore\.events WHERE aggregate_type = \$1`).
+	db.mock.ExpectQuery(`SELECT MAX\(event_sequence\) FROM eventstore\.events WHERE \( aggregate_type = \$1 \)`).
 		WithArgs(aggregateType).
 		WillReturnRows(sqlmock.NewRows([]string{"max_sequence"}).AddRow(sequence))
 	return db
 }
 
 func (db *dbMock) expectLatestSequenceFilterError(aggregateType string, err error) *dbMock {
-	db.mock.ExpectQuery(`SELECT MAX\(event_sequence\) FROM eventstore\.events WHERE aggregate_type = \$1`).
+	db.mock.ExpectQuery(`SELECT MAX\(event_sequence\) FROM eventstore\.events WHERE \( aggregate_type = \$1 \)`).
 		WithArgs(aggregateType).WillReturnError(err)
 	return db
 }

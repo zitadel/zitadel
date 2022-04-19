@@ -41,7 +41,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQueryFactory("user").Limit(34),
+				searchQuery: es_models.NewSearchQueryFactory().Limit(34).AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
 				eventsLen: 3,
@@ -55,7 +55,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQueryFactory("user").OrderDesc(),
+				searchQuery: es_models.NewSearchQueryFactory().OrderDesc().AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
 				eventsLen: 34,
@@ -69,7 +69,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQueryFactory("nonAggregate"),
+				searchQuery: es_models.NewSearchQueryFactory().AddQuery().AggregateTypes("nonAggregate").Factory(),
 			},
 			res: res{
 				wantErr:   true,
@@ -83,7 +83,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQueryFactory("user"),
+				searchQuery: es_models.NewSearchQueryFactory().AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
 				wantErr:   true,
@@ -97,7 +97,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQueryFactory("user").Limit(5).AggregateIDs("hop"),
+				searchQuery: es_models.NewSearchQueryFactory().Limit(5).AddQuery().AggregateTypes("user").AggregateIDs("hop").Factory(),
 			},
 			res: res{
 				wantErr:   false,
@@ -111,7 +111,7 @@ func TestSQL_Filter(t *testing.T) {
 			},
 			args: args{
 				events:      &mockEvents{t: t},
-				searchQuery: es_models.NewSearchQueryFactory("user").Limit(5).AggregateIDs("hop"),
+				searchQuery: es_models.NewSearchQueryFactory().Limit(5).AddQuery().AggregateTypes("user").AggregateIDs("hop").Factory(),
 			},
 			res: res{
 				wantErr:   false,
@@ -176,7 +176,7 @@ func TestSQL_LatestSequence(t *testing.T) {
 		{
 			name: "no events for aggregate",
 			args: args{
-				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence),
+				searchQuery: es_models.NewSearchQueryFactory().Columns(es_models.Columns_Max_Sequence).AddQuery().AggregateTypes("idiot").Factory(),
 			},
 			fields: fields{
 				client: mockDB(t).expectLatestSequenceFilterError("idiot", sql.ErrNoRows),
@@ -189,7 +189,7 @@ func TestSQL_LatestSequence(t *testing.T) {
 		{
 			name: "sql query error",
 			args: args{
-				searchQuery: es_models.NewSearchQueryFactory("idiot").Columns(es_models.Columns_Max_Sequence),
+				searchQuery: es_models.NewSearchQueryFactory().Columns(es_models.Columns_Max_Sequence).AddQuery().AggregateTypes("idiot").Factory(),
 			},
 			fields: fields{
 				client: mockDB(t).expectLatestSequenceFilterError("idiot", sql.ErrConnDone),
@@ -203,7 +203,7 @@ func TestSQL_LatestSequence(t *testing.T) {
 		{
 			name: "events for aggregate found",
 			args: args{
-				searchQuery: es_models.NewSearchQueryFactory("user").Columns(es_models.Columns_Max_Sequence),
+				searchQuery: es_models.NewSearchQueryFactory().Columns(es_models.Columns_Max_Sequence).AddQuery().AggregateTypes("user").Factory(),
 			},
 			fields: fields{
 				client: mockDB(t).expectLatestSequenceFilter("user", math.MaxUint64),
