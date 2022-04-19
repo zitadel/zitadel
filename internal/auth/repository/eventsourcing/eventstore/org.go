@@ -23,7 +23,7 @@ type OrgRepository struct {
 }
 
 func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
-	idpConfig, err := repo.View.IDPConfigByID(idpConfigID)
+	idpConfig, err := repo.View.IDPConfigByID(idpConfigID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}

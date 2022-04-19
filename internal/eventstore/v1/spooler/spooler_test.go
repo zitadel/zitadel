@@ -3,17 +3,18 @@ package spooler
 import (
 	"context"
 	"fmt"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler/mock"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/golang/mock/gomock"
 )
 
 type testHandler struct {
@@ -30,7 +31,7 @@ func (h *testHandler) AggregateTypes() []models.AggregateType {
 	return nil
 }
 
-func (h *testHandler) CurrentSequence() (uint64, error) {
+func (h *testHandler) CurrentSequence(instanceID string) (uint64, error) {
 	return 0, nil
 }
 
@@ -376,8 +377,8 @@ func newTestLocker(t *testing.T, lockerID, viewName string) *testLocker {
 
 func (l *testLocker) expectRenew(t *testing.T, err error, waitTime time.Duration) *testLocker {
 	t.Helper()
-	l.mock.EXPECT().Renew(gomock.Any(), l.viewName, gomock.Any()).DoAndReturn(
-		func(_, _ string, gotten time.Duration) error {
+	l.mock.EXPECT().Renew(gomock.Any(), l.viewName, gomock.Any(), gomock.Any()).DoAndReturn(
+		func(_, _, _ string, gotten time.Duration) error {
 			t.Helper()
 			if waitTime-gotten != 0 {
 				t.Errorf("expected waittime %v got %v", waitTime, gotten)
@@ -396,7 +397,7 @@ func TestHandleError(t *testing.T) {
 	type args struct {
 		event               *models.Event
 		failedErr           error
-		latestFailedEvent   func(sequence uint64) (*repository.FailedEvent, error)
+		latestFailedEvent   func(sequence uint64, instanceID string) (*repository.FailedEvent, error)
 		errorCountUntilSkip uint64
 	}
 	type res struct {
@@ -413,12 +414,13 @@ func TestHandleError(t *testing.T) {
 			args: args{
 				event:     &models.Event{Sequence: 30000000},
 				failedErr: errors.ThrowInternal(nil, "SPOOL-Wk53B", "this was wrong"),
-				latestFailedEvent: func(s uint64) (*repository.FailedEvent, error) {
+				latestFailedEvent: func(s uint64, instanceID string) (*repository.FailedEvent, error) {
 					return &repository.FailedEvent{
 						ErrMsg:         "blub",
 						FailedSequence: s - 1,
 						FailureCount:   6,
 						ViewName:       "super.table",
+						InstanceID:     instanceID,
 					}, nil
 				},
 				errorCountUntilSkip: 5,
@@ -432,12 +434,13 @@ func TestHandleError(t *testing.T) {
 			args: args{
 				event:     &models.Event{Sequence: 30000000},
 				failedErr: errors.ThrowInternal(nil, "SPOOL-Wk53B", "this was wrong"),
-				latestFailedEvent: func(s uint64) (*repository.FailedEvent, error) {
+				latestFailedEvent: func(s uint64, instanceID string) (*repository.FailedEvent, error) {
 					return &repository.FailedEvent{
 						ErrMsg:         "blub",
 						FailedSequence: s - 1,
 						FailureCount:   5,
 						ViewName:       "super.table",
+						InstanceID:     instanceID,
 					}, nil
 				},
 				errorCountUntilSkip: 6,
@@ -451,12 +454,13 @@ func TestHandleError(t *testing.T) {
 			args: args{
 				event:     &models.Event{Sequence: 30000000},
 				failedErr: errors.ThrowInternal(nil, "SPOOL-Wk53B", "this was wrong"),
-				latestFailedEvent: func(s uint64) (*repository.FailedEvent, error) {
+				latestFailedEvent: func(s uint64, instanceID string) (*repository.FailedEvent, error) {
 					return &repository.FailedEvent{
 						ErrMsg:         "blub",
 						FailedSequence: s - 1,
 						FailureCount:   3,
 						ViewName:       "super.table",
+						InstanceID:     instanceID,
 					}, nil
 				},
 				errorCountUntilSkip: 5,

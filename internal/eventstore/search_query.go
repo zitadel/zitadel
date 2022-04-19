@@ -20,6 +20,8 @@ type SearchQuery struct {
 	builder              *SearchQueryBuilder
 	aggregateTypes       []AggregateType
 	aggregateIDs         []string
+	instanceID           string
+	excludedInstanceIDs  []string
 	eventSequenceGreater uint64
 	eventSequenceLess    uint64
 	eventTypes           []EventType
@@ -91,9 +93,9 @@ func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQu
 }
 
 //InstanceID defines the instanceID (system) of the events
-func (factory *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
-	factory.instanceID = instanceID
-	return factory
+func (builder *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
+	builder.instanceID = instanceID
+	return builder
 }
 
 //OrderDesc changes the sorting order of the returned events to descending
@@ -149,6 +151,18 @@ func (query *SearchQuery) AggregateIDs(ids ...string) *SearchQuery {
 	return query
 }
 
+//InstanceID filters for events with the given instanceID
+func (query *SearchQuery) InstanceID(instanceID string) *SearchQuery {
+	query.instanceID = instanceID
+	return query
+}
+
+//ExcludedInstanceID filters for events not having the given instanceIDs
+func (query *SearchQuery) ExcludedInstanceID(instanceIDs ...string) *SearchQuery {
+	query.excludedInstanceIDs = instanceIDs
+	return query
+}
+
 //EventTypes filters for events with the given event types
 func (query *SearchQuery) EventTypes(types ...EventType) *SearchQuery {
 	query.eventTypes = types
@@ -180,6 +194,9 @@ func (query *SearchQuery) matches(event Event) bool {
 	if ok := isAggregateIDs(event.Aggregate(), query.aggregateIDs...); len(query.aggregateIDs) > 0 && !ok {
 		return false
 	}
+	if event.Aggregate().InstanceID != "" && query.instanceID != "" && event.Aggregate().InstanceID != query.instanceID {
+		return false
+	}
 	if ok := isEventTypes(event, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
 		return false
 	}
@@ -203,6 +220,8 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 			query.eventDataFilter,
 			query.eventSequenceGreaterFilter,
 			query.eventSequenceLessFilter,
+			query.instanceIDFilter,
+			query.excludedInstanceIDFilter,
 			query.builder.resourceOwnerFilter,
 			query.builder.instanceIDFilter,
 		} {
@@ -279,6 +298,20 @@ func (query *SearchQuery) eventSequenceLessFilter() *repository.Filter {
 		sortOrder = repository.OperationGreater
 	}
 	return repository.NewFilter(repository.FieldSequence, query.eventSequenceLess, sortOrder)
+}
+
+func (query *SearchQuery) instanceIDFilter() *repository.Filter {
+	if query.instanceID == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldInstanceID, query.instanceID, repository.OperationEquals)
+}
+
+func (query *SearchQuery) excludedInstanceIDFilter() *repository.Filter {
+	if len(query.excludedInstanceIDs) == 0 {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldInstanceID, query.excludedInstanceIDs, repository.OperationNotIn)
 }
 
 func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {

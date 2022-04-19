@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSessionView, error) {
+func UserSessionByIDs(db *gorm.DB, table, agentID, userID, instanceID string) (*model.UserSessionView, error) {
 	userSession := new(model.UserSessionView)
 	userAgentQuery := model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyUserAgentID,
@@ -22,7 +22,12 @@ func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSe
 		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
-	query := repository.PrepareGetByQuery(table, userAgentQuery, userQuery)
+	instanceIDQuery := &model.UserSessionSearchQuery{
+		Key:    usr_model.UserSessionSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
+	query := repository.PrepareGetByQuery(table, userAgentQuery, userQuery, instanceIDQuery)
 	err := query(db, userSession)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-NGBs1", "Errors.UserSession.NotFound")
@@ -30,29 +35,39 @@ func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSe
 	return userSession, err
 }
 
-func UserSessionsByUserID(db *gorm.DB, table, userID string) ([]*model.UserSessionView, error) {
+func UserSessionsByUserID(db *gorm.DB, table, userID, instanceID string) ([]*model.UserSessionView, error) {
 	userSessions := make([]*model.UserSessionView, 0)
 	userAgentQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyUserID,
 		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
+	instanceIDQuery := &usr_model.UserSessionSearchQuery{
+		Key:    usr_model.UserSessionSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
-		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
+		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery, instanceIDQuery},
 	})
 	_, err := query(db, &userSessions)
 	return userSessions, err
 }
 
-func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSessionView, error) {
+func UserSessionsByAgentID(db *gorm.DB, table, agentID, instanceID string) ([]*model.UserSessionView, error) {
 	userSessions := make([]*model.UserSessionView, 0)
 	userAgentQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyUserAgentID,
 		Method: domain.SearchMethodEquals,
 		Value:  agentID,
 	}
+	instanceIDQuery := &usr_model.UserSessionSearchQuery{
+		Key:    usr_model.UserSessionSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
-		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery},
+		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery, instanceIDQuery},
 	})
 	_, err := query(db, &userSessions)
 	return userSessions, err
@@ -84,7 +99,10 @@ func PutUserSessions(db *gorm.DB, table string, sessions ...*model.UserSessionVi
 	return save(db, s...)
 }
 
-func DeleteUserSessions(db *gorm.DB, table, userID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), userID)
+func DeleteUserSessions(db *gorm.DB, table, userID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), userID},
+		repository.Key{model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), instanceID},
+	)
 	return delete(db)
 }

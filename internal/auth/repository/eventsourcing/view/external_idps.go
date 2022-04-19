@@ -12,16 +12,16 @@ const (
 	externalIDPTable = "auth.user_external_idps"
 )
 
-func (v *View) ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID string) (*model.ExternalIDPView, error) {
-	return view.ExternalIDPByExternalUserIDAndIDPConfigID(v.Db, externalIDPTable, externalUserID, idpConfigID)
+func (v *View) ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, instanceID string) (*model.ExternalIDPView, error) {
+	return view.ExternalIDPByExternalUserIDAndIDPConfigID(v.Db, externalIDPTable, externalUserID, idpConfigID, instanceID)
 }
 
-func (v *View) ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, resourceOwner string) (*model.ExternalIDPView, error) {
-	return view.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(v.Db, externalIDPTable, externalUserID, idpConfigID, resourceOwner)
+func (v *View) ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, resourceOwner, instanceID string) (*model.ExternalIDPView, error) {
+	return view.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(v.Db, externalIDPTable, externalUserID, idpConfigID, resourceOwner, instanceID)
 }
 
-func (v *View) ExternalIDPsByIDPConfigID(idpConfigID string) ([]*model.ExternalIDPView, error) {
-	return view.ExternalIDPsByIDPConfigID(v.Db, externalIDPTable, idpConfigID)
+func (v *View) ExternalIDPsByIDPConfigID(idpConfigID, instanceID string) ([]*model.ExternalIDPView, error) {
+	return view.ExternalIDPsByIDPConfigID(v.Db, externalIDPTable, idpConfigID, instanceID)
 }
 
 func (v *View) PutExternalIDP(externalIDP *model.ExternalIDPView, event *models.Event) error {
@@ -40,24 +40,28 @@ func (v *View) PutExternalIDPs(event *models.Event, externalIDPs ...*model.Exter
 	return v.ProcessedExternalIDPSequence(event)
 }
 
-func (v *View) DeleteExternalIDP(externalUserID, idpConfigID string, event *models.Event) error {
-	err := view.DeleteExternalIDP(v.Db, externalIDPTable, externalUserID, idpConfigID)
+func (v *View) DeleteExternalIDP(externalUserID, idpConfigID, instanceID string, event *models.Event) error {
+	err := view.DeleteExternalIDP(v.Db, externalIDPTable, externalUserID, idpConfigID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedExternalIDPSequence(event)
 }
 
-func (v *View) DeleteExternalIDPsByUserID(userID string, event *models.Event) error {
-	err := view.DeleteExternalIDPsByUserID(v.Db, externalIDPTable, userID)
+func (v *View) DeleteExternalIDPsByUserID(userID, instanceID string, event *models.Event) error {
+	err := view.DeleteExternalIDPsByUserID(v.Db, externalIDPTable, userID, instanceID)
 	if err != nil {
 		return err
 	}
 	return v.ProcessedExternalIDPSequence(event)
 }
 
-func (v *View) GetLatestExternalIDPSequence() (*global_view.CurrentSequence, error) {
-	return v.latestSequence(externalIDPTable)
+func (v *View) GetLatestExternalIDPSequence(instanceID string) (*global_view.CurrentSequence, error) {
+	return v.latestSequence(externalIDPTable, instanceID)
+}
+
+func (v *View) GetLatestExternalIDPSequences() ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(externalIDPTable)
 }
 
 func (v *View) ProcessedExternalIDPSequence(event *models.Event) error {
@@ -68,8 +72,8 @@ func (v *View) UpdateExternalIDPSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(externalIDPTable)
 }
 
-func (v *View) GetLatestExternalIDPFailedEvent(sequence uint64) (*global_view.FailedEvent, error) {
-	return v.latestFailedEvent(externalIDPTable, sequence)
+func (v *View) GetLatestExternalIDPFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {
+	return v.latestFailedEvent(externalIDPTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedExternalIDPFailedEvent(failedEvent *global_view.FailedEvent) error {

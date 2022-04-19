@@ -20,6 +20,7 @@ const (
 	UserSessionKeyUserID        = "user_id"
 	UserSessionKeyState         = "state"
 	UserSessionKeyResourceOwner = "resource_owner"
+	UserSessionKeyInstanceID    = "instance_id"
 )
 
 type UserSessionView struct {
@@ -42,7 +43,7 @@ type UserSessionView struct {
 	MultiFactorVerification      time.Time `json:"-" gorm:"column:multi_factor_verification"`
 	MultiFactorVerificationType  int32     `json:"-" gorm:"column:multi_factor_verification_type"`
 	Sequence                     uint64    `json:"-" gorm:"column:sequence"`
-	InstanceID                   string    `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID                   string    `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {

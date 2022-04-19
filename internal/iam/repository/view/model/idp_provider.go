@@ -18,6 +18,7 @@ const (
 	IDPProviderKeyAggregateID = "aggregate_id"
 	IDPProviderKeyIdpConfigID = "idp_config_id"
 	IDPProviderKeyState       = "idp_state"
+	IDPProviderKeyInstanceID  = "instance_id"
 )
 
 type IDPProviderView struct {
@@ -34,7 +35,7 @@ type IDPProviderView struct {
 	IDPState        int32  `json:"-" gorm:"column:idp_state"`
 
 	Sequence   uint64 `json:"-" gorm:"column:sequence"`
-	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func IDPProviderViewToModel(provider *IDPProviderView) *model.IDPProviderView {

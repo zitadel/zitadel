@@ -288,8 +288,11 @@ func (db *CRDB) columnName(col repository.Field) string {
 }
 
 func (db *CRDB) conditionFormat(operation repository.Operation) string {
-	if operation == repository.OperationIn {
+	switch operation {
+	case repository.OperationIn:
 		return "%s %s ANY(?)"
+	case repository.OperationNotIn:
+		return "%s %s ALL(?)"
 	}
 	return "%s %s ?"
 }
@@ -304,6 +307,8 @@ func (db *CRDB) operation(operation repository.Operation) string {
 		return "<"
 	case repository.OperationJSONContains:
 		return "@>"
+	case repository.OperationNotIn:
+		return "<>"
 	}
 	return ""
 }

@@ -17,8 +17,8 @@ func (v *View) RemoveFailedEvent(database string, failedEvent *repository.Failed
 	return repository.RemoveFailedEvent(v.Db, database+"."+errColumn, failedEvent)
 }
 
-func (v *View) latestFailedEvent(viewName string, sequence uint64) (*repository.FailedEvent, error) {
-	return repository.LatestFailedEvent(v.Db, errTable, viewName, sequence)
+func (v *View) latestFailedEvent(viewName, instanceID string, sequence uint64) (*repository.FailedEvent, error) {
+	return repository.LatestFailedEvent(v.Db, errTable, viewName, instanceID, sequence)
 }
 
 func (v *View) AllFailedEvents(db string) ([]*repository.FailedEvent, error) {

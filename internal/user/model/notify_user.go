@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"time"
+
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type NotifyUser struct {
@@ -41,6 +42,7 @@ const (
 	NotifyUserSearchKeyUnspecified NotifyUserSearchKey = iota
 	NotifyUserSearchKeyUserID
 	NotifyUserSearchKeyResourceOwner
+	NotifyUserSearchKeyInstanceID
 )
 
 type NotifyUserSearchQuery struct {

@@ -2,14 +2,13 @@ package eventstore
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	view_model "github.com/caos/zitadel/internal/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
-var dbList = []string{"management", "auth", "authz", "adminapi", "notification"}
+var dbList = []string{"auth", "authz", "adminapi", "notification"}
 
 type AdministratorRepo struct {
 	View *view.View
@@ -45,16 +44,6 @@ func (repo *AdministratorRepo) GetViews() ([]*view_model.View, error) {
 		}
 	}
 	return views, nil
-}
-
-func (repo *AdministratorRepo) GetSpoolerDiv(database, view string) int64 {
-	sequence, err := repo.View.GetCurrentSequence(database, view)
-	if err != nil {
-
-		return 0
-	}
-	divDuration := time.Now().Sub(sequence.LastSuccessfulSpoolerRun)
-	return divDuration.Milliseconds()
 }
 
 func (repo *AdministratorRepo) ClearView(ctx context.Context, database, view string) error {

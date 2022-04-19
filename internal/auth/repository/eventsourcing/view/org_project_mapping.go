@@ -12,8 +12,8 @@ const (
 	orgPrgojectMappingTable = "auth.org_project_mapping"
 )
 
-func (v *View) OrgProjectMappingByIDs(orgID, projectID string) (*model.OrgProjectMapping, error) {
-	return view.OrgProjectMappingByIDs(v.Db, orgPrgojectMappingTable, orgID, projectID)
+func (v *View) OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*model.OrgProjectMapping, error) {
+	return view.OrgProjectMappingByIDs(v.Db, orgPrgojectMappingTable, orgID, projectID, instanceID)
 }
 
 func (v *View) PutOrgProjectMapping(mapping *model.OrgProjectMapping, event *models.Event) error {
@@ -24,24 +24,28 @@ func (v *View) PutOrgProjectMapping(mapping *model.OrgProjectMapping, event *mod
 	return v.ProcessedOrgProjectMappingSequence(event)
 }
 
-func (v *View) DeleteOrgProjectMapping(orgID, projectID string, event *models.Event) error {
-	err := view.DeleteOrgProjectMapping(v.Db, orgPrgojectMappingTable, orgID, projectID)
+func (v *View) DeleteOrgProjectMapping(orgID, projectID, instanceID string, event *models.Event) error {
+	err := view.DeleteOrgProjectMapping(v.Db, orgPrgojectMappingTable, orgID, projectID, instanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 	return v.ProcessedOrgProjectMappingSequence(event)
 }
 
-func (v *View) DeleteOrgProjectMappingsByProjectID(projectID string) error {
-	return view.DeleteOrgProjectMappingsByProjectID(v.Db, orgPrgojectMappingTable, projectID)
+func (v *View) DeleteOrgProjectMappingsByProjectID(projectID, instanceID string) error {
+	return view.DeleteOrgProjectMappingsByProjectID(v.Db, orgPrgojectMappingTable, projectID, instanceID)
 }
 
-func (v *View) DeleteOrgProjectMappingsByProjectGrantID(projectGrantID string) error {
-	return view.DeleteOrgProjectMappingsByProjectGrantID(v.Db, orgPrgojectMappingTable, projectGrantID)
+func (v *View) DeleteOrgProjectMappingsByProjectGrantID(projectGrantID, instanceID string) error {
+	return view.DeleteOrgProjectMappingsByProjectGrantID(v.Db, orgPrgojectMappingTable, projectGrantID, instanceID)
 }
 
-func (v *View) GetLatestOrgProjectMappingSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(orgPrgojectMappingTable)
+func (v *View) GetLatestOrgProjectMappingSequence(instanceID string) (*repository.CurrentSequence, error) {
+	return v.latestSequence(orgPrgojectMappingTable, instanceID)
+}
+
+func (v *View) GetLatestOrgProjectMappingSequences() ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(orgPrgojectMappingTable)
 }
 
 func (v *View) ProcessedOrgProjectMappingSequence(event *models.Event) error {
@@ -52,8 +56,8 @@ func (v *View) UpdateOrgProjectMappingSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(orgPrgojectMappingTable)
 }
 
-func (v *View) GetLatestOrgProjectMappingFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(orgPrgojectMappingTable, sequence)
+func (v *View) GetLatestOrgProjectMappingFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(orgPrgojectMappingTable, instanceID, sequence)
 }
 
 func (v *View) ProcessedOrgProjectMappingFailedEvent(failedEvent *repository.FailedEvent) error {

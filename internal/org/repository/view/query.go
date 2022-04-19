@@ -11,11 +11,15 @@ func OrgByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, err
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "id should be filled")
 	}
 	return OrgQuery(latestSequence).
-		AggregateIDFilter(id), nil
+		AddQuery().
+		AggregateIDFilter(id).
+		SearchQuery(), nil
 }
 
 func OrgQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
+		AddQuery().
 		AggregateTypeFilter(org.AggregateType).
-		LatestSequenceFilter(latestSequence)
+		LatestSequenceFilter(latestSequence).
+		SearchQuery()
 }

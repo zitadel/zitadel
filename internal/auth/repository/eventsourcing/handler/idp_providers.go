@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -67,8 +68,8 @@ func (_ *IDPProvider) AggregateTypes() []models.AggregateType {
 	return []es_models.AggregateType{instance.AggregateType, org.AggregateType}
 }
 
-func (i *IDPProvider) CurrentSequence() (uint64, error) {
-	sequence, err := i.view.GetLatestIDPProviderSequence()
+func (i *IDPProvider) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := i.view.GetLatestIDPProviderSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
@@ -76,13 +77,29 @@ func (i *IDPProvider) CurrentSequence() (uint64, error) {
 }
 
 func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {
-	sequence, err := i.view.GetLatestIDPProviderSequence()
+	sequences, err := i.view.GetLatestIDPProviderSequences()
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
+	query := es_models.NewSearchQuery()
+	instances := make([]string, 0)
+	for _, sequence := range sequences {
+		for _, instance := range instances {
+			if sequence.InstanceID == instance {
+				break
+			}
+		}
+		instances = append(instances, sequence.InstanceID)
+		query.AddQuery().
+			AggregateTypeFilter(i.AggregateTypes()...).
+			LatestSequenceFilter(sequence.CurrentSequence).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return query.AddQuery().
 		AggregateTypeFilter(i.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+		LatestSequenceFilter(0).
+		ExcludedInstanceIDsFilter(instances...).
+		SearchQuery(), nil
 }
 
 func (i *IDPProvider) Reduce(event *models.Event) (err error) {
@@ -108,7 +125,7 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event)
+		return i.view.DeleteIDPProvider(event.AggregateID, provider.IDPConfigID, event.InstanceID, event)
 	case instance.IDPConfigChangedEventType, org.IDPConfigChangedEventType:
 		esConfig := new(iam_view_model.IDPConfigView)
 		providerType := iam_model.IDPProviderTypeSystem
@@ -116,7 +133,7 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
 		esConfig.AppendEvent(providerType, event)
-		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID)
+		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID, esConfig.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -134,7 +151,7 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		}
 		return i.view.PutIDPProviders(event, providers...)
 	case org.LoginPolicyRemovedEventType:
-		return i.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event)
+		return i.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event.InstanceID, event)
 	default:
 		return i.view.ProcessedIDPProviderSequence(event)
 	}
