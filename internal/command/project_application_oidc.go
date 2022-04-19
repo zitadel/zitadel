@@ -321,3 +321,17 @@ func (c *Commands) getOIDCAppWriteModel(ctx context.Context, projectID, appID, r
 	}
 	return appWriteModel, nil
 }
+
+func getOIDCAppWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, appID, resourceOwner string) (*OIDCApplicationWriteModel, error) {
+	appWriteModel := NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
+	events, err := filter(ctx, appWriteModel.Query())
+	if err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return appWriteModel, nil
+	}
+	appWriteModel.AppendEvents(events...)
+	err = appWriteModel.Reduce()
+	return appWriteModel, err
+}

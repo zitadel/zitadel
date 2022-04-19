@@ -56,7 +56,7 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
 			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
 			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{KeyColumnID})),
@@ -130,9 +130,6 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			},
 			crdb.WithTableSuffix(privateKeyTableSuffix),
 		))
-		if p.keyChan != nil {
-			p.keyChan <- true
-		}
 	}
 	if e.PublicKey.Expiry.After(time.Now()) {
 		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)

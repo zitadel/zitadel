@@ -32,9 +32,13 @@ func IsOrigin(rawOrigin string) bool {
 }
 
 func BuildHTTP(hostname string, externalPort uint16, secure bool) string {
+	return BuildOrigin(fmt.Sprintf("%s:%d", hostname, externalPort), secure)
+}
+
+func BuildOrigin(host string, secure bool) string {
 	schema := "https"
 	if !secure {
 		schema = "http"
 	}
-	return fmt.Sprintf("%s://%s:%d", schema, hostname, externalPort)
+	return fmt.Sprintf("%s://%s", schema, host)
 }

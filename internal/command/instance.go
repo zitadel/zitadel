@@ -28,16 +28,6 @@ const (
 	consolePostLogoutPath = console.HandlerPrefix + "/signedout"
 )
 
-type AddInstance struct {
-	InstanceName   string
-	CustomDomain   string
-	FirstOrgName   string
-	OwnerEmail     string
-	OwnerUsername  string
-	OwnerFirstName string
-	OwnerLastName  string
-}
-
 type InstanceSetup struct {
 	zitadel      ZitadelConfig
 	InstanceName string

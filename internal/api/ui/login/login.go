@@ -36,7 +36,7 @@ type Login struct {
 	authRepo            auth_repository.Repository
 	baseURL             string
 	consolePath         string
-	oidcAuthCallbackURL func(string) string
+	oidcAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 	iamDomain           string
@@ -64,9 +64,10 @@ func CreateLogin(config Config,
 	consolePath,
 	domain,
 	baseURL string,
-	oidcAuthCallbackURL func(string) string,
+	oidcAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
 	userAgentCookie,
+	issuerInterceptor,
 	instanceHandler mux.MiddlewareFunc,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
@@ -105,7 +106,8 @@ func CreateLogin(config Config,
 		return nil, fmt.Errorf("unable to create cacheInterceptor: %w", err)
 	}
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
-	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
+
+	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources), issuerInterceptor)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName, systemDefaults.DefaultLanguage)
 	login.parser = form.NewParser()
 	return login, nil
