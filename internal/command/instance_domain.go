@@ -84,6 +84,9 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			if err != nil {
 				return nil, err
 			}
+			if appWriteModel.State == domain.AppStateUnspecified || appWriteModel.State == domain.AppStateRemoved {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-39nls", "Errors.Project.App.NotExisting")
+			}
 			redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
 			logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
 			consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(

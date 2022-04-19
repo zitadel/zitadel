@@ -67,6 +67,11 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 
 func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest) (*system_pb.AddDomainResponse, error) {
 	ctx = authz.WithInstanceID(ctx, req.Id)
+	instance, err := s.query.Instance(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ctx = authz.WithInstance(ctx, instance)
 	details, err := s.command.AddInstanceDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err

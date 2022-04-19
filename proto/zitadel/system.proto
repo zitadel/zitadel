@@ -137,7 +137,7 @@ service SystemService {
     // Returns the custom domains of an instance
     rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
         option (google.api.http) = {
-            post: "/instances/{id}/domains";
+            post: "/instances/{id}/domains/_search";
             body: "*"
         };
     }

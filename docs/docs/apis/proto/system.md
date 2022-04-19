@@ -79,7 +79,7 @@ Returns the custom domains of an instance
 
 
 
-    POST: /instances/{id}/domains
+    POST: /instances/{id}/domains/_search
 
 
 ### AddDomain
