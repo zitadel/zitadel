@@ -44,6 +44,7 @@ module.exports = {
         "guides/basics/get-started",
         "guides/basics/organizations",
         "guides/basics/projects",
+        "guides/basics/applications",
       ],
     },
     {
