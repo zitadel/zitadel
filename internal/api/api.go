@@ -71,10 +71,8 @@ func NewWithoutAuth(
 	},
 	externalSecure bool,
 ) *API {
-	verifier := internal_authz.Start(repo)
 	api := &API{
 		port:           port,
-		verifier:       verifier,
 		health:         repo,
 		router:         router,
 		externalSecure: externalSecure,
