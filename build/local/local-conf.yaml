@@ -1,0 +1,14 @@
+ExternalSecure: false
+
+database:
+  host: localhost
+  user:
+    username: zitadel
+    ssl:
+      mode: disable
+  database: zitadel
+
+adminUser:
+  username: root
+  ssl:
+    mode: disable

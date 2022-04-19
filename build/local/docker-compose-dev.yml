@@ -5,7 +5,7 @@ services:
     restart: always
     networks:
       - zitadel
-    image: cockroachdb/cockroach:v21.2.5
+    image: cockroachdb/cockroach:v21.2.8
     command: start-single-node --insecure --listen-addr=0.0.0.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]

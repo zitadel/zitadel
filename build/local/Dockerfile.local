@@ -1,0 +1,7 @@
+FROM goreleaser/goreleaser
+
+WORKDIR /zitadel
+COPY . .
+
+RUN goreleaser build --single-target --snapshot \
+    && ./zitadel admin --config build/local/local-conf.yaml start-from-init --masterkey mx6EEKX3woSRgetlAf11A0+coZ3Hzw==
