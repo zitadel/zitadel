@@ -7,18 +7,12 @@ import (
 )
 
 type SystemDefaults struct {
-	Domain             string
-	ZitadelDocs        ZitadelDocs
+	Domain             string //TODO: remove with v2
 	SecretGenerators   SecretGenerators
 	Multifactors       MultifactorConfig
 	DomainVerification DomainVerification
 	Notifications      Notifications
 	KeyConfig          KeyConfig
-}
-
-type ZitadelDocs struct {
-	Issuer            string
-	DiscoveryEndpoint string
 }
 
 type SecretGenerators struct {
