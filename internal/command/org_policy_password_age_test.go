@@ -60,7 +60,7 @@ func TestCommandSide_AddPasswordAgePolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordAgePolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								365,
 								10,
 							),
@@ -90,7 +90,7 @@ func TestCommandSide_AddPasswordAgePolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewPasswordAgePolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									10,
 									365,
 								),
@@ -203,7 +203,7 @@ func TestCommandSide_ChangePasswordAgePolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordAgePolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								365,
 							),
@@ -231,7 +231,7 @@ func TestCommandSide_ChangePasswordAgePolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordAgePolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								365,
 							),
@@ -341,7 +341,7 @@ func TestCommandSide_RemovePasswordAgePolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordAgePolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								365,
 							),
@@ -351,7 +351,7 @@ func TestCommandSide_RemovePasswordAgePolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewPasswordAgePolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -389,7 +389,7 @@ func TestCommandSide_RemovePasswordAgePolicy(t *testing.T) {
 
 func newPasswordAgePolicyChangedEvent(ctx context.Context, orgID string, maxAgeDays, expireWarnDays uint64) *org.PasswordAgePolicyChangedEvent {
 	event, _ := org.NewPasswordAgePolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.PasswordAgePolicyChanges{
 			policy.ChangeMaxAgeDays(maxAgeDays),
 			policy.ChangeExpireWarnDays(expireWarnDays),

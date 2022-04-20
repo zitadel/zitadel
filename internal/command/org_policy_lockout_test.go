@@ -60,7 +60,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -90,7 +90,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLockoutPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									10,
 									true,
 								),
@@ -203,7 +203,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -231,7 +231,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -341,7 +341,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -351,7 +351,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLockoutPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -386,7 +386,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 
 func newPasswordLockoutPolicyChangedEvent(ctx context.Context, orgID string, maxAttempts uint64, showLockoutFailure bool) *org.LockoutPolicyChangedEvent {
 	event, _ := org.NewLockoutPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.LockoutPolicyChanges{
 			policy.ChangeMaxAttempts(maxAttempts),
 			policy.ChangeShowLockOutFailures(showLockoutFailure),

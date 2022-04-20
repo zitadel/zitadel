@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	crypto_db "github.com/caos/zitadel/internal/crypto/database"
 	"github.com/caos/zitadel/internal/eventstore"
+	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
 type DefaultInstance struct {
@@ -39,7 +40,19 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		return err
 	}
 
-	cmd := command.NewCommandV2(mig.es, mig.defaults, userAlg, mig.zitadelRoles)
+	cmd, err := command.StartCommands(mig.es,
+		mig.defaults,
+		mig.zitadelRoles,
+		nil,
+		nil,
+		webauthn_helper.Config{},
+		nil,
+		nil,
+		nil,
+		nil,
+		userAlg,
+		nil,
+		nil)
 
 	ctx = authz.WithRequestedDomain(ctx, mig.domain)
 	_, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup)

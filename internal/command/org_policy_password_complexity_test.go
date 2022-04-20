@@ -63,7 +63,7 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
 							),
@@ -96,7 +96,7 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									8,
 									true, true, true, true,
 								),
@@ -221,7 +221,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
 							),
@@ -252,7 +252,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
 							),
@@ -368,7 +368,7 @@ func TestCommandSide_RemovePasswordComplexityPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								8,
 								true, true, true, true,
 							),
@@ -378,7 +378,7 @@ func TestCommandSide_RemovePasswordComplexityPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewPasswordComplexityPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -416,7 +416,7 @@ func TestCommandSide_RemovePasswordComplexityPolicy(t *testing.T) {
 
 func newPasswordComplexityPolicyChangedEvent(ctx context.Context, orgID string, minLength uint64, hasUpper, hasLower, hasNumber, hasSymbol bool) *org.PasswordComplexityPolicyChangedEvent {
 	event, _ := org.NewPasswordComplexityPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.PasswordComplexityPolicyChanges{
 			policy.ChangeMinLength(minLength),
 			policy.ChangeHasUppercase(hasUpper),

@@ -1150,7 +1150,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								false,
 								false,
 								false,
@@ -1185,7 +1185,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								false,
 								false,
@@ -1221,7 +1221,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								false,
 								false,
@@ -1273,7 +1273,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								false,
 								false,
@@ -1359,7 +1359,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								false,
 								false,
@@ -1452,7 +1452,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								false,
 								false,

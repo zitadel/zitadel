@@ -149,7 +149,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
@@ -210,28 +210,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
@@ -333,7 +333,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
@@ -394,49 +394,49 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test2",
 							),
 						),
@@ -491,10 +491,10 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test1", true),
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "test1", true),
 							),
 							eventFromEventPusher(
-								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test2", false),
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "test2", false),
 							),
 							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
@@ -543,7 +543,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
@@ -604,56 +604,56 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test2",
 							),
 						),
@@ -708,13 +708,13 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "org1.iam-domain"),
+								org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.iam-domain"),
 							),
 							eventFromEventPusher(
-								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test1", true),
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "test1", true),
 							),
 							eventFromEventPusher(
-								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test2", false),
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "test2", false),
 							),
 							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
@@ -763,7 +763,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
@@ -824,63 +824,63 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test2",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainRemovedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain", true,
 							),
 						),
@@ -935,16 +935,16 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "org1.iam-domain"),
+								org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.iam-domain"),
 							),
 							eventFromEventPusher(
-								org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "org1.iam-domain"),
+								org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org1.iam-domain"),
 							),
 							eventFromEventPusher(
-								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test1", true),
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "test1", true),
 							),
 							eventFromEventPusher(
-								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, "test2", false),
+								org.NewDomainRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "test2", false),
 							),
 							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
@@ -994,7 +994,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
@@ -1070,7 +1070,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							instance.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &instance.NewAggregate("INSTANCE").Aggregate, domain.MultiFactorTypeU2FWithPIN),
 						),
 						eventFromEventPusher(
-							org.NewLoginPolicySecondFactorAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.SecondFactorTypeOTP),
+							org.NewLoginPolicySecondFactorAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, domain.SecondFactorTypeOTP),
 						),
 					),
 					//addSecondFactorToLoginPolicy
@@ -1151,28 +1151,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
@@ -1216,7 +1216,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								5,
 								false,
 							),
@@ -1227,13 +1227,13 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewLoginPolicySecondFactorRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.SecondFactorTypeOTP),
+								org.NewLoginPolicySecondFactorRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, domain.SecondFactorTypeOTP),
 							),
 							eventFromEventPusher(
-								org.NewLoginPolicySecondFactorAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.SecondFactorTypeU2F),
+								org.NewLoginPolicySecondFactorAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, domain.SecondFactorTypeU2F),
 							),
 							eventFromEventPusher(
-								org.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.MultiFactorTypeU2FWithPIN),
+								org.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, domain.MultiFactorTypeU2FWithPIN),
 							),
 							eventFromEventPusher(
 								newLoginPolicyChangedEvent(context.Background(), "org1",
@@ -1245,22 +1245,22 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 									nil),
 							),
 							eventFromEventPusher(
-								org.NewPasswordComplexityPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+								org.NewPasswordComplexityPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate),
 							),
 							eventFromEventPusher(
-								org.NewLabelPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+								org.NewLabelPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate),
 							),
 							eventFromEventPusher(
-								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.InitCodeMessageType, language.English),
+								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, domain.InitCodeMessageType, language.English),
 							),
 							eventFromEventPusher(
-								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, language.English),
+								org.NewCustomTextTemplateRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, domain.LoginCustomText, language.English),
 							),
 							eventFromEventPusher(
-								org.NewPrivacyPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+								org.NewPrivacyPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate),
 							),
 							eventFromEventPusher(
-								org.NewLockoutPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+								org.NewLockoutPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate),
 							),
 							eventFromEventPusher(
 								newFeaturesSetEvent(context.Background(), "org1", "Test", domain.FeaturesStateActive, time.Hour),
@@ -1308,7 +1308,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
@@ -1369,28 +1369,28 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
@@ -1634,28 +1634,28 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org1.iam-domain",
 							),
 						),
@@ -1710,7 +1710,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewFeaturesRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
+								org.NewFeaturesRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -1764,7 +1764,7 @@ func newIAMFeaturesSetEvent(ctx context.Context, tierName string, state domain.F
 func newFeaturesSetEvent(ctx context.Context, orgID string, tierName string, state domain.FeaturesState, auditLog time.Duration) *org.FeaturesSetEvent {
 	event, _ := org.NewFeaturesSetEvent(
 		ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]features.FeaturesChanges{
 			features.ChangeTierName(tierName),
 			features.ChangeState(state),

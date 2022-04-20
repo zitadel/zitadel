@@ -17,13 +17,13 @@ type Aggregate struct {
 	eventstore.Aggregate
 }
 
-func NewAggregate(id, resourceOwner string) *Aggregate {
+func NewAggregate(id string) *Aggregate {
 	return &Aggregate{
 		Aggregate: eventstore.Aggregate{
 			Type:          AggregateType,
 			Version:       AggregateVersion,
 			ID:            id,
-			ResourceOwner: resourceOwner,
+			ResourceOwner: id,
 		},
 	}
 }

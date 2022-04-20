@@ -66,7 +66,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -180,7 +180,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"#ffffff",
 									"#ffffff",
 									"#ffffff",
@@ -324,7 +324,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -389,7 +389,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -454,7 +454,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -623,7 +623,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -642,7 +642,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyActivatedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -727,7 +727,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -746,7 +746,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -852,7 +852,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -894,7 +894,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -913,7 +913,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"logo",
 								),
 							),
@@ -1022,7 +1022,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1038,7 +1038,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyLogoAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -1047,7 +1047,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -1162,7 +1162,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1204,7 +1204,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1223,7 +1223,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"icon",
 								),
 							),
@@ -1330,7 +1330,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1346,7 +1346,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyIconAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -1355,7 +1355,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -1469,7 +1469,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1511,7 +1511,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1530,7 +1530,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"logo",
 								),
 							),
@@ -1639,7 +1639,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1655,7 +1655,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -1664,7 +1664,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -1779,7 +1779,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1821,7 +1821,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1840,7 +1840,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"icon",
 								),
 							),
@@ -1945,7 +1945,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1961,7 +1961,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -1970,7 +1970,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -2076,7 +2076,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -2118,7 +2118,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -2137,7 +2137,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyFontAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"font",
 								),
 							),
@@ -2242,7 +2242,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -2258,7 +2258,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyFontAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -2267,7 +2267,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyFontRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -2308,7 +2308,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 
 func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool) *org.LabelPolicyChangedEvent {
 	event, _ := org.NewLabelPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.LabelPolicyChanges{
 			policy.ChangePrimaryColor(primaryColor),
 			policy.ChangeBackgroundColor(backgroundColor),

@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -13,8 +16,6 @@ import (
 	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
@@ -85,9 +86,9 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
-				smsCrypto:   tt.fields.alg,
+				eventstore:    tt.fields.eventstore,
+				idGenerator:   tt.fields.idGenerator,
+				smsEncryption: tt.fields.alg,
 			}
 			_, got, err := r.AddSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.sms)
 			if tt.res.err == nil {

@@ -18,8 +18,8 @@ func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*que
 			removeEvent := c.removeInstanceMember(ctx, &iamAgg.Aggregate, membership.UserID, true)
 			events = append(events, removeEvent)
 		} else if membership.Org != nil {
-			iamAgg := org.NewAggregate(membership.Org.OrgID, membership.ResourceOwner)
-			removeEvent := c.removeOrgMember(ctx, &iamAgg.Aggregate, membership.UserID, true)
+			orgAgg := org.NewAggregate(membership.Org.OrgID)
+			removeEvent := c.removeOrgMember(ctx, &orgAgg.Aggregate, membership.UserID, true)
 			events = append(events, removeEvent)
 		} else if membership.Project != nil {
 			projectAgg := project.NewAggregate(membership.Project.ProjectID, membership.ResourceOwner)

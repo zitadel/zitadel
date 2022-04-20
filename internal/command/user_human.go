@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -11,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/repository/user"
-	"golang.org/x/text/language"
 )
 
 func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (*domain.Human, error) {
@@ -54,24 +55,24 @@ type AddHuman struct {
 }
 
 func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
-	return c.v2.AddHuman(ctx, resourceOwner, human)
+	return c.AddHumanCommand(ctx, resourceOwner, human)
 }
 
-func (c *commandNew) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
+func (c *Commands) AddHumanCommand(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
 	if resourceOwner == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
-	userID, err := c.id.Next()
+	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, addHumanCommand(agg, human, c.userPasswordAlg, c.phoneAlg, c.emailAlg, c.initCodeAlg))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddHumanCommand(agg, human, c.userPasswordAlg, c.smsEncryption, c.smtpEncryption, c.userEncryption))
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.es.Push(ctx, cmds...)
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +93,7 @@ type humanCreationCommand interface {
 	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
 }
 
-func addHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, phoneAlg, emailAlg, initCodeAlg crypto.EncryptionAlgorithm) preparation.Validation {
+func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, phoneAlg, emailAlg, initCodeAlg crypto.EncryptionAlgorithm) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if !human.Email.Valid() {
 			return nil, errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument")

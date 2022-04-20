@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *commandNew) AddOrgMember(a *org.Aggregate, userID string, roles ...string) preparation.Validation {
+func (c *Commands) AddOrgMemberCommand(a *org.Aggregate, userID string, roles ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if userID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
@@ -26,7 +26,7 @@ func (c *commandNew) AddOrgMember(a *org.Aggregate, userID string, roles ...stri
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 				if exists, err := ExistsUser(ctx, filter, userID, a.ID); err != nil || !exists {
-					return nil, errors.ThrowNotFound(err, "ORG-GoXOn", "Errors.User.NotFound")
+					return nil, errors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsOrgMember(ctx, filter, a.ID, userID); err != nil || isMember {
 					return nil, errors.ThrowAlreadyExists(err, "ORG-poWwe", "Errors.Org.Member.AlreadyExists")
@@ -73,25 +73,18 @@ func IsOrgMember(ctx context.Context, filter preparation.FilterToQueryReducer, o
 	return isMember, nil
 }
 
-func (c *Commands) AddOrgMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	if member.UserID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-u8fkf", "Errors.Org.MemberInvalid")
-	}
-	addedMember := NewOrgMemberWriteModel(member.AggregateID, member.UserID)
-	orgAgg := OrgAggregateFromWriteModel(&addedMember.WriteModel)
-	err := c.checkUserExists(ctx, addedMember.UserID, "")
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "Org-2H8ds", "Errors.User.NotFound")
-	}
-	event, err := c.addOrgMember(ctx, orgAgg, addedMember, member)
+func (c *Commands) AddOrgMember(ctx context.Context, userID, orgID string, roles ...string) (*domain.Member, error) {
+	orgAgg := org.NewAggregate(orgID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddOrgMemberCommand(orgAgg, userID, roles...))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedMember, pushedEvents...)
+	addedMember := NewOrgMemberWriteModel(orgID, userID)
+	err = AppendAndReduce(addedMember, events...)
 	if err != nil {
 		return nil, err
 	}

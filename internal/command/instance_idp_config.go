@@ -37,7 +37,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 		),
 	}
 	if config.OIDCConfig != nil {
-		clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
+		clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigEncryption)
 		if err != nil {
 			return nil, err
 		}

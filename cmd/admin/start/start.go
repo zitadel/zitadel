@@ -117,7 +117,7 @@ func startZitadel(config *Config, masterKey string) error {
 		Origin:      http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure),
 		DisplayName: "ZITADEL",
 	}
-	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, webAuthNConfig, keys.IDPConfig, keys.OTP, keys.SMTP, keys.SMS, keys.User, keys.DomainVerification, keys.OIDC)
+	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ.RolePermissionMappings, storage, authZRepo, webAuthNConfig, keys.IDPConfig, keys.OTP, keys.SMTP, keys.SMS, keys.User, keys.DomainVerification, keys.OIDC)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}

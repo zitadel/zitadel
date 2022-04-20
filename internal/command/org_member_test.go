@@ -30,7 +30,7 @@ func TestAddMember(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	agg := org.NewAggregate("test", "test")
+	agg := org.NewAggregate("test")
 
 	tests := []struct {
 		name string
@@ -85,7 +85,7 @@ func TestAddMember(t *testing.T) {
 					}).Filter(),
 			},
 			want: Want{
-				CreateErr: errors.ThrowNotFound(nil, "ORG-GoXOn", "Errors.User.NotFound"),
+				CreateErr: errors.ThrowPreconditionFailed(nil, "ORG-GoXOn", "Errors.User.NotFound"),
 			},
 		},
 		{
@@ -116,7 +116,7 @@ func TestAddMember(t *testing.T) {
 						return []eventstore.Event{
 							org.NewMemberAddedEvent(
 								ctx,
-								&org.NewAggregate("id", "ro").Aggregate,
+								&org.NewAggregate("id").Aggregate,
 								"userID",
 							),
 						}, nil
@@ -165,7 +165,7 @@ func TestAddMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, (&commandNew{zitadelRoles: tt.args.zitadelRoles}).AddOrgMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
+			AssertValidation(t, (&Commands{zitadelRoles: tt.args.zitadelRoles}).AddOrgMemberCommand(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
 		})
 	}
 }
@@ -201,7 +201,7 @@ func TestIsMember(t *testing.T) {
 					return []eventstore.Event{
 						org.NewMemberAddedEvent(
 							context.Background(),
-							&org.NewAggregate("orgID", "ro").Aggregate,
+							&org.NewAggregate("orgID").Aggregate,
 							"userID",
 						),
 					}, nil
@@ -219,12 +219,12 @@ func TestIsMember(t *testing.T) {
 					return []eventstore.Event{
 						org.NewMemberAddedEvent(
 							context.Background(),
-							&org.NewAggregate("orgID", "ro").Aggregate,
+							&org.NewAggregate("orgID").Aggregate,
 							"userID",
 						),
 						org.NewMemberRemovedEvent(
 							context.Background(),
-							&org.NewAggregate("orgID", "ro").Aggregate,
+							&org.NewAggregate("orgID").Aggregate,
 							"userID",
 						),
 					}, nil
@@ -242,12 +242,12 @@ func TestIsMember(t *testing.T) {
 					return []eventstore.Event{
 						org.NewMemberAddedEvent(
 							context.Background(),
-							&org.NewAggregate("orgID", "ro").Aggregate,
+							&org.NewAggregate("orgID").Aggregate,
 							"userID",
 						),
 						org.NewMemberCascadeRemovedEvent(
 							context.Background(),
-							&org.NewAggregate("orgID", "ro").Aggregate,
+							&org.NewAggregate("orgID").Aggregate,
 							"userID",
 						),
 					}, nil
@@ -292,7 +292,9 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		member *domain.Member
+		userID string
+		orgID  string
+		roles  []string
 	}
 	type res struct {
 		want *domain.Member
@@ -312,12 +314,25 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-				},
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "invalid roles, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				roles:  []string{"ORG_OWNER"},
 			},
 			res: res{
 				err: errors.IsErrorInvalidArgument,
@@ -330,56 +345,20 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 					t,
 					expectFilter(),
 				),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: domain.RoleOrgOwner,
+					},
+				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{domain.RoleOrgOwner},
-				},
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				roles:  []string{domain.RoleOrgOwner},
 			},
 			res: res{
 				err: errors.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "invalid roles, error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{"ORG_OWNER"},
-				},
-			},
-			res: res{
-				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -406,7 +385,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"user1",
 							),
 						),
@@ -419,14 +398,10 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{"ORG_OWNER"},
-				},
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				roles:  []string{"ORG_OWNER"},
 			},
 			res: res{
 				err: errors.IsErrorAlreadyExists,
@@ -457,7 +432,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 					expectPushFailed(errors.ThrowAlreadyExists(nil, "ERROR", "internal"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"user1",
 								[]string{"ORG_OWNER"}...,
 							)),
@@ -472,14 +447,10 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{"ORG_OWNER"},
-				},
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				roles:  []string{"ORG_OWNER"},
 			},
 			res: res{
 				err: errors.IsErrorAlreadyExists,
@@ -510,7 +481,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"user1",
 								[]string{"ORG_OWNER"}...,
 							)),
@@ -525,14 +496,10 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					UserID: "user1",
-					Roles:  []string{"ORG_OWNER"},
-				},
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+				roles:  []string{"ORG_OWNER"},
 			},
 			res: res{
 				want: &domain.Member{
@@ -552,7 +519,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddOrgMember(tt.args.ctx, tt.args.member)
+			got, err := r.AddOrgMember(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.roles...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -660,7 +627,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"user1",
 								[]string{"ORG_OWNER"}...,
 							),
@@ -695,7 +662,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"user1",
 								[]string{"ORG_OWNER"}...,
 							),
@@ -704,7 +671,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewMemberChangedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"user1",
 								[]string{"ORG_OWNER", "ORG_OWNER_VIEWER"}...,
 							)),

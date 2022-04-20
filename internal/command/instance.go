@@ -158,13 +158,13 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	return nil
 }
 
-func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
 	instanceID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 
-	if err = c.es.NewInstance(ctx, instanceID); err != nil {
+	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
 		return nil, err
 	}
 
@@ -189,7 +189,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	setup.Org.Human.PasswordChangeRequired = true
 
 	instanceAgg := instance.NewAggregate(instanceID)
-	orgAgg := org.NewAggregate(orgID, orgID)
+	orgAgg := org.NewAggregate(orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.Zitadel.projectID, orgID)
 
@@ -312,9 +312,9 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
-		addHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.phoneAlg, c.emailAlg, c.initCodeAlg),
-		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
-		c.AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
+		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.smsEncryption, c.smtpEncryption, c.userEncryption),
+		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
+		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
 
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
@@ -359,12 +359,12 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.Zitadel.consoleAppID),
 	)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter, validations...)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.es.Push(ctx, cmds...)
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

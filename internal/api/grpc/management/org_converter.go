@@ -66,10 +66,6 @@ func SetPrimaryOrgDomainRequestToDomain(ctx context.Context, req *mgmt_pb.SetPri
 	}
 }
 
-func AddOrgMemberRequestToDomain(ctx context.Context, req *mgmt_pb.AddOrgMemberRequest) *domain.Member {
-	return domain.NewMember(authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
-}
-
 func UpdateOrgMemberRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateOrgMemberRequest) *domain.Member {
 	return domain.NewMember(authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
 }
