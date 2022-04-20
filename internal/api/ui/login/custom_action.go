@@ -3,10 +3,10 @@ package login
 import (
 	"context"
 
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/oidc/v2/pkg/oidc"
 
 	"github.com/caos/zitadel/internal/actions"
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )

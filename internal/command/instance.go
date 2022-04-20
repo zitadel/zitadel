@@ -291,7 +291,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 	}
 
 	if setup.CustomDomain != "" {
-		validations = append(validations, c.addInstanceDomain(instanceAgg, setup.CustomDomain, false))
+		validations = append(validations, addInstanceDomain(instanceAgg, setup.CustomDomain, false))
 	}
 
 	console := &addOIDCApp{

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caos/oidc/pkg/client/rp"
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/v2/pkg/client/rp"
+	"github.com/caos/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/oidc/v2/pkg/op"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/zitadel/internal/api/authz"

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/oidc/v2/pkg/op"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"

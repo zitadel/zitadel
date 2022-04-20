@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/oidc/v2/pkg/op"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 

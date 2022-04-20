@@ -13,8 +13,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/op"
-	"github.com/caos/zitadel/internal/api/grpc/system"
+	"github.com/caos/oidc/v2/pkg/op"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,6 +28,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/admin"
 	"github.com/caos/zitadel/internal/api/grpc/auth"
 	"github.com/caos/zitadel/internal/api/grpc/management"
+	"github.com/caos/zitadel/internal/api/grpc/system"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/oidc"
