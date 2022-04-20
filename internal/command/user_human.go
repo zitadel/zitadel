@@ -55,10 +55,6 @@ type AddHuman struct {
 }
 
 func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
-	return c.AddHumanCommand(ctx, resourceOwner, human)
-}
-
-func (c *Commands) AddHumanCommand(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
 	if resourceOwner == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}

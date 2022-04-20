@@ -31,8 +31,6 @@ func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.Secr
 	}, nil
 }
 
-//AddOrg defines the commands to create a new org,
-// this includes the verified default domain
 func addSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if !typ.Valid() {
