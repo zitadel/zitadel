@@ -143,7 +143,7 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 				return fmt.Errorf("no signature algorithm provided but required")
 			}
 
-			err = sp.verifyRedirectSignature(
+			err = sp.validateRedirectSignature(
 				attrQueryRequest,
 				"",
 				sigAlg,

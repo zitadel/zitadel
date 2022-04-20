@@ -88,6 +88,10 @@ func (sp *ServiceProvider) validatePostSignature(authRequest string) error {
 		return err
 	}
 
+	if doc.Root() == nil {
+		return fmt.Errorf("error while parsing request")
+	}
+
 	certs, err := getSigningCertsFromMetadata(sp.metadata)
 	if err != nil {
 		return err

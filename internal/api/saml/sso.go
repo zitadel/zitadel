@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
 	"reflect"
-	"regexp"
+	"strconv"
 )
 
 type AuthRequestForm struct {
@@ -188,20 +188,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	// work out used acs url and protocolbinding for response
 	checker.WithValueStep(
 		func() {
-			for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
-				if acs.Binding == authNRequest.ProtocolBinding {
-					response.AcsUrl = acs.Location
-					response.ProtocolBinding = acs.Binding
-					break
-				}
-			}
-			if response.AcsUrl == "" {
-				for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
-					response.AcsUrl = acs.Location
-					response.ProtocolBinding = acs.Binding
-					break
-				}
-			}
+			response.AcsUrl, response.ProtocolBinding = getAcsUrlAndBindingForResponse(sp, authNRequest.ProtocolBinding)
 		},
 	)
 
@@ -304,22 +291,6 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 	return request, nil
 }
 
-func authNRequestIntoStringWithoutSignature(message string) (string, error) {
-	reqBytes, err := base64.StdEncoding.DecodeString(message)
-	if err != nil {
-		return "", fmt.Errorf("failed to base64 decode: %w", err)
-	}
-
-	regexSignValue := regexp.MustCompile(`(<)(.?)(.?)(:?)(SignatureValue)(.|\n|\t|\r|\f)*(</)(.?)(.?)(:?)(SignatureValue>)`)
-	authRequestWithoutSignValue := regexSignValue.ReplaceAll(reqBytes, []byte(""))
-
-	regexKeyInfo := regexp.MustCompile(`(<)(.?)(.?)(:?)(KeyInfo)(.|\n|\t|\r|\f)*(</)(.?)(.?)(:?)(KeyInfo>)`)
-	authRequest := regexKeyInfo.ReplaceAll(authRequestWithoutSignValue, []byte(""))
-
-	return base64.StdEncoding.EncodeToString(authRequest), nil
-
-}
-
 func certificateCheckNecessary(
 	authRequestSignatureF func() *xml_dsig.SignatureType,
 	spMetadataF func() *md.EntityDescriptorType,
@@ -328,6 +299,7 @@ func certificateCheckNecessary(
 		sig := authRequestSignatureF()
 		spMetadata := spMetadataF()
 		return sig != nil && sig.KeyInfo != nil &&
+			spMetadata != nil && spMetadata.SPSSODescriptor != nil &&
 			spMetadata.SPSSODescriptor.KeyDescriptor != nil && len(spMetadata.SPSSODescriptor.KeyDescriptor) > 0
 	}
 }
@@ -337,16 +309,25 @@ func checkCertificate(
 	spMetadataF func() *md.EntityDescriptorType,
 ) func() error {
 	return func() error {
-		for _, keyDesc := range spMetadataF().SPSSODescriptor.KeyDescriptor {
+		metadata := spMetadataF()
+		request := authRequestSignatureF()
+		if metadata == nil || metadata.SPSSODescriptor == nil || metadata.SPSSODescriptor.KeyDescriptor == nil || len(metadata.SPSSODescriptor.KeyDescriptor) == 0 {
+			return fmt.Errorf("no certifcate known from this service provider")
+		}
+		if request == nil || request.KeyInfo == nil || request.KeyInfo.X509Data == nil || len(request.KeyInfo.X509Data) == 0 {
+			return fmt.Errorf("no certifcate provided in request")
+		}
+
+		for _, keyDesc := range metadata.SPSSODescriptor.KeyDescriptor {
 			for _, spX509Data := range keyDesc.KeyInfo.X509Data {
-				for _, reqX509Data := range authRequestSignatureF().KeyInfo.X509Data {
+				for _, reqX509Data := range request.KeyInfo.X509Data {
 					if spX509Data.X509Certificate == reqX509Data.X509Certificate {
 						return nil
 					}
 				}
-
 			}
 		}
+
 		return fmt.Errorf("unknown certificate used to sign request")
 	}
 }
@@ -360,13 +341,11 @@ func signatureRedirectVerificationNecessary(
 	return func() bool {
 		spMeta := spMetadataF()
 		idpMeta := idpMetadataF()
-		sig := signatureF()
-		binding := protocolBinding()
 
-		return (spMeta.SPSSODescriptor.AuthnRequestsSigned == "true" ||
-			idpMeta.WantAuthnRequestsSigned == "true" ||
-			sig != "") &&
-			binding == RedirectBinding
+		return ((spMeta == nil || spMeta.SPSSODescriptor == nil || spMeta.SPSSODescriptor.AuthnRequestsSigned == "true") ||
+			(idpMeta == nil || idpMeta.WantAuthnRequestsSigned == "true") ||
+			signatureF() != "") &&
+			protocolBinding() == RedirectBinding
 	}
 }
 
@@ -393,6 +372,10 @@ func verifyRedirectSignature(
 		}
 
 		spInstance := sp()
+		if sp == nil {
+			return fmt.Errorf("no service provider instance provided but required")
+		}
+
 		err := spInstance.validateRedirectSignature(
 			authRequest(),
 			relayState(),
@@ -414,14 +397,13 @@ func signaturePostVerificationNecessary(
 		authRequestSignature := authRequestSignatureF()
 		spMeta := spMetadataF()
 		idpMeta := idpMetadataF()
-		binding := protocolBinding()
 
-		return (spMeta.SPSSODescriptor.AuthnRequestsSigned == "true" ||
-			idpMeta.WantAuthnRequestsSigned == "true" ||
+		return ((spMeta == nil || spMeta.SPSSODescriptor == nil || spMeta.SPSSODescriptor.AuthnRequestsSigned == "true") ||
+			(idpMeta == nil || idpMeta.WantAuthnRequestsSigned == "true") ||
 			(authRequestSignature != nil &&
 				!reflect.DeepEqual(authRequestSignature.SignatureValue, xml_dsig.SignatureValueType{}) &&
 				authRequestSignature.SignatureValue.Text != "")) &&
-			binding == PostBinding
+			protocolBinding() == PostBinding
 	}
 }
 
@@ -445,4 +427,44 @@ func verifyPostSignature(
 		}
 		return nil
 	}
+}
+
+func getAcsUrlAndBindingForResponse(
+	sp *ServiceProvider,
+	requestProtocolBinding string,
+) (string, string) {
+	acsUrl := ""
+	protocolBinding := ""
+
+	for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+		if acs.Binding == requestProtocolBinding {
+			acsUrl = acs.Location
+			protocolBinding = acs.Binding
+			break
+		}
+	}
+	if acsUrl == "" {
+		isDefaultFound := false
+		for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+			if acs.IsDefault == "true" {
+				isDefaultFound = true
+				acsUrl = acs.Location
+				protocolBinding = acs.Binding
+				break
+			}
+		}
+		if !isDefaultFound {
+			index := 0
+			for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+				i, _ := strconv.Atoi(acs.Index)
+				if index == 0 || i < index {
+					acsUrl = acs.Location
+					protocolBinding = acs.Binding
+					index = i
+				}
+			}
+		}
+	}
+
+	return acsUrl, protocolBinding
 }
