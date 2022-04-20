@@ -696,7 +696,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				smsEncryption:   tt.fields.phoneAlg,
 			}
-			got, err := r.AddHumanCommand(tt.args.ctx, tt.args.orgID, tt.args.human)
+			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
