@@ -22,6 +22,11 @@ const (
 	locksTable = "projections.locks"
 	signingKey = "signing_key"
 	oidcUser   = "OIDC"
+
+	retryBackoff   = 500 * time.Millisecond
+	retryCount     = 3
+	lockDuration   = retryCount * retryBackoff * 5
+	gracefulPeriod = 10 * time.Minute
 )
 
 //SigningKey wraps the query.PrivateKey to implement the op.SigningKey interface
@@ -107,7 +112,7 @@ func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err erro
 }
 
 func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
-	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(o.signingKeyGracefulPeriod))
+	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(gracefulPeriod))
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +168,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	errs := o.locker.Lock(ctx, o.signingKeyRotationCheck*2, authz.GetInstance(ctx).InstanceID())
+	errs := o.locker.Lock(ctx, lockDuration, authz.GetInstance(ctx).InstanceID())
 	err, ok := <-errs
 	if err != nil || !ok {
 		if errors.IsErrorAlreadyExists(err) {
@@ -195,8 +200,8 @@ func setOIDCCtx(ctx context.Context) context.Context {
 }
 
 func retry(retryable func() error) (err error) {
-	for i := 0; i < 3; i++ {
-		time.Sleep(500 * time.Millisecond)
+	for i := 0; i < retryCount; i++ {
+		time.Sleep(retryBackoff)
 		err = retryable()
 		if err == nil {
 			return nil

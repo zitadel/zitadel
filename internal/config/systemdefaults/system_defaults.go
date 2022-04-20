@@ -56,9 +56,7 @@ type Endpoints struct {
 }
 
 type KeyConfig struct {
-	Size                     int
-	PrivateKeyLifetime       time.Duration
-	PublicKeyLifetime        time.Duration
-	SigningKeyRotationCheck  time.Duration
-	SigningKeyGracefulPeriod time.Duration
+	Size               int
+	PrivateKeyLifetime time.Duration
+	PublicKeyLifetime  time.Duration
 }

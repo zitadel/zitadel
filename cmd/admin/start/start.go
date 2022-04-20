@@ -49,10 +49,6 @@ import (
 	"github.com/caos/zitadel/openapi"
 )
 
-const (
-	flagMasterKey = "masterkey"
-)
-
 func New() *cobra.Command {
 	start := &cobra.Command{
 		Use:   "start",
@@ -78,7 +74,6 @@ Requirements:
 
 func startZitadel(config *Config, masterKey string) error {
 	ctx := context.Background()
-	keyChan := make(chan interface{})
 
 	dbClient, err := database.Connect(config.Database)
 	if err != nil {
@@ -99,7 +94,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, keys.OIDC, keyChan, config.InternalAuthZ.RolePermissionMappings)
+	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, keys.OIDC, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
@@ -125,14 +120,14 @@ func startZitadel(config *Config, masterKey string) error {
 	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo, keys)
+	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -172,7 +167,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return err
 	}
 
-	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, config.SystemDefaults.KeyConfig, keys.OIDC, keys.OIDCKey, eventstore, dbClient, keyChan, userAgentInterceptor, instanceInterceptor.Handler)
+	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}

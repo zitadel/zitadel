@@ -40,10 +40,9 @@ const (
 type KeyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
-	keyChan             chan<- interface{}
 }
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, keyChan chan<- interface{}) *KeyProjection {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) *KeyProjection {
 	p := new(KeyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
@@ -79,7 +78,6 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	p.keyChan = keyChan
 	p.encryptionAlgorithm = keyEncryptionAlgorithm
 
 	return p
