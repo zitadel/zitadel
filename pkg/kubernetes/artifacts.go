@@ -400,26 +400,12 @@ spec:
           metadata:
             type: object
           spec:
-            properties:
-              apiVersion:
-                description: Don't access X_ApiVersion, it is only exported for (de-)serialization.
-                  Use Version and OverwriteVersion methods instead.
-                type: string
-              kind:
-                type: string
-              spec:
-                type: object
-                x-kubernetes-preserve-unknown-fields: true
-              version:
-                description: Don't access X_Version, it is only exported for (de-)serialization.
-                  Use Version and OverwriteVersion methods instead.
-                type: string
-            required:
-            - kind
-            - spec
             type: object
+            x-kubernetes-preserve-unknown-fields: true
           status:
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true
@@ -428,7 +414,8 @@ status:
     kind: ""
     plural: ""
   conditions: []
-  storedVersions: []`
+  storedVersions: []
+`
 
 		crdDefinition := &unstructured.Unstructured{}
 		if err := yaml.Unmarshal([]byte(crd), &crdDefinition.Object); err != nil {
