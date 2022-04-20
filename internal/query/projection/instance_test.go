@@ -20,7 +20,37 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		args   args
 		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
-	}{
+	}{{
+		name: "reduceInstanceAdded",
+		args: args{
+			event: getEvent(testEvent(
+				repository.EventType(instance.InstanceAddedEventType),
+				instance.AggregateType,
+				[]byte(`{"name": "Name"}`),
+			), instance.InstanceAddedEventMapper),
+		},
+		reduce: (&InstanceProjection{}).reduceInstanceAdded,
+		want: wantReduce{
+			projection:       InstanceProjectionTable,
+			aggregateType:    eventstore.AggregateType("instance"),
+			sequence:         15,
+			previousSequence: 10,
+			executer: &testExecuter{
+				executions: []execution{
+					{
+						expectedStmt: "INSERT INTO projections.instances (id, creation_date, change_date, sequence, name) VALUES ($1, $2, $3, $4, $5)",
+						expectedArgs: []interface{}{
+							"instance-id",
+							anyArg{},
+							anyArg{},
+							uint64(15),
+							"Name",
+						},
+					},
+				},
+			},
+		},
+	},
 		{
 			name: "reduceGlobalOrgSet",
 			args: args{

@@ -28,10 +28,22 @@ const (
 	consolePostLogoutPath = console.HandlerPrefix + "/signedout"
 )
 
+type AddInstance struct {
+	InstanceName   string
+	CustomDomain   string
+	FirstOrgName   string
+	OwnerEmail     string
+	OwnerUsername  string
+	OwnerFirstName string
+	OwnerLastName  string
+}
+
 type InstanceSetup struct {
-	Org      OrgSetup
-	Zitadel  ZitadelConfig
-	Features struct {
+	InstanceName string
+	CustomDomain string
+	Org          OrgSetup
+	Zitadel      ZitadelConfig
+	Features     struct {
 		TierName                 string
 		TierDescription          string
 		Retention                time.Duration
@@ -158,6 +170,32 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	return nil
 }
 
+func (c *commandNew) AddInstance(ctx context.Context, add *AddInstance, defaultValues *InstanceSetup) (*domain.ObjectDetails, error) {
+	if add.InstanceName != "" {
+		defaultValues.InstanceName = add.InstanceName
+		defaultValues.Org.Name = add.InstanceName
+	}
+	if add.CustomDomain != "" {
+		defaultValues.CustomDomain = add.CustomDomain
+	}
+	if add.FirstOrgName != "" {
+		defaultValues.Org.Name = add.FirstOrgName
+	}
+	if add.OwnerEmail != "" {
+		defaultValues.Org.Human.Email.Address = add.OwnerEmail
+	}
+	if add.OwnerUsername != "" {
+		defaultValues.Org.Human.Username = add.OwnerUsername
+	}
+	if add.OwnerFirstName != "" {
+		defaultValues.Org.Human.FirstName = add.OwnerFirstName
+	}
+	if add.OwnerLastName != "" {
+		defaultValues.Org.Human.LastName = add.OwnerLastName
+	}
+	return c.SetUpInstance(ctx, defaultValues)
+}
+
 func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
 	instanceID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -194,6 +232,7 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 	projectAgg := project.NewAggregate(setup.Zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
+		addInstance(instanceAgg, setup.InstanceName),
 		SetDefaultFeatures(
 			instanceAgg,
 			setup.Features.TierName,
@@ -289,6 +328,10 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
 	}
 
+	//if setup.CustomDomain != "" {
+	//	validations = append(validations, c.addInstanceDomain())
+	//}
+
 	console := &addOIDCApp{
 		AddApp: AddApp{
 			Aggregate: *projectAgg,
@@ -373,6 +416,16 @@ func (c *commandNew) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
 	}, nil
+}
+
+func addInstance(a *instance.Aggregate, instanceName string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				instance.NewInstanceAddedEvent(ctx, &a.Aggregate, instanceName),
+			}, nil
+		}, nil
+	}
 }
 
 //SetIAMProject defines the command to set the id of the IAM project onto the instance

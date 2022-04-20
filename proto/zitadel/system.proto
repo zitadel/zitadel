@@ -324,9 +324,8 @@ message AddInstanceRequest {
     string owner_last_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string owner_email = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string owner_username = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string password = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    uint64 request_limit = 9;
-    uint64 action_mins_limit = 10;
+    uint64 request_limit = 8;
+    uint64 action_mins_limit = 9;
 }
 
 message AddInstanceResponse {

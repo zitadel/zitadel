@@ -80,31 +80,32 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			if domainWriteModel.State == domain.InstanceDomainStateActive {
 				return nil, errors.ThrowAlreadyExists(nil, "INST-i2nl", "Errors.Instance.Domain.AlreadyExists")
 			}
+			events := []eventstore.Command{
+				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
+			}
 			appWriteModel, err := c.getOIDCAppWriteModel(ctx, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID(), "")
 			if err != nil {
 				return nil, err
 			}
-			if appWriteModel.State == domain.AppStateUnspecified || appWriteModel.State == domain.AppStateRemoved {
-				return nil, errors.ThrowPreconditionFailed(nil, "INST-39nls", "Errors.Project.App.NotExisting")
+			if appWriteModel.State.Exists() {
+				redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
+				logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
+				consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(
+					ctx,
+					ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
+					appWriteModel.AppID,
+					[]project.OIDCConfigChanges{
+						project.ChangeRedirectURIs(redirectUrls),
+						project.ChangePostLogoutRedirectURIs(logoutUrls),
+					},
+				)
+				if err != nil {
+					return nil, err
+				}
+				events = append(events, consoleChangeEvent)
 			}
-			redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
-			logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
-			consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(
-				ctx,
-				ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
-				appWriteModel.AppID,
-				[]project.OIDCConfigChanges{
-					project.ChangeRedirectURIs(redirectUrls),
-					project.ChangePostLogoutRedirectURIs(logoutUrls),
-				},
-			)
-			if err != nil {
-				return nil, err
-			}
-			return []eventstore.Command{
-				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
-				consoleChangeEvent,
-			}, nil
+
+			return events, nil
 		}, nil
 	}
 }

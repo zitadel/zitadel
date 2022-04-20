@@ -13,9 +13,10 @@ import (
 const (
 	InstanceProjectionTable = "projections.instances"
 
-	InstanceColumnID         = "id"
-	InstanceColumnChangeDate = "change_date"
-	//InstanceColumnCreationDate    = "creation_date"
+	InstanceColumnID              = "id"
+	InstanceColumnName            = "name"
+	InstanceColumnChangeDate      = "change_date"
+	InstanceColumnCreationDate    = "creation_date"
 	InstanceColumnGlobalOrgID     = "global_org_id"
 	InstanceColumnProjectID       = "iam_project_id"
 	InstanceColumnConsoleID       = "console_client_id"
@@ -38,7 +39,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
-			//crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
@@ -60,7 +61,10 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 		{
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
-				//TODO: Add create instance reduce
+				{
+					Event:  instance.InstanceAddedEventType,
+					Reduce: p.reduceInstanceAdded,
+				},
 				{
 					Event:  instance.GlobalOrgSetEventType,
 					Reduce: p.reduceGlobalOrgSet,
@@ -88,6 +92,23 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 	}
+}
+
+func (p *InstanceProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.InstanceAddedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-29nlS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
+	}
+	return crdb.NewCreateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
+			handler.NewCol(InstanceColumnCreationDate, e.CreationDate()),
+			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
+			handler.NewCol(InstanceColumnSequence, e.Sequence()),
+			handler.NewCol(InstanceColumnName, e.Name),
+		},
+	), nil
 }
 
 func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
