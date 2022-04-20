@@ -24,6 +24,7 @@ const (
 	Step19
 	Step20
 	Step21
+	Step22
 	//StepCount marks the the length of possible steps (StepCount-1 == last possible step)
 	StepCount
 )

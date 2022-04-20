@@ -15,8 +15,6 @@ func GetTemplateData(translator *i18n.Translator, translateArgs map[string]inter
 		PrimaryColor:    templates.DefaultPrimaryColor,
 		BackgroundColor: templates.DefaultBackgroundColor,
 		FontColor:       templates.DefaultFontColor,
-		LogoURL:         templates.DefaultLogo,
-		FontURL:         templates.DefaultFont,
 		FontFamily:      templates.DefaultFontFamily,
 		IncludeFooter:   false,
 	}
@@ -33,14 +31,14 @@ func GetTemplateData(translator *i18n.Translator, translateArgs map[string]inter
 	if apiDomain == "" {
 		return templateData
 	}
-	templateData.LogoURL = ""
 	if policy.Light.LogoURL != "" {
 		templateData.LogoURL = fmt.Sprintf("%s/assets/v1/%s/%s", apiDomain, policy.ID, policy.Light.LogoURL)
 	}
 	if policy.FontURL != "" {
 		split := strings.Split(policy.FontURL, "/")
-		templateData.FontFamily = split[len(split)-1] + "," + templates.DefaultFontFamily
+		templateData.FontFaceFamily = split[len(split)-1]
 		templateData.FontURL = fmt.Sprintf("%s/assets/v1/%s/%s", apiDomain, policy.ID, policy.FontURL)
+		templateData.FontFamily = templateData.FontFaceFamily + "," + templates.DefaultFontFamily
 	}
 	return templateData
 }
