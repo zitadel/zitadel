@@ -99,7 +99,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeJWT,
@@ -109,7 +109,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"jwt-endpoint",
 								"issuer",
@@ -119,7 +119,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPConfigRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name",
 							),
@@ -146,7 +146,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeJWT,
@@ -156,7 +156,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"jwt-endpoint",
 								"issuer",
@@ -191,7 +191,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeJWT,
@@ -201,7 +201,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"jwt-endpoint",
 								"issuer",
@@ -256,8 +256,8 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idpConfigSecretCrypto: tt.fields.secretCrypto,
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := r.ChangeIDPJWTConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -275,7 +275,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 
 func newIDPJWTConfigChangedEvent(ctx context.Context, orgID, configID, jwtEndpoint, issuer, keysEndpoint, headerName string) *org.IDPJWTConfigChangedEvent {
 	event, _ := org.NewIDPJWTConfigChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		configID,
 		[]idpconfig.JWTConfigChanges{
 			idpconfig.ChangeJWTEndpoint(jwtEndpoint),

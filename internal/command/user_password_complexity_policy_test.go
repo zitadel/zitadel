@@ -51,7 +51,7 @@ func Test_customPasswordComplexityPolicy(t *testing.T) {
 					return []eventstore.Event{
 						org.NewPasswordComplexityPolicyAddedEvent(
 							context.Background(),
-							&org.NewAggregate("id", "ro").Aggregate,
+							&org.NewAggregate("id").Aggregate,
 							8,
 							true,
 							true,
@@ -64,7 +64,7 @@ func Test_customPasswordComplexityPolicy(t *testing.T) {
 			want: &PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
-					ResourceOwner: "ro",
+					ResourceOwner: "id",
 					Events:        []eventstore.Event{},
 				},
 				MinLength:    8,
@@ -195,7 +195,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 					return []eventstore.Event{
 						org.NewPasswordComplexityPolicyAddedEvent(
 							context.Background(),
-							&org.NewAggregate("id", "ro").Aggregate,
+							&org.NewAggregate("id").Aggregate,
 							8,
 							true,
 							true,
@@ -208,7 +208,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 			want: &PasswordComplexityPolicyWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
-					ResourceOwner: "ro",
+					ResourceOwner: "id",
 					Events:        []eventstore.Event{},
 				},
 				MinLength:    8,

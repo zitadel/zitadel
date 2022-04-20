@@ -27,7 +27,7 @@ func TestAddOrg(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	agg := org.NewAggregate("test", "test")
+	agg := org.NewAggregate("test")
 
 	tests := []struct {
 		name string
@@ -178,23 +178,23 @@ func TestCommandSide_AddOrg(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"Org")),
 							eventFromEventPusher(org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain")),
 							eventFromEventPusher(org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain")),
 							eventFromEventPusher(org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain")),
 							eventFromEventPusher(org.NewMemberAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"user1", domain.RoleOrgOwner)),
 						},
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("Org")),
@@ -247,23 +247,23 @@ func TestCommandSide_AddOrg(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"Org")),
 							eventFromEventPusher(org.NewDomainAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain")),
 							eventFromEventPusher(org.NewDomainVerifiedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain")),
 							eventFromEventPusher(org.NewDomainPrimarySetEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain")),
 							eventFromEventPusher(org.NewMemberAddedEvent(
 								context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"user1", domain.RoleOrgOwner)),
 						},
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("Org")),
@@ -315,22 +315,22 @@ func TestCommandSide_AddOrg(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"Org",
 							)),
 							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate, "org.iam-domain",
+								&org.NewAggregate("org2").Aggregate, "org.iam-domain",
 							)),
 							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain",
 							)),
 							eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"org.iam-domain",
 							)),
 							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"user1",
 								domain.RoleOrgOwner,
 							)),
@@ -450,7 +450,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 					),
@@ -459,7 +459,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
+								&org.NewAggregate("org1").Aggregate, "org", "neworg")),
 						},
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("neworg")),
@@ -484,37 +484,37 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org.zitadel.ch"),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org.zitadel.ch"),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
+								&org.NewAggregate("org1").Aggregate, "org", "neworg")),
 							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+								&org.NewAggregate("org1").Aggregate, "neworg.zitadel.ch")),
 							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+								&org.NewAggregate("org1").Aggregate, "neworg.zitadel.ch")),
 							eventFromEventPusher(org.NewDomainRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "org.zitadel.ch", true)),
+								&org.NewAggregate("org1").Aggregate, "org.zitadel.ch", true)),
 						},
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("neworg")),
@@ -539,44 +539,44 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org.zitadel.ch"),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org.zitadel.ch"),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org.zitadel.ch"),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgChangedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "org", "neworg")),
+								&org.NewAggregate("org1").Aggregate, "org", "neworg")),
 							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+								&org.NewAggregate("org1").Aggregate, "neworg.zitadel.ch")),
 							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+								&org.NewAggregate("org1").Aggregate, "neworg.zitadel.ch")),
 							eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "neworg.zitadel.ch")),
+								&org.NewAggregate("org1").Aggregate, "neworg.zitadel.ch")),
 							eventFromEventPusher(org.NewDomainRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate, "org.zitadel.ch", true)),
+								&org.NewAggregate("org1").Aggregate, "org.zitadel.ch", true)),
 						},
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
 						uniqueConstraintsFromEventConstraint(org.NewAddOrgNameUniqueConstraint("neworg")),
@@ -654,12 +654,12 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 						eventFromEventPusher(
 							org.NewOrgDeactivatedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate),
+								&org.NewAggregate("org1").Aggregate),
 						),
 					),
 				),
@@ -680,7 +680,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 					),
@@ -688,7 +688,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgDeactivatedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate)),
+								&org.NewAggregate("org1").Aggregate)),
 						},
 					),
 				),
@@ -709,14 +709,14 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgDeactivatedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 							)),
 						},
 					),
@@ -789,7 +789,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 					),
@@ -811,12 +811,12 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 						eventFromEventPusher(
 							org.NewOrgDeactivatedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 							),
 						),
 					),
@@ -824,7 +824,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgReactivatedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 							)),
 						},
 					),
@@ -846,18 +846,18 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"org"),
 						),
 						eventFromEventPusher(
 							org.NewOrgDeactivatedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate),
+								&org.NewAggregate("org1").Aggregate),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewOrgReactivatedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate)),
+								&org.NewAggregate("org1").Aggregate)),
 						},
 					),
 				),

@@ -30,36 +30,25 @@ type Commands struct {
 	iamDomain    string
 	zitadelRoles []authz.RoleMapping
 
-	idpConfigSecretCrypto crypto.EncryptionAlgorithm
-	smtpPasswordCrypto    crypto.EncryptionAlgorithm
-	smsCrypto             crypto.EncryptionAlgorithm
-
+	idpConfigEncryption         crypto.EncryptionAlgorithm
+	smtpEncryption              crypto.EncryptionAlgorithm
+	smsEncryption               crypto.EncryptionAlgorithm
+	userEncryption              crypto.EncryptionAlgorithm
 	userPasswordAlg             crypto.HashAlgorithm
 	machineKeySize              int
 	applicationKeySize          int
 	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
-	multifactors                domain.MultifactorConfigs
 
+	multifactors       domain.MultifactorConfigs
 	webauthn           *webauthn_helper.WebAuthN
 	keySize            int
 	keyAlgorithm       crypto.EncryptionAlgorithm
 	privateKeyLifetime time.Duration
 	publicKeyLifetime  time.Duration
-	tokenVerifier      orgFeatureChecker
 
-	v2 *commandNew
-}
-
-type commandNew struct {
-	es              *eventstore.Eventstore
-	userPasswordAlg crypto.HashAlgorithm
-	phoneAlg        crypto.EncryptionAlgorithm
-	emailAlg        crypto.EncryptionAlgorithm
-	initCodeAlg     crypto.EncryptionAlgorithm
-	zitadelRoles    []authz.RoleMapping
-	id              id.Generator
+	tokenVerifier orgFeatureChecker
 }
 
 type orgFeatureChecker interface {
@@ -68,7 +57,7 @@ type orgFeatureChecker interface {
 
 func StartCommands(es *eventstore.Eventstore,
 	defaults sd.SystemDefaults,
-	authZConfig authz.Config,
+	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
 	webAuthN webauthn_helper.Config,
@@ -85,16 +74,16 @@ func StartCommands(es *eventstore.Eventstore,
 		static:                staticStore,
 		idGenerator:           id.SonyFlakeGenerator,
 		iamDomain:             defaults.Domain,
-		zitadelRoles:          authZConfig.RolePermissionMappings,
+		zitadelRoles:          zitadelRoles,
 		keySize:               defaults.KeyConfig.Size,
 		privateKeyLifetime:    defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:     defaults.KeyConfig.PublicKeyLifetime,
-		idpConfigSecretCrypto: idpConfigEncryption,
-		smtpPasswordCrypto:    smtpEncryption,
-		smsCrypto:             smsEncryption,
+		idpConfigEncryption:   idpConfigEncryption,
+		smtpEncryption:        smtpEncryption,
+		smsEncryption:         smsEncryption,
+		userEncryption:        userEncryption,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
-		v2:                    NewCommandV2(es, defaults, userEncryption, authZConfig.RolePermissionMappings),
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)
@@ -126,31 +115,6 @@ func StartCommands(es *eventstore.Eventstore,
 
 	repo.tokenVerifier = authZRepo
 	return repo, nil
-}
-
-func NewCommandV2(
-	es *eventstore.Eventstore,
-	defaults sd.SystemDefaults,
-	userAlg crypto.EncryptionAlgorithm,
-	zitadelRoles []authz.RoleMapping,
-) *commandNew {
-	instance_repo.RegisterEventMappers(es)
-	org.RegisterEventMappers(es)
-	usr_repo.RegisterEventMappers(es)
-	usr_grant_repo.RegisterEventMappers(es)
-	proj_repo.RegisterEventMappers(es)
-	keypair.RegisterEventMappers(es)
-	action.RegisterEventMappers(es)
-
-	return &commandNew{
-		es:              es,
-		userPasswordAlg: crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost),
-		initCodeAlg:     userAlg,
-		phoneAlg:        userAlg,
-		emailAlg:        userAlg,
-		zitadelRoles:    zitadelRoles,
-		id:              id.SonyFlakeGenerator,
-	}
 }
 
 func AppendAndReduce(object interface {

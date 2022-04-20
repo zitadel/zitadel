@@ -31,7 +31,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 		config.AuthorizationEndpoint,
 		config.TokenEndpoint,
 		config.ClientSecretString,
-		c.idpConfigSecretCrypto,
+		c.idpConfigEncryption,
 		config.IDPDisplayNameMapping,
 		config.UsernameMapping,
 		config.Scopes...)

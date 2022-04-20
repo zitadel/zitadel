@@ -2,57 +2,44 @@ package admin
 
 import (
 	"github.com/caos/logging"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/domain"
-	admin_grpc "github.com/caos/zitadel/pkg/grpc/admin"
 	"golang.org/x/text/language"
+
+	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/command"
+	admin_grpc "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
-func setUpOrgHumanToDomain(human *admin_grpc.SetUpOrgRequest_Human) *domain.Human {
-	return &domain.Human{
-		Username: human.UserName,
-		Profile:  setUpOrgHumanProfileToDomain(human.Profile),
-		Email:    setUpOrgHumanEmailToDomain(human.Email),
-		Phone:    setUpOrgHumanPhoneToDomain(human.Phone),
-		Password: setUpOrgHumanPasswordToDomain(human.Password),
-	}
-}
-
-func setUpOrgHumanProfileToDomain(profile *admin_grpc.SetUpOrgRequest_Human_Profile) *domain.Profile {
+func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) command.AddHuman {
 	var lang language.Tag
-	lang, err := language.Parse(profile.PreferredLanguage)
-	logging.Log("ADMIN-tiMWs").OnError(err).Debug("unable to parse language")
-
-	return &domain.Profile{
-		FirstName:         profile.FirstName,
-		LastName:          profile.LastName,
-		NickName:          profile.NickName,
-		DisplayName:       profile.DisplayName,
-		PreferredLanguage: lang,
-		Gender:            user_grpc.GenderToDomain(profile.Gender),
+	lang, err := language.Parse(human.Profile.PreferredLanguage)
+	logging.OnError(err).Debug("unable to parse language")
+	return command.AddHuman{
+		Username:      human.UserName,
+		FirstName:     human.Profile.FirstName,
+		LastName:      human.Profile.LastName,
+		NickName:      human.Profile.NickName,
+		DisplayName:   human.Profile.DisplayName,
+		PreferredLang: lang,
+		Gender:        user_grpc.GenderToDomain(human.Profile.Gender),
+		Email:         setUpOrgHumanEmailToDomain(human.Email),
+		Phone:         setUpOrgHumanPhoneToDomain(human.Phone),
+		Password:      human.Password,
 	}
 }
 
-func setUpOrgHumanEmailToDomain(email *admin_grpc.SetUpOrgRequest_Human_Email) *domain.Email {
-	return &domain.Email{
-		EmailAddress:    email.Email,
-		IsEmailVerified: email.IsEmailVerified,
+func setUpOrgHumanEmailToDomain(email *admin_grpc.SetUpOrgRequest_Human_Email) command.Email {
+	return command.Email{
+		Address:  email.Email,
+		Verified: email.IsEmailVerified,
 	}
 }
 
-func setUpOrgHumanPhoneToDomain(phone *admin_grpc.SetUpOrgRequest_Human_Phone) *domain.Phone {
+func setUpOrgHumanPhoneToDomain(phone *admin_grpc.SetUpOrgRequest_Human_Phone) command.Phone {
 	if phone == nil {
-		return nil
+		return command.Phone{}
 	}
-	return &domain.Phone{
-		PhoneNumber:     phone.Phone,
-		IsPhoneVerified: phone.IsPhoneVerified,
+	return command.Phone{
+		Number:   phone.Phone,
+		Verified: phone.IsPhoneVerified,
 	}
-}
-
-func setUpOrgHumanPasswordToDomain(password string) *domain.Password {
-	if password == "" {
-		return nil
-	}
-	return domain.NewPassword(password)
 }

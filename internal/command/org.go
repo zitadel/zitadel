@@ -21,7 +21,7 @@ type OrgSetup struct {
 	Human AddHuman
 }
 
-func (c *commandNew) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDetails, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDetails, error) {
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -32,19 +32,19 @@ func (c *commandNew) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectD
 		return nil, err
 	}
 
-	orgAgg := org.NewAggregate(orgID, orgID)
+	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.es.Filter,
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
 		AddOrgCommand(ctx, orgAgg, o.Name),
-		addHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.phoneAlg, c.emailAlg, c.initCodeAlg),
-		c.AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
+		AddHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.smsEncryption, c.smtpEncryption, c.userEncryption),
+		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.es.Push(ctx, cmds...)
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,31 +94,6 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Org.NotFound")
 	}
 	return nil
-}
-
-func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, initCodeGenerator, phoneCodeGenerator crypto.Generator, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
-	domainPolicy, err := c.getDefaultDomainPolicy(ctx)
-	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Instance.DomainPolicy.NotFound")
-	}
-	pwPolicy, err := c.getDefaultPasswordComplexityPolicy(ctx)
-	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Instance.PasswordComplexity.NotFound")
-	}
-	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, domainPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, claimedUserIDs, selfregistered)
-	if err != nil {
-		return nil, err
-	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(orgWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
 func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {

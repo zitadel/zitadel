@@ -59,7 +59,7 @@ func TestCommandSide_AddMailTemplate(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMailTemplateAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								[]byte("template"),
 							),
 						),
@@ -87,7 +87,7 @@ func TestCommandSide_AddMailTemplate(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewMailTemplateAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									[]byte("template"),
 								),
 							),
@@ -195,7 +195,7 @@ func TestCommandSide_ChangeMailTemplate(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMailTemplateAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								[]byte("template"),
 							),
 						),
@@ -221,7 +221,7 @@ func TestCommandSide_ChangeMailTemplate(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMailTemplateAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								[]byte("template"),
 							),
 						),
@@ -328,7 +328,7 @@ func TestCommandSide_RemoveMailTemplate(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewMailTemplateAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								[]byte("template"),
 							),
 						),
@@ -337,7 +337,7 @@ func TestCommandSide_RemoveMailTemplate(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewMailTemplateRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -372,7 +372,7 @@ func TestCommandSide_RemoveMailTemplate(t *testing.T) {
 
 func newMailTemplateChangedEvent(ctx context.Context, orgID string, template string) *org.MailTemplateChangedEvent {
 	event, _ := org.NewMailTemplateChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.MailTemplateChanges{
 			policy.ChangeTemplate([]byte(template)),
 		},
