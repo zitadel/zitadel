@@ -97,7 +97,6 @@ Login:
     SharedMaxAge: 168h #7d
 
 Console:
-  ConsoleOverwriteDir: ""
   ShortCache:
     MaxAge: 5m
     SharedMaxAge: 15m
