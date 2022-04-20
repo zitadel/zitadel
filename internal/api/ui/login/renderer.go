@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html/template"
@@ -9,10 +10,9 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/gorilla/csrf"
-	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -36,7 +36,7 @@ type LanguageData struct {
 	Lang string
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string, defaultLanguage language.Tag) *Renderer {
+func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string) *Renderer {
 	r := &Renderer{
 		pathPrefix:    pathPrefix,
 		staticStorage: staticStorage,
@@ -219,7 +219,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	r.Renderer, err = renderer.NewRenderer(
 		staticDir,
 		tmplMapping, funcs,
-		i18n.TranslatorConfig{DefaultLanguage: defaultLanguage, CookieName: cookieName},
+		cookieName,
 	)
 	logging.New().OnError(err).WithError(err).Panic("error creating renderer")
 	return r
@@ -317,7 +317,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplError], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
 func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
@@ -337,7 +337,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
-		Lang:                   l.renderer.ReqLang(l.getTranslator(authReq), r).String(),
+		Lang:                   l.renderer.ReqLang(l.getTranslator(r.Context(), authReq), r).String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
@@ -371,8 +371,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 	return baseData
 }
 
-func (l *Login) getTranslator(authReq *domain.AuthRequest) *i18n.Translator {
-	translator, _ := l.renderer.NewTranslator()
+func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
+	translator, _ := l.renderer.NewTranslator(ctx)
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
 		l.addLoginTranslations(translator, authReq.OrgTranslations)
@@ -420,7 +420,7 @@ func (l *Login) setLinksOnBaseData(baseData baseData, privacyPolicy *domain.Priv
 func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
 	caosErr := new(caos_errs.CaosError)
 	if errors.As(err, &caosErr) {
-		localized := l.renderer.LocalizeFromRequest(l.getTranslator(nil), r, caosErr.Message, nil)
+		localized := l.renderer.LocalizeFromRequest(l.getTranslator(r.Context(), nil), r, caosErr.Message, nil)
 		return caosErr.ID, localized
 
 	}

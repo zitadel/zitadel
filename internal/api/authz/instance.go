@@ -2,6 +2,8 @@ package authz
 
 import (
 	"context"
+
+	"golang.org/x/text/language"
 )
 
 var (
@@ -14,6 +16,7 @@ type Instance interface {
 	ConsoleClientID() string
 	ConsoleApplicationID() string
 	RequestedDomain() string
+	DefaultLanguage() language.Tag
 }
 
 type InstanceVerifier interface {
@@ -43,6 +46,10 @@ func (i *instance) ConsoleApplicationID() string {
 
 func (i *instance) RequestedDomain() string {
 	return i.Domain
+}
+
+func (i *instance) DefaultLanguage() language.Tag {
+	return language.Und
 }
 
 func GetInstance(ctx context.Context) Instance {

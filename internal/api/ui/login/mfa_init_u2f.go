@@ -36,7 +36,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 		},
 		MFAType: domain.MFATypeU2F,
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplMFAU2FInit], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplMFAU2FInit], data, nil)
 }
 
 func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {

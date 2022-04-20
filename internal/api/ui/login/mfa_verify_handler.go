@@ -74,7 +74,7 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplMFAVerify], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplMFAVerify], data, nil)
 }
 
 func removeSelectedProviderFromList(providers []domain.MFAType, selected domain.MFAType) []domain.MFAType {

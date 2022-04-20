@@ -192,7 +192,7 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, nil)
 }
 

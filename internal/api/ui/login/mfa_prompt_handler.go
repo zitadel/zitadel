@@ -74,7 +74,7 @@ func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq 
 		l.handleMFACreation(w, r, authReq, data)
 		return
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFAPrompt], data, nil)
 }
 

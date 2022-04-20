@@ -3,9 +3,9 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	text_grpc "github.com/caos/zitadel/internal/api/grpc/text"
 	"github.com/caos/zitadel/internal/domain"
@@ -13,7 +13,7 @@ import (
 )
 
 func (s *Server) GetDefaultInitMessageText(ctx context.Context, req *admin_pb.GetDefaultInitMessageTextRequest) (*admin_pb.GetDefaultInitMessageTextResponse, error) {
-	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.InitCodeMessageType, req.Language)
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.InitCodeMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *Server) ResetCustomInitMessageTextToDefault(ctx context.Context, req *a
 }
 
 func (s *Server) GetDefaultPasswordResetMessageText(ctx context.Context, req *admin_pb.GetDefaultPasswordResetMessageTextRequest) (*admin_pb.GetDefaultPasswordResetMessageTextResponse, error) {
-	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.PasswordResetMessageType, req.Language)
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.PasswordResetMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (s *Server) ResetCustomPasswordResetMessageTextToDefault(ctx context.Contex
 }
 
 func (s *Server) GetDefaultVerifyEmailMessageText(ctx context.Context, req *admin_pb.GetDefaultVerifyEmailMessageTextRequest) (*admin_pb.GetDefaultVerifyEmailMessageTextResponse, error) {
-	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.VerifyEmailMessageType, req.Language)
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.VerifyEmailMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (s *Server) ResetCustomVerifyEmailMessageTextToDefault(ctx context.Context,
 }
 
 func (s *Server) GetDefaultVerifyPhoneMessageText(ctx context.Context, req *admin_pb.GetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.GetDefaultVerifyPhoneMessageTextResponse, error) {
-	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.VerifyPhoneMessageType, req.Language)
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (s *Server) ResetCustomVerifyPhoneMessageTextToDefault(ctx context.Context,
 }
 
 func (s *Server) GetDefaultDomainClaimedMessageText(ctx context.Context, req *admin_pb.GetDefaultDomainClaimedMessageTextRequest) (*admin_pb.GetDefaultDomainClaimedMessageTextResponse, error) {
-	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.DomainClaimedMessageType, req.Language)
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Contex
 }
 
 func (s *Server) GetDefaultPasswordlessRegistrationMessageText(ctx context.Context, req *admin_pb.GetDefaultPasswordlessRegistrationMessageTextRequest) (*admin_pb.GetDefaultPasswordlessRegistrationMessageTextResponse, error) {
-	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.PasswordlessRegistrationMessageType, req.Language)
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.PasswordlessRegistrationMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}

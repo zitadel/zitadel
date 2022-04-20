@@ -507,7 +507,7 @@ func (n *Notification) getLogProvider(ctx context.Context) (*log.LogConfig, erro
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(ctx context.Context, orgID, textType string) (*i18n.Translator, error) {
-	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.queries.GetDefaultLanguage(ctx)})
+	translator, err := i18n.NewTranslator(n.statikDir, n.queries.GetDefaultLanguage(ctx), "")
 	if err != nil {
 		return nil, err
 	}

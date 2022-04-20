@@ -43,7 +43,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 		},
 		passwordSet,
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplPasswordlessVerification], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplPasswordlessVerification], data, nil)
 }
 
 func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Request) {

@@ -113,7 +113,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		data.IamDomain = l.iamDomain
 	}
 
-	translator := l.getTranslator(authRequest)
+	translator := l.getTranslator(r.Context(), authRequest)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
 }
 

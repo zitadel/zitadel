@@ -79,7 +79,7 @@ func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, auth
 		}
 	}
 
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFAInitVerify], data, nil)
 }
 

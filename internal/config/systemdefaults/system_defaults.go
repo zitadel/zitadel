@@ -3,13 +3,10 @@ package systemdefaults
 import (
 	"time"
 
-	"golang.org/x/text/language"
-
 	"github.com/caos/zitadel/internal/crypto"
 )
 
 type SystemDefaults struct {
-	DefaultLanguage    language.Tag
 	Domain             string
 	ZitadelDocs        ZitadelDocs
 	SecretGenerators   SecretGenerators

@@ -131,7 +131,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 }
 
 func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	contents, err := q.readLoginTranslationFile(lang)
+	contents, err := q.readLoginTranslationFile(ctx, lang)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang str
 }
 
 func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	contents, err := q.readLoginTranslationFile(lang)
+	contents, err := q.readLoginTranslationFile(ctx, lang)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.Custo
 	return loginText, nil
 }
 
-func (q *Queries) readLoginTranslationFile(lang string) ([]byte, error) {
+func (q *Queries) readLoginTranslationFile(ctx context.Context, lang string) ([]byte, error) {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
 	contents, ok := q.LoginTranslationFileContents[lang]
@@ -194,7 +194,7 @@ func (q *Queries) readLoginTranslationFile(lang string) ([]byte, error) {
 	if !ok {
 		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
 		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.GetDefaultLanguage(context.Background()).String()))
+			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
 		}
 		if err != nil {
 			return nil, err

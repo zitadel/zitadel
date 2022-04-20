@@ -48,7 +48,7 @@ func translatorFromNamespace(namespace string, defaultLanguage language.Tag) *i1
 	dir, err := fs.NewWithNamespace(namespace)
 	logging.LogWithFields("ERROR-7usEW", "namespace", namespace).OnError(err).Panic("unable to get namespace")
 
-	translator, err := i18n.NewTranslator(dir, i18n.TranslatorConfig{DefaultLanguage: defaultLanguage})
+	translator, err := i18n.NewTranslator(dir, defaultLanguage, "")
 	logging.Log("ERROR-Sk8sf").OnError(err).Panic("unable to get i18n translator")
 
 	return translator

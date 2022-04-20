@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
+
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -110,13 +111,13 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		requestedPlatformType,
 		disabled,
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID)
 		logging.Log("HANDL-XjWKE").OnError(err).Error("unable to get active label policy")
 		data.LabelPolicy = labelPolicyToDomain(policy)
 
-		translator, err = l.renderer.NewTranslator()
+		translator, err = l.renderer.NewTranslator(r.Context())
 		if err == nil {
 			texts, err := l.authRepo.GetLoginText(r.Context(), orgID)
 			logging.Log("LOGIN-HJK4t").OnError(err).Warn("could not get custom texts")
@@ -194,5 +195,5 @@ func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *htt
 		userData:       l.getUserData(r, authReq, "Passwordless Registration Done", errID, errMessage),
 		HideNextButton: authReq == nil,
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplPasswordlessRegistrationDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplPasswordlessRegistrationDone], data, nil)
 }
