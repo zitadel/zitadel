@@ -3,6 +3,7 @@ package types
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/ui/login"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -26,7 +27,8 @@ func SendPasswordlessRegistrationLink(ctx context.Context, mailhtml string, tran
 	if err != nil {
 		return err
 	}
-	url := domain.PasswordlessInitCodeLink(systemDefaults.Notifications.Endpoints.PasswordlessRegistration, user.ID, user.ResourceOwner, code.ID, codeString)
+	var origin string //TODO: build / retrieve origin
+	url := domain.PasswordlessInitCodeLink(origin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, user.ID, user.ResourceOwner, code.ID, codeString)
 	var args = mapNotifyUserToArgs(user)
 
 	emailCodeData := &PasswordlessRegistrationLinkData{
@@ -38,5 +40,5 @@ func SendPasswordlessRegistrationLink(ctx context.Context, mailhtml string, tran
 	if err != nil {
 		return err
 	}
-	return generateEmail(ctx, user, emailCodeData.Subject, template, systemDefaults.Notifications, smtpConfig, getFileSystemProvider, getLogProvider, true)
+	return generateEmail(ctx, user, emailCodeData.Subject, template, smtpConfig, getFileSystemProvider, getLogProvider, true)
 }

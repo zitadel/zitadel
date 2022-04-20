@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -39,6 +40,10 @@ type initUserData struct {
 	HasLowercase              string
 	HasNumber                 string
 	HasSymbol                 string
+}
+
+func InitUserLink(origin, userID, code string, passwordSet bool) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s&passwordset=%t", externalLink(origin), EndpointInitUser, userID, code, passwordSet)
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {

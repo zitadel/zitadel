@@ -41,6 +41,7 @@ type Notification struct {
 	handler
 	command            *command.Commands
 	systemDefaults     sd.SystemDefaults
+	fileSystemPath     string
 	statikDir          http.FileSystem
 	subscription       *v1.Subscription
 	assetsPrefix       string
@@ -190,7 +191,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
+	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -228,7 +229,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
+	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.getSMTPConfig, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -267,7 +268,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
+	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -294,7 +295,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(ctx, translator, user, phoneCode, n.systemDefaults, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto)
+	err = types.SendPhoneVerificationCode(ctx, translator, user, phoneCode, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto)
 	if err != nil {
 		return err
 	}
@@ -334,7 +335,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, colors, n.assetsPrefix)
+	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -492,6 +493,7 @@ func (n *Notification) getFileSystemProvider(ctx context.Context) (*fs.FSConfig,
 	}
 	return &fs.FSConfig{
 		Compact: config.Compact,
+		Path:    n.fileSystemPath,
 	}, nil
 }
 

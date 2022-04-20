@@ -34,16 +34,7 @@ type DomainVerification struct {
 }
 
 type Notifications struct {
-	Endpoints      Endpoints
 	FileSystemPath string
-}
-
-type Endpoints struct {
-	InitCode                 string
-	PasswordReset            string
-	VerifyEmail              string
-	DomainClaimed            string
-	PasswordlessRegistration string
 }
 
 type KeyConfig struct {

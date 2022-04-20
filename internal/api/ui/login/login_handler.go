@@ -17,6 +17,14 @@ type loginData struct {
 	Register  bool   `schema:"register"`
 }
 
+func LoginLink(origin string) string {
+	return externalLink(origin) + EndpointLogin
+}
+
+func externalLink(origin string) string {
+	return origin + HandlerPrefix
+}
+
 func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequest(r)
 	if err != nil {

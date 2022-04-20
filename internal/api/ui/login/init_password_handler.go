@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -36,6 +37,10 @@ type initPasswordData struct {
 	HasLowercase              string
 	HasNumber                 string
 	HasSymbol                 string
+}
+
+func InitPasswordLink(origin, userID, code string) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s", externalLink(origin), EndpointInitPassword, userID, code)
 }
 
 func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {

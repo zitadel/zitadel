@@ -9,6 +9,8 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/caos/zitadel/internal/api/ui/login"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/authn"
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
@@ -259,8 +261,9 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 		),
 	}
 	if code != nil {
+		var origin string //TODO: build / retrieve origin
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
-			Link:       code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+			Link:       code.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 			Lifetime:   durationpb.New(code.Expiration),
 			Expiration: durationpb.New(code.Expiration),
 		}
@@ -654,9 +657,10 @@ func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.A
 	if err != nil {
 		return nil, err
 	}
+	var origin string //TODO: build / retrieve origin
 	return &mgmt_pb.AddPasswordlessRegistrationResponse{
 		Details:    obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }

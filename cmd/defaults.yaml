@@ -155,12 +155,6 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
   Notifications:
-    Endpoints:
-      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}'
-      PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
-      VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
-      DomainClaimed: '$ZITADEL_ACCOUNTS/login'
-      PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init'
     FileSystemPath: '.notifications/'
   KeyConfig:
     Size: 2048
