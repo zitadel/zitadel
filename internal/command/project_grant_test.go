@@ -2,6 +2,10 @@ package command
 
 import (
 	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,8 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/repository/usergrant"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCommandSide_AddProjectGrant(t *testing.T) {
@@ -123,7 +125,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								&org.NewAggregate("grantedorg1").Aggregate,
 								"granted org",
 							),
 						),
@@ -160,7 +162,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								&org.NewAggregate("grantedorg1").Aggregate,
 								"granted org",
 							),
 						),
@@ -389,7 +391,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								&org.NewAggregate("grantedorg1").Aggregate,
 								"granted org",
 							),
 						),
@@ -435,7 +437,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								&org.NewAggregate("grantedorg1").Aggregate,
 								"granted org",
 							),
 						),
@@ -489,7 +491,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								&org.NewAggregate("grantedorg1").Aggregate,
 								"granted org",
 							),
 						),
@@ -569,7 +571,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								&org.NewAggregate("grantedorg1").Aggregate,
 								"granted org",
 							),
 						),
@@ -651,7 +653,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("grantedorg1", "grantedorg1").Aggregate,
+								&org.NewAggregate("grantedorg1").Aggregate,
 								"granted org",
 							),
 						),

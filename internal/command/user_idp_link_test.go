@@ -159,7 +159,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
@@ -209,7 +209,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,

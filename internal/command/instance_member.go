@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -13,7 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *commandNew) AddInstanceMember(a *instance.Aggregate, userID string, roles ...string) preparation.Validation {
+func (c *Commands) AddInstanceMemberCommand(a *instance.Aggregate, userID string, roles ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if userID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument")
@@ -23,7 +24,7 @@ func (c *commandNew) AddInstanceMember(a *instance.Aggregate, userID string, rol
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
-					return nil, errors.ThrowNotFound(err, "INSTA-GSXOn", "Errors.User.NotFound")
+					return nil, errors.ThrowPreconditionFailed(err, "INSTA-GSXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsInstanceMember(ctx, filter, a.ID, userID); err != nil || isMember {
 					return nil, errors.ThrowAlreadyExists(err, "INSTA-pFDwe", "Errors.Instance.Member.AlreadyExists")
@@ -69,48 +70,22 @@ func IsInstanceMember(ctx context.Context, filter preparation.FilterToQueryReduc
 	return isMember, nil
 }
 
-func (c *Commands) AddInstanceMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	if member.UserID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-Mf83b", "Errors.IAM.MemberInvalid")
-	}
-	addedMember := NewInstanceMemberWriteModel(ctx, member.UserID)
-	instanceAgg := InstanceAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
-	err := c.checkUserExists(ctx, addedMember.UserID, "")
-	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "INSTANCE-5N9vs", "Errors.User.NotFound")
-	}
-	event, err := c.addInstanceMember(ctx, instanceAgg, addedMember, member)
+func (c *Commands) AddInstanceMember(ctx context.Context, userID string, roles ...string) (*domain.Member, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceMemberCommand(instanceAgg, userID, roles...))
 	if err != nil {
 		return nil, err
 	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedMember, pushedEvents...)
+	addedMember := NewInstanceMemberWriteModel(ctx, userID)
+	err = AppendAndReduce(addedMember, events...)
 	if err != nil {
 		return nil, err
 	}
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
-}
-
-func (c *Commands) addInstanceMember(ctx context.Context, instanceAgg *eventstore.Aggregate, addedMember *InstanceMemberWriteModel, member *domain.Member) (eventstore.Command, error) {
-	if !member.IsIAMValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-GR34U", "Errors.IAM.MemberInvalid")
-	}
-	if len(domain.CheckForInvalidRoles(member.Roles, domain.IAMRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Errors.IAM.MemberInvalid")
-	}
-	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
-	if err != nil {
-		return nil, err
-	}
-	if addedMember.State == domain.MemberStateActive {
-		return nil, errors.ThrowAlreadyExists(nil, "INSTANCE-sdgQ4", "Errors.IAM.Member.AlreadyExists")
-	}
-
-	return instance.NewMemberAddedEvent(ctx, instanceAgg, member.UserID, member.Roles...), nil
 }
 
 //ChangeInstanceMember updates an existing member

@@ -15,7 +15,7 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2biiR", "Errors.ResourceOwnerMissing")
 	}
-	orgAgg := org.NewAggregate(resourceOwner, resourceOwner)
+	orgAgg := org.NewAggregate(resourceOwner)
 	events, existingMessageText, err := c.setOrgMessageText(ctx, &orgAgg.Aggregate, messageText)
 	if err != nil {
 		return nil, err

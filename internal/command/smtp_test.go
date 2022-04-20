@@ -4,15 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
@@ -120,8 +120,8 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
-				smtpPasswordCrypto: tt.fields.alg,
+				eventstore:     tt.fields.eventstore,
+				smtpEncryption: tt.fields.alg,
 			}
 			got, err := r.AddSMTPConfig(tt.args.ctx, tt.args.instanceID, tt.args.smtp)
 			if tt.res.err == nil {
@@ -372,8 +372,8 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
-				smtpPasswordCrypto: tt.fields.alg,
+				eventstore:     tt.fields.eventstore,
+				smtpEncryption: tt.fields.alg,
 			}
 			got, err := r.ChangeSMTPConfigPassword(tt.args.ctx, tt.args.instanceID, tt.args.password)
 			if tt.res.err == nil {
