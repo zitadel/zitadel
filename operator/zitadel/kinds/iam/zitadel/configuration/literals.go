@@ -23,6 +23,7 @@ func literalsConfigMap(
 	desired *Configuration,
 	dbConn db.Connection,
 	certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath string,
+	necessaryUsers map[string]string,
 ) map[string]string {
 
 	tls := ""
@@ -53,6 +54,11 @@ func literalsConfigMap(
 		"CR_ROOT_CERT":                   fmt.Sprintf("%s/%s", certPath, db.CACert),
 		"CR_USER_CERT":                   fmt.Sprintf("%s/%s", certPath, db.UserCert(dbConn.User())),
 		"CR_USER_KEY":                    fmt.Sprintf("%s/%s", certPath, db.UserKey(dbConn.User())),
+	}
+
+	for k := range necessaryUsers {
+		literalsConfigMap["CR_"+strings.ToUpper(k)+"_CERT"] = fmt.Sprintf("%s/%s", certPath, db.UserCert(k))
+		literalsConfigMap["CR_"+strings.ToUpper(k)+"_KEY"] = fmt.Sprintf("%s/%s", certPath, db.UserKey(k))
 	}
 
 	if desired != nil {
