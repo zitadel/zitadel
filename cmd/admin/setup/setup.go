@@ -73,7 +73,10 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.S3DefaultInstance.baseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
 	ctx := context.Background()
-	migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
-	migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
-	migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
+	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
+	logging.OnError(err).Fatal("unable to migrate step 1")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
+	logging.OnError(err).Fatal("unable to migrate step 3")
+	err = migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
+	logging.OnError(err).Fatal("unable to migrate step 4")
 }

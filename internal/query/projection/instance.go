@@ -38,6 +38,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(InstanceColumnName, crdb.ColumnTypeText),
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),

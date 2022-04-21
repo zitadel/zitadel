@@ -215,12 +215,12 @@ failed event. You can find out if it worked on the `failure_count`
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| first_org_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| first_org_name |  string | - | string.max_len: 200<br />  |
 | custom_domain |  string | - | string.max_len: 200<br />  |
-| owner_first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| owner_last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| owner_first_name |  string | - | string.max_len: 200<br />  |
+| owner_last_name |  string | - | string.max_len: 200<br />  |
 | owner_email |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| owner_username |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| owner_username |  string | - | string.max_len: 200<br />  |
 | request_limit |  uint64 | - |  |
 | action_mins_limit |  uint64 | - |  |
 

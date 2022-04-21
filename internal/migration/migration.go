@@ -34,8 +34,12 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 	err = migration.Execute(ctx)
 	logging.OnError(err).Error("migration failed")
 
-	_, err = es.Push(ctx, setupDoneCmd(migration, err))
-	return err
+	_, pushErr := es.Push(ctx, setupDoneCmd(migration, err))
+	logging.OnError(pushErr).Error("migration failed")
+	if err != nil {
+		return err
+	}
+	return pushErr
 }
 
 func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {

@@ -56,6 +56,9 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		nil,
 		nil)
 
+	if err != nil {
+		return err
+	}
 	ctx = authz.WithRequestedDomain(ctx, mig.domain)
 
 	_, _, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup, mig.externalSecure, mig.baseURL)
