@@ -70,14 +70,7 @@ func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, resp
 			return
 		}
 
-		redirectURL := fmt.Sprintf("%s?SAMLResponse=%s", r.AcsUrl, url.QueryEscape(string(respData)))
-		if r.RelayState != "" {
-			redirectURL = fmt.Sprintf("%s&RelayState=%s", redirectURL, url.QueryEscape(r.RelayState))
-		}
-		if r.Signature != "" && r.SigAlg != "" {
-			redirectURL = fmt.Sprintf("%s&Signature=%s&SigAlg=%s", redirectURL, url.QueryEscape(r.Signature), url.QueryEscape(r.SigAlg))
-		}
-		http.Redirect(w, request, redirectURL, http.StatusFound)
+		http.Redirect(w, request,  fmt.Sprintf("%s?%s", r.AcsUrl, buildRedirectQuery(string(respData), r.RelayState, r.SigAlg, r.Signature)), http.StatusFound)
 		return
 	default:
 		//TODO: no binding

@@ -19,7 +19,7 @@ import (
 )
 
 /*
-commented as russellhaering/goxmldsig produces invalid singatures for responses currently
+commented as russellhaering/goxmldsig produces invalid signatures for responses currently
 
 func Create(signingContext *dsig.SigningContext, element interface{}) (*xml_dsig.SignatureType, error) {
 	data, _, err := canonicalize(element)
@@ -158,6 +158,10 @@ func ValidatePost(certs []*x509.Certificate, el *etree.Element) error {
 
 	_, err = validationContext.Validate(el)
 	return err
+}
+
+func CreateRedirect(signingContext *dsig.SigningContext, query string) ([]byte, error) {
+	return signingContext.SignString(query)
 }
 
 func ValidateRedirect(sigAlg string, elementToSign []byte, signature []byte, pubKey interface{}) error {

@@ -1,15 +1,11 @@
 package saml
 
 import (
-	"encoding/base64"
 	"fmt"
 	"github.com/caos/logging"
 	httpapi "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/api/saml/signature"
-	"github.com/caos/zitadel/internal/api/saml/xml"
 	"net"
 	"net/http"
-	"net/url"
 )
 
 func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Request) {
@@ -73,46 +69,17 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 
 	switch response.ProtocolBinding {
 	case PostBinding:
-		sig, err := signature.Create(p.signer, samlResponse.Assertion)
-		if err != nil {
+		if err := createPostSignature(samlResponse, p); err != nil {
 			logging.Log("SAML-120dk2").Error(err)
 			response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to sign response: %w", err).Error()))
 			return
 		}
-
-		samlResponse.Assertion.Signature = sig
 	case RedirectBinding:
-		respStr, err := xml.Marshal(samlResponse)
-		if err != nil {
-			logging.Log("SAML-95jw3k").Error(err)
-			response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to marshal response: %w", err).Error()))
-			return
-		}
-
-		respData, err := xml.DeflateAndBase64([]byte(respStr))
-		if err != nil {
-			logging.Log("SAML-po2n1s").Error(err)
-			response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to deflate response: %w", err).Error()))
-			return
-		}
-
-		query := "SAMLResponse=" + url.QueryEscape(string(respData))
-		if response.RelayState != "" {
-			query += "&RelayState=" + response.RelayState
-		}
-		if p.signingContext.GetSignatureMethodIdentifier() != "" {
-			query += "&SigAlg=" + url.QueryEscape(p.signingContext.GetSignatureMethodIdentifier())
-		}
-
-		sig, err := p.signingContext.SignString(query)
-		if err != nil {
+		if err := createRedirectSignature(samlResponse, p, response); err != nil {
 			logging.Log("SAML-jwnu2i").Error(err)
 			response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to sign response: %w", err).Error()))
 			return
 		}
-
-		response.Signature = url.QueryEscape(base64.StdEncoding.EncodeToString(sig))
-		response.SigAlg = url.QueryEscape(base64.StdEncoding.EncodeToString([]byte(p.signingContext.GetSignatureMethodIdentifier())))
 	}
 
 	response.sendBackResponse(r, w, samlResponse)

@@ -64,10 +64,12 @@ func GetSigningContextAndSigner(
 	}
 
 	tlsCert, err := ParseTlsKeyPair(cert, key)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	signingContext := dsig.NewDefaultSigningContext(dsig.TLSCertKeyStore(tlsCert))
-	signingContext.Canonicalizer = dsig.MakeC14N10ExclusiveCanonicalizerWithPrefixList("")
-	if err := signingContext.SetSignatureMethod(signatureAlgorithm); err != nil {
+	signingContext, err := GetSigningContext(tlsCert, signatureAlgorithm)
+	if err != nil {
 		return nil, nil, err
 	}
 
@@ -78,5 +80,15 @@ func GetSigningContextAndSigner(
 	if err != nil {
 		return nil, nil, err
 	}
+
 	return signingContext, signer, nil
+}
+
+func GetSigningContext(tlsCert tls.Certificate, signatureAlgorithm string) (*dsig.SigningContext, error) {
+	signingContext := dsig.NewDefaultSigningContext(dsig.TLSCertKeyStore(tlsCert))
+	signingContext.Canonicalizer = dsig.MakeC14N10ExclusiveCanonicalizerWithPrefixList("")
+	if err := signingContext.SetSignatureMethod(signatureAlgorithm); err != nil {
+		return nil, err
+	}
+	return signingContext, nil
 }

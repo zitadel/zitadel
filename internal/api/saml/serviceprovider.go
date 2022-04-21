@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
-	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/url"
 )
 
@@ -70,14 +69,6 @@ func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginUR
 	}, nil
 }
 
-func (sp *ServiceProvider) verifyRequest(request *samlp.AuthnRequestType) error {
-	if string(sp.metadata.EntityID) != request.Issuer.Text {
-		return fmt.Errorf("request contains unknown issuer")
-	}
-
-	return nil
-}
-
 func getSigningCertsFromMetadata(metadata *md.EntityDescriptorType) ([]*x509.Certificate, error) {
 	return signature.ParseCertificates(xml.GetCertsFromKeyDescriptors(metadata.SPSSODescriptor.KeyDescriptor))
 }
@@ -105,7 +96,7 @@ func (sp *ServiceProvider) validateRedirectSignature(request, relayState, sigAlg
 		return fmt.Errorf("error can not validate signature if no certificate is present for this service provider")
 	}
 
-	elementToSign := []byte{}
+	elementToSign := make([]byte, 0)
 	if url.QueryEscape(relayState) != "" {
 		elementToSign = []byte(fmt.Sprintf("SAMLRequest=%s&RelayState=%s&SigAlg=%s", url.QueryEscape(request), url.QueryEscape(relayState), url.QueryEscape(sigAlg)))
 	} else {

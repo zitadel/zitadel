@@ -1,7 +1,6 @@
 package saml
 
 import (
-	"encoding/base64"
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
@@ -10,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
-	"reflect"
 	"strconv"
 )
 
@@ -103,7 +101,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		},
 	)
 
-	// get persistet service provider from issuer out of the request
+	// get persisted service provider from issuer out of the request
 	checker.WithLogicStep(
 		func() error {
 			sp, err = p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
@@ -329,103 +327,6 @@ func checkCertificate(
 		}
 
 		return fmt.Errorf("unknown certificate used to sign request")
-	}
-}
-
-func signatureRedirectVerificationNecessary(
-	idpMetadataF func() *md.IDPSSODescriptorType,
-	spMetadataF func() *md.EntityDescriptorType,
-	signatureF func() string,
-	protocolBinding func() string,
-) func() bool {
-	return func() bool {
-		spMeta := spMetadataF()
-		idpMeta := idpMetadataF()
-
-		return ((spMeta == nil || spMeta.SPSSODescriptor == nil || spMeta.SPSSODescriptor.AuthnRequestsSigned == "true") ||
-			(idpMeta == nil || idpMeta.WantAuthnRequestsSigned == "true") ||
-			signatureF() != "") &&
-			protocolBinding() == RedirectBinding
-	}
-}
-
-func verifyRedirectSignature(
-	authRequest func() string,
-	relayState func() string,
-	sig func() string,
-	sigAlg func() string,
-	sp func() *ServiceProvider,
-	errF func(error),
-) func() error {
-	return func() error {
-		if authRequest() == "" {
-			return fmt.Errorf("no authrequest provided but required")
-		}
-		if relayState() == "" {
-			return fmt.Errorf("no relaystate provided but required")
-		}
-		if sig() == "" {
-			return fmt.Errorf("no signature provided but required")
-		}
-		if sigAlg() == "" {
-			return fmt.Errorf("no signature algorithm provided but required")
-		}
-
-		spInstance := sp()
-		if sp == nil {
-			return fmt.Errorf("no service provider instance provided but required")
-		}
-
-		err := spInstance.validateRedirectSignature(
-			authRequest(),
-			relayState(),
-			sigAlg(),
-			sig(),
-		)
-		errF(err)
-		return err
-	}
-}
-
-func signaturePostVerificationNecessary(
-	idpMetadataF func() *md.IDPSSODescriptorType,
-	spMetadataF func() *md.EntityDescriptorType,
-	authRequestSignatureF func() *xml_dsig.SignatureType,
-	protocolBinding func() string,
-) func() bool {
-	return func() bool {
-		authRequestSignature := authRequestSignatureF()
-		spMeta := spMetadataF()
-		idpMeta := idpMetadataF()
-
-		return ((spMeta == nil || spMeta.SPSSODescriptor == nil || spMeta.SPSSODescriptor.AuthnRequestsSigned == "true") ||
-			(idpMeta == nil || idpMeta.WantAuthnRequestsSigned == "true") ||
-			(authRequestSignature != nil &&
-				!reflect.DeepEqual(authRequestSignature.SignatureValue, xml_dsig.SignatureValueType{}) &&
-				authRequestSignature.SignatureValue.Text != "")) &&
-			protocolBinding() == PostBinding
-	}
-}
-
-func verifyPostSignature(
-	authRequestF func() string,
-	spF func() *ServiceProvider,
-	errF func(error),
-) func() error {
-	return func() error {
-		sp := spF()
-
-		data, err := base64.StdEncoding.DecodeString(authRequestF())
-		if err != nil {
-			errF(err)
-			return err
-		}
-
-		if err := sp.validatePostSignature(string(data)); err != nil {
-			errF(err)
-			return err
-		}
-		return nil
 	}
 }
 
