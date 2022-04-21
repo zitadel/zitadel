@@ -38,7 +38,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(InstanceColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(InstanceColumnName, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
@@ -133,13 +133,15 @@ func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnProjectID, e.ProjectID),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -149,14 +151,16 @@ func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnConsoleID, e.ClientID),
 			handler.NewCol(InstanceColumnConsoleAppID, e.AppID),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -166,13 +170,16 @@ func (p *InstanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnDefaultLanguage, e.Language.String()),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

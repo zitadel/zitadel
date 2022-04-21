@@ -47,7 +47,8 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		mig.zitadelRoles,
 		nil,
 		nil,
-		webauthn_helper.Config{},
+		//TODO: Livio will fix this, but it ZITADEL doesn't run without this
+		webauthn_helper.Config{DisplayName: "HELLO LIVIO", ID: "RPID"},
 		nil,
 		nil,
 		nil,
