@@ -15,7 +15,7 @@ func (s *Server) Healthz(context.Context, *mgmt_pb.HealthzRequest) (*mgmt_pb.Hea
 }
 
 func (s *Server) GetOIDCInformation(ctx context.Context, _ *mgmt_pb.GetOIDCInformationRequest) (*mgmt_pb.GetOIDCInformationResponse, error) {
-	issuer := http.BuildHTTP(authz.GetInstance(ctx).RequestedDomain(), s.externalPort, s.externalSecure) + s.issuerPath
+	issuer := http.BuildOrigin(authz.GetInstance(ctx).RequestedDomain(), s.externalSecure) + s.issuerPath
 	return &mgmt_pb.GetOIDCInformationResponse{
 		Issuer:            issuer,
 		DiscoveryEndpoint: issuer + oidc.DiscoveryEndpoint,

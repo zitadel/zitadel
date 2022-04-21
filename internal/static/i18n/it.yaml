@@ -44,6 +44,8 @@ Errors:
   SMTPConfig:
     NotFound: Configurazione SMTP non trovata
     AlreadyExists: La configurazione SMTP esiste già
+  Notification:
+    NoDomain: Nessun dominio trovato per il messaggio
   User:
     NotFound: L'utente non è stato trovato
     AlreadyExists: L'utente già esistente

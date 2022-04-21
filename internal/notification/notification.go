@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing"
 	_ "github.com/caos/zitadel/internal/notification/statik"
 	"github.com/caos/zitadel/internal/query"
@@ -20,7 +19,8 @@ type Config struct {
 }
 
 func Start(config Config,
-	systemDefaults sd.SystemDefaults,
+	externalPort uint16,
+	externalSecure bool,
 	command *command.Commands,
 	queries *query.Queries,
 	dbClient *sql.DB,
@@ -32,6 +32,6 @@ func Start(config Config,
 	statikFS, err := fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
 
-	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command, queries, dbClient, assetsPrefix, userEncryption, smtpEncryption, smsEncryption)
+	_, err = eventsourcing.Start(config.Repository, statikFS, externalPort, externalSecure, command, queries, dbClient, assetsPrefix, userEncryption, smtpEncryption, smsEncryption)
 	logging.OnError(err).Panic("unable to start app")
 }

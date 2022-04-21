@@ -44,6 +44,8 @@ Errors:
   SMTPConfig:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
+  Notification:
+    NoDomain: No Domain found for message
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists

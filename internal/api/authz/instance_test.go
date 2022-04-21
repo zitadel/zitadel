@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 )
 
 func Test_Instance(t *testing.T) {
@@ -83,6 +84,14 @@ func (m *mockInstance) ConsoleApplicationID() string {
 	return "appID"
 }
 
+func (m *mockInstance) DefaultLanguage() language.Tag {
+	return language.English
+}
+
 func (m *mockInstance) RequestedDomain() string {
 	return "zitadel.cloud"
+}
+
+func (m *mockInstance) RequestedHost() string {
+	return "zitadel.cloud:443"
 }

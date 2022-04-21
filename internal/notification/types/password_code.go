@@ -24,12 +24,11 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getTwilioConfig func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
+func SendPasswordCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getTwilioConfig func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string, origin string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
 	}
-	var origin string //TODO: build / retrieve origin
 	url := login.InitPasswordLink(origin, user.ID, codeString)
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString

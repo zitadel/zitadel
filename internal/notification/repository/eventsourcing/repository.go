@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -24,7 +23,8 @@ type EsRepository struct {
 
 func Start(conf Config,
 	dir http.FileSystem,
-	systemDefaults sd.SystemDefaults,
+	externalPort uint16,
+	externalSecure bool,
 	command *command.Commands,
 	queries *query.Queries,
 	dbClient *sql.DB,
@@ -43,7 +43,7 @@ func Start(conf Config,
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, command, queries, systemDefaults, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, command, queries, externalPort, externalSecure, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption)
 
 	return &EsRepository{
 		spool,

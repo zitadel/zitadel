@@ -5,11 +5,11 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/caos/zitadel/internal/api/ui/login"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/api/ui/login"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
@@ -67,7 +67,7 @@ func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPass
 	if err != nil {
 		return nil, err
 	}
-	var origin string //TODO: build / retrieve origin
+	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 	return &auth_pb.AddMyPasswordlessLinkResponse{
 		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),

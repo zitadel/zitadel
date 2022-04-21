@@ -21,12 +21,11 @@ type EmailVerificationCodeData struct {
 	URL string
 }
 
-func SendEmailVerificationCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
+func SendEmailVerificationCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string, origin string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
 	}
-	var origin string //TODO: build / retrieve origin
 	url := login.MailVerificationLink(origin, user.ID, codeString)
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString

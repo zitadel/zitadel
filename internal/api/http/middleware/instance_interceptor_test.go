@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
 )
@@ -261,6 +262,14 @@ func (m *mockInstance) ConsoleApplicationID() string {
 	return "consoleApplicationID"
 }
 
+func (m *mockInstance) DefaultLanguage() language.Tag {
+	return language.English
+}
+
 func (m *mockInstance) RequestedDomain() string {
 	return "zitadel.cloud"
+}
+
+func (m *mockInstance) RequestedHost() string {
+	return "zitadel.cloud:443"
 }

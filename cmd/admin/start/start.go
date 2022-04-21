@@ -117,7 +117,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
-	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(config.Notification, config.ExternalPort, config.ExternalSecure, commands, queries, dbClient, assets.HandlerPrefix, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys)
@@ -152,10 +152,10 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err := authenticatedAPIs.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, assets.HandlerPrefix, keys.User)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.Port, config.ExternalSecure, oidc.HandlerPrefix)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, oidc.HandlerPrefix)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure)); err != nil {
 		return err
 	}
 

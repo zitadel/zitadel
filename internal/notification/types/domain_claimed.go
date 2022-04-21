@@ -20,8 +20,7 @@ type DomainClaimedData struct {
 	URL string
 }
 
-func SendDomainClaimed(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), colors *query.LabelPolicy, assetsPrefix string) error {
-	var origin string //TODO: build / retrieve origin
+func SendDomainClaimed(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), colors *query.LabelPolicy, assetsPrefix string, origin string) error {
 	url := login.LoginLink(origin)
 	var args = mapNotifyUserToArgs(user)
 	args["TempUsername"] = username

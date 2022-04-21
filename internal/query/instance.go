@@ -108,6 +108,10 @@ func (i *Instance) ConsoleApplicationID() string {
 }
 
 func (i *Instance) RequestedDomain() string {
+	return strings.Split(i.host, ":")[0]
+}
+
+func (i *Instance) RequestedHost() string {
 	return i.host
 }
 
@@ -168,8 +172,8 @@ func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 }
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
-	host = strings.Split(host, ":")[0] //remove possible port
 	stmt, scan := prepareInstanceDomainQuery(host)
+	host = strings.Split(host, ":")[0] //remove possible port
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceDomainDomainCol.identifier(): host,
 	}).ToSql()

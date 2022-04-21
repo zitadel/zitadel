@@ -16,6 +16,7 @@ type Instance interface {
 	ConsoleClientID() string
 	ConsoleApplicationID() string
 	RequestedDomain() string
+	RequestedHost() string
 	DefaultLanguage() language.Tag
 }
 
@@ -45,6 +46,10 @@ func (i *instance) ConsoleApplicationID() string {
 }
 
 func (i *instance) RequestedDomain() string {
+	return i.Domain
+}
+
+func (i *instance) RequestedHost() string {
 	return i.Domain
 }
 
