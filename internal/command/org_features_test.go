@@ -9,9 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/static/mock"
-
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -19,13 +17,14 @@ import (
 	"github.com/caos/zitadel/internal/repository/features"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/static"
+	"github.com/caos/zitadel/internal/static/mock"
 )
 
 func TestCommandSide_SetOrgFeatures(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
-		iamDomain  string
 		static     static.Storage
 	}
 	type args struct {
@@ -291,10 +290,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						},
 					),
 				),
-				iamDomain: "iam-domain",
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -503,10 +501,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("test1")),
 					),
 				),
-				iamDomain: "iam-domain",
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -723,10 +720,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("test1")),
 					),
 				),
-				iamDomain: "iam-domain",
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -953,10 +949,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("test1")),
 					),
 				),
-				iamDomain: "iam-domain",
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -1268,11 +1263,10 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						},
 					),
 				),
-				iamDomain: "iam-domain",
-				static:    mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
+				static: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -1462,10 +1456,9 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 						},
 					),
 				),
-				iamDomain: "iam-domain",
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				resourceOwner: "org1",
 				features: &domain.Features{
 					TierName:                 "Test",
@@ -1500,7 +1493,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
-				iamDomain:  tt.fields.iamDomain,
 				static:     tt.fields.static,
 			}
 			got, err := r.SetOrgFeatures(tt.args.ctx, tt.args.resourceOwner, tt.args.features)
@@ -1520,7 +1512,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
-		iamDomain  string
 	}
 	type args struct {
 		ctx           context.Context
@@ -1715,10 +1706,9 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 						},
 					),
 				),
-				iamDomain: "iam-domain",
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				resourceOwner: "org1",
 			},
 			res: res{
@@ -1732,7 +1722,6 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
-				iamDomain:  tt.fields.iamDomain,
 			}
 			got, err := r.RemoveOrgFeatures(tt.args.ctx, tt.args.resourceOwner)
 			if tt.res.err == nil {

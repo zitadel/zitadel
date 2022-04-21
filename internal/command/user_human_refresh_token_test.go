@@ -25,7 +25,6 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
-		iamDomain    string
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -285,7 +284,6 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 			c := &Commands{
 				eventstore:   tt.fields.eventstore,
 				idGenerator:  tt.fields.idGenerator,
-				iamDomain:    tt.fields.iamDomain,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
 			got, gotRefresh, err := c.AddAccessAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken,

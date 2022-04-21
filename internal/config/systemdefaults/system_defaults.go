@@ -7,7 +7,6 @@ import (
 )
 
 type SystemDefaults struct {
-	Domain             string //TODO: remove with v2
 	SecretGenerators   SecretGenerators
 	Multifactors       MultifactorConfig
 	DomainVerification DomainVerification

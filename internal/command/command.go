@@ -27,7 +27,6 @@ type Commands struct {
 	eventstore   *eventstore.Eventstore
 	static       static.Storage
 	idGenerator  id.Generator
-	iamDomain    string
 	zitadelRoles []authz.RoleMapping
 
 	idpConfigEncryption         crypto.EncryptionAlgorithm
@@ -73,7 +72,6 @@ func StartCommands(es *eventstore.Eventstore,
 		eventstore:            es,
 		static:                staticStore,
 		idGenerator:           id.SonyFlakeGenerator,
-		iamDomain:             defaults.Domain,
 		zitadelRoles:          zitadelRoles,
 		keySize:               defaults.KeyConfig.Size,
 		privateKeyLifetime:    defaults.KeyConfig.PrivateKeyLifetime,

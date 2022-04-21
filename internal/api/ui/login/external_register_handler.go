@@ -97,7 +97,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	provider, err := l.getRPConfig(idpConfig, EndpointExternalRegisterCallback)
+	provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalRegisterCallback)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

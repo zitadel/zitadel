@@ -7,6 +7,7 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
@@ -292,13 +293,14 @@ func (c *Commands) changeDefaultDomain(ctx context.Context, orgID, newName strin
 	if err != nil {
 		return nil, err
 	}
-	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, c.iamDomain)
+	iamDomain := authz.GetInstance(ctx).RequestedDomain()
+	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, iamDomain)
 	isPrimary := defaultDomain == orgDomains.PrimaryDomain
 	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
 	for _, orgDomain := range orgDomains.Domains {
 		if orgDomain.State == domain.OrgDomainStateActive {
 			if orgDomain.Domain == defaultDomain {
-				newDefaultDomain := domain.NewIAMDomainName(newName, c.iamDomain)
+				newDefaultDomain := domain.NewIAMDomainName(newName, iamDomain)
 				events := []eventstore.Command{
 					org.NewDomainAddedEvent(ctx, orgAgg, newDefaultDomain),
 					org.NewDomainVerifiedEvent(ctx, orgAgg, newDefaultDomain),
@@ -321,7 +323,7 @@ func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eve
 		return nil, err
 	}
 	hasDefault := false
-	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, c.iamDomain)
+	defaultDomain := domain.NewIAMDomainName(orgDomains.OrgName, authz.GetInstance(ctx).RequestedDomain())
 	isPrimary := defaultDomain == orgDomains.PrimaryDomain
 	orgAgg := OrgAggregateFromWriteModel(&orgDomains.WriteModel)
 	events := make([]eventstore.Command, 0, len(orgDomains.Domains))

@@ -24,7 +24,6 @@ type Server struct {
 	command         *command.Commands
 	query           *query.Queries
 	administrator   repository.AdministratorRepository
-	iamDomain       string
 	assetsAPIDomain string
 	userCodeAlg     crypto.EncryptionAlgorithm
 }
@@ -36,7 +35,6 @@ type Config struct {
 func CreateServer(command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	iamDomain,
 	assetsAPIDomain string,
 	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
@@ -44,7 +42,6 @@ func CreateServer(command *command.Commands,
 		command:         command,
 		query:           query,
 		administrator:   repo,
-		iamDomain:       iamDomain,
 		assetsAPIDomain: assetsAPIDomain,
 		userCodeAlg:     userCodeAlg,
 	}

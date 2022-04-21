@@ -20,7 +20,7 @@ type Config struct {
 	SystemDefaults  systemdefaults.SystemDefaults
 	InternalAuthZ   authz.Config
 	ExternalPort    uint16
-	ExternalDomain  string
+	ExternalDomain  string //TODO: remove
 	ExternalSecure  bool
 	Log             *logging.Config
 	EncryptionKeys  *encryptionKeyConfig

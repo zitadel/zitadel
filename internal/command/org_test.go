@@ -71,7 +71,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
-		iamDomain    string
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
@@ -203,7 +202,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
-				iamDomain:   "iam-domain",
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "ORG_OWNER",
@@ -211,7 +209,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -272,7 +270,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
-				iamDomain:   "iam-domain",
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "ORG_OWNER",
@@ -280,7 +277,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -341,7 +338,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "org2"),
-				iamDomain:   "iam-domain",
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: "ORG_OWNER",
@@ -349,7 +345,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -372,7 +368,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			r := &Commands{
 				eventstore:   tt.fields.eventstore,
 				idGenerator:  tt.fields.idGenerator,
-				iamDomain:    tt.fields.iamDomain,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
 			got, err := r.AddOrg(tt.args.ctx, tt.args.name, tt.args.userID, tt.args.resourceOwner, tt.args.claimedUserIDs)
@@ -392,7 +387,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 func TestCommandSide_ChangeOrg(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
-		iamDomain  string
 	}
 	type args struct {
 		ctx   context.Context
@@ -444,7 +438,6 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "push failed, error",
 			fields: fields{
-				iamDomain: "zitadel.ch",
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -467,7 +460,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
+				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -478,7 +471,6 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "change org name verified, not primary",
 			fields: fields{
-				iamDomain: "zitadel.ch",
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -524,7 +516,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
+				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -533,7 +525,6 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		{
 			name: "change org name verified, with primary",
 			fields: fields{
-				iamDomain: "zitadel.ch",
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
@@ -586,7 +577,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
+				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -597,7 +588,6 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
-				iamDomain:  tt.fields.iamDomain,
 			}
 			_, err := r.ChangeOrg(tt.args.ctx, tt.args.orgID, tt.args.name)
 			if tt.res.err == nil {

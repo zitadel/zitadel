@@ -16,7 +16,6 @@ import (
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/form"
@@ -33,12 +32,11 @@ type Login struct {
 	query               *query.Queries
 	staticStorage       static.Storage
 	authRepo            auth_repository.Repository
-	baseURL             string
+	externalSecure      bool
 	consolePath         string
 	oidcAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
-	iamDomain           string
 }
 
 type Config struct {
@@ -58,10 +56,7 @@ func CreateLogin(config Config,
 	query *query.Queries,
 	authRepo *eventsourcing.EsRepository,
 	staticStorage static.Storage,
-	systemDefaults systemdefaults.SystemDefaults,
-	consolePath,
-	domain,
-	baseURL string,
+	consolePath string,
 	oidcAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
 	userAgentCookie,
@@ -74,13 +69,12 @@ func CreateLogin(config Config,
 
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
-		baseURL:             baseURL + HandlerPrefix,
+		externalSecure:      externalSecure,
 		consolePath:         consolePath,
 		command:             command,
 		query:               query,
 		staticStorage:       staticStorage,
 		authRepo:            authRepo,
-		iamDomain:           domain,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
 	}
@@ -128,7 +122,7 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, l.iamDomain), query.TextEndsWithIgnoreCase)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain()), query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
@@ -149,4 +143,8 @@ func setContext(ctx context.Context, resourceOwner string) context.Context {
 		OrgID:  resourceOwner,
 	}
 	return authz.SetCtxData(ctx, data)
+}
+
+func (l *Login) baseURL(ctx context.Context) string {
+	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure) + HandlerPrefix
 }
