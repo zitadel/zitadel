@@ -318,18 +318,19 @@ message GetInstanceResponse {
 
 message AddInstanceRequest {
     string instance_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string first_org_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string first_org_name = 2 [(validate.rules).string = {max_len: 200}];
     string custom_domain = 3 [(validate.rules).string = {max_len: 200}];
-    string owner_first_name = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_last_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string owner_first_name = 4 [(validate.rules).string = {max_len: 200}];
+    string owner_last_name = 5 [(validate.rules).string = {max_len: 200}];
     string owner_email = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_username = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string owner_username = 7 [(validate.rules).string = {max_len: 200}];
     uint64 request_limit = 8;
     uint64 action_mins_limit = 9;
 }
 
 message AddInstanceResponse {
     string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message RemoveInstanceRequest {

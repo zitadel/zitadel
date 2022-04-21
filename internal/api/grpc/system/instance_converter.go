@@ -3,11 +3,37 @@ package system
 import (
 	instance_grpc "github.com/caos/zitadel/internal/api/grpc/instance"
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/query"
 	instance_pb "github.com/caos/zitadel/pkg/grpc/instance"
 	system_pb "github.com/caos/zitadel/pkg/grpc/system"
 )
 
+func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup) *command.InstanceSetup {
+	if req.InstanceName != "" {
+		defaultInstance.InstanceName = req.InstanceName
+		defaultInstance.Org.Name = req.InstanceName
+	}
+	if req.CustomDomain != "" {
+		defaultInstance.CustomDomain = req.CustomDomain
+	}
+	if req.FirstOrgName != "" {
+		defaultInstance.Org.Name = req.FirstOrgName
+	}
+	if req.OwnerEmail != "" {
+		defaultInstance.Org.Human.Email.Address = req.OwnerEmail
+	}
+	if req.OwnerUsername != "" {
+		defaultInstance.Org.Human.Username = req.OwnerUsername
+	}
+	if req.OwnerFirstName != "" {
+		defaultInstance.Org.Human.FirstName = req.OwnerFirstName
+	}
+	if req.OwnerLastName != "" {
+		defaultInstance.Org.Human.LastName = req.OwnerLastName
+	}
+	return &defaultInstance
+}
 func ListInstancesRequestToModel(req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := instance_grpc.InstanceQueriesToModel(req.Queries)

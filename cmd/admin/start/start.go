@@ -152,7 +152,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.DefaultInstance, config.ExternalPort, config.ExternalDomain, config.ExternalSecure)); err != nil {
 		return err
 	}
 	if err := authenticatedAPIs.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix, keys.User)); err != nil {

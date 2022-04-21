@@ -67,6 +67,11 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 	}, nil
 }
 
+func (c *Commands) addGeneratedInstanceDomain(a *instance.Aggregate, instanceName string) preparation.Validation {
+	domain := domain.NewGeneratedInstanceDomain(instanceName, c.iamDomain)
+	return c.addInstanceDomain(a, domain, true)
+}
+
 func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {

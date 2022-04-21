@@ -40,7 +40,18 @@ func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequ
 }
 
 func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequest) (*system_pb.AddInstanceResponse, error) {
-	//TODO: Add instance command
+	id, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.DefaultInstance), s.ExternalSecure, s.BaseURL)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.AddInstanceResponse{
+		Id: id,
+		Details: object.AddToDetailsPb(
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner,
+		),
+	}, nil
 	return nil, nil
 }
 

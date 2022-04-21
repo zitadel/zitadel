@@ -23,5 +23,7 @@ func (f InstanceDomainState) Exists() bool {
 }
 
 func NewGeneratedInstanceDomain(instanceName, iamDomain string) string {
+	//TODO: Add random number/string to be unique
+	instanceName = strings.TrimSpace(instanceName)
 	return strings.ToLower(strings.ReplaceAll(instanceName, " ", "-") + "." + iamDomain)
 }

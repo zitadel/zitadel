@@ -24,6 +24,8 @@ type DefaultInstance struct {
 	domain            string
 	defaults          systemdefaults.SystemDefaults
 	zitadelRoles      []authz.RoleMapping
+	baseURL           string
+	externalSecure    bool
 }
 
 func (mig *DefaultInstance) Execute(ctx context.Context) error {
@@ -55,7 +57,8 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		nil)
 
 	ctx = authz.WithRequestedDomain(ctx, mig.domain)
-	_, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup)
+
+	_, _, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup, mig.externalSecure, mig.baseURL)
 	return err
 }
 
