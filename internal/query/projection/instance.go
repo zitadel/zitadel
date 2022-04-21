@@ -117,13 +117,15 @@ func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handle
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.GlobalOrgSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnGlobalOrgID, e.OrgID),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -173,7 +175,6 @@ func (p *InstanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnDefaultLanguage, e.Language.String()),

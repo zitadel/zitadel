@@ -69,12 +69,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, global_org_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, global_org_id) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
-								"instance-id",
 								anyArg{},
 								uint64(15),
 								"orgid",
+								"instance-id",
 							},
 						},
 					},
@@ -99,12 +99,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, iam_project_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, iam_project_id) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
-								"instance-id",
 								anyArg{},
 								uint64(15),
 								"project-id",
+								"instance-id",
 							},
 						},
 					},
@@ -129,12 +129,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, default_language) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
-								"instance-id",
 								anyArg{},
 								uint64(15),
 								"en",
+								"instance-id",
 							},
 						},
 					},
