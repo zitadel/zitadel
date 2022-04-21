@@ -30,7 +30,8 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 				middleware.SentryHandler(),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
-				middleware.InstanceInterceptor(queries, hostHeaderName),
+				//TODO: Handle Ignored Services
+				middleware.InstanceInterceptor(queries, hostHeaderName, "/zitadel.system.v1.SystemService"),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(queries),
 				middleware.ValidationHandler(),

@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 
@@ -15,20 +16,27 @@ import (
 )
 
 type Config struct {
-	Database       database.Config
-	SystemDefaults systemdefaults.SystemDefaults
-	InternalAuthZ  authz.Config
-	ExternalPort   uint16
-	ExternalDomain string
-	ExternalSecure bool
-	Log            *logging.Config
-	EncryptionKeys *encryptionKeyConfig
+	Database        database.Config
+	SystemDefaults  systemdefaults.SystemDefaults
+	InternalAuthZ   authz.Config
+	ExternalPort    uint16
+	ExternalDomain  string
+	ExternalSecure  bool
+	Log             *logging.Config
+	EncryptionKeys  *encryptionKeyConfig
+	DefaultInstance command.InstanceSetup
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
-	err := v.Unmarshal(config)
-	logging.OnError(err).Fatal("unable to read config")
+	err := v.Unmarshal(config,
+		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hook.Base64ToBytesHookFunc(),
+			hook.TagToLanguageHookFunc(),
+			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToSliceHookFunc(","),
+		)),
+	)
 
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")

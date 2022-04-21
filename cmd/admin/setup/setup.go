@@ -51,6 +51,12 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}
 	steps.s2AssetsTable = &AssetTable{dbClient: dbClient}
 
+	instanceSetup := config.DefaultInstance
+	instanceSetup.InstanceName = steps.S3DefaultInstance.InstanceSetup.InstanceName
+	instanceSetup.CustomDomain = steps.S3DefaultInstance.InstanceSetup.CustomDomain
+	instanceSetup.Org = steps.S3DefaultInstance.InstanceSetup.Org
+	steps.S3DefaultInstance.InstanceSetup = instanceSetup
+
 	steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = strings.TrimSpace(steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address)
 	if steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address == "" {
 		steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = "admin@" + config.ExternalDomain
@@ -63,13 +69,14 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.S3DefaultInstance.domain = config.ExternalDomain
 	steps.S3DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
 	steps.S3DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
-	steps.S3DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
-	steps.S3DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
-	steps.S3DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
-	steps.S3DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
+	steps.S3DefaultInstance.externalSecure = config.ExternalSecure
+	steps.S3DefaultInstance.baseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
 	ctx := context.Background()
-	migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
-	migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
-	migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
+	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
+	logging.OnError(err).Fatal("unable to migrate step 1")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
+	logging.OnError(err).Fatal("unable to migrate step 3")
+	err = migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
+	logging.OnError(err).Fatal("unable to migrate step 4")
 }

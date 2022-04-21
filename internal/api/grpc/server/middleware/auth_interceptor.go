@@ -15,6 +15,10 @@ import (
 
 func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Config) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		//TODO: Change as soon as we know how to authenticate system api
+		if verifier == nil {
+			return handler(ctx, req)
+		}
 		return authorize(ctx, req, info, handler, verifier, authConfig)
 	}
 }

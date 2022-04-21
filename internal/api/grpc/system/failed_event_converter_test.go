@@ -1,11 +1,12 @@
-package admin
+package system_test
 
 import (
 	"testing"
 
+	system_grpc "github.com/caos/zitadel/internal/api/grpc/system"
 	"github.com/caos/zitadel/internal/test"
 	"github.com/caos/zitadel/internal/view/model"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	system_pb "github.com/caos/zitadel/pkg/grpc/system"
 )
 
 func TestFailedEventsToPbFields(t *testing.T) {
@@ -33,7 +34,7 @@ func TestFailedEventsToPbFields(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := FailedEventsViewToPb(tt.args.failedEvents)
+			got := system_grpc.FailedEventsViewToPb(tt.args.failedEvents)
 			for _, g := range got {
 				test.AssertFieldsMapped(t, g)
 			}
@@ -63,14 +64,14 @@ func TestFailedEventToPbFields(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		converted := FailedEventViewToPb(tt.args.failedEvent)
+		converted := system_grpc.FailedEventViewToPb(tt.args.failedEvent)
 		test.AssertFieldsMapped(t, converted)
 	}
 }
 
 func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 	type args struct {
-		req *admin_pb.RemoveFailedEventRequest
+		req *system_pb.RemoveFailedEventRequest
 	}
 	tests := []struct {
 		name string
@@ -79,7 +80,7 @@ func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 		{
 			"all fields",
 			args{
-				req: &admin_pb.RemoveFailedEventRequest{
+				req: &system_pb.RemoveFailedEventRequest{
 					Database:       "admin",
 					ViewName:       "users",
 					FailedSequence: 456,
@@ -88,7 +89,7 @@ func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		converted := RemoveFailedEventRequestToModel(tt.args.req)
+		converted := system_grpc.RemoveFailedEventRequestToModel(tt.args.req)
 		test.AssertFieldsMapped(t, converted, "FailureCount", "ErrMsg")
 	}
 }

@@ -25,11 +25,6 @@ message Instance {
             example: "\"ZITADEL\"";
         }
     ];
-    string version = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"v1.0.0\"";
-        }
-    ];
 }
 
 enum State {
@@ -44,27 +39,15 @@ message Query {
     oneof query {
         option (validate.required) = true;
 
-        IdQuery id_query = 1;
-        StateQuery state_query = 2;
+        IdsQuery id_query = 1;
     }
 }
 
 //IdQuery is always equals
-message IdQuery {
-    string id = 1 [
-        (validate.rules).string = {max_len: 200},
+message IdsQuery {
+    repeated string ids = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "4820840938402429";
-        }
-    ];
-}
-
-//StateQuery is always equals
-message StateQuery {
-    State state = 1 [
-        (validate.rules).enum.defined_only = true,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current state of the instance";
         }
     ];
 }

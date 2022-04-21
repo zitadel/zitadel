@@ -67,6 +67,11 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 	}, nil
 }
 
+func (c *Commands) addGeneratedInstanceDomain(a *instance.Aggregate, instanceName string) preparation.Validation {
+	domain := domain.NewGeneratedInstanceDomain(instanceName, c.iamDomain)
+	return c.addInstanceDomain(a, domain, true)
+}
+
 func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
@@ -80,28 +85,32 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			if domainWriteModel.State == domain.InstanceDomainStateActive {
 				return nil, errors.ThrowAlreadyExists(nil, "INST-i2nl", "Errors.Instance.Domain.AlreadyExists")
 			}
+			events := []eventstore.Command{
+				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
+			}
 			appWriteModel, err := c.getOIDCAppWriteModel(ctx, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID(), "")
 			if err != nil {
 				return nil, err
 			}
-			redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
-			logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
-			consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(
-				ctx,
-				ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
-				appWriteModel.AppID,
-				[]project.OIDCConfigChanges{
-					project.ChangeRedirectURIs(redirectUrls),
-					project.ChangePostLogoutRedirectURIs(logoutUrls),
-				},
-			)
-			if err != nil {
-				return nil, err
+			if appWriteModel.State.Exists() {
+				redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
+				logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
+				consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(
+					ctx,
+					ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
+					appWriteModel.AppID,
+					[]project.OIDCConfigChanges{
+						project.ChangeRedirectURIs(redirectUrls),
+						project.ChangePostLogoutRedirectURIs(logoutUrls),
+					},
+				)
+				if err != nil {
+					return nil, err
+				}
+				events = append(events, consoleChangeEvent)
 			}
-			return []eventstore.Command{
-				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
-				consoleChangeEvent,
-			}, nil
+
+			return events, nil
 		}, nil
 	}
 }

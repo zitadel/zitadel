@@ -14,7 +14,9 @@ const (
 	InstanceProjectionTable = "projections.instances"
 
 	InstanceColumnID              = "id"
+	InstanceColumnName            = "name"
 	InstanceColumnChangeDate      = "change_date"
+	InstanceColumnCreationDate    = "creation_date"
 	InstanceColumnGlobalOrgID     = "global_org_id"
 	InstanceColumnProjectID       = "iam_project_id"
 	InstanceColumnConsoleID       = "console_client_id"
@@ -36,10 +38,13 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(InstanceColumnName, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(InstanceColumnConsoleAppID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(InstanceColumnSetUpStarted, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(InstanceColumnSetUpDone, crdb.ColumnTypeInt64, crdb.Default(0)),
@@ -57,6 +62,10 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 		{
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceAddedEventType,
+					Reduce: p.reduceInstanceAdded,
+				},
 				{
 					Event:  instance.GlobalOrgSetEventType,
 					Reduce: p.reduceGlobalOrgSet,
@@ -86,18 +95,37 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
+func (p *InstanceProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.InstanceAddedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-29nlS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
+	}
+	return crdb.NewCreateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
+			handler.NewCol(InstanceColumnCreationDate, e.CreationDate()),
+			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
+			handler.NewCol(InstanceColumnSequence, e.Sequence()),
+			handler.NewCol(InstanceColumnName, e.Name),
+		},
+	), nil
+}
+
 func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.GlobalOrgSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.GlobalOrgSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnGlobalOrgID, e.OrgID),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -107,13 +135,15 @@ func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnProjectID, e.ProjectID),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -123,14 +153,16 @@ func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnConsoleID, e.ClientID),
 			handler.NewCol(InstanceColumnConsoleAppID, e.AppID),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -140,13 +172,15 @@ func (p *InstanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
 	}
-	return crdb.NewUpsertStatement(
+	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnDefaultLanguage, e.Language.String()),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

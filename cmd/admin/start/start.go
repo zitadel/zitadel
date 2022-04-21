@@ -14,6 +14,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/zitadel/internal/api/grpc/system"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -142,7 +143,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo)
 
-	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
+	authenticatedAPIs := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
@@ -151,18 +152,21 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix, keys.User)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.DefaultInstance, config.ExternalPort, config.ExternalDomain, config.ExternalSecure)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix, keys.User)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User)); err != nil {
+		return err
+	}
+	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User)); err != nil {
 		return err
 	}
 
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
+	authenticatedAPIs.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, config.ExternalDomain, id.SonyFlakeGenerator, config.ExternalSecure)
 	if err != nil {
@@ -174,26 +178,26 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
-	apis.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
+	authenticatedAPIs.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
 
 	openAPIHandler, err := openapi.Start()
 	if err != nil {
 		return fmt.Errorf("unable to start openapi handler: %w", err)
 	}
-	apis.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
+	authenticatedAPIs.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
 
 	baseURL := http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 	c, err := console.Start(config.Console, config.ExternalDomain, baseURL, issuer, instanceInterceptor.Handler)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
-	apis.RegisterHandler(console.HandlerPrefix, c)
+	authenticatedAPIs.RegisterHandler(console.HandlerPrefix, c)
 
 	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix+"/", config.ExternalDomain, baseURL, op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
-	apis.RegisterHandler(login.HandlerPrefix, l.Handler())
+	authenticatedAPIs.RegisterHandler(login.HandlerPrefix, l.Handler())
 
 	return nil
 }

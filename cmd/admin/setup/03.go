@@ -24,6 +24,8 @@ type DefaultInstance struct {
 	domain            string
 	defaults          systemdefaults.SystemDefaults
 	zitadelRoles      []authz.RoleMapping
+	baseURL           string
+	externalSecure    bool
 }
 
 func (mig *DefaultInstance) Execute(ctx context.Context) error {
@@ -45,7 +47,8 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		mig.zitadelRoles,
 		nil,
 		nil,
-		webauthn_helper.Config{},
+		//TODO: Livio will fix this, but it ZITADEL doesn't run without this
+		webauthn_helper.Config{DisplayName: "HELLO LIVIO", ID: "RPID"},
 		nil,
 		nil,
 		nil,
@@ -54,8 +57,12 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		nil,
 		nil)
 
+	if err != nil {
+		return err
+	}
 	ctx = authz.WithRequestedDomain(ctx, mig.domain)
-	_, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup)
+
+	_, _, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup, mig.externalSecure, mig.baseURL)
 	return err
 }
 
