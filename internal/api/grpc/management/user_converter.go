@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/pkg/grpc/user"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -27,12 +28,36 @@ func ListUsersRequestToModel(req *mgmt_pb.ListUsersRequest) (*query.UserSearchQu
 	}
 	return &query.UserSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset: offset,
-			Limit:  limit,
-			Asc:    asc,
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: UserFieldNameToSortingColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil
+}
+
+func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
+	switch field {
+	case user.UserFieldName_USER_FIELD_NAME_EMAIL:
+		return query.HumanEmailCol
+	case user.UserFieldName_USER_FIELD_NAME_FIRST_NAME:
+		return query.HumanFirstNameCol
+	case user.UserFieldName_USER_FIELD_NAME_LAST_NAME:
+		return query.HumanLastNameCol
+	case user.UserFieldName_USER_FIELD_NAME_DISPLAY_NAME:
+		return query.HumanDisplayNameCol
+	case user.UserFieldName_USER_FIELD_NAME_USER_NAME:
+		return query.UserUsernameCol
+	case user.UserFieldName_USER_FIELD_NAME_STATE:
+		return query.UserStateCol
+	case user.UserFieldName_USER_FIELD_NAME_TYPE:
+		return query.UserTypeCol
+	case user.UserFieldName_USER_FIELD_NAME_NICK_NAME:
+		return query.HumanNickNameCol
+	default:
+		return query.Column{}
+	}
 }
 
 func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
