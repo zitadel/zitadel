@@ -124,8 +124,9 @@ var (
 		table: userTable,
 	}
 	UserUsernameCol = Column{
-		name:  projection.UserUsernameCol,
-		table: userTable,
+		name:           projection.UserUsernameCol,
+		table:          userTable,
+		isOrderByLower: true,
 	}
 	UserTypeCol = Column{
 		name:  projection.UserTypeCol,
@@ -155,20 +156,24 @@ var (
 		table: humanTable,
 	}
 	HumanFirstNameCol = Column{
-		name:  projection.HumanFirstNameCol,
-		table: humanTable,
+		name:           projection.HumanFirstNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
 	HumanLastNameCol = Column{
-		name:  projection.HumanLastNameCol,
-		table: humanTable,
+		name:           projection.HumanLastNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
 	HumanNickNameCol = Column{
-		name:  projection.HumanNickNameCol,
-		table: humanTable,
+		name:           projection.HumanNickNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
 	HumanDisplayNameCol = Column{
-		name:  projection.HumanDisplayNameCol,
-		table: humanTable,
+		name:           projection.HumanDisplayNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
 	HumanPreferredLanguageCol = Column{
 		name:  projection.HumanPreferredLanguageCol,
@@ -185,8 +190,9 @@ var (
 
 	// email
 	HumanEmailCol = Column{
-		name:  projection.HumanEmailCol,
-		table: humanTable,
+		name:           projection.HumanEmailCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
 	HumanIsEmailVerifiedCol = Column{
 		name:  projection.HumanIsEmailVerifiedCol,
@@ -213,8 +219,9 @@ var (
 		table: machineTable,
 	}
 	MachineNameCol = Column{
-		name:  projection.MachineNameCol,
-		table: machineTable,
+		name:           projection.MachineNameCol,
+		table:          machineTable,
+		isOrderByLower: true,
 	}
 	MachineDescriptionCol = Column{
 		name:  projection.MachineDescriptionCol,
@@ -380,27 +387,27 @@ func NewUserResourceOwnerSearchQuery(value string, comparison TextComparison) (S
 }
 
 func NewUserUsernameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(UserUsernameCol, value, comparison)
+	return NewTextQuery(Column(UserUsernameCol), value, comparison)
 }
 
 func NewUserFirstNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanFirstNameCol, value, comparison)
+	return NewTextQuery(Column(HumanFirstNameCol), value, comparison)
 }
 
 func NewUserLastNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanLastNameCol, value, comparison)
+	return NewTextQuery(Column(HumanLastNameCol), value, comparison)
 }
 
 func NewUserNickNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanNickNameCol, value, comparison)
+	return NewTextQuery(Column(HumanNickNameCol), value, comparison)
 }
 
 func NewUserDisplayNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanDisplayNameCol, value, comparison)
+	return NewTextQuery(Column(HumanDisplayNameCol), value, comparison)
 }
 
 func NewUserEmailSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanEmailCol, value, comparison)
+	return NewTextQuery(Column(HumanEmailCol), value, comparison)
 }
 
 func NewUserStateSearchQuery(value int32) (SearchQuery, error) {
