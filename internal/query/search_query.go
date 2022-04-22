@@ -381,12 +381,16 @@ func (c Column) identifier() string {
 	return c.name
 }
 
+func (c StringColumn) identifier() string {
+	return Column(c).identifier()
+}
+
 func (c Column) orderBy() string {
 	return c.identifier()
 }
 
 func (c StringColumn) orderBy() string {
-	return "LOWER(" + Column(c).identifier() + ")"
+	return "LOWER(" + c.identifier() + ")"
 }
 
 func (c Column) setTable(t table) Column {

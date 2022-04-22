@@ -380,27 +380,27 @@ func NewUserResourceOwnerSearchQuery(value string, comparison TextComparison) (S
 }
 
 func NewUserUsernameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(UserUsernameCol, value, comparison)
+	return NewTextQuery(Column(UserUsernameCol), value, comparison)
 }
 
 func NewUserFirstNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanFirstNameCol, value, comparison)
+	return NewTextQuery(Column(HumanFirstNameCol), value, comparison)
 }
 
 func NewUserLastNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanLastNameCol, value, comparison)
+	return NewTextQuery(Column(HumanLastNameCol), value, comparison)
 }
 
 func NewUserNickNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanNickNameCol, value, comparison)
+	return NewTextQuery(Column(HumanNickNameCol), value, comparison)
 }
 
 func NewUserDisplayNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanDisplayNameCol, value, comparison)
+	return NewTextQuery(Column(HumanDisplayNameCol), value, comparison)
 }
 
 func NewUserEmailSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(HumanEmailCol, value, comparison)
+	return NewTextQuery(Column(HumanEmailCol), value, comparison)
 }
 
 func NewUserStateSearchQuery(value int32) (SearchQuery, error) {
