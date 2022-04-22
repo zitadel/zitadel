@@ -9,22 +9,30 @@ import (
 	"reflect"
 )
 
+func signaturePostProvided(
+	signatureF func() *xml_dsig.SignatureType,
+) func() bool {
+	return func() bool {
+		signatureV := signatureF()
+
+		return signatureV != nil &&
+			!reflect.DeepEqual(signatureV.SignatureValue, xml_dsig.SignatureValueType{}) &&
+			signatureV.SignatureValue.Text != ""
+	}
+}
 func signaturePostVerificationNecessary(
 	idpMetadataF func() *md.IDPSSODescriptorType,
 	spMetadataF func() *md.EntityDescriptorType,
-	authRequestSignatureF func() *xml_dsig.SignatureType,
+	signatureF func() *xml_dsig.SignatureType,
 	protocolBinding func() string,
 ) func() bool {
 	return func() bool {
-		authRequestSignature := authRequestSignatureF()
 		spMeta := spMetadataF()
 		idpMeta := idpMetadataF()
 
 		return ((spMeta == nil || spMeta.SPSSODescriptor == nil || spMeta.SPSSODescriptor.AuthnRequestsSigned == "true") ||
 			(idpMeta == nil || idpMeta.WantAuthnRequestsSigned == "true") ||
-			(authRequestSignature != nil &&
-				!reflect.DeepEqual(authRequestSignature.SignatureValue, xml_dsig.SignatureValueType{}) &&
-				authRequestSignature.SignatureValue.Text != "")) &&
+			signaturePostProvided(signatureF)()) &&
 			protocolBinding() == PostBinding
 	}
 }

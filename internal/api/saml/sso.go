@@ -22,7 +22,7 @@ type AuthRequestForm struct {
 }
 
 func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request) {
-	checker := checker.Checker{}
+	checkerInstance := checker.Checker{}
 	var authRequestForm *AuthRequestForm
 	var authNRequest *samlp.AuthnRequestType
 	var sp *ServiceProvider
@@ -38,7 +38,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	}
 
 	// parse form to cover POST and REDIRECT binding
-	checker.WithLogicStep(
+	checkerInstance.WithLogicStep(
 		func() error {
 			authRequestForm, err = getAuthRequestFromRequest(r)
 			if err != nil {
@@ -55,7 +55,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// verify that relayState is provided
-	checker.WithValueNotEmptyCheck(
+	checkerInstance.WithValueNotEmptyCheck(
 		"relayState",
 		func() string { return authRequestForm.RelayState },
 		"SAML-86272s",
@@ -65,7 +65,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// verify that request is not empty
-	checker.WithValueNotEmptyCheck(
+	checkerInstance.WithValueNotEmptyCheck(
 		"SAMLRequest",
 		func() string { return authRequestForm.AuthRequest },
 		"SAML-nu32kq",
@@ -75,7 +75,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// verify that there is a signature provided if signature algorithm is provided
-	checker.WithConditionalValueNotEmpty(
+	checkerInstance.WithConditionalValueNotEmpty(
 		func() bool { return authRequestForm.SigAlg != "" },
 		"Signature",
 		func() string { return authRequestForm.Sig },
@@ -86,7 +86,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// decode request from xml into golang struct
-	checker.WithLogicStep(
+	checkerInstance.WithLogicStep(
 		func() error {
 			authNRequest, err = xml.DecodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
 			if err != nil {
@@ -102,7 +102,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// get persisted service provider from issuer out of the request
-	checker.WithLogicStep(
+	checkerInstance.WithLogicStep(
 		func() error {
 			sp, err = p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
 			if err != nil {
@@ -118,7 +118,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	//validate used certificate for signing the request
-	checker.WithConditionalLogicStep(
+	checkerInstance.WithConditionalLogicStep(
 		certificateCheckNecessary(
 			func() *xml_dsig.SignatureType { return authNRequest.Signature },
 			func() *md.EntityDescriptorType { return sp.metadata },
@@ -134,7 +134,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// verify signature if necessary
-	checker.WithConditionalLogicStep(
+	checkerInstance.WithConditionalLogicStep(
 		signatureRedirectVerificationNecessary(
 			func() *md.IDPSSODescriptorType { return p.Metadata },
 			func() *md.EntityDescriptorType { return sp.metadata },
@@ -156,7 +156,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// verify signature if necessary
-	checker.WithConditionalLogicStep(
+	checkerInstance.WithConditionalLogicStep(
 		signaturePostVerificationNecessary(
 			func() *md.IDPSSODescriptorType { return p.Metadata },
 			func() *md.EntityDescriptorType { return sp.metadata },
@@ -174,24 +174,15 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		},
 	)
 
-	// verify that destination in request is this IDP
-	checker.WithLogicStep(
-		func() error { err = p.verifyRequestDestinationOfAuthRequest(authNRequest); return err },
-		"SAML-83722s",
-		func() {
-			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify request destination: %w", err).Error()))
-		},
-	)
-
 	// work out used acs url and protocolbinding for response
-	checker.WithValueStep(
+	checkerInstance.WithValueStep(
 		func() {
 			response.AcsUrl, response.ProtocolBinding = getAcsUrlAndBindingForResponse(sp, authNRequest.ProtocolBinding)
 		},
 	)
 
 	// check if supported acs url is provided
-	checker.WithValueNotEmptyCheck(
+	checkerInstance.WithValueNotEmptyCheck(
 		"acsUrl",
 		func() string { return response.AcsUrl },
 		"SAML-83712s",
@@ -201,7 +192,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	// check if supported protocolbinding is provided
-	checker.WithValueNotEmptyCheck(
+	checkerInstance.WithValueNotEmptyCheck(
 		"protocol binding",
 		func() string { return response.ProtocolBinding },
 		"SAML-83711s",
@@ -210,28 +201,16 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		},
 	)
 
-	//check if authrequest has required attributes
-	checker.WithValuesNotEmptyCheck(
-		func() []string { return []string{authNRequest.Id, authNRequest.Version, authNRequest.Issuer.Text} },
-		"SAML-8kj22s",
+	checkerInstance.WithLogicStep(
+		checkRequestRequiredContent(p, sp, authNRequest),
+		"SAML-83722s",
 		func() {
-			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("request is missing requiered attributes").Error()))
-		},
-	)
-
-	//check if entityId used in the request and serviceprovider is equal
-	checker.WithValueEqualsCheck(
-		"entityID",
-		func() string { return authNRequest.Issuer.Text },
-		func() string { return string(sp.metadata.EntityID) },
-		"SAML-7qj22s",
-		func() {
-			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("provided issuer is not equal to known service provider").Error()))
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to validate request content: %w", err).Error()))
 		},
 	)
 
 	// persist authrequest
-	checker.WithLogicStep(
+	checkerInstance.WithLogicStep(
 		func() error {
 			authRequest, err = p.storage.CreateAuthRequest(
 				r.Context(),
@@ -250,7 +229,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	//check and log errors if necessary
-	if checker.CheckFailed() {
+	if checkerInstance.CheckFailed() {
 		return
 	}
 
@@ -287,6 +266,46 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 	}
 
 	return request, nil
+}
+
+func checkRequestRequiredContent(
+	idp *IdentityProvider,
+	sp *ServiceProvider,
+	authNRequest *samlp.AuthnRequestType,
+) func() error {
+	return func() error {
+		if authNRequest.Conditions != nil &&
+			(authNRequest.Conditions.NotOnOrAfter != "" || authNRequest.Conditions.NotBefore != "") {
+			if err := checkIfRequestTimeIsStillValid(
+				func() string { return authNRequest.Conditions.NotBefore },
+				func() string { return authNRequest.Conditions.NotOnOrAfter },
+			)(); err != nil {
+				return err
+			}
+		}
+
+		if authNRequest.Id == "" {
+			return fmt.Errorf("ID is missing in request")
+		}
+
+		if authNRequest.Version == "" {
+			return fmt.Errorf("version is missing in request")
+		}
+
+		if authNRequest.Issuer.Text == "" {
+			return fmt.Errorf("issuer is missing in request")
+		}
+
+		if authNRequest.Issuer.Text != string(sp.metadata.EntityID) {
+			return fmt.Errorf("issuer in request not equal entityID of service provider")
+		}
+
+		if err := idp.verifyRequestDestinationOfAuthRequest(authNRequest); err != nil {
+			return err
+		}
+
+		return nil
+	}
 }
 
 func certificateCheckNecessary(

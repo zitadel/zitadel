@@ -7,7 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/http"
-	"time"
 )
 
 type LogoutRequestForm struct {
@@ -17,11 +16,12 @@ type LogoutRequestForm struct {
 }
 
 func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Request) {
-	checker := checker.Checker{}
+	checkerInstance := checker.Checker{}
 	var logoutRequestForm *LogoutRequestForm
 	var logoutRequest *samlp.LogoutRequestType
 	var err error
 	var sp *ServiceProvider
+
 	response := &LogoutResponse{
 		LogoutTemplate: p.logoutTemplate,
 		ErrorFunc: func(err error) {
@@ -31,7 +31,7 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	}
 
 	// parse from to get logout request
-	checker.WithLogicStep(
+	checkerInstance.WithLogicStep(
 		func() error {
 			logoutRequestForm, err = getLogoutRequestFromRequest(r)
 			if err != nil {
@@ -47,7 +47,7 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	)
 
 	//decode logout request to internal struct
-	checker.WithLogicStep(
+	checkerInstance.WithLogicStep(
 		func() error {
 			logoutRequest, err = xml.DecodeLogoutRequest(logoutRequestForm.Encoding, logoutRequestForm.LogoutRequest)
 			if err != nil {
@@ -64,24 +64,11 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	)
 
 	//verify required data in request
-	checker.WithLogicStep(
-		func() error {
-			now := time.Now().UTC()
-			if logoutRequest.NotOnOrAfter != "" {
-				//TODO
-				t, err := time.Parse("", logoutRequest.NotOnOrAfter)
-				if err != nil {
-					return fmt.Errorf("failed to parse NotOnOrAfter: %w", err)
-				}
-				if t.After(now) {
-					return fmt.Errorf("on or after time given by NotOnOrAfter")
-				}
-			}
-			if logoutRequest.NameID == nil || logoutRequest.NameID.Text == "" {
-				return fmt.Errorf("no nameID provided")
-			}
-			return nil
-		},
+	checkerInstance.WithLogicStep(
+		checkIfRequestTimeIsStillValid(
+			func() string { return logoutRequest.IssueInstant },
+			func() string { return logoutRequest.NotOnOrAfter },
+		),
 		"SAML-892u3n",
 		func() {
 			response.sendBackLogoutResponse(w, response.makeDeniedLogoutResponse(fmt.Errorf("failed to validate request: %w", err).Error()))
@@ -89,7 +76,7 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	)
 
 	// get persisted service provider from issuer out of the request
-	checker.WithLogicStep(
+	checkerInstance.WithLogicStep(
 		func() error {
 			sp, err = p.GetServiceProvider(r.Context(), logoutRequest.Issuer.Text)
 			return err
@@ -101,7 +88,7 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	)
 
 	// get logoutURL from provided service provider metadata
-	checker.WithValueStep(
+	checkerInstance.WithValueStep(
 		func() {
 			if sp.metadata.SPSSODescriptor.SingleLogoutService != nil {
 				for _, url := range sp.metadata.SPSSODescriptor.SingleLogoutService {
@@ -113,7 +100,7 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	)
 
 	//check and log errors if necessary
-	if checker.CheckFailed() {
+	if checkerInstance.CheckFailed() {
 		return
 	}
 
