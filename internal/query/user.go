@@ -123,7 +123,7 @@ var (
 		name:  projection.UserSequenceCol,
 		table: userTable,
 	}
-	UserUsernameCol = Column{
+	UserUsernameCol = StringColumn{
 		name:  projection.UserUsernameCol,
 		table: userTable,
 	}
@@ -154,19 +154,19 @@ var (
 		name:  projection.HumanUserIDCol,
 		table: humanTable,
 	}
-	HumanFirstNameCol = Column{
+	HumanFirstNameCol = StringColumn{
 		name:  projection.HumanFirstNameCol,
 		table: humanTable,
 	}
-	HumanLastNameCol = Column{
+	HumanLastNameCol = StringColumn{
 		name:  projection.HumanLastNameCol,
 		table: humanTable,
 	}
-	HumanNickNameCol = Column{
+	HumanNickNameCol = StringColumn{
 		name:  projection.HumanNickNameCol,
 		table: humanTable,
 	}
-	HumanDisplayNameCol = Column{
+	HumanDisplayNameCol = StringColumn{
 		name:  projection.HumanDisplayNameCol,
 		table: humanTable,
 	}
@@ -184,7 +184,7 @@ var (
 	}
 
 	// email
-	HumanEmailCol = Column{
+	HumanEmailCol = StringColumn{
 		name:  projection.HumanEmailCol,
 		table: humanTable,
 	}
@@ -212,7 +212,7 @@ var (
 		name:  projection.MachineUserIDCol,
 		table: machineTable,
 	}
-	MachineNameCol = Column{
+	MachineNameCol = StringColumn{
 		name:  projection.MachineNameCol,
 		table: machineTable,
 	}

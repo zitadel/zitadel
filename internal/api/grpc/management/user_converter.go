@@ -56,7 +56,7 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 	case user.UserFieldName_USER_FIELD_NAME_NICK_NAME:
 		return query.HumanNickNameCol
 	default:
-		return query.Column{}
+		return query.UserIDCol
 	}
 }
 

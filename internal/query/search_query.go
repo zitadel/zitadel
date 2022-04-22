@@ -31,17 +31,15 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	}
 
 	if !req.SortingColumn.isZero() {
-		clause := "LOWER(" + sqlPlaceholder + ")"
+		clause := req.SortingColumn.orderBy()
 		if !req.Asc {
 			clause += " DESC"
 		}
-		query = query.OrderByClause(clause, req.SortingColumn.identifier())
+		query = query.OrderByClause(clause)
 	}
 
 	return query
 }
-
-const sqlPlaceholder = "?"
 
 type SearchQuery interface {
 	toQuery(sq.SelectBuilder) sq.SelectBuilder
@@ -371,6 +369,8 @@ type Column struct {
 	table table
 }
 
+type StringColumn Column
+
 func (c Column) identifier() string {
 	if c.table.alias != "" {
 		return c.table.alias + "." + c.name
@@ -379,6 +379,14 @@ func (c Column) identifier() string {
 		return c.table.name + "." + c.name
 	}
 	return c.name
+}
+
+func (c Column) orderBy() string {
+	return c.identifier()
+}
+
+func (c StringColumn) orderBy() string {
+	return "LOWER(" + Column(c).identifier() + ")"
 }
 
 func (c Column) setTable(t table) Column {
