@@ -365,11 +365,10 @@ func (t table) isZero() bool {
 }
 
 type Column struct {
-	name  string
-	table table
+	name           string
+	table          table
+	isOrderByLower bool
 }
-
-type StringColumn Column
 
 func (c Column) identifier() string {
 	if c.table.alias != "" {
@@ -381,15 +380,10 @@ func (c Column) identifier() string {
 	return c.name
 }
 
-func (c StringColumn) identifier() string {
-	return Column(c).identifier()
-}
-
 func (c Column) orderBy() string {
-	return c.identifier()
-}
-
-func (c StringColumn) orderBy() string {
+	if !c.isOrderByLower {
+		return c.identifier()
+	}
 	return "LOWER(" + c.identifier() + ")"
 }
 

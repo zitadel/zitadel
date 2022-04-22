@@ -123,9 +123,10 @@ var (
 		name:  projection.UserSequenceCol,
 		table: userTable,
 	}
-	UserUsernameCol = StringColumn{
-		name:  projection.UserUsernameCol,
-		table: userTable,
+	UserUsernameCol = Column{
+		name:           projection.UserUsernameCol,
+		table:          userTable,
+		isOrderByLower: true,
 	}
 	UserTypeCol = Column{
 		name:  projection.UserTypeCol,
@@ -154,21 +155,25 @@ var (
 		name:  projection.HumanUserIDCol,
 		table: humanTable,
 	}
-	HumanFirstNameCol = StringColumn{
-		name:  projection.HumanFirstNameCol,
-		table: humanTable,
+	HumanFirstNameCol = Column{
+		name:           projection.HumanFirstNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
-	HumanLastNameCol = StringColumn{
-		name:  projection.HumanLastNameCol,
-		table: humanTable,
+	HumanLastNameCol = Column{
+		name:           projection.HumanLastNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
-	HumanNickNameCol = StringColumn{
-		name:  projection.HumanNickNameCol,
-		table: humanTable,
+	HumanNickNameCol = Column{
+		name:           projection.HumanNickNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
-	HumanDisplayNameCol = StringColumn{
-		name:  projection.HumanDisplayNameCol,
-		table: humanTable,
+	HumanDisplayNameCol = Column{
+		name:           projection.HumanDisplayNameCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
 	HumanPreferredLanguageCol = Column{
 		name:  projection.HumanPreferredLanguageCol,
@@ -184,9 +189,10 @@ var (
 	}
 
 	// email
-	HumanEmailCol = StringColumn{
-		name:  projection.HumanEmailCol,
-		table: humanTable,
+	HumanEmailCol = Column{
+		name:           projection.HumanEmailCol,
+		table:          humanTable,
+		isOrderByLower: true,
 	}
 	HumanIsEmailVerifiedCol = Column{
 		name:  projection.HumanIsEmailVerifiedCol,
@@ -212,9 +218,10 @@ var (
 		name:  projection.MachineUserIDCol,
 		table: machineTable,
 	}
-	MachineNameCol = StringColumn{
-		name:  projection.MachineNameCol,
-		table: machineTable,
+	MachineNameCol = Column{
+		name:           projection.MachineNameCol,
+		table:          machineTable,
+		isOrderByLower: true,
 	}
 	MachineDescriptionCol = Column{
 		name:  projection.MachineDescriptionCol,
