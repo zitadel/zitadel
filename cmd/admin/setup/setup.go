@@ -18,10 +18,11 @@ import (
 var (
 	//go:embed steps.yaml
 	defaultSteps []byte
+	stepFiles    []string
 )
 
 func New() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "setup",
 		Short: "setup ZITADEL instance",
 		Long: `sets up data to start ZITADEL.
@@ -37,6 +38,14 @@ Requirements:
 			Setup(config, steps, masterKey)
 		},
 	}
+
+	Flags(cmd)
+
+	return cmd
+}
+
+func Flags(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringArrayVar(&stepFiles, "steps", nil, "paths to step files to overwrite default steps")
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
@@ -78,4 +87,14 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 3")
 	err = migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
 	logging.OnError(err).Fatal("unable to migrate step 4")
+}
+
+func initSteps(v *viper.Viper, files ...string) func() {
+	return func() {
+		for _, file := range files {
+			v.SetConfigFile(file)
+			err := v.MergeInConfig()
+			logging.WithFields("file", file).OnError(err).Warn("unable to read setup file")
+		}
+	}
 }

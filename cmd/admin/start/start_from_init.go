@@ -38,6 +38,7 @@ Requirements:
 	}
 
 	startFlags(cmd)
+	setup.Flags(cmd)
 
 	return cmd
 }
