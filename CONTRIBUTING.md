@@ -58,9 +58,22 @@ Please validate and test the code before you contribute.
 
 To keep the code clean and understandable we use [golangci-lint](https://golangci-lint.run). We recommend to format the code with this linter while working on ZITADEL to simplify the review process. The configuration is locaed [here](./.golangci.yaml).
 
-To start the backend with a debugger run the [`main.go`-file](./main.go) located in the root of ZITADEL and provide the following arguments: <!-- TODO: args and flags-->. Ensure that the database is running by running `docker compose -f ./build/local/docker-compose.yml up db`. For additional information please use the documentation of your IDE.
+To start the backend with a debugger run the [`main.go`-file](./main.go) located in the root of ZITADEL and provide the arguments and env-variables from below. Ensure that the database is running by running `docker compose -f ./build/local/docker-compose.yml up db`. For additional information please use the documentation of your IDE.
 
 Make sure to use the following configurations:
+
+Environment variables:
+
+```bash
+export CAOS_OIDC_DEV=true
+export ZITADEL_MASTERKEY=JIzH+ZGMn2Vk7PPGAcGmdFL3ZkFTXaU=
+```
+
+Args:
+
+```bash
+admin --config build/local/local-conf.yaml start-from-init
+```
 
 ### Console
 
