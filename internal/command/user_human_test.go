@@ -28,9 +28,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		eventstore      *eventstore.Eventstore
 		idGenerator     id.Generator
 		userPasswordAlg crypto.HashAlgorithm
-		initCodeAlg     crypto.EncryptionAlgorithm
-		emailCodeAlg    crypto.EncryptionAlgorithm
-		phoneAlg        crypto.EncryptionAlgorithm
+		codeAlg         crypto.EncryptionAlgorithm
 	}
 	type args struct {
 		ctx             context.Context
@@ -246,9 +244,8 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				initCodeAlg:  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				emailCodeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -365,8 +362,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				initCodeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				emailCodeAlg:    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -460,7 +456,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				initCodeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -542,7 +538,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				phoneAlg:    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -655,9 +651,8 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				initCodeAlg:  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				emailCodeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -691,10 +686,8 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			r := &Commands{
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
-				userEncryption:  tt.fields.initCodeAlg,
-				smtpEncryption:  tt.fields.emailCodeAlg,
+				userEncryption:  tt.fields.codeAlg,
 				idGenerator:     tt.fields.idGenerator,
-				smsEncryption:   tt.fields.phoneAlg,
 			}
 			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human)
 			if tt.res.err == nil {
@@ -2828,9 +2821,7 @@ func TestAddHumanCommand(t *testing.T) {
 		human       *AddHuman
 		passwordAlg crypto.HashAlgorithm
 		filter      preparation.FilterToQueryReducer
-		phoneAlg    crypto.EncryptionAlgorithm
-		emailAlg    crypto.EncryptionAlgorithm
-		initCodeAlg crypto.EncryptionAlgorithm
+		codeAlg     crypto.EncryptionAlgorithm
 	}
 	agg := user.NewAggregate("id", "ro")
 	tests := []struct {
@@ -2984,7 +2975,7 @@ func TestAddHumanCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg, tt.args.phoneAlg, tt.args.emailAlg, tt.args.initCodeAlg), tt.args.filter, tt.want)
+			AssertValidation(t, AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg, tt.args.codeAlg), tt.args.filter, tt.want)
 		})
 	}
 }
