@@ -63,7 +63,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 		return nil, err
 	}
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddHumanCommand(agg, human, c.userPasswordAlg, c.smsEncryption, c.smtpEncryption, c.userEncryption))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddHumanCommand(agg, human, c.userPasswordAlg, c.userEncryption))
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ type humanCreationCommand interface {
 	AddPasswordData(secret *crypto.CryptoValue, changeRequired bool)
 }
 
-func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, phoneAlg, emailAlg, initCodeAlg crypto.EncryptionAlgorithm) preparation.Validation {
+func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm, codeAlg crypto.EncryptionAlgorithm) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if !human.Email.Valid() {
 			return nil, errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument")
@@ -174,7 +174,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			// email not verified or
 			// user not registered and password set
 			if human.shouldAddInitCode() {
-				value, expiry, err := newUserInitCode(ctx, filter, initCodeAlg)
+				value, expiry, err := newUserInitCode(ctx, filter, codeAlg)
 				if err != nil {
 					return nil, err
 				}
@@ -184,7 +184,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			if human.Email.Verified {
 				cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
 			} else {
-				value, expiry, err := newEmailCode(ctx, filter, emailAlg)
+				value, expiry, err := newEmailCode(ctx, filter, codeAlg)
 				if err != nil {
 					return nil, err
 				}
@@ -194,7 +194,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			if human.Phone.Verified {
 				cmds = append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &a.Aggregate))
 			} else if human.Phone.Number != "" {
-				value, expiry, err := newPhoneCode(ctx, filter, phoneAlg)
+				value, expiry, err := newPhoneCode(ctx, filter, codeAlg)
 				if err != nil {
 					return nil, err
 				}

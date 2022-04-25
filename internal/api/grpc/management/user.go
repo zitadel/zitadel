@@ -199,7 +199,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 	lang, err := language.Parse(req.Profile.PreferredLanguage)
 	logging.OnError(err).Debug("unable to parse language")
 
-	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, &command.AddHuman{
+	human := &command.AddHuman{
 		Username:    req.UserName,
 		FirstName:   req.Profile.FirstName,
 		LastName:    req.Profile.LastName,
@@ -220,7 +220,14 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 		Passwordless:           false,
 		Register:               false,
 		ExternalIDP:            false,
-	})
+	}
+	if req.Phone != nil {
+		human.Phone = command.Phone{
+			Number:   req.Phone.Phone,
+			Verified: req.Phone.IsPhoneVerified,
+		}
+	}
+	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human)
 	if err != nil {
 		return nil, err
 	}

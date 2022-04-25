@@ -312,7 +312,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
-		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.smsEncryption, c.smtpEncryption, c.userEncryption),
+		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
 
@@ -357,10 +357,15 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 
 		AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
-		c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName),
+	)
+	validations = append(validations,
+		c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)...,
 	)
 	if setup.CustomDomain != "" {
-		validations = append(validations, c.addInstanceDomain(instanceAgg, setup.CustomDomain, false))
+		validations = append(validations,
+			c.addInstanceDomain(instanceAgg, setup.CustomDomain, false),
+			setPrimaryInstanceDomain(instanceAgg, setup.CustomDomain),
+		)
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
