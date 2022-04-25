@@ -109,7 +109,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
 	webAuthNConfig := &webauthn.Config{
-		DisplayName:    "ZITADEL",
+		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
 	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ.RolePermissionMappings, storage, authZRepo, webAuthNConfig, keys.IDPConfig, keys.OTP, keys.SMTP, keys.SMS, keys.User, keys.DomainVerification, keys.OIDC)

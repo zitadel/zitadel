@@ -10,6 +10,8 @@ ExternalSecure: true
 HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"
 
+WebAuthNName: ZITADEL
+
 Database:
   Host: localhost
   Port: 26257
