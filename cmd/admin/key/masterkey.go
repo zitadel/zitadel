@@ -21,6 +21,9 @@ var (
 )
 
 func AddMasterKeyFlag(cmd *cobra.Command) {
+	if cmd.PersistentFlags().Lookup(flagMasterKey) != nil {
+		return
+	}
 	cmd.PersistentFlags().StringP(flagMasterKey, flagMasterKeyShort, "", "path to the masterkey for en/decryption keys")
 	cmd.PersistentFlags().String(flagMasterKeyArg, "", "masterkey as argument for en/decryption keys")
 	cmd.PersistentFlags().Bool(flagMasterKeyEnv, false, "read masterkey for en/decryption keys from environment variable (ZITADEL_MASTERKEY)")

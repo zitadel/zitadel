@@ -46,6 +46,7 @@ Requirements:
 
 func Flags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringArrayVar(&stepFiles, "steps", nil, "paths to step files to overwrite default steps")
+	key.AddMasterKeyFlag(cmd)
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
