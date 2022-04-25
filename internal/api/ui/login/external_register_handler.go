@@ -97,7 +97,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	provider, err := l.getRPConfig(idpConfig, EndpointExternalRegisterCallback)
+	provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalRegisterCallback)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -192,7 +192,7 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, nil)
 }
 

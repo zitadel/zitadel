@@ -32,7 +32,11 @@ func IsOrigin(rawOrigin string) bool {
 }
 
 func BuildHTTP(hostname string, externalPort uint16, secure bool) string {
-	return BuildOrigin(fmt.Sprintf("%s:%d", hostname, externalPort), secure)
+	host := hostname
+	if externalPort != 0 {
+		host = fmt.Sprintf("%s:%d", hostname, externalPort)
+	}
+	return BuildOrigin(host, secure)
 }
 
 func BuildOrigin(host string, secure bool) string {

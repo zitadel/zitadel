@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -19,7 +20,8 @@ import (
 
 func TestCommandSide_AddInstanceDomain(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore     *eventstore.Eventstore
+		externalSecure bool
 	}
 	type args struct {
 		ctx    context.Context
@@ -134,6 +136,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", instance.NewAddInstanceDomainUniqueConstraint("domain.ch")),
 					),
 				),
+				externalSecure: true,
 			},
 			args: args{
 				ctx:    authz.WithInstance(context.Background(), new(mockInstance)),
@@ -149,7 +152,8 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:     tt.fields.eventstore,
+				externalSecure: tt.fields.externalSecure,
 			}
 			got, err := r.AddInstanceDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {
@@ -404,8 +408,8 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 
 func newOIDCAppChangedEventInstanceDomain(ctx context.Context, appID, projectID, resourceOwner string) *project.OIDCConfigChangedEvent {
 	changes := []project.OIDCConfigChanges{
-		project.ChangeRedirectURIs([]string{"https://test.ch", "domain.ch/ui/console/auth/callback"}),
-		project.ChangePostLogoutRedirectURIs([]string{"https://test.ch/logout", "domain.ch/ui/console/signedout"}),
+		project.ChangeRedirectURIs([]string{"https://test.ch", "https://domain.ch/ui/console/auth/callback"}),
+		project.ChangePostLogoutRedirectURIs([]string{"https://test.ch/logout", "https://domain.ch/ui/console/signedout"}),
 	}
 	event, _ := project.NewOIDCConfigChangedEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,

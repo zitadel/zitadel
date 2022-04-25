@@ -3,17 +3,17 @@ package middleware
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/query"
 	"google.golang.org/grpc"
+
+	"github.com/caos/zitadel/internal/api/authz"
 
 	_ "github.com/caos/zitadel/internal/statik"
 )
 
-func TranslationHandler(query *query.Queries) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	translator := newZitadelTranslator(query.GetDefaultLanguage(context.Background()))
-
+func TranslationHandler() func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		resp, err := handler(ctx, req)
+		translator := newZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage())
 		if loc, ok := resp.(localizers); ok && resp != nil {
 			translateFields(ctx, loc, translator)
 		}

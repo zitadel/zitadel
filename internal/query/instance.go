@@ -76,14 +76,14 @@ type Instance struct {
 	CreationDate time.Time
 	Sequence     uint64
 
-	GlobalOrgID     string
-	IAMProjectID    string
-	ConsoleID       string
-	ConsoleAppID    string
-	DefaultLanguage language.Tag
-	SetupStarted    domain.Step
-	SetupDone       domain.Step
-	Host            string
+	GlobalOrgID  string
+	IAMProjectID string
+	ConsoleID    string
+	ConsoleAppID string
+	DefaultLang  language.Tag
+	SetupStarted domain.Step
+	SetupDone    domain.Step
+	host         string
 }
 
 type Instances struct {
@@ -108,7 +108,15 @@ func (i *Instance) ConsoleApplicationID() string {
 }
 
 func (i *Instance) RequestedDomain() string {
-	return i.Host
+	return strings.Split(i.host, ":")[0]
+}
+
+func (i *Instance) RequestedHost() string {
+	return i.host
+}
+
+func (i *Instance) DefaultLanguage() language.Tag {
+	return i.DefaultLang
 }
 
 type InstanceSearchQueries struct {
@@ -165,8 +173,9 @@ func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
 	stmt, scan := prepareInstanceDomainQuery(host)
+	host = strings.Split(host, ":")[0] //remove possible port
 	query, args, err := stmt.Where(sq.Eq{
-		InstanceDomainDomainCol.identifier(): strings.Split(host, ":")[0],
+		InstanceDomainDomainCol.identifier(): host,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
@@ -177,11 +186,11 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instan
 }
 
 func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
-	iam, err := q.Instance(ctx)
+	instance, err := q.Instance(ctx)
 	if err != nil {
 		return language.Und
 	}
-	return iam.DefaultLanguage
+	return instance.DefaultLanguage()
 }
 
 func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
@@ -200,7 +209,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 		).
 			From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{Host: host}
+			instance := &Instance{host: host}
 			lang := ""
 			err := row.Scan(
 				&instance.ID,
@@ -221,7 +230,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 			}
-			instance.DefaultLanguage = language.Make(lang)
+			instance.DefaultLang = language.Make(lang)
 			return instance, nil
 		}
 }
@@ -299,7 +308,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{Host: host}
+			instance := &Instance{host: host}
 			lang := ""
 			err := row.Scan(
 				&instance.ID,
@@ -320,7 +329,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 			}
-			instance.DefaultLanguage = language.Make(lang)
+			instance.DefaultLang = language.Make(lang)
 			return instance, nil
 		}
 }

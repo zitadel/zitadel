@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -15,7 +16,7 @@ import (
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := addInstanceDomain(instanceAgg, instanceDomain, false)
+	validation := c.addInstanceDomain(instanceAgg, instanceDomain, false)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -67,12 +68,12 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 	}, nil
 }
 
-func (c *Commands) addGeneratedInstanceDomain(a *instance.Aggregate, instanceName string) preparation.Validation {
-	domain := domain.NewGeneratedInstanceDomain(instanceName, c.iamDomain)
-	return addInstanceDomain(a, domain, true)
+func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.Aggregate, instanceName string) preparation.Validation {
+	domain := domain.NewGeneratedInstanceDomain(instanceName, authz.GetInstance(ctx).RequestedDomain())
+	return c.addInstanceDomain(a, domain, true)
 }
 
-func addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
+func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
@@ -93,8 +94,8 @@ func addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated b
 				return nil, err
 			}
 			if appWriteModel.State.Exists() {
-				redirectUrls := append(appWriteModel.RedirectUris, instanceDomain+consoleRedirectPath)
-				logoutUrls := append(appWriteModel.PostLogoutRedirectUris, instanceDomain+consolePostLogoutPath)
+				redirectUrls := append(appWriteModel.RedirectUris, http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure)+consoleRedirectPath)
+				logoutUrls := append(appWriteModel.PostLogoutRedirectUris, http.BuildOrigin(instanceDomain, c.externalSecure)+consolePostLogoutPath)
 				consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(
 					ctx,
 					ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),

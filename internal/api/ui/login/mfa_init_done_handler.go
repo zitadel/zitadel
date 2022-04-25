@@ -17,6 +17,6 @@ func (l *Login) renderMFAInitDone(w http.ResponseWriter, r *http.Request, authRe
 	var errType, errMessage string
 	data.baseData = l.getBaseData(r, authReq, "MFA Init Done", errType, errMessage)
 	data.profileData = l.getProfileData(authReq)
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFAInitDone], data, nil)
 }

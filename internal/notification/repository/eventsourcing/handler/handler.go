@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -39,7 +38,8 @@ func Register(configs Configs,
 	es v1.Eventstore,
 	command *command.Commands,
 	queries *query.Queries,
-	systemDefaults sd.SystemDefaults,
+	externalPort uint16,
+	externalSecure bool,
 	dir http.FileSystem,
 	assetsPrefix string,
 	userEncryption crypto.EncryptionAlgorithm,
@@ -55,7 +55,8 @@ func Register(configs Configs,
 			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
 			command,
 			queries,
-			systemDefaults,
+			externalPort,
+			externalSecure,
 			dir,
 			assetsPrefix,
 			userEncryption,

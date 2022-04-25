@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/caos/zitadel/internal/admin/repository"
-	http_util "github.com/caos/zitadel/internal/api/http"
 	"google.golang.org/grpc"
+
+	"github.com/caos/zitadel/internal/admin/repository"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
@@ -26,7 +26,6 @@ type Server struct {
 	administrator   repository.AdministratorRepository
 	DefaultInstance command.InstanceSetup
 	ExternalSecure  bool
-	BaseURL         string
 }
 
 type Config struct {
@@ -37,8 +36,6 @@ func CreateServer(command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
 	defaultInstance command.InstanceSetup,
-	externalPort uint16,
-	externalDomain string,
 	externalSecure bool) *Server {
 	return &Server{
 		command:         command,
@@ -46,7 +43,6 @@ func CreateServer(command *command.Commands,
 		administrator:   repo,
 		DefaultInstance: defaultInstance,
 		ExternalSecure:  externalSecure,
-		BaseURL:         http_util.BuildHTTP(externalDomain, externalPort, externalSecure),
 	}
 }
 

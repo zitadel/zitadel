@@ -61,12 +61,12 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 			data.HasNumber = NumberRegex
 		}
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplChangePassword], data, nil)
 }
 
 func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	var errType, errMessage string
 	data := l.getUserData(r, authReq, "Password Change Done", errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplChangePasswordDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

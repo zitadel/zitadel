@@ -249,7 +249,7 @@ func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimed
 	if err != nil {
 		return nil, nil, nil, caos_errs.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
 	}
-	organisation.AddIAMDomain(c.iamDomain)
+	organisation.AddIAMDomain(authz.GetInstance(ctx).RequestedDomain())
 	addedOrg := NewOrgWriteModel(organisation.AggregateID)
 
 	orgAgg := OrgAggregateFromWriteModel(&addedOrg.WriteModel)

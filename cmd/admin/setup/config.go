@@ -4,11 +4,11 @@ import (
 	"bytes"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/command"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/hook"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -20,7 +20,6 @@ type Config struct {
 	SystemDefaults  systemdefaults.SystemDefaults
 	InternalAuthZ   authz.Config
 	ExternalPort    uint16
-	ExternalDomain  string
 	ExternalSecure  bool
 	Log             *logging.Config
 	EncryptionKeys  *encryptionKeyConfig

@@ -22,7 +22,7 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 		Users:    selectionData.Users,
 		Linking:  len(authReq.LinkingUsers) > 0,
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplUserSelection], data, nil)
 }
 

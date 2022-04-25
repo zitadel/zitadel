@@ -9,8 +9,8 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -40,7 +40,7 @@ const (
 type Notification struct {
 	handler
 	command            *command.Commands
-	systemDefaults     sd.SystemDefaults
+	fileSystemPath     string
 	statikDir          http.FileSystem
 	subscription       *v1.Subscription
 	assetsPrefix       string
@@ -48,13 +48,16 @@ type Notification struct {
 	userDataCrypto     crypto.EncryptionAlgorithm
 	smtpPasswordCrypto crypto.EncryptionAlgorithm
 	smsTokenCrypto     crypto.EncryptionAlgorithm
+	externalPort       uint16
+	externalSecure     bool
 }
 
 func newNotification(
 	handler handler,
 	command *command.Commands,
 	query *query.Queries,
-	defaults sd.SystemDefaults,
+	externalPort uint16,
+	externalSecure bool,
 	statikDir http.FileSystem,
 	assetsPrefix string,
 	userEncryption crypto.EncryptionAlgorithm,
@@ -64,13 +67,14 @@ func newNotification(
 	h := &Notification{
 		handler:            handler,
 		command:            command,
-		systemDefaults:     defaults,
 		statikDir:          statikDir,
 		assetsPrefix:       assetsPrefix,
 		queries:            query,
 		userDataCrypto:     userEncryption,
 		smtpPasswordCrypto: smtpEncryption,
 		smsTokenCrypto:     smsEncryption,
+		externalSecure:     externalSecure,
+		externalPort:       externalPort,
 	}
 
 	h.subscribe()
@@ -190,7 +194,11 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
+	origin, err := n.origin(ctx)
+	if err != nil {
+		return err
+	}
+	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix, origin)
 	if err != nil {
 		return err
 	}
@@ -228,7 +236,12 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
+
+	origin, err := n.origin(ctx)
+	if err != nil {
+		return err
+	}
+	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.getSMTPConfig, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix, origin)
 	if err != nil {
 		return err
 	}
@@ -267,7 +280,11 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
+	origin, err := n.origin(ctx)
+	if err != nil {
+		return err
+	}
+	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix, origin)
 	if err != nil {
 		return err
 	}
@@ -294,7 +311,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(ctx, translator, user, phoneCode, n.systemDefaults, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto)
+	err = types.SendPhoneVerificationCode(ctx, translator, user, phoneCode, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto)
 	if err != nil {
 		return err
 	}
@@ -334,7 +351,11 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, colors, n.assetsPrefix)
+	origin, err := n.origin(ctx)
+	if err != nil {
+		return err
+	}
+	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, colors, n.assetsPrefix, origin)
 	if err != nil {
 		return err
 	}
@@ -381,7 +402,11 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 		return err
 	}
 
-	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
+	origin, err := n.origin(ctx)
+	if err != nil {
+		return err
+	}
+	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix, origin)
 	if err != nil {
 		return err
 	}
@@ -492,6 +517,7 @@ func (n *Notification) getFileSystemProvider(ctx context.Context) (*fs.FSConfig,
 	}
 	return &fs.FSConfig{
 		Compact: config.Compact,
+		Path:    n.fileSystemPath,
 	}, nil
 }
 
@@ -507,7 +533,7 @@ func (n *Notification) getLogProvider(ctx context.Context) (*log.LogConfig, erro
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(ctx context.Context, orgID, textType string) (*i18n.Translator, error) {
-	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.queries.GetDefaultLanguage(ctx)})
+	translator, err := i18n.NewTranslator(n.statikDir, n.queries.GetDefaultLanguage(ctx), "")
 	if err != nil {
 		return nil, err
 	}
@@ -534,4 +560,18 @@ func (n *Notification) getTranslatorWithOrgTexts(ctx context.Context, orgID, tex
 
 func (n *Notification) getUserByID(userID, instanceID string) (*model.NotifyUser, error) {
 	return n.view.NotifyUserByID(userID, instanceID)
+}
+
+func (n *Notification) origin(ctx context.Context) (string, error) {
+	primary, err := query.NewInstanceDomainPrimarySearchQuery(true)
+	domains, err := n.queries.SearchInstanceDomains(ctx, &query.InstanceDomainSearchQueries{
+		Queries: []query.SearchQuery{primary},
+	})
+	if err != nil {
+		return "", err
+	}
+	if len(domains.Domains) < 1 {
+		return "", errors.ThrowInternal(nil, "NOTIF-Ef3r1", "Errors.Notification.NoDomain")
+	}
+	return http_utils.BuildHTTP(domains.Domains[0].Domain, n.externalPort, n.externalSecure), nil
 }

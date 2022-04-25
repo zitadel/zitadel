@@ -8,9 +8,9 @@ import (
 	"regexp"
 	"testing"
 
+	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
 )
@@ -105,17 +105,17 @@ func Test_InstancePrepares(t *testing.T) {
 				),
 			},
 			object: &Instance{
-				ID:              "id",
-				CreationDate:    testNow,
-				ChangeDate:      testNow,
-				Sequence:        20211108,
-				GlobalOrgID:     "global-org-id",
-				IAMProjectID:    "project-id",
-				ConsoleID:       "client-id",
-				ConsoleAppID:    "app-id",
-				SetupStarted:    domain.Step2,
-				SetupDone:       domain.Step1,
-				DefaultLanguage: language.English,
+				ID:           "id",
+				CreationDate: testNow,
+				ChangeDate:   testNow,
+				Sequence:     20211108,
+				GlobalOrgID:  "global-org-id",
+				IAMProjectID: "project-id",
+				ConsoleID:    "client-id",
+				ConsoleAppID: "app-id",
+				SetupStarted: domain.Step2,
+				SetupDone:    domain.Step1,
+				DefaultLang:  language.English,
 			},
 		},
 		{

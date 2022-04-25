@@ -3,7 +3,7 @@ package types
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/api/ui/login"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
@@ -24,15 +24,12 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getTwilioConfig func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
+func SendPasswordCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getTwilioConfig func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string, origin string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
 	}
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.PasswordReset, &UrlData{UserID: user.ID, Code: codeString})
-	if err != nil {
-		return err
-	}
+	url := login.InitPasswordLink(origin, user.ID, codeString)
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString
 
@@ -47,8 +44,8 @@ func SendPasswordCode(ctx context.Context, mailhtml string, translator *i18n.Tra
 		return err
 	}
 	if code.NotificationType == int32(domain.NotificationTypeSms) {
-		return generateSms(ctx, user, passwordResetData.Text, systemDefaults.Notifications, getTwilioConfig, getFileSystemProvider, getLogProvider, false)
+		return generateSms(ctx, user, passwordResetData.Text, getTwilioConfig, getFileSystemProvider, getLogProvider, false)
 	}
-	return generateEmail(ctx, user, passwordResetData.Subject, template, systemDefaults.Notifications, smtpConfig, getFileSystemProvider, getLogProvider, true)
+	return generateEmail(ctx, user, passwordResetData.Subject, template, smtpConfig, getFileSystemProvider, getLogProvider, true)
 
 }

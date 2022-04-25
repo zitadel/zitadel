@@ -1,17 +1,18 @@
 package renderer
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"text/template"
 
+	"github.com/caos/logging"
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
-
-	"github.com/caos/logging"
 )
 
 const (
@@ -21,16 +22,16 @@ const (
 )
 
 type Renderer struct {
-	Templates        map[string]*template.Template
-	dir              http.FileSystem
-	translatorConfig i18n.TranslatorConfig
+	Templates  map[string]*template.Template
+	dir        http.FileSystem
+	cookieName string
 }
 
-func NewRenderer(dir http.FileSystem, tmplMapping map[string]string, funcs map[string]interface{}, translatorConfig i18n.TranslatorConfig) (*Renderer, error) {
+func NewRenderer(dir http.FileSystem, tmplMapping map[string]string, funcs map[string]interface{}, cookieName string) (*Renderer, error) {
 	var err error
 	r := &Renderer{
-		dir:              dir,
-		translatorConfig: translatorConfig,
+		dir:        dir,
+		cookieName: cookieName,
 	}
 	err = r.loadTemplates(dir, nil, tmplMapping, funcs)
 	if err != nil {
@@ -46,8 +47,8 @@ func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, tran
 	}
 }
 
-func (r *Renderer) NewTranslator() (*i18n.Translator, error) {
-	return i18n.NewTranslator(r.dir, r.translatorConfig)
+func (r *Renderer) NewTranslator(ctx context.Context) (*i18n.Translator, error) {
+	return i18n.NewTranslator(r.dir, authz.GetInstance(ctx).DefaultLanguage(), r.cookieName)
 }
 
 func (r *Renderer) Localize(translator *i18n.Translator, id string, args map[string]interface{}) string {

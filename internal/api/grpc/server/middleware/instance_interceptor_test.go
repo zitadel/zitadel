@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
@@ -177,6 +178,14 @@ func (m *mockInstance) ConsoleApplicationID() string {
 	return "consoleApplicationID"
 }
 
+func (m *mockInstance) DefaultLanguage() language.Tag {
+	return language.English
+}
+
 func (m *mockInstance) RequestedDomain() string {
 	return "localhost"
+}
+
+func (m *mockInstance) RequestedHost() string {
+	return "localhost:8080"
 }

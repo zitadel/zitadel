@@ -47,7 +47,7 @@ func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, authReq *do
 
 func (l *Login) generatePolicyDescription(r *http.Request, authReq *domain.AuthRequest, policy *iam_model.PasswordComplexityPolicyView) (string, error) {
 	description := "<ul class=\"lgn-no-dots lgn-policy\" id=\"passwordcomplexity\">"
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	minLength := l.renderer.LocalizeFromRequest(translator, r, "Password.MinLength", nil)
 	description += "<li id=\"minlength\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + minLength + " " + strconv.Itoa(int(policy.MinLength)) + "</span></li>"
 	if policy.HasUppercase {

@@ -3,6 +3,10 @@ package management
 import (
 	"context"
 
+	"github.com/caos/oidc/v2/pkg/oidc"
+
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/http"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -10,9 +14,10 @@ func (s *Server) Healthz(context.Context, *mgmt_pb.HealthzRequest) (*mgmt_pb.Hea
 	return &mgmt_pb.HealthzResponse{}, nil
 }
 
-func (s *Server) GetOIDCInformation(ctx context.Context, req *mgmt_pb.GetOIDCInformationRequest) (*mgmt_pb.GetOIDCInformationResponse, error) {
+func (s *Server) GetOIDCInformation(ctx context.Context, _ *mgmt_pb.GetOIDCInformationRequest) (*mgmt_pb.GetOIDCInformationResponse, error) {
+	issuer := http.BuildOrigin(authz.GetInstance(ctx).RequestedDomain(), s.externalSecure) + s.issuerPath
 	return &mgmt_pb.GetOIDCInformationResponse{
-		Issuer:            s.systemDefaults.ZitadelDocs.Issuer,
-		DiscoveryEndpoint: s.systemDefaults.ZitadelDocs.DiscoveryEndpoint,
+		Issuer:            issuer,
+		DiscoveryEndpoint: issuer + oidc.DiscoveryEndpoint,
 	}, nil
 }

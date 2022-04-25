@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -24,6 +25,10 @@ type mailVerificationData struct {
 	baseData
 	profileData
 	UserID string
+}
+
+func MailVerificationLink(origin, userID, code string) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s", externalLink(origin), EndpointMailVerification, userID, code)
 }
 
 func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +97,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 		UserID:      userID,
 		profileData: l.getProfileData(authReq),
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
@@ -101,6 +106,6 @@ func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authR
 		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
 		profileData: l.getProfileData(authReq),
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerified], data, nil)
 }

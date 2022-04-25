@@ -19,9 +19,8 @@ import (
 )
 
 type Config struct {
-	ConsoleOverwriteDir string
-	ShortCache          middleware.CacheConfig
-	LongCache           middleware.CacheConfig
+	ShortCache middleware.CacheConfig
+	LongCache  middleware.CacheConfig
 }
 
 type spaHandler struct {

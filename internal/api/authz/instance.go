@@ -2,6 +2,8 @@ package authz
 
 import (
 	"context"
+
+	"golang.org/x/text/language"
 )
 
 var (
@@ -14,6 +16,8 @@ type Instance interface {
 	ConsoleClientID() string
 	ConsoleApplicationID() string
 	RequestedDomain() string
+	RequestedHost() string
+	DefaultLanguage() language.Tag
 }
 
 type InstanceVerifier interface {
@@ -21,8 +25,11 @@ type InstanceVerifier interface {
 }
 
 type instance struct {
-	ID     string
-	Domain string
+	ID        string
+	Domain    string
+	projectID string
+	appID     string
+	clientID  string
 }
 
 func (i *instance) InstanceID() string {
@@ -30,19 +37,27 @@ func (i *instance) InstanceID() string {
 }
 
 func (i *instance) ProjectID() string {
-	return ""
+	return i.projectID
 }
 
 func (i *instance) ConsoleClientID() string {
-	return ""
+	return i.clientID
 }
 
 func (i *instance) ConsoleApplicationID() string {
-	return ""
+	return i.appID
 }
 
 func (i *instance) RequestedDomain() string {
 	return i.Domain
+}
+
+func (i *instance) RequestedHost() string {
+	return i.Domain
+}
+
+func (i *instance) DefaultLanguage() language.Tag {
+	return language.Und
 }
 
 func GetInstance(ctx context.Context) Instance {
@@ -68,5 +83,17 @@ func WithRequestedDomain(ctx context.Context, domain string) context.Context {
 	}
 
 	i.Domain = domain
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithConsole(ctx context.Context, projectID, appID string) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+
+	i.projectID = projectID
+	i.appID = appID
+	//i.clientID = clientID
 	return context.WithValue(ctx, instanceKey, i)
 }

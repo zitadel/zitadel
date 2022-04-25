@@ -157,7 +157,7 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	return nil
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, externalSecure bool, baseURL string) (string, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, externalSecure bool) (string, *domain.ObjectDetails, error) {
 	instanceID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -167,7 +167,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 		return "", nil, err
 	}
 
-	ctx = authz.SetCtxData(authz.WithInstanceID(ctx, instanceID), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 	requestedDomain := authz.GetInstance(ctx).RequestedDomain()
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), requestedDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
@@ -184,6 +183,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 	if err = setup.generateIDs(); err != nil {
 		return "", nil, err
 	}
+	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
 
 	setup.Org.Human.PasswordChangeRequired = true
 
@@ -194,7 +194,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 
 	validations := []preparation.Validation{
 		addInstance(instanceAgg, setup.InstanceName),
-		c.addGeneratedInstanceDomain(instanceAgg, setup.InstanceName),
 		SetDefaultFeatures(
 			instanceAgg,
 			setup.Features.TierName,
@@ -290,10 +289,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
 	}
 
-	if setup.CustomDomain != "" {
-		validations = append(validations, addInstanceDomain(instanceAgg, setup.CustomDomain, false))
-	}
-
 	console := &addOIDCApp{
 		AddApp: AddApp{
 			Aggregate: *projectAgg,
@@ -301,12 +296,12 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 			Name:      consoleAppName,
 		},
 		Version:                  domain.OIDCVersionV1,
-		RedirectUris:             []string{baseURL + consoleRedirectPath},
+		RedirectUris:             []string{},
 		ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 		GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
 		ApplicationType:          domain.OIDCApplicationTypeUserAgent,
 		AuthMethodType:           domain.OIDCAuthMethodTypeNone,
-		PostLogoutRedirectUris:   []string{baseURL + consolePostLogoutPath},
+		PostLogoutRedirectUris:   []string{},
 		DevMode:                  !externalSecure,
 		AccessTokenType:          domain.OIDCTokenTypeBearer,
 		AccessTokenRoleAssertion: false,
@@ -362,7 +357,11 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 
 		AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
+		c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName),
 	)
+	if setup.CustomDomain != "" {
+		validations = append(validations, c.addInstanceDomain(instanceAgg, setup.CustomDomain, false))
+	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {

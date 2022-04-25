@@ -3,7 +3,6 @@ package types
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/channels/fs"
 	"github.com/caos/zitadel/internal/notification/channels/log"
@@ -13,7 +12,7 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-func generateSms(ctx context.Context, user *view_model.NotifyUser, content string, config systemdefaults.Notifications, getTwilioProvider func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastPhone bool) error {
+func generateSms(ctx context.Context, user *view_model.NotifyUser, content string, getTwilioProvider func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastPhone bool) error {
 	number := ""
 	twilio, err := getTwilioProvider(ctx)
 	if err == nil {
@@ -28,7 +27,7 @@ func generateSms(ctx context.Context, user *view_model.NotifyUser, content strin
 		message.RecipientPhoneNumber = user.LastPhone
 	}
 
-	channelChain, err := senders.SMSChannels(ctx, config, twilio, getFileSystemProvider, getLogProvider)
+	channelChain, err := senders.SMSChannels(ctx, twilio, getFileSystemProvider, getLogProvider)
 
 	if channelChain.Len() == 0 {
 		return caos_errors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")

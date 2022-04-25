@@ -107,7 +107,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	translator := l.getTranslator(authRequest)
+	translator := l.getTranslator(r.Context(), authRequest)
 	if formData == nil {
 		formData = new(registerFormData)
 	}

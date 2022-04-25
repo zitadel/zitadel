@@ -41,15 +41,15 @@ type Message struct {
 	Text string
 }
 
-func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, error) {
+func NewTranslator(dir http.FileSystem, defaultLanguage language.Tag, cookieName string) (*Translator, error) {
 	t := new(Translator)
 	var err error
-	t.bundle, err = newBundle(dir, config.DefaultLanguage)
+	t.bundle, err = newBundle(dir, defaultLanguage)
 	if err != nil {
 		return nil, err
 	}
 	t.cookieHandler = http_util.NewCookieHandler()
-	t.cookieName = config.CookieName
+	t.cookieName = cookieName
 	return t, nil
 }
 

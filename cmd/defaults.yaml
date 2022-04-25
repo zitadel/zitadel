@@ -5,7 +5,6 @@ Log:
 
 Port: 8080
 ExternalPort: 8080
-ExternalDomain: localhost
 ExternalSecure: true
 HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"
@@ -97,7 +96,6 @@ Login:
     SharedMaxAge: 168h #7d
 
 Console:
-  ConsoleOverwriteDir: ""
   ShortCache:
     MaxAge: 5m
     SharedMaxAge: 15m
@@ -138,25 +136,8 @@ EncryptionKeys:
   CSRFCookieKeyID: "csrfCookieKey"
   UserAgentCookieKeyID: "userAgentCookieKey"
 
-#TODO: configure as soon as possible
-#AssetStorage:
-#  Type: $ZITADEL_ASSET_STORAGE_TYPE
-#  Config:
-#    Endpoint: $ZITADEL_ASSET_STORAGE_ENDPOINT
-#    AccessKeyID: $ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID
-#    SecretAccessKey: $ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY
-#    SSL: $ZITADEL_ASSET_STORAGE_SSL
-#    Location: $ZITADEL_ASSET_STORAGE_LOCATION
-#    BucketPrefix: $ZITADEL_ASSET_STORAGE_BUCKET_PREFIX
-#    MultiDelete: $ZITADEL_ASSET_STORAGE_MULTI_DELETE
-
 #TODO: remove as soon as possible
 SystemDefaults:
-  #  DefaultLanguage: 'en'
-  Domain: $ZITADEL_DEFAULT_DOMAIN
-  ZitadelDocs:
-    Issuer: $ZITADEL_ISSUER
-    DiscoveryEndpoint: '$ZITADEL_ISSUER/.well-known/openid-configuration'
   SecretGenerators:
     PasswordSaltCost: 14
     MachineKeySize: 2048
@@ -172,19 +153,11 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
   Notifications:
-    Endpoints:
-      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}'
-      PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
-      VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
-      DomainClaimed: '$ZITADEL_ACCOUNTS/login'
-      PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init'
     FileSystemPath: '.notifications/'
   KeyConfig:
     Size: 2048
     PrivateKeyLifetime: 6h
     PublicKeyLifetime: 30h
-    SigningKeyRotationCheck: 10s
-    SigningKeyGracefulPeriod: 10m
 
 DefaultInstance:
   InstanceName:

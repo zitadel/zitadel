@@ -158,8 +158,8 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) 
 	return scan(row)
 }
 
-func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(messageType, language string) (*MessageText, error) {
-	contents, err := q.readNotificationTextMessages(language)
+func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx context.Context, messageType, language string) (*MessageText, error) {
+	contents, err := q.readNotificationTextMessages(ctx, language)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 }
 
 func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
-	contents, err := q.readNotificationTextMessages(language)
+	contents, err := q.readNotificationTextMessages(ctx, language)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	return result, nil
 }
 
-func (q *Queries) readNotificationTextMessages(language string) ([]byte, error) {
+func (q *Queries) readNotificationTextMessages(ctx context.Context, language string) ([]byte, error) {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
 	var err error
@@ -237,7 +237,7 @@ func (q *Queries) readNotificationTextMessages(language string) ([]byte, error) 
 	if !ok {
 		contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", language))
 		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", q.GetDefaultLanguage(context.Background()).String()))
+			contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
 		}
 		if err != nil {
 			return nil, err
