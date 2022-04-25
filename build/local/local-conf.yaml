@@ -1,14 +1,14 @@
 ExternalSecure: false
 
-database:
-  host: localhost
-  user:
-    username: zitadel
-    ssl:
-      mode: disable
-  database: zitadel
+DATABASE:
+  HOST: localhost
+  USER:
+    USERNAME: zitadel
+    SSL:
+      MODE: disable
+  DATABASE: zitadel
 
-adminUser:
-  username: root
-  ssl:
-    mode: disable
+ADMINUSER:
+  USERNAME: root
+  SSL:
+    MODE: disable

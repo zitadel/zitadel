@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  zitadel:
+    restart: always
+    networks:
+      - zitadel
+    image: ghcr.io/caos/zitadel:latest
+    command: admin --config /.zitadel/local-conf.yaml start-from-init --masterkeyFromEnv
+    environment:
+    #Warning: This key should be recreated for security reasons!
+      - ZITADEL_MASTERKEY=JIzH+ZGMn2Vk7PPGAcGmdFL3ZkFTXaU=
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/debug"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 40s
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 9090:8080
+
+  db:
+    restart: always
+    networks:
+      - zitadel
+    image: cockroachdb/cockroach:v21.2.8
+    command: start-single-node --insecure --listen-addr=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
+    ports:
+      - 8080:8080
+      - 26257:26257
+
+networks:
+  zitadel:

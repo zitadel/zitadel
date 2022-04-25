@@ -16,7 +16,7 @@ For people who are new to ZITADEL: We flag issues which are a good starting poin
 
 Make ZITADEL more popular and give it a ⭐
 
-Help shaping the future of ZITADEL by 
+Help shaping the future of ZITADEL by
 
 - Join our [chat](https://zitadel.ch/chat) and discuss with us or others.
 - Ask or answer questions in the [issues section](https://github.com/caos/zitadel/issues)
@@ -36,10 +36,10 @@ We strongly recomend to talk to us before you start contributing to streamline o
 We accept contributions through pull requests. You need a github account for that. If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork). Please draft the pull request as soon as possible. Go through the following checklist before you submit the final pull request:
 
 1. Create a feature branch from the `main`-branch
-2. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the lastet commit of the `main`-branch
-3. <!-- TODO: additional steps or does the pipeline the rest? -->
-4. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request correct tagging is required and will be requested by the reviewers.
-5. Request a [review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from one of the authors. The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
+1. Make your changes on the new branch
+1. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the lastet commit of the `main`-branch
+1. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request correct tagging is required and will be requested by the reviewers.
+1. Request a [review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from one of the authors. The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
 
 ## Contribute Code
 
@@ -58,7 +58,9 @@ Please validate and test the code before you contribute.
 
 To keep the code clean and understandable we use [golangci-lint](https://golangci-lint.run). We recommend to format the code with this linter while working on ZITADEL to simplify the review process. The configuration is locaed [here](./.golangci.yaml).
 
-To start the backend with a debugger run the [`main.go`-file](./main.go) located in the root of ZITADEL and provide the following arguments: <!-- TODO: args and flags-->. Ensure that the database is running by running `docker compose -f ./build/local/docker-compose.yml up database` <!-- TODO: validate command -->. For additional information please use the documentation of your IDE.
+To start the backend with a debugger run the [`main.go`-file](./main.go) located in the root of ZITADEL and provide the following arguments: <!-- TODO: args and flags-->. Ensure that the database is running by running `docker compose -f ./build/local/docker-compose.yml up db`. For additional information please use the documentation of your IDE.
+
+Make sure to use the following configurations:
 
 ### Console
 
@@ -67,6 +69,8 @@ To start the backend with a debugger run the [`main.go`-file](./main.go) located
 ### API Definitions
 
 Ensure the provided code meets the [offical style guide](https://developers.google.com/protocol-buffers/docs/style).
+
+The following docker command builds the grpc stub into the correct folders:
 
 ```bash
 docker build -f build/grpc/Dockerfile -t zitadel-base:local . \

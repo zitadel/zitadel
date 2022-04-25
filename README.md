@@ -70,14 +70,11 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/doc
 
 ### Run on your machine
 
-<!-- TODO: download/install zitadel  -->
-
-<!-- TODO: insecure, should we write logs to a file? -->
-<!-- TODO: what will be printed? is it possible to open the browser and show the login screen? -->
-
 First of all you need to start the cockroach database [using their guide to start a cluster](https://www.cockroachlabs.com/docs/v21.2/start-a-local-cluster)
 
 After the database is up and running you can start ZITADEL:
+
+<!-- TODO: install zitadel cli -->
 
 ```bash
 zitadel admin start-with-init
