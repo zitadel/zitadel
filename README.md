@@ -87,13 +87,13 @@ zitadel admin start-with-init
 | Language | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
 |----------|--------|--------------|----------|---------|---------------------------|
 | .NET     | [zitadel-net](https://github.com/caos/zitadel-net) | GRPC | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
-| Dart     | [zitadel-dart](https://github.com/caos/zitadel-dart) | GRPC | ✔️ | | [buehler 👑](https://github.com/buehler) |
+| Dart     | [zitadel-dart](https://github.com/caos/zitadel-dart) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
 | Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
 | Go       | [zitadel-go](https://github.com/caos/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
-| Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | | [buehler 👑](https://github.com/buehler) |
-| JVM      | ❌ | ❌ | ❌ | | Maybe you? |
-| Python   | ❌ | ❌ | ❌ | | Maybe you? |
-| Javascript | ❌ | ❌ | ❌ | | Maybe you? |
+| Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
+| JVM      | ❓ | ❓ | ❓ | | Maybe you? |
+| Python   | ❓ | ❓ | ❓ | | Maybe you? |
+| Javascript | ❓ | ❓ | ❓ | | Maybe you? |
 
 (\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.ch/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
 (\*\*) Automatically check if the access token is valid and claims match
