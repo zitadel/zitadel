@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/text"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
@@ -34,6 +35,6 @@ func (s *Server) SetDefaultLanguage(ctx context.Context, req *admin_pb.SetDefaul
 	return nil, nil
 }
 
-func (s *Server) GetDefaultLanguage(ctx context.Context, req *admin_pb.GetDefaultLanguageRequest) (*admin_pb.GetDefaultLanguageResponse, error) {
-	return &admin_pb.GetDefaultLanguageResponse{Language: s.query.GetDefaultLanguage(ctx).String()}, nil
+func (s *Server) GetDefaultLanguage(ctx context.Context, _ *admin_pb.GetDefaultLanguageRequest) (*admin_pb.GetDefaultLanguageResponse, error) {
+	return &admin_pb.GetDefaultLanguageResponse{Language: authz.GetInstance(ctx).DefaultLanguage().String()}, nil
 }

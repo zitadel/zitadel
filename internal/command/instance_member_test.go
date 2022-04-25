@@ -4,6 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/repository/user"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -12,9 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/member"
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
 )
 
 func TestCommandSide_AddIAMMember(t *testing.T) {
@@ -24,7 +26,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		member *domain.Member
+		userID string
+		roles  []string
 	}
 	type res struct {
 		want *domain.Member
@@ -44,8 +47,23 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
+				ctx: context.Background(),
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "invalid roles, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
 				ctx:    context.Background(),
-				member: &domain.Member{},
+				userID: "user1",
+				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -58,50 +76,19 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					t,
 					expectFilter(),
 				),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "IAM_OWNER",
+					},
+				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER"},
-				},
+				ctx:    context.Background(),
+				userID: "user1",
+				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "invalid roles, error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER"},
-				},
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -141,11 +128,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
-				member: &domain.Member{
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER"},
-				},
+				ctx:    context.Background(),
+				userID: "user1",
+				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -191,11 +176,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				member: &domain.Member{
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER"},
-				},
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				userID: "user1",
+				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -244,11 +227,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				member: &domain.Member{
-					UserID: "user1",
-					Roles:  []string{"IAM_OWNER"},
-				},
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				userID: "user1",
+				roles:  []string{"IAM_OWNER"},
 			},
 			res: res{
 				want: &domain.Member{
@@ -269,7 +250,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddInstanceMember(tt.args.ctx, tt.args.member)
+			got, err := r.AddInstanceMember(tt.args.ctx, tt.args.userID, tt.args.roles...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

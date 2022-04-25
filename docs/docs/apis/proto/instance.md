@@ -70,13 +70,13 @@ DomainPrimaryQuery is always equals
 
 
 
-### IdQuery
+### IdsQuery
 IdQuery is always equals
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.max_len: 200<br />  |
+| ids | repeated string | - |  |
 
 
 
@@ -91,7 +91,6 @@ IdQuery is always equals
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  State | - |  |
 | name |  string | - |  |
-| version |  string | - |  |
 
 
 
@@ -102,19 +101,7 @@ IdQuery is always equals
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.id_query |  IdQuery | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.state_query |  StateQuery | - |  |
-
-
-
-
-### StateQuery
-StateQuery is always equals
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| state |  State | - | enum.defined_only: true<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.id_query |  IdsQuery | - |  |
 
 
 

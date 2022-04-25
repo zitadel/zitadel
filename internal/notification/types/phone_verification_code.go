@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
@@ -20,7 +19,7 @@ type PhoneVerificationCodeData struct {
 	UserID string
 }
 
-func SendPhoneVerificationCode(ctx context.Context, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PhoneCode, systemDefaults systemdefaults.SystemDefaults, getTwilioConfig func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm) error {
+func SendPhoneVerificationCode(ctx context.Context, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PhoneCode, getTwilioConfig func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -35,5 +34,5 @@ func SendPhoneVerificationCode(ctx context.Context, translator *i18n.Translator,
 	if err != nil {
 		return err
 	}
-	return generateSms(ctx, user, template, systemDefaults.Notifications, getTwilioConfig, getFileSystemProvider, getLogProvider, true)
+	return generateSms(ctx, user, template, getTwilioConfig, getFileSystemProvider, getLogProvider, true)
 }

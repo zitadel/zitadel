@@ -5,11 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/domain"
@@ -1179,7 +1180,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewMemberCascadeRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"user1",
 								),
 							),

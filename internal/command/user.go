@@ -7,6 +7,7 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -333,7 +334,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 		user.NewDomainClaimedEvent(
 			ctx,
 			userAgg,
-			fmt.Sprintf("%s@temporary.%s", id, c.iamDomain),
+			fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
 			existingUser.UserName,
 			domainPolicy.UserLoginMustBeDomain),
 	}, changedUserGrant, nil

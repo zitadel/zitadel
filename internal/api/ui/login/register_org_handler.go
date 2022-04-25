@@ -3,8 +3,9 @@ package login
 import (
 	"net/http"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
-
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -65,17 +66,8 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordlessInitCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegisterOrg(w, r, authRequest, data, err)
-		return
-	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegisterOrg(w, r, authRequest, data, err)
-		return
-	}
-	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), initCodeGenerator, phoneCodeGenerator, userIDs, true)
+	_ = userIDs //TODO: handle userIDs
+	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg())
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -119,10 +111,10 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	orgPolicy, _ := l.getDefaultDomainPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
-		data.IamDomain = l.iamDomain
+		data.IamDomain = authz.GetInstance(r.Context()).RequestedDomain()
 	}
 
-	translator := l.getTranslator(authRequest)
+	translator := l.getTranslator(r.Context(), authRequest)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
 }
 
@@ -145,8 +137,21 @@ func (d registerOrgFormData) toUserDomain() *domain.Human {
 	}
 }
 
-func (d registerOrgFormData) toOrgDomain() *domain.Org {
-	return &domain.Org{
+func (d registerOrgFormData) toCommandOrg() *command.OrgSetup {
+	if d.Username == "" {
+		d.Username = d.Email
+	}
+	return &command.OrgSetup{
 		Name: d.RegisterOrgName,
+		Human: command.AddHuman{
+			Username:  d.Username,
+			FirstName: d.Firstname,
+			LastName:  d.Lastname,
+			Email: command.Email{
+				Address: d.Email,
+			},
+			Password: d.Password,
+			Register: true,
+		},
 	}
 }

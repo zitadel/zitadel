@@ -16,7 +16,6 @@ import (
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/form"
@@ -25,28 +24,25 @@ import (
 )
 
 type Login struct {
-	endpoint      string
-	router        http.Handler
-	renderer      *Renderer
-	parser        *form.Parser
-	command       *command.Commands
-	query         *query.Queries
-	staticStorage static.Storage
-	//staticCache         cache.Cache //TODO: enable when storage is implemented again
+	endpoint            string
+	router              http.Handler
+	renderer            *Renderer
+	parser              *form.Parser
+	command             *command.Commands
+	query               *query.Queries
+	staticStorage       static.Storage
 	authRepo            auth_repository.Repository
-	baseURL             string
+	externalSecure      bool
 	consolePath         string
-	oidcAuthCallbackURL func(string) string
+	oidcAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
-	iamDomain           string
 }
 
 type Config struct {
 	LanguageCookieName string
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
-	//StaticCache         cache_config.CacheConfig //TODO: enable when storage is implemented again
 }
 
 const (
@@ -60,13 +56,11 @@ func CreateLogin(config Config,
 	query *query.Queries,
 	authRepo *eventsourcing.EsRepository,
 	staticStorage static.Storage,
-	systemDefaults systemdefaults.SystemDefaults,
-	consolePath,
-	domain,
-	baseURL string,
-	oidcAuthCallbackURL func(string) string,
+	consolePath string,
+	oidcAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
 	userAgentCookie,
+	issuerInterceptor,
 	instanceHandler mux.MiddlewareFunc,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
@@ -75,22 +69,15 @@ func CreateLogin(config Config,
 
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
-		baseURL:             baseURL + HandlerPrefix,
+		externalSecure:      externalSecure,
 		consolePath:         consolePath,
 		command:             command,
 		query:               query,
 		staticStorage:       staticStorage,
 		authRepo:            authRepo,
-		iamDomain:           domain,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
 	}
-	//TODO: enable when storage is implemented again
-	//login.staticCache, err = config.StaticCache.Config.NewCache()
-	//if err != nil {
-	//	return nil, fmt.Errorf("unable to create storage cache: %w", err)
-	//}
-
 	statikFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return nil, fmt.Errorf("unable to create filesystem: %w", err)
@@ -105,8 +92,9 @@ func CreateLogin(config Config,
 		return nil, fmt.Errorf("unable to create cacheInterceptor: %w", err)
 	}
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
-	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
-	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName, systemDefaults.DefaultLanguage)
+
+	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources), issuerInterceptor)
+	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil
 }
@@ -134,7 +122,7 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, l.iamDomain), query.TextEndsWithIgnoreCase)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain()), query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
@@ -155,4 +143,8 @@ func setContext(ctx context.Context, resourceOwner string) context.Context {
 		OrgID:  resourceOwner,
 	}
 	return authz.SetCtxData(ctx, data)
+}
+
+func (l *Login) baseURL(ctx context.Context) string {
+	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure) + HandlerPrefix
 }

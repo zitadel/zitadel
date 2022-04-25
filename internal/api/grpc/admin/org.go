@@ -5,8 +5,10 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
@@ -46,22 +48,19 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Org.Name, s.iamDomain))
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Org.Name, authz.GetInstance(ctx).RequestedDomain()))
 	if err != nil {
 		return nil, err
 	}
-	human := setUpOrgHumanToDomain(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
-	org := setUpOrgOrgToDomain(req.Org)
+	_ = userIDs                                                                        //TODO: handle userIDs
+	human := setUpOrgHumanToCommand(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
+	org := setUpOrgOrgToDomain(req.Org)                                                //TODO: handle domain
+	_ = org
 
-	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
-	}
-	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.SetUpOrg(ctx, org, human, initCodeGenerator, phoneCodeGenerator, userIDs, false)
+	objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
+		Name:  req.Org.Name,
+		Human: human,
+	})
 	if err != nil {
 		return nil, err
 	}

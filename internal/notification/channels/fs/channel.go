@@ -19,15 +19,12 @@ import (
 	"github.com/caos/zitadel/internal/notification/messages"
 )
 
-func InitFSChannel(path string, config FSConfig) (channels.NotificationChannel, error) {
-	if path == "" {
-		return nil, nil
-	}
-	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+func InitFSChannel(config FSConfig) (channels.NotificationChannel, error) {
+	if err := os.MkdirAll(config.Path, os.ModePerm); err != nil {
 		return nil, err
 	}
 
-	logging.Log("NOTIF-kSvPp").Debug("successfully initialized filesystem email and sms channel")
+	logging.Debug("successfully initialized filesystem email and sms channel")
 
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 
@@ -48,6 +45,6 @@ func InitFSChannel(path string, config FSConfig) (channels.NotificationChannel, 
 			return caos_errors.ThrowUnimplementedf(nil, "NOTIF-6f9a1", "filesystem provider doesn't support message type %T", message)
 		}
 
-		return ioutil.WriteFile(filepath.Join(path, fileName), []byte(content), 0666)
+		return ioutil.WriteFile(filepath.Join(config.Path, fileName), []byte(content), 0666)
 	}), nil
 }

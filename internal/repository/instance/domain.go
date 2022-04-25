@@ -96,7 +96,7 @@ func NewDomainPrimarySetEvent(ctx context.Context, aggregate *eventstore.Aggrega
 }
 
 func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.Event, error) {
-	orgDomainAdded := &DomainAddedEvent{
+	orgDomainAdded := &DomainPrimarySetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, orgDomainAdded)

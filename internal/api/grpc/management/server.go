@@ -26,6 +26,8 @@ type Server struct {
 	assetAPIPrefix  string
 	passwordHashAlg crypto.HashAlgorithm
 	userCodeAlg     crypto.EncryptionAlgorithm
+	externalSecure  bool
+	issuerPath      string
 }
 
 func CreateServer(
@@ -34,6 +36,8 @@ func CreateServer(
 	sd systemdefaults.SystemDefaults,
 	assetAPIPrefix string,
 	userCodeAlg crypto.EncryptionAlgorithm,
+	externalSecure bool,
+	issuerPath string,
 ) *Server {
 	return &Server{
 		command:         command,
@@ -42,6 +46,8 @@ func CreateServer(
 		assetAPIPrefix:  assetAPIPrefix,
 		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		userCodeAlg:     userCodeAlg,
+		externalSecure:  externalSecure,
+		issuerPath:      issuerPath,
 	}
 }
 

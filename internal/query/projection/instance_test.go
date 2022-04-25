@@ -20,7 +20,37 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		args   args
 		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
-	}{
+	}{{
+		name: "reduceInstanceAdded",
+		args: args{
+			event: getEvent(testEvent(
+				repository.EventType(instance.InstanceAddedEventType),
+				instance.AggregateType,
+				[]byte(`{"name": "Name"}`),
+			), instance.InstanceAddedEventMapper),
+		},
+		reduce: (&InstanceProjection{}).reduceInstanceAdded,
+		want: wantReduce{
+			projection:       InstanceProjectionTable,
+			aggregateType:    eventstore.AggregateType("instance"),
+			sequence:         15,
+			previousSequence: 10,
+			executer: &testExecuter{
+				executions: []execution{
+					{
+						expectedStmt: "INSERT INTO projections.instances (id, creation_date, change_date, sequence, name) VALUES ($1, $2, $3, $4, $5)",
+						expectedArgs: []interface{}{
+							"instance-id",
+							anyArg{},
+							anyArg{},
+							uint64(15),
+							"Name",
+						},
+					},
+				},
+			},
+		},
+	},
 		{
 			name: "reduceGlobalOrgSet",
 			args: args{
@@ -39,12 +69,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, global_org_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, global_org_id) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
-								"instance-id",
 								anyArg{},
 								uint64(15),
 								"orgid",
+								"instance-id",
 							},
 						},
 					},
@@ -69,12 +99,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, iam_project_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, iam_project_id) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
-								"instance-id",
 								anyArg{},
 								uint64(15),
 								"project-id",
+								"instance-id",
 							},
 						},
 					},
@@ -99,12 +129,12 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, default_language) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
-								"instance-id",
 								anyArg{},
 								uint64(15),
 								"en",
+								"instance-id",
 							},
 						},
 					},

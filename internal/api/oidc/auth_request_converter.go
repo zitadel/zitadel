@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/oidc/v2/pkg/oidc"
+	"github.com/caos/oidc/v2/pkg/op"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"

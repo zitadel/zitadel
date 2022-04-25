@@ -99,7 +99,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -109,7 +109,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -128,7 +128,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPConfigRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name",
 							),
@@ -155,7 +155,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -165,7 +165,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -212,7 +212,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -222,7 +222,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -302,8 +302,8 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idpConfigSecretCrypto: tt.fields.secretCrypto,
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := r.ChangeIDPOIDCConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -321,7 +321,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 
 func newIDPOIDCConfigChangedEvent(ctx context.Context, orgID, configID, clientID, issuer, authorizationEndpoint, tokenEndpoint string, secret *crypto.CryptoValue, displayMapping, usernameMapping domain.OIDCMappingField, scopes []string) *org.IDPOIDCConfigChangedEvent {
 	event, _ := org.NewIDPOIDCConfigChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		configID,
 		[]idpconfig.OIDCConfigChanges{
 			idpconfig.ChangeClientID(clientID),

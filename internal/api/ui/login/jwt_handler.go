@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/client/rp"
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/v2/pkg/client/rp"
+	"github.com/caos/oidc/v2/pkg/oidc"
 
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/domain"
@@ -99,7 +99,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 			return
 		}
 	}
-	redirect, err := l.redirectToJWTCallback(authReq)
+	redirect, err := l.redirectToJWTCallback(r.Context(), authReq)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
@@ -153,7 +153,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	redirect, err := l.redirectToJWTCallback(authReq)
+	redirect, err := l.redirectToJWTCallback(r.Context(), authReq)
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
@@ -174,8 +174,8 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 	return nil
 }
 
-func (l *Login) redirectToJWTCallback(authReq *domain.AuthRequest) (string, error) {
-	redirect, err := url.Parse(l.baseURL + EndpointJWTCallback)
+func (l *Login) redirectToJWTCallback(ctx context.Context, authReq *domain.AuthRequest) (string, error) {
+	redirect, err := url.Parse(l.baseURL(ctx) + EndpointJWTCallback)
 	if err != nil {
 		return "", err
 	}

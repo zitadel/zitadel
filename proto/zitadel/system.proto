@@ -105,7 +105,7 @@ service SystemService {
     // Returns a list of ZITADEL instances/tenants
     rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
         option (google.api.http) = {
-            post: "/instances"
+            post: "/instances/_search"
             body: "*"
         };
     }
@@ -134,17 +134,11 @@ service SystemService {
         };
     }
 
-    // Returns the usage metrics of an instance
-    rpc GetUsage(GetUsageRequest) returns (GetUsageResponse) {
-        option (google.api.http) = {
-            get: "/instances/{id}/usage";
-        };
-    }
-
     // Returns the custom domains of an instance
     rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
         option (google.api.http) = {
-            get: "/instances/{id}/domains";
+            post: "/instances/{id}/domains/_search";
+            body: "*"
         };
     }
 
@@ -178,6 +172,7 @@ service SystemService {
     rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
         option (google.api.http) = {
             post: "/views/_search";
+            body: "*"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -229,6 +224,7 @@ service SystemService {
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
             post: "/failedevents/_search";
+            body: "*"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -322,19 +318,19 @@ message GetInstanceResponse {
 
 message AddInstanceRequest {
     string instance_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string first_org_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string first_org_name = 2 [(validate.rules).string = {max_len: 200}];
     string custom_domain = 3 [(validate.rules).string = {max_len: 200}];
-    string owner_first_name = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_last_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string owner_first_name = 4 [(validate.rules).string = {max_len: 200}];
+    string owner_last_name = 5 [(validate.rules).string = {max_len: 200}];
     string owner_email = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_username = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string password = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    uint64 request_limit = 9;
-    uint64 action_mins_limit = 10;
+    string owner_username = 7 [(validate.rules).string = {max_len: 200}];
+    uint64 request_limit = 8;
+    uint64 action_mins_limit = 9;
 }
 
 message AddInstanceResponse {
     string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message RemoveInstanceRequest {

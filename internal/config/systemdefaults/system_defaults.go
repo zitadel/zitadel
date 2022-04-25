@@ -3,25 +3,15 @@ package systemdefaults
 import (
 	"time"
 
-	"golang.org/x/text/language"
-
 	"github.com/caos/zitadel/internal/crypto"
 )
 
 type SystemDefaults struct {
-	DefaultLanguage    language.Tag
-	Domain             string
-	ZitadelDocs        ZitadelDocs
 	SecretGenerators   SecretGenerators
 	Multifactors       MultifactorConfig
 	DomainVerification DomainVerification
 	Notifications      Notifications
 	KeyConfig          KeyConfig
-}
-
-type ZitadelDocs struct {
-	Issuer            string
-	DiscoveryEndpoint string
 }
 
 type SecretGenerators struct {
@@ -43,22 +33,11 @@ type DomainVerification struct {
 }
 
 type Notifications struct {
-	Endpoints      Endpoints
 	FileSystemPath string
 }
 
-type Endpoints struct {
-	InitCode                 string
-	PasswordReset            string
-	VerifyEmail              string
-	DomainClaimed            string
-	PasswordlessRegistration string
-}
-
 type KeyConfig struct {
-	Size                     int
-	PrivateKeyLifetime       time.Duration
-	PublicKeyLifetime        time.Duration
-	SigningKeyRotationCheck  time.Duration
-	SigningKeyGracefulPeriod time.Duration
+	Size               int
+	PrivateKeyLifetime time.Duration
+	PublicKeyLifetime  time.Duration
 }

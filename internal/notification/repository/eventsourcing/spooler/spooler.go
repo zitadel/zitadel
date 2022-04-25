@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -27,7 +26,8 @@ func StartSpooler(c SpoolerConfig,
 	sql *sql.DB,
 	command *command.Commands,
 	queries *query.Queries,
-	systemDefaults sd.SystemDefaults,
+	externalPort uint16,
+	externalSecure bool,
 	dir http.FileSystem,
 	assetsPrefix string,
 	userEncryption crypto.EncryptionAlgorithm,
@@ -38,7 +38,7 @@ func StartSpooler(c SpoolerConfig,
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, systemDefaults, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, externalPort, externalSecure, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

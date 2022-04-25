@@ -69,7 +69,9 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) erro
 		return err
 	}
 	a.RegisterHandler(prefix, handler)
-	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
+	if a.verifier != nil {
+		a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
+	}
 	return nil
 }
 

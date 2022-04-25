@@ -22,7 +22,7 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, co
 
 	var token *crypto.CryptoValue
 	if config.Token != "" {
-		token, err = crypto.Encrypt([]byte(config.Token), c.smsCrypto)
+		token, err = crypto.Encrypt([]byte(config.Token), c.smsEncryption)
 		if err != nil {
 			return "", nil, err
 		}
@@ -91,7 +91,7 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, i
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fj9wf", "Errors.SMSConfig.NotFound")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	newtoken, err := crypto.Encrypt([]byte(token), c.smsCrypto)
+	newtoken, err := crypto.Encrypt([]byte(token), c.smsEncryption)
 	if err != nil {
 		return nil, err
 	}

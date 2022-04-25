@@ -17,6 +17,14 @@ type loginData struct {
 	Register  bool   `schema:"register"`
 }
 
+func LoginLink(origin string) string {
+	return externalLink(origin) + EndpointLogin
+}
+
+func externalLink(origin string) string {
+	return origin + HandlerPrefix
+}
+
 func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequest(r)
 	if err != nil {
@@ -82,5 +90,5 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplLogin], data, funcs)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplLogin], data, funcs)
 }

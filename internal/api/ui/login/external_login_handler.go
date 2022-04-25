@@ -1,14 +1,15 @@
 package login
 
 import (
+	"context"
 	"encoding/base64"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/caos/oidc/pkg/client/rp"
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/v2/pkg/client/rp"
+	"github.com/caos/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -100,7 +101,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 }
 
 func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
-	provider, err := l.getRPConfig(idpConfig, callbackEndpoint)
+	provider, err := l.getRPConfig(r.Context(), idpConfig, callbackEndpoint)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -150,7 +151,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	if idpConfig.IsOIDC {
-		provider, err := l.getRPConfig(idpConfig, EndpointExternalLoginCallback)
+		provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalLoginCallback)
 		if err != nil {
 			l.renderLogin(w, r, authReq, err)
 			return
@@ -166,13 +167,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 }
 
-func (l *Login) getRPConfig(idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
+func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
 	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
 	if idpConfig.OIDCIssuer != "" {
-		return rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
+		return rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL(ctx)+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 	}
 	if idpConfig.OAuthAuthorizationEndpoint == "" || idpConfig.OAuthTokenEndpoint == "" {
 		return nil, caos_errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig")
@@ -184,7 +185,7 @@ func (l *Login) getRPConfig(idpConfig *iam_model.IDPConfigView, callbackEndpoint
 			AuthURL:  idpConfig.OAuthAuthorizationEndpoint,
 			TokenURL: idpConfig.OAuthTokenEndpoint,
 		},
-		RedirectURL: l.baseURL + callbackEndpoint,
+		RedirectURL: l.baseURL(ctx) + callbackEndpoint,
 		Scopes:      idpConfig.OIDCScopes,
 	}
 	return rp.NewRelyingPartyOAuth(oauth2Config, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
@@ -308,7 +309,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
 }
 

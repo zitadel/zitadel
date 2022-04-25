@@ -11,11 +11,10 @@ import (
 	"github.com/caos/zitadel/internal/notification/messages"
 	"github.com/caos/zitadel/internal/notification/senders"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-func generateEmail(ctx context.Context, user *view_model.NotifyUser, subject, content string, config systemdefaults.Notifications, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastEmail bool) error {
+func generateEmail(ctx context.Context, user *view_model.NotifyUser, subject, content string, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastEmail bool) error {
 	content = html.UnescapeString(content)
 	message := &messages.Email{
 		Recipients: []string{user.VerifiedEmail},
@@ -26,7 +25,7 @@ func generateEmail(ctx context.Context, user *view_model.NotifyUser, subject, co
 		message.Recipients = []string{user.LastEmail}
 	}
 
-	channelChain, err := senders.EmailChannels(ctx, config, smtpConfig, getFileSystemProvider, getLogProvider)
+	channelChain, err := senders.EmailChannels(ctx, smtpConfig, getFileSystemProvider, getLogProvider)
 	if err != nil {
 		return err
 	}

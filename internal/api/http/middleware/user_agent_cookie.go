@@ -21,10 +21,6 @@ func UserAgentIDFromCtx(ctx context.Context) (string, bool) {
 	return userAgentID, ok
 }
 
-func InstanceIDFromCtx(ctx context.Context) string {
-	return "" //TODO: implement
-}
-
 type UserAgent struct {
 	ID string
 }
@@ -41,10 +37,9 @@ type UserAgentCookieConfig struct {
 	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, domain string, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
+func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
 	opts := []http_utils.CookieHandlerOpt{
 		http_utils.WithEncryption(cookieKey, cookieKey),
-		http_utils.WithDomain(domain),
 		http_utils.WithMaxAge(int(config.MaxAge.Seconds())),
 	}
 	if !externalSecure {
@@ -68,7 +63,7 @@ func (ua *userAgentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		ctx := context.WithValue(r.Context(), userAgentKey, agent.ID)
 		r = r.WithContext(ctx)
-		ua.setUserAgent(w, agent)
+		ua.setUserAgent(w, r.Host, agent)
 	}
 	ua.nextHandler.ServeHTTP(w, r)
 }
@@ -90,8 +85,8 @@ func (ua *userAgentHandler) getUserAgent(r *http.Request) (*UserAgent, error) {
 	return userAgent, nil
 }
 
-func (ua *userAgentHandler) setUserAgent(w http.ResponseWriter, agent *UserAgent) error {
-	err := ua.cookieHandler.SetEncryptedCookie(w, ua.cookieName, agent)
+func (ua *userAgentHandler) setUserAgent(w http.ResponseWriter, host string, agent *UserAgent) error {
+	err := ua.cookieHandler.SetEncryptedCookie(w, ua.cookieName, host, agent)
 	if err != nil {
 		return errors.ThrowPermissionDenied(err, "HTTP-AqgqdA", "cannot set user agent cookie")
 	}

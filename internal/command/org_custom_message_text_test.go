@@ -74,7 +74,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageGreeting,
 									"Greeting",
@@ -83,7 +83,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageSubject,
 									"Subject",
@@ -92,7 +92,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageTitle,
 									"Title",
@@ -101,7 +101,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessagePreHeader,
 									"PreHeader",
@@ -110,7 +110,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageText,
 									"Text",
@@ -119,7 +119,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageButtonText,
 									"ButtonText",
@@ -128,7 +128,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageFooterText,
 									"Footer",
@@ -168,7 +168,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageGreeting,
 								"Greeting",
@@ -177,7 +177,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageSubject,
 								"Subject",
@@ -186,7 +186,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageTitle,
 								"Title",
@@ -195,7 +195,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessagePreHeader,
 								"PreHeader",
@@ -204,7 +204,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageText,
 								"Text",
@@ -213,7 +213,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageButtonText,
 								"ButtonText",
@@ -222,7 +222,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageFooterText,
 								"Footer",
@@ -234,7 +234,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageGreeting,
 									language.English,
@@ -242,7 +242,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageSubject,
 									language.English,
@@ -250,7 +250,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageTitle,
 									language.English,
@@ -258,7 +258,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessagePreHeader,
 									language.English,
@@ -266,7 +266,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageText,
 									language.English,
@@ -274,7 +274,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageButtonText,
 									language.English,
@@ -282,7 +282,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									domain.MessageFooterText,
 									language.English,
@@ -409,7 +409,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageGreeting,
 								"Greeting",
@@ -418,7 +418,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageSubject,
 								"Subject",
@@ -427,7 +427,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageTitle,
 								"Title",
@@ -436,7 +436,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessagePreHeader,
 								"PreHeader",
@@ -445,7 +445,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageText,
 								"Text",
@@ -454,7 +454,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageButtonText,
 								"ButtonText",
@@ -463,7 +463,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"Template",
 								domain.MessageFooterText,
 								"Footer",
@@ -475,7 +475,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewCustomTextTemplateRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"Template",
 									language.English,
 								),

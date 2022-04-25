@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -21,6 +22,14 @@ var (
 	}
 	InstanceColumnID = Column{
 		name:  projection.InstanceColumnID,
+		table: instanceTable,
+	}
+	InstanceColumnName = Column{
+		name:  projection.InstanceColumnName,
+		table: instanceTable,
+	}
+	InstanceColumnCreationDate = Column{
+		name:  projection.InstanceColumnCreationDate,
 		table: instanceTable,
 	}
 	InstanceColumnChangeDate = Column{
@@ -62,18 +71,24 @@ var (
 )
 
 type Instance struct {
-	ID         string
-	ChangeDate time.Time
-	Sequence   uint64
+	ID           string
+	ChangeDate   time.Time
+	CreationDate time.Time
+	Sequence     uint64
 
-	GlobalOrgID     string
-	IAMProjectID    string
-	ConsoleID       string
-	ConsoleAppID    string
-	DefaultLanguage language.Tag
-	SetupStarted    domain.Step
-	SetupDone       domain.Step
-	Host            string
+	GlobalOrgID  string
+	IAMProjectID string
+	ConsoleID    string
+	ConsoleAppID string
+	DefaultLang  language.Tag
+	SetupStarted domain.Step
+	SetupDone    domain.Step
+	host         string
+}
+
+type Instances struct {
+	SearchResponse
+	Instances []*Instance
 }
 
 func (i *Instance) InstanceID() string {
@@ -93,12 +108,28 @@ func (i *Instance) ConsoleApplicationID() string {
 }
 
 func (i *Instance) RequestedDomain() string {
-	return i.Host
+	return strings.Split(i.host, ":")[0]
+}
+
+func (i *Instance) RequestedHost() string {
+	return i.host
+}
+
+func (i *Instance) DefaultLanguage() language.Tag {
+	return i.DefaultLang
 }
 
 type InstanceSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
+}
+
+func NewInstanceIDsListSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(InstanceColumnID, list, ListIn)
 }
 
 func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -107,6 +138,24 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 		query = q.toQuery(query)
 	}
 	return query
+}
+
+func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
+	query, scan := prepareInstancesQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-3j98f", "Errors.Internal")
+	}
+	instances, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	return instances, err
 }
 
 func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
@@ -123,9 +172,10 @@ func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 }
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
-	stmt, scan := prepareInstanceQuery(host)
+	stmt, scan := prepareInstanceDomainQuery(host)
+	host = strings.Split(host, ":")[0] //remove possible port
 	query, args, err := stmt.Where(sq.Eq{
-		InstanceColumnID.identifier(): "system", //TODO: change column to domain when available
+		InstanceDomainDomainCol.identifier(): host,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
@@ -136,16 +186,17 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instan
 }
 
 func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
-	iam, err := q.Instance(ctx)
+	instance, err := q.Instance(ctx)
 	if err != nil {
 		return language.Und
 	}
-	return iam.DefaultLanguage
+	return instance.DefaultLanguage()
 }
 
 func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
+			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
 			InstanceColumnGlobalOrgID.identifier(),
@@ -158,10 +209,11 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 		).
 			From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{Host: host}
+			instance := &Instance{host: host}
 			lang := ""
 			err := row.Scan(
 				&instance.ID,
+				&instance.CreationDate,
 				&instance.ChangeDate,
 				&instance.Sequence,
 				&instance.GlobalOrgID,
@@ -178,7 +230,106 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 			}
-			instance.DefaultLanguage = language.Make(lang)
+			instance.DefaultLang = language.Make(lang)
+			return instance, nil
+		}
+}
+
+func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+	return sq.Select(
+			InstanceColumnID.identifier(),
+			InstanceColumnCreationDate.identifier(),
+			InstanceColumnChangeDate.identifier(),
+			InstanceColumnSequence.identifier(),
+			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnProjectID.identifier(),
+			InstanceColumnConsoleID.identifier(),
+			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnSetupStarted.identifier(),
+			InstanceColumnSetupDone.identifier(),
+			InstanceColumnDefaultLanguage.identifier(),
+			countColumn.identifier(),
+		).From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*Instances, error) {
+			instances := make([]*Instance, 0)
+			var count uint64
+			for rows.Next() {
+				instance := new(Instance)
+				lang := ""
+				//TODO: Get Host
+				err := rows.Scan(
+					&instance.ID,
+					&instance.CreationDate,
+					&instance.ChangeDate,
+					&instance.Sequence,
+					&instance.GlobalOrgID,
+					&instance.IAMProjectID,
+					&instance.ConsoleID,
+					&instance.ConsoleAppID,
+					&instance.SetupStarted,
+					&instance.SetupDone,
+					&lang,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				instances = append(instances, instance)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-8nlWW", "Errors.Query.CloseRows")
+			}
+
+			return &Instances{
+				Instances: instances,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
+}
+
+func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+	return sq.Select(
+			InstanceColumnID.identifier(),
+			InstanceColumnCreationDate.identifier(),
+			InstanceColumnChangeDate.identifier(),
+			InstanceColumnSequence.identifier(),
+			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnProjectID.identifier(),
+			InstanceColumnConsoleID.identifier(),
+			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnSetupStarted.identifier(),
+			InstanceColumnSetupDone.identifier(),
+			InstanceColumnDefaultLanguage.identifier(),
+		).
+			From(instanceTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
+			PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Instance, error) {
+			instance := &Instance{host: host}
+			lang := ""
+			err := row.Scan(
+				&instance.ID,
+				&instance.CreationDate,
+				&instance.ChangeDate,
+				&instance.Sequence,
+				&instance.GlobalOrgID,
+				&instance.IAMProjectID,
+				&instance.ConsoleID,
+				&instance.ConsoleAppID,
+				&instance.SetupStarted,
+				&instance.SetupDone,
+				&lang,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
+			}
+			instance.DefaultLang = language.Make(lang)
 			return instance, nil
 		}
 }

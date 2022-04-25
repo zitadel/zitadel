@@ -61,7 +61,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -93,7 +93,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewPrivacyPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"TOSLink",
 									"PrivacyLink",
 									"HelpLink",
@@ -134,7 +134,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewPrivacyPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"",
 									"",
 									"",
@@ -252,7 +252,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -282,7 +282,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -327,7 +327,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -440,7 +440,7 @@ func TestCommandSide_RemovePrivacyPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPrivacyPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
 								"HelpLink",
@@ -451,7 +451,7 @@ func TestCommandSide_RemovePrivacyPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewPrivacyPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -489,7 +489,7 @@ func TestCommandSide_RemovePrivacyPolicy(t *testing.T) {
 
 func newPrivacyPolicyChangedEvent(ctx context.Context, orgID string, tosLink, privacyLink, helpLink string) *org.PrivacyPolicyChangedEvent {
 	event, _ := org.NewPrivacyPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.PrivacyPolicyChanges{
 			policy.ChangeTOSLink(tosLink),
 			policy.ChangePrivacyLink(privacyLink),

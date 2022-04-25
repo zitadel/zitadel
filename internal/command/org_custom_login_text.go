@@ -15,7 +15,7 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-m29rF", "Errors.ResourceOwnerMissing")
 	}
-	iamAgg := org.NewAggregate(resourceOwner, resourceOwner)
+	iamAgg := org.NewAggregate(resourceOwner)
 	events, existingLoginText, err := c.setOrgLoginText(ctx, &iamAgg.Aggregate, loginText)
 	if err != nil {
 		return nil, err

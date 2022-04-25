@@ -51,7 +51,7 @@ func Test_customDomainPolicy(t *testing.T) {
 					return []eventstore.Event{
 						org.NewDomainPolicyAddedEvent(
 							context.Background(),
-							&org.NewAggregate("id", "ro").Aggregate,
+							&org.NewAggregate("id").Aggregate,
 							true,
 							true,
 						),
@@ -61,7 +61,7 @@ func Test_customDomainPolicy(t *testing.T) {
 			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
-					ResourceOwner: "ro",
+					ResourceOwner: "id",
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,
@@ -183,7 +183,7 @@ func Test_DomainPolicy(t *testing.T) {
 					return []eventstore.Event{
 						org.NewDomainPolicyAddedEvent(
 							context.Background(),
-							&org.NewAggregate("id", "ro").Aggregate,
+							&org.NewAggregate("id").Aggregate,
 							true,
 							true,
 						),
@@ -193,7 +193,7 @@ func Test_DomainPolicy(t *testing.T) {
 			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID:   "id",
-					ResourceOwner: "ro",
+					ResourceOwner: "id",
 					Events:        []eventstore.Event{},
 				},
 				UserLoginMustBeDomain: true,

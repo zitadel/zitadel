@@ -181,7 +181,7 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner str
 	events := []eventstore.Command{
 		action.NewRemovedEvent(ctx, actionAgg, existingAction.Name),
 	}
-	orgAgg := org.NewAggregate(resourceOwner, resourceOwner).Aggregate
+	orgAgg := org.NewAggregate(resourceOwner).Aggregate
 	for _, flowType := range flowTypes {
 		events = append(events, org.NewTriggerActionsCascadeRemovedEvent(ctx, &orgAgg, flowType, actionID))
 	}

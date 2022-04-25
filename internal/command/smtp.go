@@ -20,7 +20,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 	}
 	var smtpPassword *crypto.CryptoValue
 	if config.SMTP.Password != "" {
-		smtpPassword, err = crypto.Encrypt([]byte(config.SMTP.Password), c.smtpPasswordCrypto)
+		smtpPassword, err = crypto.Encrypt([]byte(config.SMTP.Password), c.smtpEncryption)
 		if err != nil {
 			return nil, err
 		}
@@ -90,7 +90,7 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, pas
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-	newPW, err := crypto.Encrypt([]byte(password), c.smtpPasswordCrypto)
+	newPW, err := crypto.Encrypt([]byte(password), c.smtpEncryption)
 	if err != nil {
 		return nil, err
 	}

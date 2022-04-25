@@ -64,7 +64,7 @@ func TestCommands_AddAction(t *testing.T) {
 						eventFromEventPusher(
 							func() eventstore.Command {
 								e, _ := org.NewFeaturesSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									[]features.FeaturesChanges{
 										features.ChangeMaxActions(1),
 									},
@@ -106,7 +106,7 @@ func TestCommands_AddAction(t *testing.T) {
 						eventFromEventPusher(
 							func() eventstore.Command {
 								e, _ := org.NewFeaturesSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									[]features.FeaturesChanges{
 										features.ChangeMaxActions(2),
 									},
@@ -164,7 +164,7 @@ func TestCommands_AddAction(t *testing.T) {
 						eventFromEventPusher(
 							func() eventstore.Command {
 								e, _ := org.NewFeaturesSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									[]features.FeaturesChanges{
 										features.ChangeMaxActions(2),
 									},
@@ -687,7 +687,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 						eventFromEventPusher(
 							func() eventstore.Command {
 								e, _ := org.NewFeaturesSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									[]features.FeaturesChanges{
 										features.ChangeMaxActions(1),
 									},
@@ -742,7 +742,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 						eventFromEventPusher(
 							func() eventstore.Command {
 								e, _ := org.NewFeaturesSetEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									[]features.FeaturesChanges{
 										features.ChangeMaxActions(1),
 									},
@@ -923,7 +923,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewTriggerActionsCascadeRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									domain.FlowTypeExternalAuthentication,
 									"id1",
 								),

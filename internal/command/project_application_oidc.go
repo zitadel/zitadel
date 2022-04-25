@@ -291,7 +291,7 @@ func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID,
 		return err
 	}
 	if !app.State.Exists() {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.NoExisting")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.NotExisting")
 	}
 	if !app.IsOIDC() {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC")
@@ -320,4 +320,18 @@ func (c *Commands) getOIDCAppWriteModel(ctx context.Context, projectID, appID, r
 		return nil, err
 	}
 	return appWriteModel, nil
+}
+
+func getOIDCAppWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, appID, resourceOwner string) (*OIDCApplicationWriteModel, error) {
+	appWriteModel := NewOIDCApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
+	events, err := filter(ctx, appWriteModel.Query())
+	if err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return appWriteModel, nil
+	}
+	appWriteModel.AppendEvents(events...)
+	err = appWriteModel.Reduce()
+	return appWriteModel, err
 }

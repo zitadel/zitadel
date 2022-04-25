@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/hook"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -15,20 +16,26 @@ import (
 )
 
 type Config struct {
-	Database       database.Config
-	SystemDefaults systemdefaults.SystemDefaults
-	InternalAuthZ  authz.Config
-	ExternalPort   uint16
-	ExternalDomain string
-	ExternalSecure bool
-	Log            *logging.Config
-	EncryptionKeys *encryptionKeyConfig
+	Database        database.Config
+	SystemDefaults  systemdefaults.SystemDefaults
+	InternalAuthZ   authz.Config
+	ExternalPort    uint16
+	ExternalSecure  bool
+	Log             *logging.Config
+	EncryptionKeys  *encryptionKeyConfig
+	DefaultInstance command.InstanceSetup
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
-	err := v.Unmarshal(config)
-	logging.OnError(err).Fatal("unable to read config")
+	err := v.Unmarshal(config,
+		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hook.Base64ToBytesHookFunc(),
+			hook.TagToLanguageHookFunc(),
+			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToSliceHookFunc(","),
+		)),
+	)
 
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")

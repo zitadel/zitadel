@@ -47,27 +47,4 @@ export class IamViewsComponent implements AfterViewInit {
       this.dataSource.sort = this.sort;
     });
   }
-
-  public cancelView(viewname: string, db: string): void {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.CLEAR',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'IAM.VIEWS.DIALOG.VIEW_CLEAR_TITLE',
-        descriptionKey: 'IAM.VIEWS.DIALOG.VIEW_CLEAR_DESCRIPTION',
-      },
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe(resp => {
-      if (resp) {
-        this.adminService.clearView(viewname, db).then(() => {
-          this.toast.showInfo('IAM.VIEWS.CLEARED', true);
-          this.loadViews();
-        }).catch(error => {
-          this.toast.showError(error);
-        });
-      }
-    });
-  }
 }

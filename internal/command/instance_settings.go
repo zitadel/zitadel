@@ -3,43 +3,72 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/command/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
-	if generatorType == domain.SecretGeneratorTypeUnspecified {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0pkwf", "Errors.SecretGenerator.TypeMissing")
+func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
+	agg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, addSecretGeneratorConfig(agg, typ, config))
+	if err != nil {
+		return nil, err
 	}
 
-	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
+	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	if generatorWriteModel.State == domain.SecretGeneratorStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-3n9ls", "Errors.SecretGenerator.AlreadyExists")
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: agg.ResourceOwner,
+	}, nil
+}
+
+func addSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if !typ.Valid() {
+			return nil, errors.ThrowInvalidArgument(nil, "V2-FGqVj", "Errors.InvalidArgument")
+		}
+		if config.Length < 1 {
+			return nil, errors.ThrowInvalidArgument(nil, "V2-jEqCt", "Errors.InvalidArgument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+
+			if writeModel.State == domain.SecretGeneratorStateActive {
+				return nil, errors.ThrowAlreadyExists(nil, "V2-6CqKo", "Errors.SecretGenerator.AlreadyExists")
+			}
+
+			return []eventstore.Command{
+				instance.NewSecretGeneratorAddedEvent(
+					ctx,
+					&a.Aggregate,
+					typ,
+					config.Length,
+					config.Expiry,
+					config.IncludeLowerLetters,
+					config.IncludeUpperLetters,
+					config.IncludeDigits,
+					config.IncludeSymbols,
+				),
+			}, nil
+		}, nil
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSecretGeneratorAddedEvent(
-		ctx,
-		instanceAgg,
-		generatorType,
-		config.Length,
-		config.Expiry,
-		config.IncludeLowerLetters,
-		config.IncludeUpperLetters,
-		config.IncludeDigits,
-		config.IncludeSymbols))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(generatorWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&generatorWriteModel.WriteModel), nil
 }
 
 func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {

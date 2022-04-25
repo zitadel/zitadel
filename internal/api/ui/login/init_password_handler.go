@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -36,6 +37,10 @@ type initPasswordData struct {
 	HasLowercase              string
 	HasNumber                 string
 	HasSymbol                 string
+}
+
+func InitPasswordLink(origin, userID, code string) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s", externalLink(origin), EndpointInitPassword, userID, code)
 }
 
 func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {
@@ -142,11 +147,11 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 			data.HasNumber = NumberRegex
 		}
 	}
-	translator := l.getTranslator(authReq)
+	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 
 func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	data := l.getUserData(r, authReq, "Password Init Done", "", "")
-	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplInitPasswordDone], data, nil)
+	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplInitPasswordDone], data, nil)
 }

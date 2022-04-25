@@ -4,12 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/action"
 	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCommands_ClearFlow(t *testing.T) {
@@ -70,7 +71,7 @@ func TestCommands_ClearFlow(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewTriggerActionsSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
 								[]string{"actionID1"},
@@ -80,7 +81,7 @@ func TestCommands_ClearFlow(t *testing.T) {
 					expectPush(
 						eventPusherToEvents(
 							org.NewFlowClearedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.FlowTypeExternalAuthentication,
 							),
 						),
@@ -182,7 +183,7 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewTriggerActionsSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
 								[]string{"actionID1"},
@@ -242,7 +243,7 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 					expectPush(
 						eventPusherToEvents(
 							org.NewTriggerActionsSetEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
 								[]string{"actionID1"},

@@ -1427,21 +1427,6 @@ they represent the delta of the event happend on the objects
     POST: /views/_search
 
 
-### ClearView
-
-> **rpc** ClearView([ClearViewRequest](#clearviewrequest))
-[ClearViewResponse](#clearviewresponse)
-
-Truncates the delta of the change stream
-be carefull with this function because ZITADEL has to 
-recompute the deltas after they got cleared. 
-Search requests will return wrong results until all deltas are recomputed
-
-
-
-    POST: /views/{database}/{view_name}
-
-
 ### ListFailedEvents
 
 > **rpc** ListFailedEvents([ListFailedEventsRequest](#listfailedeventsrequest))
@@ -1463,7 +1448,7 @@ For example if the SMTP-API wasn't able to send an email at the first time
 
 Deletes the event from failed events view.
 the event is not removed from the change stream
-This call is usefull if the system was able to process the event later. 
+This call is usefull if the system was able to process the event later.
 e.g. if the second try of sending an email was successful. the first try produced a
 failed event. You can find out if it worked on the `failure_count`
 
@@ -1714,24 +1699,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### ClearViewRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| database |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| view_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### ClearViewResponse
-This is an empty response
 
 
 

@@ -2525,34 +2525,6 @@ service AdminService {
         };
     }
 
-    //Truncates the delta of the change stream
-    // be carefull with this function because ZITADEL has to 
-    // recompute the deltas after they got cleared. 
-    // Search requests will return wrong results until all deltas are recomputed
-    rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
-        option (google.api.http) = {
-            post: "/views/{database}/{view_name}";
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.write";
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "views";
-            external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
-                description: "details of ZITADEL's event driven software concepts";
-            };
-            responses: {
-                key: "200";
-                value: {
-                    description: "View cleared";
-                };
-            };
-        };
-    }
-
     //Returns event descriptions which cannot be processed.
     // It's possible that some events need some retries. 
     // For example if the SMTP-API wasn't able to send an email at the first time
@@ -2582,7 +2554,7 @@ service AdminService {
 
     //Deletes the event from failed events view.
     // the event is not removed from the change stream
-    // This call is usefull if the system was able to process the event later. 
+    // This call is usefull if the system was able to process the event later.
     // e.g. if the second try of sending an email was successful. the first try produced a
     // failed event. You can find out if it worked on the `failure_count`
     rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
@@ -4511,34 +4483,6 @@ message ListViewsResponse {
     //TODO: list details
     repeated View result = 1;
 }
-
-message ClearViewRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["database", "view_name"]
-		};
-	};
-
-    string database = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"adminapi\"";
-            min_length: 1;
-            max_length: 200;
-        }
-    ];
-    string view_name = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"iam_members\"";
-            min_length: 1;
-            max_length: 200;
-        }
-    ];
-}
-
-//This is an empty response
-message ClearViewResponse {}
 
 //This is an empty request
 message ListFailedEventsRequest {}

@@ -2,7 +2,11 @@ package start
 
 import (
 	"github.com/caos/logging"
+	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/config/hook"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
@@ -24,10 +28,10 @@ type Config struct {
 	Log             *logging.Config
 	Port            uint16
 	ExternalPort    uint16
-	ExternalDomain  string
 	ExternalSecure  bool
 	HTTP2HostHeader string
 	HTTP1HostHeader string
+	WebAuthNName    string
 	Database        database.Config
 	Projections     projection.Config
 	AuthZ           authz.Config
@@ -42,14 +46,20 @@ type Config struct {
 	InternalAuthZ   internal_authz.Config
 	SystemDefaults  systemdefaults.SystemDefaults
 	EncryptionKeys  *encryptionKeyConfig
+	DefaultInstance command.InstanceSetup
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 
-	err := v.Unmarshal(config)
-	logging.OnError(err).Fatal("unable to read config")
-
+	err := v.Unmarshal(config,
+		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hook.Base64ToBytesHookFunc(),
+			hook.TagToLanguageHookFunc(),
+			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToSliceHookFunc(","),
+		)),
+	)
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 

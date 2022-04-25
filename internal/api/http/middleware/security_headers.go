@@ -63,7 +63,7 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r = saveContext(r, nonceKey, nonce)
 	}
 	headers := w.Header()
-	headers.Set(http_utils.ContentSecurityPolicy, h.csp.Value(nonce))
+	headers.Set(http_utils.ContentSecurityPolicy, h.csp.Value(nonce, r.Host))
 	headers.Set(http_utils.XXSSProtection, "1; mode=block")
 	headers.Set(http_utils.StrictTransportSecurity, "max-age=31536000; includeSubDomains")
 	headers.Set(http_utils.XFrameOptions, "DENY")

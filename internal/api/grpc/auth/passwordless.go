@@ -8,6 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/api/ui/login"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
@@ -65,9 +67,10 @@ func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPass
 	if err != nil {
 		return nil, err
 	}
+	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 	return &auth_pb.AddMyPasswordlessLinkResponse{
 		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       initCode.Link(s.defaults.Notifications.Endpoints.PasswordlessRegistration),
+		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }

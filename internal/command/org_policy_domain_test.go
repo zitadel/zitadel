@@ -60,7 +60,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
 							),
@@ -90,7 +90,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewDomainPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									true,
 									true,
 								),
@@ -203,7 +203,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
 							),
@@ -231,7 +231,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
 							),
@@ -341,7 +341,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
 							),
@@ -351,7 +351,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewDomainPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -386,7 +386,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 
 func newDomainPolicyChangedEvent(ctx context.Context, orgID string, userLoginMustBeDomain, validateOrgDomains bool) *org.DomainPolicyChangedEvent {
 	event, _ := org.NewDomainPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.DomainPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
 			policy.ChangeValidateOrgDomains(validateOrgDomains),

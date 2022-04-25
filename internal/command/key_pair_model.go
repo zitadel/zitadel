@@ -3,8 +3,7 @@ package command
 import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	keypair "github.com/caos/zitadel/internal/repository/keypair"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/keypair"
 )
 
 type KeyPairWriteModel struct {
@@ -52,7 +51,7 @@ func (wm *KeyPairWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(project.AggregateType).
+		AggregateTypes(keypair.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(keypair.AddedEventType).
 		Builder()

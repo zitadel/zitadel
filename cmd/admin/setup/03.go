@@ -23,6 +23,8 @@ type DefaultInstance struct {
 	domain            string
 	defaults          systemdefaults.SystemDefaults
 	zitadelRoles      []authz.RoleMapping
+	externalSecure    bool
+	externalPort      uint16
 }
 
 func (mig *DefaultInstance) Execute(ctx context.Context) error {
@@ -39,10 +41,28 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		return err
 	}
 
-	cmd := command.NewCommandV2(mig.es, mig.defaults, userAlg, mig.zitadelRoles)
+	cmd, err := command.StartCommands(mig.es,
+		mig.defaults,
+		mig.zitadelRoles,
+		nil,
+		nil,
+		nil,
+		mig.externalSecure,
+		mig.externalPort,
+		nil,
+		nil,
+		nil,
+		nil,
+		userAlg,
+		nil,
+		nil)
 
+	if err != nil {
+		return err
+	}
 	ctx = authz.WithRequestedDomain(ctx, mig.domain)
-	_, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup)
+
+	_, _, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup, mig.externalSecure)
 	return err
 }
 

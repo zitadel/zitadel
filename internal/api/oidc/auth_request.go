@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/oidc/v2/pkg/oidc"
+	"github.com/caos/oidc/v2/pkg/op"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http/middleware"

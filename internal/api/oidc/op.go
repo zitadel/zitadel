@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/oidc/v2/pkg/op"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
@@ -17,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/api/ui/login"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -74,26 +73,23 @@ type OPStorage struct {
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
 	encAlg                            crypto.EncryptionAlgorithm
-	keyChan                           <-chan interface{}
-	currentKey                        query.PrivateKey
-	signingKeyRotationCheck           time.Duration
-	signingKeyGracefulPeriod          time.Duration
 	locker                            crdb.Locker
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, userAgentCookie, instanceHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
-	opConfig, err := createOPConfig(config, issuer, defaultLogoutRedirectURI, cryptoKey)
+func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *sql.DB, userAgentCookie, instanceHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, keyConfig, encryptionAlg, es, projections, keyChan)
-	options, err := createOptions(config, userAgentCookie, instanceHandler)
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections)
+	options, err := createOptions(config, externalSecure, userAgentCookie, instanceHandler)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
-	provider, err := op.NewOpenIDProvider(
+	provider, err := op.NewDynamicOpenIDProvider(
 		ctx,
+		HandlerPrefix,
 		opConfig,
 		storage,
 		options...,
@@ -104,17 +100,12 @@ func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedire
 	return provider, nil
 }
 
-func Issuer(domain string, port uint16, externalSecure bool) string {
-	return http_utils.BuildHTTP(domain, port, externalSecure) + HandlerPrefix
-}
-
-func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string, cryptoKey []byte) (*op.Config, error) {
+func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []byte) (*op.Config, error) {
 	supportedLanguages, err := getSupportedLanguages()
 	if err != nil {
 		return nil, err
 	}
 	opConfig := &op.Config{
-		Issuer:                   issuer,
 		DefaultLogoutRedirectURI: defaultLogoutRedirectURI,
 		CodeMethodS256:           config.CodeMethodS256,
 		AuthMethodPost:           config.AuthMethodPost,
@@ -130,21 +121,26 @@ func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string, cryp
 	return opConfig, nil
 }
 
-func createOptions(config Config, userAgentCookie, instanceHandler func(http.Handler) http.Handler) ([]op.Option, error) {
+func createOptions(config Config, externalSecure bool, userAgentCookie, instanceHandler func(http.Handler) http.Handler) ([]op.Option, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	interceptor := op.WithHttpInterceptors(
-		middleware.MetricsHandler(metricTypes),
-		middleware.TelemetryHandler(),
-		middleware.NoCacheInterceptor,
-		instanceHandler,
-		userAgentCookie,
-		http_utils.CopyHeadersToContext,
-	)
-	endpoints := customEndpoints(config.CustomEndpoints)
-	if len(endpoints) == 0 {
-		return []op.Option{interceptor}, nil
+	options := []op.Option{
+		op.WithHttpInterceptors(
+			middleware.MetricsHandler(metricTypes),
+			middleware.TelemetryHandler(),
+			middleware.NoCacheInterceptor,
+			instanceHandler,
+			userAgentCookie,
+			http_utils.CopyHeadersToContext,
+		),
 	}
-	return append(endpoints, interceptor), nil
+	if !externalSecure {
+		options = append(options, op.WithAllowInsecure())
+	}
+	endpoints := customEndpoints(config.CustomEndpoints)
+	if len(endpoints) != 0 {
+		options = append(options, endpoints...)
+	}
+	return options, nil
 }
 
 func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
@@ -176,7 +172,7 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	return options
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}) *OPStorage {
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, projections *sql.DB) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -189,10 +185,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
 		encAlg:                            encAlg,
-		signingKeyGracefulPeriod:          keyConfig.SigningKeyGracefulPeriod,
-		signingKeyRotationCheck:           keyConfig.SigningKeyRotationCheck,
 		locker:                            crdb.NewLocker(projections, locksTable, signingKey),
-		keyChan:                           keyChan,
 		assetAPIPrefix:                    assets.HandlerPrefix,
 	}
 }

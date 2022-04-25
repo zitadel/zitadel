@@ -3,7 +3,7 @@ package types
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/api/ui/login"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
@@ -27,15 +27,12 @@ type UrlData struct {
 	PasswordSet bool
 }
 
-func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
+func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix, origin string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
 	}
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.InitCode, &UrlData{UserID: user.ID, Code: codeString, PasswordSet: user.PasswordSet})
-	if err != nil {
-		return err
-	}
+	url := login.InitUserLink(origin, user.ID, codeString, user.PasswordSet)
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString
 
@@ -47,5 +44,5 @@ func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Tra
 	if err != nil {
 		return err
 	}
-	return generateEmail(ctx, user, initCodeData.Subject, template, systemDefaults.Notifications, smtpConfig, getFileSystemProvider, getLogProvider, true)
+	return generateEmail(ctx, user, initCodeData.Subject, template, smtpConfig, getFileSystemProvider, getLogProvider, true)
 }
