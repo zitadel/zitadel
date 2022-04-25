@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
+	"github.com/caos/zitadel/internal/api/saml/models"
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
@@ -25,8 +27,8 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	checkerInstance := checker.Checker{}
 	var authRequestForm *AuthRequestForm
 	var authNRequest *samlp.AuthnRequestType
-	var sp *ServiceProvider
-	var authRequest AuthRequestInt
+	var sp *serviceprovider.ServiceProvider
+	var authRequest models.AuthRequestInt
 	var err error
 
 	response := &Response{
@@ -121,11 +123,11 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	checkerInstance.WithConditionalLogicStep(
 		certificateCheckNecessary(
 			func() *xml_dsig.SignatureType { return authNRequest.Signature },
-			func() *md.EntityDescriptorType { return sp.metadata },
+			func() *md.EntityDescriptorType { return sp.Metadata },
 		),
 		checkCertificate(
 			func() *xml_dsig.SignatureType { return authNRequest.Signature },
-			func() *md.EntityDescriptorType { return sp.metadata },
+			func() *md.EntityDescriptorType { return sp.Metadata },
 		),
 		"SAML-b17d9a",
 		func() {
@@ -137,7 +139,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	checkerInstance.WithConditionalLogicStep(
 		signatureRedirectVerificationNecessary(
 			func() *md.IDPSSODescriptorType { return p.Metadata },
-			func() *md.EntityDescriptorType { return sp.metadata },
+			func() *md.EntityDescriptorType { return sp.Metadata },
 			func() string { return authRequestForm.Sig },
 			func() string { return authRequestForm.Binding },
 		),
@@ -146,7 +148,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			func() string { return authRequestForm.RelayState },
 			func() string { return authRequestForm.Sig },
 			func() string { return authRequestForm.SigAlg },
-			func() *ServiceProvider { return sp },
+			func() *serviceprovider.ServiceProvider { return sp },
 			func(errF error) { err = errF },
 		),
 		"SAML-817n2s",
@@ -159,13 +161,13 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	checkerInstance.WithConditionalLogicStep(
 		signaturePostVerificationNecessary(
 			func() *md.IDPSSODescriptorType { return p.Metadata },
-			func() *md.EntityDescriptorType { return sp.metadata },
+			func() *md.EntityDescriptorType { return sp.Metadata },
 			func() *xml_dsig.SignatureType { return authNRequest.Signature },
 			func() string { return authRequestForm.Binding },
 		),
 		verifyPostSignature(
 			func() string { return authRequestForm.AuthRequest },
-			func() *ServiceProvider { return sp },
+			func() *serviceprovider.ServiceProvider { return sp },
 			func(errF error) { err = errF },
 		),
 		"SAML-817n2s",
@@ -270,7 +272,7 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 
 func checkRequestRequiredContent(
 	idp *IdentityProvider,
-	sp *ServiceProvider,
+	sp *serviceprovider.ServiceProvider,
 	authNRequest *samlp.AuthnRequestType,
 ) func() error {
 	return func() error {
@@ -296,7 +298,7 @@ func checkRequestRequiredContent(
 			return fmt.Errorf("issuer is missing in request")
 		}
 
-		if authNRequest.Issuer.Text != string(sp.metadata.EntityID) {
+		if authNRequest.Issuer.Text != sp.GetEntityID() {
 			return fmt.Errorf("issuer in request not equal entityID of service provider")
 		}
 
@@ -350,13 +352,13 @@ func checkCertificate(
 }
 
 func getAcsUrlAndBindingForResponse(
-	sp *ServiceProvider,
+	sp *serviceprovider.ServiceProvider,
 	requestProtocolBinding string,
 ) (string, string) {
 	acsUrl := ""
 	protocolBinding := ""
 
-	for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+	for _, acs := range sp.Metadata.SPSSODescriptor.AssertionConsumerService {
 		if acs.Binding == requestProtocolBinding {
 			acsUrl = acs.Location
 			protocolBinding = acs.Binding
@@ -365,7 +367,7 @@ func getAcsUrlAndBindingForResponse(
 	}
 	if acsUrl == "" {
 		isDefaultFound := false
-		for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+		for _, acs := range sp.Metadata.SPSSODescriptor.AssertionConsumerService {
 			if acs.IsDefault == "true" {
 				isDefaultFound = true
 				acsUrl = acs.Location
@@ -375,7 +377,7 @@ func getAcsUrlAndBindingForResponse(
 		}
 		if !isDefaultFound {
 			index := 0
-			for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+			for _, acs := range sp.Metadata.SPSSODescriptor.AssertionConsumerService {
 				i, _ := strconv.Atoi(acs.Index)
 				if index == 0 || i < index {
 					acsUrl = acs.Location

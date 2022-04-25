@@ -1,6 +1,7 @@
 package saml
 
 import (
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"testing"
@@ -247,9 +248,9 @@ func TestSSO_verifyPostSignature(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			spConfig := &ServiceProviderConfig{Metadata: tt.args.spMetadata}
+			spConfig := &serviceprovider.ServiceProviderConfig{Metadata: tt.args.spMetadata}
 
-			sp, err := NewServiceProvider("test", spConfig, "")
+			sp, err := serviceprovider.NewServiceProvider("test", spConfig, "")
 			if err != nil {
 				t.Errorf("verifyPostSignature() got = %v, wanted to create service provider instance", err)
 				return
@@ -258,7 +259,7 @@ func TestSSO_verifyPostSignature(t *testing.T) {
 			requestF := func() string {
 				return tt.args.request
 			}
-			spF := func() *ServiceProvider {
+			spF := func() *serviceprovider.ServiceProvider {
 				return sp
 			}
 			errF := func(err error) {

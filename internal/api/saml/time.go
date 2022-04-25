@@ -15,7 +15,7 @@ func checkIfRequestTimeIsStillValid(notBefore func() string, notOnOrAfter func()
 			if err != nil {
 				return fmt.Errorf("failed to parse NotBefore: %w", err)
 			}
-			if t.Before(now) {
+			if t.After(now) {
 				return fmt.Errorf("before time given by NotBefore")
 			}
 		}
@@ -25,7 +25,7 @@ func checkIfRequestTimeIsStillValid(notBefore func() string, notOnOrAfter func()
 			if err != nil {
 				return fmt.Errorf("failed to parse NotOnOrAfter: %w", err)
 			}
-			if t.Equal(now) || t.After(now) {
+			if t.Equal(now) || t.Before(now) {
 				return fmt.Errorf("on or after time given by NotOnOrAfter")
 			}
 		}

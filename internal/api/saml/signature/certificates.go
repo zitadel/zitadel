@@ -19,7 +19,7 @@ func ParseCertificates(certStrs []string) ([]*x509.Certificate, error) {
 	regex := regexp.MustCompile(`\s+`)
 	for _, certStr := range certStrs {
 		certStr = regex.ReplaceAllString(certStr, "")
-		certStr = strings.ReplaceAll(certStr, "\n", "")
+		certStr = strings.TrimPrefix(strings.TrimSuffix(certStr, "-----ENDCERTIFICATE-----"), "-----BEGINCERTIFICATE-----")
 		certBytes, err := base64.StdEncoding.DecodeString(certStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse PEM block containing the public key")

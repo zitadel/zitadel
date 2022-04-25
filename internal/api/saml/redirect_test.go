@@ -1,6 +1,7 @@
 package saml
 
 import (
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	dsig "github.com/russellhaering/goxmldsig"
 	"testing"
@@ -278,9 +279,9 @@ func TestRedirect_verifyRedirectSignature(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			spConfig := &ServiceProviderConfig{Metadata: tt.args.spMetadata}
+			spConfig := &serviceprovider.ServiceProviderConfig{Metadata: tt.args.spMetadata}
 
-			sp, err := NewServiceProvider("test", spConfig, "")
+			sp, err := serviceprovider.NewServiceProvider("test", spConfig, "")
 			if err != nil {
 				t.Errorf("verifyRedirectSignature() got = %v, wanted to create service provider instance", err)
 				return
@@ -298,7 +299,7 @@ func TestRedirect_verifyRedirectSignature(t *testing.T) {
 			sigAlgF := func() string {
 				return tt.args.sigAlg
 			}
-			spF := func() *ServiceProvider {
+			spF := func() *serviceprovider.ServiceProvider {
 				return sp
 			}
 			errF := func(err error) {

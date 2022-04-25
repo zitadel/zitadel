@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/saml"
@@ -18,7 +19,7 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 	checkerInstance := checker.Checker{}
 	var attrQueryRequest string
 	var err error
-	var sp *ServiceProvider
+	var sp *serviceprovider.ServiceProvider
 	var attrQuery *samlp.AttributeQueryType
 	var response *samlp.ResponseType
 
@@ -72,11 +73,11 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 	checkerInstance.WithConditionalLogicStep(
 		certificateCheckNecessary(
 			func() *xml_dsig.SignatureType { return attrQuery.Signature },
-			func() *md.EntityDescriptorType { return sp.metadata },
+			func() *md.EntityDescriptorType { return sp.Metadata },
 		),
 		checkCertificate(
 			func() *xml_dsig.SignatureType { return attrQuery.Signature },
-			func() *md.EntityDescriptorType { return sp.metadata },
+			func() *md.EntityDescriptorType { return sp.Metadata },
 		),
 		"SAML-bxi3n5",
 		func() {
@@ -91,7 +92,7 @@ func (p *IdentityProvider) attributeQueryHandleFunc(w http.ResponseWriter, r *ht
 		),
 		verifyPostSignature(
 			func() string { return attrQueryRequest },
-			func() *ServiceProvider { return sp },
+			func() *serviceprovider.ServiceProvider { return sp },
 			func(errF error) { err = errF },
 		),
 		"SAML-ao1n2ps",

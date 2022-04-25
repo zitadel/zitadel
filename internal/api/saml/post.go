@@ -2,6 +2,7 @@ package saml
 
 import (
 	"encoding/base64"
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
@@ -39,7 +40,7 @@ func signaturePostVerificationNecessary(
 
 func verifyPostSignature(
 	authRequestF func() string,
-	spF func() *ServiceProvider,
+	spF func() *serviceprovider.ServiceProvider,
 	errF func(error),
 ) func() error {
 	return func() error {
@@ -51,7 +52,7 @@ func verifyPostSignature(
 			return err
 		}
 
-		if err := sp.validatePostSignature(string(data)); err != nil {
+		if err := sp.ValidatePostSignature(string(data)); err != nil {
 			errF(err)
 			return err
 		}

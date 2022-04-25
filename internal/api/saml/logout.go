@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/checker"
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"net/http"
@@ -20,7 +21,7 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	var logoutRequestForm *LogoutRequestForm
 	var logoutRequest *samlp.LogoutRequestType
 	var err error
-	var sp *ServiceProvider
+	var sp *serviceprovider.ServiceProvider
 
 	response := &LogoutResponse{
 		LogoutTemplate: p.logoutTemplate,
@@ -90,8 +91,8 @@ func (p *IdentityProvider) logoutHandleFunc(w http.ResponseWriter, r *http.Reque
 	// get logoutURL from provided service provider metadata
 	checkerInstance.WithValueStep(
 		func() {
-			if sp.metadata.SPSSODescriptor.SingleLogoutService != nil {
-				for _, url := range sp.metadata.SPSSODescriptor.SingleLogoutService {
+			if sp.Metadata.SPSSODescriptor.SingleLogoutService != nil {
+				for _, url := range sp.Metadata.SPSSODescriptor.SingleLogoutService {
 					response.LogoutURL = url.Location
 					break
 				}

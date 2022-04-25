@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/key"
+	"github.com/caos/zitadel/internal/api/saml/models"
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/auth/repository"
@@ -19,6 +21,7 @@ import (
 )
 
 var _ EntityStorage = &ProviderStorage{}
+var _ IdentityProviderStorage = &ProviderStorage{}
 var _ AuthStorage = &ProviderStorage{}
 var _ UserStorage = &ProviderStorage{}
 
@@ -27,22 +30,24 @@ type StorageConfig struct {
 }
 
 type EntityStorage interface {
-	GetEntityByID(ctx context.Context, entityID string) (*ServiceProvider, error)
-	GetEntityIDByAppID(ctx context.Context, entityID string) (string, error)
 	GetCA(context.Context, chan<- key.CertificateAndKey)
 	GetMetadataSigningKey(context.Context, chan<- key.CertificateAndKey)
+}
+
+type IdentityProviderStorage interface {
+	GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error)
+	GetEntityIDByAppID(ctx context.Context, entityID string) (string, error)
 	GetResponseSigningKey(context.Context, chan<- key.CertificateAndKey)
 }
 
 type AuthStorage interface {
-	CreateAuthRequest(context.Context, *samlp.AuthnRequestType, string, string, string, string) (AuthRequestInt, error)
-	AuthRequestByID(context.Context, string) (AuthRequestInt, error)
-	AuthRequestByCode(context.Context, string) (AuthRequestInt, error)
+	CreateAuthRequest(context.Context, *samlp.AuthnRequestType, string, string, string, string) (models.AuthRequestInt, error)
+	AuthRequestByID(context.Context, string) (models.AuthRequestInt, error)
 }
 
 type UserStorage interface {
-	SetUserinfoWithUserID(ctx context.Context, userinfo AttributeSetter, userID string, attributes []int) (err error)
-	SetUserinfoWithLoginName(ctx context.Context, userinfo AttributeSetter, loginName string, attributes []int) (err error)
+	SetUserinfoWithUserID(ctx context.Context, userinfo models.AttributeSetter, userID string, attributes []int) (err error)
+	SetUserinfoWithLoginName(ctx context.Context, userinfo models.AttributeSetter, loginName string, attributes []int) (err error)
 }
 
 type ProviderStorage struct {
@@ -67,16 +72,16 @@ type ProviderStorage struct {
 	defaultLoginURL string
 }
 
-func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) (*ServiceProvider, error) {
+func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
 	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
 	metadata := app.SAMLConfig.Metadata
 
-	return NewServiceProvider(
+	return serviceprovider.NewServiceProvider(
 		app.ID,
-		&ServiceProviderConfig{
+		&serviceprovider.ServiceProviderConfig{
 			Metadata: metadata,
 			URL:      app.SAMLConfig.MetadataURL,
 		},
@@ -112,7 +117,7 @@ func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyC
 	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLResponseSinging)
 }
 
-func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (_ AuthRequestInt, err error) {
+func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -130,7 +135,7 @@ func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.Auth
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *ProviderStorage) AuthRequestByID(ctx context.Context, id string) (_ AuthRequestInt, err error) {
+func (p *ProviderStorage) AuthRequestByID(ctx context.Context, id string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -144,7 +149,7 @@ func (p *ProviderStorage) AuthRequestByID(ctx context.Context, id string) (_ Aut
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *ProviderStorage) AuthRequestByCode(ctx context.Context, code string) (_ AuthRequestInt, err error) {
+func (p *ProviderStorage) AuthRequestByCode(ctx context.Context, code string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -155,7 +160,7 @@ func (p *ProviderStorage) AuthRequestByCode(ctx context.Context, code string) (_
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *ProviderStorage) SetUserinfoWithUserID(ctx context.Context, userinfo AttributeSetter, userID string, attributes []int) (err error) {
+func (p *ProviderStorage) SetUserinfoWithUserID(ctx context.Context, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	user, err := p.query.GetUserByID(ctx, userID)
@@ -190,7 +195,7 @@ func (p *ProviderStorage) SetUserinfoWithUserID(ctx context.Context, userinfo At
 	return nil
 }
 
-func (p *ProviderStorage) SetUserinfoWithLoginName(ctx context.Context, userinfo AttributeSetter, loginName string, attributes []int) (err error) {
+func (p *ProviderStorage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.AttributeSetter, loginName string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

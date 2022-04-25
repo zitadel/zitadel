@@ -1,15 +1,9 @@
 package saml
 
-import "github.com/caos/zitadel/internal/api/saml/xml/saml"
-
-type AttributeSetter interface {
-	SetEmail(string)
-	SetFullName(string)
-	SetGivenName(string)
-	SetSurname(string)
-	SetUserID(string)
-	SetUsername(string)
-}
+import (
+	"github.com/caos/zitadel/internal/api/saml/models"
+	"github.com/caos/zitadel/internal/api/saml/xml/saml"
+)
 
 const (
 	AttributeEmail int = iota
@@ -29,7 +23,7 @@ type Attributes struct {
 	username  string
 }
 
-var _ AttributeSetter = &Attributes{}
+var _ models.AttributeSetter = &Attributes{}
 
 func (a *Attributes) GetNameID() *saml.NameIDType {
 	return &saml.NameIDType{

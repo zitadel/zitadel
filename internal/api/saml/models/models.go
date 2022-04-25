@@ -1,4 +1,4 @@
-package saml
+package models
 
 type AuthRequestInt interface {
 	GetID() string
@@ -15,4 +15,13 @@ type AuthRequestInt interface {
 	GetUserID() string
 	GetUserName() string
 	Done() bool
+}
+
+type AttributeSetter interface {
+	SetEmail(string)
+	SetFullName(string)
+	SetGivenName(string)
+	SetSurname(string)
+	SetUserID(string)
+	SetUsername(string)
 }

@@ -3,6 +3,7 @@ package saml
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
@@ -32,7 +33,7 @@ func verifyRedirectSignature(
 	relayState func() string,
 	sig func() string,
 	sigAlg func() string,
-	sp func() *ServiceProvider,
+	sp func() *serviceprovider.ServiceProvider,
 	errF func(error),
 ) func() error {
 	return func() error {
@@ -54,7 +55,7 @@ func verifyRedirectSignature(
 			return fmt.Errorf("no service provider instance provided but required")
 		}
 
-		err := spInstance.validateRedirectSignature(
+		err := spInstance.ValidateRedirectSignature(
 			authRequest(),
 			relayState(),
 			sigAlg(),

@@ -1,6 +1,7 @@
 package saml
 
 import (
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/xml_dsig"
 	"net/http"
@@ -15,7 +16,7 @@ func TestSSO_getAcsUrlAndBindingForResponse(t *testing.T) {
 		binding string
 	}
 	type args struct {
-		sp             *ServiceProvider
+		sp             *serviceprovider.ServiceProvider
 		requestBinding string
 	}
 	tests := []struct {
@@ -25,8 +26,8 @@ func TestSSO_getAcsUrlAndBindingForResponse(t *testing.T) {
 	}{{
 		"sp with post and redirect, default used",
 		args{
-			&ServiceProvider{
-				metadata: &md.EntityDescriptorType{
+			&serviceprovider.ServiceProvider{
+				Metadata: &md.EntityDescriptorType{
 					SPSSODescriptor: &md.SPSSODescriptorType{
 						AssertionConsumerService: []md.IndexedEndpointType{
 							{Index: "1", IsDefault: "true", Binding: RedirectBinding, Location: "redirect"},
@@ -45,8 +46,8 @@ func TestSSO_getAcsUrlAndBindingForResponse(t *testing.T) {
 		{
 			"sp with post and redirect, first index used",
 			args{
-				&ServiceProvider{
-					metadata: &md.EntityDescriptorType{
+				&serviceprovider.ServiceProvider{
+					Metadata: &md.EntityDescriptorType{
 						SPSSODescriptor: &md.SPSSODescriptorType{
 							AssertionConsumerService: []md.IndexedEndpointType{
 								{Index: "1", Binding: RedirectBinding, Location: "redirect"},
@@ -65,8 +66,8 @@ func TestSSO_getAcsUrlAndBindingForResponse(t *testing.T) {
 		{
 			"sp with post and redirect, redirect used",
 			args{
-				&ServiceProvider{
-					metadata: &md.EntityDescriptorType{
+				&serviceprovider.ServiceProvider{
+					Metadata: &md.EntityDescriptorType{
 						SPSSODescriptor: &md.SPSSODescriptorType{
 							AssertionConsumerService: []md.IndexedEndpointType{
 								{Binding: RedirectBinding, Location: "redirect"},
@@ -85,8 +86,8 @@ func TestSSO_getAcsUrlAndBindingForResponse(t *testing.T) {
 		{
 			"sp with post and redirect, post used",
 			args{
-				&ServiceProvider{
-					metadata: &md.EntityDescriptorType{
+				&serviceprovider.ServiceProvider{
+					Metadata: &md.EntityDescriptorType{
 						SPSSODescriptor: &md.SPSSODescriptorType{
 							AssertionConsumerService: []md.IndexedEndpointType{
 								{Binding: RedirectBinding, Location: "redirect"},
@@ -105,8 +106,8 @@ func TestSSO_getAcsUrlAndBindingForResponse(t *testing.T) {
 		{
 			"sp with redirect, post used",
 			args{
-				&ServiceProvider{
-					metadata: &md.EntityDescriptorType{
+				&serviceprovider.ServiceProvider{
+					Metadata: &md.EntityDescriptorType{
 						SPSSODescriptor: &md.SPSSODescriptorType{
 							AssertionConsumerService: []md.IndexedEndpointType{
 								{Binding: RedirectBinding, Location: "redirect"},
@@ -124,8 +125,8 @@ func TestSSO_getAcsUrlAndBindingForResponse(t *testing.T) {
 		{
 			"sp with post, redirect used",
 			args{
-				&ServiceProvider{
-					metadata: &md.EntityDescriptorType{
+				&serviceprovider.ServiceProvider{
+					Metadata: &md.EntityDescriptorType{
 						SPSSODescriptor: &md.SPSSODescriptorType{
 							AssertionConsumerService: []md.IndexedEndpointType{
 								{Binding: PostBinding, Location: "post"},

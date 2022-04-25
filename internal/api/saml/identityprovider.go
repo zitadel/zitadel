@@ -11,6 +11,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/key"
+	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
 	"github.com/caos/zitadel/internal/api/saml/signature"
 	"github.com/caos/zitadel/internal/api/saml/xml/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
@@ -23,7 +24,7 @@ import (
 
 type IDPStorage interface {
 	AuthStorage
-	EntityStorage
+	IdentityProviderStorage
 	UserStorage
 	Health(context.Context) error
 }
@@ -82,13 +83,13 @@ type IdentityProvider struct {
 	NameIDMappingEndpoint         op.Endpoint
 	AttributeEndpoint             op.Endpoint
 
-	serviceProviders []*ServiceProvider
+	serviceProviders []*serviceprovider.ServiceProvider
 }
 
 func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
-	cert, key := getResponseCert(storage)
+	cert, privateKey := getResponseCert(storage)
 
-	signingContext, signer, err := signature.GetSigningContextAndSigner(cert, key, conf.SignatureAlgorithm)
+	signingContext, signer, err := signature.GetSigningContextAndSigner(cert, privateKey, conf.SignatureAlgorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -103,30 +104,33 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		return nil, err
 	}
 
-	tlsCert, err := signature.ParseTlsKeyPair(cert, key)
+	tlsCert, err := signature.ParseTlsKeyPair(cert, privateKey)
 	if err != nil {
 		return nil, err
 	}
 
 	metadata, aaMetadata := conf.getMetadata(metadataEndpoint, tlsCert.Certificate[0])
-	return &IdentityProvider{
-		storage:                       storage,
-		EntityID:                      metadataEndpoint.Absolute(""),
-		Metadata:                      metadata,
-		AAMetadata:                    aaMetadata,
-		signingContext:                signingContext,
-		signer:                        signer,
-		CertificateEndpoint:           op.NewEndpointWithURL(conf.Endpoints.Certificate.Path, conf.Endpoints.Certificate.URL),
-		CallbackEndpoint:              op.NewEndpointWithURL(conf.Endpoints.Callback.Path, conf.Endpoints.Callback.URL),
-		SingleSignOnEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL),
-		SingleLogoutEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleLogOut.Path, conf.Endpoints.SingleLogOut.URL),
-		ArtifactResulationEndpoint:    op.NewEndpointWithURL(conf.Endpoints.Artifact.Path, conf.Endpoints.Artifact.URL),
-		SLOArtifactResulationEndpoint: op.NewEndpointWithURL(conf.Endpoints.SLOArtifact.Path, conf.Endpoints.SLOArtifact.URL),
-		NameIDMappingEndpoint:         op.NewEndpointWithURL(conf.Endpoints.NameIDMapping.Path, conf.Endpoints.NameIDMapping.URL),
-		AttributeEndpoint:             op.NewEndpointWithURL(conf.Endpoints.Attribute.Path, conf.Endpoints.Attribute.URL),
-		postTemplate:                  postTemplate,
-		logoutTemplate:                logoutTemplate,
-	}, nil
+	idp := &IdentityProvider{
+		storage:        storage,
+		EntityID:       metadataEndpoint.Absolute(""),
+		Metadata:       metadata,
+		AAMetadata:     aaMetadata,
+		signingContext: signingContext,
+		signer:         signer,
+		postTemplate:   postTemplate,
+		logoutTemplate: logoutTemplate,
+	}
+	if conf.Endpoints != nil {
+		idp.CertificateEndpoint = op.NewEndpointWithURL(conf.Endpoints.Certificate.Path, conf.Endpoints.Certificate.URL)
+		idp.CallbackEndpoint = op.NewEndpointWithURL(conf.Endpoints.Callback.Path, conf.Endpoints.Callback.URL)
+		idp.SingleSignOnEndpoint = op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL)
+		idp.SingleLogoutEndpoint = op.NewEndpointWithURL(conf.Endpoints.SingleLogOut.Path, conf.Endpoints.SingleLogOut.URL)
+		idp.ArtifactResulationEndpoint = op.NewEndpointWithURL(conf.Endpoints.Artifact.Path, conf.Endpoints.Artifact.URL)
+		idp.SLOArtifactResulationEndpoint = op.NewEndpointWithURL(conf.Endpoints.SLOArtifact.Path, conf.Endpoints.SLOArtifact.URL)
+		idp.NameIDMappingEndpoint = op.NewEndpointWithURL(conf.Endpoints.NameIDMapping.Path, conf.Endpoints.NameIDMapping.URL)
+		idp.AttributeEndpoint = op.NewEndpointWithURL(conf.Endpoints.Attribute.Path, conf.Endpoints.Attribute.URL)
+	}
+	return idp, nil
 }
 
 type Route struct {
@@ -147,7 +151,7 @@ func (p *IdentityProvider) GetRoutes() []*Route {
 	}
 }
 
-func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID string) (*ServiceProvider, error) {
+func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
 	index := 0
 	found := false
 	for i, sp := range p.serviceProviders {
@@ -221,11 +225,11 @@ func (p *IdentityProvider) verifyRequestDestinationOfAttrQuery(request *samlp.At
 	return nil
 }
 
-func notImplementedHandleFunc(w http.ResponseWriter, r *http.Request) {
+func notImplementedHandleFunc(w http.ResponseWriter, _ *http.Request) {
 	http.Error(w, fmt.Sprintf("not implemented yet"), http.StatusNotImplemented)
 }
 
-func getResponseCert(storage Storage) ([]byte, *rsa.PrivateKey) {
+func getResponseCert(storage IdentityProviderStorage) ([]byte, *rsa.PrivateKey) {
 	ctx := context.Background()
 	certAndKeyCh := make(chan key.CertificateAndKey)
 	go storage.GetResponseSigningKey(ctx, certAndKeyCh)

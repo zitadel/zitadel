@@ -1,4 +1,4 @@
-package saml
+package serviceprovider
 
 import (
 	"crypto/x509"
@@ -18,14 +18,14 @@ type ServiceProviderConfig struct {
 
 type ServiceProvider struct {
 	ID              string
-	metadata        *md.EntityDescriptorType
+	Metadata        *md.EntityDescriptorType
 	url             string
 	signerPublicKey interface{}
 	defaultLoginURL string
 }
 
 func (sp *ServiceProvider) GetEntityID() string {
-	return string(sp.metadata.EntityID)
+	return string(sp.Metadata.EntityID)
 }
 
 func (sp *ServiceProvider) LoginURL(id string) string {
@@ -62,7 +62,7 @@ func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginUR
 
 	return &ServiceProvider{
 		ID:              id,
-		metadata:        metadata,
+		Metadata:        metadata,
 		url:             config.URL,
 		signerPublicKey: signerPublicKey,
 		defaultLoginURL: defaultLoginURL,
@@ -73,7 +73,7 @@ func getSigningCertsFromMetadata(metadata *md.EntityDescriptorType) ([]*x509.Cer
 	return signature.ParseCertificates(xml.GetCertsFromKeyDescriptors(metadata.SPSSODescriptor.KeyDescriptor))
 }
 
-func (sp *ServiceProvider) validatePostSignature(authRequest string) error {
+func (sp *ServiceProvider) ValidatePostSignature(authRequest string) error {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes([]byte(authRequest)); err != nil {
 		return err
@@ -83,7 +83,7 @@ func (sp *ServiceProvider) validatePostSignature(authRequest string) error {
 		return fmt.Errorf("error while parsing request")
 	}
 
-	certs, err := getSigningCertsFromMetadata(sp.metadata)
+	certs, err := getSigningCertsFromMetadata(sp.Metadata)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (sp *ServiceProvider) validatePostSignature(authRequest string) error {
 	return signature.ValidatePost(certs, doc.Root())
 }
 
-func (sp *ServiceProvider) validateRedirectSignature(request, relayState, sigAlg, expectedSig string) error {
+func (sp *ServiceProvider) ValidateRedirectSignature(request, relayState, sigAlg, expectedSig string) error {
 	if sp.signerPublicKey == nil {
 		return fmt.Errorf("error can not validate signature if no certificate is present for this service provider")
 	}
