@@ -14,7 +14,6 @@ func startFlags(cmd *cobra.Command) {
 	bindBoolFlag(cmd, "externalSecure", "if ZITADEL will be served on HTTPS")
 
 	key.AddMasterKeyFlag(cmd)
-
 }
 
 func bindStringFlag(cmd *cobra.Command, name, description string) {

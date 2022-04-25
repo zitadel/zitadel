@@ -36,6 +36,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 		)),
 	)
+	logging.OnError(err).Fatal("unable to read default config")
 
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
@@ -57,6 +58,12 @@ func MustNewSteps(v *viper.Viper) *Steps {
 	v.SetConfigType("yaml")
 	err := v.ReadConfig(bytes.NewBuffer(defaultSteps))
 	logging.OnError(err).Fatal("unable to read setup steps")
+
+	for _, file := range stepFiles {
+		v.SetConfigFile(file)
+		err := v.MergeInConfig()
+		logging.WithFields("file", file).OnError(err).Warn("unable to read setup file")
+	}
 
 	steps := new(Steps)
 	err = v.Unmarshal(steps,

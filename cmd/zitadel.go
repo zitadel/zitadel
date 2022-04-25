@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	_ "embed"
+	"errors"
 	"io"
 	"strings"
 
@@ -25,8 +26,8 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		Use:   "zitadel",
 		Short: "The ZITADEL CLI let's you interact with ZITADEL",
 		Long:  `The ZITADEL CLI let's you interact with ZITADEL`,
-		Run: func(cmd *cobra.Command, args []string) {
-			logging.New().Info("hello world")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return errors.New("no additional command provided")
 		},
 	}
 
