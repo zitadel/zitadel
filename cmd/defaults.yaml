@@ -138,7 +138,6 @@ EncryptionKeys:
 
 #TODO: remove as soon as possible
 SystemDefaults:
-  Domain: $ZITADEL_DEFAULT_DOMAIN #TODO: remove as soon as possible
   SecretGenerators:
     PasswordSaltCost: 14
     MachineKeySize: 2048
