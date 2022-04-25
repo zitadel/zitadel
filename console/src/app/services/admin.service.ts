@@ -17,8 +17,6 @@ import {
   AddOIDCIDPResponse,
   AddSecondFactorToLoginPolicyRequest,
   AddSecondFactorToLoginPolicyResponse,
-  ClearViewRequest,
-  ClearViewResponse,
   DeactivateIDPRequest,
   DeactivateIDPResponse,
   GetCustomDomainClaimedMessageTextRequest,
@@ -356,13 +354,6 @@ export class AdminService {
   public listFailedEvents(): Promise<ListFailedEventsResponse.AsObject> {
     const req = new ListFailedEventsRequest();
     return this.grpcService.admin.listFailedEvents(req, null).then(resp => resp.toObject());
-  }
-
-  public clearView(viewname: string, db: string): Promise<ClearViewResponse.AsObject> {
-    const req = new ClearViewRequest();
-    req.setDatabase(db);
-    req.setViewName(viewname);
-    return this.grpcService.admin.clearView(req, null).then(resp => resp.toObject());
   }
 
   public removeFailedEvent(viewname: string, db: string, sequence: number): Promise<RemoveFailedEventResponse.AsObject> {
