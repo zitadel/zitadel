@@ -79,7 +79,7 @@ require (
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.22.4
 	k8s.io/apiextensions-apiserver v0.22.2
-	k8s.io/apimachinery v0.22.4
+	k8s.io/apimachinery v0.23.6
 	k8s.io/client-go v0.22.4
 	sigs.k8s.io/controller-runtime v0.10.3
 	sigs.k8s.io/yaml v1.3.0
@@ -125,7 +125,7 @@ require (
 	github.com/dsoprea/go-utility v0.0.0-20200512094054-1abbbc781176 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
+	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/fxamacker/cbor/v2 v2.2.0 // indirect
@@ -134,7 +134,7 @@ require (
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.0.0 // indirect
 	github.com/go-git/go-git/v5 v5.2.0 // indirect
-	github.com/go-logr/logr v0.4.0 // indirect
+	github.com/go-logr/logr v1.2.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b // indirect
 	github.com/gobuffalo/flect v0.2.3 // indirect
@@ -217,11 +217,12 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/component-base v0.22.2 // indirect
-	k8s.io/klog/v2 v2.9.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20211109043538-20434351676c // indirect
-	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a // indirect
+	k8s.io/klog/v2 v2.30.0 // indirect
+	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
+	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	sigs.k8s.io/controller-tools v0.7.0 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
+	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 )
 
 replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
