@@ -2,10 +2,11 @@ package start
 
 import (
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/hook"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/config/hook"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
@@ -31,6 +32,7 @@ type Config struct {
 	ExternalSecure  bool
 	HTTP2HostHeader string
 	HTTP1HostHeader string
+	WebAuthNName    string
 	Database        database.Config
 	Projections     projection.Config
 	AuthZ           authz.Config

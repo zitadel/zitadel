@@ -25,18 +25,17 @@ import (
 )
 
 type Login struct {
-	endpoint      string
-	router        http.Handler
-	renderer      *Renderer
-	parser        *form.Parser
-	command       *command.Commands
-	query         *query.Queries
-	staticStorage static.Storage
-	//staticCache         cache.Cache //TODO: enable when storage is implemented again
+	endpoint            string
+	router              http.Handler
+	renderer            *Renderer
+	parser              *form.Parser
+	command             *command.Commands
+	query               *query.Queries
+	staticStorage       static.Storage
 	authRepo            auth_repository.Repository
 	baseURL             string
 	consolePath         string
-	oidcAuthCallbackURL func(string) string
+	oidcAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 	iamDomain           string
@@ -46,7 +45,6 @@ type Config struct {
 	LanguageCookieName string
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
-	//StaticCache         cache_config.CacheConfig //TODO: enable when storage is implemented again
 }
 
 const (
@@ -64,9 +62,10 @@ func CreateLogin(config Config,
 	consolePath,
 	domain,
 	baseURL string,
-	oidcAuthCallbackURL func(string) string,
+	oidcAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
 	userAgentCookie,
+	issuerInterceptor,
 	instanceHandler mux.MiddlewareFunc,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
@@ -85,12 +84,6 @@ func CreateLogin(config Config,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
 	}
-	//TODO: enable when storage is implemented again
-	//login.staticCache, err = config.StaticCache.Config.NewCache()
-	//if err != nil {
-	//	return nil, fmt.Errorf("unable to create storage cache: %w", err)
-	//}
-
 	statikFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return nil, fmt.Errorf("unable to create filesystem: %w", err)
@@ -105,7 +98,8 @@ func CreateLogin(config Config,
 		return nil, fmt.Errorf("unable to create cacheInterceptor: %w", err)
 	}
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
-	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
+
+	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources), issuerInterceptor)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName, systemDefaults.DefaultLanguage)
 	login.parser = form.NewParser()
 	return login, nil

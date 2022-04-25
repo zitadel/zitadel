@@ -28,16 +28,6 @@ const (
 	consolePostLogoutPath = console.HandlerPrefix + "/signedout"
 )
 
-type AddInstance struct {
-	InstanceName   string
-	CustomDomain   string
-	FirstOrgName   string
-	OwnerEmail     string
-	OwnerUsername  string
-	OwnerFirstName string
-	OwnerLastName  string
-}
-
 type InstanceSetup struct {
 	zitadel      ZitadelConfig
 	InstanceName string
@@ -301,7 +291,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 	}
 
 	if setup.CustomDomain != "" {
-		validations = append(validations, c.addInstanceDomain(instanceAgg, setup.CustomDomain, false))
+		validations = append(validations, addInstanceDomain(instanceAgg, setup.CustomDomain, false))
 	}
 
 	console := &addOIDCApp{

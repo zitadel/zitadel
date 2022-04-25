@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -163,9 +164,9 @@ func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 }
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
-	stmt, scan := prepareInstanceQuery(host)
+	stmt, scan := prepareInstanceDomainQuery(host)
 	query, args, err := stmt.Where(sq.Eq{
-		InstanceColumnID.identifier(): "system", //TODO: change column to domain when available
+		InstanceDomainDomainCol.identifier(): strings.Split(host, ":")[0],
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
@@ -277,5 +278,49 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 					Count: count,
 				},
 			}, nil
+		}
+}
+
+func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+	return sq.Select(
+			InstanceColumnID.identifier(),
+			InstanceColumnCreationDate.identifier(),
+			InstanceColumnChangeDate.identifier(),
+			InstanceColumnSequence.identifier(),
+			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnProjectID.identifier(),
+			InstanceColumnConsoleID.identifier(),
+			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnSetupStarted.identifier(),
+			InstanceColumnSetupDone.identifier(),
+			InstanceColumnDefaultLanguage.identifier(),
+		).
+			From(instanceTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
+			PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Instance, error) {
+			instance := &Instance{Host: host}
+			lang := ""
+			err := row.Scan(
+				&instance.ID,
+				&instance.CreationDate,
+				&instance.ChangeDate,
+				&instance.Sequence,
+				&instance.GlobalOrgID,
+				&instance.IAMProjectID,
+				&instance.ConsoleID,
+				&instance.ConsoleAppID,
+				&instance.SetupStarted,
+				&instance.SetupDone,
+				&lang,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
+			}
+			instance.DefaultLanguage = language.Make(lang)
+			return instance, nil
 		}
 }

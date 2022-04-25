@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	crypto_db "github.com/caos/zitadel/internal/crypto/database"
 	"github.com/caos/zitadel/internal/eventstore"
-	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
 type DefaultInstance struct {
@@ -47,8 +46,7 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		mig.zitadelRoles,
 		nil,
 		nil,
-		//TODO: Livio will fix this, but it ZITADEL doesn't run without this
-		webauthn_helper.Config{DisplayName: "HELLO LIVIO", ID: "RPID"},
+		nil,
 		nil,
 		nil,
 		nil,

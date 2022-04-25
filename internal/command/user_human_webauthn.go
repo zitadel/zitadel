@@ -157,7 +157,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner s
 	if accountName == "" {
 		accountName = user.EmailAddress
 	}
-	webAuthN, err := c.webauthn.BeginRegistration(user, accountName, authenticatorPlatform, domain.UserVerificationRequirementDiscouraged, isLoginUI, tokens...)
+	webAuthN, err := c.webauthnConfig.BeginRegistration(ctx, user, accountName, authenticatorPlatform, domain.UserVerificationRequirementDiscouraged, isLoginUI, tokens...)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -272,7 +272,7 @@ func (c *Commands) verifyHumanWebAuthN(ctx context.Context, userID, resourceowne
 		return nil, nil, nil, err
 	}
 	_, token := domain.GetTokenToVerify(tokens)
-	webAuthN, err := c.webauthn.FinishRegistration(user, token, tokenName, credentialData, userAgentID != "")
+	webAuthN, err := c.webauthnConfig.FinishRegistration(ctx, user, token, tokenName, credentialData, userAgentID != "")
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -343,7 +343,7 @@ func (c *Commands) beginWebAuthNLogin(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, nil, err
 	}
-	webAuthNLogin, err := c.webauthn.BeginLogin(human, domain.UserVerificationRequirementDiscouraged, isLoginUI, tokens...)
+	webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, human, domain.UserVerificationRequirementDiscouraged, isLoginUI, tokens...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -454,7 +454,7 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, nil, 0, err
 	}
-	keyID, signCount, err := c.webauthn.FinishLogin(human, webAuthN, credentialData, isLoginUI, tokens...)
+	keyID, signCount, err := c.webauthnConfig.FinishLogin(ctx, human, webAuthN, credentialData, isLoginUI, tokens...)
 	if err != nil && keyID == nil {
 		return nil, nil, 0, err
 	}

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/oidc/pkg/client/rp"
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/caos/oidc/v2/pkg/client/rp"
+	"github.com/caos/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"

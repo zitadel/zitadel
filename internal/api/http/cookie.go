@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/securecookie"
 
@@ -20,7 +21,6 @@ type CookieHandler struct {
 	sameSite     http.SameSite
 	path         string
 	maxAge       int
-	domain       string
 }
 
 func NewCookieHandler(opts ...CookieHandlerOpt) *CookieHandler {
@@ -76,12 +76,6 @@ func WithMaxAge(maxAge int) CookieHandlerOpt {
 	}
 }
 
-func WithDomain(domain string) CookieHandlerOpt {
-	return func(c *CookieHandler) {
-		c.domain = domain
-	}
-}
-
 func SetCookiePrefix(name, domain, path string, secureOnly bool) string {
 	if !secureOnly {
 		return name
@@ -101,7 +95,7 @@ func (c *CookieHandler) GetCookieValue(r *http.Request, name string) (string, er
 }
 
 func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, value interface{}) error {
-	cookie, err := r.Cookie(SetCookiePrefix(name, c.domain, c.path, c.secureOnly))
+	cookie, err := r.Cookie(SetCookiePrefix(name, r.Host, c.path, c.secureOnly))
 	if err != nil {
 		return err
 	}
@@ -111,11 +105,11 @@ func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, va
 	return c.securecookie.Decode(name, cookie.Value, value)
 }
 
-func (c *CookieHandler) SetCookie(w http.ResponseWriter, name string, value string) {
-	c.httpSet(w, name, value, c.maxAge)
+func (c *CookieHandler) SetCookie(w http.ResponseWriter, name, domain, value string) {
+	c.httpSet(w, name, domain, value, c.maxAge)
 }
 
-func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name string, value interface{}) error {
+func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain string, value interface{}) error {
 	if c.securecookie == nil {
 		return errors.ThrowInternal(nil, "HTTP-s2HUtx", "securecookie not configured")
 	}
@@ -123,19 +117,19 @@ func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name string, v
 	if err != nil {
 		return err
 	}
-	c.httpSet(w, name, encoded, c.maxAge)
+	c.httpSet(w, name, domain, encoded, c.maxAge)
 	return nil
 }
 
-func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, name string) {
-	c.httpSet(w, name, "", -1)
+func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, r *http.Request, name string) {
+	c.httpSet(w, name, r.Host, "", -1)
 }
 
-func (c *CookieHandler) httpSet(w http.ResponseWriter, name, value string, maxage int) {
+func (c *CookieHandler) httpSet(w http.ResponseWriter, name, domain, value string, maxage int) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     SetCookiePrefix(name, c.domain, c.path, c.secureOnly),
+		Name:     SetCookiePrefix(name, domain, c.path, c.secureOnly),
 		Value:    value,
-		Domain:   c.domain,
+		Domain:   strings.Split(domain, ":")[0],
 		Path:     c.path,
 		MaxAge:   maxage,
 		HttpOnly: c.httpOnly,

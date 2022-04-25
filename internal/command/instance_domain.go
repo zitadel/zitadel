@@ -15,7 +15,7 @@ import (
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.addInstanceDomain(instanceAgg, instanceDomain, false)
+	validation := addInstanceDomain(instanceAgg, instanceDomain, false)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string)
 
 func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.setPrimaryInstanceDomain(instanceAgg, instanceDomain)
+	validation := setPrimaryInstanceDomain(instanceAgg, instanceDomain)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain 
 
 func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.removeInstanceDomain(instanceAgg, instanceDomain)
+	validation := removeInstanceDomain(instanceAgg, instanceDomain)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -69,16 +69,16 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 
 func (c *Commands) addGeneratedInstanceDomain(a *instance.Aggregate, instanceName string) preparation.Validation {
 	domain := domain.NewGeneratedInstanceDomain(instanceName, c.iamDomain)
-	return c.addInstanceDomain(a, domain, true)
+	return addInstanceDomain(a, domain, true)
 }
 
-func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
+func addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, instanceDomain)
+			domainWriteModel, err := getInstanceDomainWriteModel(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -88,7 +88,7 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			events := []eventstore.Command{
 				instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated),
 			}
-			appWriteModel, err := c.getOIDCAppWriteModel(ctx, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID(), "")
+			appWriteModel, err := getOIDCAppWriteModel(ctx, filter, authz.GetInstance(ctx).ProjectID(), authz.GetInstance(ctx).ConsoleApplicationID(), "")
 			if err != nil {
 				return nil, err
 			}
@@ -115,13 +115,13 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 	}
 }
 
-func (c *Commands) setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
+func setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-9mWjf", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, instanceDomain)
+			domainWriteModel, err := getInstanceDomainWriteModel(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -133,13 +133,13 @@ func (c *Commands) setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomai
 	}
 }
 
-func (c *Commands) removeInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
+func removeInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-39nls", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainWriteModel, err := c.getInstanceDomainWriteModel(ctx, instanceDomain)
+			domainWriteModel, err := getInstanceDomainWriteModel(ctx, filter, instanceDomain)
 			if err != nil {
 				return nil, err
 			}
@@ -154,11 +154,16 @@ func (c *Commands) removeInstanceDomain(a *instance.Aggregate, instanceDomain st
 	}
 }
 
-func (c *Commands) getInstanceDomainWriteModel(ctx context.Context, domain string) (*InstanceDomainWriteModel, error) {
+func getInstanceDomainWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, domain string) (*InstanceDomainWriteModel, error) {
 	domainWriteModel := NewInstanceDomainWriteModel(ctx, domain)
-	err := c.eventstore.FilterToQueryReducer(ctx, domainWriteModel)
+	events, err := filter(ctx, domainWriteModel.Query())
 	if err != nil {
 		return nil, err
 	}
-	return domainWriteModel, nil
+	if len(events) == 0 {
+		return domainWriteModel, nil
+	}
+	domainWriteModel.AppendEvents(events...)
+	err = domainWriteModel.Reduce()
+	return domainWriteModel, err
 }
