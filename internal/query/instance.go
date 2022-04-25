@@ -230,7 +230,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 			}
-			instance.DefaultLanguage = language.Make(lang)
+			instance.DefaultLang = language.Make(lang)
 			return instance, nil
 		}
 }
@@ -308,7 +308,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{Host: host}
+			instance := &Instance{host: host}
 			lang := ""
 			err := row.Scan(
 				&instance.ID,
@@ -319,46 +319,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (
 				&instance.IAMProjectID,
 				&instance.ConsoleID,
 				&instance.ConsoleAppID,
-				&instance.SetupStarted,
-				&instance.SetupDone,
-				&lang,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
-			}
-			instance.DefaultLang = language.Make(lang)
-			return instance, nil
-		}
-}
-
-func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-	return sq.Select(
-			InstanceColumnID.identifier(),
-			InstanceColumnChangeDate.identifier(),
-			InstanceColumnSequence.identifier(),
-			InstanceColumnGlobalOrgID.identifier(),
-			InstanceColumnProjectID.identifier(),
-			InstanceColumnConsoleID.identifier(),
-			InstanceColumnSetupStarted.identifier(),
-			InstanceColumnSetupDone.identifier(),
-			InstanceColumnDefaultLanguage.identifier(),
-		).
-			From(instanceTable.identifier()).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{host: host}
-			lang := ""
-			err := row.Scan(
-				&instance.ID,
-				&instance.ChangeDate,
-				&instance.Sequence,
-				&instance.GlobalOrgID,
-				&instance.IAMProjectID,
-				&instance.ConsoleID,
 				&instance.SetupStarted,
 				&instance.SetupDone,
 				&lang,

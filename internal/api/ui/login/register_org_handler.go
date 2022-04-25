@@ -3,8 +3,8 @@ package login
 import (
 	"net/http"
 
-	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )

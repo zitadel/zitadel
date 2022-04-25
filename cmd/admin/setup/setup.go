@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/caos/zitadel/cmd/admin/key"
-	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/migration"
@@ -59,18 +58,18 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 
 	steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = strings.TrimSpace(steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address)
 	if steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address == "" {
-		steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = "admin@" + config.ExternalDomain
+		steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = "admin@" + instanceSetup.CustomDomain
 	}
 
 	steps.S3DefaultInstance.es = eventstoreClient
 	steps.S3DefaultInstance.db = dbClient
 	steps.S3DefaultInstance.defaults = config.SystemDefaults
 	steps.S3DefaultInstance.masterKey = masterKey
-	steps.S3DefaultInstance.domain = config.ExternalDomain
+	steps.S3DefaultInstance.domain = instanceSetup.CustomDomain
 	steps.S3DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
 	steps.S3DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.S3DefaultInstance.externalSecure = config.ExternalSecure
-	steps.S3DefaultInstance.baseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
+	steps.S3DefaultInstance.externalPort = config.ExternalPort
 
 	ctx := context.Background()
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)

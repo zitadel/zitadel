@@ -24,10 +24,12 @@ import (
 )
 
 type Commands struct {
-	eventstore   *eventstore.Eventstore
-	static       static.Storage
-	idGenerator  id.Generator
-	zitadelRoles []authz.RoleMapping
+	eventstore     *eventstore.Eventstore
+	static         static.Storage
+	idGenerator    id.Generator
+	zitadelRoles   []authz.RoleMapping
+	externalSecure bool
+	externalPort   uint16
 
 	idpConfigEncryption         crypto.EncryptionAlgorithm
 	smtpEncryption              crypto.EncryptionAlgorithm
@@ -60,6 +62,8 @@ func StartCommands(es *eventstore.Eventstore,
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
 	webAuthN *webauthn_helper.Config,
+	externalSecure bool,
+	externalPort uint16,
 	idpConfigEncryption,
 	otpEncryption,
 	smtpEncryption,
@@ -73,6 +77,8 @@ func StartCommands(es *eventstore.Eventstore,
 		static:                staticStore,
 		idGenerator:           id.SonyFlakeGenerator,
 		zitadelRoles:          zitadelRoles,
+		externalSecure:        externalSecure,
+		externalPort:          externalPort,
 		keySize:               defaults.KeyConfig.Size,
 		privateKeyLifetime:    defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:     defaults.KeyConfig.PublicKeyLifetime,
