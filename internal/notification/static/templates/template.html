@@ -31,15 +31,6 @@
   </style>
   <![endif]-->
 
-  <!--[if !mso]><!-->
-  <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700" rel="stylesheet" type="text/css">
-  <style type="text/css">
-    @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700);
-  </style>
-  <!--<![endif]-->
-
-
-
   <style type="text/css">
     @media only screen and (min-width:480px) {
       .mj-column-per-100 { width:100% !important; max-width: 100%; }
@@ -65,7 +56,7 @@
   {{if .FontURL}}
   <style>
     @font-face {
-      font-family: '{{.FontFamily}}';
+      font-family: '{{.FontFaceFamily}}';
       font-style: normal;
       font-display: swap;
       src: url({{.FontURL}});
@@ -281,7 +272,7 @@
                                                         align="center" bgcolor="{{.PrimaryColor}}" role="presentation" style="border:none;border-radius:6px;cursor:auto;mso-padding-alt:10px 25px;background:{{.PrimaryColor}};" valign="middle"
                                                 >
                                                   <a
-                                                          href="{{.URL}}" rel="noopener noreferrer" style="display:inline-block;background:{{.PrimaryColor}};color:#ffffff;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:14px;font-weight:500;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:6px;" target="_blank"
+                                                          href="{{.URL}}" rel="noopener noreferrer" style="display:inline-block;background:{{.PrimaryColor}};color:#ffffff;font-family:{{.FontFamily}};font-size:14px;font-weight:500;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:6px;" target="_blank"
                                                   >
                                                     {{.ButtonText}}
                                                   </a>
@@ -369,4 +360,3 @@
 
 </body>
 </html>
-  
