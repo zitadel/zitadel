@@ -17,7 +17,7 @@ Prerequisits:
 
 import CreateApp from "./application/application.mdx";
 
-<CreateApp appType="web" authType="code" appName="Gitlab" redirectURI="<your_gitlab_url>/users/auth/openid_connect/callback"/>
+<CreateApp appType="web" authType="code" appName="Gitlab" redirectURI="https://<your_gitlab_url>/users/auth/openid_connect/callback"/>
 
 ## Gitlab configuration
 
@@ -44,7 +44,7 @@ gitlab_rails['omniauth_providers'] = [
       client_options: {
         identifier: "<CLIENT ID from ZITADEL>",
         secret: "<CLIENT SECRET from ZITADEL>",
-        redirect_uri: "https://<GITLAB HOST>/users/auth/openid_connect/callback"
+        redirect_uri: "https://<your_gitlab_url>/users/auth/openid_connect/callback"
       }
     }
   }
