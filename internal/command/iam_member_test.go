@@ -2,18 +2,19 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/member"
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/iam"
+	"github.com/zitadel/zitadel/internal/repository/member"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"golang.org/x/text/language"
 )
 
 func TestCommandSide_AddIAMMember(t *testing.T) {

@@ -9,14 +9,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	caos_errors "github.com/caos/zitadel/internal/errors"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 
 	"github.com/k3a/html2text"
 
-	"github.com/caos/zitadel/internal/notification/channels"
-	"github.com/caos/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
 func InitFSChannel(config FSConfig) (channels.NotificationChannel, error) {

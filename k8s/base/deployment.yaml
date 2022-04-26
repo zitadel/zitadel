@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: zitadel
-        image: docker.pkg.github.com/caos/zitadel/zitadel:latest
+        image: docker.pkg.github.com/zitadel/zitadel/zitadel:latest
         imagePullPolicy: IfNotPresent
         args: ["start"]
         ports:

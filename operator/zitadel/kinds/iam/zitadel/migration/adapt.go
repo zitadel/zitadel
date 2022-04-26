@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"github.com/rakyll/statik/fs"
 	batchv1 "k8s.io/api/batch/v1"
@@ -23,9 +23,9 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
 	"github.com/caos/orbos/pkg/labels"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/helpers"
-	_ "github.com/caos/zitadel/statik"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/helpers"
+	_ "github.com/zitadel/zitadel/statik"
 )
 
 const (

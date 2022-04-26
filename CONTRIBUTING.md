@@ -2,13 +2,13 @@
 
 ## Did you find a bug?
 
-Please file an issue [here](https://github.com/caos/zitadel/issues/new?assignees=&labels=bug&template=bug_report.md&title=).
+Please file an issue [here](https://github.com/zitadel/zitadel/issues/new?assignees=&labels=bug&template=bug_report.md&title=).
 
 Bugs are evaluated every day as soon as possible.
 
 ## Enhancement
 
-Do you miss a feature? Please file an issue [here](https://github.com/caos/zitadel/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
+Do you miss a feature? Please file an issue [here](https://github.com/zitadel/zitadel/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
 
 Enhancements are discussed and evaluated every Wednesday by the ZITADEL core team.
 
@@ -16,8 +16,8 @@ Enhancements are discussed and evaluated every Wednesday by the ZITADEL core tea
 
 We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
 
-* [Issues for first time contributors](https://github.com/caos/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-* [All issues](https://github.com/caos/zitadel/issues)
+* [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+* [All issues](https://github.com/zitadel/zitadel/issues)
 
 ### Make a PR
 

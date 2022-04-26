@@ -5,15 +5,15 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/static"
 
 	"golang.org/x/text/language"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	req_model "github.com/zitadel/zitadel/internal/auth_request/model"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
 
 type UserView struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {

@@ -9,20 +9,20 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 
-	id_mock "github.com/caos/zitadel/internal/id/mock"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/repository/user"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 func TestCommands_AddPersonalAccessToken(t *testing.T) {

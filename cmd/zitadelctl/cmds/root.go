@@ -7,8 +7,8 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/orb"
-	"github.com/caos/zitadel/operator/helpers"
 	"github.com/spf13/cobra"
+	"github.com/zitadel/zitadel/operator/helpers"
 )
 
 type RootValues struct {

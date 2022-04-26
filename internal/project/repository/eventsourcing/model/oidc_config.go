@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	"github.com/caos/zitadel/internal/project/model"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	key_model "github.com/zitadel/zitadel/internal/key/model"
+	"github.com/zitadel/zitadel/internal/project/model"
 )
 
 type OIDCConfig struct {

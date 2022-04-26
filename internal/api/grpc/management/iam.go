@@ -3,7 +3,7 @@ package management
 import (
 	"context"
 
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetIAM(ctx context.Context, req *mgmt_pb.GetIAMRequest) (*mgmt_pb.GetIAMResponse, error) {

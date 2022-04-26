@@ -2,8 +2,9 @@ package dbuser
 
 import (
 	"fmt"
+
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/orbos/mntr"

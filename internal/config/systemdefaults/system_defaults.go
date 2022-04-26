@@ -1,16 +1,16 @@
 package systemdefaults
 
 import (
-	"github.com/caos/zitadel/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/notification/channels/chat"
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
-	"github.com/caos/zitadel/internal/notification/channels/twilio"
-	"github.com/caos/zitadel/internal/notification/templates"
+	"github.com/zitadel/zitadel/internal/config/types"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/notification/channels/chat"
+	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/internal/notification/templates"
 )
 
 type SystemDefaults struct {

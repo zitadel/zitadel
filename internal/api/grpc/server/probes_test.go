@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 func TestValidator_Healthz(t *testing.T) {

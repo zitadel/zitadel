@@ -1,10 +1,11 @@
 package configuration
 
 import (
-	"github.com/caos/zitadel/pkg/databases/certs/client"
 	"time"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/certs/client"
+
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -12,7 +13,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/orbos/pkg/labels"
 
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 )
 
 type ConsoleEnv struct {

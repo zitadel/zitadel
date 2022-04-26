@@ -1,12 +1,12 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	grant_model "github.com/zitadel/zitadel/internal/usergrant/model"
+	"github.com/zitadel/zitadel/internal/usergrant/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, error) {

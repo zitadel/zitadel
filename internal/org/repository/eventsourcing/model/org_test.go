@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/org/model"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/org/model"
 )
 
 func TestOrgFromEvents(t *testing.T) {

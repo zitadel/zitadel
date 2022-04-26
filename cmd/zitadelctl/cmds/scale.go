@@ -4,10 +4,10 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
-	"github.com/caos/zitadel/operator/crtlgitops"
-	"github.com/caos/zitadel/pkg/databases/db"
-	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
+	"github.com/zitadel/zitadel/operator/crtlcrd/zitadel"
+	"github.com/zitadel/zitadel/operator/crtlgitops"
+	"github.com/zitadel/zitadel/pkg/databases/db"
+	kubernetes2 "github.com/zitadel/zitadel/pkg/kubernetes"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
 )
 

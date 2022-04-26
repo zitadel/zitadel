@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang/protobuf/ptypes/timestamp"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
 
 type Org struct {

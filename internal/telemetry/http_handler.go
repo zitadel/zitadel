@@ -1,9 +1,10 @@
 package telemetry
 
 import (
-	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"net/http"
 	"strings"
+
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )

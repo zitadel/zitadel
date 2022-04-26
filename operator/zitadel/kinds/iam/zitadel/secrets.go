@@ -2,7 +2,7 @@ package zitadel
 
 import (
 	"github.com/caos/orbos/pkg/secret"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 )
 
 func getSecretsMap(desiredKind *DesiredV0) (

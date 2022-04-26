@@ -25,7 +25,7 @@ AssetStorage:
 Metrics:
   Type: 'otel'
   Config:
-    MeterName: 'github.com/caos/zitadel'
+    MeterName: 'github.com/zitadel/zitadel'
 
 EventstoreBase:
   Host: $ZITADEL_EVENTSTORE_HOST

@@ -6,11 +6,11 @@ import (
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/dbuser"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/node"
-	"github.com/caos/zitadel/pkg/databases/certs/client"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/user/dbuser"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/user/node"
+	"github.com/zitadel/zitadel/pkg/databases/certs/client"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 )
 
 const (

@@ -3,7 +3,7 @@ package crtlcrd
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/pkg/databases"
+	"github.com/zitadel/zitadel/pkg/databases"
 )
 
 func Restore(

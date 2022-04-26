@@ -3,17 +3,17 @@ package eventsourcing
 import (
 	"net/http"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/command"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/query"
 
 	"golang.org/x/text/language"
 
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
-	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/spooler"
-	noti_view "github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/config/types"
+	es_spol "github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	"github.com/zitadel/zitadel/internal/notification/repository/eventsourcing/spooler"
+	noti_view "github.com/zitadel/zitadel/internal/notification/repository/eventsourcing/view"
 )
 
 type Config struct {

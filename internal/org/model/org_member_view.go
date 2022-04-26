@@ -3,8 +3,8 @@ package model
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
 type OrgMemberView struct {

@@ -1,13 +1,13 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/view/repository"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 func UserMembershipByIDs(db *gorm.DB, table, userID, aggregateID, objectID string, membertype usr_model.MemberType) (*model.UserMembershipView, error) {

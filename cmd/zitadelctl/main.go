@@ -6,7 +6,7 @@ import (
 
 	"github.com/caos/orbos/mntr"
 
-	"github.com/caos/zitadel/cmd/zitadelctl/cmds"
+	"github.com/zitadel/zitadel/cmd/zitadelctl/cmds"
 )
 
 var (

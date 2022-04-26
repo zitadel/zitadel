@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
-	"github.com/caos/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/common"
 
 	corev1 "k8s.io/api/core/v1"
 )

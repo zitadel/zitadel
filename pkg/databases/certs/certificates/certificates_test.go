@@ -4,7 +4,7 @@ package certificates
 
 import (
 	"crypto/x509"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/pem"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/certificate/pem"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

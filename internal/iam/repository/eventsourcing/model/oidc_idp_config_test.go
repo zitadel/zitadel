@@ -3,7 +3,7 @@ package model
 import (
 	"testing"
 
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 func TestOIDCIdpConfigChanges(t *testing.T) {

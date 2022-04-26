@@ -5,7 +5,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	caos_errors "github.com/caos/zitadel/internal/errors"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
 func NewStorage(t *testing.T) *MockStorage {

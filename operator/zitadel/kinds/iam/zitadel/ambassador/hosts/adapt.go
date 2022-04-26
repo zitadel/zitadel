@@ -5,8 +5,8 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/host"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 )
 
 const (

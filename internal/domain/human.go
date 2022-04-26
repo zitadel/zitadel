@@ -3,9 +3,9 @@ package domain
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	caos_errors "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/crypto"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type Human struct {

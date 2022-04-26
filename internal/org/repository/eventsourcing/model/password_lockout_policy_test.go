@@ -2,9 +2,10 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	"testing"
+
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
 )
 
 func TestAppendAddLockoutPolicyEvent(t *testing.T) {

@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
 	"reflect"
 	"testing"
+
+	"github.com/lib/pq"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/project/model"
+	es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 func mockProjectData(project *es_model.Project) []byte {

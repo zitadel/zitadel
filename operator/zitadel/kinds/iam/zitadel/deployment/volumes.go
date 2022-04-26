@@ -1,7 +1,7 @@
 package deployment
 
 import (
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/helpers"
 	corev1 "k8s.io/api/core/v1"
 )
 

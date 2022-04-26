@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"testing"
+
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 func TestApplicationValid(t *testing.T) {

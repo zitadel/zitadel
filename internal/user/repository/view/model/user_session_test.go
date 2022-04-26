@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/crypto"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/crypto"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 func now() time.Time {

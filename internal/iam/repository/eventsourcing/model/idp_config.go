@@ -3,9 +3,9 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/caos/logging"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/zitadel/logging"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/iam/model"
 )
 
 type IDPConfig struct {

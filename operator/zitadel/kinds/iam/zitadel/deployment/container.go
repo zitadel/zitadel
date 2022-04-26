@@ -1,9 +1,10 @@
 package deployment
 
 import (
-	"github.com/caos/zitadel/operator/common"
 	"sort"
 	"strings"
+
+	"github.com/zitadel/zitadel/operator/common"
 
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	corev1 "k8s.io/api/core/v1"

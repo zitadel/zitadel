@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/domain"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 const (

@@ -2,6 +2,7 @@ package orb
 
 import (
 	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
@@ -9,12 +10,12 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/orbos/pkg/treelabels"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
-	"github.com/caos/zitadel/operator/database/kinds/databases"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/bucket/backup"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/bucket/restore"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases"
 )
 
 const (

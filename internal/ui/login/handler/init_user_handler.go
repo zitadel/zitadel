@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 	"strconv"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 const (

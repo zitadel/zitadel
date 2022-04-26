@@ -4,14 +4,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caos/oidc/pkg/client/rp"
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/zitadel/oidc/pkg/client/rp"
+	"github.com/zitadel/oidc/pkg/oidc"
 	"golang.org/x/text/language"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/query"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (

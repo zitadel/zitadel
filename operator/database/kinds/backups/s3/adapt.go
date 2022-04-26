@@ -2,6 +2,7 @@ package s3
 
 import (
 	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
@@ -9,11 +10,11 @@ import (
 	secretpkg "github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/operator/database/kinds/backups/s3/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/s3/restore"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/s3/backup"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/s3/restore"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 	corev1 "k8s.io/api/core/v1"
 )
 

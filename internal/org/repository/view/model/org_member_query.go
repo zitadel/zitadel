@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	org_model "github.com/zitadel/zitadel/internal/org/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type OrgMemberSearchRequest org_model.OrgMemberSearchRequest

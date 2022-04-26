@@ -5,10 +5,10 @@ import (
 	"reflect"
 	"testing"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/usergrant/model"
-	es_model "github.com/caos/zitadel/internal/usergrant/repository/eventsourcing/model"
 	"github.com/lib/pq"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/usergrant/model"
+	es_model "github.com/zitadel/zitadel/internal/usergrant/repository/eventsourcing/model"
 )
 
 func mockUserGrantData(grant *es_model.UserGrant) []byte {

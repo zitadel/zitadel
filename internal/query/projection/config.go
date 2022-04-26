@@ -1,6 +1,6 @@
 package projection
 
-import "github.com/caos/zitadel/internal/config/types"
+import "github.com/zitadel/zitadel/internal/config/types"
 
 type Config struct {
 	RequeueEvery     types.Duration

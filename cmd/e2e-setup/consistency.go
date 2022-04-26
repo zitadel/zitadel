@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/caos/logging"
 	"time"
+
+	"github.com/zitadel/logging"
 )
 
 func awaitConsistency(ctx context.Context, cfg E2EConfig, expectUsers []user) (err error) {

@@ -3,12 +3,12 @@ package view
 import (
 	"github.com/jinzhu/gorm"
 
-	auth_model "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	auth_model "github.com/zitadel/zitadel/internal/auth_request/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSessionView, error) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 
 type Config struct {

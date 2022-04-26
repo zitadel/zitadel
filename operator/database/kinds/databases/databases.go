@@ -10,8 +10,8 @@ import (
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed"
 )
 
 const (

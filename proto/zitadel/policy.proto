@@ -5,7 +5,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.policy.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/policy";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/policy";
 
 message OrgIAMPolicy {
     zitadel.v1.ObjectDetails details = 1;

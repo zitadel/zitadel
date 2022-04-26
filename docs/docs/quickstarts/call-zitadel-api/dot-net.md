@@ -11,7 +11,7 @@ For detailed information about the SDK, refer to the [.NET SDK documentation](ht
 
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-net) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API.
+The client [SDK](https://github.com/zitadel/zitadel-net) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API.
 
 You'll need a service account assigned with the *ORG_OWNER* role
 (or another role, depending on the needed API requests).
@@ -119,12 +119,12 @@ either the *ORG_OWNER* or *ORG_OWNER_VIEWER* roles.
 
 For more help, check the [guides](#prerequisites) mentioned at the beginning.
 
-If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/caos/zitadel/issues) or in the [SDK](https://github.com/caos/zitadel-go/issues).
+If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/zitadel/zitadel/issues) or in the [SDK](https://github.com/zitadel/zitadel-go/issues).
 
 ### What's next?
 
 Now you can develop on the APIs by adding more calls.
 
-Checkout more [examples from the SDK](https://github.com/caos/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
+Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
 
 > This guide will be updated soon to show you how to use the SDK for your own API as well.

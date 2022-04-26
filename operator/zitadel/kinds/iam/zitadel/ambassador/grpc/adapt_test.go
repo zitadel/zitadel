@@ -8,9 +8,9 @@ import (
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels/mocklabels"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	apixv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )

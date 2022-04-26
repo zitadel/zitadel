@@ -1,10 +1,10 @@
 package types
 
 import (
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/notification/messages"
-	"github.com/caos/zitadel/internal/notification/senders"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 func generateSms(user *view_model.NotifyUser, content string, config systemdefaults.Notifications, lastPhone bool) error {

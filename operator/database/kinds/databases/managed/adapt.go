@@ -2,11 +2,12 @@ package managed
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user"
 	"strconv"
 	"strings"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/user"
+
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -18,14 +19,14 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/operator/database/kinds/backups"
-	managedCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/services"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/statefulset"
-	certCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/user/current"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups"
+	managedCurr "github.com/zitadel/zitadel/operator/database/kinds/databases/managed/current"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/rbac"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/services"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/statefulset"
+	certCurr "github.com/zitadel/zitadel/operator/database/kinds/databases/managed/user/current"
 )
 
 const (

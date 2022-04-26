@@ -11,7 +11,7 @@ import (
 
 	"github.com/lib/pq"
 
-	errs "github.com/caos/zitadel/internal/errors"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 var (

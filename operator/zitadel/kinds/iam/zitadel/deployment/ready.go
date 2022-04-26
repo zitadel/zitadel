@@ -8,7 +8,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
 
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 )
 
 func GetReadyFunc(monitor mntr.Monitor, namespace string, name *labels.Name) operator.EnsureFunc {

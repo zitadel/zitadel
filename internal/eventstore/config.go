@@ -1,8 +1,8 @@
 package eventstore
 
 import (
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore/repository/sql"
+	"github.com/zitadel/zitadel/internal/config/types"
+	"github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 )
 
 func Start(sqlConfig types.SQL) (*Eventstore, error) {

@@ -7,9 +7,9 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api/database"
-	v1 "github.com/caos/zitadel/operator/api/database/v1"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
+	"github.com/zitadel/zitadel/operator/api/database"
+	v1 "github.com/zitadel/zitadel/operator/api/database/v1"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 )

@@ -5,7 +5,7 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 )
 
 func Destroy(

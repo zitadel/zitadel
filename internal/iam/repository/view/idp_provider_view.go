@@ -1,12 +1,12 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
 	"github.com/jinzhu/gorm"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/iam/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idpConfigID string) (*model.IDPProviderView, error) {

@@ -1,10 +1,11 @@
 package domain
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"regexp"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")

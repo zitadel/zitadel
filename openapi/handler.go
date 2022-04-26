@@ -5,7 +5,7 @@ import (
 
 	"github.com/rakyll/statik/fs"
 
-	_ "github.com/caos/zitadel/openapi/statik"
+	_ "github.com/zitadel/zitadel/openapi/statik"
 )
 
 func Start() (http.Handler, error) {

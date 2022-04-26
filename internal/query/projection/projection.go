@@ -5,10 +5,10 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/handler"
-	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 )
 
 const (

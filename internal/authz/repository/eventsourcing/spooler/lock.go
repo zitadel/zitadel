@@ -2,8 +2,9 @@ package spooler
 
 import (
 	"database/sql"
-	es_locker "github.com/caos/zitadel/internal/eventstore/v1/locker"
 	"time"
+
+	es_locker "github.com/zitadel/zitadel/internal/eventstore/v1/locker"
 )
 
 const (
