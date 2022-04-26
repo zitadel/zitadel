@@ -3,13 +3,13 @@ package admin
 import (
 	_ "embed"
 
-	"github.com/caos/logging"
 	"github.com/spf13/cobra"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/cmd/admin/initialise"
-	"github.com/caos/zitadel/cmd/admin/key"
-	"github.com/caos/zitadel/cmd/admin/setup"
-	"github.com/caos/zitadel/cmd/admin/start"
+	"github.com/zitadel/zitadel/cmd/admin/initialise"
+	"github.com/zitadel/zitadel/cmd/admin/key"
+	"github.com/zitadel/zitadel/cmd/admin/setup"
+	"github.com/zitadel/zitadel/cmd/admin/start"
 )
 
 func New() *cobra.Command {

@@ -11,10 +11,10 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/handler"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	es_repo_mock "github.com/caos/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 )
 
 var (

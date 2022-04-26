@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/service"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/service"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 //BaseEvent represents the minimum metadata of an event

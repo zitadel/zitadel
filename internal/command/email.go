@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/command/preparation"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type Email struct {

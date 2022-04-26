@@ -3,7 +3,7 @@ package model
 import (
 	"testing"
 
-	user_model "github.com/caos/zitadel/internal/user/model"
+	user_model "github.com/zitadel/zitadel/internal/user/model"
 	"golang.org/x/text/language"
 )
 

@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/view/model"
+	"github.com/zitadel/zitadel/internal/view/model"
 )
 
 type AdministratorRepository interface {

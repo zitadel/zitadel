@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func (q *Queries) GetIAMMemberRoles() []string {

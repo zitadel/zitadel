@@ -61,7 +61,7 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 
 We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](support-services) to this document.
 
-Customers without a Subscription or a Subscription plan that does not include Support Services should post inquiries and issues regarding ZITADEL from customers to our [GitHub Discussions](https://github.com/caos/zitadel/discussions), whenever feasible.
+Customers without a Subscription or a Subscription plan that does not include Support Services should post inquiries and issues regarding ZITADEL from customers to our [GitHub Discussions](https://github.com/zitadel/zitadel/discussions), whenever feasible.
 
 If you need support integrating or setting up ZITADEL, please contact our consulting team.
 

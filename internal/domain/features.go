@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (

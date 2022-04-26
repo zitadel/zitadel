@@ -10,9 +10,9 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_IDPPrepares(t *testing.T) {

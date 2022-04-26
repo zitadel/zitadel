@@ -11,8 +11,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_InstancePrepares(t *testing.T) {

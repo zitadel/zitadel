@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/domain"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type Project struct {

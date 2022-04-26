@@ -1,10 +1,10 @@
 package admin
 
 import (
-	instance_grpc "github.com/caos/zitadel/internal/api/grpc/instance"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/query"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func ListInstanceDomainsRequestToModel(req *admin_pb.ListInstanceDomainsRequest) (*query.InstanceDomainSearchQueries, error) {

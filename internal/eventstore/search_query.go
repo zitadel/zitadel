@@ -1,8 +1,8 @@
 package eventstore
 
 import (
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 //SearchQueryBuilder represents the builder for your filter

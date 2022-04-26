@@ -4,12 +4,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/oidc/v2/pkg/oidc"
-	"github.com/caos/oidc/v2/pkg/op"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v2/pkg/op"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Client struct {

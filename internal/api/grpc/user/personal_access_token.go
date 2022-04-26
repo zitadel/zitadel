@@ -3,9 +3,9 @@ package user
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func PersonalAccessTokensToPb(tokens []*query.PersonalAccessToken) []*user.PersonalAccessToken {

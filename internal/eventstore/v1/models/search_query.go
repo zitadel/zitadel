@@ -3,9 +3,9 @@ package models
 import (
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type SearchQueryFactory struct {

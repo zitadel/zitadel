@@ -4,15 +4,15 @@ import (
 	"context"
 	"strings"
 
-	"github.com/caos/zitadel/internal/api/ui/login"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/i18n"
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/log"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
-	"github.com/caos/zitadel/internal/notification/templates"
-	"github.com/caos/zitadel/internal/query"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/notification/templates"
+	"github.com/zitadel/zitadel/internal/query"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 type DomainClaimedData struct {

@@ -3,8 +3,8 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain.JWTIDPConfig) (*domain.JWTIDPConfig, error) {

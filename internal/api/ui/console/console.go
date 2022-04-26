@@ -10,13 +10,13 @@ import (
 	"path"
 	"time"
 
-	"github.com/caos/logging"
-	"github.com/caos/oidc/v2/pkg/op"
 	"github.com/gorilla/mux"
+	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/op"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 
 type Config struct {

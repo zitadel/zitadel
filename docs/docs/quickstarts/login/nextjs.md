@@ -4,7 +4,7 @@ title: Next.js
 
 This is our Zitadel [Next.js](https://nextjs.org/) template. It shows how to authenticate as a user and retrieve user information from the OIDC endpoint.
 
-> The template code is part of our zitadel-example repo. Take a look [here](https://github.com/caos/zitadel-examples/tree/main/nextjs).
+> The template code is part of our zitadel-example repo. Take a look [here](https://github.com/zitadel/zitadel-examples/tree/main/nextjs).
 
 ## Getting Started
 

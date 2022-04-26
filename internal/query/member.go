@@ -3,7 +3,7 @@ package query
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/query/projection"
 
 	sq "github.com/Masterminds/squirrel"
 )

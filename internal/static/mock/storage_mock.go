@@ -9,7 +9,7 @@ import (
 	io "io"
 	reflect "reflect"
 
-	static "github.com/caos/zitadel/internal/static"
+	static "github.com/zitadel/zitadel/internal/static"
 	gomock "github.com/golang/mock/gomock"
 )
 

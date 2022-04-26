@@ -3,9 +3,9 @@ package senders
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/notification/channels"
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/log"
 )
 
 func debugChannels(ctx context.Context, getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) (*Chain, error) {

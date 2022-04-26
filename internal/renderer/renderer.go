@@ -7,12 +7,12 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 const (

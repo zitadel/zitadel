@@ -6,8 +6,8 @@ package {{.File.GoPkg.Name}}
 import (
     "google.golang.org/grpc"
     
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 )
 
 {{ range $s := .File.Services }}

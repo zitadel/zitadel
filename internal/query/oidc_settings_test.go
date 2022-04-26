@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	errs "github.com/caos/zitadel/internal/errors"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_OIDCConfigsPrepares(t *testing.T) {

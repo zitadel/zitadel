@@ -3,10 +3,10 @@ package config
 import (
 	"database/sql"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/static"
-	"github.com/caos/zitadel/internal/static/database"
-	"github.com/caos/zitadel/internal/static/s3"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/static/database"
+	"github.com/zitadel/zitadel/internal/static/s3"
 )
 
 type AssetStorageConfig struct {

@@ -5,7 +5,7 @@ import (
 	//sql import
 	_ "github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 func Connect(config Config) (*sql.DB, error) {

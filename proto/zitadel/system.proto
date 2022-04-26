@@ -15,7 +15,7 @@ import "validate/validate.proto";
 
 package zitadel.system.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/system";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/system";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
@@ -29,7 +29,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         }
         license: {
             name: "Apache 2.0",
-            url: "https://github.com/caos/zitadel/blob/main/LICENSE";
+            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
         };
     };
 

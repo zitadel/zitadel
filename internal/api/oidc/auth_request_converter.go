@@ -6,15 +6,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/oidc/v2/pkg/oidc"
-	"github.com/caos/oidc/v2/pkg/op"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 const (

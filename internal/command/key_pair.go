@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
 
 func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {

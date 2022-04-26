@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"html"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 const (

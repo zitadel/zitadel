@@ -6,7 +6,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.idp.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/idp";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/idp";
 
 message IDP {
     string id = 1 [

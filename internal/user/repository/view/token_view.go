@@ -4,11 +4,11 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/user/model"
-	usr_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/user/model"
+	usr_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 func TokenByID(db *gorm.DB, table, tokenID, instanceID string) (*usr_model.TokenView, error) {

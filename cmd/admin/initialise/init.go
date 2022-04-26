@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	_ "embed"
 
-	"github.com/caos/logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 func New() *cobra.Command {

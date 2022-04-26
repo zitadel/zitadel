@@ -3,13 +3,13 @@ package types
 import (
 	"context"
 
-	caos_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/log"
-	"github.com/caos/zitadel/internal/notification/channels/twilio"
-	"github.com/caos/zitadel/internal/notification/messages"
-	"github.com/caos/zitadel/internal/notification/senders"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 func generateSms(ctx context.Context, user *view_model.NotifyUser, content string, getTwilioProvider func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastPhone bool) error {

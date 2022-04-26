@@ -10,8 +10,8 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_MessageTextPrepares(t *testing.T) {

@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 type RefreshTokenRepository interface {

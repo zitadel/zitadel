@@ -1,4 +1,4 @@
-module github.com/caos/zitadel
+module github.com/zitadel/zitadel
 
 go 1.17
 
@@ -12,8 +12,6 @@ require (
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1
-	github.com/caos/logging v0.3.1
-	github.com/caos/oidc/v2 v2.0.0-dynamic-issuer.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
 	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51
 	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d
@@ -50,6 +48,8 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
+	github.com/zitadel/logging v0.3.3
+	github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0
 	go.opentelemetry.io/otel v1.2.0

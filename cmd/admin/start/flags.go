@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/caos/zitadel/cmd/admin/key"
+	"github.com/zitadel/zitadel/cmd/admin/key"
 )
 
 func startFlags(cmd *cobra.Command) {
