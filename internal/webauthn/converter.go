@@ -1,9 +1,9 @@
 package webauthn
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func WebAuthNsToCredentials(webAuthNs []*domain.WebAuthNToken) []webauthn.Credential {

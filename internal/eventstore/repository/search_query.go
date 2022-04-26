@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/caos/zitadel/internal/errors"
+import "github.com/zitadel/zitadel/internal/errors"
 
 //SearchQuery defines the which and how data are queried
 type SearchQuery struct {

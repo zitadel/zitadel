@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_SecretGeneratorsPrepares(t *testing.T) {

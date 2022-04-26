@@ -2,10 +2,10 @@ package twilio
 
 import (
 	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/channels"
-	"github.com/caos/zitadel/internal/notification/messages"
 	twilio "github.com/kevinburke/twilio-go"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
 func InitTwilioChannel(config TwilioConfig) channels.NotificationChannel {

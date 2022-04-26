@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	_ "github.com/caos/zitadel/internal/statik"
+	_ "github.com/zitadel/zitadel/internal/statik"
 )
 
 func NoCacheInterceptor() grpc.UnaryServerInterceptor {

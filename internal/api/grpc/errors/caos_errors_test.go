@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func TestCaosToGRPCError(t *testing.T) {

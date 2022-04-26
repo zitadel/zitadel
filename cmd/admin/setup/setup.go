@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/caos/zitadel/cmd/admin/key"
-	"github.com/caos/zitadel/internal/database"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/migration"
+	"github.com/zitadel/zitadel/cmd/admin/key"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/migration"
 )
 
 var (

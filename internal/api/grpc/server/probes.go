@@ -7,9 +7,9 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/proto"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/proto"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type ValidationFunction func(ctx context.Context) error

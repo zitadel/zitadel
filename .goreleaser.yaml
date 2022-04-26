@@ -27,8 +27,8 @@ builds:
 dist: .artifacts/goreleaser
 dockers:
 - image_templates:
-  - ghcr.io/caos/zitadel:{{ .Tag }}-amd64
-  - ghcr.io/caos/zitadel:{{ .ShortCommit }}-amd64
+  - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
+  - ghcr.io/zitadel/zitadel:{{ .ShortCommit }}-amd64
   - europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel:{{ .Tag }}-amd64
   - europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel:{{ .ShortCommit }}-amd64
   use: buildx
@@ -36,8 +36,8 @@ dockers:
   build_flag_templates:
   - "--platform=linux/amd64"
 - image_templates:
-    - ghcr.io/caos/zitadel:{{ .Tag }}-arm64
-    - ghcr.io/caos/zitadel:{{ .ShortCommit }}-arm64
+    - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
+    - ghcr.io/zitadel/zitadel:{{ .ShortCommit }}-arm64
   use: buildx
   dockerfile: build/Dockerfile
   build_flag_templates:

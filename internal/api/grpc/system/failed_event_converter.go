@@ -1,9 +1,9 @@
 package system
 
 import (
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/view/model"
-	system_pb "github.com/caos/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/view/model"
+	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func FailedEventsViewToPb(failedEvents []*model.FailedEvent) []*system_pb.FailedEvent {

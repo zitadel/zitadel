@@ -4,8 +4,8 @@ set -eux
 
 echo "Generate grpc"
 
-OPENAPI_PATH=${GOPATH}/src/github.com/caos/zitadel/openapi/v2
-ZITADEL_PATH=${GOPATH}/src/github.com/caos/zitadel
+OPENAPI_PATH=${GOPATH}/src/github.com/zitadel/zitadel/openapi/v2
+ZITADEL_PATH=${GOPATH}/src/github.com/zitadel/zitadel
 GRPC_PATH=${ZITADEL_PATH}/pkg/grpc
 PROTO_PATH=/proto/include/zitadel
 DOCS_PATH=${ZITADEL_PATH}/docs/apis/proto

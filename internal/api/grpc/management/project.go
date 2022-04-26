@@ -3,13 +3,13 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
-	"github.com/caos/zitadel/internal/query"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
+	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	project_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByIDRequest) (*mgmt_pb.GetProjectByIDResponse, error) {

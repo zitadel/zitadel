@@ -9,7 +9,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 const (

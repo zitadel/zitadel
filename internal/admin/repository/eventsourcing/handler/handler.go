@@ -3,10 +3,10 @@ package handler
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/static"
 )
 
 type Configs map[string]*Config

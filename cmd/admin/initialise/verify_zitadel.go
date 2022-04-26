@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/caos/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 const (

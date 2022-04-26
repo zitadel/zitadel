@@ -7,8 +7,8 @@ import (
 	"github.com/caos/logging"
 	"github.com/getsentry/sentry-go"
 
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (

@@ -9,8 +9,8 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 const (

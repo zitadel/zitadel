@@ -6,12 +6,12 @@ import (
 	"github.com/caos/logging"
 	"github.com/rakyll/statik/fs"
 
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/crypto"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/notification/repository/eventsourcing"
-	_ "github.com/caos/zitadel/internal/notification/statik"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/notification/repository/eventsourcing"
+	_ "github.com/zitadel/zitadel/internal/notification/statik"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Config struct {

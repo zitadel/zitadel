@@ -12,7 +12,7 @@ Now open a terminal and execute the following commands.
 
 ```bash
 # Download the zitadelctl binary
-curl -s https://api.github.com/repos/caos/zitadel/releases/latest | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/latest | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 sudo chmod +x /usr/local/bin/zitadelctl
 sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 

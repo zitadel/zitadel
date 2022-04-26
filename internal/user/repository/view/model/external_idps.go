@@ -6,10 +6,10 @@ import (
 
 	"github.com/caos/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (

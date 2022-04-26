@@ -1,12 +1,12 @@
 package system
 
 import (
-	instance_grpc "github.com/caos/zitadel/internal/api/grpc/instance"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/query"
-	instance_pb "github.com/caos/zitadel/pkg/grpc/instance"
-	system_pb "github.com/caos/zitadel/pkg/grpc/system"
+	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/query"
+	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
+	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup) *command.InstanceSetup {

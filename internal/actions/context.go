@@ -3,7 +3,7 @@ package actions
 import (
 	"encoding/json"
 
-	"github.com/caos/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 )
 
 type Context map[string]interface{}

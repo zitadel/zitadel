@@ -5,8 +5,8 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/api/assets"
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/assets"
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 type dynamicResourceData struct {

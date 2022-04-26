@@ -6,10 +6,10 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type Machine struct {

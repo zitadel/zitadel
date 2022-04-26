@@ -9,9 +9,9 @@ import (
 	"github.com/caos/logging"
 	"github.com/pkg/errors"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/channels"
-	"github.com/caos/zitadel/internal/notification/messages"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 )
 
 var _ channels.NotificationChannel = (*Email)(nil)

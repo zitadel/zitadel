@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/id"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 type cookieKey int

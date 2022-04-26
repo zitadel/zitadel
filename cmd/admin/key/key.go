@@ -9,11 +9,11 @@ import (
 	"github.com/spf13/viper"
 	"sigs.k8s.io/yaml"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 
-	"github.com/caos/zitadel/internal/crypto"
-	cryptoDB "github.com/caos/zitadel/internal/crypto/database"
-	"github.com/caos/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/crypto"
+	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 const (

@@ -1,12 +1,12 @@
 package management
 
 import (
-	action_grpc "github.com/caos/zitadel/internal/api/grpc/action"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/query"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func createActionRequestToDomain(req *mgmt_pb.CreateActionRequest) *domain.Action {

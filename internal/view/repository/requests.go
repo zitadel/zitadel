@@ -8,7 +8,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/jinzhu/gorm"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func PrepareGetByKey(table string, key ColumnKey, id string) func(db *gorm.DB, res interface{}) error {

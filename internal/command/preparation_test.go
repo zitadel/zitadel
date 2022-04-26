@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/caos/zitadel/internal/command/preparation"
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 //Want represents the expected values for each step

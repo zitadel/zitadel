@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/caos/zitadel/internal/config"
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/config"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 const (

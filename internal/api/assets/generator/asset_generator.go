@@ -8,7 +8,7 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/config"
+	"github.com/zitadel/zitadel/internal/config"
 )
 
 var (
@@ -132,7 +132,7 @@ func GenerateAssetHandler(configFilePath, handlerPrefix string, authz, router, d
 const authzTmpl = `package {{.GoPkgName}}
 
 import (
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 /**
@@ -167,9 +167,9 @@ const routerTmpl = `package {{.GoPkgName}}
 import (
 	"github.com/gorilla/mux"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/static"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/static"
 )
 
 type {{.Name}} interface {

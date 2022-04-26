@@ -8,7 +8,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
 
-	"github.com/caos/zitadel/cmd/admin/initialise"
+	"github.com/zitadel/zitadel/cmd/admin/initialise"
 )
 
 var (

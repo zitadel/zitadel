@@ -11,8 +11,8 @@ import (
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
-	z_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	z_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type querier interface {

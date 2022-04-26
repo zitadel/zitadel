@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/caos/zitadel/internal/eventstore/v1/internal/repository"
-	z_sql "github.com/caos/zitadel/internal/eventstore/v1/internal/repository/sql"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/internal/repository"
+	z_sql "github.com/zitadel/zitadel/internal/eventstore/v1/internal/repository/sql"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type Eventstore interface {

@@ -1,8 +1,8 @@
 package log
 
 import (
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing/otel"
 	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 )

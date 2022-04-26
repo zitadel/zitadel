@@ -33,7 +33,7 @@ TBD
 
 ## Public Disclosure
 
-All accepted and mitigated vulnerabilities will be published on [ZITADEL's GitHub Security Page](https://github.com/caos/zitadel/security/advisories).
+All accepted and mitigated vulnerabilities will be published on [ZITADEL's GitHub Security Page](https://github.com/zitadel/zitadel/security/advisories).
 
 ### Timing
 

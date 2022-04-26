@@ -7,7 +7,7 @@ It shows how to add user login to your application and fetch some data from the 
 
 At the end of the guide, your application has login functionality and has access to the current user's profile.  
 
-> This documentation refers to our [example](https://github.com/caos/zitadel-examples/tree/main/angular) in GitHub. Note that we've written ZITADEL Console in Angular, so you can also use that as a reference.  
+> This documentation refers to our [example](https://github.com/zitadel/zitadel-examples/tree/main/angular) in GitHub. Note that we've written ZITADEL Console in Angular, so you can also use that as a reference.  
 
 ## Setup Application and Get Keys
 
@@ -22,7 +22,7 @@ We recommend you use [Authorization Code](../../apis/openidoauth/grant-types#aut
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.  
 
-> If you are following along with the [example](https://github.com/caos/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.  
+> If you are following along with the [example](https://github.com/zitadel/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.  
 
 If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.  
 
@@ -158,7 +158,7 @@ const newState = setState ? await this.statehandler.createState().toPromise() : 
 ...
 ```
 
-If you decide to use the _StatehandlerService_, provide it in the `app.module`. Make sure it gets initialized first using Angular’s `APP_INITIALIZER`. You find the service implementation in the [example](https://github.com/caos/zitadel-examples/tree/main/angular).
+If you decide to use the _StatehandlerService_, provide it in the `app.module`. Make sure it gets initialized first using Angular’s `APP_INITIALIZER`. You find the service implementation in the [example](https://github.com/zitadel/zitadel-examples/tree/main/angular).
 
 ```ts
 
@@ -305,12 +305,12 @@ And in your HTML file:
 
 You have successfully integrated your Angular application with ZITADEL!
 
-If you get stuck, consider checking out our [example](https://github.com/caos/zitadel-examples/tree/main/angular) application. It includes all the mentioned functionality of this quickstart. You can simply start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ by your own configuration. If you run into issues, contact us or raise an issue on [GitHub](https://github.com/caos/zitadel).
+If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-examples/tree/main/angular) application. It includes all the mentioned functionality of this quickstart. You can simply start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ by your own configuration. If you run into issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
 
 ![App in console](/img/angular/app-screen.png)
 
 ### What's next?
 
-Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs. Refer to the [docs](../../apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/caos/zitadel) which is using gRPC to access data.
+Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs. Refer to the [docs](../../apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which is using gRPC to access data.
 
 For more information about creating an Angular application, refer to [Angular](https://angular.io/start) and for more information about the OAuth/OIDC library used above, consider reading their docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

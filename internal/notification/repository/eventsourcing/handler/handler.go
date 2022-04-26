@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/crypto"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	queryv1 "github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/notification/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Configs map[string]*Config

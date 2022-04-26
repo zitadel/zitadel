@@ -1,6 +1,6 @@
 package domain
 
-import es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+import es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 
 type ProjectGrant struct {
 	es_models.ObjectRoot

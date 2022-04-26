@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/query"
-	user_pb "github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func UserGrantsToPb(assetPrefix string, grants []*query.UserGrant) []*user_pb.UserGrant {

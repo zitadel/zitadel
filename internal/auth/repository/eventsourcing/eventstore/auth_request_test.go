@@ -8,18 +8,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/auth_request/repository/cache"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
-	"github.com/caos/zitadel/internal/query"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/auth_request/repository/cache"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	proj_view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
+	"github.com/zitadel/zitadel/internal/query"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	user_model "github.com/zitadel/zitadel/internal/user/model"
+	user_es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 type mockViewNoUserSession struct{}

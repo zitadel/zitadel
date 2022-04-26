@@ -3,11 +3,11 @@ package change
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 
-	"github.com/caos/zitadel/internal/query"
-	change_pb "github.com/caos/zitadel/pkg/grpc/change"
-	"github.com/caos/zitadel/pkg/grpc/message"
+	"github.com/zitadel/zitadel/internal/query"
+	change_pb "github.com/zitadel/zitadel/pkg/grpc/change"
+	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
 func ChangeQueryToQuery(query *change_pb.ChangeQuery) (sequence uint64, limit uint64, asc bool) {
