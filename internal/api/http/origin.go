@@ -33,7 +33,7 @@ func IsOrigin(rawOrigin string) bool {
 
 func BuildHTTP(hostname string, externalPort uint16, secure bool) string {
 	host := hostname
-	if externalPort != 0 {
+	if externalPort != 0 || (externalPort != 443 && secure) || (externalPort != 80 && !secure) {
 		host = fmt.Sprintf("%s:%d", hostname, externalPort)
 	}
 	return BuildOrigin(host, secure)

@@ -98,7 +98,7 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			}
 			if appWriteModel.State.Exists() {
 				redirectUrls := append(appWriteModel.RedirectUris, http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure)+consoleRedirectPath)
-				logoutUrls := append(appWriteModel.PostLogoutRedirectUris, http.BuildOrigin(instanceDomain, c.externalSecure)+consolePostLogoutPath)
+				logoutUrls := append(appWriteModel.PostLogoutRedirectUris, http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure)+consolePostLogoutPath)
 				consoleChangeEvent, err := project.NewOIDCConfigChangedEvent(
 					ctx,
 					ProjectAggregateFromWriteModel(&appWriteModel.WriteModel),
