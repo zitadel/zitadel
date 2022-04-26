@@ -1,3 +1,5 @@
+import ThemedImage from '@theme/ThemedImage';
+
 export default function ReviewConfig(props) {
     let clientObjects = []
     if (clientID(props.appType, props.authType)) {
@@ -10,7 +12,15 @@ export default function ReviewConfig(props) {
         <div>
             <h3>Review your configuration</h3>
             <p>This page shows what will be created. After you have reviewed the configuration you can create the application.</p>
+            <h3>Client informations</h3>
             <p>Please make sure to safe the <b>client {clientObjects.join(' and ')}</b> for later user in the application.</p>
+            <ThemedImage
+                alt="client infos"
+                sources={{
+                    light: '/img/guides/application/client-' + clientObjects.join('-') + '-light.png',
+                    dark: '/img/guides/application/client-' + clientObjects.join('-') + '-dark.png'
+                }}
+            />
         </div>
     ): null;
 }
