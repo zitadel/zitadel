@@ -77,9 +77,8 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) erro
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
 	prefix = strings.TrimSuffix(prefix, "/")
-	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
-	subRouter.Use(sentryHandler.Handle)
+	subRouter.Use(sentryhttp.New(sentryhttp.Options{}).Handle)
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
 }
 
