@@ -6,32 +6,36 @@ import ThemedImage from '@theme/ThemedImage';
 
 import AuthType from '../integrations/application/auth-type.mdx';
 import RedirectURIs from '../integrations/application/redirect-uris.mdx';
+import GenerateKey from '../integrations/application/generate-key.mdx';
+import ReviewConfig from '../integrations/application/review-config.mdx';
 
-<table class="table-wrapper">
-    <tr>
-        <td>Description</td>
-        <td>Learn what applications are and how to use.</td>
-    </tr>
-    <tr>
-        <td>Learning Outcomes</td>
-        <td>
-            In this module you will:
-            <ul>
-              <li>Get an overview of application types</li>
-              <li>Learn which application type allows which authentication types</li>
-              <li>Learn why Redirect URIs make login processes more secure</li>
-            </ul>
-        </td>
-    </tr>
-     <tr>
-        <td>Prerequisites</td>
-        <td>
-            <ul>
-                <li>ZITADEL <a href="./organizations">organization</a></li>
-                <li>ZITADEL <a href="./projects">project</a></li>
-            </ul>
-        </td>
-    </tr>
+<table className="table-wrapper">
+  <tbody>
+      <tr>
+          <td>Description</td>
+          <td>Learn what applications are and how to use.</td>
+      </tr>
+      <tr>
+          <td>Learning Outcomes</td>
+          <td>
+              In this module you will:
+              <ul>
+                <li>Get an overview of application types</li>
+                <li>Learn which application type allows which authentication types</li>
+                <li>Learn why Redirect URIs make login processes more secure</li>
+              </ul>
+          </td>
+      </tr>
+      <tr>
+          <td>Prerequisites</td>
+          <td>
+              <ul>
+                  <li>ZITADEL <a href="./organizations">organization</a></li>
+                  <li>ZITADEL <a href="./projects">project</a></li>
+              </ul>
+          </td>
+      </tr>
+    </tbody>
 </table>
 
 ## What is an application?
@@ -90,7 +94,10 @@ Following authentication types can be used:
 
 <RedirectURIs appType="web"/>
 
-## Create key for private key JWT
+## Review Configuration
 
-After you successfully created your application with authentication type JWT your can create keys in the "KEYS" section of the app details like following video shows:
+<ReviewConfig authType="code"/>
 
+## Generate key for private key JWT
+
+<GenerateKey appType="api"/>

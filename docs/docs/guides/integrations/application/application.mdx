@@ -29,7 +29,9 @@ export default function CreateApp(props) {
             <AuthType appType={props.appType} authType={props.authType}/>
             <h3>Redirect URIs</h3>
             <RedirectURIs appType={props.appType} redirectURI={props.redirectURI} postLogoutURI={props.postLogoutURI}/>
+            <h3>Review your configuration</h3>
             <ReviewConfig appType={props.appType} authType={props.authType} />
+            <h3>Create key for private key JWT</h3>
             <GenerateKey appType={props.appType} authType={props.authType} />
         </div>
     );
