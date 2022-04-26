@@ -5,9 +5,9 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api/database"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
+	"github.com/zitadel/zitadel/operator/api/database"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
 )
 
 func GitOpsClear(
@@ -59,4 +59,3 @@ func clear(
 
 	return nil
 }
-

@@ -9,16 +9,16 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/notification/templates"
 	"github.com/gorilla/csrf"
+	"github.com/zitadel/zitadel/internal/notification/templates"
 	"golang.org/x/text/language"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/i18n"
-	"github.com/caos/zitadel/internal/renderer"
-	"github.com/caos/zitadel/internal/static"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/renderer"
+	"github.com/zitadel/zitadel/internal/static"
 )
 
 const (

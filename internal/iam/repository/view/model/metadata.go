@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	usr_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	usr_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (

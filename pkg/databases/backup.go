@@ -5,8 +5,8 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api/database"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
+	"github.com/zitadel/zitadel/operator/api/database"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
 )
 
 func GitOpsInstantBackup(

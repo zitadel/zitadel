@@ -2,9 +2,9 @@ package admin
 
 import (
 	"github.com/caos/logging"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/domain"
-	admin_grpc "github.com/caos/zitadel/pkg/grpc/admin"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	admin_grpc "github.com/zitadel/zitadel/pkg/grpc/admin"
 	"golang.org/x/text/language"
 )
 

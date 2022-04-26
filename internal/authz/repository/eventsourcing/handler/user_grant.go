@@ -4,23 +4,23 @@ import (
 	"context"
 	"strings"
 
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	es_sdk "github.com/zitadel/zitadel/internal/eventstore/v1/sdk"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	iam_view "github.com/zitadel/zitadel/internal/iam/repository/view"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	proj_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
+	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
+	proj_es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
+	view_model "github.com/zitadel/zitadel/internal/usergrant/repository/view/model"
 )
 
 const (

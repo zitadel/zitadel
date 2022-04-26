@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/caos/zitadel/internal/cache/config"
-	"github.com/caos/zitadel/internal/eventstore/v1/internal/repository/sql"
+	"github.com/zitadel/zitadel/internal/cache/config"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/internal/repository/sql"
 )
 
 type Config struct {

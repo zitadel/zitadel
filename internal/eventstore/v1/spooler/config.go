@@ -1,13 +1,14 @@
 package spooler
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"math/rand"
 	"os"
 
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 type Config struct {

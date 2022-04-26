@@ -3,13 +3,14 @@ package db
 import (
 	"crypto/rsa"
 	"fmt"
-	"github.com/caos/orbos/pkg/labels"
 	"sort"
 	"strings"
 
-	"github.com/caos/zitadel/operator/common"
+	"github.com/caos/orbos/pkg/labels"
 
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/common"
+
+	"github.com/zitadel/zitadel/operator/helpers"
 	corev1 "k8s.io/api/core/v1"
 )
 

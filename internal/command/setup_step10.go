@@ -5,8 +5,8 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type Step10 struct {

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"gopkg.in/yaml.v3"
 	core "k8s.io/api/core/v1"
@@ -18,13 +18,13 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/migration"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/services"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/migration"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/services"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/setup"
 )
 
 func AdaptFunc(

@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/base64"
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
+
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 
 const (

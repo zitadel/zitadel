@@ -2,9 +2,10 @@ package restore
 
 import (
 	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 )
 
 func GetCleanupFunc(

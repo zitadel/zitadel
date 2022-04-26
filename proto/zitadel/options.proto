@@ -4,7 +4,7 @@ package zitadel.v1;
 
 import "google/protobuf/descriptor.proto";
 
-option go_package = "github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption";
+option go_package = "github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption";
 
 
 extend google.protobuf.MethodOptions {

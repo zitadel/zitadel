@@ -8,7 +8,7 @@ ARG ENV=prod
 #######################
 FROM golang:1.16 as go-base
 
-WORKDIR src/github.com/caos/zitadel/
+WORKDIR src/github.com/zitadel/zitadel/
 COPY go.mod go.sum ./
 RUN go mod download
 
@@ -24,7 +24,7 @@ RUN go test -race -v -coverprofile=profile.cov ./operator/...
 
 ## Go test
 FROM scratch as go-codecov
-COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+COPY --from=go-test /go/src/github.com/zitadel/zitadel/profile.cov profile.cov
 
 ## Go prod build
 FROM go-test as prod-go-build
@@ -52,7 +52,7 @@ ARG OS=linux
 
 RUN apk add -U --no-cache ca-certificates
 
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadelctl /app/zitadelctl
+COPY --from=prod-go-build /go/src/github.com/zitadel/zitadel/zitadelctl /app/zitadelctl
 RUN chmod a+x /app/zitadelctl
 
 ## Scratch Image

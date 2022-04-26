@@ -1,11 +1,12 @@
 package backup
 
 import (
-	command "github.com/caos/zitadel/operator/database/kinds/backups/bucket/command"
-	"github.com/caos/zitadel/pkg/databases/db"
 	"time"
 
-	"github.com/caos/zitadel/operator"
+	command "github.com/zitadel/zitadel/operator/database/kinds/backups/bucket/command"
+	"github.com/zitadel/zitadel/pkg/databases/db"
+
+	"github.com/zitadel/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"

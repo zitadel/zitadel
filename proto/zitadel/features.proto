@@ -5,7 +5,7 @@ import "google/protobuf/duration.proto";
 
 package zitadel.features.v1;
 
-option go_package = "github.com/caos/zitadel/pkg/grpc/features";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/features";
 
 message Features {
   zitadel.v1.ObjectDetails details = 1;

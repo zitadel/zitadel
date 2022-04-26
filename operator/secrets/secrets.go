@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/pkg/kubernetes"
 
-	crddb "github.com/caos/zitadel/operator/api/database"
-	crdzit "github.com/caos/zitadel/operator/api/zitadel"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
-	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	crddb "github.com/zitadel/zitadel/operator/api/database"
+	crdzit "github.com/zitadel/zitadel/operator/api/zitadel"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
+	orbzit "github.com/zitadel/zitadel/operator/zitadel/kinds/orb"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"

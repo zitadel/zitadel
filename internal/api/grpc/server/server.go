@@ -2,18 +2,19 @@ package server
 
 import (
 	"context"
-	grpc_api "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
+
+	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 
 	"github.com/caos/logging"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
-	"github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (

@@ -7,10 +7,10 @@ import (
 	"github.com/zitadel/oidc/pkg/oidc"
 	"github.com/zitadel/oidc/pkg/op"
 
-	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
+	authreq_model "github.com/zitadel/zitadel/internal/auth_request/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Client struct {

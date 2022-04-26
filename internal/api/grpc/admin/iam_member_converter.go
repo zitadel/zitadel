@@ -1,11 +1,11 @@
 package admin
 
 import (
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/query"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func AddIAMMemberToDomain(req *admin_pb.AddIAMMemberRequest) *domain.Member {

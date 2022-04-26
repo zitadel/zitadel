@@ -6,11 +6,11 @@ import (
 
 	"github.com/caos/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	usr_es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 
 	"github.com/lib/pq"
 )

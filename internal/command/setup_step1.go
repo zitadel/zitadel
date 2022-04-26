@@ -3,15 +3,15 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	iam_repo "github.com/zitadel/zitadel/internal/repository/iam"
 )
 
 const (

@@ -3,9 +3,9 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/iam"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type ExistingLabelPoliciesReadModel struct {

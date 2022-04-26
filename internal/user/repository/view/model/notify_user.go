@@ -7,11 +7,11 @@ import (
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	org_model "github.com/zitadel/zitadel/internal/org/model"
+	"github.com/zitadel/zitadel/internal/user/model"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 const (

@@ -3,11 +3,11 @@ package types
 import (
 	"html"
 
-	"github.com/caos/zitadel/internal/notification/messages"
-	"github.com/caos/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 func generateEmail(user *view_model.NotifyUser, subject, content string, config systemdefaults.Notifications, lastEmail bool) error {

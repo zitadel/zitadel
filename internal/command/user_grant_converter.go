@@ -1,6 +1,6 @@
 package command
 
-import "github.com/caos/zitadel/internal/domain"
+import "github.com/zitadel/zitadel/internal/domain"
 
 func userGrantWriteModelToUserGrant(writeModel *UserGrantWriteModel) *domain.UserGrant {
 	return &domain.UserGrant{

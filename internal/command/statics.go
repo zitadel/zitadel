@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func (c *Commands) UploadAsset(ctx context.Context, bucketName, objectName, contentType string, file io.Reader, size int64) (*domain.AssetInfo, error) {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type ProjectionHandlerConfig struct {

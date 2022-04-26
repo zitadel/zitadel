@@ -9,7 +9,7 @@ At the end of the guide, you should have an application that can read the detail
 
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-go) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API using our [OIDC client library](https://github.com/zitadel/oidc).
+The client [SDK](https://github.com/zitadel/zitadel-go) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API using our [OIDC client library](https://github.com/zitadel/oidc).
 
 You'll need a service account assigned with the *ORG-OWNER* role. 
 (or another role, depending on the needed API requests).
@@ -28,7 +28,7 @@ For background information, we recommend reading the guide on [how to access the
 Add the SDK into Go Modules with this command:
 
 ```bash
-go get github.com/caos/zitadel-go
+go get github.com/zitadel/zitadel-go
 ```
 
 ### Create example client
@@ -48,10 +48,10 @@ import (
     
     "github.com/zitadel/oidc/pkg/oidc"
     
-    "github.com/caos/zitadel-go/pkg/client/management"
-    "github.com/caos/zitadel-go/pkg/client/middleware"
-    "github.com/caos/zitadel-go/pkg/client/zitadel"
-    pb "github.com/caos/zitadel-go/pkg/client/zitadel/management"
+    "github.com/zitadel/zitadel-go/pkg/client/management"
+    "github.com/zitadel/zitadel-go/pkg/client/middleware"
+    "github.com/zitadel/zitadel-go/pkg/client/zitadel"
+    pb "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
 )
 
 
@@ -133,7 +133,7 @@ The service user needs the *ORG_OWNER* or *ORG_OWNER_VIEWER* role.
 
 For more help, check the [guides](#prerequisites) mentioned at the beginning.
 
-If you've run into any other problems, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/caos/zitadel/issues) or in the [SDK](https://github.com/caos/zitadel-go/issues).
+If you've run into any other problems, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/zitadel/zitadel/issues) or in the [SDK](https://github.com/zitadel/zitadel-go/issues).
 
 ### What's next?
 
@@ -148,6 +148,6 @@ You can also try to overwrite the organization context:
     log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
 }
 ```
-Checkout more [examples from the SDK](https://github.com/caos/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
+Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
 
 > This guide will be updated soon to show you how to use the SDK for your own API as well.

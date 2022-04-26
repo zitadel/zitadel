@@ -4,8 +4,8 @@ import (
 	"database/sql"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
 
 const (

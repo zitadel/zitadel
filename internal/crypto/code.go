@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"time"
 
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/config/types"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 var (

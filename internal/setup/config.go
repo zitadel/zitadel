@@ -1,8 +1,8 @@
 package setup
 
 import (
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type IAMSetUp struct {

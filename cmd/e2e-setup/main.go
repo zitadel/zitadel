@@ -4,17 +4,18 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"time"
 
-	authz_repo "github.com/caos/zitadel/internal/authz/repository"
+	"gopkg.in/yaml.v3"
 
-	"github.com/caos/zitadel/internal/domain"
+	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
+
+	"github.com/zitadel/zitadel/internal/domain"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config"
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type user struct {

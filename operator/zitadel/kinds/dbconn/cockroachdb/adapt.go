@@ -3,8 +3,9 @@ package cockroachdb
 import (
 	"errors"
 	"fmt"
-	"github.com/caos/zitadel/pkg/databases/certs/pem"
 	"strconv"
+
+	"github.com/zitadel/zitadel/pkg/databases/certs/pem"
 
 	"github.com/caos/orbos/pkg/secret/read"
 
@@ -17,8 +18,8 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 )
 
 const (

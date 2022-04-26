@@ -1,9 +1,9 @@
 package policy
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/query"
-	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
+	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 )
 
 func ModelPrivacyPolicyToPb(policy *query.PrivacyPolicy) *policy_pb.PrivacyPolicy {

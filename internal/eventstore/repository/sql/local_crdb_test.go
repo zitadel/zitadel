@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	migrationsPath = os.ExpandEnv("${GOPATH}/src/github.com/caos/zitadel/migrations/cockroach")
+	migrationsPath = os.ExpandEnv("${GOPATH}/src/github.com/zitadel/zitadel/migrations/cockroach")
 	testCRDBClient *sql.DB
 )
 

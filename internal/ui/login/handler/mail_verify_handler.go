@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 const (

@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	z_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/lib/pq"
+	z_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 type querier interface {

@@ -3,7 +3,7 @@ package models
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 type AggregateCreator struct {

@@ -2,7 +2,7 @@ package backup
 
 import (
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/helpers"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"

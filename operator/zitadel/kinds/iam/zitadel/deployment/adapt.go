@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/caos/orbos/pkg/kubernetes/resources/deployment"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/helpers"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +22,7 @@ const (
 	dbSecrets     = "db-secrets"
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
-	//zitadelImage can be found in github.com/caos/zitadel repo
+	//zitadelImage can be found in github.com/zitadel/zitadel repo
 	timeout = 60 * time.Second
 )
 

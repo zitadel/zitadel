@@ -4,10 +4,10 @@
 
 **[🏡 website](https://zitadel.ch) [💬 chat](https://zitadel.ch/chat) [📞 contact](https://zitadel.ch/contact/) [📋 guide](https://docs.zitadel.ch/docs/guides/overview) [🧑‍💻 api docs](https://docs.zitadel.ch/docs/apis/introduction) [❓user manuals](https://docs.zitadel.ch/docs/manuals/introduction)**
 
-[![stable version](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases/latest)
-[![license](https://badgen.net/github/license/caos/zitadel)](#license)
-[![code coverage](https://badgen.net/codecov/c/github/caos/zitadel)](https://app.codecov.io/gh/caos/zitadel)
-[![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
+[![stable version](https://badgen.net/github/release/zitadel/zitadel/stable)](https://github.com/zitadel/zitadel/releases/latest)
+[![license](https://badgen.net/github/license/zitadel/zitadel)](#license)
+[![code coverage](https://badgen.net/codecov/c/github/zitadel/zitadel)](https://app.codecov.io/gh/zitadel/zitadel)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zitadel/zitadel)](https://goreportcard.com/report/github.com/zitadel/zitadel)
 [![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://zitadel.ch/chat)
 [![follow us](https://badgen.net/twitter/follow/zitadel)](https://twitter.com/zitadel)
 <a href="https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL"><img src="./docs/static/logos/oidc-cert.png" alt="OpenID certification" height="35px" width="auto" /></a>
@@ -25,8 +25,8 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 
 ## Contributors
 
-<a href="https://github.com/caos/zitadel/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=caos/zitadel" />
+<a href="https://github.com/zitadel/zitadel/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=zitadel/zitadel" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).
@@ -50,16 +50,16 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 
 ### Quickstarts
 
-See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/caos/zitadel/discussions/1717).
+See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/zitadel/zitadel/discussions/1717).
 
 ### Client libraries
 
 | Language | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
 |----------|--------|--------------|----------|---------|---------------------------|
-| .NET     | [zitadel-net](https://github.com/caos/zitadel-net) | GRPC | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
-| Dart     | [zitadel-dart](https://github.com/caos/zitadel-dart) | GRPC | ✔️ | | [buehler 👑](https://github.com/buehler) |
+| .NET     | [zitadel-net](https://github.com/zitadel/zitadel-net) | GRPC | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
+| Dart     | [zitadel-dart](https://github.com/zitadel/zitadel-dart) | GRPC | ✔️ | | [buehler 👑](https://github.com/buehler) |
 | Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
-| Go       | [zitadel-go](https://github.com/caos/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
+| Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
 | Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | | [buehler 👑](https://github.com/buehler) |
 | JVM      | ❌ | ❌ | ❌ | | Maybe you? |
 | Python   | ❌ | ❌ | ❌ | | Maybe you? |
@@ -136,7 +136,7 @@ Customize login and console with your design
 ## Other CAOS Projects
 
 * [**OIDC for GO**](https://github.com/zitadel/oidc) - OpenID Connect SDK (client and server) for Go
-* [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT
+* [**ZITADEL Tools**](https://github.com/zitadel/zitadel-tools) - Go tool to convert  key file to privately signed JWT
 
 ## Usage Data
 

@@ -3,7 +3,7 @@ package deployment
 /* Deprecated in V2
 
 import (
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	"testing"

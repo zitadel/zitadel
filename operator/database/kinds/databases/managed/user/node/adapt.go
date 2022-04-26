@@ -3,19 +3,20 @@ package node
 import (
 	"crypto/rsa"
 	"errors"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
 	"reflect"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator/database/kinds/databases/managed/current"
+
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/pkg/labels"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
-	"github.com/caos/zitadel/pkg/databases/certs/certificates"
-	"github.com/caos/zitadel/pkg/databases/certs/pem"
+	"github.com/zitadel/zitadel/pkg/databases/certs/certificates"
+	"github.com/zitadel/zitadel/pkg/databases/certs/pem"
 )
 
 const (

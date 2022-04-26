@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/static"
-	"github.com/caos/zitadel/internal/static/s3"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/static/s3"
 )
 
 type AssetStorageConfig struct {

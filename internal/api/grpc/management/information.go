@@ -3,7 +3,7 @@ package management
 import (
 	"context"
 
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) Healthz(context.Context, *mgmt_pb.HealthzRequest) (*mgmt_pb.HealthzResponse, error) {

@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/repository/iam"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/repository/iam"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func (c *Commands) SetDefaultFeatures(ctx context.Context, features *domain.Features) (*domain.ObjectDetails, error) {

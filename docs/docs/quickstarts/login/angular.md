@@ -8,7 +8,7 @@ It covers how to:
 - Add a user login to your application
 - Fetch some data from the user info endpoint.
 
-> This documentation refers to our [example](https://github.com/caos/zitadel-examples/tree/main/angular) in GitHub.
+> This documentation refers to our [example](https://github.com/zitadel/zitadel-examples/tree/main/angular) in GitHub.
 > Note that we've written the ZITADEL console in Angular.
 > You can also use that as a reference.
 
@@ -35,7 +35,7 @@ with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#pro
 In the Redirect URIs field, tell ZITADEL where to redirect users after authentication.
 For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
-> If you are following along with the [example](https://github.com/caos/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.
+> If you are following along with the [example](https://github.com/zitadel/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.
 
 After users log out, you can redirect them back to a route on your application.
 To do so, add an optional redirect in the Post Logout URIs field.
@@ -186,7 +186,7 @@ const newState = setState ? await this.statehandler.createState().toPromise() : 
 
 If you decide to use the `StatehandlerService`, provide it in the `AppModule`.
 Make sure it gets initialized first using Angular’s `APP_INITIALIZER`.
-You can find the service implementation in the [example](https://github.com/caos/zitadel-examples/tree/main/angular).
+You can find the service implementation in the [example](https://github.com/zitadel/zitadel-examples/tree/main/angular).
 
 ```ts
 
@@ -340,17 +340,17 @@ And in your HTML file:
 
 You have successfully integrated your Angular application with ZITADEL!
 
-If you get stuck, check out our [example](https://github.com/caos/zitadel-examples/tree/main/angular) application.
+If you get stuck, check out our [example](https://github.com/zitadel/zitadel-examples/tree/main/angular) application.
 It includes all the mentioned functionality of this quickstart.
 You can start by cloning the repository and replacing the `AuthConfig` in the `AppModule` with your own configuration.
 
-If you run into issues, contact us or raise an issue on [GitHub](https://github.com/caos/zitadel).
+If you run into issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
 
 ![App in console](/img/angular/app-screen.png)
 
 ### What's next?
 
 Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs.
-Refer to the [docs](../../apis/introduction) or check out our ZITADEL console code on [GitHub](https://github.com/caos/zitadel), which uses gRPC to access data.
+Refer to the [docs](../../apis/introduction) or check out our ZITADEL console code on [GitHub](https://github.com/zitadel/zitadel), which uses gRPC to access data.
 
 For more information about creating an Angular application, refer to [Angular](https://angular.io/start) and for more information about the OAuth/OIDC library used above, consider reading their docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

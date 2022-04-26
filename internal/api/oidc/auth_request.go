@@ -9,14 +9,14 @@ import (
 	"github.com/caos/logging"
 	"github.com/zitadel/oidc/pkg/oidc"
 	"github.com/zitadel/oidc/pkg/op"
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 
-	"github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/user/model"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/user/model"
+	grant_model "github.com/zitadel/zitadel/internal/usergrant/model"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {

@@ -5,9 +5,9 @@ import (
 
 	"github.com/zitadel/oidc/pkg/oidc"
 
-	"github.com/caos/zitadel/internal/actions"
-	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/actions"
+	"github.com/zitadel/zitadel/internal/domain"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
 
 func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.ExternalUser, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.ExternalUser, error) {

@@ -11,8 +11,8 @@ import (
 	"github.com/k3a/html2text"
 
 	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/channels"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels"
 )
 
 func InitChatChannel(config ChatConfig) (channels.NotificationChannel, error) {

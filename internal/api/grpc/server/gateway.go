@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	client_middleware "github.com/caos/zitadel/internal/api/grpc/client/middleware"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	grpc_util "github.com/zitadel/zitadel/internal/api/grpc"
+	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 )

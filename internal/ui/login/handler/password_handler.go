@@ -3,9 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 
 const (

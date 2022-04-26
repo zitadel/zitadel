@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
 
 type wantExecuter struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	repo "github.com/caos/zitadel/internal/eventstore/repository"
+	repo "github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 func (db *CRDB) Step20(ctx context.Context, latestSequence uint64) error {

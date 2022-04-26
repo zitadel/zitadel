@@ -7,11 +7,11 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/crypto"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/key/model"
-	es_model "github.com/caos/zitadel/internal/key/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/crypto"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/key/model"
+	es_model "github.com/zitadel/zitadel/internal/key/repository/eventsourcing/model"
 )
 
 const (

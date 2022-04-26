@@ -10,10 +10,10 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 
-	databasev1 "github.com/caos/zitadel/operator/api/database/v1"
-	zitadelv1 "github.com/caos/zitadel/operator/api/zitadel/v1"
-	"github.com/caos/zitadel/operator/crtlcrd/database"
-	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
+	databasev1 "github.com/zitadel/zitadel/operator/api/database/v1"
+	zitadelv1 "github.com/zitadel/zitadel/operator/api/zitadel/v1"
+	"github.com/zitadel/zitadel/operator/crtlcrd/database"
+	"github.com/zitadel/zitadel/operator/crtlcrd/zitadel"
 )
 
 const (

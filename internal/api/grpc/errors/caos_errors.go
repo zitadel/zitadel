@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/pkg/grpc/message"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/pkg/grpc/message"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

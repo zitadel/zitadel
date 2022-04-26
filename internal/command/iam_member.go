@@ -4,13 +4,13 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	iam_repo "github.com/zitadel/zitadel/internal/repository/iam"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddIAMMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {

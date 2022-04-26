@@ -13,7 +13,7 @@ import (
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
-	coremock "github.com/caos/zitadel/operator/database/kinds/databases/core/mock"
+	coremock "github.com/zitadel/zitadel/operator/database/kinds/databases/core/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"

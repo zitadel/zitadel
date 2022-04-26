@@ -2,7 +2,8 @@ package bucket
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/pkg/databases/db"
+
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -13,10 +14,10 @@ import (
 	secretpkg "github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/bucket/backup"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/bucket/restore"
 )
 
 const (

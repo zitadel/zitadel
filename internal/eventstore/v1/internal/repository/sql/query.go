@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	z_errors "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/lib/pq"
+	z_errors "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (

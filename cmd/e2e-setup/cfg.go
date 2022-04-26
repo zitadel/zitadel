@@ -6,10 +6,10 @@ import (
 	"regexp"
 
 	"github.com/caos/logging"
-	internal_authz "github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/config"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/config"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/config/types"
 )
 
 var (

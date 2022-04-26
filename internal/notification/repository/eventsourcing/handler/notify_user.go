@@ -5,19 +5,19 @@ import (
 
 	"github.com/caos/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	query2 "github.com/caos/zitadel/internal/query"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	es_sdk "github.com/zitadel/zitadel/internal/eventstore/v1/sdk"
+	org_view "github.com/zitadel/zitadel/internal/org/repository/view"
+	query2 "github.com/zitadel/zitadel/internal/query"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	org_model "github.com/zitadel/zitadel/internal/org/model"
+	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 const (

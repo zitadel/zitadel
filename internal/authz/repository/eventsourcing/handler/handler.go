@@ -3,11 +3,11 @@ package handler
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/config/types"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
 )
 
 type Configs map[string]*Config

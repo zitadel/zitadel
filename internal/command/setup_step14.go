@@ -5,10 +5,10 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
-	org_repo "github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	iam_repo "github.com/zitadel/zitadel/internal/repository/iam"
+	org_repo "github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type Step14 struct {

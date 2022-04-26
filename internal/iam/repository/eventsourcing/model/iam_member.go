@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/caos/logging"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type IAMMember struct {

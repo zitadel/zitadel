@@ -1,8 +1,9 @@
 package model
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"time"
+
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type RefreshToken struct {

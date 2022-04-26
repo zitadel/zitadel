@@ -3,8 +3,8 @@ package zitadel
 import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api/core"
-	zitadelv1 "github.com/caos/zitadel/operator/api/zitadel/v1"
+	"github.com/zitadel/zitadel/operator/api/core"
+	zitadelv1 "github.com/zitadel/zitadel/operator/api/zitadel/v1"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 )

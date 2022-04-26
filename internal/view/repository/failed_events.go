@@ -1,12 +1,13 @@
 package repository
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"strings"
 
-	"github.com/caos/zitadel/internal/errors"
-	view_model "github.com/caos/zitadel/internal/view/model"
+	"github.com/zitadel/zitadel/internal/domain"
+
 	"github.com/jinzhu/gorm"
+	"github.com/zitadel/zitadel/internal/errors"
+	view_model "github.com/zitadel/zitadel/internal/view/model"
 )
 
 const (

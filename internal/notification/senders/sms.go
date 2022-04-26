@@ -1,9 +1,9 @@
 package senders
 
 import (
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/notification/channels"
-	"github.com/caos/zitadel/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 )
 
 func SMSChannels(config systemdefaults.Notifications) (channels.NotificationChannel, error) {

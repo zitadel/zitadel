@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/crypto"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/user/model"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 func mockUserData(user *es_model.User) []byte {

@@ -9,7 +9,7 @@ At the end of the guide, you should have an API with a protected endpoint.
 
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-go) provides an interceptor for both gRPC and HTTP.
+The client [SDK](https://github.com/zitadel/zitadel-go) provides an interceptor for both gRPC and HTTP.
 Both interceptors handle the OAuth 2.0 introspection request. 
 For authentication, they use *JWT with Private Key*.
 The SDK imports our [OIDC client library](https://github.com/zitadel/oidc).
@@ -23,7 +23,7 @@ All you need is an API and its JSON key.
 Add the SDK into Go Modules with this command:
 
 ```bash
-go get github.com/caos/zitadel-go
+go get github.com/zitadel/zitadel-go
 ```
 
 ### Create example API
@@ -42,10 +42,10 @@ import (
 	"net/http"
 	"time"
 
-	api_mw "github.com/caos/zitadel-go/pkg/api/middleware"
-	http_mw "github.com/caos/zitadel-go/pkg/api/middleware/http"
-	"github.com/caos/zitadel-go/pkg/client"
-	"github.com/caos/zitadel-go/pkg/client/middleware"
+	api_mw "github.com/zitadel/zitadel-go/pkg/api/middleware"
+	http_mw "github.com/zitadel/zitadel-go/pkg/api/middleware/http"
+	"github.com/zitadel/zitadel-go/pkg/client"
+	"github.com/zitadel/zitadel-go/pkg/client/middleware"
 )
 
 func main() {

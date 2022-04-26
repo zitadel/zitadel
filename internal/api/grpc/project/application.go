@@ -3,13 +3,13 @@ package project
 import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/query"
-	app_pb "github.com/caos/zitadel/pkg/grpc/app"
-	message_pb "github.com/caos/zitadel/pkg/grpc/message"
+	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	proj_model "github.com/zitadel/zitadel/internal/project/model"
+	"github.com/zitadel/zitadel/internal/query"
+	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
+	message_pb "github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
 func AppsToPb(apps []*query.App) []*app_pb.App {

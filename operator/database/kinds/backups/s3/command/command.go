@@ -2,9 +2,10 @@ package command
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/pkg/databases/db"
-	corev1 "k8s.io/api/core/v1"
 	"strings"
+
+	"github.com/zitadel/zitadel/pkg/databases/db"
+	corev1 "k8s.io/api/core/v1"
 )
 
 type Action string

@@ -65,7 +65,7 @@ module.exports = {
           position: "left",
         },
         {
-          href: "https://github.com/caos/zitadel",
+          href: "https://github.com/zitadel/zitadel",
           label: "GitHub",
           position: "right",
         },
@@ -78,7 +78,7 @@ module.exports = {
           items: [
             {
               label: "GitHub Discussions",
-              href: "https://github.com/caos/zitadel/discussions",
+              href: "https://github.com/zitadel/zitadel/discussions",
             },
             {
               label: "Twitter",
@@ -141,7 +141,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/caos/zitadel/edit/main/docs/",
+          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {

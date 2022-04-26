@@ -1,8 +1,9 @@
 package services
 
 import (
-	"github.com/caos/zitadel/operator"
 	"strconv"
+
+	"github.com/zitadel/zitadel/operator"
 
 	"github.com/caos/orbos/pkg/labels"
 

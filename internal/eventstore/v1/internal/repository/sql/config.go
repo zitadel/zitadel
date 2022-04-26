@@ -5,8 +5,8 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/config/types"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type Config struct {

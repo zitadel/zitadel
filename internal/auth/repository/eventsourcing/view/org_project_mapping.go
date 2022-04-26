@@ -1,11 +1,11 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/repository/view"
-	"github.com/caos/zitadel/internal/project/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/project/repository/view"
+	"github.com/zitadel/zitadel/internal/project/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const (

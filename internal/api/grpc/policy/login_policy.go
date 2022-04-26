@@ -3,10 +3,10 @@ package policy
 import (
 	timestamp_pb "google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/pkg/grpc/object"
-	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/object"
+	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 )
 
 func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {

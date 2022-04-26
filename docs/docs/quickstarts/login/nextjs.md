@@ -8,7 +8,7 @@ It covers how to
 - Authenticate as a user
 - Retrieve user information from the OIDC endpoint.
 
-> The template code is part of the [zitadel-example repo](https://github.com/caos/zitadel-examples/tree/main/nextjs).
+> The template code is part of the [zitadel-example repo](https://github.com/zitadel/zitadel-examples/tree/main/nextjs).
 
 ## Get started
 
