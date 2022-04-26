@@ -16,7 +16,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
-
 	"github.com/caos/zitadel/internal/api/http/middleware"
 )
 
