@@ -25,6 +25,36 @@ message Instance {
             example: "\"ZITADEL\"";
         }
     ];
+    string version = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"1.0.0\"";
+        }
+    ];
+}
+
+message InstanceDetail {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    State state = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the instance";
+        }
+    ];
+    string name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string version = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"1.0.0\"";
+        }
+    ];
+    repeated Domain domains = 6;
 }
 
 enum State {

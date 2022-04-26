@@ -25,7 +25,7 @@ It respondes as soon as ZITADEL started
 > **rpc** ListInstances([ListInstancesRequest](#listinstancesrequest))
 [ListInstancesResponse](#listinstancesresponse)
 
-Returns a list of ZITADEL instances/tenants
+Returns a list of ZITADEL instances
 
 
 
@@ -41,7 +41,7 @@ Returns the detail of an instance
 
 
 
-    GET: /instances/{id}
+    GET: /instances/{instance_id}
 
 
 ### AddInstance
@@ -67,7 +67,19 @@ This might take some time
 
 
 
-    DELETE: /instances/{id}
+    DELETE: /instances/{instance_id}
+
+
+### ExistsDomain
+
+> **rpc** ExistsDomain([ExistsDomainRequest](#existsdomainrequest))
+[ExistsDomainResponse](#existsdomainresponse)
+
+Checks if a domain exists
+
+
+
+    POST: /domains/{domain}/_exists
 
 
 ### ListDomains
@@ -79,7 +91,7 @@ Returns the custom domains of an instance
 
 
 
-    POST: /instances/{id}/domains/_search
+    POST: /instances/{instance_id}/domains/_search
 
 
 ### AddDomain
@@ -91,7 +103,7 @@ Returns the domain of an instance
 
 
 
-    POST: /instances/{id}/domains
+    POST: /instances/{instance_id}/domains
 
 
 ### RemoveDomain
@@ -103,7 +115,7 @@ Returns the domain of an instance
 
 
 
-    DELETE: /instances/{id}/domains/{domain}
+    DELETE: /instances/{instance_id}/domains/{domain}
 
 
 ### SetPrimaryDomain
@@ -115,7 +127,7 @@ Returns the domain of an instance
 
 
 
-    POST: /instances/{id}/domains/_set_primary
+    POST: /instances/{instance_id}/domains/_set_primary
 
 
 ### ListViews
@@ -191,7 +203,7 @@ failed event. You can find out if it worked on the `failure_count`
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
@@ -217,12 +229,47 @@ failed event. You can find out if it worked on the `failure_count`
 | instance_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | first_org_name |  string | - | string.max_len: 200<br />  |
 | custom_domain |  string | - | string.max_len: 200<br />  |
-| owner_first_name |  string | - | string.max_len: 200<br />  |
-| owner_last_name |  string | - | string.max_len: 200<br />  |
-| owner_email |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| owner_username |  string | - | string.max_len: 200<br />  |
-| request_limit |  uint64 | - |  |
-| action_mins_limit |  uint64 | - |  |
+| owner_user_name |  string | - | string.max_len: 200<br />  |
+| owner_email |  AddInstanceRequest.Email | - | message.required: true<br />  |
+| owner_profile |  AddInstanceRequest.Profile | - | message.required: false<br />  |
+| owner_password |  AddInstanceRequest.Password | - | message.required: false<br />  |
+
+
+
+
+### AddInstanceRequest.Email
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| email |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| is_email_verified |  bool | - |  |
+
+
+
+
+### AddInstanceRequest.Password
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password |  string | - | string.max_len: 200<br />  |
+| password_change_required |  bool | - |  |
+
+
+
+
+### AddInstanceRequest.Profile
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| first_name |  string | - | string.max_len: 200<br />  |
+| last_name |  string | - | string.max_len: 200<br />  |
+| preferred_language |  string | - | string.max_len: 10<br />  |
 
 
 
@@ -233,7 +280,7 @@ failed event. You can find out if it worked on the `failure_count`
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - |  |
+| instance_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -282,6 +329,28 @@ This is an empty response
 
 
 
+### ExistsDomainRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ExistsDomainResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| exists |  bool | - |  |
+
+
+
+
 ### FailedEvent
 
 
@@ -303,7 +372,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -314,7 +383,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| instance |  zitadel.instance.v1.Instance | - |  |
+| instance |  zitadel.instance.v1.InstanceDetail | - |  |
 
 
 
@@ -325,7 +394,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -361,7 +430,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | list limitations and ordering | string.min_len: 1<br /> string.max_len: 200<br />  |
+| instance_id |  string | list limitations and ordering | string.min_len: 1<br /> string.max_len: 200<br />  |
 | query |  zitadel.v1.ListQuery | - |  |
 | sorting_column |  zitadel.instance.v1.DomainFieldName | the field the result is sorted |  |
 | queries | repeated zitadel.instance.v1.DomainSearchQuery | criterias the client is looking for |  |
@@ -448,7 +517,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
@@ -490,7 +559,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -512,7 +581,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 

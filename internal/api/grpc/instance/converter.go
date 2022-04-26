@@ -27,6 +27,18 @@ func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 	}
 }
 
+func InstanceDetailToPb(instance *query.Instance) *instance_pb.InstanceDetail {
+	return &instance_pb.InstanceDetail{
+		Details: object.ToViewDetailsPb(
+			instance.Sequence,
+			instance.CreationDate,
+			instance.ChangeDate,
+			instance.InstanceID(),
+		),
+		Id: instance.InstanceID(),
+	}
+}
+
 func InstanceQueriesToModel(queries []*instance_pb.Query) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {

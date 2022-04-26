@@ -102,7 +102,7 @@ service SystemService {
         };
     }
 
-    // Returns a list of ZITADEL instances/tenants
+    // Returns a list of ZITADEL instances
     rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
         option (google.api.http) = {
             post: "/instances/_search"
@@ -113,7 +113,7 @@ service SystemService {
     // Returns the detail of an instance
     rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
         option (google.api.http) = {
-            get: "/instances/{id}";
+            get: "/instances/{instance_id}";
         };
     }
 
@@ -130,14 +130,22 @@ service SystemService {
     // This might take some time
     rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
         option (google.api.http) = {
-            delete: "/instances/{id}"
+            delete: "/instances/{instance_id}"
+        };
+    }
+
+    // Checks if a domain exists
+    rpc ExistsDomain(ExistsDomainRequest) returns (ExistsDomainResponse) {
+        option (google.api.http) = {
+            post: "/domains/{domain}/_exists";
+            body: "*"
         };
     }
 
     // Returns the custom domains of an instance
     rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
         option (google.api.http) = {
-            post: "/instances/{id}/domains/_search";
+            post: "/instances/{instance_id}/domains/_search";
             body: "*"
         };
     }
@@ -145,7 +153,7 @@ service SystemService {
     // Returns the domain of an instance
     rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
         option (google.api.http) = {
-            post: "/instances/{id}/domains";
+            post: "/instances/{instance_id}/domains";
             body: "*"
         };
     }
@@ -153,14 +161,14 @@ service SystemService {
     // Returns the domain of an instance
     rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
         option (google.api.http) = {
-            delete: "/instances/{id}/domains/{domain}";
+            delete: "/instances/{instance_id}/domains/{domain}";
         };
     }
 
     // Returns the domain of an instance
     rpc SetPrimaryDomain(SetPrimaryDomainRequest) returns (SetPrimaryDomainResponse) {
         option (google.api.http) = {
-            post: "/instances/{id}/domains/_set_primary";
+            post: "/instances/{instance_id}/domains/_set_primary";
             body: "*"
         };
     }
@@ -309,32 +317,44 @@ message ListInstancesResponse {
 }
 
 message GetInstanceRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetInstanceResponse {
-    zitadel.instance.v1.Instance instance = 1;
+    zitadel.instance.v1.InstanceDetail instance = 1;
 }
 
 message AddInstanceRequest {
+    message Profile {
+        string first_name = 1 [(validate.rules).string = {max_len: 200}];
+        string last_name = 2 [(validate.rules).string = {max_len: 200}];
+        string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
+    }
+    message Email {
+        string email = 1[(validate.rules).string = {min_len: 1, max_len: 200}];
+        bool is_email_verified = 2;
+    }
+    message Password {
+        string password = 1 [(validate.rules).string = {max_len: 200}];
+        bool password_change_required = 2;
+    }
+
     string instance_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string first_org_name = 2 [(validate.rules).string = {max_len: 200}];
     string custom_domain = 3 [(validate.rules).string = {max_len: 200}];
-    string owner_first_name = 4 [(validate.rules).string = {max_len: 200}];
-    string owner_last_name = 5 [(validate.rules).string = {max_len: 200}];
-    string owner_email = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_username = 7 [(validate.rules).string = {max_len: 200}];
-    uint64 request_limit = 8;
-    uint64 action_mins_limit = 9;
+    string owner_user_name = 4 [(validate.rules).string = {max_len: 200}];
+    Email owner_email = 5 [(validate.rules).message.required = true];
+    Profile owner_profile = 6 [(validate.rules).message.required = false];
+    Password owner_password = 7 [(validate.rules).message.required = false];
 }
 
 message AddInstanceResponse {
-    string id = 1;
+    string instance_id = 1;
     zitadel.v1.ObjectDetails details = 2;
 }
 
 message RemoveInstanceRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveInstanceResponse {
@@ -342,7 +362,7 @@ message RemoveInstanceResponse {
 }
 
 message GetUsageRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetUsageResponse {
@@ -351,8 +371,16 @@ message GetUsageResponse {
     uint64 executed_action_mins = 3;
 }
 
+message ExistsDomainRequest {
+    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ExistsDomainResponse {
+    bool exists = 1;
+}
+
 message ListDomainsRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];//list limitations and ordering
+    string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];//list limitations and ordering
     zitadel.v1.ListQuery query = 2;
     // the field the result is sorted
     zitadel.instance.v1.DomainFieldName sorting_column = 3;
@@ -367,7 +395,7 @@ message ListDomainsResponse {
 }
 
 message AddDomainRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -376,7 +404,7 @@ message AddDomainResponse {
 }
 
 message RemoveDomainRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
@@ -385,7 +413,7 @@ message RemoveDomainResponse {
 }
 
 message SetPrimaryDomainRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
