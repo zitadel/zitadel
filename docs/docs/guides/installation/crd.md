@@ -24,7 +24,7 @@ zitadelctl takeoff
 kubectl apply --filename ./database.yml,./zitadel.yml
 
 # Write the encryption keys
-cat EOF << zitadelctl writesecret zitadel.keys.existing --stdin
+cat << EOF | zitadelctl writesecret zitadel.keys.existing --stdin
 otpverificationkey_1: $(openssl rand -base64 22)
 cookiekey_1: $(openssl rand -base64 22)
 domainverificationkey_1: $(openssl rand -base64 22)
