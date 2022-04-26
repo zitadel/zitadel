@@ -12,7 +12,7 @@ At the end of the guide, you should have an API with a protected endpoint.
 The client [SDK](https://github.com/caos/zitadel-go) provides an interceptor for both gRPC and HTTP.
 Both interceptors handle the OAuth 2.0 introspection request. 
 For authentication, they use *JWT with Private Key*.
-The SDK imports our [OIDC client library](https://github.com/caos/oidc).
+The SDK imports our [OIDC client library](https://github.com/zitadel/oidc).
 
 All you need is an API and its JSON key.
 

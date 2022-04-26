@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/op"
+	"github.com/zitadel/oidc/pkg/oidc"
+	"github.com/zitadel/oidc/pkg/op"
 
 	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"

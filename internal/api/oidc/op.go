@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/op"
+	"github.com/zitadel/oidc/pkg/op"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 

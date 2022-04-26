@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/client/rp"
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/zitadel/oidc/pkg/client/rp"
+	"github.com/zitadel/oidc/pkg/oidc"
 
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/domain"

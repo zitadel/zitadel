@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/zitadel/oidc/pkg/oidc"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/caos/zitadel/internal/api/authz"

@@ -9,7 +9,7 @@ At the end of the guide, you should have an application that can read the detail
 
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-go) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API using our [OIDC client library](https://github.com/caos/oidc).
+The client [SDK](https://github.com/caos/zitadel-go) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API using our [OIDC client library](https://github.com/zitadel/oidc).
 
 You'll need a service account assigned with the *ORG-OWNER* role. 
 (or another role, depending on the needed API requests).
@@ -46,7 +46,7 @@ import (
     "context"
     "log"
     
-    "github.com/caos/oidc/pkg/oidc"
+    "github.com/zitadel/oidc/pkg/oidc"
     
     "github.com/caos/zitadel-go/pkg/client/management"
     "github.com/caos/zitadel-go/pkg/client/middleware"

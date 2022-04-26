@@ -135,8 +135,7 @@ Customize login and console with your design
 
 ## Other CAOS Projects
 
-* [**ORBOS**](https://github.com/caos/orbos/) - GitOps everything
-* [**OIDC for GO**](https://github.com/caos/oidc) - OpenID Connect SDK (client and server) for Go
+* [**OIDC for GO**](https://github.com/zitadel/oidc) - OpenID Connect SDK (client and server) for Go
 * [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT
 
 ## Usage Data

@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/zitadel/oidc/pkg/oidc"
 
 	"github.com/caos/zitadel/internal/actions"
 	"github.com/caos/zitadel/internal/domain"

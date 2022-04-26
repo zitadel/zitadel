@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/oidc/pkg/oidc"
+	"github.com/zitadel/oidc/pkg/oidc"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
