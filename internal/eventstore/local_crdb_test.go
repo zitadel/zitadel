@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	"github.com/zitadel/logging"
 )
 
 var (

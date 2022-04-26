@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"

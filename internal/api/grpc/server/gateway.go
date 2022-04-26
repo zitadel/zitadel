@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/zitadel/logging"
 	grpc_util "github.com/zitadel/zitadel/internal/api/grpc"
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	http_util "github.com/zitadel/zitadel/internal/api/http"

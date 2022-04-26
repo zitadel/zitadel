@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
 	req_model "github.com/zitadel/zitadel/internal/auth_request/model"
 	"github.com/zitadel/zitadel/internal/domain"

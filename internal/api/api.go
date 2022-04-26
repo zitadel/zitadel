@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
+	"github.com/zitadel/logging"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"google.golang.org/grpc"

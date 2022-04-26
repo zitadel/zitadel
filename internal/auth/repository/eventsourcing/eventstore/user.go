@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/user/model"
 

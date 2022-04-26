@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/user"

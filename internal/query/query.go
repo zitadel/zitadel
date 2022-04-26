@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/caos/logging"
 	"github.com/rakyll/statik/fs"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

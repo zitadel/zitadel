@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/pkg/client/rp"
 	"github.com/zitadel/oidc/pkg/oidc"
 

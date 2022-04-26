@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/config"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"

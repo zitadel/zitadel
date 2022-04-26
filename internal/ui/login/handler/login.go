@@ -5,9 +5,9 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
 	"github.com/rakyll/statik/fs"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

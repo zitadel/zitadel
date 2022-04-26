@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/crypto"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/iam/model"

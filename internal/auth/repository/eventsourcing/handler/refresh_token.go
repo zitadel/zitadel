@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"

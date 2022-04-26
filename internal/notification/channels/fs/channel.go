@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 

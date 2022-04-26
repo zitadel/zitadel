@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"

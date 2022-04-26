@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/caos/logging"
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"

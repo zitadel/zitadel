@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"

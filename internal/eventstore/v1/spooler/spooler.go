@@ -11,7 +11,7 @@ import (
 
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 	"golang.org/x/text/language"
 

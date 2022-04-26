@@ -6,8 +6,8 @@ import (
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 
-	"github.com/caos/logging"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 

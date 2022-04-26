@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/getsentry/sentry-go"
 	"github.com/rs/cors"
+	"github.com/zitadel/logging"
 
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"

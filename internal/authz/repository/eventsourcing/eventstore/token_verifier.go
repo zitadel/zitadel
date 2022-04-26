@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"

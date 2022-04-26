@@ -8,8 +8,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"golang.org/x/text/language"
 

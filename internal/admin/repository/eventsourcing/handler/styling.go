@@ -7,9 +7,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/gamut"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"

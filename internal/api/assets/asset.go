@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/superseriousbusiness/exifremove/pkg/exifremove"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"

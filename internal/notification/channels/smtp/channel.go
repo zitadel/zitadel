@@ -7,8 +7,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/notification/messages"
 
-	"github.com/caos/logging"
 	"github.com/pkg/errors"
+	"github.com/zitadel/logging"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 )

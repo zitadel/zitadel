@@ -9,7 +9,7 @@ import (
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	iam_view "github.com/zitadel/zitadel/internal/iam/repository/view"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"

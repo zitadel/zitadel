@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"

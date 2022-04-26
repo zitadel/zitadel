@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 )
 
 const (

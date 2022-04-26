@@ -3,7 +3,7 @@ package sql
 import (
 	"context"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	repo "github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 

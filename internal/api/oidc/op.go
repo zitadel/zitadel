@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/rakyll/statik/fs"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/pkg/op"
 	"golang.org/x/text/language"
 

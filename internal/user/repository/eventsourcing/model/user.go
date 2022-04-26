@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"

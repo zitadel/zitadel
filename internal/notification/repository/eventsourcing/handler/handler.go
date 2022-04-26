@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/query"
 
 	"github.com/zitadel/zitadel/internal/command"

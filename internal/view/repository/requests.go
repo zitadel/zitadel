@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/jinzhu/gorm"
+	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )

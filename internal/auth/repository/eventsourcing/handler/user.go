@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"

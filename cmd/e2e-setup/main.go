@@ -12,7 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config"
 	"github.com/zitadel/zitadel/internal/eventstore"

@@ -1,8 +1,8 @@
 package twilio
 
 import (
-	"github.com/caos/logging"
 	twilio "github.com/kevinburke/twilio-go"
+	"github.com/zitadel/logging"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
