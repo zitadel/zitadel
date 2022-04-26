@@ -637,6 +637,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	if request.LoginPolicy.IgnoreUnknownUsernames {
 		if errors.IsNotFound(err) || (user != nil && user.State == int32(domain.UserStateInactive)) {
+			if request.LabelPolicy.HideLoginNameSuffix {
+				preferredLoginName = loginName
+			}
 			request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)
 			return nil
 		}
