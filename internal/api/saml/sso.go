@@ -204,7 +204,11 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	)
 
 	checkerInstance.WithLogicStep(
-		checkRequestRequiredContent(p, sp, authNRequest),
+		checkRequestRequiredContent(
+			func() *IdentityProvider { return p },
+			func() *serviceprovider.ServiceProvider { return sp },
+			func() *samlp.AuthnRequestType { return authNRequest },
+		),
 		"SAML-83722s",
 		func() {
 			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to validate request content: %w", err).Error()))
@@ -271,11 +275,15 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 }
 
 func checkRequestRequiredContent(
-	idp *IdentityProvider,
-	sp *serviceprovider.ServiceProvider,
-	authNRequest *samlp.AuthnRequestType,
+	idpF func() *IdentityProvider,
+	spF func() *serviceprovider.ServiceProvider,
+	authNRequestF func() *samlp.AuthnRequestType,
 ) func() error {
 	return func() error {
+		sp := spF()
+		idp := idpF()
+		authNRequest := authNRequestF()
+
 		if authNRequest.Conditions != nil &&
 			(authNRequest.Conditions.NotOnOrAfter != "" || authNRequest.Conditions.NotBefore != "") {
 			if err := checkIfRequestTimeIsStillValid(
