@@ -3,7 +3,7 @@ package cmds
 import (
 	"errors"
 
-	"github.com/caos/zitadel/pkg/databases"
+	"github.com/zitadel/zitadel/pkg/databases"
 
 	"github.com/caos/orbos/mntr"
 
@@ -16,8 +16,8 @@ import (
 	"github.com/caos/orbos/pkg/orb"
 	"github.com/spf13/cobra"
 
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
-	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
+	orbzit "github.com/zitadel/zitadel/operator/zitadel/kinds/orb"
 )
 
 func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobra.Command {

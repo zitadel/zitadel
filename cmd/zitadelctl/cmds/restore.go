@@ -6,12 +6,12 @@ import (
 	"github.com/caos/orbos/mntr"
 
 	"github.com/caos/orbos/pkg/kubernetes/cli"
-	"github.com/caos/zitadel/operator/crtlcrd"
-	"github.com/caos/zitadel/operator/crtlgitops"
+	"github.com/zitadel/zitadel/operator/crtlcrd"
+	"github.com/zitadel/zitadel/operator/crtlgitops"
 
-	"github.com/caos/zitadel/pkg/databases"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"github.com/zitadel/zitadel/pkg/databases"
 )
 
 func RestoreCommand(getRv GetRootValues) *cobra.Command {

@@ -3,11 +3,11 @@ package cmds
 import (
 	"os"
 
-	"github.com/caos/zitadel/pkg/databases"
+	"github.com/zitadel/zitadel/pkg/databases"
 
 	"github.com/caos/orbos/pkg/kubernetes/cli"
 
-	"github.com/caos/zitadel/operator/secrets"
+	"github.com/zitadel/zitadel/operator/secrets"
 
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/spf13/cobra"

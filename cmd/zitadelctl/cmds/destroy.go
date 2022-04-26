@@ -5,13 +5,13 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/cli"
-	"github.com/caos/zitadel/operator/crtlcrd"
-	"github.com/caos/zitadel/operator/crtlgitops"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
-	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
-	"github.com/caos/zitadel/pkg/databases"
-	kuberneteszit "github.com/caos/zitadel/pkg/kubernetes"
 	"github.com/spf13/cobra"
+	"github.com/zitadel/zitadel/operator/crtlcrd"
+	"github.com/zitadel/zitadel/operator/crtlgitops"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
+	orbzit "github.com/zitadel/zitadel/operator/zitadel/kinds/orb"
+	"github.com/zitadel/zitadel/pkg/databases"
+	kuberneteszit "github.com/zitadel/zitadel/pkg/kubernetes"
 )
 
 func TeardownCommand(getRv GetRootValues) *cobra.Command {

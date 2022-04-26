@@ -4,13 +4,13 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/cli"
 	"gopkg.in/yaml.v3"
 
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
-	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	"github.com/spf13/cobra"
+	orbzit "github.com/zitadel/zitadel/operator/zitadel/kinds/orb"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 

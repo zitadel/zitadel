@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"github.com/caos/orbos/pkg/kubernetes/cli"
-	"github.com/caos/zitadel/pkg/databases"
+	"github.com/zitadel/zitadel/pkg/databases"
 
 	"github.com/spf13/cobra"
 )
