@@ -1,13 +1,9 @@
 import ThemedImage from '@theme/ThemedImage';
 
 export default function AuthType(props) {
-    let rows = defaultAuthTypes(props.appType, props.authType);
-    
     return (
         <div>
-            <h3>Select the authentication method</h3>
-            <p>The authentication method defines the communication flow durring a login</p>
-            {rows}
+            {defaultAuthTypes(props.appType, props.authType)}
         </div>
     );
 }
@@ -79,7 +75,7 @@ export const api = (typ) => {
 export const native = () => {
     return [() => <tr key="native">
         <td>
-            Native only supports code, that's why you don't have to select anything
+            Native only supports code authentication type, that's why you don't have to select any
         </td>
     </tr>]
 }

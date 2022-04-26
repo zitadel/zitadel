@@ -3,9 +3,8 @@ import ThemedImage from '@theme/ThemedImage';
 export default function RedirectURIs(props) { 
     return ['web', 'native', 'user-agent'].includes(props.appType) ? (
         <div>
-            <h3>Redirect URIs</h3>
             <p>
-                Durring the login flow the application defines where the users is redirected to after login or logout.
+                During the login flow the application defines where the users is redirected to after login or logout.
                 <br/>
                 ZITADEL verifies if the URL the user gets redirected to is valid by checking if one of the redirect URIs match.
             </p>
