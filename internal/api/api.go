@@ -98,7 +98,25 @@ func (a *API) routeGRPC() {
 }
 
 func (a *API) routeGRPCWeb(router *mux.Router) {
-	router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(grpcweb.WrapServer(a.grpcServer))
+	router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(
+		grpcweb.WrapServer(a.grpcServer,
+			grpcweb.WithAllowedRequestHeaders(
+				[]string{
+					http_util.Origin,
+					http_util.ContentType,
+					http_util.Accept,
+					http_util.AcceptLanguage,
+					http_util.Authorization,
+					http_util.ZitadelOrgID,
+					http_util.XUserAgent,
+					http_util.XGrpcWeb,
+				},
+			),
+			grpcweb.WithOriginFunc(func(_ string) bool {
+				return true
+			}),
+		),
+	)
 }
 
 func (a *API) healthHandler() http.Handler {
