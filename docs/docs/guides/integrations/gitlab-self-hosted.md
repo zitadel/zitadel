@@ -1,5 +1,5 @@
 ---
-title: Connect with auth0
+title: Gitlab OmniAuth Provider
 ---
 
 This guide shows how to enable login with ZITADEL on self hosted gitlab instances.
@@ -15,11 +15,9 @@ Prerequisits:
 - existing project, if not present follow the first 3 steps [here](../../guides/basics/projects#exercise---create-a-simple-project)
 - running gitlab instance see [installation guide](https://docs.gitlab.com/ee/install/)
 
-## Create application in ZITADEL
+import CreateApp from "./application/application.mdx";
 
-First of all we create the application in your ZITADEL project.
-
-TODO: copy from auth0.md
+<CreateApp appType="web" authType="code" appName="Gitlab" redirectURI="<your_gitlab_url>/users/auth/openid_connect/callback"/>
 
 ## Gitlab configuration
 
@@ -44,8 +42,8 @@ gitlab_rails['omniauth_providers'] = [
       issuer: "https://issuer.zitadel.ch",
       discovery: true,
       client_options: {
-        identifier: "<CLIENT ID>",
-        secret: "<CLIENT SECRET >",
+        identifier: "<CLIENT ID from ZITADEL>",
+        secret: "<CLIENT SECRET from ZITADEL>",
         redirect_uri: "https://<GITLAB HOST>/users/auth/openid_connect/callback"
       }
     }

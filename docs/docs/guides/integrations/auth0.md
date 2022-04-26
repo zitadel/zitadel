@@ -1,12 +1,11 @@
 ---
-title: Connect with auth0
+title: Connect with Auth0
 ---
 
 This guide shows how to enable login with ZITADEL on auth0.
 
 It covers how to:
 
-- create a project in ZITADEL
 - create and configure the application in your project
 - create and configure the connection in your auth0 tenant
 
@@ -16,7 +15,7 @@ Prerequisits:
 - existing project, if not present follow the first 3 steps [here](../../guides/basics/projects#exercise---create-a-simple-project)
 - existing auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
 
-We have to switch between ZITADEL and auth0. If the headings begin with "ZITADEL" switch to the ZITADEL console and if the headings start with auth0 please switch to the auth0 gui. The guide uses light design print screens for auth0 and dark design for ZITADEL console.
+We have to switch between ZITADEL and auth0. If the headings begin with "ZITADEL" switch to the ZITADEL console and if the headings start with auth0 please switch to the auth0 gui.
 
 ## **auth0**: Create a new connection
 
@@ -38,21 +37,9 @@ Next we have to switch to the ZITADEL console.
 
 First of all we create the application in your project.
 
-Click on the "+"-button in the application-section. This will lead you to the the creation wizzard.
+import CreateApp from "./application/application.mdx";
 
-1. Insert the name of the application. In this example we simply use "auth0"
-2. The application type "WEB" is already preselected
-   ![app name](/img/oidc/auth0/zitadel-app-name.jpg)
-3. Press continue
-4. auth0 uses the code flow to that's why we have to change the type from "PKCE" to "CODE"
-   ![app type](/img/oidc/auth0/zitadel-app-type.png)
-5. Click "continue"
-6. Paste the Callback URL (copied in auth0 gui) in the "Redirect URI"-field
-   ![redirects](/img/oidc/auth0/zitadel-redirects.png)
-7. Click "continue"
-8. Click "Create"
-9. We now see the client id and client secret. We need these information in the next steps
-   ![client](/img/oidc/auth0/zitadel-client.png)
+<CreateApp appType="web" authType="code" appName="Auth0" redirectURI="https://<TENANT>.<REGION>.auth0.com/login/callback"/>
 
 ## **auth0**: Connect ZITADEL
 

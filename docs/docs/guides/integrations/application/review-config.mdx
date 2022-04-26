@@ -1,0 +1,24 @@
+export default function ReviewConfig(props) {
+    let clientObjects = []
+    if (clientID(props.appType, props.authType)) {
+        clientObjects.push('id')
+    }
+    if (clientSecret(props.appType, props.authType)) {
+        clientObjects.push('secret')
+    }
+    return clientObjects.length > 0 ? (
+        <div>
+            <h3>Review your configuration</h3>
+            <p>This page shows what will be created. After you have reviewed the configuration you can create the application.</p>
+            <p>Please make sure to safe the <b>client {clientObjects.join(' and ')}</b> for later user in the application.</p>
+        </div>
+    ): null;
+}
+
+export function clientID(appType, authType) {
+    return ['pkce', 'code', 'jwt', 'post', 'implicit', 'basic'].includes(authType) || appType === 'native'
+}
+
+export function clientSecret(appType, authType) {
+    return ['code', 'post', 'basic'].includes(authType)
+}

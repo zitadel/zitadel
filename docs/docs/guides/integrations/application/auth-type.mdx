@@ -1,0 +1,181 @@
+import ThemedImage from '@theme/ThemedImage';
+
+export default function AuthType(props) {
+    let rows = defaultAuthTypes(props.appType, props.authType);
+    
+    return (
+        <div>
+            <h3>Select the authentication method</h3>
+            <p>The authentication method defines the communication flow durring a login</p>
+            {rows}
+        </div>
+    );
+}
+
+export function defaultAuthTypes(appType, authType) {
+    let rows;
+    switch (appType) {
+        case 'web':
+            rows = web(authType);
+            break;
+        case 'user-agent':
+            rows = userAgent(authType);
+            break;
+        break;
+        case 'api':
+            rows = api(authType);
+            break;
+        break;
+        case 'native':
+            rows = native();
+            break;
+        default:
+            return null
+            break;
+    }
+    return (
+        <table>
+            <tbody>
+                {rows.map((fn) => fn())}
+            </tbody>
+        </table>
+    );
+}
+
+export const web = (typ) => {
+    switch (typ) {
+        case 'pkce':
+            return [pkce];
+        case 'code':
+            return [code];
+        case 'jwt':
+            return [jwt];
+        case 'post':
+            return [post];
+    }
+    return [pkce, code, jwt, post]
+}
+
+export const userAgent = (typ) => {
+    switch (typ) {
+        case 'pkce':
+            return [pkce];
+        case 'implicit':
+            return [implicit];
+    }
+    return [pkce, implicit]
+}
+
+export const api = (typ) => {
+    switch (typ) {
+        case 'jwt':
+            return [jwt];
+        case 'basic':
+            return [basic];
+    }
+    return [jwt, basic]
+}
+
+export const native = () => {
+    return [() => <tr key="native">
+        <td>
+            Native only supports code, that's why you don't have to select anything
+        </td>
+    </tr>]
+}
+
+export const pkce = () => <tr key="pkce">
+        <td>
+            <ThemedImage
+            alt="pkce preview"
+            sources={{
+                light: '/img/guides/application/pkce-logo-light.png',
+                dark: '/img/guides/application/pkce-logo-dark.png'
+            }}
+            />
+        </td>
+        <td>
+            <h4>PKCE</h4>
+            <p>Recommended because it's the most secure.</p>
+        </td>
+    </tr>
+
+export const code = () => <tr key="code">
+      <td>
+        <ThemedImage
+          alt="code preview"
+          sources={{
+            light: '/img/guides/application/code-logo-light.png',
+            dark: '/img/guides/application/code-logo-dark.png'
+          }}
+        />
+      </td>
+      <td>
+        <h4>Code</h4>
+        <p>Use if your application needs client id and client secret</p>
+      </td>
+    </tr>
+
+export const jwt = () => <tr key="jwt">
+      <td>
+        <ThemedImage
+          alt="jwt preview"
+          sources={{
+            light: '/img/guides/application/jwt-logo-light.png',
+            dark: '/img/guides/application/jwt-logo-dark.png'
+          }}
+        />
+      </td>
+      <td>
+        <h4>(Private Key) JWT</h4>
+        <p>Key file to authorize your application. You can create keys after created the application see <a href="#create-key-for-private-key-jwt">below</a></p>
+      </td>
+    </tr>
+
+export const post = () => <tr key="post">
+      <td>
+        <ThemedImage
+          alt="post preview"
+          sources={{
+            light: '/img/guides/application/post-logo-light.png',
+            dark: '/img/guides/application/post-logo-dark.png'
+          }}
+        />
+      </td>
+      <td>
+        <h4>Post</h4>
+        <p>Only use if you have no other possibilities. Client id and client secret in request body</p>
+      </td>
+    </tr>
+
+export const implicit = () => <tr key="implicit">
+      <td>
+        <ThemedImage
+          alt="implicit preview"
+          sources={{
+            light: '/img/guides/application/implicit-logo-light.png',
+            dark: '/img/guides/application/implicit-logo-dark.png'
+          }}
+        />
+      </td>
+      <td>
+        <h4>Implicit</h4>
+        <p>Only use if you have no other possibilities. The flow is objective to be removed.</p>
+      </td>
+    </tr>
+
+export const basic = () => <tr key="basic">
+      <td>
+        <ThemedImage
+          alt="basic preview"
+          sources={{
+            light: '/img/guides/application/basic-logo-light.png',
+            dark: '/img/guides/application/basic-logo-dark.png'
+          }}
+        />
+      </td>
+      <td>
+        <h4>Basic</h4>
+        <p>The application sends username and password</p>
+      </td>
+    </tr>

@@ -53,6 +53,8 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/integrations/authenticated-mongodb-charts",
+        "guides/integrations/auth0",
+        "guides/integrations/gitlab-self-hosted",
       ],
     },
     {

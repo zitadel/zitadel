@@ -40,11 +40,8 @@ import PKCENative from "../authentication/authmethods/pkcenative.mdx";
 
 ## What is an application?
 
-<!-- An application in ZITADEL describes a part of your project. If your project is built on a micro service arichtecture, then each micro service is an application. -->
-
 Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your API, maybe without even knowing. All applications share the roles and authorizations of their project.
 
-<!-- TODO: image describing multiple applications in a project --->
 <!-- TODO: oidc vs saml --->
 
 ## Applicaiton types
@@ -63,14 +60,72 @@ Detailed information about authentication types can be found [here](../authentic
 
 ### Web
 
-Server side rendered applications users interact with. For example if you developed an application using Thymeleaf in Java or Razor in .NET or want to enable SSO in Gitlab.
+Server side rendered applications users interact with. For example if you develop an application using Thymeleaf in Java or Razor in .NET or want to enable SSO in Gitlab.
 
 Following authentication types can be used:
 
-- PKCE: is recommended because it's the most secure.
-- Code: Use if your application needs client id and client secret.
-- (Private Key) JWT: Key file to authorize your application.
-- Post: Only use if you have no other possibilities. Client id and client secret in request body.
+<table>
+    <tr>
+      <td>
+        <h4>PKCE</h4>
+        <p>Recommended because it's the most secure.</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="pkce preview"
+          sources={{
+            light: '/img/guides/pkce-logo-light.png',
+            dark: '/img/guides/pkce-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Code</h4>
+        <p>Use if your application needs client id and client secret</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="code preview"
+          sources={{
+            light: '/img/guides/code-logo-light.png',
+            dark: '/img/guides/code-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>(Private Key) JWT</h4>
+        <p>Key file to authorize your application. You can create keys after created the application see [below](#create-key-for-private-key-jwt)</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="jwt preview"
+          sources={{
+            light: '/img/guides/jwt-logo-light.png',
+            dark: '/img/guides/jwt-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Post</h4>
+        <p>Only use if you have no other possibilities. Client id and client secret in request body</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="post preview"
+          sources={{
+            light: '/img/guides/post-logo-light.png',
+            dark: '/img/guides/post-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+</table>
 
 ### Native
 
@@ -84,8 +139,38 @@ Applications which are executed in a web browser. For example single page applic
 
 Following authentication types can be used:
 
-- PKCE: is recommended because it's the most secure.
-- Implicit: Only use if you have no other possibilities. The flow is objective to be removed.
+<table>
+    <tr>
+      <td>
+        <h4>PKCE</h4>
+        <p>Recommended because it's the most secure.</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="pkce preview"
+          sources={{
+            light: '/img/guides/pkce-logo-light.png',
+            dark: '/img/guides/pkce-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Implicit</h4>
+        <p>Only use if you have no other possibilities. The flow is objective to be removed.</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="implicit preview"
+          sources={{
+            light: '/img/guides/implicit-logo-light.png',
+            dark: '/img/guides/implicit-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+</table>
 
 ### API
 
@@ -93,8 +178,38 @@ Applications without human interaction, these applications are accessed by other
 
 Following authentication types can be used:
 
-- (Private Key) JWT: Key file to authorize your application.
-- Basic: The application sends username and password
+<table>
+    <tr>
+      <td>
+        <h4>(Private Key) JWT</h4>
+        <p>Key file to authorize your application. You can create keys after created the application see [below](#create-key-for-private-key-jwt)</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="jwt preview"
+          sources={{
+            light: '/img/guides/jwt-logo-light.png',
+            dark: '/img/guides/jwt-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h4>Basic</h4>
+        <p>The application sends username and password</p>
+      </td>
+      <td>
+        <ThemedImage
+          alt="basic preview"
+          sources={{
+            light: '/img/guides/basic-logo-light.png',
+            dark: '/img/guides/basic-logo-dark.png'
+          }}
+        />
+      </td>
+    </tr>
+</table>
 
 ## Redirect URIs
 
