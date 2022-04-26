@@ -7,7 +7,7 @@ module.exports = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "caos",
+  organizationName: "zitadel",
   projectName: "zitadel",
   scripts: [
     {
@@ -86,7 +86,7 @@ module.exports = {
             },
             {
               label: "Linkedin",
-              href: "https://www.linkedin.com/company/caos-ag/",
+              href: "https://www.linkedin.com/company/zitadel/",
             },
             {
               label: "Blog",
@@ -107,7 +107,7 @@ module.exports = {
             },
             {
               label: "GitHub",
-              href: "https://github.com/caos",
+              href: "https://github.com/zitadel",
             },
             {
               label: "Status",

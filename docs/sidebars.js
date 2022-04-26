@@ -104,7 +104,7 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "CAOS Managed",
+          label: "ZITADEL Managed",
           collapsed: true,
           items: [
             "guides/installation/shared-cloud",
@@ -113,7 +113,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "CAOS Service Packages",
+          label: "ZITADEL Service Packages",
           collapsed: true,
           items: [
             "guides/installation/setup",
