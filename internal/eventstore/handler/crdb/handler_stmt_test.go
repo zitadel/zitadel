@@ -1558,6 +1558,10 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 							sequence:   6,
 							instanceID: "instanceID",
 						},
+						{
+							sequence:   10,
+							instanceID: "instanceID2",
+						},
 					},
 				},
 			},
@@ -1566,7 +1570,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectUpdateTwoCurrentSequence("my_table", "my_projection", currentSequences{
+					expectUpdateThreeCurrentSequence(t, "my_table", "my_projection", currentSequences{
 						"agg": []*instanceSequence{
 							{
 								sequence:   5,
@@ -1577,6 +1581,10 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 							{
 								sequence:   6,
 								instanceID: "instanceID",
+							},
+							{
+								sequence:   10,
+								instanceID: "instanceID2",
 							},
 						},
 					}),
