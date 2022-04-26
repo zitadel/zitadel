@@ -1,9 +1,9 @@
 package start
 
 import (
-	"github.com/caos/logging"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"

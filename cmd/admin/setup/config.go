@@ -3,9 +3,9 @@ package setup
 import (
 	"bytes"
 
-	"github.com/caos/logging"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"

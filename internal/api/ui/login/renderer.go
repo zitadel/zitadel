@@ -9,8 +9,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"

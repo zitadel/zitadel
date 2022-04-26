@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin/initialise"
 )

@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/i18n"

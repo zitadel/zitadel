@@ -3,9 +3,9 @@ package server
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes/empty"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/proto"

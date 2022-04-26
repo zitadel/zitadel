@@ -5,9 +5,9 @@ import (
 	_ "embed"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin/key"
 	"github.com/zitadel/zitadel/internal/database"

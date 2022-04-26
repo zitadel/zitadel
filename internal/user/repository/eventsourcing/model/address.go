@@ -3,7 +3,7 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"

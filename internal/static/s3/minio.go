@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/minio/minio-go/v7"
+	"github.com/zitadel/logging"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zitadel/zitadel/internal/domain"

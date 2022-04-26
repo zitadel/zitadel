@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 

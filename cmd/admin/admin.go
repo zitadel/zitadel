@@ -3,8 +3,8 @@ package admin
 import (
 	_ "embed"
 
-	"github.com/caos/logging"
 	"github.com/spf13/cobra"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin/initialise"
 	"github.com/zitadel/zitadel/cmd/admin/key"

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 )
 
 const (

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"

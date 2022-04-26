@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 

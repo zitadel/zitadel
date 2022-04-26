@@ -10,8 +10,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/gorilla/mux"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

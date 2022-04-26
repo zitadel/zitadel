@@ -3,7 +3,7 @@ package crypto
 import (
 	"crypto/rand"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/errors"
 )

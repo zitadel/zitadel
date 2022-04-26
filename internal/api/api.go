@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"

@@ -123,8 +123,8 @@ github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kB
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1 h1:NDBbPmhS+EqABEs5Kg3n/5ZNjy73Pz7SIV+KCeqyXcs=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
-github.com/caos/logging v0.3.1 h1:892AMeHs09D0e3ZcGB+QDRsZ5+2xtPAsAhOy8eKfztc=
-github.com/caos/logging v0.3.1/go.mod h1:B8QNS0WDmR2Keac52Fw+XN4ZJkzLDGrcRIPB2Ux4uRo=
+github.com/zitadel/logging v0.3.1 h1:892AMeHs09D0e3ZcGB+QDRsZ5+2xtPAsAhOy8eKfztc=
+github.com/zitadel/logging v0.3.1/go.mod h1:B8QNS0WDmR2Keac52Fw+XN4ZJkzLDGrcRIPB2Ux4uRo=
 github.com/caos/oidc/v2 v2.0.0-dynamic-issuer.1 h1:xJuhRlhJf9huGX/+c/mEN2QaFiYlSMHd4QfsWkDoCGI=
 github.com/caos/oidc/v2 v2.0.0-dynamic-issuer.1/go.mod h1:bdIIx0WCNjbGqpi7o4PifypVoeCAD3yTncL03rogNKw=
 github.com/casbin/casbin/v2 v2.1.2/go.mod h1:YcPU1XXisHhLzuxH9coDNf2FbKpjGlbCg3n9yuLkIJQ=

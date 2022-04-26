@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"

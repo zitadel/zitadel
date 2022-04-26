@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
