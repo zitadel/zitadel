@@ -1,7 +1,7 @@
 project_name: zitadel
 release:
   github:
-    owner: caos
+    owner: zitadel
     name: zitadel
   draft: true
   prerelease: auto
