@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/pkg/grpc/user"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
