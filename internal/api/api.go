@@ -83,12 +83,15 @@ func (a *API) RegisterHandler(prefix string, handler http.Handler) {
 }
 
 func (a *API) routeGRPC() {
-	http2Route := a.router.Methods(http.MethodPost).
+	http2Route := a.router.
 		MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
 			return r.ProtoMajor == 2
 		}).
 		Subrouter()
-	http2Route.Headers("Content-Type", "application/grpc").Handler(a.grpcServer)
+	http2Route.
+		Methods(http.MethodPost).
+		Headers("Content-Type", "application/grpc").
+		Handler(a.grpcServer)
 
 	if !a.externalSecure {
 		a.routeGRPCWeb(a.router)
@@ -98,31 +101,34 @@ func (a *API) routeGRPC() {
 }
 
 func (a *API) routeGRPCWeb(router *mux.Router) {
-	router.NewRoute().MatcherFunc(
-		func(r *http.Request, _ *mux.RouteMatch) bool {
-			if strings.Contains(strings.ToLower(r.Header.Get("content-type")), "application/grpc-web+") {
-				return true
-			}
-			return strings.Contains(strings.ToLower(r.Header.Get("access-control-request-headers")), "x-grpc-web")
-		}).Handler(
-		grpcweb.WrapServer(a.grpcServer,
-			grpcweb.WithAllowedRequestHeaders(
-				[]string{
-					http_util.Origin,
-					http_util.ContentType,
-					http_util.Accept,
-					http_util.AcceptLanguage,
-					http_util.Authorization,
-					http_util.ZitadelOrgID,
-					http_util.XUserAgent,
-					http_util.XGrpcWeb,
-				},
+	router.NewRoute().
+		Methods(http.MethodPost, http.MethodOptions).
+		MatcherFunc(
+			func(r *http.Request, _ *mux.RouteMatch) bool {
+				if strings.Contains(strings.ToLower(r.Header.Get("content-type")), "application/grpc-web+") {
+					return true
+				}
+				return strings.Contains(strings.ToLower(r.Header.Get("access-control-request-headers")), "x-grpc-web")
+			}).
+		Handler(
+			grpcweb.WrapServer(a.grpcServer,
+				grpcweb.WithAllowedRequestHeaders(
+					[]string{
+						http_util.Origin,
+						http_util.ContentType,
+						http_util.Accept,
+						http_util.AcceptLanguage,
+						http_util.Authorization,
+						http_util.ZitadelOrgID,
+						http_util.XUserAgent,
+						http_util.XGrpcWeb,
+					},
+				),
+				grpcweb.WithOriginFunc(func(_ string) bool {
+					return true
+				}),
 			),
-			grpcweb.WithOriginFunc(func(_ string) bool {
-				return true
-			}),
-		),
-	)
+		)
 }
 
 func (a *API) healthHandler() http.Handler {
