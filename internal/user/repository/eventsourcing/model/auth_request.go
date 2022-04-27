@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
-	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"net"
 
-	"github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/zitadel/logging"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+
+	"github.com/zitadel/zitadel/internal/auth_request/model"
 )
 
 type AuthRequest struct {

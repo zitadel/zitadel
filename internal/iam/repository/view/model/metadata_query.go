@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type MetadataSearchRequest domain.MetadataSearchRequest

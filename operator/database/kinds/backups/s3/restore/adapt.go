@@ -1,11 +1,12 @@
 package restore
 
 import (
-	"github.com/caos/zitadel/operator/database/kinds/backups/s3/command"
-	"github.com/caos/zitadel/pkg/databases/db"
 	"time"
 
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/s3/command"
+	"github.com/zitadel/zitadel/pkg/databases/db"
+
+	"github.com/zitadel/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"

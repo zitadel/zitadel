@@ -3,6 +3,8 @@ package s3
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -11,8 +13,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/database/kinds/backups/core"
-	"strings"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/core"
 )
 
 func BackupList() core.BackupListFunc {

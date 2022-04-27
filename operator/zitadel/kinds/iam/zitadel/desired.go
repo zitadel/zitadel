@@ -9,7 +9,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 )
 
 type DesiredV0 struct {

@@ -9,7 +9,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/rolebinding"
 	"github.com/caos/orbos/pkg/kubernetes/resources/serviceaccount"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 )
 
 func AdaptFunc(

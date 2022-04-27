@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/caos/zitadel/internal/domain"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
 )
 
 func TestAppendAddLoginPolicyEvent(t *testing.T) {

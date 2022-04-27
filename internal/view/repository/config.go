@@ -3,9 +3,9 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/errors"
 	"github.com/jinzhu/gorm"
+	"github.com/zitadel/zitadel/internal/config/types"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type ViewConfig struct {

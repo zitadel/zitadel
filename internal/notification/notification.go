@@ -3,14 +3,14 @@ package notification
 import (
 	"context"
 
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/notification/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/query"
 	"github.com/rakyll/statik/fs"
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/command"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/notification/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/query"
 
-	_ "github.com/caos/zitadel/internal/notification/statik"
+	_ "github.com/zitadel/zitadel/internal/notification/statik"
 )
 
 type Config struct {

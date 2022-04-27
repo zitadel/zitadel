@@ -7,7 +7,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator/database/kinds/backups"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups"
 )
 
 func BackupList() func(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, desired *tree.Tree) ([]string, error) {

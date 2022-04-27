@@ -13,9 +13,9 @@ const (
 	PostgresImage        dockerhubImage = "postgres:9.6.17"
 	FlywayImage          dockerhubImage = "flyway/flyway:8.0.2"
 	AlpineImage          dockerhubImage = "alpine:3.11"
-	ZITADELImage         zitadelImage   = "caos/zitadel"
-	BackupImage          zitadelImage   = "caos/zitadel-crbackup"
-	ZITADELOperatorImage zitadelImage   = "caos/zitadel-operator"
+	ZITADELImage         zitadelImage   = "zitadel/zitadel"
+	BackupImage          zitadelImage   = "zitadel/zitadel-crbackup"
+	ZITADELOperatorImage zitadelImage   = "zitadel/zitadel-operator"
 )
 
 func (z zitadelImage) Reference(customImageRegistry, version string) string {

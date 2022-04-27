@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 //SearchQuery is deprecated. Use SearchQueryFactory

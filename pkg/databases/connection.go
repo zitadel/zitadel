@@ -3,17 +3,17 @@ package databases
 import (
 	"context"
 
-	"github.com/caos/zitadel/operator/api/database"
-	"github.com/caos/zitadel/operator/api/zitadel"
+	"github.com/zitadel/zitadel/operator/api/database"
+	"github.com/zitadel/zitadel/operator/api/zitadel"
 
 	"github.com/caos/orbos/pkg/tree"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
-	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	"github.com/pkg/errors"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
+	orbzit "github.com/zitadel/zitadel/operator/zitadel/kinds/orb"
 
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/pkg/orb"
 

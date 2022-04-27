@@ -1,7 +1,7 @@
 package tracing
 
 import (
-	grpc_errs "github.com/caos/zitadel/internal/api/grpc/errors"
+	grpc_errs "github.com/zitadel/zitadel/internal/api/grpc/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )

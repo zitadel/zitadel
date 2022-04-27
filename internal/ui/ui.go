@@ -6,9 +6,9 @@ import (
 
 	sentryhttp "github.com/getsentry/sentry-go/http"
 
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/ui/console"
-	"github.com/caos/zitadel/internal/ui/login"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/ui/console"
+	"github.com/zitadel/zitadel/internal/ui/login"
 )
 
 const (

@@ -1,16 +1,16 @@
 package handler
 
 import (
-	"github.com/caos/logging"
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/user/repository/view"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/logging"
+	req_model "github.com/zitadel/zitadel/internal/auth_request/model"
+	"github.com/zitadel/zitadel/internal/errors"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/user/repository/view"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 const (

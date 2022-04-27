@@ -3,12 +3,12 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/iam/model"
+	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
 
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	org_model "github.com/zitadel/zitadel/internal/org/model"
 )
 
 const (

@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	"github.com/lib/pq"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
 )
 
 func mockProjectMemberData(member *es_model.ProjectMember) []byte {

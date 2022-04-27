@@ -1,12 +1,12 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/internal/usergrant/repository/view"
-	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	grant_model "github.com/zitadel/zitadel/internal/usergrant/model"
+	"github.com/zitadel/zitadel/internal/usergrant/repository/view"
+	"github.com/zitadel/zitadel/internal/usergrant/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 const (

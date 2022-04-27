@@ -11,12 +11,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/caos/logging"
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	"github.com/zitadel/logging"
 )
 
 var (
-	migrationsPath = os.ExpandEnv("${GOPATH}/src/github.com/caos/zitadel/migrations/cockroach")
+	migrationsPath = os.ExpandEnv("${GOPATH}/src/github.com/zitadel/zitadel/migrations/cockroach")
 	testCRDBClient *sql.DB
 )
 

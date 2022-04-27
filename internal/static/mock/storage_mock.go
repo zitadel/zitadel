@@ -11,8 +11,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	domain "github.com/caos/zitadel/internal/domain"
-	static "github.com/caos/zitadel/internal/static"
+	domain "github.com/zitadel/zitadel/internal/domain"
+	static "github.com/zitadel/zitadel/internal/static"
 	gomock "github.com/golang/mock/gomock"
 )
 

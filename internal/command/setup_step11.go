@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	iam_repo "github.com/zitadel/zitadel/internal/repository/iam"
 )
 
 type Step11 struct {

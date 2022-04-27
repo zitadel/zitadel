@@ -3,11 +3,12 @@ package cockroachdb
 import (
 	"crypto/rsa"
 	"fmt"
-	"github.com/caos/orbos/pkg/labels"
 	"strings"
 
+	"github.com/caos/orbos/pkg/labels"
+
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 )
 
 var _ db.Connection = (*Current)(nil)

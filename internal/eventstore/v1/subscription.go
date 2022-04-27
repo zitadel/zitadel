@@ -3,7 +3,7 @@ package v1
 import (
 	"sync"
 
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 var (

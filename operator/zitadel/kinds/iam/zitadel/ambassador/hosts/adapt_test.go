@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/caos/orbos/mntr"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 	"github.com/stretchr/testify/assert"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/orbos/pkg/labels"

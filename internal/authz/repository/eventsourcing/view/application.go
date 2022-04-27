@@ -3,9 +3,9 @@ package view
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (v *View) ApplicationByOIDCClientID(clientID string) (*query.App, error) {

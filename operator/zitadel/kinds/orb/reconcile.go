@@ -10,8 +10,8 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/orbos/pkg/treelabels"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/pkg/kubernetes"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/pkg/kubernetes"
 )
 
 func Reconcile(

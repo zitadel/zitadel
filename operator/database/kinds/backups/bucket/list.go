@@ -14,7 +14,7 @@ import (
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator/database/kinds/backups/core"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/core"
 )
 
 func BackupList() core.BackupListFunc {

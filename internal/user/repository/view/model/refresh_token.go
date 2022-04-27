@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
-	usr_model "github.com/caos/zitadel/internal/user/model"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
 )
 
 const (

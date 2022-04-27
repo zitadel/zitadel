@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"testing"
 
-	errs "github.com/caos/zitadel/internal/errors"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_ProjectRolePrepares(t *testing.T) {

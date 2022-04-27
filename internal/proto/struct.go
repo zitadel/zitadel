@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	pb_struct "github.com/golang/protobuf/ptypes/struct"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 )
 
 var (

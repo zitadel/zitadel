@@ -3,8 +3,8 @@ package database
 import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api/core"
-	databasev1 "github.com/caos/zitadel/operator/api/database/v1"
+	"github.com/zitadel/zitadel/operator/api/core"
+	databasev1 "github.com/zitadel/zitadel/operator/api/database/v1"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 )

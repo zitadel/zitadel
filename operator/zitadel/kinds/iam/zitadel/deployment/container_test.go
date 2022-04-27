@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/caos/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/common"
 
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/helpers"
 )
 
 func TestDeployment_GetContainer(t *testing.T) {

@@ -3,8 +3,8 @@ package model
 import (
 	"testing"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 func TestNotifyUserAppendEvent(t *testing.T) {

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/config/types"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/config/types"
 )
 
 type Cache struct {

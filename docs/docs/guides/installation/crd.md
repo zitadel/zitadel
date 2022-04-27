@@ -13,7 +13,7 @@ Especially the values for the domain, cluster DNS, storage class, email and Twil
 
 ```bash
 # Download the zitadelctl binary
-curl -s https://api.github.com/repos/caos/zitadel/releases/latest | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/latest | grep "browser_download_url.*zitadelctl-$(uname | awk '{print tolower($0)}')-amd64" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadelctl && sudo chmod +x /usr/local/bin/zitadelctl && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 sudo chmod +x /usr/local/bin/zitadelctl
 sudo chown $(id -u):$(id -g) /usr/local/bin/zitadelctl
 
@@ -24,7 +24,7 @@ zitadelctl takeoff
 kubectl apply --filename ./database.yml,./zitadel.yml
 
 # Write the encryption keys
-cat EOF << zitadelctl writesecret zitadel.keys.existing --stdin
+cat << EOF | zitadelctl writesecret zitadel.keys.existing --stdin
 otpverificationkey_1: $(openssl rand -base64 22)
 cookiekey_1: $(openssl rand -base64 22)
 domainverificationkey_1: $(openssl rand -base64 22)

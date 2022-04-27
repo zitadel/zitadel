@@ -3,8 +3,8 @@ package backup
 /* Deprecated in V2
 
 import (
-	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"

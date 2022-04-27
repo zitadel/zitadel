@@ -3,9 +3,9 @@ package management
 import (
 	"testing"
 
-	"github.com/caos/zitadel/internal/test"
-	"github.com/caos/zitadel/pkg/grpc/idp"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/test"
+	"github.com/zitadel/zitadel/pkg/grpc/idp"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func Test_addOIDCIDPRequestToDomain(t *testing.T) {

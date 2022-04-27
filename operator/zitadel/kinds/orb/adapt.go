@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	cockroachdb "github.com/caos/zitadel/operator/zitadel/kinds/dbconn"
+	cockroachdb "github.com/zitadel/zitadel/operator/zitadel/kinds/dbconn"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -14,8 +14,8 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam"
 )
 
 const namespaceName = "caos-zitadel"

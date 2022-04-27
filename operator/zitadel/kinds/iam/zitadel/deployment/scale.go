@@ -4,7 +4,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator"
+	"github.com/zitadel/zitadel/operator"
 )
 
 func GetScaleFunc(monitor mntr.Monitor, namespace string, name *labels.Name) func(replicaCount int) operator.EnsureFunc {

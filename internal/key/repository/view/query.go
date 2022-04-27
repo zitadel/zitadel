@@ -1,8 +1,8 @@
 package view
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
 
 func KeyPairQuery(latestSequence uint64) *eventstore.SearchQueryBuilder {

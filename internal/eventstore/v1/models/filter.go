@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type Filter struct {

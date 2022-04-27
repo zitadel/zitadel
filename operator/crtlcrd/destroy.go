@@ -3,9 +3,9 @@ package crtlcrd
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/crtlcrd/database"
-	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator/crtlcrd/database"
+	"github.com/zitadel/zitadel/operator/crtlcrd/zitadel"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 )
 
 func Destroy(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, dbConn db.Connection, version string, features ...string) error {

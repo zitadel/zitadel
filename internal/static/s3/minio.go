@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/minio/minio-go/v7"
+	"github.com/zitadel/logging"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 type Minio struct {

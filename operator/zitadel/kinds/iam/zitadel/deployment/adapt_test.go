@@ -11,7 +11,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/helpers"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"

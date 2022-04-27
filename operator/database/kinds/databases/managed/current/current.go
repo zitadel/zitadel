@@ -2,11 +2,12 @@ package current
 
 import (
 	"crypto/rsa"
+
 	"github.com/caos/orbos/pkg/labels"
 
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 
-	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/user/current"
+	cacurr "github.com/zitadel/zitadel/operator/database/kinds/databases/managed/user/current"
 
 	"github.com/caos/orbos/pkg/tree"
 )

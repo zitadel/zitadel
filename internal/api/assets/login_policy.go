@@ -4,11 +4,11 @@ import (
 	"context"
 	"strings"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 func (h *Handler) UploadDefaultLabelPolicyLogo() Uploader {

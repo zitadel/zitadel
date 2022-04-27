@@ -10,18 +10,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/superseriousbusiness/exifremove/pkg/exifremove"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/static"
 )
 
 type Handler struct {

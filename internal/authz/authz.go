@@ -1,10 +1,10 @@
 package authz
 
 import (
-	"github.com/caos/zitadel/internal/authz/repository"
-	"github.com/caos/zitadel/internal/authz/repository/eventsourcing"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/authz/repository"
+	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Config struct {

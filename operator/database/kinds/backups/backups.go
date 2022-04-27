@@ -2,15 +2,16 @@ package backups
 
 import (
 	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket"
-	"github.com/caos/zitadel/operator/database/kinds/backups/s3"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/bucket"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/s3"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 	corev1 "k8s.io/api/core/v1"
 )
 

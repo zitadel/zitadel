@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	grant_model "github.com/zitadel/zitadel/internal/usergrant/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type UserGrantSearchRequest grant_model.UserGrantSearchRequest

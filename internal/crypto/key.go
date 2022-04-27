@@ -3,10 +3,10 @@ package crypto
 import (
 	"os"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/config"
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/config"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 const (

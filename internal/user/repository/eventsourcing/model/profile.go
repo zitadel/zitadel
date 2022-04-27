@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/text/language"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 type Profile struct {

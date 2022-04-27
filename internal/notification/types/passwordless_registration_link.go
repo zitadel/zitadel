@@ -1,14 +1,14 @@
 package types
 
 import (
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/i18n"
-	"github.com/caos/zitadel/internal/notification/templates"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/user"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/notification/templates"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 type PasswordlessRegistrationLinkData struct {

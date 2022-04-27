@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string) (*domain.Permissions, error) {

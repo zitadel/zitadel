@@ -4,9 +4,9 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/zitadel"
-	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator/zitadel"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/orb"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
 )
 

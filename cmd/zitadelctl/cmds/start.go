@@ -2,9 +2,9 @@ package cmds
 
 import (
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/crtlcrd"
-	"github.com/caos/zitadel/operator/crtlgitops"
 	"github.com/spf13/cobra"
+	"github.com/zitadel/zitadel/operator/crtlcrd"
+	"github.com/zitadel/zitadel/operator/crtlgitops"
 )
 
 func StartOperator(getRv GetRootValues) *cobra.Command {

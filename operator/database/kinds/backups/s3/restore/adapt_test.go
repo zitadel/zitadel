@@ -3,7 +3,7 @@ package restore
 /* Deprecated in V2
 
 import (
-	"github.com/caos/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/common"
 	"testing"
 
 	"github.com/caos/orbos/mntr"

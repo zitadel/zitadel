@@ -4,7 +4,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 )
 
 func CreateListener(endpoint string) net.Listener {

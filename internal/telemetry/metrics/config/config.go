@@ -3,9 +3,9 @@ package config
 import (
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics/otel"
 )
 
 type MetricsConfig struct {

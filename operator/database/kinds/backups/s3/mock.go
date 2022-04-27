@@ -4,8 +4,8 @@ package s3
 
 import (
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/bucket/backup"
+	"github.com/zitadel/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/golang/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"

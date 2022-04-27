@@ -11,8 +11,8 @@ import (
 
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
-	"github.com/caos/zitadel/operator/helpers"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	"github.com/zitadel/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	batchv1 "k8s.io/api/batch/v1"

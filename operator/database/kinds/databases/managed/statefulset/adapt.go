@@ -20,8 +20,8 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/statefulset"
 	"github.com/caos/orbos/pkg/labels"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/helpers"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/helpers"
 )
 
 const (

@@ -10,9 +10,9 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"github.com/zitadel/zitadel/operator"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/iam/zitadel"
+	"github.com/zitadel/zitadel/pkg/databases/db"
 )
 
 func Adapt(

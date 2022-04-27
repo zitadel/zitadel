@@ -5,13 +5,13 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
 
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
 
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/iam/model"
 )
 
 const (

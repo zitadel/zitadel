@@ -9,7 +9,7 @@ import (
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 	api_trace "go.opentelemetry.io/otel/trace"
 
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Tracer struct {

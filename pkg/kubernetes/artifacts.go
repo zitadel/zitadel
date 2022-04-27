@@ -1,7 +1,7 @@
 package kubernetes
 
 import (
-	"github.com/caos/zitadel/operator/common"
+	"github.com/zitadel/zitadel/operator/common"
 
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"

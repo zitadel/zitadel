@@ -6,7 +6,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.authn.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/authn";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/authn";
 
 message Key {
     string id = 1 [

@@ -4,17 +4,17 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/pkg/databases"
+	"github.com/zitadel/zitadel/pkg/databases"
 
-	"github.com/caos/zitadel/operator/database"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
-	"github.com/caos/zitadel/operator/zitadel"
+	"github.com/zitadel/zitadel/operator/database"
+	orbdb "github.com/zitadel/zitadel/operator/database/kinds/orb"
+	"github.com/zitadel/zitadel/operator/zitadel"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	orbconfig "github.com/caos/orbos/pkg/orb"
-	"github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	"github.com/zitadel/zitadel/operator/zitadel/kinds/orb"
 )
 
 func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string, gitops bool) error {

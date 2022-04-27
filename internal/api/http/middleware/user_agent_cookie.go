@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/id"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/config/types"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 type cookieKey int

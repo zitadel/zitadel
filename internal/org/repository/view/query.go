@@ -3,9 +3,9 @@ package view
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
 )
 
 func OrgByIDQuery(id string, latestSequence uint64) (*es_models.SearchQuery, error) {

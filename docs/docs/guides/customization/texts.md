@@ -39,10 +39,10 @@ If you need support for a specific language, we highly recommend you to write tr
 
 ZITADEL loads translations from three files:
 
- - [Console translations](https://github.com/caos/zitadel/tree/main/console/src/assets/i18n)
- - [Login interface texts](https://github.com/caos/zitadel/tree/main/internal/ui/login/static/i18n)
- - [Email Notifcation texts](https://github.com/caos/zitadel/tree/main/internal/notification/static/i18n)
- - [Common translations](https://github.com/caos/zitadel/tree/main/internal/static/i18n) for success or error toasts
+ - [Console translations](https://github.com/zitadel/zitadel/tree/main/console/src/assets/i18n)
+ - [Login interface texts](https://github.com/zitadel/zitadel/tree/main/internal/ui/login/static/i18n)
+ - [Email Notifcation texts](https://github.com/zitadel/zitadel/tree/main/internal/notification/static/i18n)
+ - [Common translations](https://github.com/zitadel/zitadel/tree/main/internal/static/i18n) for success or error toasts
 
  Make sure you set the locale as the name. Later on, a language header will determine which file gets displayed.
 
