@@ -19,6 +19,11 @@ var (
 		name:  "test_col",
 		table: testTable,
 	}
+	testLowerCol = Column{
+		name:           "test_lower_col",
+		table:          testTable,
+		isOrderByLower: true,
+	}
 	testNoCol = Column{
 		name:  "",
 		table: testTable,
@@ -34,7 +39,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 	}
 	type want struct {
 		stmtAddition string
-		args         []interface{}
 	}
 	tests := []struct {
 		name   string
@@ -46,7 +50,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			fields: fields{},
 			want: want{
 				stmtAddition: "",
-				args:         nil,
 			},
 		},
 		{
@@ -56,7 +59,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			},
 			want: want{
 				stmtAddition: "OFFSET 5",
-				args:         nil,
 			},
 		},
 		{
@@ -66,7 +68,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			},
 			want: want{
 				stmtAddition: "LIMIT 5",
-				args:         nil,
 			},
 		},
 		{
@@ -76,8 +77,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				Asc:           true,
 			},
 			want: want{
-				stmtAddition: "ORDER BY LOWER(?)",
-				args:         []interface{}{"test_table.test_col"},
+				stmtAddition: "ORDER BY test_table.test_col",
 			},
 		},
 		{
@@ -86,8 +86,17 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				SortingColumn: testCol,
 			},
 			want: want{
-				stmtAddition: "ORDER BY LOWER(?) DESC",
-				args:         []interface{}{"test_table.test_col"},
+				stmtAddition: "ORDER BY test_table.test_col DESC",
+			},
+		},
+		{
+			name: "sort lower asc",
+			fields: fields{
+				SortingColumn: testLowerCol,
+				Asc:           true,
+			},
+			want: want{
+				stmtAddition: "ORDER BY LOWER(test_table.test_lower_col)",
 			},
 		},
 		{
@@ -99,8 +108,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				Asc:           true,
 			},
 			want: want{
-				stmtAddition: "ORDER BY LOWER(?) LIMIT 10 OFFSET 5",
-				args:         []interface{}{"test_table.test_col"},
+				stmtAddition: "ORDER BY test_table.test_col LIMIT 10 OFFSET 5",
 			},
 		},
 	}
@@ -116,16 +124,12 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			query := sq.Select((testCol).identifier()).From(testTable.identifier())
 			expectedQuery, _, _ := query.ToSql()
 
-			stmt, args, err := req.toQuery(query).ToSql()
+			stmt, _, err := req.toQuery(query).ToSql()
 			if len(tt.want.stmtAddition) > 0 {
 				expectedQuery += " " + tt.want.stmtAddition
 			}
 			if expectedQuery != stmt {
 				t.Errorf("stmt = %q, want %q", stmt, expectedQuery)
-			}
-
-			if !reflect.DeepEqual(args, tt.want.args) {
-				t.Errorf("args = %v, want %v", args, tt.want.stmtAddition)
 			}
 
 			if err != nil {
