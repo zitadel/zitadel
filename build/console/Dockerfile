@@ -17,7 +17,7 @@ RUN build/console/generate-grpc.sh
 ## copy for local dev
 #######################
 FROM scratch as npm-copy
-COPY --from=npm-base /console/src/app/proto/generated .
+COPY --from=npm-base /console/src/app/proto/generated /console/src/app/proto/generated
 
 #######################
 ## angular lint workspace and prod build
