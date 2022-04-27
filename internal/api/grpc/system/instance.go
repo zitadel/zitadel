@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
