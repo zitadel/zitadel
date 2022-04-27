@@ -1,0 +1,31 @@
+.btn-container {
+  display: flex;
+  margin: -0.5rem;
+  align-items: center;
+
+  button {
+    margin: 1rem 0.5rem;
+  }
+}
+
+.desc {
+  font-size: 0.9rem;
+}
+
+.entry {
+  margin: 0.5rem 0;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-start;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}

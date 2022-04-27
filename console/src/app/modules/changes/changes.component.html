@@ -1,45 +1,44 @@
 <div class="change-header">
-    <span class="ch-header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
-    <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" (click)="init()" mat-icon-button>
-        <mat-icon class="icon">refresh</mat-icon>
-    </button>
+  <span class="ch-header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
 </div>
 
-<div class="scroll-container" cnslScrollable (scrollPosition)="scrollHandler($event)">
-    <li class="item change-item-back" *ngFor="let hist of data | async; index as histindex">
-        <span *ngIf="hist.values[0].dates[0]" class="date">
-          {{ hist.values[0].dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}
-        </span>
-        <div class="item" *ngFor="let dayelement of hist.values; index as i">
-            <div class="row">
-                <cnsl-avatar matTooltip="{{ dayelement.editorDisplayName }}"
-                    *ngIf="dayelement.editorDisplayName; else spacer" class="avatar"
-                    [name]="dayelement.editorDisplayName" [size]="32" [forColor]="dayelement?.editorPreferredLoginName ?? 'A'"
-                    [avatarUrl]="dayelement.editorAvatarUrl || ''">
-                </cnsl-avatar>
-                <ng-template #spacer>
-                    <div class="spacer"></div>
-                </ng-template>
-                <div class="actions">
-                    <div class="action" *ngFor="let action of dayelement.eventTypes; index as j">
-                        <button disabled mat-icon-button aria-label="Restore history"
-                            matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}">
-                            <mat-icon class="icon">schedule</mat-icon>
-                        </button>
-
-                        <span>
-                            <span class="msg">{{ action.localizedMessage }}</span>
-                            <span class="block">{{
-                                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
-                                }}</span>
-                        </span>
-                    </div>
-                </div>
+<div class="scroll-container">
+  <li class="item" *ngFor="let hist of data | async; index as histindex">
+    <span *ngIf="hist.values[0].dates[0]" class="date">
+      {{ hist.values[0].dates[0]| timestampToDate | localizedDate: 'dd. MMM YYYY' }}
+    </span>
+    <div class="item" *ngFor="let dayelement of hist.values; index as i">
+      <div class="row">
+        <cnsl-avatar matTooltip="{{ dayelement.editorDisplayName }}" *ngIf="dayelement.editorDisplayName; else spacer"
+          class="avatar" [name]="dayelement.editorDisplayName" [size]="32"
+          [forColor]="dayelement?.editorPreferredLoginName ?? 'A'" [avatarUrl]="dayelement.editorAvatarUrl || ''">
+        </cnsl-avatar>
+        <ng-template #spacer>
+          <div class="spacer"></div>
+        </ng-template>
+        <div class="change-actions">
+          <div class="change-action" *ngFor="let action of dayelement.eventTypes; index as j">
+            <div>
+              <span class="msg">{{ action.localizedMessage }}</span>
+              <span class="block"
+                matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MM YYYY, HH:mm' }}">{{
+                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
+                }}</span>
             </div>
+          </div>
         </div>
-    </li>
-    <div class="sp-wrapper">
-        <mat-spinner *ngIf="loading | async" diameter="25"></mat-spinner>
+      </div>
     </div>
-    <span class="end-container" *ngIf="bottom">{{'CHANGES.BOTTOM' | translate}}</span>
+  </li>
+  <div class="ch-sp-wrapper">
+    <mat-spinner *ngIf="loading | async" diameter="25"></mat-spinner>
+  </div>
+
+  <button (click)="more()" class="load-more-button" *ngIf="!bottom" mat-stroked-button>
+    {{'CHANGES.LOADMORE' | translate}}
+  </button>
+
+  <div *ngIf="bottom" class="end-container">
+    <span class="cnsl-secondary-text">{{'CHANGES.BOTTOM' | translate}}</span>
+  </div>
 </div>

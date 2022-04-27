@@ -1,12 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { GrantedProject, Project, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { getMembershipColor } from 'src/app/utils/color';
 
 import { ProjectAutocompleteType } from '../search-project-autocomplete/search-project-autocomplete.component';
 
@@ -33,14 +34,14 @@ export class MemberCreateDialogComponent {
    *  without ending $, to enable write event permission even if user is allowed
    *  to create members for only one specific project.
    */
-  public creationTypes: Array<{ type: CreationType, disabled$: Observable<boolean>; }> = [
+  public creationTypes: Array<{ type: CreationType; disabled$: Observable<boolean> }> = [
     { type: CreationType.IAM, disabled$: this.authService.isAllowed(['iam.member.write$']) },
     { type: CreationType.ORG, disabled$: this.authService.isAllowed(['org.member.write$']) },
     { type: CreationType.PROJECT_OWNED, disabled$: this.authService.isAllowed(['project.member.write']) },
     { type: CreationType.PROJECT_GRANTED, disabled$: this.authService.isAllowed(['project.grant.member.write']) },
   ];
   public users: Array<User.AsObject> = [];
-  public roles: Array<Role.AsObject> | string[] = [];
+  public roles: string[] = [];
   public CreationType: any = CreationType;
   public ProjectAutocompleteType: any = ProjectAutocompleteType;
   public memberRoleOptions: string[] = [];
@@ -72,26 +73,45 @@ export class MemberCreateDialogComponent {
 
   public loadRoles(): void {
     switch (this.creationType) {
+      case CreationType.ORG:
+        this.mgmtService
+          .listOrgMemberRoles()
+          .then((resp) => {
+            this.memberRoleOptions = resp.resultList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+        break;
       case CreationType.PROJECT_GRANTED:
-        this.mgmtService.listProjectGrantMemberRoles().then(resp => {
-          this.memberRoleOptions = resp.resultList;
-        }).catch(error => {
-          this.toastService.showError(error);
-        });
+        this.mgmtService
+          .listProjectGrantMemberRoles()
+          .then((resp) => {
+            this.memberRoleOptions = resp.resultList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
         break;
       case CreationType.PROJECT_OWNED:
-        this.mgmtService.listProjectMemberRoles().then(resp => {
-          this.memberRoleOptions = resp.resultList;
-        }).catch(error => {
-          this.toastService.showError(error);
-        });
+        this.mgmtService
+          .listProjectMemberRoles()
+          .then((resp) => {
+            this.memberRoleOptions = resp.resultList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
         break;
       case CreationType.IAM:
-        this.adminService.listIAMMemberRoles().then(resp => {
-          this.memberRoleOptions = resp.rolesList;
-        }).catch(error => {
-          this.toastService.showError(error);
-        });
+        this.adminService
+          .listIAMMemberRoles()
+          .then((resp) => {
+            this.memberRoleOptions = resp.rolesList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
         break;
     }
   }
@@ -121,5 +141,18 @@ export class MemberCreateDialogComponent {
 
   public setOrgMemberRoles(roles: string[]): void {
     this.roles = roles;
+  }
+
+  public toggleRole(role: string): void {
+    const index = this.roles.findIndex((r) => r === role);
+    if (index > -1) {
+      this.roles.splice(index, 1);
+    } else {
+      this.roles.push(role);
+    }
+  }
+
+  public getColor(role: string) {
+    return getMembershipColor(role)[500];
   }
 }

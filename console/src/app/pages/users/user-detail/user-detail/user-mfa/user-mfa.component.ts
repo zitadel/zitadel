@@ -8,7 +8,6 @@ import { AuthFactor, AuthFactorState, User } from 'src/app/proto/generated/zitad
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-
 export interface MFAItem {
   name: string;
   verified: boolean;
@@ -33,24 +32,27 @@ export class UserMfaComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
 
   public error: string = '';
-  constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) { }
+  constructor(private mgmtUserService: ManagementService, private dialog: MatDialog, private toast: ToastService) {}
 
   public ngOnInit(): void {
     this.getMFAs();
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.mfaSubject.complete();
     this.loadingSubject.complete();
   }
 
   public getMFAs(): void {
-    this.mgmtUserService.listHumanMultiFactors(this.user.id).then(mfas => {
-      this.dataSource = new MatTableDataSource(mfas.resultList);
-      this.dataSource.sort = this.sort;
-    }).catch(error => {
-      this.error = error.message;
-    });
+    this.mgmtUserService
+      .listHumanMultiFactors(this.user.id)
+      .then((mfas) => {
+        this.dataSource = new MatTableDataSource(mfas.resultList);
+        this.dataSource.sort = this.sort;
+      })
+      .catch((error) => {
+        this.error = error.message;
+      });
   }
 
   public deleteMFA(factor: AuthFactor.AsObject): void {
@@ -64,32 +66,38 @@ export class UserMfaComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         if (factor.otp) {
-          this.mgmtUserService.removeHumanMultiFactorOTP(this.user.id).then(() => {
-            this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+          this.mgmtUserService
+            .removeHumanMultiFactorOTP(this.user.id)
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
-            const index = this.dataSource.data.findIndex(mfa => !!mfa.otp);
-            if (index > -1) {
-              this.dataSource.data.splice(index, 1);
-            }
-            this.getMFAs();
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+              const index = this.dataSource.data.findIndex((mfa) => !!mfa.otp);
+              if (index > -1) {
+                this.dataSource.data.splice(index, 1);
+              }
+              this.getMFAs();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         } else if (factor.u2f) {
-          this.mgmtUserService.removeHumanAuthFactorU2F(this.user.id, factor.u2f.id).then(() => {
-            this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+          this.mgmtUserService
+            .removeHumanAuthFactorU2F(this.user.id, factor.u2f.id)
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
 
-            const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);
-            if (index > -1) {
-              this.dataSource.data.splice(index, 1);
-            }
-            this.getMFAs();
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+              const index = this.dataSource.data.findIndex((mfa) => !!mfa.u2f);
+              if (index > -1) {
+                this.dataSource.data.splice(index, 1);
+              }
+              this.getMFAs();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });

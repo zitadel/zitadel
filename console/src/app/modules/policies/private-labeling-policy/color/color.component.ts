@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ColorEvent } from 'ngx-color';
+import { BehaviorSubject, debounceTime } from 'rxjs';
 
 import { ColorType } from '../private-labeling-policy.component';
 
@@ -9,7 +10,7 @@ import { ColorType } from '../private-labeling-policy.component';
   styleUrls: ['./color.component.scss'],
 })
 export class ColorComponent implements OnInit {
-  public PRIMARY: Array<{ name: string; color: string; }> = [
+  public PRIMARY: Array<{ name: string; color: string }> = [
     { name: 'red', color: '#f44336' },
     { name: 'pink', color: '#e91e63' },
     { name: 'purple', color: '#9c27b0' },
@@ -32,14 +33,14 @@ export class ColorComponent implements OnInit {
     { name: 'white', color: '#ffffff' },
   ];
 
-  public WARN: Array<{ name: string; color: string; }> = [
+  public WARN: Array<{ name: string; color: string }> = [
     { name: 'red', color: '#f44336' },
     { name: 'pink', color: '#e91e63' },
     { name: 'purple', color: '#9c27b0' },
     { name: 'deeppurple', color: '#673ab7' },
   ];
 
-  public FONTLIGHT: Array<{ name: string; color: string; }> = [
+  public FONTLIGHT: Array<{ name: string; color: string }> = [
     { name: 'gray-500', color: '#6b7280' },
     { name: 'gray-600', color: '#4b5563' },
     { name: 'gray-700', color: '#374151' },
@@ -48,7 +49,7 @@ export class ColorComponent implements OnInit {
     { name: 'black', color: '#000000' },
   ];
 
-  public FONTDARK: Array<{ name: string; color: string; }> = [
+  public FONTDARK: Array<{ name: string; color: string }> = [
     { name: 'white', color: '#ffffff' },
     { name: 'gray-50', color: '#f9fafb' },
     { name: 'gray-100', color: '#f3f4f6' },
@@ -58,7 +59,7 @@ export class ColorComponent implements OnInit {
     { name: 'gray-500', color: '#6b7280' },
   ];
 
-  public BACKGROUNDLIGHT: Array<{ name: string; color: string; }> = [
+  public BACKGROUNDLIGHT: Array<{ name: string; color: string }> = [
     { name: 'white', color: '#ffffff' },
     { name: 'gray-50', color: '#f9fafb' },
     { name: 'gray-100', color: '#f3f4f6' },
@@ -68,7 +69,7 @@ export class ColorComponent implements OnInit {
     { name: 'gray-500', color: '#6b7280' },
   ];
 
-  public BACKGROUNDDARK: Array<{ name: string; color: string; }> = [
+  public BACKGROUNDDARK: Array<{ name: string; color: string }> = [
     { name: 'gray-500', color: '#6b7280' },
     { name: 'gray-600', color: '#4b5563' },
     { name: 'gray-700', color: '#374151' },
@@ -77,18 +78,22 @@ export class ColorComponent implements OnInit {
     { name: 'black', color: '#000000' },
   ];
 
-  public colors: Array<{ name: string; color: string; }> = this.PRIMARY;
+  public colors: Array<{ name: string; color: string }> = this.PRIMARY;
   public isOpen: boolean = false;
 
   @Input() colorType: ColorType = ColorType.PRIMARY;
   @Input() color: string = '';
   @Input() previewColor: string = '';
+  @Input() previewColor$: BehaviorSubject<string> = new BehaviorSubject('');
   @Input() name: string = '';
   @Output() previewChanged: EventEmitter<string> = new EventEmitter();
+  @Input() disabled: boolean = false;
 
   public emitPreview(color: string): void {
-    this.previewColor = color;
-    this.previewChanged.emit(this.previewColor);
+    this.previewColor$.next(color);
+    this.previewColor$.pipe(debounceTime(500)).subscribe((value) => {
+      this.previewChanged.emit(value);
+    });
   }
 
   public ngOnInit(): void {

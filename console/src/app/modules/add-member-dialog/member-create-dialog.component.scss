@@ -3,19 +3,34 @@
 }
 
 .desc {
-  color: var(--grey);
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
-.full-width {
-  width: 100%;
+.roles-selection {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  .role-cb {
+    padding: 0.25rem 0;
+    box-sizing: border-box;
+
+    .role-cb-content {
+      padding-left: 0.5rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
 }
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

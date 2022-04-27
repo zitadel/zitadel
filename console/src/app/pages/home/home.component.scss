@@ -1,173 +1,155 @@
-.wrapper {
-  padding-bottom: 100px;
-  position: relative;
+@use '@angular/material' as mat;
 
-  .header {
+@mixin home-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  $list-background-color: mat.get-color-from-palette($background, 300);
+  $card-background-color: mat.get-color-from-palette($background, cards);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #fff, #000);
+
+  .home-wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
-    margin-bottom: 2rem;
 
-    .title {
-      font-size: 24px;
-      margin-bottom: 1rem;
-    }
-
-    .wlc_stnce {
-      color: var(--grey);
-      font-size: 16px;
-    }
-  }
-
-  .gridcontainer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    justify-content: space-evenly;
-
-    @media only screen and (max-width: 899px) {
-      grid-template-columns: 1fr;
-    }
-
-    .onboard,
-    .quickstart {
-      text-decoration: none;
-      cursor: pointer;
-      box-sizing: border-box;
-      position: relative;
-      border-radius: .5rem;
-      padding: 1.5rem;
-      box-shadow: 0 3px 8px 0 rgb(0 0 0 / 6%);
-
-      h2 {
-        color: white;
-      }
-
-      .first-steps {
-        text-transform: uppercase;
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .close {
-        visibility: hidden;
-        position: absolute;
-        top: 0;
-        right: 0;
-
-        i {
-          color: white;
-          font-size: 1rem;
-        }
-      }
-
-      &:hover {
-        .close {
-          visibility: visible;
-        }
-      }
-    }
-
-    .onboard {
-      background: linear-gradient(40deg, rgb(177, 59, 122), rgb(225, 53, 81), rgb(230, 107, 86));
-
-      p {
-        color: #fad6e3;
-      }
-    }
-
-    .quickstart {
-      background: linear-gradient(40deg, #047857, #059669);
-
-      p {
-        color: #d6f3fa;
-      }
-
-      .logo-cloud {
-        display: flex;
-        flex-wrap: wrap;
-        margin: -.5rem;
-
-        i {
-          font-size: 40px;
-          padding: .5rem;
-          border: 1px solid #ffffff50;
-          border-radius: .5rem;
-          margin: .5rem;
-          color: white;
-        }
-      }
-    }
-
-    .griditem {
+    .header {
       display: flex;
       flex-direction: column;
+      margin-bottom: 2rem;
 
-      .card {
-        margin: 0 !important;
+      .title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .home-grid-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      justify-content: space-evenly;
+
+      @media only screen and (min-width: 599px) {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .top {
-        h2 {
-          margin-top: .5rem;
+      @media only screen and (min-width: 1000px) {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .grid-item {
+        padding: 1rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        box-sizing: border-box;
+        font-size: 14px;
+        background-color: $card-background-color;
+        border: 1px solid $border-color;
+        border-radius: 1rem;
+        margin: 0;
+        text-decoration: none;
+        color: white;
+        box-shadow: 0 0 15px #0000001a;
+
+        &.edit-state {
+          cursor: move;
+        }
+
+        &.green {
+          background: linear-gradient(40deg, #059669 30%, #047857);
+        }
+
+        &.blue {
+          background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+        }
+
+        .grid-item-avatar {
+          height: 40px;
+          width: 40px;
+          margin-right: 1rem;
+          border-radius: 50%;
           display: flex;
           align-items: center;
-        }
+          justify-content: center;
+          background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
 
-        p {
-          display: block;
-          color: var(--grey);
-          font-size: .9rem;
-        }
+          &.purple {
+            background: linear-gradient(40deg, #7c3aed 30%, #6d28d9);
+          }
 
-        i {
-          font-size: 2.5rem;
-          margin-right: 1rem;
-          transition: color .1s;
-        }
-      }
+          &.red {
+            background: linear-gradient(40deg, #dc2626 30%, #db2777);
+          }
 
-      .fill-space {
-        flex: 1;
-      }
+          &.green {
+            background: linear-gradient(40deg, #03704e 30%, #047857);
+          }
 
-      .footer {
-        display: flex;
-        align-items: center;
-        border-top: 1px solid #ffffff20;
-        padding-top: 1rem;
+          &.blue {
+            background: linear-gradient(40deg, #306ccc 30%, #4f46e5);
+          }
 
-        a {
-          border-radius: .5rem;
+          &.yellow {
+            background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+          }
+
+          &.black {
+            background: linear-gradient(40deg, #1f2937, #111827);
+          }
+
+          .icon,
+          i {
+            font-size: 1.5rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            color: white;
+          }
         }
       }
     }
+
+    .disclaimer {
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 5rem;
+    }
+
+    .fill-space {
+      flex: 1;
+    }
   }
 
-  .disclaimer {
-    color: var(--grey);
-    font-size: 14px;
-    margin-top: 3rem;
-  }
-}
+  .short-link {
+    margin-bottom: 0.5rem;
+    font-size: 15px;
+    text-decoration: none;
+    display: block;
+    position: relative;
 
-.short-link {
-  margin-bottom: .5rem;
-  font-size: 15px;
-  text-decoration: none;
-  display: block;
-  position: relative;
-
-  .las {
-    font-size: 1.5rem !important;
-    height: 1.5rem;
-    visibility: hidden;
-    position: absolute;
-    right: 0;
-  }
-
-  &:hover {
     .las {
-      visibility: visible;
+      font-size: 1.5rem !important;
+      height: 1.5rem;
+      visibility: hidden;
+      position: absolute;
+      right: 0;
+    }
+
+    &:hover {
+      .las {
+        visibility: visible;
+      }
     }
   }
 }

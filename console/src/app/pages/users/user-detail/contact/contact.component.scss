@@ -1,13 +1,13 @@
 .method-col {
   display: flex;
   flex-direction: column;
-  margin: -.5rem;
+  margin: -0.5rem;
 
   .method-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: .5rem;
+    padding: 0.5rem;
     padding-right: 0;
     border-bottom: 1px solid #ffffff20;
     flex-wrap: wrap;
@@ -15,20 +15,19 @@
     .left {
       .label {
         font-size: 13px;
-        margin-bottom: .5rem;
+        margin-bottom: 0.5rem;
         min-width: 100px;
-        color: var(--grey);
         display: block;
       }
 
       .name {
         display: block;
-        margin-bottom: .5rem;
+        margin-bottom: 0.5rem;
       }
 
       .contact-state {
         font-size: 14px;
-        margin-bottom: .5rem;
+        margin-bottom: 0.5rem;
 
         &.verified {
           color: #85d996;
@@ -61,9 +60,8 @@
 
     .verify {
       text-decoration: none;
-      font-size: .8rem;
-      color: var(--grey);
-      border-radius: .5rem;
+      font-size: 0.8rem;
+      border-radius: 0.5rem;
       cursor: pointer;
       word-wrap: none;
       white-space: nowrap;

@@ -1,5 +1,17 @@
+.subinfo {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin: -1.5rem 0 0 0;
+
+  i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
+}
+
 .tier-desc {
-  color: var(--grey);
   font-size: 14px;
   margin-top: 0;
 }
@@ -16,7 +28,6 @@
 
   .title {
     font-size: 14px;
-    color: var(--grey);
     margin-bottom: 0.5rem;
 
     a {
@@ -45,7 +56,7 @@
   margin: 0.5rem;
 }
 
-.error {
+.error-tier-message {
   color: var(--warn);
   font-size: 14px;
 }
@@ -56,15 +67,6 @@
   margin-bottom: 1rem;
 }
 
-.divider {
-  height: 1px;
-  width: 100%;
-  background-color: var(--grey);
-  opacity: 0.5;
-  margin: 0.5rem 0;
-  display: block;
-}
-
 .content {
   padding-top: 1rem;
   display: flex;
@@ -73,7 +75,6 @@
 
   .feature-section {
     font-size: 14px;
-    color: var(--grey);
     margin-top: 1.5rem;
   }
 

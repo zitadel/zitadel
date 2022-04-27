@@ -2,7 +2,6 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import {
   GetOrgFeaturesResponse,
   SetDefaultFeaturesRequest,
@@ -12,6 +11,7 @@ import { ActionsAllowed, Features } from 'src/app/proto/generated/zitadel/featur
 import { GetFeaturesResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { StripeCustomer, SubscriptionService } from 'src/app/services/subscription.service';
@@ -61,42 +61,51 @@ export class FeaturesComponent implements OnDestroy {
     private adminService: AdminService,
     private subService: SubscriptionService,
     private dialog: MatDialog,
+    breadcrumbService: BreadcrumbService,
   ) {
+    const iamBread = new Breadcrumb({
+      type: BreadcrumbType.IAM,
+      name: 'IAM',
+      routerLink: ['/system'],
+    });
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([iamBread, bread]);
+
     const temporg: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.session);
 
     if (temporg) {
       this.org = temporg;
     }
-    this.sub = this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-          if (this.serviceType === FeatureServiceType.MGMT) {
-            this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
-          }
-          return this.route.params;
-        }),
-      )
-      .subscribe((_) => {
-        this.fetchData();
-      });
 
-    if (this.serviceType === FeatureServiceType.MGMT) {
-      this.customerLoading = true;
-      this.subService
-        .getCustomer(this.org.id)
-        .then((payload) => {
-          this.customerLoading = false;
-          this.stripeCustomer = payload;
-          if (this.customerValid) {
-            this.getLinkToStripe();
-          }
-        })
-        .catch((error) => {
-          this.customerLoading = false;
-          console.error(error);
-        });
+    const serviceType = this.route.snapshot.data.serviceType;
+    if (serviceType !== undefined) {
+      this.serviceType = serviceType;
+      if (this.serviceType === FeatureServiceType.MGMT) {
+        this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
+      }
+
+      if (this.serviceType === FeatureServiceType.MGMT) {
+        this.customerLoading = true;
+        this.subService
+          .getCustomer(this.org.id)
+          .then((payload) => {
+            this.customerLoading = false;
+            this.stripeCustomer = payload;
+            if (this.customerValid) {
+              this.getLinkToStripe();
+            }
+          })
+          .catch((error) => {
+            this.customerLoading = false;
+            console.error(error);
+          });
+      }
     }
+
+    this.fetchData();
   }
 
   public ngOnDestroy(): void {
@@ -113,7 +122,6 @@ export class FeaturesComponent implements OnDestroy {
 
     dialogRefPhone.afterClosed().subscribe((customer) => {
       if (customer) {
-        console.log(customer);
         this.stripeCustomer = customer;
         this.subService
           .setCustomer(this.org.id, customer)
@@ -183,7 +191,6 @@ export class FeaturesComponent implements OnDestroy {
         req.setPrivacyPolicy(this.features.privacyPolicy);
         req.setMetadataUser(this.features.metadataUser);
         req.setLockoutPolicy(this.features.lockoutPolicy);
-        // req.setActions(this.features.actions);
         req.setActionsAllowed(this.features.actionsAllowed);
         req.setMaxActions(this.features.maxActions);
 
@@ -213,7 +220,6 @@ export class FeaturesComponent implements OnDestroy {
         dreq.setCustomTextMessage(this.features.customTextMessage);
         dreq.setMetadataUser(this.features.metadataUser);
         dreq.setLockoutPolicy(this.features.lockoutPolicy);
-        // dreq.setActions(this.features.actions);
         dreq.setActionsAllowed(this.features.actionsAllowed);
         dreq.setMaxActions(this.features.maxActions);
 

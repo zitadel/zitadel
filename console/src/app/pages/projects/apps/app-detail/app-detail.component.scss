@@ -1,68 +1,131 @@
-.head {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #ffffff20;
-  flex-wrap: wrap;
+@use '@angular/material' as mat;
 
-  a {
-    display: block;
+@mixin app-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
+  $button-text-color: map-get($foreground, text);
+  $button-disabled-text-color: map-get($foreground, disabled-button);
+  $divider-color: map-get($foreground, dividers);
+
+  .app-zitadel-warning {
+    font-size: 14px;
+    color: $warn-color;
   }
 
-  .title-col {
-    margin-left: 2rem;
-    margin-right: 1rem;
+  .app-err-container {
+    color: $warn-color;
+    font-size: 14px;
+  }
 
-    h1 {
-      font-size: 2rem;
-      margin: 0;
-      font-weight: normal;
+  .dev-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .devmode {
+      margin: 1rem 0 0.5rem 0;
     }
-
-    span {
-      font-size: 14px;
-      margin: .5rem 0;
-      color: var(--grey);
-    }
   }
 
-  .fill-space {
-    flex: 1;
+  .app-desc {
+    font-size: 14px;
+    margin: 0;
   }
 
-  .desc {
+  .app-input {
     width: 100%;
-    display: block;
-    font-size: .9rem;
-    color: var(--grey);
+  }
+
+  .app-info-row {
+    display: flex;
+    flex-direction: column;
+    margin: 0 -0.5rem;
+
+    @media only screen and (min-width: 500px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .app-info-wrapper {
+      display: flex;
+      flex-direction: column;
+      margin: 0 0.5rem;
+      flex: 1;
+      align-items: flex-start;
+      box-sizing: border-box;
+
+      &:not(.width) {
+        min-width: 100px;
+      }
+
+      .app-info-row-title {
+        font-size: 12px;
+        margin: 0;
+      }
+
+      .app-info-row-desc {
+        margin: 0;
+        font-size: 14px;
+        padding: 2px 0;
+      }
+
+      .app-copy-row {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: stretch;
+
+        button {
+          transition: opacity 0.15s ease-in-out;
+          background-color: #8795a110;
+          border: 1px solid #8795a160;
+          border-radius: 4px;
+          padding: 0.25rem 1rem;
+          margin: 0.25rem 0;
+          color: $button-text-color;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          cursor: copy;
+
+          &[disabled] {
+            color: $button-disabled-text-color;
+          }
+        }
+
+        .environment {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          margin: 0.25rem 0;
+
+          .key {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  .app-main-content {
+    border-top: 1px solid $divider-color;
     margin-top: 1.5rem;
   }
+}
 
-  .zitadel-warning {
+.compliance {
+  .compliance-title {
+    margin: 1rem 0 1rem 0;
+    font-size: 16px;
+  }
+
+  .problem {
     font-size: 14px;
-    color: rgb(201, 51, 71);
+    margin: 0 0 0.5rem 0;
+    display: block;
   }
-
-  .actions-trigger {
-    margin-top: .25rem;
-    display: flex;
-    align-items: center;
-
-    .icon {
-      margin-left: .5rem;
-      margin-right: -.5rem;
-    }
-  }
-}
-
-.err-container {
-  color: rgb(201, 51, 71);
-  font-size: 14px;
-}
-
-.compliance .problem {
-  font-size: 14px;
-  margin-bottom: .5rem;
-  display: block;
 }
 
 .name-content {
@@ -75,7 +138,7 @@
     outline: none;
     margin-top: 1rem;
     margin-right: 1rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
 
     * {
       outline: none;
@@ -93,11 +156,11 @@
 
 .docs-line {
   flex-basis: 100%;
-  margin: .5rem 0;
+  margin: 0.5rem 0;
 
   p {
     margin: 0;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
   }
 
   p:last-child {
@@ -105,99 +168,51 @@
   }
 }
 
-.grid {
+.app-oidc-grid {
   width: 100%;
   display: grid;
+  grid-gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 
   .rt {
     margin-top: 2.3rem;
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 
-.expandables {
-  padding-top: 1rem;
-
-  .expandable {
-    display: block;
-    width: 100%;
-    margin: 0 .5rem;
-
-    .title {
-      margin: 0;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      font-size: 14px;
-    }
-
-    .dev-col {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-
-      .devmode {
-        margin: 1rem 0 .5rem 0;
-      }
-    }
-
-    .content {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      margin: 0 -.5rem;
-      padding-bottom: 2rem;
-
-      .redirect-section {
-        flex: 1;
-        margin: 0 .5rem;
-      }
-    }
-
-    .desc {
-      color: var(--grey);
-      font-size: 14px;
-      margin: 0;
-    }
-
-    .input {
-      width: 100%;
-    }
-  }
+.main-app-content {
+  display: flex;
+  flex-direction: column;
 }
 
-.formfield {
+.app-formfield {
   flex: 1 1 30%;
-  margin: 0 .5rem;
 
   &.full-width {
     flex-basis: 100%;
   }
 }
 
-.section-title {
+.app-section-title {
   margin: 1.5rem 0 0 0;
 }
 
-.full-width {
+.app-full-width {
   flex-basis: 100%;
-  margin-left: .5rem;
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .clockskew-title {
   font-size: 14px;
-  color: var(--grey);
-  margin: 1rem .5rem 0 .5rem;
+  margin: 1rem 0.5rem 0 0.5rem;
 }
 
 .clockskew-slider {
   width: 100%;
-  margin: 0 .5rem;
+  margin: 0 0.5rem;
 }
 
 .desc {
-  color: var(--grey);
   font-size: 14px;
   margin-bottom: 1.5rem;
 }
@@ -205,18 +220,11 @@
 .error {
   font-size: 13px;
   color: var(--warn);
-  margin: 0 .5rem 1.5rem .5rem;
+  margin: 0 0.5rem 1.5rem 0.5rem;
 }
 
 .btn-container {
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
-}
-
-.divider {
-  flex-basis: 100%;
-  margin: 1.5rem .5rem;
-  height: 1px;
-  background-color: rgba(#8795a1, .2);
 }

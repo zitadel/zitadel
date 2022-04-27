@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -23,18 +24,25 @@ export class UserCreateMachineComponent implements OnDestroy {
     private toast: ToastService,
     public userService: ManagementService,
     private fb: FormBuilder,
+    breadcrumbService: BreadcrumbService,
   ) {
+    breadcrumbService.setBreadcrumb([
+      new Breadcrumb({
+        type: BreadcrumbType.IAM,
+        name: 'IAM',
+        routerLink: ['/system'],
+      }),
+      new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+    ]);
     this.initForm();
   }
 
   private initForm(): void {
     this.userForm = this.fb.group({
-      userName: ['',
-        [
-          Validators.required,
-          Validators.minLength(2),
-        ],
-      ],
+      userName: ['', [Validators.required, Validators.minLength(2)]],
       name: ['', [Validators.required]],
       description: ['', []],
     });

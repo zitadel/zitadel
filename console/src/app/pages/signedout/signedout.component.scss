@@ -1,11 +1,11 @@
-.wrap {
+.signed-out-wrap {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  .header {
+  .signed-out-header {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,7 +15,6 @@
     }
 
     p {
-      color: var(--grey);
       text-align: center;
       font-size: 14px;
       margin: 0;
@@ -30,10 +29,10 @@
 
     button {
       display: block;
-      padding: .5rem 4rem;
+      padding: 0.5rem 4rem;
 
       i {
-        margin-left: .5rem;
+        margin-left: 0.5rem;
       }
     }
   }

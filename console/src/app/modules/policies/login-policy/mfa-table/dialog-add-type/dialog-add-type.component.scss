@@ -4,7 +4,6 @@
 
 .desc {
   font-size: 14px;
-  color: var(--grey);
 }
 
 .form-field {
@@ -13,10 +12,10 @@
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   button {
-    margin-left: .5rem;
-    border-radius: .5rem;
+    margin-left: 0.5rem;
+    border-radius: 0.5rem;
   }
 }

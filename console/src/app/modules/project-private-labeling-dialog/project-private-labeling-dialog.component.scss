@@ -4,12 +4,11 @@
 }
 
 .desc {
-  color: var(--grey);
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .radio-button {
-  margin: .5rem 0;
+  margin: 0.5rem 0;
 
   .label {
     white-space: normal;
@@ -23,13 +22,13 @@
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   button {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }

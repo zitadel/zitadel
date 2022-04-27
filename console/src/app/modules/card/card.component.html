@@ -1,7 +1,7 @@
-<div class="card" [ngClass]="{'nomargin': nomargin, 'warn': warn}">
+<div class="card" [ngClass]="{'nomargin': nomargin, 'stretch': stretch, 'warn': warn}" [attr.data-e2e]="'app-card'">
   <div *ngIf="title || description" class="header" [ngClass]="{'bottom-margin': expanded}">
     <div *ngIf="title" class="row">
-      <h2 class="title">{{title}}</h2>
+      <h2 class="title" [attr.data-e2e]="'app-card-title'">{{title}}</h2>
       <span class="fill-space"></span>
       <ng-content select="[card-actions]"></ng-content>
       <button class="button" type="button" matTooltip="Expand or collapse" mat-icon-button
@@ -10,7 +10,7 @@
         <mat-icon *ngIf="expanded">keyboard_arrow_up</mat-icon>
       </button>
     </div>
-    <p *ngIf="description" class="desc">{{description}}</p>
+    <p *ngIf="description" class="desc cnsl-secondary-text">{{description}}</p>
   </div>
   <div class="card-content" *ngIf="expanded" [@openClose]="animate">
     <ng-content></ng-content>

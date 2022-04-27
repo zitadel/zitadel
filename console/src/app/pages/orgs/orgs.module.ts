@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -16,38 +15,39 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { FeaturesModule } from 'src/app/modules/features/features.module';
+import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { ZitadelTierModule } from '../../modules/zitadel-tier/zitadel-tier.module';
-import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';
-import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
 
 @NgModule({
-  declarations: [OrgDetailComponent, DomainVerificationComponent],
+  declarations: [OrgDetailComponent],
   imports: [
     CommonModule,
     HasRolePipeModule,
     OrgsRoutingModule,
     FormsModule,
+    InfoRowModule,
     HasRoleModule,
     InputModule,
     InfoSectionModule,
     MatButtonModule,
     MatDialogModule,
     CardModule,
+    TopViewModule,
     MatIconModule,
     ReactiveFormsModule,
-    MatButtonToggleModule,
     MetaLayoutModule,
     MatTabsModule,
     MatTooltipModule,
@@ -57,7 +57,6 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     MatMenuModule,
     ChangesModule,
     MatProgressSpinnerModule,
-    AddDomainDialogModule,
     TranslateModule,
     SharedModule,
     ContributorsModule,
@@ -67,4 +66,4 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     ZitadelTierModule,
   ],
 })
-export class OrgsModule { }
+export class OrgsModule {}

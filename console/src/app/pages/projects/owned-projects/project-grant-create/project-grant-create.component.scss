@@ -1,0 +1,54 @@
+.container {
+  padding: 4rem 0 2rem 0;
+
+  .abort-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    white-space: nowrap;
+
+    .abort {
+      font-size: 1.2rem;
+      margin-left: 2rem;
+    }
+
+    .abort-2 {
+      font-size: 1.2rem;
+      margin-left: 2rem;
+      white-space: nowrap;
+    }
+  }
+
+  .create-content {
+    padding-left: 4.5rem;
+
+    form {
+      max-width: 35rem;
+
+      .org-domain {
+        margin-right: 1rem;
+      }
+    }
+  }
+}
+
+.domain-button {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+
+  .small-button {
+    display: block;
+  }
+
+  .big-button {
+    display: block;
+    padding: 0.5rem 4rem;
+  }
+}

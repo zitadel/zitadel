@@ -1,58 +1,49 @@
 <h1 mat-dialog-title>
-    <span class="title">{{'MEMBER.ADD' | translate}}</span>
+  <span class="title">{{'MEMBER.ADD' | translate}}</span>
 </h1>
-<p class="desc"> {{'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate}}</p>
+<p class="desc cnsl-secondary-text"> {{'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate}}</p>
 
 <div mat-dialog-content>
-    <!-- if no context -->
-    <ng-container *ngIf="showCreationTypeSelector">
-        <cnsl-form-field class="full-width" appearance="outline">
-            <cnsl-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</cnsl-label>
-            <mat-select [(ngModel)]="creationType" (selectionChange)="loadRoles()">
-                <mat-option *ngFor="let type of creationTypes" [value]="type.type"
-                    [disabled]="(type.disabled$ | async) === false">
-                    {{ 'MEMBER.CREATIONTYPES.'+type.type | translate}}
-                </mat-option>
-            </mat-select>
-        </cnsl-form-field>
-
-        <ng-container
-            *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED">
-            <p>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</p>
-            <cnsl-search-project-autocomplete class="block" [singleOutput]="true"
-                (selectionChanged)="selectProject($event)"
-                [autocompleteType]="creationType === CreationType.PROJECT_OWNED ? ProjectAutocompleteType.PROJECT_OWNED : creationType === CreationType.PROJECT_GRANTED ? ProjectAutocompleteType.PROJECT_GRANTED : undefined">
-            </cnsl-search-project-autocomplete>
-        </ng-container>
-    </ng-container>
-    <!-- if no context end -->
-
-    <cnsl-search-user-autocomplete [users]="preselectedUsers" (selectionChanged)="users = $any($event)">
-    </cnsl-search-user-autocomplete>
-
-    <cnsl-form-field class="full-width" appearance="outline"
-        *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED || creationType === CreationType.IAM">
-        <cnsl-label>{{ 'ROLESLABEL' | translate }}</cnsl-label>
-        <mat-select [(ngModel)]="roles" multiple>
-            <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
-                {{ role }}
-            </mat-option>
-        </mat-select>
+  <ng-container *ngIf="showCreationTypeSelector">
+    <cnsl-form-field class="full-width" appearance="outline">
+      <cnsl-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</cnsl-label>
+      <mat-select [(ngModel)]="creationType" (selectionChange)="loadRoles()">
+        <mat-option *ngFor="let type of creationTypes" [value]="type.type"
+          [disabled]="(type.disabled$ | async) === false">
+          {{ 'MEMBER.CREATIONTYPES.'+type.type | translate}}
+        </mat-option>
+      </mat-select>
     </cnsl-form-field>
 
-    <ng-container *ngIf="creationType === CreationType.ORG">
-        <cnsl-org-member-roles-autocomplete (selectionChanged)="setOrgMemberRoles($event)">
-        </cnsl-org-member-roles-autocomplete>
+    <ng-container *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED">
+      <p>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</p>
+      <cnsl-search-project-autocomplete class="block" (selectionChanged)="selectProject($event)"
+        [autocompleteType]="creationType === CreationType.PROJECT_OWNED ? ProjectAutocompleteType.PROJECT_OWNED : creationType === CreationType.PROJECT_GRANTED ? ProjectAutocompleteType.PROJECT_GRANTED : undefined">
+      </cnsl-search-project-autocomplete>
     </ng-container>
+  </ng-container>
+
+  <cnsl-search-user-autocomplete [users]="preselectedUsers" (selectionChanged)="users = $any($event)">
+  </cnsl-search-user-autocomplete>
+
+  <div class="roles-selection">
+    <mat-checkbox class="role-cb" *ngFor="let role of memberRoleOptions" color="primary" (change)="toggleRole(role)"
+      [checked]="roles.includes(role)">
+      <div class="role-cb-content">
+        <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+        <span>{{role | roletransform}}</span>
+      </div>
+    </mat-checkbox>
+  </div>
 
 </div>
 <div mat-dialog-actions class="action">
-    <button mat-button (click)="closeDialog()">
-        {{'ACTIONS.CANCEL' | translate}}
-    </button>
+  <button mat-stroked-button (click)="closeDialog()">
+    {{'ACTIONS.CANCEL' | translate}}
+  </button>
 
-    <button [disabled]="users.length === 0 || roles.length === 0" color="primary" mat-raised-button class="ok-button"
-        (click)="closeDialogWithSuccess()">
-        {{'ACTIONS.ADD' | translate}}
-    </button>
+  <button [disabled]="users.length === 0 || roles.length === 0" color="primary" mat-raised-button class="ok-button"
+    (click)="closeDialogWithSuccess()">
+    {{'ACTIONS.ADD' | translate}}
+  </button>
 </div>

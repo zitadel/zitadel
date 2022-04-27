@@ -3,20 +3,20 @@
   <div class="icon-wrapper" *ngIf="data.icon">
     <i class="icon {{data.icon}}"></i>
   </div>
-  <p class="desc"> {{data.descriptionKey | translate: data.descriptionParam}}</p>
+  <p class="desc cnsl-secondary-text"> {{data.descriptionKey | translate: data.descriptionParam}}</p>
 
   <cnsl-form-field *ngIf="data.confirmation && data.confirmationKey" class="formfield">
     <cnsl-label>{{data.confirmationKey | translate: {value: data.confirmation} }}</cnsl-label>
-    <input cnslInput [(ngModel)]="confirm" />
+    <input cnslInput [(ngModel)]="confirm" [attr.e2e-data]="'confirm-dialog-input'"/>
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
-  <button *ngIf="data.cancelKey" mat-button (click)="closeDialog()">
+  <button *ngIf="data.cancelKey" mat-stroked-button (click)="closeDialog()">
     {{data.cancelKey | translate}}
   </button>
   <span class="fill-space"></span>
   <button color="warn" [disabled]="data.confirmation && confirm !== data.confirmation" mat-raised-button
-    class="ok-button" (click)="closeDialogWithSuccess()">
+    class="ok-button" (click)="closeDialogWithSuccess()" [attr.e2e-data]="'confirm-dialog-button'">
     {{data.confirmKey | translate}}
   </button>
 </div>

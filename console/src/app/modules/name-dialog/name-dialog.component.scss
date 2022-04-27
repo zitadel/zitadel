@@ -5,7 +5,6 @@ h1 {
 
 .desc {
   font-size: 14px;
-  color: var(--grey);
 }
 
 .formfield {
@@ -14,13 +13,13 @@ h1 {
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   button {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }

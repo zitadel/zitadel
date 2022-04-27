@@ -35,7 +35,7 @@ export class PersonalAccessTokensComponent implements OnInit {
   public keyResult!: ListPersonalAccessTokensResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  @Input() public displayedColumns: string[] = ['select', 'id', 'creationDate', 'expirationDate', 'actions'];
+  @Input() public displayedColumns: string[] = ['id', 'creationDate', 'expirationDate', 'actions'];
 
   @Output() public changedSelection: EventEmitter<Array<PersonalAccessToken.AsObject>> = new EventEmitter();
 

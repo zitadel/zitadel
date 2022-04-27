@@ -1,0 +1,230 @@
+@use '@angular/material' as mat;
+
+@mixin shortcut-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  $list-background-color: mat.get-color-from-palette($background, 300);
+  $card-background-color: mat.get-color-from-palette($background, cards);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #fff, #000);
+
+  .shortcut-container {
+    width: 100%;
+    margin: 0 25px 25px 0;
+    display: inline-block;
+    vertical-align: top;
+
+    .shortcut-title-container {
+      display: flex;
+      align-items: center;
+
+      .shortcut-btn {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+
+  .shortcut-list-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+    width: 100%;
+
+    @media only screen and (min-width: 800px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media only screen and (min-width: 1200px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .shortcut-list {
+      border: 1px solid $border-color;
+      min-height: 60px;
+      background-color: $list-background-color;
+      border-radius: 1rem;
+      overflow: hidden;
+      display: block;
+      padding: 1rem;
+    }
+  }
+
+  .shortcut-desc {
+    align-self: center;
+    font-size: 14px;
+    color: var(--grey);
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .shortcut-grid {
+    border: 1px solid $border-color;
+    min-height: 60px;
+    background-color: $list-background-color;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+    padding: 1rem;
+
+    @media only screen and (min-width: 800px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media only screen and (min-width: 1200px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .shortcut-desc {
+      align-self: center;
+      font-size: 14px;
+      color: var(--grey);
+      margin-top: 0;
+      text-align: center;
+    }
+  }
+
+  .shortcut-box {
+    padding: 1rem;
+    color: map-get($foreground, text);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    font-size: 14px;
+    background-color: $card-background-color;
+    border: 1px solid $border-color;
+    border-radius: 1rem;
+    margin: 1rem 0;
+    text-decoration: none;
+
+    &.edit-state {
+      cursor: move;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+    }
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.no-margin {
+      margin: 0;
+    }
+
+    .shortcuts-avatar {
+      flex-shrink: 0;
+      height: 40px;
+      width: 40px;
+      margin-right: 1rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
+
+      &.purple {
+        background: linear-gradient(40deg, #7c3aed 30%, #6d28d9);
+      }
+
+      &.red {
+        background: linear-gradient(40deg, #dc2626 30%, #db2777);
+      }
+
+      &.green {
+        background: linear-gradient(40deg, #059669 30%, #047857);
+      }
+
+      &.blue {
+        background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+      }
+
+      &.yellow {
+        background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+      }
+
+      &.black {
+        background: linear-gradient(40deg, #1f2937, #111827);
+      }
+
+      .icon,
+      i {
+        font-size: 1.5rem;
+        height: 1.2rem;
+        line-height: 1.2rem;
+        color: white;
+      }
+
+      .shortcuts-avatar-label {
+        font-size: 18px;
+        color: white;
+      }
+    }
+
+    .shortcut-col {
+      display: flex;
+      flex-direction: column;
+
+      .shortcut-item-desc {
+        font-size: 13px;
+        margin-top: 0.5rem;
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .shortcut-state-dot {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      margin-left: 1rem;
+      flex-shrink: 0;
+
+      &.active {
+        background-color: var(--success);
+      }
+
+      &.inactive {
+        background-color: var(--warn);
+      }
+    }
+  }
+
+  .cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 1rem;
+    border: 1px solid $border-color;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .shortcut-list.cdk-drop-list-dragging .shortcut-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}

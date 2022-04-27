@@ -1,53 +1,36 @@
 .icon-button {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
-.table-wrapper {
-  overflow-x: auto;
+td,
+th {
+  padding: 0.5rem;
 
-  .table,
-  .paginator {
-    width: 100%;
-
-    td,
-    th {
-      padding: .5rem;
-
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-    .action {
-      width: 40px;
-    }
+  &:first-child {
+    padding-left: 0;
+    padding-right: 1rem;
   }
 
-  tr {
-    button {
-      visibility: hidden;
-    }
-
-    &:hover {
-      button {
-        visibility: visible;
-      }
-    }
+  &:last-child {
+    padding-right: 0;
   }
+}
 
-  .sa-icon {
-    display: block;
-    width: 32px;
-    margin: 0 .5rem;
+.action {
+  width: 40px;
+}
 
-    i {
-      margin: auto;
-    }
+.member-action-tr {
+  max-width: 100px;
+}
+
+.sa-icon {
+  display: block;
+  width: 32px;
+  margin: 0 0.5rem;
+
+  i {
+    margin: auto;
   }
 }
 

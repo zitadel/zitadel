@@ -1,101 +1,51 @@
-.head {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #81868a30;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+@use '@angular/material' as mat;
 
-  .fill-space {
-    flex: 1;
-  }
+@mixin owned-project-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
 
-  a {
-    display: block;
-  }
-
-  h1 {
-    margin: 0 1rem;
-    margin-left: 2rem;
-    font-weight: normal;
-  }
-
-  .actions-trigger {
-    margin-top: .25rem;
-    display: flex;
-    align-items: center;
-
-    .icon {
-      margin-left: .5rem;
-      margin-right: -.5rem;
-    }
-  }
-
-  .full-width {
-    padding-top: 1rem;
-    width: 100%;
-    display: block;
-
-    .icon-button {
-      margin-right: 1rem;
-    }
-
-    .desc {
-      font-size: .9rem;
-      color: var(--grey);
-    }
-
-    .zitadel-warning {
-      font-size: 14px;
-      color: rgb(201, 51, 71);
-    }
-  }
-}
-
-.privatelabel-info {
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid #81868a30;
-  padding: .5rem 0 1rem 0;
-
-  .setting-title {
+  .zitadel-warning {
     font-size: 14px;
-    color: var(--grey);
-    text-transform: uppercase;
-    margin: 0;
+    color: $warn-color;
   }
 
-  .setting-desc {
-    margin: 0;
+  .project-detail-privatelabel-info {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    padding: 0 0 1rem 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid map-get($foreground, divider);
 
-    .icon-button {
-      margin-left: .5rem;
+    .setting-title {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .setting-desc {
+      margin: 0;
+      display: flex;
+      align-items: center;
+
+      span {
+        font-size: 14px;
+      }
+
+      .icon-button {
+        margin-left: 0.5rem;
+      }
     }
   }
-}
 
-.line {
-  .formfield {
-    flex: 1;
+  .project-detail-btn-container {
+    display: flex;
+    justify-content: flex-end;
   }
-
-  button {
-    margin-top: 1rem;
-  }
-
-  display: flex;
-  align-items: center;
 }
 
 .desc {
-  color: var(--grey);
   font-size: 14px;
-  margin-bottom: 1.5rem;
-}
-
-.divider {
-  height: 1px;
-  background-color: var(--grey);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }

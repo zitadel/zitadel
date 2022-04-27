@@ -1,16 +1,15 @@
 @use '@angular/material' as mat;
 
 @mixin link-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $primary-color-lighter: mat.get-color-from-palette($primary, A300);
 
   a {
-      color: $primary-color;
+    color: $primary-color;
   }
 
   a:hover {
-      color: $primary-color-lighter;
+    color: $primary-color-lighter;
   }
 }

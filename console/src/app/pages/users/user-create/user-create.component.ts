@@ -8,6 +8,7 @@ import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -62,7 +63,20 @@ export class UserCreateComponent implements OnDestroy {
     private fb: FormBuilder,
     private mgmtService: ManagementService,
     private changeDetRef: ChangeDetectorRef,
+    breadcrumbService: BreadcrumbService,
   ) {
+    breadcrumbService.setBreadcrumb([
+      new Breadcrumb({
+        type: BreadcrumbType.IAM,
+        name: 'IAM',
+        routerLink: ['/system'],
+      }),
+      new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+    ]);
+
     this.loading = true;
     this.loadOrg();
     this.mgmtService

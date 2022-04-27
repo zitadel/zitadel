@@ -21,6 +21,7 @@ import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ShowTokenDialogModule } from '../show-token-dialog/show-token-dialog.module';
+import { TableActionsModule } from '../table-actions/table-actions.module';
 import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { PersonalAccessTokensComponent } from './personal-access-tokens.component';
 
@@ -42,6 +43,7 @@ import { PersonalAccessTokensComponent } from './personal-access-tokens.componen
     MatTooltipModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,
+    TableActionsModule,
     LocalizedDatePipeModule,
     TranslateModule,
     RefreshTableModule,

@@ -1,107 +1,164 @@
+@mixin accounts-card-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $card-background-color: mat.get-color-from-palette($background, cards);
 
-.card {
-  border-radius: .5rem;
-  z-index: 200;
-  border: 1px solid #ffffff30;
-  width: 350px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem 0;
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $secondary-text: map-get($foreground, secondary-text);
 
-  .avatar {
-    font-size: 80px;
-    margin-bottom: 1rem;
-  }
-
-  .u-name {
-    font-size: 1rem;
-    line-height: 1rem;
-  }
-
-  .u-email {
-    font-size: .8rem;
-    margin-top: 0;
-  }
-
-  .iamuser {
-    font-size: 1rem;
-  }
-
-  button {
-    border-radius: 50vh;
-    margin: .5rem;
-
-    .mat-button-wrapper {
-      font-size: .8rem;
-    }
-  }
-
-  .l-accounts {
+  .accounts-card {
+    border-radius: 0.5rem;
+    z-index: 300;
+    background-color: $card-background-color;
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border: 1px solid $border-color;
+    box-sizing: border-box;
+    outline: none;
+    width: 350px;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    padding: .5rem 0;
-    max-height: 310px;
-    overflow-y: auto;
-    border-top: 1px solid rgba(#8795a1, .3);
-    border-bottom: 1px solid rgba(#8795a1, .3);
+    align-items: center;
+    padding: 1rem 0;
+    position: relative;
 
-    .row {
-      padding: .5rem;
-      display: flex;
+    .avatar {
+      font-size: 80px;
+      margin-bottom: 1rem;
+      border-radius: 50%;
+      border: 2px solid $border-color;
+
+      &.iam-user {
+        border: 2px solid $primary-color;
+      }
+    }
+
+    .u-name {
+      font-size: 1rem;
+      line-height: 1rem;
+    }
+
+    .u-email {
+      font-size: 0.8rem;
+      margin-top: 0;
+    }
+
+    .iamuser {
+      position: absolute;
+      border-radius: 50vw;
+      right: 1rem;
+      top: 1rem;
+      font-size: 12px;
+      line-height: 12px;
+      font-weight: 600;
+      background-color: $primary-color;
+      color: mat.get-color-from-palette($primary, default-contrast);
+      flex-direction: row;
       align-items: center;
-      color: inherit;
       text-decoration: none;
+      padding: 0 4px;
+      display: none;
 
-      &:hover {
-        cursor: pointer;
-        background-color: #00000010;
+      .label {
+        margin: 0.5rem 1rem;
       }
 
-      .small-avatar {
-        height: 35px;
-        width: 35px;
-        line-height: 35px;
-        font-size: 35px;
-        border-radius: 50%;
-        margin: 0 1rem;
+      .iambtn {
+        margin: 0 0 0 4px;
+        color: mat.get-color-from-palette($primary, default-contrast);
       }
 
-      .icon-wrapper {
-        height: 35px;
-        width: 35px;
-        border-radius: 50%;
-        margin: 0 1rem;
-        text-align: center;
-
-        i {
-          margin: auto;
-          vertical-align: middle;
-        }
-      }
-
-      .col {
-        flex: 1;
+      @media only screen and (max-width: 600px) {
         display: flex;
-        flex-direction: column;
 
-        .user-title {
-          font-weight: 500;
-          font-size: .9rem;
-          line-height: 1rem;
-        }
-
-        .email,
-        .loginname {
-          color: var(--grey);
-          font-size: .8rem;
-          line-height: 1rem;
+        .label {
+          margin: 0.5rem 0 0.5rem 0.5rem;
         }
       }
+    }
 
-      .fill-space {
-        flex: 1;
+    button {
+      border-radius: 50vh;
+      margin: 0.5rem;
+
+      .mat-button-wrapper {
+        font-size: 0.8rem;
+      }
+    }
+
+    .l-accounts {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding: 0.5rem 0;
+      max-height: 450px;
+      overflow-y: auto;
+      border-top: 1px solid rgba(#8795a1, 0.3);
+      border-bottom: 1px solid rgba(#8795a1, 0.3);
+
+      .row {
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        color: inherit;
+        text-decoration: none;
+
+        &:hover {
+          cursor: pointer;
+          background-color: #00000010;
+        }
+
+        .small-avatar {
+          height: 35px;
+          width: 35px;
+          line-height: 35px;
+          font-size: 35px;
+          border-radius: 50%;
+          margin: 0 1rem;
+        }
+
+        .icon-wrapper {
+          height: 35px;
+          width: 35px;
+          border-radius: 50%;
+          margin: 0 1rem;
+          text-align: center;
+
+          i {
+            margin: auto;
+            vertical-align: middle;
+          }
+        }
+
+        .col {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+
+          .user-title {
+            font-weight: 500;
+            font-size: 0.9rem;
+            line-height: 1rem;
+          }
+
+          .email,
+          .loginname {
+            color: $secondary-text;
+            font-size: 0.8rem;
+            line-height: 1rem;
+          }
+        }
+
+        .fill-space {
+          flex: 1;
+        }
       }
     }
   }

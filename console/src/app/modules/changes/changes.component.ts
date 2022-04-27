@@ -32,16 +32,17 @@ export interface MappedChange {
     editorDisplayName: string;
     editorAvatarUrl: string;
     editorPreferredLoginName: string;
-    eventTypes: Array<{ key: string; localizedMessage: string; }>;
+    eventTypes: Array<{ key: string; localizedMessage: string }>;
     sequences: number[];
   }>;
 }
 
-type ListChanges = ListMyUserChangesResponse.AsObject |
-  ListUserChangesResponse.AsObject |
-  ListProjectChangesResponse.AsObject |
-  ListOrgChangesResponse.AsObject |
-  ListAppChangesResponse.AsObject;
+type ListChanges =
+  | ListMyUserChangesResponse.AsObject
+  | ListUserChangesResponse.AsObject
+  | ListProjectChangesResponse.AsObject
+  | ListOrgChangesResponse.AsObject
+  | ListAppChangesResponse.AsObject;
 
 @Component({
   selector: 'cnsl-changes',
@@ -64,9 +65,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
   public data!: Observable<MappedChange[]>;
   public changes!: ListChanges;
   private destroyed$: Subject<void> = new Subject();
-  constructor(private mgmtUserService: ManagementService, private authUserService: GrpcAuthService) {
-
-  }
+  constructor(private mgmtUserService: ManagementService, private authUserService: GrpcAuthService) {}
 
   ngOnInit(): void {
     this.init();
@@ -82,24 +81,23 @@ export class ChangesComponent implements OnInit, OnDestroy {
     this.destroyed$.next();
   }
 
-  public scrollHandler(e: any): void {
-    if (e === 'bottom') {
-      this.more();
-    }
-  }
-
   public init(): void {
     let first: Promise<ListChanges>;
     switch (this.changeType) {
-      case ChangeType.MYUSER: first = this.authUserService.listMyUserChanges(20, 0);
+      case ChangeType.MYUSER:
+        first = this.authUserService.listMyUserChanges(30, 0);
         break;
-      case ChangeType.USER: first = this.mgmtUserService.listUserChanges(this.id, 20, 0);
+      case ChangeType.USER:
+        first = this.mgmtUserService.listUserChanges(this.id, 30, 0);
         break;
-      case ChangeType.PROJECT: first = this.mgmtUserService.listProjectChanges(this.id, 20, 0);
+      case ChangeType.PROJECT:
+        first = this.mgmtUserService.listProjectChanges(this.id, 30, 0);
         break;
-      case ChangeType.ORG: first = this.mgmtUserService.listOrgChanges(20, 0);
+      case ChangeType.ORG:
+        first = this.mgmtUserService.listOrgChanges(30, 0);
         break;
-      case ChangeType.APP: first = this.mgmtUserService.listAppChanges(this.id, this.secId, 20, 0);
+      case ChangeType.APP:
+        first = this.mgmtUserService.listAppChanges(this.id, this.secId, 30, 0);
         break;
     }
 
@@ -109,24 +107,30 @@ export class ChangesComponent implements OnInit, OnDestroy {
     this.data = this._data.asObservable().pipe(
       scan((acc, val) => {
         return false ? val.concat(acc) : acc.concat(val);
-      }));
+      }),
+    );
   }
 
-  private more(): void {
+  public more(): void {
     const cursor = this.getCursor();
 
     let more: Promise<ListChanges>;
 
     switch (this.changeType) {
-      case ChangeType.MYUSER: more = this.authUserService.listMyUserChanges(20, cursor);
+      case ChangeType.MYUSER:
+        more = this.authUserService.listMyUserChanges(20, cursor);
         break;
-      case ChangeType.USER: more = this.mgmtUserService.listUserChanges(this.id, 20, cursor);
+      case ChangeType.USER:
+        more = this.mgmtUserService.listUserChanges(this.id, 20, cursor);
         break;
-      case ChangeType.PROJECT: more = this.mgmtUserService.listProjectChanges(this.id, 20, cursor);
+      case ChangeType.PROJECT:
+        more = this.mgmtUserService.listProjectChanges(this.id, 20, cursor);
         break;
-      case ChangeType.ORG: more = this.mgmtUserService.listOrgChanges(20, cursor);
+      case ChangeType.ORG:
+        more = this.mgmtUserService.listOrgChanges(20, cursor);
         break;
-      case ChangeType.APP: more = this.mgmtUserService.listAppChanges(this.id, this.secId, 20, cursor);
+      case ChangeType.APP:
+        more = this.mgmtUserService.listAppChanges(this.id, this.secId, 20, cursor);
         break;
     }
 
@@ -147,42 +151,45 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
   // Maps the snapshot to usable format the updates source
   private mapAndUpdate(col: Promise<ListChanges>): any {
-    if (this._done.value || this._loading.value) { return; }
+    if (this._done.value || this._loading.value) {
+      return;
+    }
 
     // Map snapshot with doc ref (needed for cursor)
     if (!this.bottom) {
       // loading
       this._loading.next(true);
 
-      return from(col).pipe(
-        take(1),
-        tap((res: ListChanges) => {
-          const values = res.resultList;
-          const mapped = this.mapChanges(values);
-          // update source with new values, done loading
-          // this._data.next(values);
-          this._data.next(mapped);
+      return from(col)
+        .pipe(
+          take(1),
+          tap((res: ListChanges) => {
+            const values = res.resultList;
+            const mapped = this.mapChanges(values);
 
-          this._loading.next(false);
+            this._data.next(mapped);
 
-          // no more values, mark done
-          if (!values.length) {
-            this._done.next(true);
-          }
-        }),
-        catchError(_ => {
-          this._loading.next(false);
-          this.bottom = true;
-          return of([]);
-        }),
-      ).subscribe();
+            this._loading.next(false);
+
+            if (!values.length) {
+              this._done.next(true);
+            }
+          }),
+          catchError((_) => {
+            this._loading.next(false);
+            this.bottom = true;
+            return of([]);
+          }),
+        )
+        .subscribe();
     }
   }
 
   private mapChanges(changes: Change.AsObject[]): {
-    key: string; values: any[];
+    key: string;
+    values: any[];
   }[] {
-    const splitted: { [editorId: string]: any[]; } = {};
+    const splitted: { [editorId: string]: any[] } = {};
     changes.forEach((change) => {
       if (change.changeDate) {
         const index = `${this.getDateString(change.changeDate)}`;
@@ -230,7 +237,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
         }
       }
     });
-    const arr = Object.keys(splitted).map(key => {
+    const arr = Object.keys(splitted).map((key) => {
       return { key: key, values: splitted[key] };
     });
 
@@ -263,7 +270,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
 
   // Order by descending property key
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
-    return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
+    return a.key > b.key ? -1 : b.key > a.key ? 1 : 0;
   };
   /* eslint-enable */
 }

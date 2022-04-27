@@ -1,297 +1,61 @@
 @use '@angular/material' as mat;
 
-.root-header {
-  position: fixed;
-  z-index: 100;
-  display: flex;
-  height: 60px;
-  align-items: center;
-  padding: 0 1rem;
-  top: 0;
-  left: 0;
-  right: 0;
+@mixin main-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
 
-  .org-button {
-    font-weight: bold;
-    padding-right: 0.5rem;
-  }
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+  $base: map-get($foreground, base);
 
-  .logo {
-    max-height: 40px;
-    width: 40px;
-  }
-
-  .title {
-    text-decoration: none;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 400;
-    line-height: 1.2rem;
-  }
-
-  .context-menu {
-    border-radius: 0.5rem;
-    background-color: #2d2e30;
-  }
-
-  .fill-space {
-    flex: 1;
-  }
-
-  .doc-link {
-    margin-right: 1rem;
-
-    @media only screen and (max-width: 500px) {
-      display: none;
-    }
-  }
-
-  .org-context-wrapper {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    user-select: none;
-
-    .context_card {
-      position: absolute;
-      top: 60px;
-      left: 0;
-      overflow: hidden;
-      border-radius: 0.5rem;
-    }
-  }
-
-  .icon-container {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    user-select: none;
-
-    .docs {
-      text-decoration: none;
-      font-size: 1.4rem;
-    }
-
-    .avatar {
-      display: block;
-      margin: auto;
-      cursor: pointer;
-    }
-
-    .name {
-      font-size: 1rem;
-      font-weight: 400;
-    }
-
-    .a_card {
-      position: absolute;
-      top: 60px;
-      right: 0;
-      overflow: hidden;
-      border-radius: 0.5rem;
-    }
-  }
-}
-
-.main-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  padding-top: 60px;
-
-  .sidenav {
-    width: 280px;
-    border-right: none;
-
-    .side-column {
-      padding-top: 60px;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      height: calc(100% - 60px);
-
-      .list {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        margin-top: 2rem;
-
-        .logout-icon {
-          margin-left: 1rem;
-        }
-
-        .fill-space {
-          flex: 1;
-        }
-
-        .nav-item {
-          display: flex;
-          align-items: center;
-          text-decoration: none;
-          cursor: pointer;
-          padding: 0 1rem;
-          margin-right: 0.5rem;
-          border-top-right-radius: 1.5rem;
-          border-bottom-right-radius: 1.5rem;
-
-          .icon {
-            margin: 0.5rem 1rem;
-          }
-
-          .iam-i {
-            object-fit: contain;
-            max-height: 24px;
-            margin: 0.5rem 1rem;
-          }
-
-          .label {
-            margin-bottom: 0;
-            font-size: 14px;
-          }
-
-          .c_label {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-
-            .count {
-              font-size: 12px;
-            }
-          }
-
-          &:hover {
-            // background-color: #00000010;
-            border-top-right-radius: 1.5rem;
-            border-bottom-right-radius: 1.5rem;
-          }
-
-          &.active {
-            border-top-right-radius: 1.5rem;
-            border-bottom-right-radius: 1.5rem;
-            font-weight: bold;
-          }
-        }
-
-        .project-status {
-          padding: 1rem;
-        }
-      }
-
-      .fill-space {
-        flex: 1 1 auto;
-      }
-
-      .toc-line {
-        margin: 2rem 2rem;
-
-        .toc {
-          font-size: 12px;
-          color: var(--grey);
-          text-decoration: none;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-
-        .slash {
-          margin: 0 0.5rem;
-          color: var(--grey);
-        }
-      }
-
-      .logout-button {
-        margin-bottom: 1rem;
-      }
-    }
-  }
-
-  .content {
+  .main-container {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    min-height: 100%;
+    position: relative;
 
-    .router {
-      height: 100%;
-      overflow-y: auto;
-    }
-  }
+    .router-container {
+      padding: 0 2rem;
 
-  .theme-section {
-    display: block;
-    padding: 0 0.5rem;
-    margin-top: 2rem;
-    align-self: flex-start;
-    border-radius: 1rem;
+      @media only screen and (max-width: 500px) {
+        padding: 0 1rem;
+      }
 
-    .round-light {
-      display: inline-block;
-      border-radius: 50%;
-      height: 30px;
-      width: 30px;
-      margin: 0.5rem;
-      cursor: pointer;
-      background: linear-gradient(315deg, #e6e6e6, #fff);
+      .outlet {
+        margin: 0 auto;
+      }
     }
 
-    .round-dark {
-      display: inline-block;
-      border-radius: 50%;
-      height: 30px;
-      width: 30px;
-      margin: 0.5rem;
-      cursor: pointer;
-      background: linear-gradient(315deg, #000, #000);
+    .nav {
+      position: sticky;
+      top: 0;
+      right: 0;
+      left: 0;
+      background-color: map-get($background, toolbar);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid map-get($foreground, divider);
+      z-index: 50;
+      transform: all 0.2s ease;
+
+      @-moz-document url-prefix() {
+        background-color: map-get($background, moz-toolbar);
+        backdrop-filter: none;
+      }
+
+      &.shadow {
+        box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+      }
+    }
+
+    .fill-space {
+      flex: 1;
     }
   }
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin: 5px 0;
-
-  span {
-    border: 1px solid #81868a40;
-    padding: 2px 1rem;
-    border-radius: 50vw;
-    color: var(--grey);
-    font-size: 11px;
-  }
-
-  .line {
-    display: block;
-    background-color: #81868a40;
-    height: 1px;
-    margin: 0.5rem 0;
-    flex: 1;
-    min-width: 10px;
-  }
-
-  .hiddenline {
-    display: block;
-    visibility: hidden;
-    width: 4rem;
-  }
-}
-
-@mixin textvar($theme) {
-  .filter-form {
-    margin: 0 0.5rem;
-    /* stylelint-disable */
-    $foreground: map-get($theme, foreground);
-    color: mat.get-color-from-palette($foreground, text) !important;
-  }
-
-  .show-all {
-    $primary: map-get($theme, primary);
-    color: mat.get-color-from-palette($primary, 300) !important;
-    border-bottom: 1px solid var(--grey);
-    margin-bottom: 0.5rem;
-  }
-  /* stylelint-enable */
 }

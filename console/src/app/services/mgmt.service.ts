@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SortDirection } from '@angular/material/sort';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
@@ -191,6 +192,8 @@ import {
   ListAppKeysResponse,
   ListAppsRequest,
   ListAppsResponse,
+  ListGrantedProjectRolesRequest,
+  ListGrantedProjectRolesResponse,
   ListGrantedProjectsRequest,
   ListGrantedProjectsResponse,
   ListHumanAuthFactorsRequest,
@@ -432,7 +435,7 @@ import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
-import { ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
+import { GrantedProject, Project, ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
 import {
   Gender,
   MembershipQuery,
@@ -448,7 +451,9 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
   providedIn: 'root',
 })
 export class ManagementService {
+  public ownedProjects: BehaviorSubject<Project.AsObject[]> = new BehaviorSubject<Project.AsObject[]>([]);
   public ownedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
+  public grantedProjects: BehaviorSubject<GrantedProject.AsObject[]> = new BehaviorSubject<GrantedProject.AsObject[]>([]);
   public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(private readonly grpcService: GrpcService) {}
@@ -634,14 +639,15 @@ export class ManagementService {
 
   public listOrgIDPs(limit?: number, offset?: number, queryList?: IDPQuery[]): Promise<ListOrgIDPsResponse.AsObject> {
     const req = new ListOrgIDPsRequest();
-    const metadata = new ListQuery();
+    const query = new ListQuery();
 
     if (limit) {
-      metadata.setLimit(limit);
+      query.setLimit(limit);
     }
     if (offset) {
-      metadata.setOffset(offset);
+      query.setOffset(offset);
     }
+    req.setQuery(query);
     if (queryList) {
       req.setQueriesList(queryList);
     }
@@ -1633,6 +1639,7 @@ export class ManagementService {
     offset: number,
     queriesList?: UserSearchQuery[],
     sortingColumn?: UserFieldName,
+    sortingDirection?: SortDirection,
   ): Promise<ListUsersResponse.AsObject> {
     const req = new ListUsersRequest();
     const query = new ListQuery();
@@ -1642,10 +1649,14 @@ export class ManagementService {
     if (offset) {
       query.setOffset(offset);
     }
+    if (sortingDirection) {
+      query.setAsc(sortingDirection === 'asc');
+    }
     req.setQuery(query);
     if (sortingColumn) {
       req.setSortingColumn(sortingColumn);
     }
+
     if (queriesList) {
       req.setQueriesList(queriesList);
     }
@@ -1811,6 +1822,7 @@ export class ManagementService {
       const obj = value.toObject();
       const count = obj.resultList.length;
       if (count >= 0) {
+        this.ownedProjects.next(obj.resultList);
         this.ownedProjectsCount.next(count);
       }
 
@@ -1819,8 +1831,8 @@ export class ManagementService {
   }
 
   public listGrantedProjects(
-    limit: number,
-    offset: number,
+    limit?: number,
+    offset?: number,
     queryList?: ProjectQuery[],
   ): Promise<ListGrantedProjectsResponse.AsObject> {
     const req = new ListGrantedProjectsRequest();
@@ -1839,6 +1851,7 @@ export class ManagementService {
     }
     return this.grpcService.mgmt.listGrantedProjects(req, null).then((value) => {
       const obj = value.toObject();
+      this.grantedProjects.next(obj.resultList);
       this.grantedProjectsCount.next(obj.resultList.length);
       return obj;
     });
@@ -2108,6 +2121,32 @@ export class ManagementService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.mgmt.listProjectRoles(req, null).then((resp) => resp.toObject());
+  }
+
+  public listGrantedProjectRoles(
+    projectId: string,
+    grantId: string,
+    limit?: number,
+    offset?: number,
+    queryList?: RoleQuery[],
+  ): Promise<ListGrantedProjectRolesResponse.AsObject> {
+    const req = new ListGrantedProjectRolesRequest();
+    req.setProjectId(projectId);
+    req.setGrantId(grantId);
+
+    const query = new ListQuery();
+    if (limit) {
+      query.setLimit(limit);
+    }
+    if (offset) {
+      query.setOffset(offset);
+    }
+
+    req.setQuery(query);
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    return this.grpcService.mgmt.listGrantedProjectRoles(req, null).then((resp) => resp.toObject());
   }
 
   public bulkAddProjectRoles(

@@ -1,7 +1,12 @@
-.wrapp {
-  width: 100% !important;
-}
+.subinfo {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin: -1.5rem 0 0 0;
 
-.del-button {
-  margin-right: .5rem;
+  i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
 }

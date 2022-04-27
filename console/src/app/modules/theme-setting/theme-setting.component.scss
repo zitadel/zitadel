@@ -1,0 +1,12 @@
+@use '@angular/material' as mat;
+
+@mixin theme-setting($theme) {
+  $primary: map-get($theme, primary);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .theme-setting-button {
+    background-color: if($is-dark-theme, #ffffff10, #fff) !important;
+  }
+}

@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
@@ -17,24 +17,32 @@ import { ToastService } from '../../../../services/toast.service';
   templateUrl: './external-idps.component.html',
   styleUrls: ['./external-idps.component.scss'],
 })
-export class ExternalIdpsComponent implements OnInit {
+export class ExternalIdpsComponent implements OnInit, OnDestroy {
   @Input() service!: GrpcAuthService | ManagementService;
   @Input() userId!: string;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public totalResult: number = 0;
   public viewTimestamp!: Timestamp.AsObject;
-  public dataSource: MatTableDataSource<IDPUserLink.AsObject>
-    = new MatTableDataSource<IDPUserLink.AsObject>();
-  public selection: SelectionModel<IDPUserLink.AsObject>
-    = new SelectionModel<IDPUserLink.AsObject>(true, []);
+  public dataSource: MatTableDataSource<IDPUserLink.AsObject> = new MatTableDataSource<IDPUserLink.AsObject>();
+  public selection: SelectionModel<IDPUserLink.AsObject> = new SelectionModel<IDPUserLink.AsObject>(true, []);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  @Input() public displayedColumns: string[] = ['idpConfigId', 'idpName', 'externalUserId', 'externalUserDisplayName', 'actions'];
+  @Input() public displayedColumns: string[] = [
+    'idpConfigId',
+    'idpName',
+    'externalUserId',
+    'externalUserDisplayName',
+    'actions',
+  ];
 
-  constructor(private toast: ToastService, private dialog: MatDialog) { }
+  constructor(private toast: ToastService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.getData(10, 0);
+  }
+
+  ngOnDestroy(): void {
+    this.loadingSubject.complete();
   }
 
   public isAllSelected(): boolean {
@@ -44,9 +52,7 @@ export class ExternalIdpsComponent implements OnInit {
   }
 
   public masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
 
   public changePage(event: PageEvent): void {
@@ -64,21 +70,23 @@ export class ExternalIdpsComponent implements OnInit {
     }
 
     if (promise) {
-      promise.then(resp => {
-        this.dataSource.data = resp.resultList;
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details.viewTimestamp;
-        }
-        if (resp.details?.totalResult) {
-          this.totalResult = resp.details?.totalResult;
-        } else {
-          this.totalResult = 0;
-        }
-        this.loadingSubject.next(false);
-      }).catch((error: any) => {
-        this.toast.showError(error);
-        this.loadingSubject.next(false);
-      });
+      promise
+        .then((resp) => {
+          this.dataSource.data = resp.resultList;
+          if (resp.details?.viewTimestamp) {
+            this.viewTimestamp = resp.details.viewTimestamp;
+          }
+          if (resp.details?.totalResult) {
+            this.totalResult = resp.details?.totalResult;
+          } else {
+            this.totalResult = 0;
+          }
+          this.loadingSubject.next(false);
+        })
+        .catch((error: any) => {
+          this.toast.showError(error);
+          this.loadingSubject.next(false);
+        });
     }
   }
 
@@ -97,25 +105,25 @@ export class ExternalIdpsComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         let promise;
         if (this.service instanceof ManagementService) {
-          promise = (this.service as ManagementService)
-            .removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId);
+          promise = (this.service as ManagementService).removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId);
         } else if (this.service instanceof GrpcAuthService) {
-          promise = (this.service as GrpcAuthService)
-            .removeMyLinkedIDP(idp.idpId, idp.providedUserId);
+          promise = (this.service as GrpcAuthService).removeMyLinkedIDP(idp.idpId, idp.providedUserId);
         }
 
         if (promise) {
-          promise.then(_ => {
-            setTimeout(() => {
-              this.refreshPage();
-            }, 1000);
-          }).catch((error: any) => {
-            this.toast.showError(error);
-          });
+          promise
+            .then((_) => {
+              setTimeout(() => {
+                this.refreshPage();
+              }, 1000);
+            })
+            .catch((error: any) => {
+              this.toast.showError(error);
+            });
         }
       }
     });

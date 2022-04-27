@@ -6,8 +6,7 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./detail-layout.component.scss'],
 })
 export class DetailLayoutComponent {
-  @Input() backRouterLink: any = undefined;
+  @Input() hasBackButton: boolean = true;
   @Input() title: string | null = '';
   @Input() description: string | null = '';
-  @Input() maxWidth: boolean = true;
 }

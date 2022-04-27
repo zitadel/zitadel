@@ -1,0 +1,190 @@
+@use '@angular/material' as mat;
+
+@mixin nav-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .nav-col {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    position: relative;
+    align-items: flex-start;
+    transform: transale3d(0, 0, 0);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+
+    .nav-row {
+      position: relative;
+      width: 100%;
+      height: 36px;
+
+      .nav-row-abs {
+        padding: 0 2rem;
+        max-width: 80rem;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        align-self: stretch;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        @media only screen and (max-width: 500px) {
+          padding: 0 1rem 0 1rem;
+        }
+
+        .fill-space {
+          flex: 1;
+        }
+
+        .nav-item {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          line-height: 14px;
+          padding: 0.4rem 12px;
+          color: mat.get-color-from-palette($foreground, text) !important;
+          transition: all 0.2s ease;
+          text-decoration: none;
+          border-radius: 50vw;
+          font-weight: 500;
+          margin: 0.25rem 2px;
+          white-space: nowrap;
+
+          .c_label {
+            display: flex;
+            align-items: center;
+            text-align: center;
+
+            .count {
+              display: none;
+              margin-left: 6px;
+            }
+          }
+
+          &:hover {
+            background: if($is-dark-theme, #ffffff40, #00000010);
+          }
+
+          &.active {
+            background-color: $primary-color;
+            color: mat.get-color-from-palette($foreground, toolbar-items) !important;
+
+            .c_label {
+              .count {
+                display: inline-block;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .mat-menu-content,
+    .mat-menu-panel {
+      background-color: $back;
+      border-radius: 0.5rem;
+
+      @include mat.elevation(5);
+
+      .active {
+        color: $primary-color !important;
+        background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
+      }
+    }
+
+    .root-header {
+      background-color: $back !important;
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+      .slash {
+        color: if($is-dark-theme, #525454, #d1d5d9);
+      }
+
+      .org-button {
+        transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+      }
+    }
+
+    .divider {
+      .span {
+        border-color: map-get($foreground, divider);
+      }
+
+      .line {
+        background-color: map-get($foreground, divider);
+      }
+    }
+
+    ::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+      background-color: map-get($background, background);
+      border-radius: 1px;
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+    }
+
+    ::-webkit-scrollbar {
+      width: 2px;
+      height: 2px;
+      background-color: map-get($background, background);
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: $primary-color;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
+    }
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .nav-shortcut-action-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    height: 20px;
+    width: 20px;
+    position: relative;
+    margin: 0 4px;
+    cursor: default;
+
+    .nav-key-overlay {
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: if($is-dark-theme, #fff, #000);
+      opacity: 0.15;
+      border-radius: 4px;
+    }
+
+    .span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50% -50%);
+      opacity: 1;
+    }
+  }
+}

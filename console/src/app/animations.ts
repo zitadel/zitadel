@@ -10,40 +10,37 @@ import {
   trigger,
 } from '@angular/animations';
 
-
-export const toolbarAnimation: AnimationTriggerMetadata =
-  trigger('toolbar', [
-    transition(':enter', [
+export const toolbarAnimation: AnimationTriggerMetadata = trigger('toolbar', [
+  transition(':enter', [
+    style({
+      transform: 'translateY(-100%)',
+      opacity: 0,
+    }),
+    animate(
+      '.2s ease-out',
       style({
-        transform: 'translateY(-100%)',
-        opacity: 0,
+        transform: 'translateY(0%)',
+        opacity: 1,
       }),
-      animate(
-        '.2s ease-out',
-        style({
-          transform: 'translateY(0%)',
-          opacity: 1,
-        }),
-      ),
-    ]),
-  ]);
+    ),
+  ]),
+]);
 
-export const adminLineAnimation: AnimationTriggerMetadata =
-  trigger('adminline', [
-    transition(':enter', [
+export const adminLineAnimation: AnimationTriggerMetadata = trigger('adminline', [
+  transition(':enter', [
+    style({
+      transform: 'translateY(100%)',
+      opacity: 0.5,
+    }),
+    animate(
+      '.2s ease-out',
       style({
-        transform: 'translateY(100%)',
-        opacity: 0.5,
+        transform: 'translateY(0%)',
+        opacity: 1,
       }),
-      animate(
-        '.2s ease-out',
-        style({
-          transform: 'translateY(0%)',
-          opacity: 1,
-        }),
-      ),
-    ]),
-  ]);
+    ),
+  ]),
+]);
 
 export const accountCard: AnimationTriggerMetadata = trigger('accounts', [
   transition(':enter', [
@@ -64,11 +61,7 @@ export const accountCard: AnimationTriggerMetadata = trigger('accounts', [
 ]);
 
 export const navAnimations: Array<AnimationTriggerMetadata> = [
-  trigger('navAnimation', [
-    transition('* => *', [
-      query('@navitem', stagger('50ms', animateChild()), { optional: true }),
-    ]),
-  ]),
+  trigger('navAnimation', [transition('* => *', [query('@navitem', stagger('50ms', animateChild()), { optional: true })])]),
   trigger('navitem', [
     transition(':enter', [
       style({
@@ -94,7 +87,6 @@ export const navAnimations: Array<AnimationTriggerMetadata> = [
     ]),
   ]),
 ];
-
 
 export const enterAnimations: Array<AnimationTriggerMetadata> = [
   trigger('appearfade', [
@@ -129,12 +121,10 @@ export const enterAnimations: Array<AnimationTriggerMetadata> = [
 
 export const routeAnimations: AnimationTriggerMetadata = trigger('routeAnimations', [
   transition('HomePage => AddPage', [
-    style({ transform: 'translateX(100%)', opacity: 0.5 }),
+    style({ transform: 'translateX(50%)', opacity: 0.5 }),
     animate('250ms ease-out', style({ transform: 'translateX(0%)', opacity: 1 })),
   ]),
-  transition('AddPage => HomePage',
-    [animate('250ms', style({ transform: 'translateX(100%)', opacity: 0.5 }))],
-  ),
+  transition('AddPage => HomePage', [animate('250ms', style({ transform: 'translateX(50%)', opacity: 0.5 }))]),
   transition('HomePage => DetailPage', [
     query(':enter, :leave', style({ position: 'absolute', left: 0, right: 0 }), {
       optional: true,
@@ -159,13 +149,9 @@ export const routeAnimations: AnimationTriggerMetadata = trigger('routeAnimation
           optional: true,
         },
       ),
-      query(
-        ':leave',
-        [style({ opacity: 1, width: '100%' }), animate('.35s ease-out', style({ opacity: 0 }))],
-        {
-          optional: true,
-        },
-      ),
+      query(':leave', [style({ opacity: 1, width: '100%' }), animate('.35s ease-out', style({ opacity: 0 }))], {
+        optional: true,
+      }),
     ]),
   ]),
   transition('DetailPage => HomePage', [

@@ -1,22 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 declare const tinycolor: any;
 
 export interface Color {
   name: string;
   hex: string;
-  darkContrast: boolean;
+  rgb: string;
+  contrastColor: string;
 }
 
 @Injectable()
 export class ThemeService {
-  private _darkTheme: Subject<boolean> = new Subject<boolean>();
+  private _darkTheme: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   public isDarkTheme: Observable<boolean> = this._darkTheme.asObservable();
 
   private primaryColorPalette: Color[] = [];
   private warnColorPalette: Color[] = [];
   private backgroundColorPalette: Color[] = [];
+
+  constructor() {
+    const theme = localStorage.getItem('theme');
+    if (theme) {
+      if (theme === 'light-theme') {
+        this.setDarkTheme(false);
+      } else {
+        this.setDarkTheme(true);
+      }
+    }
+  }
 
   setDarkTheme(isDarkTheme: boolean): void {
     this._darkTheme.next(isDarkTheme);
@@ -25,10 +37,7 @@ export class ThemeService {
   public updateTheme(colors: Color[], type: string, theme: string): void {
     colors.forEach((color) => {
       document.documentElement.style.setProperty(`--theme-${theme}-${type}-${color.name}`, color.hex);
-      document.documentElement.style.setProperty(
-        `--theme-${theme}-${type}-contrast-${color.name}`,
-        color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff',
-      );
+      document.documentElement.style.setProperty(`--theme-${theme}-${type}-contrast-${color.name}`, color.contrastColor);
     });
   }
 
@@ -77,7 +86,8 @@ export class ThemeService {
     return {
       name: name,
       hex: c.toHexString(),
-      darkContrast: c.isLight(),
+      rgb: c.toRgbString(),
+      contrastColor: this.getContrast(c.toHexString()),
     };
   }
 
@@ -89,5 +99,15 @@ export class ThemeService {
   public isDark(hex: string): boolean {
     const color = tinycolor(hex);
     return color.isDark();
+  }
+
+  public getContrast(color: string): string {
+    const onBlack = tinycolor.readability('#000', color);
+    const onWhite = tinycolor.readability('#fff', color);
+    if (onBlack > onWhite) {
+      return 'hsla(0, 0%, 0%, 0.87)';
+    } else {
+      return '#ffffff';
+    }
   }
 }
