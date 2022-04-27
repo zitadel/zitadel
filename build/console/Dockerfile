@@ -7,9 +7,6 @@ ARG NODE_VERSION=14
 FROM node:${NODE_VERSION} as npm-base
 WORKDIR /console
 
-COPY console/package.json console/package-lock.json ./
-RUN npm ci
-
 COPY console .
 COPY --from=zitadel-base:local /proto /proto
 COPY --from=zitadel-base:local /usr/local/bin /usr/local/bin/.
@@ -26,6 +23,10 @@ COPY --from=npm-base /console/src/app/proto/generated .
 ## angular lint workspace and prod build
 #######################
 FROM npm-base as angular-build
+
+COPY console/package.json console/package-lock.json ./
+RUN npm ci
+
 RUN npm run lint
 RUN npm run prodbuild
 RUN ls -la /console/dist/console
