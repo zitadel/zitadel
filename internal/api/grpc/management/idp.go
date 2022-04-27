@@ -3,11 +3,11 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/query"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
+	object_pb "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRequest) (*mgmt_pb.GetOrgIDPByIDResponse, error) {

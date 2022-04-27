@@ -1,12 +1,12 @@
 package user
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	user_pb "github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	user_model "github.com/zitadel/zitadel/internal/user/model"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func MembershipQueriesToQuery(queries []*user_pb.MembershipQuery) (_ []query.SearchQuery, err error) {

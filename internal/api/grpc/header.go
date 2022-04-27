@@ -6,7 +6,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	"github.com/caos/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/http"
 )
 
 func GetHeader(ctx context.Context, headername string) string {

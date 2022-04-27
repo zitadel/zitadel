@@ -7,11 +7,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/cmd/admin"
+	"github.com/zitadel/zitadel/cmd/admin"
 )
 
 var (

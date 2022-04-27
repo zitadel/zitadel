@@ -1,10 +1,10 @@
 package org
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
-	instance_pb "github.com/caos/zitadel/pkg/grpc/instance"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
 )
 
 func InstancesToPb(instances []*query.Instance) []*instance_pb.Instance {

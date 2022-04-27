@@ -3,10 +3,10 @@ package login
 import (
 	"net/http"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/api/assets"
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/assets"
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 type dynamicResourceData struct {

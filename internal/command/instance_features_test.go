@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/features"
-	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/features"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 func TestSetDefaultFeatures(t *testing.T) {

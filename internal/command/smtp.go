@@ -3,11 +3,11 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
-	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config *smtp.EmailConfig) (*domain.ObjectDetails, error) {

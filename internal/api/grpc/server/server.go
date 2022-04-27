@@ -4,11 +4,11 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	grpc_api "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 type Server interface {

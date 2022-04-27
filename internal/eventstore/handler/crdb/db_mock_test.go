@@ -3,13 +3,13 @@ package crdb
 import (
 	"database/sql"
 	"database/sql/driver"
-	"sort"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type mockExpectation func(sqlmock.Sqlmock)
@@ -187,32 +187,69 @@ func expectUpdateCurrentSequence(tableName, projection string, seq uint64, aggre
 	}
 }
 
-func expectUpdateTwoCurrentSequence(tableName, projection string, sequences currentSequences) func(sqlmock.Sqlmock) {
-	//sort them so the args will always have the same order
-	keys := make([]string, 0, len(sequences))
-	for k := range sequences {
-		keys = append(keys, string(k))
-	}
-	sort.Strings(keys)
-	args := make([]driver.Value, len(keys)*4)
-	for i, k := range keys {
-		aggregateType := eventstore.AggregateType(k)
-		for _, sequence := range sequences[aggregateType] {
-			args[i*4] = projection
-			args[i*4+1] = aggregateType
-			args[i*4+2] = sequence.sequence
-			args[i*4+3] = sequence.instanceID
+func expectUpdateThreeCurrentSequence(t *testing.T, tableName, projection string, sequences currentSequences) func(sqlmock.Sqlmock) {
+	args := make([][]interface{}, 0)
+	for aggregateType, instanceSequences := range sequences {
+		for _, sequence := range instanceSequences {
+			args = append(args, []interface{}{
+				projection,
+				aggregateType,
+				sequence.sequence,
+				sequence.instanceID,
+			})
 		}
 	}
+	matcher := &currentSequenceMatcher{t: t, seq: args}
+	matchers := make([]driver.Value, len(args)*4)
+	for i := 0; i < len(args)*4; i++ {
+		matchers[i] = matcher
+	}
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO " + tableName + ` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\), \(\$5, \$6, \$7, \$8, NOW\(\)\)`).
+		m.ExpectExec("UPSERT INTO " + tableName + ` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\), \(\$5, \$6, \$7, \$8, NOW\(\)\), \(\$9, \$10, \$11, \$12, NOW\(\)\)`).
 			WithArgs(
-				args...,
+				matchers...,
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
 			)
 	}
+}
+
+type currentSequenceMatcher struct {
+	seq [][]interface{}
+	i   int
+	t   *testing.T
+}
+
+func (m *currentSequenceMatcher) Match(value driver.Value) bool {
+	if m.i%4 == 0 {
+		m.i = 0
+	}
+	left := make([]interface{}, 0, len(m.seq))
+	for _, seq := range m.seq {
+		found := seq[m.i]
+		if found == nil {
+			continue
+		}
+		switch v := value.(type) {
+		case string:
+			if found == v || found == eventstore.AggregateType(v) {
+				seq[m.i] = nil
+				m.i++
+				return true
+			}
+		case int64:
+			if found == uint64(v) {
+				seq[m.i] = nil
+				m.i++
+				return true
+			}
+		}
+		left = append(left, found)
+	}
+	m.t.Errorf("expected: %v, possible left values: %v", value, left)
+	m.t.FailNow()
+	return false
 }
 
 func expectUpdateCurrentSequenceErr(tableName, projection string, seq uint64, err error, aggregateType, instanceID string) func(sqlmock.Sqlmock) {

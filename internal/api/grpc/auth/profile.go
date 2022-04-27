@@ -3,10 +3,10 @@ package auth
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func (s *Server) GetMyProfile(ctx context.Context, req *auth_pb.GetMyProfileRequest) (*auth_pb.GetMyProfileResponse, error) {

@@ -1,9 +1,9 @@
 package settings
 
 import (
-	obj_pb "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/query"
-	settings_pb "github.com/caos/zitadel/pkg/grpc/settings"
+	obj_pb "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
+	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
 func NotificationProviderToPb(provider *query.DebugNotificationProvider) *settings_pb.DebugNotificationProvider {

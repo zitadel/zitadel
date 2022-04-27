@@ -3,11 +3,11 @@ package config
 import (
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/telemetry/tracing/google"
-	"github.com/caos/zitadel/internal/telemetry/tracing/log"
-	"github.com/caos/zitadel/internal/telemetry/tracing/otel"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing/google"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing/log"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing/otel"
 )
 
 type TracingConfig struct {

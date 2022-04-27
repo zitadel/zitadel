@@ -3,13 +3,13 @@ package spooler
 import (
 	"database/sql"
 
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/query"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/query"
 
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/handler"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
 )
 
 type SpoolerConfig struct {

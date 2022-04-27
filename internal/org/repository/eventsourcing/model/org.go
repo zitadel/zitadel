@@ -3,12 +3,12 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
+	org_model "github.com/zitadel/zitadel/internal/org/model"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type Org struct {

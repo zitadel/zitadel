@@ -2,11 +2,11 @@
 <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Release](https://github.com/caos/zitadel/actions/workflows/zitadel.yml/badge.svg)](https://github.com/caos/zitadel/actions)
-[![license](https://badgen.net/github/license/caos/zitadel/)](https://github.com/caos/zitadel/blob/main/LICENSE)
-[![release](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
-[![codecov](https://codecov.io/gh/caos/zitadel/branch/main/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
+[![Release](https://github.com/zitadel/zitadel/actions/workflows/zitadel.yml/badge.svg)](https://github.com/zitadel/zitadel/actions)
+[![license](https://badgen.net/github/license/zitadel/zitadel/)](https://github.com/zitadel/zitadel/blob/main/LICENSE)
+[![release](https://badgen.net/github/release/zitadel/zitadel/stable)](https://github.com/zitadel/zitadel/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zitadel/zitadel)](https://goreportcard.com/report/github.com/zitadel/zitadel)
+[![codecov](https://codecov.io/gh/zitadel/zitadel/branch/main/graph/badge.svg)](https://codecov.io/gh/zitadel/zitadel)
 [![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)  
 [![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
 
@@ -41,11 +41,11 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 
 ### Quickstarts
 
-See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/caos/zitadel/discussions/1717).
+See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/zitadel/zitadel/discussions/1717).
 
 ### Client libraries
 
-* [Go](https://github.com/caos/zitadel-go) client library
+* [Go](https://github.com/zitadel/zitadel-go) client library
 * [.NET](https://github.com/caos/zitadel-net) client library
 * [Dart](https://github.com/caos/zitadel-dart) client library
 * [Elixir](https://github.com/jshmrtn/zitadel_api) client library (maintained by [jshmrtn]([jshmrtn](https://github.com/jshmrtn)))
@@ -121,8 +121,8 @@ Customize login and console with your design
 ## Other CAOS Projects
 
 * [**ORBOS**](https://github.com/caos/orbos/) - GitOps everything
-* [**OIDC for GO**](https://github.com/caos/oidc) - OpenID Connect SDK (client and server) for Go
-* [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT
+* [**OIDC for GO**](https://github.com/zitadel/oidc) - OpenID Connect SDK (client and server) for Go
+* [**ZITADEL Tools**](https://github.com/zitadel/zitadel-tools) - Go tool to convert  key file to privately signed JWT
 
 ## Usage Data
 

@@ -7,10 +7,10 @@ import (
 
 	"github.com/lib/pq"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/repository/project"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/project/model"
+	es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 func mockProjectData(project *es_model.Project) []byte {

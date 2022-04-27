@@ -5,8 +5,8 @@ ARG GO_VERSION=1.17
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
 FROM golang:${GO_VERSION} as go-dep
-RUN mkdir -p src/github.com/caos/zitadel
-WORKDIR /go/src/github.com/caos/zitadel
+RUN mkdir -p src/github.com/zitadel/zitadel
+WORKDIR /go/src/github.com/zitadel/zitadel
 
 #download modules
 COPY . .
@@ -71,21 +71,21 @@ COPY . .
 ## copy for local dev
 #######################
 FROM scratch as go-copy
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/ui/login/statik/statik.go internal/api/ui/login/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/statik/statik.go internal/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/api/ui/login/statik/statik.go internal/api/ui/login/statik/statik.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/statik/statik.go internal/statik/statik.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/statik/statik.go openapi/statik/statik.go
 
-COPY --from=go-stub /go/src/github.com/caos/zitadel/pkg/grpc pkg/grpc
-COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/v2/zitadel openapi/v2/zitadel
-COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/proto docs/docs/apis/proto
-COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/assets docs/docs/apis/assets
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/pkg/grpc pkg/grpc
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/v2/zitadel openapi/v2/zitadel
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/openapi/statik/statik.go openapi/statik/statik.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/docs/apis/proto docs/docs/apis/proto
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/docs/apis/assets docs/docs/apis/assets
 
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
+COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go
 
 #######################
 ## Go test
@@ -100,4 +100,4 @@ RUN go install github.com/rakyll/statik \
 ## Go test results
 #######################
 FROM scratch as go-codecov
-COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+COPY --from=go-test /go/src/github.com/zitadel/zitadel/profile.cov profile.cov

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func getTestCtx(userID, orgID string) context.Context {

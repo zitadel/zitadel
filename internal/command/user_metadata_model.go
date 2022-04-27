@@ -1,9 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/metadata"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/metadata"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type UserMetadataWriteModel struct {

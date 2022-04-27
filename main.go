@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/caos/zitadel/cmd"
 	"github.com/spf13/cobra"
+	"github.com/zitadel/zitadel/cmd"
 )
 
 func main() {

@@ -57,7 +57,7 @@ With this token you can make subsequent requests, just like a human user.
 
 In this exercise we will authenticate a service user and receive an access_token to use against a API.
 
-> **Information:** Are you stuck? Don't hesitate to reach out to us on [Github Discussions](https://github.com/caos/zitadel/discussions) or [contact us](https://zitadel.ch/contact/) privately.
+> **Information:** Are you stuck? Don't hesitate to reach out to us on [Github Discussions](https://github.com/zitadel/zitadel/discussions) or [contact us](https://zitadel.ch/contact/) privately.
 
 ### 1. Generate a private-public key pair in ZITADEL
 
@@ -111,7 +111,7 @@ Payload
 
 Please refer to [JWT_with_Private_Key](../../apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
 
-If you use Go, you might want to use the [provided tool](https://github.com/caos/zitadel-tools) to generate a JWT from the downloaded json. There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
+If you use Go, you might want to use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded json. There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
 
 ### 3. With this JWT, request an OAuth token from ZITADEL
 

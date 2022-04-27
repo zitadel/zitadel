@@ -3,11 +3,11 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/instance"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*query.Membership) (_ []eventstore.Command, err error) {

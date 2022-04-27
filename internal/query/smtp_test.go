@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/caos/zitadel/internal/crypto"
-	errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/crypto"
+	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_SMTPConfigsPrepares(t *testing.T) {

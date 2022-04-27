@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var errTest = errors.New("test")

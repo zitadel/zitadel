@@ -1,8 +1,9 @@
 package bigcache
 
 import (
-	"github.com/caos/zitadel/internal/cache"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/cache"
 )
 
 type Config struct {

@@ -3,10 +3,10 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
-	settings_pb "github.com/caos/zitadel/pkg/grpc/settings"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
 func (s *Server) ListSMSProviders(ctx context.Context, req *admin_pb.ListSMSProvidersRequest) (*admin_pb.ListSMSProvidersResponse, error) {

@@ -3,10 +3,10 @@ package system_test
 import (
 	"testing"
 
-	system_grpc "github.com/caos/zitadel/internal/api/grpc/system"
-	"github.com/caos/zitadel/internal/test"
-	"github.com/caos/zitadel/internal/view/model"
-	system_pb "github.com/caos/zitadel/pkg/grpc/system"
+	system_grpc "github.com/zitadel/zitadel/internal/api/grpc/system"
+	"github.com/zitadel/zitadel/internal/test"
+	"github.com/zitadel/zitadel/internal/view/model"
+	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func TestFailedEventsToPbFields(t *testing.T) {

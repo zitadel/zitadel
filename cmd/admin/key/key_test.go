@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	caos_errors "github.com/caos/zitadel/internal/errors"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 func Test_keysFromArgs(t *testing.T) {

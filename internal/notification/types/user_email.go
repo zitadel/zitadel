@@ -4,14 +4,14 @@ import (
 	"context"
 	"html"
 
-	caos_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/log"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
-	"github.com/caos/zitadel/internal/notification/messages"
-	"github.com/caos/zitadel/internal/notification/senders"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 func generateEmail(ctx context.Context, user *view_model.NotifyUser, subject, content string, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastEmail bool) error {

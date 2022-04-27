@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 
-	"github.com/caos/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
 
 type Table struct {

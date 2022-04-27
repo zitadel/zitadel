@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	es_locker "github.com/caos/zitadel/internal/eventstore/v1/locker"
+	es_locker "github.com/zitadel/zitadel/internal/eventstore/v1/locker"
 )
 
 const (

@@ -5,20 +5,20 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
-	internal_authz "github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/authz/repository"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/authz/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type API struct {
@@ -98,7 +98,25 @@ func (a *API) routeGRPC() {
 }
 
 func (a *API) routeGRPCWeb(router *mux.Router) {
-	router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(grpcweb.WrapServer(a.grpcServer))
+	router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(
+		grpcweb.WrapServer(a.grpcServer,
+			grpcweb.WithAllowedRequestHeaders(
+				[]string{
+					http_util.Origin,
+					http_util.ContentType,
+					http_util.Accept,
+					http_util.AcceptLanguage,
+					http_util.Authorization,
+					http_util.ZitadelOrgID,
+					http_util.XUserAgent,
+					http_util.XGrpcWeb,
+				},
+			),
+			grpcweb.WithOriginFunc(func(_ string) bool {
+				return true
+			}),
+		),
+	)
 }
 
 func (a *API) healthHandler() http.Handler {

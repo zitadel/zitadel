@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/minio/minio-go/v7"
+	"github.com/zitadel/logging"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/static"
 )
 
 var _ static.Storage = (*Minio)(nil)

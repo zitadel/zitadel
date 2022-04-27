@@ -9,7 +9,7 @@ At the end of the guide you should have an application able to read the details 
 
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-go) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API using our [OIDC client library](https://github.com/caos/oidc).
+The client [SDK](https://github.com/zitadel/zitadel-go) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API using our [OIDC client library](https://github.com/zitadel/oidc).
 All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
 However, we recommend you read the guide on [how to access ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of :
@@ -25,7 +25,7 @@ However, we recommend you read the guide on [how to access ZITADEL API](../../gu
 You need to add the SDK into Go Modules by:
 
 ```bash
-go get github.com/caos/zitadel-go
+go get github.com/zitadel/zitadel-go
 ```
 
 ### Create example client
@@ -40,12 +40,12 @@ import (
     "context"
     "log"
     
-    "github.com/caos/oidc/pkg/oidc"
+    "github.com/zitadel/oidc/pkg/oidc"
     
-    "github.com/caos/zitadel-go/pkg/client/management"
-    "github.com/caos/zitadel-go/pkg/client/middleware"
-    "github.com/caos/zitadel-go/pkg/client/zitadel"
-    pb "github.com/caos/zitadel-go/pkg/client/zitadel/management"
+    "github.com/zitadel/zitadel-go/pkg/client/management"
+    "github.com/zitadel/zitadel-go/pkg/client/middleware"
+    "github.com/zitadel/zitadel-go/pkg/client/zitadel"
+    pb "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
 )
 
 
@@ -123,7 +123,7 @@ If you encountered an error (e.g. `code = PermissionDenied desc = No matching pe
 ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
 and check the mentioned [guides](#prerequisites) at the beginning.
 
-If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/caos/zitadel/issues) or in the [SDK](https://github.com/caos/zitadel-go/issues).
+If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/zitadel/zitadel/issues) or in the [SDK](https://github.com/zitadel/zitadel-go/issues).
 
 ### Whats next?
 
@@ -137,6 +137,6 @@ Now you can proceed implementing our APIs by adding more calls or trying to over
     log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
 }
 ```
-Checkout more [examples from the SDK](https://github.com/caos/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
+Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
 
 > This guide will be updated soon to show you how to use the SDK for your own API as well.

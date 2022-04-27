@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"net/http"
 
-	http_utils "github.com/caos/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 )
 
 func DefaultMetricsHandler(handler http.Handler) http.Handler {

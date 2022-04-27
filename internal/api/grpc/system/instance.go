@@ -3,12 +3,11 @@ package system
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	instance_grpc "github.com/caos/zitadel/internal/api/grpc/instance"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/query"
-	object_pb "github.com/caos/zitadel/pkg/grpc/object"
-	system_pb "github.com/caos/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
+	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func (s *Server) ListInstances(ctx context.Context, req *system_pb.ListInstancesRequest) (*system_pb.ListInstancesResponse, error) {

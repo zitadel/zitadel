@@ -4,11 +4,11 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/id"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 type Config struct {

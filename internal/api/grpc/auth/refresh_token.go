@@ -3,11 +3,11 @@ package auth
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func (s *Server) ListMyRefreshTokens(ctx context.Context, req *auth.ListMyRefreshTokensRequest) (*auth.ListMyRefreshTokensResponse, error) {

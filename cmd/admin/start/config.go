@@ -1,27 +1,27 @@
 package start
 
 import (
-	"github.com/caos/logging"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/hook"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/hook"
 
-	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
-	internal_authz "github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/api/oidc"
-	"github.com/caos/zitadel/internal/api/ui/console"
-	"github.com/caos/zitadel/internal/api/ui/login"
-	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/authz"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/database"
-	"github.com/caos/zitadel/internal/notification"
-	"github.com/caos/zitadel/internal/query/projection"
-	static_config "github.com/caos/zitadel/internal/static/config"
+	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/ui/console"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/authz"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/notification"
+	"github.com/zitadel/zitadel/internal/query/projection"
+	static_config "github.com/zitadel/zitadel/internal/static/config"
 )
 
 type Config struct {

@@ -3,10 +3,10 @@ package query
 import (
 	"context"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 func (q *Queries) Languages(ctx context.Context) ([]language.Tag, error) {

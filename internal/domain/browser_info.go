@@ -4,7 +4,7 @@ import (
 	"net"
 	net_http "net/http"
 
-	http_util "github.com/caos/zitadel/internal/api/http"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
 type BrowserInfo struct {
