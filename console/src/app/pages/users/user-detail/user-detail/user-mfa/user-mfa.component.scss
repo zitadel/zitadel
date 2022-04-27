@@ -13,7 +13,7 @@
   .row {
     display: flex;
     justify-content: space-between;
-    padding: .5rem 0;
+    padding: 0.5rem 0;
     align-items: center;
 
     span {
@@ -34,16 +34,4 @@
 
 .table {
   width: 100%;
-
-  td,
-  th {
-    &:first-child {
-      padding-left: 0;
-      padding-right: 1rem;
-    }
-
-    &:last-child {
-      padding-right: 0;
-    }
-  }
 }

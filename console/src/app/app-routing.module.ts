@@ -4,6 +4,7 @@ import { QuicklinkStrategy } from 'ngx-quicklink';
 
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { UserGrantContext } from './modules/user-grants/user-grants-datasource';
 import { OrgCreateComponent } from './pages/org-create/org-create.component';
 
 const routes: Routes = [
@@ -11,14 +12,6 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./pages/home/home.module').then((m) => m.HomeModule),
     canActivate: [AuthGuard],
-  },
-  {
-    path: 'firststeps',
-    loadChildren: () => import('./modules/onboarding/onboarding.module').then((m) => m.OnboardingModule),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.write'],
-    },
   },
   {
     path: 'granted-projects',
@@ -31,7 +24,7 @@ const routes: Routes = [
   },
   {
     path: 'projects',
-    loadChildren: () => import('./pages/projects/owned-projects/owned-projects.module').then((m) => m.OwnedProjectsModule),
+    loadChildren: () => import('./pages/projects/projects.module').then((m) => m.ProjectsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['project.read'],
@@ -42,21 +35,13 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       {
-        path: 'list',
-        loadChildren: () => import('src/app/pages/users/user-list/user-list.module').then((m) => m.UserListModule),
-        canActivate: [RoleGuard],
-        data: {
-          roles: ['user.read'],
-        },
-      },
-      {
         path: '',
-        loadChildren: () => import('src/app/pages/users/user-detail/user-detail.module').then((m) => m.UserDetailModule),
+        loadChildren: () => import('src/app/pages/users/users.module').then((m) => m.UsersModule),
       },
     ],
   },
   {
-    path: 'iam',
+    path: 'system',
     loadChildren: () => import('./pages/iam/iam.module').then((m) => m.IamModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
@@ -93,6 +78,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/grants/grants.module').then((m) => m.GrantsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
+      context: UserGrantContext.NONE,
       roles: ['user.grant.read'],
     },
   },
@@ -139,6 +125,30 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'failed-events',
+    loadChildren: () => import('./pages/failed-events/failed-events.module').then((m) => m.FailedEventsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
+    path: 'views',
+    loadChildren: () => import('./pages/iam-views/iam-views.module').then((m) => m.IamViewsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
+    path: 'domains',
+    loadChildren: () => import('./pages/domains/domains.module').then((m) => m.DomainsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['org.read'],
+    },
+  },
+  {
     path: 'signedout',
     loadChildren: () => import('./pages/signedout/signedout.module').then((m) => m.SignedoutModule),
   },
@@ -153,6 +163,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes, {
       preloadingStrategy: QuicklinkStrategy,
       relativeLinkResolution: 'legacy',
+      scrollPositionRestoration: 'enabled',
     }),
   ],
   exports: [RouterModule],

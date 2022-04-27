@@ -1,77 +1,43 @@
-.table-wrapper {
-  overflow: auto;
+@use '@angular/material' as mat;
 
-  .table,
-  .paginator {
-    width: 100%;
+@mixin user-table-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
 
-    td,
-    th {
-      padding-left: .5rem;
-      padding-right: .5rem;
+  .user-table-left-actions {
+    display: flex;
+    align-items: center;
+
+    .type-button {
+      border: none;
+      background: none;
+      text-align: left;
+      padding: 0.75rem 0;
+      opacity: 0.6;
+      font-size: 15px;
+      cursor: pointer;
+      color: map-get($foreground, base);
 
       &:first-child {
-        padding-left: 0;
-        padding-right: .5rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-    th {
-      .search-button {
-        visibility: hidden;
-        width: 30px;
-
-        .icon {
-          font-size: 1.2rem;
-        }
-      }
-
-      &:hover,
-      &.search-active {
-        .search-button {
-          visibility: visible;
-        }
-      }
-    }
-
-    tr {
-      .dlt-button {
-        visibility: hidden;
+        margin-right: 1rem;
       }
 
       &:hover {
-        .dlt-button {
-          visibility: visible;
-        }
+        opacity: 1;
+      }
+
+      &.active {
+        font-weight: 600;
+        opacity: 1;
       }
     }
   }
 }
 
-.filtername {
-  flex: 1;
-  margin-right: 1rem;
-
-  .filterinput {
-    height: 36px;
-    transform: translateY(1px);
-  }
+.user-tr-actions {
+  width: 42px;
 }
 
-.sa-icon {
-  display: block;
-  width: 32px;
-  margin: 0 .5rem;
-
-  i {
-    margin: auto;
-  }
-}
-
-td {
-  outline: none;
+.margin-left {
+  margin-left: 0.5rem;
 }

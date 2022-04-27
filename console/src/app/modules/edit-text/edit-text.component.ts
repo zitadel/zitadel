@@ -12,14 +12,14 @@ import { InfoSectionType } from '../info-section/info-section.component';
 })
 export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = '';
-  @Input() current$!: Observable<{ [key: string]: any | string }>;
-  @Input() default$!: Observable<{ [key: string]: any | string }>;
+  @Input() current$!: Observable<{ [key: string]: string | boolean }>;
+  @Input() default$!: Observable<{ [key: string]: string | boolean }>;
   @Input() currentlyDragged: string = '';
   @Output() changedValues: EventEmitter<{ [key: string]: string }> = new EventEmitter();
-  public currentMap: { [key: string]: string } = {};
+  public currentMap: { [key: string]: string | boolean } = {}; // boolean because of isDefault
   private destroy$: Subject<void> = new Subject();
   public form!: FormGroup;
-  public warnText: { [key: string]: string | undefined } = {};
+  public warnText: { [key: string]: string | boolean | undefined } = {};
 
   @Input() public chips: any[] = [];
   @Input() public disabled: boolean = true;
@@ -47,7 +47,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  public setWarnText(key: string, text: string | undefined): void {
+  public setWarnText(key: string, text: string | boolean | undefined): void {
     this.warnText[key] = text;
   }
 

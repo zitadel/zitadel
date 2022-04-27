@@ -1,7 +1,12 @@
-.del-button {
-  margin-right: .5rem;
-}
+.subinfo {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin: -1.5rem 0 0 0;
 
-:root {
-  width: 100%;
+  i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
 }

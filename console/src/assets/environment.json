@@ -1,5 +1,5 @@
 {
-  "api": "https://api.zitadel.dev",
-  "issuer": "https://issuer.zitadel.dev",
-  "clientid": "70669160379706195@zitadel"
+  "api": "https://zitadel.cloud",
+  "issuer": "https://zitadel.cloud/oauth/v2",
+  "clientid": "158502175385846017@zitadel"
 }

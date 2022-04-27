@@ -6,7 +6,6 @@
 }
 
 .desc {
-  color: var(--grey);
   font-size: 14px;
 }
 
@@ -52,7 +51,7 @@
 .cropper {
   margin: 1rem 0;
   width: auto;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
 }
 
 .action {
@@ -60,7 +59,7 @@
   justify-content: flex-end;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 

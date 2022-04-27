@@ -1,61 +1,80 @@
-.form {
-  width: 100%;
-  padding-top: 1rem;
-
-  .btn-container {
-    button {
-      margin-top: 3rem;
-      display: block;
-      padding: 0.5rem 4rem;
-      border-radius: 0.5rem;
-    }
-  }
-}
-
-.content {
-  width: 100%;
+.abort-container {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  margin: 0 -0.5rem;
+  align-items: center;
+  margin-bottom: 2rem;
 
-  .section {
-    padding: 0.5rem;
-    flex-basis: 100%;
-    color: var(--grey);
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
   }
 
-  .formfield {
-    flex: 1 0 33%;
-    margin: 0 0.5rem;
-  }
-
-  .email-is-verified,
-  .use-password-block {
-    margin: 0 0.5rem;
-    flex-basis: 100%;
-    margin-top: 1.5rem;
-
-    .block-checkbox {
-      display: block;
-      margin: 0.25rem 0;
-    }
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
   }
 }
 
-.pwd-section {
-  margin: 0 0.5rem;
+.user-create-main-content {
+  padding-left: 4.5rem;
+  max-width: 35rem;
 
-  .section {
-    padding: 0.5rem 0;
+  .user-create-form {
+    padding-top: 1rem;
+
+    .user-create-btn-container {
+      button {
+        margin-top: 3rem;
+        display: block;
+        padding: 0.5rem 4rem;
+        border-radius: 0.5rem;
+      }
+    }
   }
 
-  .user-create-pwd-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 1rem;
+  .user-create-content {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    margin: 0 -0.5rem;
+
+    .user-create-section {
+      padding: 0.5rem;
+      flex-basis: 100%;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .formfield {
+      flex: 1 0 33%;
+      margin: 0 0.5rem;
+    }
+
+    .email-is-verified,
+    .use-password-block {
+      margin: 0 0.5rem;
+      flex-basis: 100%;
+      margin-top: 1.5rem;
+
+      .block-checkbox {
+        display: block;
+        margin: 0.25rem 0;
+      }
+    }
+  }
+
+  .pwd-section {
+    margin: 0 0.5rem;
+
+    .section {
+      padding: 0.5rem 0;
+    }
+
+    .user-create-pwd-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 1rem;
+    }
   }
 }

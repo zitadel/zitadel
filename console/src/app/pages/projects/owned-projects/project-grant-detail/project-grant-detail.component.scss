@@ -1,16 +1,44 @@
-.desc {
+.subinfo {
+  display: flex;
+  align-items: center;
   font-size: 14px;
-  color: var(--grey);
+  margin: -1.5rem 0 0 0;
+
+  i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
 }
 
-.del-button {
-  margin-right: .5rem;
+.actions-trigger-desk {
+  margin-top: 0.25rem;
+  display: none;
+  align-items: center;
+
+  @media only screen and (min-width: 700px) {
+    display: flex;
+  }
+
+  .icon {
+    margin-left: 0.25rem;
+    margin-right: -0.5rem;
+  }
+}
+
+.actions-trigger-mob {
+  display: inline;
+
+  @media only screen and (min-width: 700px) {
+    display: none;
+  }
 }
 
 .master-row {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  margin-top: 1rem;
 
   .left-col {
     flex: 1;
@@ -22,14 +50,10 @@
       max-width: 400px;
       display: flex;
       align-items: center;
-      padding: .5rem 0;
+      padding: 0.5rem 0;
 
       span {
-        font-size: .9rem;
-      }
-
-      .first {
-        color: var(--grey);
+        font-size: 0.9rem;
       }
     }
   }
@@ -39,11 +63,12 @@
   }
 }
 
-.formfield {
+.grant-detail-roles {
+  display: block;
   width: 100%;
+  max-width: 400px;
 }
 
-.divider {
-  height: 1px;
-  background-color: #8795a140;
+.project-grant-h2 {
+  margin-top: 1rem;
 }

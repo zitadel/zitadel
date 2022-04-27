@@ -7,6 +7,7 @@ import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/managem
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -30,6 +31,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public currentPolicy: GridPolicy = IAM_POLICY;
+  public orgName: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -37,20 +39,41 @@ export class OrgIamPolicyComponent implements OnDestroy {
     private storage: StorageService,
     private injector: Injector,
     private adminService: AdminService,
+    private storageService: StorageService,
+    breadcrumbService: BreadcrumbService,
   ) {
     const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     if (temporg) {
       this.org = temporg;
     }
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      if (this.serviceType === PolicyComponentServiceType.MGMT) {
-        this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
-      }
-      return this.route.params;
-    })).subscribe(_ => {
-      this.fetchData();
-    });
+    this.sub = this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
+          if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+            if (org && org.id) {
+              this.orgName = org.name;
+            }
+            this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
+
+            const iambread = new Breadcrumb({
+              type: BreadcrumbType.IAM,
+              name: 'System',
+              routerLink: ['/system'],
+            });
+            const bread: Breadcrumb = {
+              type: BreadcrumbType.ORG,
+              routerLink: ['/org'],
+            };
+            breadcrumbService.setBreadcrumb([iambread, bread]);
+          }
+          return this.route.params;
+        }),
+      )
+      .subscribe((_) => {
+        this.fetchData();
+      });
   }
 
   public ngOnDestroy(): void {
@@ -58,7 +81,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
   }
 
   public fetchData(): void {
-    this.getData().then(resp => {
+    this.getData().then((resp) => {
       if (resp?.policy) {
         this.iamData = resp.policy;
       }
@@ -80,52 +103,60 @@ export class OrgIamPolicyComponent implements OnDestroy {
   }
 
   public savePolicy(): void {
+    console.log(this.iamData);
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.iamData as OrgIAMPolicy.AsObject).isDefault) {
-          this.adminService.addCustomOrgIAMPolicy(
-            this.org.id,
-            this.iamData.userLoginMustBeDomain,
-          ).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          this.adminService
+            .addCustomOrgIAMPolicy(this.org.id, this.iamData.userLoginMustBeDomain)
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+              this.fetchData();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
           break;
         } else {
-          this.adminService.updateCustomOrgIAMPolicy(
-            this.org.id,
-            this.iamData.userLoginMustBeDomain,
-          ).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          this.adminService
+            .updateCustomOrgIAMPolicy(this.org.id, this.iamData.userLoginMustBeDomain)
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+              this.fetchData();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
           break;
         }
       case PolicyComponentServiceType.ADMIN:
         // update Default org iam policy?
-        this.adminService.updateOrgIAMPolicy(
-          this.iamData.userLoginMustBeDomain,
-        ).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.adminService
+          .updateOrgIAMPolicy(this.iamData.userLoginMustBeDomain)
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+            this.fetchData();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
         break;
     }
   }
 
   public removePolicy(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      this.adminService.resetCustomOrgIAMPolicyToDefault(this.org.id).then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-        setTimeout(() => {
-          this.fetchData();
-        }, 1000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      this.adminService
+        .resetCustomOrgIAMPolicyToDefault(this.org.id)
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 

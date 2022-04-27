@@ -1,15 +1,13 @@
 @use '@angular/material' as mat;
 
 @mixin card-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $background: map-get($theme, background);
-  $card-background-color: mat.get-color-from-palette($background, card);
+  $card-background-color: mat.get-color-from-palette($background, cards);
   $is-dark-theme: map-get($theme, is-dark);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-selected-color: if($is-dark-theme, #ffffff, #000000);
-  /* stylelint-enable */
+  $border-selected-color: if($is-dark-theme, #fff, #000);
 
   .card {
     background-color: $card-background-color;
@@ -18,7 +16,6 @@
     box-sizing: border-box;
     border-radius: 0.5rem;
     outline: none;
-    height: 100%;
 
     &.warn {
       border-color: var(--warn);
@@ -57,5 +54,26 @@
         color: $border-selected-color;
       }
     }
+  }
+
+  .cnsl-chip {
+    height: auto;
+    border: 1px solid $border-color;
+  }
+
+  .cnsl-chip-list {
+    padding: 0.5rem 0;
+    display: block;
+  }
+
+  .cnsl-chip-dot {
+    height: 1rem;
+    width: 1rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: #cd5c5c;
+    margin-left: -4px;
+    margin-right: 8px;
+    box-shadow: 0 0 3px #0000001a;
   }
 }

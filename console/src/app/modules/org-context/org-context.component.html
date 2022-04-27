@@ -1,4 +1,4 @@
-<div class="card" cnslOutsideClick (clickOutside)="closeCard($event)">
+<div class="org-context-card" cdkTrapFocus>
   <div class="spinner-w">
     <mat-spinner diameter="20" *ngIf="orgLoading$ | async" color="accent">
     </mat-spinner>
@@ -10,19 +10,40 @@
   </div>
 
   <div class="org-wrapper">
-    <button mat-button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
-      *ngFor="let temporg of orgs$ | async" (click)="setActiveOrg(temporg)">
-      {{temporg?.name ? temporg.name : 'NO NAME'}}
+    <button class="org-button-with-pin" mat-button
+      [ngClass]="{'active': pinnedorg.id === org?.id, 'border-bottom':pinned.selected.length && i === pinned.selected.length -1}"
+      [disabled]="!pinnedorg.id" *ngFor="let pinnedorg of pinned.selected; index as i"
+      (click)="setActiveOrg(pinnedorg)">
+      <div class="org-flex-row">
+        <span class="org-span">{{pinnedorg?.name ? pinnedorg.name : 'NO NAME'}}</span>
+        <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: pinnedorg}"></template>
+      </div>
     </button>
+    <ng-container *ngFor="let temporg of orgs$ | async">
+      <button *ngIf="!pinned.isSelected(temporg)" class="org-button-with-pin" mat-button
+        [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id" (click)="setActiveOrg(temporg)">
+        <div class="org-flex-row"><span class="org-span">{{temporg?.name ? temporg.name : 'NO NAME'}}</span>
+          <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: temporg}"></template>
+        </div>
+      </button>
+    </ng-container>
   </div>
 
-  <button mat-button class="show-all" [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
+  <button mat-button class="show-all" [routerLink]="[ '/org/overview' ]" (click)="closedCard.emit()">{{'MENU.SHOWORGS' |
     translate}}</button>
 
   <ng-template cnslHasRole [hasRole]="['org.create','iam.write']">
-    <button mat-button [routerLink]="[ '/org/create' ]">
+    <button mat-button [routerLink]="[ '/org/create' ]" (click)="closedCard.emit()">
       <mat-icon class="avatar">add</mat-icon>
       {{'MENU.NEWORG' | translate}}
     </button>
   </ng-template>
 </div>
+
+<ng-template #toggleButton let-key="key">
+  <button matTooltip="{{'ACTIONS.PIN' | translate}}" [ngClass]="{ selected: pinned.isSelected(key)}"
+    (click)="toggle(key,$event)" class="edit-button" mat-icon-button>
+    <mat-icon *ngIf="pinned.isSelected(key)" svgIcon="mdi_pin"></mat-icon>
+    <mat-icon svgIcon="mdi_pin_outline" *ngIf="!pinned.isSelected(key)"></mat-icon>
+  </button>
+</ng-template>

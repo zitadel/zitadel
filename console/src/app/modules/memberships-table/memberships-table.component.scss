@@ -1,0 +1,93 @@
+.icon-button {
+  margin-right: 0.5rem;
+}
+
+.action {
+  width: 40px;
+}
+
+.form-field {
+  flex: 1;
+}
+
+.roles-sp-wrapper {
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+// .membership-auth-line {
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center;
+//   justify-content: space-between;
+
+//   .membership-role-list {
+//     display: flex;
+//     flex-direction: column;
+//     margin: 0.25rem;
+//     font-size: 14px;
+//     text-overflow: ellipsis;
+//     overflow: hidden;
+//     justify-items: center;
+//     align-self: center;
+//   }
+
+//   .goto-btn {
+//     margin-left: 0.5rem;
+
+//     i {
+//       height: 1rem;
+//       line-height: 1rem;
+//       font-size: 1rem;
+//     }
+//   }
+// }
+
+.membership-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  .membership-role-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0.25rem;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    justify-items: center;
+    align-self: center;
+  }
+
+  .goto-btn {
+    margin-left: 0.5rem;
+
+    i {
+      height: 1rem;
+      line-height: 1rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+.sa-icon {
+  display: block;
+  width: 32px;
+  margin: 0 0.5rem;
+
+  i {
+    margin: auto;
+  }
+}
+
+.pointer {
+  outline: none;
+  cursor: pointer;
+}
+
+.role-row {
+  min-width: 200px;
+}

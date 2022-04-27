@@ -1,14 +1,7 @@
-.full-width {
-  width: 100%;
-}
-
-.more-space {
-  margin-bottom: 1rem;
-}
-
 .target-desc {
   font-size: 14px;
   display: block;
+  margin-top: 0.5rem;
 
   a {
     color: #4072b4;
@@ -21,13 +14,17 @@
   }
 }
 
-.line {
-  width: 100%;
-  display: flex;
+.user-create-form-field {
+  flex: 1;
 
-  .form-field {
-    flex: 1;
+  &.more-space {
+    margin-bottom: 1rem;
   }
+}
+
+.line {
+  display: flex;
+  max-width: 500px;
 
   button {
     margin-top: 30px;
@@ -36,20 +33,24 @@
 
 .sm-dlt {
   cursor: pointer;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .found {
-  margin: .5rem 0;
-  background: #4072b410;
-  border-radius: .5rem;
-  padding: .5rem;
+  margin: 0.5rem 0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0;
+  max-width: 500px;
+  box-sizing: border-box;
+
+  .add-user-row {
+    margin-left: -4px;
+  }
 
   .found-user-row {
-    padding: .5rem 0;
     display: flex;
     align-items: center;
-    min-height: 56px;
+    padding: 0.25rem 0;
 
     button {
       visibility: hidden;
@@ -63,16 +64,62 @@
   }
 
   .found-label {
-    font-size: .9rem;
-    color: var(--grey);
+    font-size: 14px;
+  }
+
+  .user-name-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .smaller {
+      font-size: 13px;
+    }
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .search-user-dl-btn {
+    transition: color 0.2s ease;
+
+    &:not(:hover) {
+      color: var(--grey);
+    }
   }
 }
 
 .circle {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 input {
   max-width: 500px;
   display: block;
+}
+
+.user-option {
+  display: flex;
+  align-items: center;
+
+  .user-option-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+
+    span {
+      line-height: normal;
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .smaller {
+      font-size: 13px;
+    }
+  }
 }

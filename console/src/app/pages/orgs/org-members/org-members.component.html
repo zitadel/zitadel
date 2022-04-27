@@ -1,23 +1,31 @@
-<cnsl-detail-layout [backRouterLink]="[ '/org']" title="{{org?.name}} {{ 'ORG.MEMBER.TITLE' | translate }}"
-    description="{{ 'ORG.MEMBER.DESCRIPTION' | translate }}">
-    <p class="desc">{{'MEMBER.DOCSINFO' | translate}} <a href="https://docs.zitadel.ch/docs/manuals/admin-managers"
-            target="_blank">ZITADEL Managers</a>.</p>
-    <cnsl-members-table [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
-        (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
-        (changedSelection)="selection = $event" [refreshTrigger]="changePage"
-        [canDelete]="['org.member.delete:'+org?.id,'org.member.delete$'] | hasRole | async"
-        [canWrite]="['org.member.write$'] | hasRole | async" (deleteMember)="removeOrgMember($event)">
-        <ng-template cnslHasRole selectactions [hasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
-            <button (click)="removeOrgMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
-                class="del-button" mat-raised-button color="warn">
-                <i class="las la-trash"></i>
-                {{'ACTIONS.SELECTIONDELETE' | translate}}
-            </button>
-        </ng-template>
-        <ng-template cnslHasRole writeactions [hasRole]="['org.member.write:'+org?.id,'org.member.write']">
-            <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
-                <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-            </a>
-        </ng-template>
-    </cnsl-members-table>
+<cnsl-detail-layout title="{{org?.name}} {{ 'ORG.MEMBER.TITLE' | translate }}">
+  <p class="subinfo" sub>
+    <span class="cnsl-secondary-text">{{ 'ORG.MEMBER.DESCRIPTION' | translate }}</span>
+    <a mat-icon-button href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">
+      <i class="las la-info-circle"></i>
+    </a>
+  </p>
+  <cnsl-members-table [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
+    (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
+    (changedSelection)="selection = $event" [refreshTrigger]="changePage"
+    [canDelete]="['org.member.delete:'+org?.id,'org.member.delete$'] | hasRole | async"
+    [canWrite]="['org.member.write$'] | hasRole | async" (deleteMember)="removeOrgMember($event)">
+    <ng-template cnslHasRole selectactions [hasRole]="['org.member.delete:'+org?.id,'org.member.delete']">
+      <button (click)="removeOrgMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
+        mat-raised-button color="warn">
+        <i class="las la-trash"></i>
+        <span>{{'ACTIONS.SELECTIONDELETE' | translate}}</span>
+        <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeOrgMemberSelection()">
+        </cnsl-action-keys>
+      </button>
+    </ng-template>
+    <ng-template cnslHasRole writeactions [hasRole]="['org.member.write:'+org?.id,'org.member.write']">
+      <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="openAddMember()">
+        </cnsl-action-keys>
+      </button>
+    </ng-template>
+  </cnsl-members-table>
 </cnsl-detail-layout>

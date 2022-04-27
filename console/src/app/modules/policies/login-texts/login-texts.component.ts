@@ -15,8 +15,12 @@ import {
   GetDefaultLoginTextsRequest,
   SetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -60,7 +64,7 @@ const KeyNamesArray = [
   'passwordlessRegistrationDoneText',
   'passwordlessRegistrationText',
   'passwordlessText',
-  'externalRegistrationUserOverviewText'
+  'externalRegistrationUserOverviewText',
 ];
 /* eslint-enable */
 
@@ -97,10 +101,10 @@ export class LoginTextsComponent implements OnDestroy {
   public currentPolicyChangeDate!: Timestamp.AsObject | undefined;
   public newerPolicyChangeDate!: Timestamp.AsObject | undefined;
 
-  public totalCustomPolicy: { [key: string]: { [key: string]: string; }; } = {};
+  public totalCustomPolicy?: { [key: string]: { [key: string]: string } | boolean } = {}; // LoginCustomText.AsObject
 
-  public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
-  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string; }> = new BehaviorSubject({});
+  public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
+  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({});
 
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -116,68 +120,109 @@ export class LoginTextsComponent implements OnDestroy {
 
   public destroy$: Subject<void> = new Subject();
   public InfoSectionType: any = InfoSectionType;
-
+  public orgName: string = '';
   public form: FormGroup = new FormGroup({
     currentSubMap: new FormControl('emailVerificationDoneText'),
     locale: new FormControl('en'),
   });
+
+  public canWrite$: Observable<boolean> = this.authService.isAllowed([
+    this.serviceType === PolicyComponentServiceType.ADMIN
+      ? 'iam.policy.write'
+      : this.serviceType === PolicyComponentServiceType.MGMT
+      ? 'policy.write'
+      : '',
+  ]);
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
+    private storageService: StorageService,
+    breadcrumbService: BreadcrumbService,
   ) {
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
+    this.sub = this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
-          this.service.getSupportedLanguages().then(lang => {
-            this.LOCALES = lang.languagesList;
+              this.service.getSupportedLanguages().then((lang) => {
+                this.LOCALES = lang.languagesList;
+              });
+
+              this.loadData();
+
+              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+              if (org && org.id) {
+                this.orgName = org.name;
+              }
+
+              const iambread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'System',
+                routerLink: ['/system'],
+              });
+              const bread: Breadcrumb = {
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              };
+              breadcrumbService.setBreadcrumb([iambread, bread]);
+
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.service = this.injector.get(AdminService as Type<AdminService>);
+
+              this.service.getSupportedLanguages().then((lang) => {
+                this.LOCALES = lang.languagesList;
+              });
+
+              this.loadData();
+
+              const iamBread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'System',
+                routerLink: ['/system'],
+              });
+              breadcrumbService.setBreadcrumb([iamBread]);
+              break;
+          }
+
+          return this.route.params;
+        }),
+      )
+      .subscribe(() => {
+        interval(10000)
+          .pipe(
+            // debounceTime(5000),
+            takeUntil(this.destroy$),
+          )
+          .subscribe((x) => {
+            this.checkForChanges();
           });
-
-          this.loadData();
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-
-          this.service.getSupportedLanguages().then(lang => {
-            this.LOCALES = lang.languagesList;
-          });
-
-          this.loadData();
-          break;
-      }
-
-      return this.route.params;
-    })).subscribe(() => {
-      interval(10000).pipe(
-        // debounceTime(5000),
-        takeUntil(this.destroy$),
-      ).subscribe(x => {
-        this.checkForChanges();
       });
-    });
 
-    this.form.valueChanges.pipe(
-      startWith({ currentSubMap: 'emailVerificationDoneText', locale: 'en' }),
-      pairwise(),
-      takeUntil(this.destroy$),
-    ).subscribe(pair => {
-      this.checkForUnsaved(pair[0].currentSubMap).then((wantsToSave) => {
-        if (wantsToSave) {
-          this.saveCurrentMessage().then(() => {
+    this.form.valueChanges
+      .pipe(startWith({ currentSubMap: 'emailVerificationDoneText', locale: 'en' }), pairwise(), takeUntil(this.destroy$))
+      .subscribe((pair) => {
+        this.checkForUnsaved(pair[0].currentSubMap).then((wantsToSave) => {
+          if (wantsToSave) {
+            this.saveCurrentMessage()
+              .then(() => {
+                this.loadData();
+              })
+              .catch(() => {
+                // load even if save failed
+                this.loadData();
+              });
+          } else {
             this.loadData();
-          }).catch(() => {
-            // load even if save failed
-            this.loadData();
-          });
-        } else {
-          this.loadData();
-        }
+          }
+        });
       });
-    });
   }
 
   public getDefaultValues(req: any): Promise<any> {
@@ -206,29 +251,32 @@ export class LoginTextsComponent implements OnDestroy {
   public async loadData(): Promise<any> {
     const reqDefaultInit = REQUESTMAP[this.serviceType].getDefault;
     reqDefaultInit.setLanguage(this.locale);
-    this.getDefaultInitMessageTextMap$ = from(
-      this.getDefaultValues(reqDefaultInit),
-    ).pipe(map(m => m[this.currentSubMap]));
+    this.getDefaultInitMessageTextMap$ = from(this.getDefaultValues(reqDefaultInit)).pipe(map((m) => m[this.currentSubMap]));
 
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
-    this.totalCustomPolicy = (await this.getCurrentValues(reqCustomInit));
-    this.getCustomInitMessageTextMap$.next(
-      this.totalCustomPolicy[this.currentSubMap],
-    );
+    return this.getCurrentValues(reqCustomInit)
+      .then((policy) => {
+        if (policy) {
+          this.totalCustomPolicy = policy;
+          this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   private async patchSingleCurrentMap(): Promise<any> {
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
-    const pol = (await this.getCurrentValues(reqCustomInit));
-    this.getCustomInitMessageTextMap$.next(
-      pol[this.currentSubMap],
-    );
+    this.getCurrentValues(reqCustomInit).then((policy) => {
+      this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
+    });
   }
 
   public checkForChanges(): void {
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
 
-    (this.service as ManagementService).getCustomLoginTexts(reqCustomInit).then(policy => {
+    (this.service as ManagementService).getCustomLoginTexts(reqCustomInit).then((policy) => {
       this.newerPolicyChangeDate = policy.customText?.details?.changeDate;
     });
   }
@@ -240,7 +288,7 @@ export class LoginTextsComponent implements OnDestroy {
    */
   public checkForUnsaved(oldkey: string): Promise<boolean> {
     const old = this.getCustomInitMessageTextMap$.getValue();
-    const unsaved = this.totalCustomPolicy[oldkey];
+    const unsaved = this.totalCustomPolicy ? this.totalCustomPolicy[oldkey] : undefined;
 
     if (old && unsaved && JSON.stringify(old) !== JSON.stringify(unsaved)) {
       const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -259,32 +307,38 @@ export class LoginTextsComponent implements OnDestroy {
     }
   }
 
-  public updateCurrentValues(values: { [key: string]: string; }): void {
-    const setFcn = REQUESTMAP[this.serviceType].setFcn;
-    this.totalCustomPolicy[this.currentSubMap] = values;
+  public updateCurrentValues(values: { [key: string]: string }): void {
+    if (this.totalCustomPolicy) {
+      const setFcn = REQUESTMAP[this.serviceType].setFcn;
+      this.totalCustomPolicy[this.currentSubMap] = values;
 
-    this.updateRequest = setFcn(this.totalCustomPolicy);
-    this.updateRequest.setLanguage(this.locale);
+      this.updateRequest = setFcn(this.totalCustomPolicy);
+      this.updateRequest.setLanguage(this.locale);
+    }
   }
 
   public saveCurrentMessage(): Promise<any> {
     const entirePayload = this.updateRequest.toObject();
-    this.getCustomInitMessageTextMap$.next(
-      (entirePayload as any)[this.currentSubMap],
-    );
+    this.getCustomInitMessageTextMap$.next((entirePayload as any)[this.currentSubMap]);
 
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).setCustomLoginText(this.updateRequest).then(() => {
-          this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
-          setTimeout(() => {
-            this.patchSingleCurrentMap();
-          }, 1000);
-        }).catch(error => this.toast.showError(error));
+        return (this.service as ManagementService)
+          .setCustomLoginText(this.updateRequest)
+          .then(() => {
+            this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+            setTimeout(() => {
+              this.patchSingleCurrentMap();
+            }, 1000);
+          })
+          .catch((error) => this.toast.showError(error));
       case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).setCustomLoginText(this.updateRequest).then(() => {
-          this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
-        }).catch(error => this.toast.showError(error));
+        return (this.service as AdminService)
+          .setCustomLoginText(this.updateRequest)
+          .then(() => {
+            this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+          })
+          .catch((error) => this.toast.showError(error));
     }
   }
 
@@ -300,24 +354,30 @@ export class LoginTextsComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-          (this.service as ManagementService).resetCustomLoginTextToDefault(this.locale).then(() => {
-            setTimeout(() => {
-              this.loadData();
-            }, 1000);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          (this.service as ManagementService)
+            .resetCustomLoginTextToDefault(this.locale)
+            .then(() => {
+              setTimeout(() => {
+                this.loadData();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-          (this.service as AdminService).resetCustomLoginTextToDefault(this.locale).then(() => {
-            setTimeout(() => {
-              this.loadData();
-            }, 1000);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          (this.service as AdminService)
+            .resetCustomLoginTextToDefault(this.locale)
+            .then(() => {
+              setTimeout(() => {
+                this.loadData();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });

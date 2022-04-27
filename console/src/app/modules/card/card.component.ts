@@ -22,4 +22,5 @@ export class CardComponent {
   @Input() public description: string = '';
   @Input() public animate: boolean = false;
   @Input() public nomargin?: boolean = false;
+  @Input() public stretch: boolean = false;
 }

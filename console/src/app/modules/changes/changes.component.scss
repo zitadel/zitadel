@@ -11,7 +11,7 @@
     font-weight: 400;
     margin-top: 1rem;
     font-size: 14px;
-    letter-spacing: .05em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 
@@ -23,24 +23,25 @@
 @mixin changes-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
   $foreground: map-get($theme, foreground);
+  $secondary-text: map-get($foreground, secondary-text);
 
   .scroll-container {
-    max-height: 50vh;
-    overflow-y: scroll;
     border-bottom: 1px solid map-get($foreground, divider);
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
+    box-sizing: border-box;
 
     .date {
       font-weight: 500;
-      font-size: .8rem;
+      font-size: 0.8rem;
       display: block;
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
     }
 
     .item {
       display: block;
       padding: 10px 0;
-      font-size: .8rem;
+      font-size: 0.8rem;
+      box-sizing: border-box;
 
       .row {
         display: flex;
@@ -50,31 +51,25 @@
           width: 32px;
         }
 
-        .actions {
+        .change-actions {
           flex: 1;
           display: flex;
           flex-direction: column;
-          margin-top: -.5rem;
+          margin-top: -0.25rem;
+          margin-left: 1rem;
 
-          .action {
+          .change-action {
             display: flex;
             flex-direction: row;
             align-items: center;
             flex: 1;
-
-            .icon {
-              width: 32px;
-              display: inline-block;
-              height: 1.2rem;
-              line-height: 1.2rem;
-              font-size: 1.2rem;
-              color: var(--grey);
-            }
+            padding: 0.25rem 0;
+            cursor: default;
 
             span {
               flex: 1;
               font-weight: 500;
-              font-size: .8rem;
+              font-size: 0.8rem;
               overflow-x: hidden;
             }
 
@@ -84,60 +79,32 @@
 
             .block {
               display: block;
-            }
-
-            .restore {
-              visibility: hidden;
-              display: none;
-              opacity: 0;
-              margin-left: 1rem;
-              transform: opacity .2s ease-in-out;
-            }
-
-            &:hover {
-              .restore {
-                visibility: visible;
-                display: inline-block;
-                opacity: 1;
-                color: #81868a;
-
-                &[disabled] {
-                  visibility: hidden;
-                }
-
-                &:hover {
-                  color: white;
-                }
-              }
+              color: $secondary-text;
             }
           }
         }
-
-        /* stylelint-disable */
-        $primary: map-get($theme, primary);
-        $is-dark-theme: map-get($theme, is-dark);
-        $transparent-color: if($is-dark-theme, rgba(#8795a1, .2), rgba(#8795a1, .2));
-
-        /* stylelint-enable */
-
-        &.change-item-back {
-          background-color: rgba($transparent-color, .93);
-          transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
-        }
-      }
-
-      .sp-wrapper {
-        padding: .5rem;
-        display: flex;
-        justify-content: center;
       }
     }
 
+    .ch-sp-wrapper {
+      padding: 0.5rem;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .load-more-button {
+      margin-bottom: 1rem;
+    }
+
     .end-container {
-      font-size: 14px;
       margin: 1rem 0 1rem 0;
-      display: block;
-      color: var(--grey);
+      display: flex;
+      flex-direction: column;
+
+      span {
+        font-size: 13px;
+      }
     }
   }
 }

@@ -6,7 +6,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 })
 export class HasRoleDirective {
   private hasView: boolean = false;
-  @Input() public set hasRole(roles: string[] | RegExp[]) {
+  @Input() public set hasRole(roles: string[] | RegExp[] | undefined) {
     if (roles && roles.length > 0) {
       this.authService.isAllowed(roles).subscribe((isAllowed) => {
         if (isAllowed && !this.hasView) {
@@ -17,6 +17,11 @@ export class HasRoleDirective {
           this.hasView = false;
         }
       });
+    } else {
+      if (!this.hasView) {
+        this.viewContainerRef.clear();
+        this.viewContainerRef.createEmbeddedView(this.templateRef);
+      }
     }
   }
 

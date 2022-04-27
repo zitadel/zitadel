@@ -1,71 +1,72 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-    [timestamp]="keyResult?.details?.viewTimestamp" [selection]="selection">
-    <div actions>
-        <a [disabled]="([('project.app.write:' + projectId), 'project.app.write'] | hasRole | async) === false"
-            color="primary" mat-raised-button (click)="openAddKey()">
-            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-        </a>
-    </div>
+  [timestamp]="keyResult?.details?.viewTimestamp" [selection]="selection">
+  <div actions>
+    <a [disabled]="([('project.app.write:' + projectId), 'project.app.write'] | hasRole | async) === false"
+      color="primary" mat-raised-button (click)="openAddKey()">
+      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+    </a>
+  </div>
 
-    <div class="table-wrapper">
-        <table class="table" mat-table [dataSource]="dataSource">
-            <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef>
-                    <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
-                        [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected()">
-                    </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let key">
-                    <mat-checkbox color="primary" (click)="$event.stopPropagation()"
-                        (change)="$event ? selection.toggle(key) : null" [checked]="selection.isSelected(key)">
-                    </mat-checkbox>
-                </td>
-            </ng-container>
+  <div class="table-wrapper">
+    <table class="table" mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let key">
+          <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(key) : null" [checked]="selection.isSelected(key)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
 
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.ID' | translate }} </th>
-                <td mat-cell *matCellDef="let key"> {{key?.id}} </td>
-            </ng-container>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.ID' | translate }} </th>
+        <td mat-cell *matCellDef="let key"> {{key?.id}} </td>
+      </ng-container>
 
-            <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.TYPE' | translate }} </th>
-                <td mat-cell *matCellDef="let key"> {{'USER.MACHINE.KEYTYPES.'+key?.type | translate}} </td>
-            </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.TYPE' | translate }} </th>
+        <td mat-cell *matCellDef="let key"> {{'USER.MACHINE.KEYTYPES.'+key?.type | translate}} </td>
+      </ng-container>
 
-            <ng-container matColumnDef="creationDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.CREATIONDATE' | translate }} </th>
-                <td mat-cell *matCellDef="let key">
-                    {{key.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
-                </td>
-            </ng-container>
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.CREATIONDATE' | translate }} </th>
+        <td mat-cell *matCellDef="let key">
+          {{key.details.creationDate | timestampToDate | localizedDate: 'fromNow'}}
+        </td>
+      </ng-container>
 
-            <ng-container matColumnDef="expirationDate">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.EXPIRATIONDATE' | translate }} </th>
-                <td mat-cell *matCellDef="let key">
-                    {{key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
-                </td>
-            </ng-container>
+      <ng-container matColumnDef="expirationDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.EXPIRATIONDATE' | translate }} </th>
+        <td mat-cell *matCellDef="let key">
+          {{key.expirationDate | timestampToDate | localizedDate: 'fromNow'}}
+        </td>
+      </ng-container>
 
-            <ng-container matColumnDef="actions" stickyEnd>
-                <th mat-header-cell *matHeaderCellDef></th>
-                <td mat-cell *matCellDef="let key">
-                    <button
-                        [disabled]="([('project.app.write:' + projectId), 'project.app.write'] | hasRole | async) === false"
-                        mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}"
-                        (click)="deleteKey(key)">
-                        <i class="las la-trash"></i>
-                    </button>
-                </td>
-            </ng-container>
+      <ng-container matColumnDef="actions" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let key">
+          <cnsl-table-actions>
+            <button actions
+              [disabled]="([('project.app.write:' + projectId), 'project.app.write'] | hasRole | async) === false"
+              mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}" (click)="deleteKey(key)">
+              <i class="las la-trash"></i>
+            </button>
+          </cnsl-table-actions>
+        </td>
+      </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let key; columns: displayedColumns;"
-                (click)="selection.toggle(key);">
-            </tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr class="highlight" mat-row *matRowDef="let key; columns: displayedColumns;" (click)="selection.toggle(key);">
+      </tr>
+    </table>
+  </div>
 
-        </table>
-        <cnsl-paginator #paginator class="paginator" [timestamp]="keyResult?.details?.viewTimestamp" [length]="keyResult?.details?.totalResult || 0" [pageSize]="10"
-            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
-    </div>
+  <cnsl-paginator #paginator class="paginator" [timestamp]="keyResult?.details?.viewTimestamp"
+    [length]="keyResult?.details?.totalResult || 0" [pageSize]="20" [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="changePage($event)"></cnsl-paginator>
 </cnsl-refresh-table>

@@ -167,7 +167,7 @@ export class GrpcAuthService {
     } else {
       let orgs = this.cachedOrgs;
       if (orgs.length === 0) {
-        orgs = (await this.listMyProjectOrgs(10, 0)).resultList;
+        orgs = (await this.listMyProjectOrgs()).resultList;
         this.cachedOrgs = orgs;
       }
 
@@ -310,21 +310,23 @@ export class GrpcAuthService {
   }
 
   public listMyProjectOrgs(
-    limit: number,
-    offset: number,
+    limit?: number,
+    offset?: number,
     queryList?: OrgQuery[],
   ): Promise<ListMyProjectOrgsResponse.AsObject> {
     const req = new ListMyProjectOrgsRequest();
-    const metadata = new ListQuery();
+    const query = new ListQuery();
     if (offset) {
-      metadata.setOffset(offset);
+      query.setOffset(offset);
     }
     if (limit) {
-      metadata.setLimit(limit);
+      query.setLimit(limit);
     }
     if (queryList) {
       req.setQueriesList(queryList);
     }
+
+    req.setQuery(query);
 
     return this.grpcService.auth.listMyProjectOrgs(req, null).then((resp) => resp.toObject());
   }

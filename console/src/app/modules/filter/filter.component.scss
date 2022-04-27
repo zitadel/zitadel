@@ -1,0 +1,97 @@
+@mixin filter-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $card-background-color: mat.get-color-from-palette($background, cards);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+
+  .cnsl-filter-button-wrapper {
+    position: relative;
+    padding-right: 0.5rem;
+
+    .filter-toggle {
+      .filter-count {
+        font-size: 14px;
+        color: $primary-color;
+        margin-left: 0.5rem;
+      }
+    }
+  }
+
+  .cnsl-filter-wrapper {
+    border-radius: 0.5rem;
+    background-color: $card-background-color;
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border: 1px solid $border-color;
+    box-sizing: border-box;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+    color: map-get($foreground, text);
+
+    @media only screen and (min-width: 500px) {
+      width: 320px;
+    }
+
+    .filter-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid if($is-dark-theme, #ffffff15, #00000015);
+
+      .filter-middle {
+        margin: 0 1rem;
+      }
+    }
+
+    .filter-row {
+      padding: 0.5rem 0;
+
+      .cb {
+        padding: 0.5rem 0;
+        font-size: 15px;
+      }
+
+      .subquery {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.5rem;
+        background-color: if($is-dark-theme, #00000020, #00000008);
+        margin: 0 -0.5rem;
+
+        .nomethod {
+          font-size: 14px;
+        }
+
+        .filter-select-method {
+          min-width: 100px;
+          margin-right: 0.5rem;
+        }
+
+        .filter-input-value {
+          input {
+            height: 36px;
+            font-size: 15px;
+          }
+        }
+
+        .filter-select-value {
+          min-width: 150px;
+        }
+      }
+    }
+  }
+}

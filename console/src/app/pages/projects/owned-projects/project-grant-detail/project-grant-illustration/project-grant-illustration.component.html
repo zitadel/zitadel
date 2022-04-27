@@ -1,0 +1,47 @@
+<div class="pgi" *ngIf="grantedProject">
+  <div class="pgi-org-wrapper first-org">
+    <span class="pgi-label">{{grantedProject.projectOwnerName}}</span>
+    <div class="pgi-project-wrapper fill-space">
+      <span class="pgi-label">{{grantedProject.projectName}}</span>
+      <div class="pgi-role-wrapper fill-space">
+        <div class="pgi-role-row">
+          <cnsl-project-role-chip [roleName]="role.key" *ngFor="let role of projectRoleOptions">{{role.key}}
+          </cnsl-project-role-chip>
+        </div>
+        <span class="fill-space"></span>
+        <span class="pgi-label-sec cnsl-secondary-text">roles</span>
+      </div>
+      <span class="pgi-label-sec cnsl-secondary-text">project</span>
+    </div>
+    <span class="pgi-label-sec cnsl-secondary-text">org</span>
+  </div>
+
+  <i class="pgi-arrow las la-long-arrow-alt-right"></i>
+
+  <div class="pgi-org-wrapper">
+    <span class="pgi-label italic">{{grantedProject.grantedOrgName}}</span>
+    <div class="pgi-project-wrapper fill-space">
+      <div class="pgi-label-wrapper">
+        <span class="pgi-label">{{grantedProject.projectName}}</span>
+        <div class="pgi-state-dot" *ngIf="grantedProject && grantedProject.state !== undefined"
+          matTooltip="{{'PROJECT.STATE.'+grantedProject.state | translate}}"
+          [ngClass]="{'active': grantedProject.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': grantedProject.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE }">
+        </div>
+      </div>
+      <div class="pgi-role-wrapper fill-space">
+        <div class="pgi-role-row">
+          <cnsl-project-role-chip [showRemove]="true" (removed)="removeRole(role)" [roleName]="role"
+            *ngFor="let role of grantedProject.grantedRoleKeysList">{{role}}
+          </cnsl-project-role-chip>
+        </div>
+        <button matTooltip="{{'ACTIONS.EDIT' | translate}}" mat-icon-button (click)="editRoleClicked.emit()">
+          <i class="las la-pen"></i>
+        </button>
+        <span class="fill-space"></span>
+        <span class="pgi-label-sec cnsl-secondary-text">granted roles</span>
+      </div>
+      <span class="pgi-label-sec cnsl-secondary-text">granted project</span>
+    </div>
+    <span class="pgi-label-sec cnsl-secondary-text">granted org</span>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+@use '@angular/material' as mat;
+
+@mixin keyboard-shortcuts-theme($theme) {
+  $primary: map-get($theme, primary);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $text-color: map-get($foreground, text);
+  $accent: map-get($theme, accent);
+  $is-dark-theme: map-get($theme, is-dark);
+  $accent-color: mat.get-color-from-palette($primary, 500);
+  $back: map-get($background, background);
+  $card-background-color: mat.get-color-from-palette($background, cards);
+
+  .keyboard-shortcuts-group {
+    $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+
+    border: 1px solid $border-color;
+    background-color: $card-background-color;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 0.5rem 0 0 0;
+
+    h2 {
+      font-size: 1rem;
+      margin: 0 0 1rem 0;
+    }
+
+    .keyboard-shortcuts-wrapper {
+      display: flex;
+      flex-direction: column;
+
+      .keyboard-shortcut {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0;
+
+        .keyboard-shortcut-name {
+          font-size: 14px;
+
+          strong {
+            color: $text-color;
+          }
+        }
+
+        &:not(:last-child) {
+          border-bottom: 1px solid map-get($foreground, dividers);
+        }
+
+        .fill-space {
+          flex: 1;
+        }
+      }
+    }
+  }
+
+  .keyboard-shortcuts-action-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    height: 20px;
+    width: 20px;
+    position: relative;
+    margin: 0 4px;
+
+    .keyboard-shortcuts-key-overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: if($is-dark-theme, #fff, #000);
+      opacity: 0.15;
+      border-radius: 4px;
+    }
+
+    .keyboard-shortcuts-span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+      opacity: 1;
+      text-transform: uppercase;
+    }
+  }
+
+  .keyboard-shortcuts-plus {
+    font-size: 14px;
+  }
+}
+
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.action {
+  display: flex;
+
+  button {
+    border-radius: 0.5rem;
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+}

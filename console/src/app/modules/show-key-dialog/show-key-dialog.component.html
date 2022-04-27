@@ -1,30 +1,25 @@
 <span class="title" mat-dialog-title>{{'USER.MACHINE.ADDED.TITLE' | translate}}</span>
 <div mat-dialog-content>
-    <p class="desc"> {{'USER.MACHINE.ADDED.DESCRIPTION' | translate}}</p>
-    <ng-container *ngIf="keyResponse">
-        <div class="row">
-            <p class="left">{{'USER.MACHINE.ID' | translate}}</p>
-            <p class="right">{{$any(keyResponse)?.id}}</p>
-            <p class="right">{{$any(keyResponse)?.keyId}}</p>
-        </div>
+  <p class="desc"> {{'USER.MACHINE.ADDED.DESCRIPTION' | translate}}</p>
+  <ng-container *ngIf="keyResponse">
+    <div class="row">
+      <p class="left cnsl-secondary-text">{{'USER.MACHINE.ID' | translate}}</p>
+      <p class="right">{{$any(keyResponse)?.id}}</p>
+      <p class="right">{{$any(keyResponse)?.keyId}}</p>
+    </div>
 
-        <div class="row">
-            <p class="left">{{'USER.MACHINE.CREATIONDATE' | translate}}</p>
-            <p *ngIf="keyResponse.details && keyResponse.details.creationDate" class="right">
-              {{ keyResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
-            </p>
-        </div>
-        <!-- <div class="row">
-            <p class="left">{{'USER.MACHINE.EXPIRATIONDATE' | translate}}</p>
-            <p *ngIf="keyResponse.details && keyResponse.details.expirationDate" class="right">
-              {{ keyResponse.details.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
-            </p>
-        </div> -->
-        <button class="download-button" mat-stroked-button color="primary" (click)="saveFile()">Download</button>
-    </ng-container>
+    <div class="row">
+      <p class="left cnsl-secondary-text">{{'USER.MACHINE.CREATIONDATE' | translate}}</p>
+      <p *ngIf="keyResponse.details && keyResponse.details.creationDate" class="right">
+        {{ keyResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
+      </p>
+    </div>
+
+    <button class="download-button" mat-stroked-button color="primary" (click)="saveFile()">Download</button>
+  </ng-container>
 </div>
 <div mat-dialog-actions class="action">
-    <button color="primary" mat-raised-button class="ok-button" (click)="closeDialog()">
-        {{'ACTIONS.CLOSE' | translate}}
-    </button>
+  <button color="primary" mat-raised-button class="ok-button" (click)="closeDialog()">
+    {{'ACTIONS.CLOSE' | translate}}
+  </button>
 </div>

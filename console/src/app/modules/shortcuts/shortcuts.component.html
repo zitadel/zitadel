@@ -1,0 +1,210 @@
+<div cdkDropListGroup>
+  <div class="shortcut-container">
+    <div class="shortcut-title-container">
+      <h2>{{'HOME.SHORTCUTS.SHORTCUTS' | translate}}</h2>
+      <button [matTooltip]="(editState ? 'ACTIONS.CLOSE' : 'ACTIONS.EDIT') | translate" class="shortcut-btn"
+        (click)="editState = !editState" mat-icon-button>
+        <i *ngIf="!editState" class=" las la-pen"></i>
+        <mat-icon *ngIf="editState">close</mat-icon>
+      </button>
+      <button matTooltip="{{'ACTIONS.RESETDEFAULT' | translate}}" (click)="reset()" *ngIf="editState" mat-icon-button>
+        <i *ngIf="editState" class="las la-undo-alt"></i>
+      </button>
+    </div>
+
+    <div class="shortcut-list-row">
+      <div cdkDropList [cdkDropListData]="main" class="shortcut-list" (cdkDropListDropped)="drop($event, 'main')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of main">
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <a [routerLink]="!editState ? shortcut.routerLink : null" class="shortcut-box"
+              [ngClass]="{'edit-state': editState && !shortcut.disabled, 'disabled': editState && shortcut.disabled}"
+              cdkDrag [cdkDragDisabled]="shortcut.disabled || !editState">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+                <span *ngIf="shortcut.label" class="shortcuts-avatar-label">{{shortcut.label}}</span>
+              </div>
+              <div class="shortcut-col">
+                <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+                <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+              </div>
+
+              <span class="fill-space"></span>
+
+              <div class="shortcut-state-dot" *ngIf="shortcut && shortcut.state !== undefined"
+                matTooltip="{{'PROJECT.STATE.'+shortcut.state | translate}}"
+                [ngClass]="{'active': shortcut.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': shortcut.state === ProjectState.PROJECT_STATE_INACTIVE }">
+              </div>
+            </a>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div cdkDropList [cdkDropListData]="secondary" class="shortcut-list"
+        (cdkDropListDropped)="drop($event, 'secondary')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of secondary">
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <a [routerLink]="!editState ? shortcut.routerLink : null" class="shortcut-box"
+              [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
+              [cdkDragDisabled]="shortcut.disabled || !editState">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+                <span *ngIf="shortcut.label" class="shortcuts-avatar-label">{{shortcut.label}}</span>
+              </div>
+              <div class="shortcut-col">
+                <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+                <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+              </div>
+
+              <span class="fill-space"></span>
+
+              <div class="shortcut-state-dot" *ngIf="shortcut && shortcut.state !== undefined"
+                matTooltip="{{'PROJECT.STATE.'+shortcut.state | translate}}"
+                [ngClass]="{'active': shortcut.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': shortcut.state === ProjectState.PROJECT_STATE_INACTIVE }">
+              </div>
+            </a>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div cdkDropList [cdkDropListData]="third" class="shortcut-list" (cdkDropListDropped)="drop($event, 'third')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of third">
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <a [routerLink]="!editState ? shortcut.routerLink : null" class="shortcut-box"
+              [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
+              [cdkDragDisabled]="shortcut.disabled || !editState">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+                <span *ngIf="shortcut.label" class="shortcuts-avatar-label">{{shortcut.label}}</span>
+              </div>
+
+              <div class="shortcut-col">
+                <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+                <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+              </div>
+
+              <span class="fill-space"></span>
+
+              <div class="shortcut-state-dot" *ngIf="shortcut && shortcut.state !== undefined"
+                matTooltip="{{'PROJECT.STATE.'+shortcut.state | translate}}"
+                [ngClass]="{'active': shortcut.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': shortcut.state === ProjectState.PROJECT_STATE_INACTIVE }">
+              </div>
+            </a>
+          </ng-template>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="shortcut-container" *ngIf="editState">
+    <h2>{{'HOME.SHORTCUTS.SETTINGS' | translate}}</h2>
+
+    <div class="shortcut-list-row">
+
+      <div cdkDropList [cdkDropListData]="allRoutes" class="shortcut-list" (cdkDropListDropped)="drop($event, 'main')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of allRoutes">
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <div class="shortcut-box"
+              [ngClass]="{'edit-state': editState && !shortcut.disabled, 'disabled': editState && shortcut.disabled}"
+              cdkDrag [cdkDragDisabled]="shortcut.disabled">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+                <span *ngIf="shortcut.label" class="shortcuts-avatar-label">{{shortcut.label}}</span>
+              </div>
+              <div class="shortcut-col">
+                <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+                <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+                <span class="shortcut-item-desc cnsl-secondary-text" *ngIf="shortcut.i18nDesc">{{shortcut.i18nDesc |
+                  translate}}</span>
+                <span class="shortcut-item-desc cnsl-secondary-text" *ngIf="shortcut.desc">{{shortcut.desc}}</span>
+              </div>
+              <span class="fill-space"></span>
+              <div class="shortcut-state-dot" *ngIf="shortcut && shortcut.state !== undefined"
+                matTooltip="{{'PROJECT.STATE.'+shortcut.state | translate}}"
+                [ngClass]="{'active': shortcut.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': shortcut.state === ProjectState.PROJECT_STATE_INACTIVE }">
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div cdkDropList [cdkDropListData]="allPolicies" class="shortcut-list"
+        (cdkDropListDropped)="drop($event, 'secondary')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of allPolicies">
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <div class="shortcut-box" [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
+              [cdkDragDisabled]="shortcut.disabled">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+                <span *ngIf="shortcut.label" class="shortcuts-avatar-label">{{shortcut.label}}</span>
+              </div>
+              <div class="shortcut-col">
+                <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+                <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+                <span class="shortcut-item-desc cnsl-secondary-text" *ngIf="shortcut.i18nDesc">{{shortcut.i18nDesc |
+                  translate}}</span>
+                <span class="shortcut-item-desc cnsl-secondary-text" *ngIf="shortcut.desc">{{shortcut.desc}}</span>
+              </div>
+              <span class="fill-space"></span>
+              <div class="shortcut-state-dot" *ngIf="shortcut && shortcut.state !== undefined"
+                matTooltip="{{'PROJECT.STATE.'+shortcut.state | translate}}"
+                [ngClass]="{'active': shortcut.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': shortcut.state === ProjectState.PROJECT_STATE_INACTIVE }">
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div cdkDropList [cdkDropListData]="allProjects" class="shortcut-list"
+        (cdkDropListDropped)="drop($event, 'third')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of allProjects">
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <div class="shortcut-box" [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
+              [cdkDragDisabled]="shortcut.disabled">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+                <span *ngIf="shortcut.label" class="shortcuts-avatar-label">{{shortcut.label}}</span>
+              </div>
+              <div class="shortcut-col">
+                <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+                <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+                <span class="shortcut-item-desc cnsl-secondary-text" *ngIf="shortcut.i18nDesc">{{shortcut.i18nDesc |
+                  translate}}</span>
+                <span class="shortcut-item-desc cnsl-secondary-text" *ngIf="shortcut.desc">{{shortcut.desc}}</span>
+              </div>
+              <span class="fill-space"></span>
+              <div class="shortcut-state-dot" *ngIf="shortcut && shortcut.state !== undefined"
+                matTooltip="{{'PROJECT.STATE.'+shortcut.state | translate}}"
+                [ngClass]="{'active': shortcut.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': shortcut.state === ProjectState.PROJECT_STATE_INACTIVE }">
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <ng-template #shortcutRef let-shortcut="shortcut">
+  <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+    <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+      <div class="shortcuts-avatar {{shortcut.color}}">
+        <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+        <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+      </div>
+      <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+      <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+    </div>
+  </ng-template>
+</ng-template> -->

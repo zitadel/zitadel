@@ -1,0 +1,16 @@
+.title {
+  font-size: 1.2rem;
+}
+
+.desc {
+  font-size: 0.9rem;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}

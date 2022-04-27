@@ -3,7 +3,6 @@ h1 {
 }
 
 .desc {
-  color: var(--grey);
   margin-bottom: 2rem;
   font-size: 14px;
 }
@@ -11,7 +10,8 @@ h1 {
 .title-section {
   display: flex;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
 
   h2 {
     margin: 0;
@@ -26,48 +26,53 @@ h1 {
   display: flex;
   flex-direction: column;
   max-width: 1000px;
+  position: relative;
 
-  .flow-type {
-    padding: 1rem 1rem;
-    margin: 0.5rem 0;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  .formfield {
+    max-width: 300px;
   }
 
-  .topelements {
-    border: 3px solid var(--color-main);
-    border-radius: 1rem;
-    padding: 0 0.5rem;
+  .flow-type {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 1.5rem;
+
+    .type-icon {
+      color: var(--color-main);
+    }
+
+    .type-button-icon,
+    .type-icon,
+    span {
+      margin-right: 1rem;
+    }
+
+    .type-icon,
+    .type-button-icon {
+      position: relative;
+    }
   }
 
   .trigger-wrapper {
-    padding-left: 100px;
     position: relative;
 
-    .topbottomline {
-      position: absolute;
-      top: 0;
-      bottom: 100px;
-      left: 120px;
-      width: 3px;
-      z-index: -1;
-      background-color: var(--color-main);
-    }
-
     .trigger {
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
       display: flex;
       align-items: center;
-      background: var(--color-main);
-      color: white;
-      margin: 0.5rem 0;
-      min-height: 40px;
+      position: relative;
+
+      .trigger-top {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding-left: 7px;
+      }
 
       .icon {
         margin-right: 1rem;
+        color: var(--color-main);
       }
 
       .fill-space {
@@ -97,8 +102,22 @@ h1 {
             margin-right: 0.5rem;
           }
         }
+
+        .state {
+          margin-left: 1rem;
+        }
       }
     }
+  }
+
+  .topbottomline {
+    position: absolute;
+    top: 26px;
+    bottom: 1.5rem;
+    left: 35px;
+    width: 2px;
+    z-index: 0;
+    background-color: var(--color-main);
   }
 
   .add-btn {

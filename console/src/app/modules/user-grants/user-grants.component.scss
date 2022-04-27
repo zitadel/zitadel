@@ -1,96 +1,73 @@
-.table-wrapper {
-  overflow: auto;
+@use '@angular/material' as mat;
 
-  .table,
-  .paginator {
-    width: 100%;
-    background-color: #2d2e30;
+@mixin user-grants-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
 
-    td,
-    th {
-      padding-left: .5rem;
-      padding-right: .5rem;
+  .user-grants-table-left-actions {
+    display: flex;
+    align-items: center;
 
-      &:first-child {
-        padding-left: 0;
-        padding-right: .5rem;
+    .user-grant-type-button {
+      border: none;
+      background: none;
+      text-align: left;
+      padding: 0.75rem 0;
+      opacity: 0.6;
+      font-size: 15px;
+      cursor: pointer;
+      color: map-get($foreground, base);
+
+      &:not(:last-child) {
+        margin-right: 1rem;
       }
 
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-    .user {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    th {
-      .search-button {
-        visibility: hidden;
-        width: 30px;
-
-        .icon {
-          font-size: 1.2rem;
-        }
+      &:hover {
+        opacity: 1;
       }
 
-      &:hover,
-      &.search-active {
-        .search-button {
-          visibility: visible;
-        }
+      &.active {
+        font-weight: 600;
+        opacity: 1;
       }
     }
   }
 }
 
-.no-roles {
-  font-size: 13px;
-  color: var(--grey);
+.no-break {
+  white-space: nowrap;
+}
+
+.user {
+  text-decoration: none;
+  color: inherit;
+}
+
+th {
+  .search-button {
+    visibility: hidden;
+    width: 30px;
+
+    .icon {
+      font-size: 1.2rem;
+    }
+  }
+
+  &:hover,
+  &.search-active {
+    .search-button {
+      visibility: visible;
+    }
+  }
 }
 
 .flex-row {
   display: flex;
   flex-direction: row;
   max-width: 400px;
-
-  .role {
-    display: flex;
-    flex-direction: column;
-    margin: .25rem;
-    font-size: 14px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    justify-items: center;
-    align-self: center;
-  }
-
-  .fill-space {
-    flex: 1;
-  }
-
-  button {
-    margin: .5rem 0;
-    display: block;
-    max-width: 120px;
-    box-sizing: border-box;
-
-    i {
-      font-size: 1.2rem;
-      margin-bottom: 5px;
-    }
-  }
-}
-
-.row-form {
-  display: flex;
   align-items: center;
-
-  .form-field {
-    flex: 1;
-  }
+  flex-wrap: wrap;
+  padding: 3px 0;
 }
 
 .fill-space {
@@ -101,14 +78,17 @@
   min-width: 180px;
 }
 
+.user-grants-tr-actions {
+  width: 50px;
+}
+
 .date-block {
-  margin: .5rem 0;
+  margin: 0.5rem 0;
   display: block;
   min-width: 120px;
 
   .date-sub {
     font-size: 13px;
-    color: var(--grey);
     display: block;
   }
 }

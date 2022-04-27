@@ -1,0 +1,29 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.desc {
+  font-size: 0.9rem;
+}
+
+.roles-selection {
+  display: flex;
+  flex-direction: column;
+
+  .role-cb {
+    padding: 0.25rem 0;
+
+    .role-cb-content {
+      padding-left: 0.5rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+}

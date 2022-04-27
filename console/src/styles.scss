@@ -234,7 +234,12 @@ $caos-dark-theme-background: (
   app-bar: map_get($caos-dark-background, 500),
   background: map_get($caos-dark-background, 500),
   hover: rgba(black, 0.04),
-  card: map_get($caos-dark-background, 400),
+  card: #222,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-dark-background, 400),
+  contributor: map_get($caos-dark-background, 400),
+  contributor-avatar: map_get($caos-dark-background, 300),
   dialog: map_get($caos-dark-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -246,8 +251,15 @@ $caos-dark-theme-background: (
   disabled-list-option: map_get($caos-dark-background, 200),
   tooltip: map_get($mat-gray, 700),
   infosection: map_get($caos-dark-background, 300),
-  warninfosection: #4f566b,
-  successinfosection: #4f566b,
+  warninfosection: #741f2c4a,
+  successinfosection: map_get($caos-dark-background, 300),
+  state: map_get($caos-dark-background, 300),
+  state-active: #68cf8340,
+  state-inactive: #af455359,
+  toolbar: rgba(map_get($caos-dark-background, 500), 0.9),
+  moz-toolbar: map_get($caos-dark-background, 500),
+  footer: #00000020,
+  metadata-section: #00000020,
 );
 
 $caos-light-theme-background: (
@@ -255,7 +267,12 @@ $caos-light-theme-background: (
   app-bar: map_get($caos-light-background, 100),
   background: map_get($caos-light-background, 500),
   hover: rgba(black, 0.04),
-  card: map_get($caos-light-background, 400),
+  contributor: #00000010,
+  contributor-avatar: map_get($caos-light-primary, 300),
+  card: #fff,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-light-background, 400),
   dialog: map_get($caos-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -269,6 +286,10 @@ $caos-light-theme-background: (
   infosection: #e4e4e4,
   warninfosection: #ffc1c1,
   successinfosection: #cbf4c9,
+  toolbar: rgba(map_get($caos-light-background, 500), 0.9),
+  moz-toolbar: map_get($caos-light-background, 500),
+  footer: #00000008,
+  metadata-section: #605f5f08,
 );
 
 $caos-dark-theme-foreground: (
@@ -281,6 +302,7 @@ $caos-dark-theme-foreground: (
   elevation: black,
   hint-text: $light-disabled-text,
   secondary-text: $light-secondary-text,
+  placeholder-text: rgba(white, 0.4),
   icon: rgba(white, 0.54),
   icons: rgba(white, 0.54),
   text: $caos-dark-theme-text,
@@ -290,6 +312,8 @@ $caos-dark-theme-foreground: (
   infosection: #f0f0f0,
   warninfosection: #ffc1c1,
   successinfosection: #cbf4c9,
+  toolbar-items: map-get(map-get($caos-dark-primary, contrast), 500),
+  slash: #ffffff6e,
 );
 
 $caos-light-theme-foreground: (
@@ -302,6 +326,7 @@ $caos-light-theme-foreground: (
   elevation: black,
   hint-text: $dark-disabled-text,
   secondary-text: $dark-secondary-text,
+  placeholder-text: rgba(black, 0.3),
   icon: rgba(black, 0.54),
   icons: rgba(black, 0.54),
   text: $caos-light-theme-text,
@@ -311,6 +336,8 @@ $caos-light-theme-foreground: (
   infosection: #4a4a4a,
   warninfosection: #620e0e,
   successinfosection: #0e6245,
+  toolbar-items: map-get(map-get($caos-light-primary, contrast), 500),
+  slash: #0000006e,
 );
 
 $caos-dark-app-theme: (
@@ -331,14 +358,13 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography:
-  mat.define-typography-config(
-    $font-family: 'Lato',
-  );
+/* stylelint-disable */
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Lato',
+);
+/* stylelint-enable */
 
 @include mat.core($custom-typography);
-@include component-themes($caos-dark-app-theme);
-@include mat.all-component-themes($caos-dark-app-theme);
 
 .mat-dialog-container,
 .mat-raised-button,
@@ -351,17 +377,50 @@ $custom-typography:
   height: 35px !important;
 }
 
+.cnsl-action-button {
+  display: flex;
+  align-items: center;
+
+  &.mat-raised-button,
+  &.mat-stroked-button {
+    padding-left: 0.5rem;
+    height: 36px;
+
+    .mat-button-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    i:not(.no-margin) {
+      margin-right: 0.25rem;
+      font-size: 1.3rem;
+    }
+
+    .mat-icon {
+      margin-right: 0.25rem;
+    }
+  }
+}
+
+@include component-themes($caos-dark-app-theme);
+@include mat.all-component-themes($caos-dark-app-theme);
+
 .light-theme {
   @include component-themes($caos-light-app-theme);
   @include mat.all-component-themes($caos-light-app-theme);
 
+  $background: map-get($caos-light-app-theme, background);
+  $foreground: map-get($caos-light-app-theme, foreground);
+
   --color-main: var(--theme-light-primary-500);
   --warn: #cd3d56;
   --success: #10b981;
+  $border-color: map-get($foreground, divider);
 
-  $background: map-get($caos-light-app-theme, background);
+  .main-container {
+    color: map-get($foreground, base);
+  }
 
-  .sidenav,
   .main-container,
   .mat-dialog-container {
     background-color: map-get($background, background);
@@ -393,15 +452,18 @@ $custom-typography:
 }
 
 .dark-theme {
-  @include component-themes($caos-dark-app-theme);
-  @include mat.all-component-themes($caos-dark-app-theme);
+  $background: map-get($caos-dark-app-theme, background);
+  $foreground: map-get($caos-dark-app-theme, foreground);
 
   --color-main: var(--theme-dark-primary-500);
   --warn: #ff3b5b;
   --success: #10b981;
-  $background: map-get($caos-dark-app-theme, background);
+  $border-color: map-get($foreground, divider);
 
-  .sidenav,
+  .main-container {
+    color: map-get($foreground, text);
+  }
+
   .main-container,
   .mat-dialog-container {
     background-color: map-get($background, background);
@@ -434,7 +496,6 @@ $custom-typography:
     box-shadow: inset 0 -1px map-get($caos-dark-theme-foreground, divider);
   }
 }
-// @include mat.checkbox-theme($candy-app-theme);
 
 /* You can add global styles to this file, and also import other style files */
 
@@ -443,22 +504,13 @@ body {
   height: 100%;
 }
 
+/* stylelint-disable */
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
 }
+/* stylelint-enable */
 
 h1 {
   font-weight: 400;
@@ -469,40 +521,26 @@ h2 {
   font-weight: 400;
 }
 
+.transparent-backdrop {
+  background: transparent !important;
+  opacity: 0;
+}
+
 .mat-paginator .mat-select {
   border: none;
 }
 
 .max-width-container {
-  max-width: 1350px;
-  padding: 0 2rem;
-  padding-top: 2rem;
-  padding-left: 2rem;
+  max-width: 80rem;
+  margin: 0 auto;
+}
 
-  @media only screen and (min-width: 1024px) {
-    max-width: 1120px;
-  }
-
-  @media only screen and (min-width: 899px) {
-    max-width: 899px;
-  }
-
-  @media only screen and (max-width: 500px) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+.max-width-description {
+  max-width: 50rem;
 }
 
 .enlarged-container {
-  padding: 0 1.5rem;
-  padding-top: 2rem;
-  padding-left: 2rem;
-  max-width: 1690px;
-
-  @media only screen and (max-width: 500px) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+  padding: 2rem 0 0 0;
 }
 
 i {

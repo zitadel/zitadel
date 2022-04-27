@@ -3,21 +3,16 @@
   margin-top: 0;
 }
 
-.desc {
-  color: var(--grey);
-  font-size: .9rem;
-}
-
 .script {
   min-height: 200px;
 }
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 1rem;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
