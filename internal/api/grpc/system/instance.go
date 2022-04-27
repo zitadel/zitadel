@@ -57,7 +57,7 @@ func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequ
 }
 
 func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRequest) (*system_pb.ExistsDomainResponse, error) {
-	domainQuery, err := query.NewInstanceDomainDomainSearchQuery(query.TextEndsWithIgnoreCase, req.Domain)
+	domainQuery, err := query.NewInstanceDomainDomainSearchQuery(query.TextEqualsIgnoreCase, req.Domain)
 
 	query := &query.InstanceDomainSearchQueries{
 		SearchRequest: query.SearchRequest{
