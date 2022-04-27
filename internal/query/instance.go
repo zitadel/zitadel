@@ -75,6 +75,7 @@ type Instance struct {
 	ChangeDate   time.Time
 	CreationDate time.Time
 	Sequence     uint64
+	Name         string
 
 	GlobalOrgID  string
 	IAMProjectID string
@@ -233,9 +234,9 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-5m09s", "Errors.IAM.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
+				return nil, errors.ThrowInternal(err, "QUERY-3j9sf", "Errors.Internal")
 			}
 			instance.DefaultLang = language.Make(lang)
 			return instance, nil
@@ -248,6 +249,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
+			InstanceColumnName.identifier(),
 			InstanceColumnGlobalOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
@@ -269,6 +271,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 					&instance.CreationDate,
 					&instance.ChangeDate,
 					&instance.Sequence,
+					&instance.Name,
 					&instance.GlobalOrgID,
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
@@ -303,6 +306,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
+			InstanceColumnName.identifier(),
 			InstanceColumnGlobalOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
@@ -340,19 +344,20 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					&instance.CreationDate,
 					&instance.ChangeDate,
 					&instance.Sequence,
+					&instance.Name,
 					&instance.GlobalOrgID,
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
 					&instance.ConsoleAppID,
 					&instance.SetupStarted,
 					&instance.SetupDone,
-					lang,
-					domain,
-					isPrimary,
-					isGenerated,
-					changeDate,
-					creationDate,
-					sequecne,
+					&lang,
+					&domain,
+					&isPrimary,
+					&isGenerated,
+					&changeDate,
+					&creationDate,
+					&sequecne,
 				)
 				if err != nil {
 					if errs.Is(err, sql.ErrNoRows) {
