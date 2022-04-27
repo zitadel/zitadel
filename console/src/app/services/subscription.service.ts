@@ -20,24 +20,28 @@ export interface StripeCustomer {
   providedIn: 'root',
 })
 export class SubscriptionService {
-  constructor(private http: HttpClient, private storageService: StorageService) { }
+  constructor(private http: HttpClient, private storageService: StorageService) {}
 
   public getLink(orgId: string, redirectURI: string): Promise<any> {
-    return this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
+    return this.http
+      .get('./assets/environment.json')
+      .toPromise()
+      .then((data: any) => {
         if (data && data.subscriptionServiceUrl) {
           const serviceUrl = data.subscriptionServiceUrl;
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
-          return this.http.get(`${serviceUrl}/redirect`, {
-            headers: {
-              [authorizationKey]: `${bearerPrefix} ${accessToken}`,
-            },
-            params: {
-              'org': orgId,
-              'return_url': encodeURI(redirectURI),
-              'country': 'ch',
-            },
-          }).toPromise();
+          return this.http
+            .get(`${serviceUrl}/redirect`, {
+              headers: {
+                [authorizationKey]: `${bearerPrefix} ${accessToken}`,
+              },
+              params: {
+                org: orgId,
+                return_url: encodeURI(redirectURI),
+                country: 'ch',
+              },
+            })
+            .toPromise();
         } else {
           return Promise.reject('Could not load environment');
         }
@@ -45,19 +49,23 @@ export class SubscriptionService {
   }
 
   public getCustomer(orgId: string): Promise<any> {
-    return this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
+    return this.http
+      .get('../../assets/environment.json')
+      .toPromise()
+      .then((data: any) => {
         if (data && data.subscriptionServiceUrl) {
           const serviceUrl = data.subscriptionServiceUrl;
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
-          return this.http.get(`${serviceUrl}/customer`, {
-            headers: {
-              [authorizationKey]: `${bearerPrefix} ${accessToken}`,
-            },
-            params: {
-              'org': orgId,
-            },
-          }).toPromise();
+          return this.http
+            .get(`${serviceUrl}/customer`, {
+              headers: {
+                [authorizationKey]: `${bearerPrefix} ${accessToken}`,
+              },
+              params: {
+                org: orgId,
+              },
+            })
+            .toPromise();
         } else {
           return Promise.reject('Could not load environment');
         }
@@ -65,19 +73,23 @@ export class SubscriptionService {
   }
 
   public setCustomer(orgId: string, body: StripeCustomer): Promise<any> {
-    return this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
+    return this.http
+      .get('./assets/environment.json')
+      .toPromise()
+      .then((data: any) => {
         if (data && data.subscriptionServiceUrl) {
           const serviceUrl = data.subscriptionServiceUrl;
           const accessToken = this.storageService.getItem(accessTokenStorageKey);
-          return this.http.post(`${serviceUrl}/customer`, body, {
-            headers: {
-              [authorizationKey]: `${bearerPrefix} ${accessToken}`,
-            },
-            params: {
-              'org': orgId,
-            },
-          }).toPromise();
+          return this.http
+            .post(`${serviceUrl}/customer`, body, {
+              headers: {
+                [authorizationKey]: `${bearerPrefix} ${accessToken}`,
+              },
+              params: {
+                org: orgId,
+              },
+            })
+            .toPromise();
         } else {
           return Promise.reject('Could not load environment');
         }

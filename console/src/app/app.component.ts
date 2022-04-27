@@ -228,7 +228,6 @@ export class AppComponent implements OnInit, OnDestroy {
   private startIntroWorkflow(): void {
     setTimeout(() => {
       const cb = () => {
-        console.log('callback yeah');
         this.storageService.setItem('intro-dismissed', true, StorageLocation.local);
       };
       const dismissed = this.storageService.getItem('intro-dismissed', StorageLocation.local);

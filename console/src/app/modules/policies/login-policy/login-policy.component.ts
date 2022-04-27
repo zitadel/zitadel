@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-  GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
-  UpdateLoginPolicyRequest,
-  UpdateLoginPolicyResponse,
+    GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
+    UpdateLoginPolicyRequest,
+    UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  AddCustomLoginPolicyRequest,
-  GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+    AddCustomLoginPolicyRequest,
+    GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -31,7 +31,10 @@ import { LoginMethodComponentType } from './mfa-table/mfa-table.component';
 })
 export class LoginPolicyComponent implements OnDestroy {
   public LoginMethodComponentType: any = LoginMethodComponentType;
-  public passwordlessTypes: Array<PasswordlessType> = [];
+  public passwordlessTypes: Array<PasswordlessType> = [
+    PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+    PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+  ];
   public loginData!: LoginPolicy.AsObject;
 
   private sub: Subscription = new Subscription();
@@ -139,6 +142,10 @@ export class LoginPolicyComponent implements OnDestroy {
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        // if(this.loginData.passwordCheckLifetime) {
+        // mgmtreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
+        // }
+
         if ((this.loginData as LoginPolicy.AsObject).isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
         } else {
@@ -152,6 +159,7 @@ export class LoginPolicyComponent implements OnDestroy {
         adminreq.setForceMfa(this.loginData.forceMfa);
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
         adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        // adminreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }
