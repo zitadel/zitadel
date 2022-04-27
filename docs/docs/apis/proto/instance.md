@@ -91,6 +91,23 @@ IdQuery is always equals
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  State | - |  |
 | name |  string | - |  |
+| version |  string | - |  |
+
+
+
+
+### InstanceDetail
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| state |  State | - |  |
+| name |  string | - |  |
+| version |  string | - |  |
+| domains | repeated Domain | - |  |
 
 
 

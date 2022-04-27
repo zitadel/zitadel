@@ -75,6 +75,7 @@ type Instance struct {
 	ChangeDate   time.Time
 	CreationDate time.Time
 	Sequence     uint64
+	Name         string
 
 	GlobalOrgID  string
 	IAMProjectID string
@@ -83,6 +84,7 @@ type Instance struct {
 	DefaultLang  language.Tag
 	SetupStarted domain.Step
 	SetupDone    domain.Step
+	Domains      []*InstanceDomain
 	host         string
 }
 
@@ -159,7 +161,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 }
 
 func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
-	stmt, scan := prepareInstanceQuery(authz.GetInstance(ctx).RequestedDomain())
+	stmt, scan := prepareInstanceDomainQuery(authz.GetInstance(ctx).RequestedDomain())
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
@@ -167,7 +169,10 @@ func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
 		return nil, errors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
+	row, err := q.client.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
 	return scan(row)
 }
 
@@ -181,7 +186,10 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instan
 		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
+	row, err := q.client.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
 	return scan(row)
 }
 
@@ -226,9 +234,9 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-5m09s", "Errors.IAM.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
+				return nil, errors.ThrowInternal(err, "QUERY-3j9sf", "Errors.Internal")
 			}
 			instance.DefaultLang = language.Make(lang)
 			return instance, nil
@@ -241,6 +249,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
+			InstanceColumnName.identifier(),
 			InstanceColumnGlobalOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
@@ -262,6 +271,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 					&instance.CreationDate,
 					&instance.ChangeDate,
 					&instance.Sequence,
+					&instance.Name,
 					&instance.GlobalOrgID,
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
@@ -290,12 +300,13 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 		}
 }
 
-func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
+			InstanceColumnName.identifier(),
 			InstanceColumnGlobalOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
@@ -303,33 +314,73 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Row) (
 			InstanceColumnSetupStarted.identifier(),
 			InstanceColumnSetupDone.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
+			InstanceDomainDomainCol.identifier(),
+			InstanceDomainIsPrimaryCol.identifier(),
+			InstanceDomainIsGeneratedCol.identifier(),
+			InstanceDomainCreationDateCol.identifier(),
+			InstanceDomainChangeDateCol.identifier(),
+			InstanceDomainSequenceCol.identifier(),
 		).
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{host: host}
-			lang := ""
-			err := row.Scan(
-				&instance.ID,
-				&instance.CreationDate,
-				&instance.ChangeDate,
-				&instance.Sequence,
-				&instance.GlobalOrgID,
-				&instance.IAMProjectID,
-				&instance.ConsoleID,
-				&instance.ConsoleAppID,
-				&instance.SetupStarted,
-				&instance.SetupDone,
-				&lang,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
+		func(rows *sql.Rows) (*Instance, error) {
+			instance := &Instance{
+				host:    host,
+				Domains: make([]*InstanceDomain, 0),
 			}
-			instance.DefaultLang = language.Make(lang)
+			lang := ""
+			for rows.Next() {
+				var (
+					domain       sql.NullString
+					isPrimary    sql.NullBool
+					isGenerated  sql.NullBool
+					changeDate   sql.NullTime
+					creationDate sql.NullTime
+					sequecne     sql.NullInt64
+				)
+				err := rows.Scan(
+					&instance.ID,
+					&instance.CreationDate,
+					&instance.ChangeDate,
+					&instance.Sequence,
+					&instance.Name,
+					&instance.GlobalOrgID,
+					&instance.IAMProjectID,
+					&instance.ConsoleID,
+					&instance.ConsoleAppID,
+					&instance.SetupStarted,
+					&instance.SetupDone,
+					&lang,
+					&domain,
+					&isPrimary,
+					&isGenerated,
+					&changeDate,
+					&creationDate,
+					&sequecne,
+				)
+				if err != nil {
+					if errs.Is(err, sql.ErrNoRows) {
+						return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
+					}
+					return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
+				}
+				if !domain.Valid {
+					continue
+				}
+				instance.Domains = append(instance.Domains, &InstanceDomain{
+					CreationDate: creationDate.Time,
+					ChangeDate:   changeDate.Time,
+					Sequence:     uint64(sequecne.Int64),
+					Domain:       domain.String,
+					IsPrimary:    isPrimary.Bool,
+					IsGenerated:  isGenerated.Bool,
+					InstanceID:   instance.ID,
+				})
+			}
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
+			}
 			return instance, nil
 		}
 }
