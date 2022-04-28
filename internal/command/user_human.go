@@ -39,8 +39,8 @@ type AddHuman struct {
 	DisplayName string
 	// Email is required
 	Email Email
-	// PreferredLang is required
-	PreferredLang language.Tag
+	// PreferredLanguage is required
+	PreferredLanguage language.Tag
 	// Gender is required
 	Gender domain.Gender
 	//Phone represents an international phone number
@@ -98,6 +98,9 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			return nil, errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
 		}
 
+		if human.PreferredLanguage == language.Und {
+			return nil, errors.ThrowInvalidArgument(nil, "USER-Sfd11", "Errors.Invalid.Argument")
+		}
 		if human.FirstName = strings.TrimSpace(human.FirstName); human.FirstName == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument")
 		}
@@ -130,7 +133,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 					human.LastName,
 					human.NickName,
 					human.DisplayName,
-					human.PreferredLang,
+					human.PreferredLanguage,
 					human.Gender,
 					human.Email.Address,
 					domainPolicy.UserLoginMustBeDomain,
@@ -144,7 +147,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 					human.LastName,
 					human.NickName,
 					human.DisplayName,
-					human.PreferredLang,
+					human.PreferredLanguage,
 					human.Gender,
 					human.Email.Address,
 					domainPolicy.UserLoginMustBeDomain,

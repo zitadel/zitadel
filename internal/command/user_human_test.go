@@ -93,6 +93,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					Email: Email{
 						Address: "email@test.ch",
 					},
+					PreferredLanguage: language.English,
 				},
 			},
 			res: res{
@@ -130,6 +131,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						Address:  "email@test.ch",
 						Verified: true,
 					},
+					PreferredLanguage: language.English,
 				},
 			},
 			res: res{
@@ -210,7 +212,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 									"lastname",
 									"",
 									"firstname lastname",
-									language.Und,
+									language.English,
 									domain.GenderUnspecified,
 									"email@test.ch",
 									true,
@@ -257,6 +259,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					Email: Email{
 						Address: "email@test.ch",
 					},
+					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 			},
@@ -375,6 +378,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					Email: Email{
 						Address: "email@test.ch",
 					},
+					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 			},
@@ -470,6 +474,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						Address:  "email@test.ch",
 						Verified: true,
 					},
+					PreferredLanguage:      language.English,
 					PasswordChangeRequired: true,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
@@ -554,6 +559,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					Phone: Phone{
 						Number: "+41711234567",
 					},
+					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 			},
@@ -668,6 +674,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						Number:   "+41711234567",
 						Verified: true,
 					},
+					PreferredLanguage: language.English,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 			},
@@ -920,8 +927,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						ChangeRequired: true,
 					},
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -940,7 +948,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -1001,8 +1009,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						ChangeRequired: false,
 					},
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1022,7 +1031,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1094,8 +1103,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1117,7 +1127,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1203,8 +1213,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						ChangeRequired: false,
 					},
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1226,7 +1237,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1312,8 +1323,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Password: &domain.Password{
 						SecretString:   "password",
@@ -1339,7 +1351,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -1411,8 +1423,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Password: &domain.Password{
 						SecretString:   "password",
@@ -1439,7 +1452,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -2767,7 +2780,7 @@ func newAddHumanEvent(password string, changeRequired bool, phone string) *user.
 		"lastname",
 		"",
 		"firstname lastname",
-		language.Und,
+		language.English,
 		domain.GenderUnspecified,
 		"email@test.ch",
 		true,
@@ -2844,11 +2857,27 @@ func TestAddHumanCommand(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid first name",
+			name: "invalid preferred language",
 			args: args{
 				a: agg,
 				human: &AddHuman{
 					Username: "username",
+					Email: Email{
+						Address: "support@zitadel.ch",
+					},
+				},
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-Sfd11", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid first name",
+			args: args{
+				a: agg,
+				human: &AddHuman{
+					Username:          "username",
+					PreferredLanguage: language.English,
 					Email: Email{
 						Address: "support@zitadel.ch",
 					},
@@ -2863,9 +2892,10 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Username:  "username",
-					FirstName: "hurst",
-					Email:     Email{Address: "support@zitadel.ch"},
+					Username:          "username",
+					PreferredLanguage: language.English,
+					FirstName:         "hurst",
+					Email:             Email{Address: "support@zitadel.ch"},
 				},
 			},
 			want: Want{
@@ -2877,11 +2907,12 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email:     Email{Address: "support@zitadel.ch"},
-					FirstName: "gigi",
-					LastName:  "giraffe",
-					Password:  "short",
-					Username:  "username",
+					Email:             Email{Address: "support@zitadel.ch"},
+					PreferredLanguage: language.English,
+					FirstName:         "gigi",
+					LastName:          "giraffe",
+					Password:          "short",
+					Username:          "username",
 				},
 				filter: NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -2919,11 +2950,12 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email:     Email{Address: "support@zitadel.ch", Verified: true},
-					FirstName: "gigi",
-					LastName:  "giraffe",
-					Password:  "",
-					Username:  "username",
+					Email:             Email{Address: "support@zitadel.ch", Verified: true},
+					PreferredLanguage: language.English,
+					FirstName:         "gigi",
+					LastName:          "giraffe",
+					Password:          "",
+					Username:          "username",
 				},
 				passwordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 				filter: NewMultiFilter().Append(
@@ -2963,7 +2995,7 @@ func TestAddHumanCommand(t *testing.T) {
 						"giraffe",
 						"",
 						"gigi giraffe",
-						language.Und,
+						language.English,
 						0,
 						"support@zitadel.ch",
 						true,

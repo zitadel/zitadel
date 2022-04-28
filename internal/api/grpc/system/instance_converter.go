@@ -1,13 +1,14 @@
 package system
 
 import (
+	"golang.org/x/text/language"
+
 	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
-	"golang.org/x/text/language"
 )
 
 func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup) *command.InstanceSetup {
@@ -35,7 +36,7 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 		if req.OwnerProfile.PreferredLanguage != "" {
 			lang, err := language.Parse(req.OwnerProfile.PreferredLanguage)
 			if err == nil {
-				defaultInstance.Org.Human.PreferredLang = lang
+				defaultInstance.Org.Human.PreferredLanguage = lang
 			}
 		}
 	}
