@@ -15,7 +15,6 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { HasRoleModule } from '../../../directives/has-role/has-role.module';
 import { DetailLayoutModule } from '../../../modules/detail-layout/detail-layout.module';
 import { InputModule } from '../../../modules/input/input.module';
-import { HasFeaturePipeModule } from '../../../pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from '../../../pipes/has-role-pipe/has-role-pipe.module';
 import { EditTextModule } from '../../edit-text/edit-text.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
@@ -38,7 +37,6 @@ import { LoginTextsComponent } from './login-texts.component';
     FormFieldModule,
     EditTextModule,
     MatButtonModule,
-    HasFeaturePipeModule,
     MatIconModule,
     HasRoleModule,
     HasRolePipeModule,
@@ -55,4 +53,4 @@ import { LoginTextsComponent } from './login-texts.component';
     LocalizedDatePipeModule,
   ],
 })
-export class LoginTextsPolicyModule { }
+export class LoginTextsPolicyModule {}

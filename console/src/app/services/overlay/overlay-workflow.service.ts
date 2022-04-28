@@ -24,7 +24,6 @@ export interface CnslOverlay {
   requirements?: {
     media?: string;
     permission?: string[];
-    feature?: string[];
   };
 }
 
@@ -83,10 +82,9 @@ export class OverlayWorkflowService implements OnDestroy {
     return zip([
       this.meetsMediaRequirements(overlay),
       this.meetsPermissionRequirements(overlay),
-      this.meetsFeatureRequirements(overlay),
     ] as Observable<boolean>[]).pipe(
-      switchMap(([media, permission, feature]) => {
-        return of(media && permission && feature);
+      switchMap(([media, permission]) => {
+        return of(media && permission);
       }),
     );
   }
@@ -109,15 +107,6 @@ export class OverlayWorkflowService implements OnDestroy {
     const regexArray = overlay.requirements?.permission;
     if (regexArray && regexArray.length) {
       return this.authService.isAllowed(regexArray);
-    } else {
-      return of(true);
-    }
-  }
-
-  public meetsFeatureRequirements(overlay: CnslOverlay): Observable<boolean> {
-    const regexArray = overlay.requirements?.feature;
-    if (regexArray && regexArray.length) {
-      return this.authService.canUseFeature(regexArray);
     } else {
       return of(true);
     }

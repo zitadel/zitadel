@@ -1,17 +1,23 @@
-<span class="title" mat-dialog-title>{{data.i18nTitle | translate}}</span>
+<span class="title" mat-dialog-title>{{ data.i18nTitle | translate }}</span>
 <div mat-dialog-content>
-  <cnsl-project-roles-table class="role-table" *ngIf="projectId"
-    [displayedColumns]="['select', 'key', 'displayname', 'group']" (changedSelection)="selectRoles($event)"
-    [projectId]="projectId" [grantId]="grantId" [selectedKeys]="selectedRoleKeysList"
-    [showSelectionActionButton]="false">
+  <cnsl-project-roles-table
+    class="role-table"
+    *ngIf="projectId"
+    [displayedColumns]="['select', 'key', 'displayname', 'group']"
+    (changedSelection)="selectRoles($event)"
+    [projectId]="projectId"
+    [grantId]="grantId"
+    [selectedKeys]="selectedRoleKeysList"
+    [showSelectionActionButton]="false"
+  >
   </cnsl-project-roles-table>
 </div>
 <div mat-dialog-actions class="action">
   <button mat-stroked-button (click)="closeDialog()">
-    {{'ACTIONS.CANCEL' | translate}}
+    {{ 'ACTIONS.CANCEL' | translate }}
   </button>
   <span class="fill-space"></span>
   <button mat-raised-button color="primary" class="ok-button" (click)="closeDialogWithSuccess()">
-    {{'ACTIONS.CHANGE' | translate}}
+    {{ 'ACTIONS.CHANGE' | translate }}
   </button>
 </div>

@@ -2,17 +2,17 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Injector, OnDestroy, OnInit, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
-import { switchMap, take, takeUntil } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import {
-  GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
-  GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
-  UpdateLabelPolicyRequest,
+    GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
+    GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
+    UpdateLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  AddCustomLabelPolicyRequest,
-  GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
-  GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
-  UpdateCustomLabelPolicyRequest,
+    AddCustomLabelPolicyRequest,
+    GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
+    GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
+    UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -371,31 +371,26 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public fetchData(): void {
     this.loading = true;
 
-    this.authService
-      .canUseFeature(['label_policy.private_label'])
-      .pipe(take(1))
-      .subscribe((canUse) => {
-        this.getPreviewData()
-          .then((data) => {
-            if (data.policy) {
-              this.previewData = data.policy;
-              this.loading = false;
-            }
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+    this.getPreviewData()
+      .then((data) => {
+        if (data.policy) {
+          this.previewData = data.policy;
+          this.loading = false;
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
 
-        this.getData()
-          .then((data) => {
-            if (data.policy) {
-              this.data = data.policy;
-              this.loading = false;
-            }
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+    this.getData()
+      .then((data) => {
+        if (data.policy) {
+          this.data = data.policy;
+          this.loading = false;
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
       });
   }
 

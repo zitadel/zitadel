@@ -12,7 +12,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { ColorChromeModule } from 'ngx-color/chrome';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 
 import { DropzoneModule } from '../../../directives/dropzone/dropzone.module';
 import { DetailLayoutModule } from '../../detail-layout/detail-layout.module';
@@ -46,7 +45,6 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     PolicyGridModule,
     MatExpansionModule,
     InfoSectionModule,
-    HasFeaturePipeModule,
   ],
 })
 export class PrivateLabelingPolicyModule {}

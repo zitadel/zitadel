@@ -22,7 +22,6 @@ import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
-import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
@@ -51,7 +50,6 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     MatTooltipModule,
     WarnDialogModule,
     MemberCreateDialogModule,
-    HasFeaturePipeModule,
     MatMenuModule,
     ChangesModule,
     MatProgressSpinnerModule,

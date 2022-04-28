@@ -11,7 +11,6 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
-import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AddDomainDialogModule } from './add-domain-dialog/add-domain-dialog.module';
@@ -28,7 +27,6 @@ import { DomainsComponent } from './domains.component';
     CommonModule,
     MatIconModule,
     CardModule,
-    HasFeaturePipeModule,
     HasRolePipeModule,
     ActionKeysModule,
     InfoSectionModule,

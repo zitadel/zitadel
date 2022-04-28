@@ -1,8 +1,13 @@
-<cnsl-detail-layout [hasBackButton]="true" [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
-  [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
-  <p class="policy-applied-to" sub>{{'POLICY.APPLIEDTO' | translate}}:
-    <strong *ngIf="orgName; else iam">{{orgName}}</strong>
-    <ng-template #iam><strong>{{'MENU.SYSTEM' | translate}}</strong>
+<cnsl-detail-layout
+  [hasBackButton]="true"
+  [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
+  [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate"
+>
+  <p class="policy-applied-to" sub>
+    {{ 'POLICY.APPLIEDTO' | translate }}:
+    <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
+    <ng-template #iam
+      ><strong>{{ 'MENU.SYSTEM' | translate }}</strong>
     </ng-template>
   </p>
 
@@ -10,8 +15,8 @@
     <cnsl-form-field class="type">
       <cnsl-label>{{ 'POLICY.MESSAGE_TEXTS.TYPE' | translate }}</cnsl-label>
       <mat-select [(ngModel)]="currentType" name="currentSubMap" (selectionChange)="changedCurrentType()">
-        <mat-option *ngFor="let type of (MESSAGETYPES | keyvalue)" [value]="type.value">
-          {{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}
+        <mat-option *ngFor="let type of MESSAGETYPES | keyvalue" [value]="type.value">
+          {{ 'POLICY.MESSAGE_TEXTS.TYPES.' + type.value | translate }}
         </mat-option>
       </mat-select>
     </cnsl-form-field>
@@ -21,37 +26,51 @@
       <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
         <mat-option *ngFor="let loc of LOCALES" [value]="loc">
           <div class="centerline">
-            <span>{{loc}} <span class="lighter cnsl-secondary-text">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc |
-                translate }}</span></span>
+            <span
+              >{{ loc }}
+              <span class="lighter cnsl-secondary-text"
+                >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LOCALES.' + loc | translate }}</span
+              ></span
+            >
           </div>
         </mat-option>
       </mat-select>
     </cnsl-form-field>
   </div>
 
-  <cnsl-info-section
-    *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
-    [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-    <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_text.message'})"></span>
-  </cnsl-info-section>
-
   <div class="content">
-    <cnsl-edit-text [chips]="chips[currentType]"
-      [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false) || (canWrite$ | async) === false"
-      label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
-        $event)"></cnsl-edit-text>
+    <cnsl-edit-text
+      [chips]="chips[currentType]"
+      [disabled]="(canWrite$ | async) === false"
+      label="one"
+      [default$]="getDefaultInitMessageTextMap$"
+      [current$]="getCustomInitMessageTextMap$"
+      (changedValues)="updateCurrentValues($event)"
+    ></cnsl-edit-text>
   </div>
 
   <div class="actions">
-    <button class="reset-button"
-      *ngIf="(getCustomInitMessageTextMap$ | async) && ((getCustomInitMessageTextMap$ | async)?.isDefault === false)"
-      [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false) || (canWrite$ | async) === false"
-      (click)="resetDefault()" color="warn" type="submit" mat-stroked-button><i class="las la-history"></i> {{
-      'ACTIONS.RESETDEFAULT' | translate }}</button>
-    <button class="save-button"
-      [disabled]="!updateRequest || (serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false) || (canWrite$ | async) === false"
-      (click)="saveCurrentMessage()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
-      }}</button>
+    <button
+      class="reset-button"
+      *ngIf="(getCustomInitMessageTextMap$ | async) && (getCustomInitMessageTextMap$ | async)?.isDefault === false"
+      [disabled]="(canWrite$ | async) === false"
+      (click)="resetDefault()"
+      color="warn"
+      type="submit"
+      mat-stroked-button
+    >
+      <i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}
+    </button>
+    <button
+      class="save-button"
+      [disabled]="!updateRequest || (canWrite$ | async) === false"
+      (click)="saveCurrentMessage()"
+      color="primary"
+      type="submit"
+      mat-raised-button
+    >
+      {{ 'ACTIONS.SAVE' | translate }}
+    </button>
   </div>
 
   <cnsl-policy-grid [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
