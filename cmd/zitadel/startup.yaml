@@ -321,7 +321,7 @@ API:
         MetadataIDPConfig:
           ValidUntil: '2023-01-01T00:00:00Z'
           #CacheDuration: "PT30S"
-          ErrorURL: "https://caos.ch"
+          ErrorURL: $ZITADEL_SAML_ERRORURL
         SignatureAlgorithm: $ZITADEL_SAML_IDP_SIGNALG
         WantAuthRequestsSigned: 'false'
         Endpoints:

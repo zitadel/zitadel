@@ -25,8 +25,8 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 	after := now.Add(c.certificateLifetime)
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCACertificate(c.certKeySize, c.keyAlgorithm, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
-		Organisation: []string{"caos AG"},
-		CommonName:   "Zitadel SAML CA",
+		Organisation: []string{"ZITADEL"},
+		CommonName:   "ZITADEL SAML CA",
 		NotBefore:    &now,
 		NotAfter:     &after,
 		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment | x509.KeyUsageCertSign,
@@ -51,14 +51,14 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 	return err
 }
 
-func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, reason string, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
+func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	ctx = setSAMLCtx(ctx)
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
-		Organisation: []string{"caos AG"},
-		CommonName:   reason,
+		Organisation: []string{"ZITADEL"},
+		CommonName:   "ZITADEL SAML response",
 		NotBefore:    &now,
 		NotAfter:     &after,
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
@@ -84,14 +84,14 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, reason s
 	return err
 }
 
-func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, reason string, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
+func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	ctx = setSAMLCtx(ctx)
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
-		Organisation: []string{"caos AG"},
-		CommonName:   reason,
+		Organisation: []string{"ZITADEL"},
+		CommonName:   "ZITADEL SAML metadata",
 		NotBefore:    &now,
 		NotAfter:     &after,
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},

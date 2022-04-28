@@ -147,9 +147,9 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage mo
 
 		switch usage {
 		case model.KeyUsageSAMLMetadataSigning:
-			return p.command.GenerateSAMLMetadataCertificate(ctx, "metadata", p.certificateAlgorithm, privateKey, cert)
+			return p.command.GenerateSAMLMetadataCertificate(ctx, p.certificateAlgorithm, privateKey, cert)
 		case model.KeyUsageSAMLResponseSinging:
-			return p.command.GenerateSAMLResponseCertificate(ctx, "response", p.certificateAlgorithm, privateKey, cert)
+			return p.command.GenerateSAMLResponseCertificate(ctx, p.certificateAlgorithm, privateKey, cert)
 		default:
 			return fmt.Errorf("unknown usage")
 		}
