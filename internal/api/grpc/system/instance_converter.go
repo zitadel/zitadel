@@ -1,6 +1,8 @@
 package system
 
 import (
+	"golang.org/x/text/language"
+
 	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
@@ -20,18 +22,32 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 	if req.FirstOrgName != "" {
 		defaultInstance.Org.Name = req.FirstOrgName
 	}
-	if req.OwnerEmail != "" {
-		defaultInstance.Org.Human.Email.Address = req.OwnerEmail
+	if req.OwnerEmail.Email != "" {
+		defaultInstance.Org.Human.Email.Address = req.OwnerEmail.Email
+		defaultInstance.Org.Human.Email.Verified = req.OwnerEmail.IsEmailVerified
 	}
-	if req.OwnerUsername != "" {
-		defaultInstance.Org.Human.Username = req.OwnerUsername
+	if req.OwnerProfile != nil {
+		if req.OwnerProfile.FirstName != "" {
+			defaultInstance.Org.Human.FirstName = req.OwnerProfile.FirstName
+		}
+		if req.OwnerProfile.LastName != "" {
+			defaultInstance.Org.Human.LastName = req.OwnerProfile.LastName
+		}
+		if req.OwnerProfile.PreferredLanguage != "" {
+			lang, err := language.Parse(req.OwnerProfile.PreferredLanguage)
+			if err == nil {
+				defaultInstance.Org.Human.PreferredLanguage = lang
+			}
+		}
 	}
-	if req.OwnerFirstName != "" {
-		defaultInstance.Org.Human.FirstName = req.OwnerFirstName
+	if req.OwnerUserName != "" {
+		defaultInstance.Org.Human.Username = req.OwnerUserName
 	}
-	if req.OwnerLastName != "" {
-		defaultInstance.Org.Human.LastName = req.OwnerLastName
+	if req.OwnerPassword != nil {
+		defaultInstance.Org.Human.Password = req.OwnerPassword.Password
+		defaultInstance.Org.Human.PasswordChangeRequired = req.OwnerPassword.PasswordChangeRequired
 	}
+
 	return &defaultInstance
 }
 func ListInstancesRequestToModel(req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
