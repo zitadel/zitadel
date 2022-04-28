@@ -237,7 +237,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	}
 
 	if *samlEnabled {
-		idp, err := saml.NewProvider(conf.API.SAML, command, query, authRepo, conf.SystemDefaults.KeyConfig, es, projections, certChan, *localDevMode)
+		idp, err := saml.NewProvider(ctx, conf.API.SAML, command, query, authRepo, conf.SystemDefaults.KeyConfig, es, projections, certChan, *localDevMode)
 		if err != nil {
 			logging.Log("API-pwaiks").OnError(err).Fatal("error starting saml")
 		}

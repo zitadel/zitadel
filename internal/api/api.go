@@ -30,9 +30,9 @@ import (
 )
 
 type Config struct {
-	GRPC grpc_util.Config
-	OIDC oidc.OPHandlerConfig
-	SAML saml.ProviderConfig
+	GRPC   grpc_util.Config
+	OIDC   oidc.OPHandlerConfig
+	SAML   saml.ProviderHandlerConfig
 	Domain string
 }
 

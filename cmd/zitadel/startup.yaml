@@ -304,50 +304,51 @@ API:
       MaxAge: 8760h #365*24h (1 year)
       Key:
         EncryptionKeyID: $ZITADEL_COOKIE_KEY
-    Metadata:
-      SignatureAlgorithm: $ZITADEL_SAML_METADATA_SIGNALG
-      Path: 'metadata'
-      URL: '$ZITADEL_SAML/metadata'
-    Organisation:
-      Name: $ZITADEL_SAML_CONTACT_COMPANY
-      DisplayName: $ZITADEL_SAML_CONTACT_COMPANY
-      URL: $ZITADEL_SAML_CONTACT_URL
-    ContactPerson:
-      ContactType: technical
-      Company: $ZITADEL_SAML_CONTACT_COMPANY
-      EmailAddress: $ZITADEL_SAML_CONTACT_EMAIL
-    IDP:
-      Metadata:
-        ValidUntil: '2023-01-01T00:00:00Z'
-        #CacheDuration: "PT30S"
-        ErrorURL: "https://caos.ch"
-      SignatureAlgorithm: $ZITADEL_SAML_IDP_SIGNALG
-      WantAuthRequestsSigned: 'false'
-      Endpoints:
-        Certificate:
-          Path: 'certificate'
-          URL: '$ZITADEL_SAML/certificate'
-        Callback:
-          Path: 'callback'
-          URL: '$ZITADEL_SAML/callback'
-        SingleSignOn:
-          Path: 'SSO'
-          URL: '$ZITADEL_SAML/SSO'
-        SingleLogOut:
-          Path: 'SLO'
-          URL: '$ZITADEL_SAML/SLO'
-        Artifact:
-          Path: 'artifact'
-          URL: '$ZITADEL_SAML/artifact'
-        SLOArtifact:
-          Path: 'SLOartifact'
-          URL: '$ZITADEL_SAML/SLOartifact'
-        NameIDMapping:
-          Path: 'nameid'
-          URL: '$ZITADEL_SAML/nameid'
-        Attribute:
-          Path: 'attribute'
-          URL: '$ZITADEL_SAML/attribute'
+    ProviderConfig:
+      MetadataConfig:
+        SignatureAlgorithm: $ZITADEL_SAML_METADATA_SIGNALG
+        Path: 'metadata'
+        URL: '$ZITADEL_SAML/metadata'
+      Organisation:
+        Name: $ZITADEL_SAML_CONTACT_COMPANY
+        DisplayName: $ZITADEL_SAML_CONTACT_COMPANY
+        URL: $ZITADEL_SAML_CONTACT_URL
+      ContactPerson:
+        ContactType: technical
+        Company: $ZITADEL_SAML_CONTACT_COMPANY
+        EmailAddress: $ZITADEL_SAML_CONTACT_EMAIL
+      IDPConfig:
+        MetadataIDPConfig:
+          ValidUntil: '2023-01-01T00:00:00Z'
+          #CacheDuration: "PT30S"
+          ErrorURL: "https://caos.ch"
+        SignatureAlgorithm: $ZITADEL_SAML_IDP_SIGNALG
+        WantAuthRequestsSigned: 'false'
+        Endpoints:
+          Certificate:
+            Path: 'certificate'
+            URL: '$ZITADEL_SAML/certificate'
+          Callback:
+            Path: 'callback'
+            URL: '$ZITADEL_SAML/callback'
+          SingleSignOn:
+            Path: 'SSO'
+            URL: '$ZITADEL_SAML/SSO'
+          SingleLogOut:
+            Path: 'SLO'
+            URL: '$ZITADEL_SAML/SLO'
+          Artifact:
+            Path: 'artifact'
+            URL: '$ZITADEL_SAML/artifact'
+          SLOArtifact:
+            Path: 'SLOartifact'
+            URL: '$ZITADEL_SAML/SLOartifact'
+          NameIDMapping:
+            Path: 'nameid'
+            URL: '$ZITADEL_SAML/nameid'
+          Attribute:
+            Path: 'attribute'
+            URL: '$ZITADEL_SAML/attribute'
 
 UI:
   Port: 50003

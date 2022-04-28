@@ -3,11 +3,11 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/zitadel/saml/pkg/provider/xml"
 )
 
 func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.SAMLApp, resourceOwner string) (_ *domain.SAMLApp, err error) {

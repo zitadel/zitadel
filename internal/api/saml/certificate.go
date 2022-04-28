@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/api/saml/key"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -12,11 +11,12 @@ import (
 	"github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/keypair"
+	"github.com/zitadel/saml/pkg/provider/key"
 	"gopkg.in/square/go-jose.v2"
 	"time"
 )
 
-func (p *ProviderStorage) resetTimer(timer *time.Timer, shortRefresh bool) (nextCheck time.Duration) {
+func (p *Storage) resetTimer(timer *time.Timer, shortRefresh bool) (nextCheck time.Duration) {
 	nextCheck = p.certificateRotationCheck
 	defer func() { timer.Reset(nextCheck) }()
 	if shortRefresh || p.currentCACertificate == nil || p.currentResponseCertificate == nil || p.currentMetadataCertificate == nil {
@@ -29,7 +29,7 @@ func (p *ProviderStorage) resetTimer(timer *time.Timer, shortRefresh bool) (next
 	return maxLifetime - p.certificateGracefulPeriod - p.certificateRotationCheck
 }
 
-func (p *ProviderStorage) GetCertificateAndKey(ctx context.Context, certAndKeyCh chan<- key.CertificateAndKey, usage model.KeyUsage) {
+func (p *Storage) GetCertificateAndKey(ctx context.Context, certAndKeyCh chan<- key.CertificateAndKey, usage model.KeyUsage) {
 	renewTimer := time.NewTimer(0)
 	go func() {
 		for {
@@ -49,7 +49,7 @@ func (p *ProviderStorage) GetCertificateAndKey(ctx context.Context, certAndKeyCh
 	}()
 }
 
-func (p *ProviderStorage) getCertificateAndKey(ctx context.Context, renewTimer *time.Timer, certAndKeyCh chan<- key.CertificateAndKey, usage model.KeyUsage) {
+func (p *Storage) getCertificateAndKey(ctx context.Context, renewTimer *time.Timer, certAndKeyCh chan<- key.CertificateAndKey, usage model.KeyUsage) {
 	certs, err := p.query.ActiveCertificates(ctx, time.Now().Add(p.certificateGracefulPeriod), usage)
 	if err != nil {
 		checkAfter := p.resetTimer(renewTimer, true)
@@ -73,7 +73,7 @@ func (p *ProviderStorage) getCertificateAndKey(ctx context.Context, renewTimer *
 	logging.Log("SAML-dK432").Infof("next signing key check in %s", checkAfter)
 }
 
-func (p *ProviderStorage) refreshCertificate(
+func (p *Storage) refreshCertificate(
 	ctx context.Context,
 	certAndKeyCh chan<- key.CertificateAndKey,
 	usage model.KeyUsage,
@@ -99,7 +99,7 @@ func (p *ProviderStorage) refreshCertificate(
 	logging.Log("EVENT-B3d21").OnError(err).Warn("could not create signing key")
 }
 
-func (p *ProviderStorage) ensureIsLatestCertificate(ctx context.Context, sequence uint64) (bool, error) {
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, sequence uint64) (bool, error) {
 	maxSequence, err := p.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
@@ -107,7 +107,7 @@ func (p *ProviderStorage) ensureIsLatestCertificate(ctx context.Context, sequenc
 	return sequence == maxSequence, nil
 }
 
-func (p *ProviderStorage) lockAndGenerateCertificateAndKey(ctx context.Context, usage model.KeyUsage, sequence uint64) error {
+func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage model.KeyUsage, sequence uint64) error {
 	errs := p.locker.Lock(ctx, p.certificateRotationCheck*2)
 	err, ok := <-errs
 	if err != nil || !ok {
@@ -160,7 +160,7 @@ func (p *ProviderStorage) lockAndGenerateCertificateAndKey(ctx context.Context, 
 	}
 }
 
-func (p *ProviderStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			ResourceOwner(domain.IAMID).
@@ -170,7 +170,7 @@ func (p *ProviderStorage) getMaxKeySequence(ctx context.Context) (uint64, error)
 	)
 }
 
-func (p *ProviderStorage) getCurrent(usage model.KeyUsage) *query.Certificate {
+func (p *Storage) getCurrent(usage model.KeyUsage) *query.Certificate {
 	switch usage {
 	case model.KeyUsageSAMLResponseSinging:
 		return &p.currentResponseCertificate
@@ -183,7 +183,7 @@ func (p *ProviderStorage) getCurrent(usage model.KeyUsage) *query.Certificate {
 	return nil
 }
 
-func (p *ProviderStorage) setCurrent(usage model.KeyUsage, current *query.Certificate) {
+func (p *Storage) setCurrent(usage model.KeyUsage, current *query.Certificate) {
 	switch usage {
 	case model.KeyUsageSAMLResponseSinging:
 		p.currentResponseCertificate = *current
@@ -194,7 +194,7 @@ func (p *ProviderStorage) setCurrent(usage model.KeyUsage, current *query.Certif
 	}
 }
 
-func (p *ProviderStorage) exchangeCertificate(certificate query.Certificate, certAndKeyCh chan<- key.CertificateAndKey, usage model.KeyUsage) (err error) {
+func (p *Storage) exchangeCertificate(certificate query.Certificate, certAndKeyCh chan<- key.CertificateAndKey, usage model.KeyUsage) (err error) {
 	current := p.getCurrent(usage)
 	currentCert := *current
 

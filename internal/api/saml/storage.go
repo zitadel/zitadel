@@ -3,11 +3,6 @@ package saml
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/api/saml/key"
-	"github.com/caos/zitadel/internal/api/saml/models"
-	"github.com/caos/zitadel/internal/api/saml/serviceprovider"
-	"github.com/caos/zitadel/internal/api/saml/xml"
-	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/crypto"
@@ -17,40 +12,26 @@ import (
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/saml/pkg/provider"
+	"github.com/zitadel/saml/pkg/provider/key"
+	"github.com/zitadel/saml/pkg/provider/models"
+	"github.com/zitadel/saml/pkg/provider/serviceprovider"
+	"github.com/zitadel/saml/pkg/provider/xml"
+	"github.com/zitadel/saml/pkg/provider/xml/samlp"
 	"time"
 )
 
-var _ EntityStorage = &ProviderStorage{}
-var _ IdentityProviderStorage = &ProviderStorage{}
-var _ AuthStorage = &ProviderStorage{}
-var _ UserStorage = &ProviderStorage{}
+var _ provider.EntityStorage = &Storage{}
+var _ provider.IdentityProviderStorage = &Storage{}
+var _ provider.AuthStorage = &Storage{}
+var _ provider.UserStorage = &Storage{}
 
 type StorageConfig struct {
-	DefaultLoginURL string
+	DefaultLoginURL      string
+	CertificateAlgorithm string
 }
 
-type EntityStorage interface {
-	GetCA(context.Context, chan<- key.CertificateAndKey)
-	GetMetadataSigningKey(context.Context, chan<- key.CertificateAndKey)
-}
-
-type IdentityProviderStorage interface {
-	GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error)
-	GetEntityIDByAppID(ctx context.Context, entityID string) (string, error)
-	GetResponseSigningKey(context.Context, chan<- key.CertificateAndKey)
-}
-
-type AuthStorage interface {
-	CreateAuthRequest(context.Context, *samlp.AuthnRequestType, string, string, string, string) (models.AuthRequestInt, error)
-	AuthRequestByID(context.Context, string) (models.AuthRequestInt, error)
-}
-
-type UserStorage interface {
-	SetUserinfoWithUserID(ctx context.Context, userinfo models.AttributeSetter, userID string, attributes []int) (err error)
-	SetUserinfoWithLoginName(ctx context.Context, userinfo models.AttributeSetter, loginName string, attributes []int) (err error)
-}
-
-type ProviderStorage struct {
+type Storage struct {
 	certChan                  <-chan interface{}
 	certificateRotationCheck  time.Duration
 	certificateGracefulPeriod time.Duration
@@ -68,11 +49,10 @@ type ProviderStorage struct {
 	command    *command.Commands
 	query      *query.Queries
 
-	SignAlgorithm   string
 	defaultLoginURL string
 }
 
-func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
+func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
 	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
@@ -89,7 +69,7 @@ func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) (*
 	)
 }
 
-func (p *ProviderStorage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
+func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
 	app, err := p.query.AppByID(ctx, appID)
 	if err != nil {
 		return "", err
@@ -101,23 +81,23 @@ func (p *ProviderStorage) GetEntityIDByAppID(ctx context.Context, appID string) 
 	return string(metadata.EntityID), nil
 }
 
-func (p *ProviderStorage) Health(context.Context) error {
+func (p *Storage) Health(context.Context) error {
 	return nil
 }
 
-func (p *ProviderStorage) GetCA(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
+func (p *Storage) GetCA(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
 	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLCA)
 }
 
-func (p *ProviderStorage) GetMetadataSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
+func (p *Storage) GetMetadataSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
 	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLMetadataSigning)
 }
 
-func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
+func (p *Storage) GetResponseSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
 	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLResponseSinging)
 }
 
-func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (_ models.AuthRequestInt, err error) {
+func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -135,7 +115,7 @@ func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.Auth
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *ProviderStorage) AuthRequestByID(ctx context.Context, id string) (_ models.AuthRequestInt, err error) {
+func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -149,7 +129,7 @@ func (p *ProviderStorage) AuthRequestByID(ctx context.Context, id string) (_ mod
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *ProviderStorage) AuthRequestByCode(ctx context.Context, code string) (_ models.AuthRequestInt, err error) {
+func (p *Storage) AuthRequestByCode(ctx context.Context, code string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -160,7 +140,7 @@ func (p *ProviderStorage) AuthRequestByCode(ctx context.Context, code string) (_
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *ProviderStorage) SetUserinfoWithUserID(ctx context.Context, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
+func (p *Storage) SetUserinfoWithUserID(ctx context.Context, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	user, err := p.query.GetUserByID(ctx, userID)
@@ -170,17 +150,17 @@ func (p *ProviderStorage) SetUserinfoWithUserID(ctx context.Context, userinfo mo
 
 	for _, attribute := range attributes {
 		switch attribute {
-		case AttributeEmail:
+		case provider.AttributeEmail:
 			userinfo.SetEmail(user.Human.Email)
-		case AttributeSurname:
+		case provider.AttributeSurname:
 			userinfo.SetSurname(user.Human.LastName)
-		case AttributeFullName:
+		case provider.AttributeFullName:
 			userinfo.SetFullName(user.Human.DisplayName)
-		case AttributeGivenName:
+		case provider.AttributeGivenName:
 			userinfo.SetGivenName(user.Human.FirstName)
-		case AttributeUsername:
+		case provider.AttributeUsername:
 			userinfo.SetUsername(user.PreferredLoginName)
-		case AttributeUserID:
+		case provider.AttributeUserID:
 			userinfo.SetUserID(userID)
 		}
 	}
@@ -195,7 +175,7 @@ func (p *ProviderStorage) SetUserinfoWithUserID(ctx context.Context, userinfo mo
 	return nil
 }
 
-func (p *ProviderStorage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.AttributeSetter, loginName string, attributes []int) (err error) {
+func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.AttributeSetter, loginName string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -210,17 +190,17 @@ func (p *ProviderStorage) SetUserinfoWithLoginName(ctx context.Context, userinfo
 
 	for _, attribute := range attributes {
 		switch attribute {
-		case AttributeEmail:
+		case provider.AttributeEmail:
 			userinfo.SetEmail(user.Human.Email)
-		case AttributeSurname:
+		case provider.AttributeSurname:
 			userinfo.SetSurname(user.Human.LastName)
-		case AttributeFullName:
+		case provider.AttributeFullName:
 			userinfo.SetFullName(user.Human.DisplayName)
-		case AttributeGivenName:
+		case provider.AttributeGivenName:
 			userinfo.SetGivenName(user.Human.FirstName)
-		case AttributeUsername:
+		case provider.AttributeUsername:
 			userinfo.SetUsername(user.PreferredLoginName)
-		case AttributeUserID:
+		case provider.AttributeUserID:
 			userinfo.SetUserID(user.ID)
 		}
 	}

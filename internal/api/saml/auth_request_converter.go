@@ -1,10 +1,10 @@
 package saml
 
 import (
-	"github.com/caos/zitadel/internal/api/saml/models"
-	"github.com/caos/zitadel/internal/api/saml/xml/samlp"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/saml/pkg/provider/models"
+	"github.com/zitadel/saml/pkg/provider/xml/samlp"
 	"time"
 )
 
