@@ -28,6 +28,7 @@
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
+@import 'src/app/pages/users/user-detail/contact/contact.component';
 @import 'src/app/pages/projects/project-grid/project-grid.component';
 @import 'src/app/app.component.scss';
 @import './styles/color.scss';
@@ -39,7 +40,6 @@
 @import 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-illustration/project-grant-illustration.component';
 @import 'src/app/modules/accounts-card/accounts-card.component.scss';
 @import 'src/app/modules/filter/filter.component.scss';
-@import 'src/app/modules/zitadel-tier/zitadel-tier.component.scss';
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
 @import 'src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.scss';
 @import 'src/app/modules/policies/private-labeling-policy/preview/preview.component.scss';
@@ -101,7 +101,6 @@
   @include accounts-card-theme($theme);
   @include sidenav-theme($theme);
   @include info-section-theme($theme);
-  @include tier-theme($theme);
   @include filter-theme($theme);
   @include preview-theme($theme);
   @include private-label-theme($theme);
@@ -112,4 +111,5 @@
   @include action-dialog-theme($theme);
   @include action-keys-theme($theme);
   @include codemirror-theme($theme);
+  @include contact-theme($theme);
 }

@@ -14,7 +14,6 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
-import { FeaturesModule } from 'src/app/modules/features/features.module';
 import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -27,7 +26,6 @@ import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ChangesModule } from '../../modules/changes/changes.module';
-import { ZitadelTierModule } from '../../modules/zitadel-tier/zitadel-tier.module';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
 
@@ -62,8 +60,6 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     ContributorsModule,
     CopyToClipboardModule,
     PolicyGridModule,
-    FeaturesModule,
-    ZitadelTierModule,
   ],
 })
 export class OrgsModule {}
