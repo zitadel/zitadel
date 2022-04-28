@@ -12,15 +12,13 @@ import (
 )
 
 type Config struct {
-	Fraction     float64
-	MetricPrefix string
-	Endpoint     string
+	Fraction float64
+	Endpoint string
 }
 
 func NewTracerFromConfig(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
 	c.Endpoint, _ = rawConfig["endpoint"].(string)
-	c.MetricPrefix, _ = rawConfig["metricprefix"].(string)
 	fraction, ok := rawConfig["fraction"].(string)
 	if ok {
 		c.Fraction, err = strconv.ParseFloat(fraction, 32)
@@ -39,6 +37,6 @@ func (c *Config) NewTracer() error {
 		return err
 	}
 
-	tracing.T = NewTracer(c.MetricPrefix, sampler, exporter)
-	return nil
+	tracing.T, err = NewTracer(sampler, exporter)
+	return err
 }
