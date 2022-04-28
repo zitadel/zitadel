@@ -5,6 +5,7 @@ Log:
 
 Port: 8080
 ExternalPort: 8080
+ExternalDomain:  #must be provided
 ExternalSecure: true
 HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"
@@ -172,7 +173,7 @@ DefaultInstance:
       Email:
         Address:
         Verified: false
-      PreferredLanguage:
+      PreferredLanguage: en
       Gender:
       Phone:
         Number:

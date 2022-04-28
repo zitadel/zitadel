@@ -14,16 +14,16 @@ func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) command.Add
 	lang, err := language.Parse(human.Profile.PreferredLanguage)
 	logging.OnError(err).Debug("unable to parse language")
 	return command.AddHuman{
-		Username:      human.UserName,
-		FirstName:     human.Profile.FirstName,
-		LastName:      human.Profile.LastName,
-		NickName:      human.Profile.NickName,
-		DisplayName:   human.Profile.DisplayName,
-		PreferredLang: lang,
-		Gender:        user_grpc.GenderToDomain(human.Profile.Gender),
-		Email:         setUpOrgHumanEmailToDomain(human.Email),
-		Phone:         setUpOrgHumanPhoneToDomain(human.Phone),
-		Password:      human.Password,
+		Username:          human.UserName,
+		FirstName:         human.Profile.FirstName,
+		LastName:          human.Profile.LastName,
+		NickName:          human.Profile.NickName,
+		DisplayName:       human.Profile.DisplayName,
+		PreferredLanguage: lang,
+		Gender:            user_grpc.GenderToDomain(human.Profile.Gender),
+		Email:             setUpOrgHumanEmailToDomain(human.Email),
+		Phone:             setUpOrgHumanPhoneToDomain(human.Phone),
+		Password:          human.Password,
 	}
 }
 

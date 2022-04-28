@@ -28,6 +28,7 @@ type Config struct {
 	Log             *logging.Config
 	Port            uint16
 	ExternalPort    uint16
+	ExternalDomain  string
 	ExternalSecure  bool
 	HTTP2HostHeader string
 	HTTP1HostHeader string

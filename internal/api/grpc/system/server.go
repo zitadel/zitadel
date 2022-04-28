@@ -25,7 +25,6 @@ type Server struct {
 	query           *query.Queries
 	administrator   repository.AdministratorRepository
 	DefaultInstance command.InstanceSetup
-	ExternalSecure  bool
 }
 
 type Config struct {
@@ -36,13 +35,12 @@ func CreateServer(command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
 	defaultInstance command.InstanceSetup,
-	externalSecure bool) *Server {
+) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		administrator:   repo,
 		DefaultInstance: defaultInstance,
-		ExternalSecure:  externalSecure,
 	}
 }
 
