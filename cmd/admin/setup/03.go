@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -14,15 +15,18 @@ import (
 )
 
 type DefaultInstance struct {
-	InstanceSetup command.InstanceSetup
+	InstanceName string
+	CustomDomain string
+	Org          command.OrgSetup
 
+	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
 	masterKey         string
 	db                *sql.DB
 	es                *eventstore.Eventstore
-	domain            string
 	defaults          systemdefaults.SystemDefaults
 	zitadelRoles      []authz.RoleMapping
+	externalDomain    string
 	externalSecure    bool
 	externalPort      uint16
 }
@@ -47,6 +51,7 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		nil,
 		nil,
 		nil,
+		mig.externalDomain,
 		mig.externalSecure,
 		mig.externalPort,
 		nil,
@@ -60,9 +65,16 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx = authz.WithRequestedDomain(ctx, mig.domain)
 
-	_, _, err = cmd.SetUpInstance(ctx, &mig.InstanceSetup, mig.externalSecure)
+	mig.instanceSetup.InstanceName = mig.InstanceName
+	mig.instanceSetup.CustomDomain = mig.CustomDomain
+	mig.instanceSetup.Org = mig.Org
+	mig.instanceSetup.Org.Human.Email.Address = strings.TrimSpace(mig.instanceSetup.Org.Human.Email.Address)
+	if mig.instanceSetup.Org.Human.Email.Address == "" {
+		mig.instanceSetup.Org.Human.Email.Address = "admin@" + mig.instanceSetup.CustomDomain
+	}
+
+	_, _, err = cmd.SetUpInstance(ctx, &mig.instanceSetup)
 	return err
 }
 

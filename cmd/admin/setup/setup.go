@@ -3,7 +3,6 @@ package setup
 import (
 	"context"
 	_ "embed"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -60,24 +59,14 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}
 	steps.s2AssetsTable = &AssetTable{dbClient: dbClient}
 
-	instanceSetup := config.DefaultInstance
-	instanceSetup.InstanceName = steps.S3DefaultInstance.InstanceSetup.InstanceName
-	instanceSetup.CustomDomain = steps.S3DefaultInstance.InstanceSetup.CustomDomain
-	instanceSetup.Org = steps.S3DefaultInstance.InstanceSetup.Org
-	steps.S3DefaultInstance.InstanceSetup = instanceSetup
-
-	steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = strings.TrimSpace(steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address)
-	if steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address == "" {
-		steps.S3DefaultInstance.InstanceSetup.Org.Human.Email.Address = "admin@" + instanceSetup.CustomDomain
-	}
-
-	steps.S3DefaultInstance.es = eventstoreClient
-	steps.S3DefaultInstance.db = dbClient
-	steps.S3DefaultInstance.defaults = config.SystemDefaults
-	steps.S3DefaultInstance.masterKey = masterKey
-	steps.S3DefaultInstance.domain = instanceSetup.CustomDomain
-	steps.S3DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
+	steps.S3DefaultInstance.instanceSetup = config.DefaultInstance
 	steps.S3DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
+	steps.S3DefaultInstance.masterKey = masterKey
+	steps.S3DefaultInstance.db = dbClient
+	steps.S3DefaultInstance.es = eventstoreClient
+	steps.S3DefaultInstance.defaults = config.SystemDefaults
+	steps.S3DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
+	steps.S3DefaultInstance.externalDomain = config.ExternalDomain
 	steps.S3DefaultInstance.externalSecure = config.ExternalSecure
 	steps.S3DefaultInstance.externalPort = config.ExternalPort
 
@@ -85,9 +74,9 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
 	logging.OnError(err).Fatal("unable to migrate step 1")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
-	logging.OnError(err).Fatal("unable to migrate step 3")
+	logging.OnError(err).Fatal("unable to migrate step 2")
 	err = migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
-	logging.OnError(err).Fatal("unable to migrate step 4")
+	logging.OnError(err).Fatal("unable to migrate step 3")
 }
 
 func initSteps(v *viper.Viper, files ...string) func() {

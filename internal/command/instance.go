@@ -157,7 +157,7 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	return nil
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, externalSecure bool) (string, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
 	instanceID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -167,8 +167,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 		return "", nil, err
 	}
 
-	requestedDomain := authz.GetInstance(ctx).RequestedDomain()
-	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), requestedDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
+	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
@@ -184,8 +183,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 		return "", nil, err
 	}
 	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
-
-	setup.Org.Human.PasswordChangeRequired = true
 
 	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID)
@@ -302,7 +299,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, exte
 		ApplicationType:          domain.OIDCApplicationTypeUserAgent,
 		AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 		PostLogoutRedirectUris:   []string{},
-		DevMode:                  !externalSecure,
+		DevMode:                  !c.externalSecure,
 		AccessTokenType:          domain.OIDCTokenTypeBearer,
 		AccessTokenRoleAssertion: false,
 		IDTokenRoleAssertion:     false,

@@ -10,6 +10,7 @@ import (
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/action"
@@ -28,6 +29,7 @@ type Commands struct {
 	static         static.Storage
 	idGenerator    id.Generator
 	zitadelRoles   []authz.RoleMapping
+	externalDomain string
 	externalSecure bool
 	externalPort   uint16
 
@@ -62,6 +64,7 @@ func StartCommands(es *eventstore.Eventstore,
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
 	webAuthN *webauthn_helper.Config,
+	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
 	idpConfigEncryption,
@@ -72,11 +75,15 @@ func StartCommands(es *eventstore.Eventstore,
 	domainVerificationEncryption,
 	oidcEncryption crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
+	if externalDomain == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "not external domain specified")
+	}
 	repo = &Commands{
 		eventstore:            es,
 		static:                staticStore,
 		idGenerator:           id.SonyFlakeGenerator,
 		zitadelRoles:          zitadelRoles,
+		externalDomain:        externalDomain,
 		externalSecure:        externalSecure,
 		externalPort:          externalPort,
 		keySize:               defaults.KeyConfig.Size,
