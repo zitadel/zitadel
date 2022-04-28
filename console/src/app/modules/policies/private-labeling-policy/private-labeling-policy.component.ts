@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, EventEmitter, Injector, OnDestroy, OnInit, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { switchMap, take, takeUntil } from 'rxjs/operators';
 import {
   GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
   GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
@@ -18,6 +18,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
@@ -33,9 +34,9 @@ export enum Theme {
   LIGHT,
 }
 
-export enum Preview {
-  CURRENT,
+export enum View {
   PREVIEW,
+  CURRENT,
 }
 
 export enum ColorType {
@@ -55,9 +56,8 @@ const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
   templateUrl: './private-labeling-policy.component.html',
   styleUrls: ['./private-labeling-policy.component.scss'],
 })
-export class PrivateLabelingPolicyComponent implements OnDestroy {
+export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public theme: Theme = Theme.LIGHT;
-  public preview: Preview = Preview.PREVIEW;
 
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
@@ -78,40 +78,62 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public loading: boolean = false;
 
   public Theme: any = Theme;
-  public Preview: any = Preview;
+  public View: any = View;
   public ColorType: any = ColorType;
   public AssetType: any = AssetType;
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
-  private org!: Org.AsObject;
+  public org!: Org.AsObject;
   public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   public InfoSectionType: any = InfoSectionType;
+
+  private destroy$: Subject<void> = new Subject();
+  public view: View = View.PREVIEW;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private assetService: AssetService,
-    private storage: StorageService,
+    private storageService: StorageService,
     private themeService: ThemeService,
+    breadcrumbService: BreadcrumbService,
   ) {
-    const org: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.session);
-
-    if (org) {
-      this.org = org;
-    }
-
-    this.sub = this.route.data
+    this.route.data
       .pipe(
+        takeUntil(this.destroy$),
         switchMap((data) => {
           this.serviceType = data.serviceType;
 
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
+
+              const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
+
+              if (org) {
+                this.org = org;
+              }
+              const iambread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'System',
+                routerLink: ['/system'],
+              });
+              const bread: Breadcrumb = {
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              };
+              breadcrumbService.setBreadcrumb([iambread, bread]);
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
+
+              const iamBread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'System',
+                routerLink: ['/system'],
+              });
+              breadcrumbService.setBreadcrumb([iamBread]);
               break;
           }
 
@@ -162,6 +184,16 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         }
       }
     }
+  }
+
+  public ngOnInit(): void {
+    this.themeService.isDarkTheme.pipe(takeUntil(this.destroy$)).subscribe((isDark) => {
+      if (isDark) {
+        this.theme = Theme.DARK;
+      } else {
+        this.theme = Theme.LIGHT;
+      }
+    });
   }
 
   public onDropFont(filelist: FileList | null): Promise<any> | void {
@@ -369,6 +401,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
 
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private async getPreviewData(): Promise<
@@ -537,13 +571,13 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   }
 
   private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
-    const darkPrimary = labelpolicy?.primaryColorDark || '#5282c1';
-    const lightPrimary = labelpolicy?.primaryColor || '#5282c1';
+    const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
+    const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
 
     const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
     const lightWarn = labelpolicy?.warnColor || '#cd3d56';
 
-    const darkBackground = labelpolicy?.backgroundColorDark || '#212224';
+    const darkBackground = labelpolicy?.backgroundColorDark || '#111827';
     const lightBackground = labelpolicy?.backgroundColor || '#fafafa';
 
     this.themeService.savePrimaryColor(darkPrimary, true);
@@ -569,4 +603,34 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
         this.toast.showError(error);
       });
   }
+
+  // /**
+  //  *  defaults to false because urls are distinct anyway
+  //  */
+  // public get previewEqualsCurrentPolicy(): boolean {
+  //   const getComparable = (policy: LabelPolicy.AsObject): Partial<LabelPolicy.AsObject> => {
+  //     return Object.assign({
+  //       primaryColor: policy.primaryColor,
+  //       hideLoginNameSuffix: policy.primaryColor,
+  //       warnColor: policy.warnColor,
+  //       backgroundColor: policy.backgroundColor,
+  //       fontColor: policy.fontColor,
+  //       primaryColorDark: policy.primaryColorDark,
+  //       backgroundColorDark: policy.backgroundColorDark,
+  //       warnColorDark: policy.warnColorDark,
+  //       fontColorDark: policy.fontColorDark,
+  //       disableWatermark: policy.disableWatermark,
+  //       logoUrl: policy.logoUrl,
+  //       iconUrl: policy.iconUrl,
+  //       logoUrlDark: policy.logoUrlDark,
+  //       iconUrlDark: policy.iconUrlDark,
+  //       fontUrl: policy.fontUrl,
+  //     });
+  //   };
+
+  //   const c = getComparable(this.data);
+  //   const p = getComparable(this.previewData);
+
+  //   return JSON.stringify(p) === JSON.stringify(c);
+  // }
 }

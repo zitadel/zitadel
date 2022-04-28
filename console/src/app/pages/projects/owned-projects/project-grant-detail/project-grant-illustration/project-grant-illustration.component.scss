@@ -1,0 +1,120 @@
+@mixin project-grant-illustration-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $overlayColor: if($is-dark-theme, #ffffff10, #00000008);
+  $highlightedOverlayColor: if($is-dark-theme, #68c4cf14, #68c4cf14);
+  $borderColor: if($is-dark-theme, #ffffff20, #00000020);
+
+  .pgi {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 2rem 0;
+
+    .pgi-arrow {
+      display: none;
+      align-self: center;
+      font-size: 3rem;
+      margin: 1rem;
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .pgi-label {
+      font-size: 14px;
+      margin-bottom: 1rem;
+      display: block;
+      align-self: flex-start;
+
+      &.italic {
+        font-style: italic;
+      }
+    }
+
+    .pgi-label-wrapper {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      align-self: flex-start;
+
+      .pgi-label {
+        margin: 0;
+      }
+
+      .pgi-state-dot {
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        margin-left: 0.5rem;
+        flex-shrink: 0;
+
+        &.active {
+          background-color: var(--success);
+        }
+
+        &.inactive {
+          background-color: var(--warn);
+        }
+      }
+    }
+
+    .pgi-label-sec {
+      font-size: 11px;
+      text-transform: uppercase;
+      margin: 1rem 0 0 0;
+      text-align: center;
+      display: block;
+    }
+
+    .pgi-org-wrapper {
+      border-radius: 1rem;
+      padding: 1rem;
+      background: $overlayColor;
+      border: 1px solid $borderColor;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .pgi-project-wrapper {
+        border-radius: 1rem;
+        background: $highlightedOverlayColor;
+        border: 1px solid $borderColor;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .pgi-role-wrapper {
+          border-radius: 1rem;
+          padding: 1rem;
+          background: $overlayColor;
+          border: 1px solid $borderColor;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .pgi-role-row {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+            max-width: 250px;
+          }
+        }
+      }
+    }
+
+    .first-org {
+      display: none;
+    }
+
+    @media only screen and (min-width: 600px) {
+      .pgi-arrow,
+      .first-org {
+        display: block;
+      }
+    }
+  }
+}

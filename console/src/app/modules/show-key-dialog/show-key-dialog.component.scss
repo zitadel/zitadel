@@ -5,7 +5,7 @@
 
 .desc {
   color: rgb(201, 51, 71);
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .form-field {
@@ -14,10 +14,10 @@
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 
@@ -33,10 +33,9 @@
   }
 
   .left {
-    color: var(--grey);
     margin-right: 1rem;
     margin-top: 0;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
   }
 
   .right {

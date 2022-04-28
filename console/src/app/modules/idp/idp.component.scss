@@ -1,37 +1,30 @@
+.idp-form {
+  padding-top: 1rem;
+}
 
-.container {
-  width: 100%;
-
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
-  }
-
-  .idp-form {
-    border-top: 1px solid #ffffff20;
-    padding-top: 1rem;
-  }
+.idp-desc {
+  font-size: 14px;
 }
 
 .idp-content {
   display: flex;
   flex-direction: row;
-  margin: 0 -.5rem;
+  margin: 0 -0.5rem;
   flex-wrap: wrap;
 
   .idp-desc {
     flex-basis: 100%;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
     margin-bottom: 1rem;
-    color: var(--grey);
   }
 
   .formfield {
     flex: 1 1 auto;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
     min-width: 150px;
 
     .chip {
-      border-radius: .5rem;
+      border-radius: 0.5rem;
       height: 40px;
     }
 
@@ -45,7 +38,7 @@
   }
 
   .auto-reg-info {
-    margin: 0 .5rem 1rem .5rem;
+    margin: 0 0.5rem 1rem 0.5rem;
     display: block;
     width: 100%;
 

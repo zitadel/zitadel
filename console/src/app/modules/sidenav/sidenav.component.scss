@@ -1,0 +1,89 @@
+@use '@angular/material' as mat;
+
+@mixin sidenav-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .sidenav-container {
+    padding-top: 1rem;
+    display: grid;
+    position: relative;
+    grid-template-columns: 1fr;
+
+    .sidenav-settings-list {
+      position: relative;
+
+      .sidenav-sticky-rel {
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 50px;
+        padding: 1rem 2rem 1rem 0;
+
+        .sidenav-setting-list-element {
+          border: none;
+          background: none;
+          text-align: left;
+          padding: 0.75rem 0;
+          opacity: 0.6;
+          font-size: 15px;
+          cursor: pointer;
+          color: map-get($foreground, base);
+          display: flex;
+          align-items: center;
+
+          i {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            line-height: 1.2rem;
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.mob-only {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+
+          &.hide-on-mobile {
+            @media only screen and (max-width: 500px) {
+              display: none;
+            }
+          }
+
+          &.show {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+
+          &.active {
+            font-weight: 600;
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    .sidenav-content {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    @media only screen and (min-width: 824px) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+
+      .sidenav-content {
+        grid-column-start: 2;
+        grid-column-end: 5;
+      }
+    }
+  }
+}

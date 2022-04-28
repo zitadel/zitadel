@@ -1,28 +1,23 @@
-.action-state-btn {
-  margin-left: 0.5rem;
+.margin-right {
+  margin-right: 0.5rem;
 }
 
-.table-wrapper {
-  overflow: auto;
+td,
+th {
+  padding: 0 1rem;
 
-  .table,
-  .paginator {
-    width: 100%;
-
-    td,
-    th {
-      padding: 0 1rem;
-
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
+  &:first-child {
+    padding-left: 0;
+    padding-right: 1rem;
   }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
+.action-select-cell {
+  width: 50px;
 }
 
 tr {

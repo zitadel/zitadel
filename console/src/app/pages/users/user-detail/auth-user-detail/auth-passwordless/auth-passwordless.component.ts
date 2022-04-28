@@ -14,10 +14,10 @@ import { DialogPasswordlessComponent } from './dialog-passwordless/dialog-passwo
 
 export interface WebAuthNOptions {
   challenge: string;
-  rp: { name: string, id: string; };
-  user: { name: string, id: string, displayName: string; };
+  rp: { name: string; id: string };
+  user: { name: string; id: string; displayName: string };
   pubKeyCredParams: any;
-  authenticatorSelection: { userVerification: string; };
+  authenticatorSelection: { userVerification: string };
   timeout: number;
   attestation: string;
 }
@@ -39,9 +39,7 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
   public error: string = '';
 
-  constructor(private service: GrpcAuthService,
-    private toast: ToastService,
-    private dialog: MatDialog) { }
+  constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     this.getPasswordless();
@@ -52,44 +50,50 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
   }
 
   public addPasswordless(): void {
-    this.service.addMyPasswordless().then((resp) => {
-      if (resp.key) {
-        const credOptions: CredentialCreationOptions = JSON.parse(atob(resp.key.publicKey as string));
+    this.service.addMyPasswordless().then(
+      (resp) => {
+        if (resp.key) {
+          const credOptions: CredentialCreationOptions = JSON.parse(atob(resp.key.publicKey as string));
 
-        if (credOptions.publicKey?.challenge) {
-          credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
-          credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
-          if (credOptions.publicKey.excludeCredentials) {
-            credOptions.publicKey.excludeCredentials.map(cred => {
-              cred.id = _base64ToArrayBuffer(cred.id as any);
-              return cred;
+          if (credOptions.publicKey?.challenge) {
+            credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
+            credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+            if (credOptions.publicKey.excludeCredentials) {
+              credOptions.publicKey.excludeCredentials.map((cred) => {
+                cred.id = _base64ToArrayBuffer(cred.id as any);
+                return cred;
+              });
+            }
+            const dialogRef = this.dialog.open(DialogPasswordlessComponent, {
+              width: '400px',
+              data: {
+                credOptions,
+                type: U2FComponentDestination.PASSWORDLESS,
+              },
+            });
+
+            dialogRef.afterClosed().subscribe((done) => {
+              this.getPasswordless();
             });
           }
-          const dialogRef = this.dialog.open(DialogPasswordlessComponent, {
-            width: '400px',
-            data: {
-              credOptions,
-              type: U2FComponentDestination.PASSWORDLESS,
-            },
-          });
-
-          dialogRef.afterClosed().subscribe(done => {
-            this.getPasswordless();
-          });
         }
-      }
-    }, error => {
-      this.toast.showError(error);
-    });
+      },
+      (error) => {
+        this.toast.showError(error);
+      },
+    );
   }
 
   public getPasswordless(): void {
-    this.service.listMyPasswordless().then(passwordless => {
-      this.dataSource = new MatTableDataSource(passwordless.resultList);
-      this.dataSource.sort = this.sort;
-    }).catch(error => {
-      this.error = error.message;
-    });
+    this.service
+      .listMyPasswordless()
+      .then((passwordless) => {
+        this.dataSource = new MatTableDataSource(passwordless.resultList);
+        this.dataSource.sort = this.sort;
+      })
+      .catch((error) => {
+        this.error = error.message;
+      });
   }
 
   public deletePasswordless(id?: string): void {
@@ -103,14 +107,17 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp && id) {
-        this.service.removeMyPasswordless(id).then(() => {
-          this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
-          this.getPasswordless();
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.service
+          .removeMyPasswordless(id)
+          .then(() => {
+            this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
+            this.getPasswordless();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }

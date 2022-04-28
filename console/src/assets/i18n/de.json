@@ -5,114 +5,77 @@
     "NEXT": "Weiter",
     "COUNT": "Ergebnisse"
   },
-  "ONBOARDING": {
-    "HEADER": "Erste Schritte",
-    "TITLE": "Lernen Sie unsere ZITADEL Console kennen.",
-    "LOGINDESC": "Melden Sie sich an um Zugriff auf Funktionen von Zitadel zu erhalten",
-    "LOGIN": "Anmelden",
-    "DESCRIPTION": "Führen Sie die folgenden Schritte aus und passen Sie ZITADEL optimal an Ihre Bedürfnisse an.",
-    "STEPS_TITLE": "Führen Sie die folgenden Schritte in gewünschter Reihenfolge aus:",
-    "STEPS": {
-      "1": {
-        "TITLE": "Projekt erstellen",
-        "DESC": "Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
-      },
-      "2": {
-        "TITLE": "Applikation erstellen",
-        "DESC": "Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
-      },
-      "3": {
-        "TITLE": "Sicherheit verbessern",
-        "DESC": "Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
-      }
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakt",
+      "TOS": "Terms of Service",
+      "PP": "Privacy Policy"
     },
-    "START": "Start",
-    "DOCS": "Docs"
+    "THEME": {
+      "DARK": "Dunkel",
+      "LIGHT": "Hell"
+    }
   },
   "HOME": {
-    "TITLE": "ZITADEL",
-    "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-    "SECURITYANDPRIVACY_DESC": "Verwalte Deine Informationen und Sicherheitseinstellungen.",
-    "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
-    "CHANGE_PWD": "Passwort ändern",
-    "PROTECTION": "Organisationsrichtlinien",
-    "PROTECTION_DESC": "Verwalte Deine Organisationsrichtlinien und entdecke die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
-    "PROTECTION_BUTTON": "Erkunden",
-    "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
-    "PROJECTS_DESC": "Autorisiere andere Benutzer, Deine eigenen Projekte zu verwenden, oder erstelle benutzerdefinierte Rollen für berechtigte Projekte",
-    "PROJECTS_BUTTON": "Projektübersicht",
-    "PROJECTS_NEW_LINK": "Neues Projekt erstellen",
-    "IAM_CREATE_ORG": "Organisation erstellen",
-    "ORG_POLICY_COMPLEXITY": "Passwort Komplexität",
-    "ORG_POLICY_IAM": "Organisation Zugangseinstellungen",
-    "ORG_POLICY_LOGIN": "Login Richtlinie",
-    "ORG_POLICY_LABEL": "Private Label Richtlinie",
-    "IAM_POLICY_COMPLEXITY": "Systemweite Passwort Komplexität",
-    "IAM_POLICY_IAM": "Systemweite Zugangseinstellungen",
-    "IAN_POLICY_LOGIN": "Systemweite Login Richtlinie",
-    "IAN_POLICY_LABEL": "Systemweite Private Label Richtlinie",
-    "USERS": "Erstelle und verwalte Deine Benutzer.",
-    "USERS_DESC": "Überwache Dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
-    "USERS_HUMANS": "Zeige Benutzer",
-    "USERS_MACHINES": "Zeige Service User",
-    "USERS_CREATE": "User erstellen",
-    "USERS_BUTTON": "Benutzer anzeigen",
-    "IAM": "Identity- und Access-Management",
-    "IAM_DESC": "Verwalte Deine Organisationen und Administratoren.",
-    "IAM_BUTTON": "ZITADEL verwalten",
     "WELCOME": "Loslegen mit ZITADEL",
-    "WELCOMESENTENCE": "Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
-    "DISCLAIMER": "Du kannst nur die Einstellungen Deiner aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Deine Daten vertraulich und sicher.",
+    "DISCLAIMER": "ZITADEL behandelt Deine Daten vertraulich und sicher.",
     "DISCLAIMERLINK": "Mehr Informationen zur Sicherheit",
+    "DOCUMENTATION": {
+      "TITLE": "Dokumentation",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
+    "GETSTARTED": {
+      "TITLE": "Starten mit ZITADEL",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
     "QUICKSTARTS": {
       "LABEL": "Erste Schritte",
       "TITLE": "Quickstarts",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Shortcuts",
+      "SETTINGS": "Organisation Einstellungen",
+      "PROJECTS": "Projekte",
+      "REORDER": "Zum Verschieben Kachel halten un ziehen",
+      "ADD": "Zum Hinzufügen Kachel halten und ziehen"
     }
   },
   "MENU": {
-    "DASHBOARD": "Übersicht",
+    "SYSTEM": "System",
+    "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
-    "IAMPOLICIES": "IAM",
-    "IAMEVENTSTORE": "Speicher",
+    "IAM": "System Übersicht",
+    "VIEWS": "Views",
+    "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organisation",
-    "ADMINSECTION": "ZITADEL Administration",
-    "ORGSECTION": "Organisation",
-    "PROJECTSSECTION": "Projektsektion",
+    "DOMAINS": "Domains",
     "PROJECT": "Projekte",
+    "PROJECTOVERVIEW": "Übersicht",
+    "PROJECTGRANTS": "Berechtigte Organisationen",
+    "ROLES": "Rollen",
     "GRANTEDPROJECT": "Berechtigte Projekte",
-    "USERSECTION": "Benutzersektion",
     "HUMANUSERS": "Benutzer",
     "MACHINEUSERS": "Service-Benutzer",
     "LOGOUT": "Alle Benutzer abmelden",
     "NEWORG": "Neue Organisation",
     "IAMADMIN": "Du bist ein IAM-Administrator. Beachte, dass Du erhöhte Rechte besitzt.",
     "SHOWORGS": "Alle Organisationen anzeigen",
-    "GRANTSECTION": "Berechtigungssektion",
     "GRANTS": "Berechtigungen",
     "ACTIONS": "Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
-    "TOOLTIP": {
-      "PERSONAL": "Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
-      "IAMPOLICIES": "Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
-      "IAMEVENTSTORE": "Bereinige views und fehlerhafte Events",
-      "ORG": "Verwalte die Zugangsrichtlinien und Domains deiner Organisation ",
-      "SELFPROJECTS": "Verwalte die Projekte deiner Organisation",
-      "GRANTEDPROJECTS": "Verwalte die berechtigten Projekte von anderen Organisationen",
-      "HUMANUSERS": "Verwalte die Menschlichen Benutzer deiner Organisation",
-      "MACHINEUSERS": "Verwalte die  Service Benutzer deiner Organisation",
-      "AUTHZ": "Verwalte die Berechtigungen deiner Organisationsbenutzer",
-      "ACTIONS": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden."
-    }
+    "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen"
   },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
+    "FILTER": "Filter",
     "RENAME": "Umbenennen",
     "SET": "Übernehmen",
     "COPY": "In die Zwischenablage kopieren",
     "COPIED": "In die Zwischenablage kopiert.",
+    "RESET": "Zurücksetzen",
     "RESETDEFAULT": "Auf Standard zurücksetzen",
     "RESETTO": "Zurücksetzen auf: ",
     "RESETCURRENT": "Auf aktuellen Wert zurücksetzen",
@@ -136,6 +99,7 @@
     "REMOVE": "Entfernen",
     "VERIFY": "Verifizieren",
     "FINISH": "Abschliessen",
+    "FINISHED": "Fertig",
     "CHANGE": "Ändern",
     "REACTIVATE": "Aktivieren",
     "DEACTIVATE": "Deaktivieren",
@@ -148,7 +112,63 @@
     "NEWVALUE": "Neuer Wert",
     "RESTORE": "Wiederherstellen",
     "CONTINUEWITHOUTSAVE": "Ohne speichern fortfahren",
-    "GOTOFEATURES": "Zu den Features"
+    "GOTOFEATURES": "Zu den Features",
+    "OF": "von",
+    "PREVIOUS": "Zurück",
+    "NEXT": "Weiter",
+    "MORE": "mehr",
+    "TABLE": {
+      "SHOWUSER": "Zeige Benutzer {{value}}"
+    }
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Alle Organisationseinstellungen und Tabellen basieren auf dieser ausgewählten Organisation. Klicken Sie auf diese Schaltfläche, um die Organisation zu wechseln oder eine neue zu erstellen."
+    },
+    "SYSTEM": {
+      "TEXT": "Klicken Sie hier, um zu den Systemeinstellungen zu gelangen. Beachten Sie, dass Sie nur Zugriff auf diese Schaltfläche haben, wenn Sie über erweiterte Berechtigungen verfügen."
+    },
+    "PROFILE": {
+      "TEXT": "Hier können Sie zwischen Ihren Benutzerkonten wechseln und Ihre Sessions und Ihr Profil verwalten."
+    },
+    "NAV": {
+      "TEXT": "Diese Navigation ändert sich basierend auf den Breadcrumbs darüber."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Achtung! Soeben wurde die Organisation gewechselt."
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "STATE": "Status",
+    "DISPLAYNAME": "Benutzer Display Name",
+    "EMAIL": "Email",
+    "USERNAME": "User Name",
+    "ORGNAME": "Organisationsname",
+    "PROJECTNAME": "Projektname",
+    "RESOURCEOWNER": "Resource Owner",
+    "METHODS": {
+      "5": "beinhaltet",
+      "7": "endet mit",
+      "1": "ist gleich"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tastaturkürzel",
+    "UNDERORGCONTEXT": "Innerhalb der Organisation",
+    "SIDEWIDE": "Seitenübergreifende Tastaturkürzel",
+    "SHORTCUTS": {
+      "HOME": "Zur Startseite",
+      "SYSTEM": "Zum <strong>S</strong>ystem",
+      "ORG": "Zur <strong>O</strong>rganisation",
+      "ORGSWITCHER": "Organisation wechseln",
+      "ME": "Zum eigenen Profil",
+      "PROJECTS": "Zu den <strong>P</strong>rojekten",
+      "USERS": "Zu den Benutzern",
+      "USERGRANTS": "Zu den <strong>A</strong>uthentisierungen",
+      "ACTIONS": "Zu den Aktionen und Abläufe",
+      "DOMAINS": "Zu den <strong>D</strong>omains"
+    }
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
@@ -162,6 +182,18 @@
     }
   },
   "USER": {
+    "SETTINGS": {
+      "TITLE": "Einstellungen",
+      "GENERAL": "Allgemein",
+      "IDP": "Identity Provider",
+      "MFA": "Multifactor Authentication",
+      "KEYS": "Schlüssel",
+      "PAT": "Personal Access Tokens",
+      "PASSWORDLESS": "Passwordless",
+      "USERGRANTS": "Authorizations",
+      "MEMBERSHIPS": "Memberships",
+      "METADATA": "Metadata"
+    },
     "TITLE": "Persönliche Informationen",
     "DESCRIPTION": "Verwalte Deine persönlichen Informationen und Sicherheitseinstellungen",
     "PAGES": {
@@ -209,6 +241,12 @@
     "TABLE": {
       "DEACTIVATE": "Deaktivieren",
       "ACTIVATE": "Aktivieren",
+      "CHANGEDATE": "Letzte Änderung",
+      "CREATIONDATE": "Erstelldatum",
+      "TYPES": {
+        "HUMAN": "Benutzer",
+        "MACHINE": "Service Users"
+      },
       "FILTER": {
         "0": "Nach Anzeigename filtern",
         "1": "Nach Username filtern",
@@ -226,7 +264,7 @@
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
       "NAME": "Name",
-      "TABLEACTIONS": "Aktionen",
+      "EMPTY": "Kein Gerät definiert",
       "TITLE": "Passwortlose Authentifizierungsmethoden",
       "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
@@ -248,7 +286,7 @@
         "3": "Gelöscht"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Passwortlos entfernen",
+        "DELETE_TITLE": "Passwortlose Authentifizierung entfernen",
         "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
         "ADD_TITLE": "Passwortlose Authentifizierung",
         "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwortlosen Authentifizierungsmethode.",
@@ -277,7 +315,7 @@
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
       "NAME": "Name",
-      "TABLEACTIONS": "Aktionen",
+      "EMPTY": "Keine weiteren Faktoren",
       "TITLE": "Multifaktor-Authentisierung",
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
@@ -316,6 +354,7 @@
       "IDPNAME": "Idp Name",
       "USERDISPLAYNAME": "Externer Name",
       "EXTERNALUSERID": "Externe Benutzer ID",
+      "EMPTY": "Kein IDP gefunden",
       "DIALOG": {
         "DELETE_TITLE": "Idp entfernen",
         "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu entfernen. Wollen Sie dies wirklich tun?"
@@ -378,7 +417,7 @@
       "DESCRIPTION": "Beschreibung",
       "KEYSTITLE": "Schlüssel",
       "KEYSDESC": "Definiere Deine Schlüssel mit einem optionalen Ablaufdatum.",
-      "TOKENSTITLE": "Access Tokens",
+      "TOKENSTITLE": "Personal Access Tokens",
       "TOKENSDESC": "Diese Access Tokens funktionieren wie gewöhnliche OAuth Access Tokens.",
       "ID": "Schlüssel-ID",
       "TYPE": "Typ",
@@ -397,6 +436,12 @@
       },
       "KEYTYPES": {
         "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Schlüssel löschen",
+          "DESCRIPTION": "Möchten Sie den ausgewählten Schlüssel löschen? Das kann nicht rückgängig gemacht werden."
+        }
       }
     },
     "PASSWORD": {
@@ -409,11 +454,12 @@
       "CONFIRMINITIAL": "Passwort wiederholen",
       "RESET": "Passwort zurücksetzen",
       "SET": "Passwort neu setzen",
-      "RESENDNOTIFICATION": "Link für das Zurücksetzen des Passworts senden",
+      "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
       "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
       "NOTEQUAL": "Die Passwörter stimmen nicht überein."
     },
+    "ID": "ID",
     "EMAIL": "E-Mail",
     "PHONE": "Telefonnummer",
     "PHONEEMPTY": "Keine Telefonnummer hinterlegt",
@@ -438,6 +484,7 @@
         "VALID": "Validiert",
         "RESEND": "Verifikationsnachricht erneut senden",
         "EDITTITLE": "Nummer ändern",
+        "EDITVALUE": "Telefonnummer",
         "EDITDESC": "Geben Sie die neue Nummer in dem darunterliegenden Feld ein!",
         "DELETETITLE": "Telefonnummer löschen",
         "DELETEDESC": "Wollen Sie die Telefonnummer wirklich löschen?"
@@ -453,6 +500,9 @@
         "TITLE": "Benutzerberechtigung erstellen",
         "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
       },
+      "PROJECTNAME": "Projektname",
+      "PROJECT-OWNED": "Eigenes Projekt",
+      "PROJECT-GRANTED": "Delegiertes Projekt",
       "FILTER": {
         "0": "Nach User Anzeigename filtern",
         "1": "Nach Domain filtern",
@@ -474,11 +524,15 @@
     "STATE": {
       "0": "Unbekannt",
       "1": "Aktiv",
-      "2": "Abgelaufen",
-      "4": "Gesperrt"
+      "2": "Inaktiv",
+      "3": "Gelöscht",
+      "4": "Gesperrt",
+      "5": "Suspendiert",
+      "6": "Initialisiert"
     },
     "SEARCH": {
-      "FOUND": "Gefunden"
+      "ADDITIONAL": "Benutzer Name (eigene Organisation)",
+      "ADDITIONAL-EXTERNAL": "Loginname (externe Organisation)"
     },
     "TARGET": {
       "SELF": "Um einen Benutzer aus einer anderen Organisation zu berechtigen, ",
@@ -529,6 +583,9 @@
       "DISPLAYNAME": "Anzeigename",
       "REMOVE": "Entfernen",
       "TYPE": "Typ",
+      "ORGID": "Organisation ID",
+      "UPDATED": "Membership wurde geändert.",
+      "NOPERMISSIONTOEDIT": "Ihnen fehlt die benötigte Berechtigung um Rollen zu ändern!",
       "TYPES": {
         "UNKNOWN": "Unbekannt",
         "ORG": "Organisation",
@@ -560,7 +617,9 @@
     "TITLE": "Aktionen und Abläufe",
     "DESCRIPTION": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
     "ACTIONSTITLE": "Aktionen",
+    "ACTIONSDESCRIPTION": "Dies sind Ihre Scripts, die sie in den Abläufen ausführen können.",
     "FLOWSTITLE": "Abläufe",
+    "FLOWSDESCRIPTION": "Abläufe eines bestimmten Typs führen Aktionen zum Zeitpunkt eines Triggers aus.",
     "ID": "ID",
     "NAME": "Name",
     "STATE": "State",
@@ -578,6 +637,7 @@
       "2": "Pre Creation",
       "3": "Post Creation"
     },
+    "ADDTRIGGER": "Trigger hinzufügen",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timout in Sekunden",
     "ALLOWEDTOFAIL": "Allowed To Fail",
@@ -595,7 +655,8 @@
       },
       "DELETEACTION": {
         "TITLE": "Aktion löschen?",
-        "DESCRIPTION": "Sie sind im Begriff eine Aktion zu löschen. Dieser Vorgang kann nicht zurückgesetzt werden. Sind Sie sicher?"
+        "DESCRIPTION": "Sie sind im Begriff eine Aktion zu löschen. Dieser Vorgang kann nicht zurückgesetzt werden. Sind Sie sicher?",
+        "DELETE_SUCCESS": "Aktion erfolgreich gelöscht."
       },
       "CLEAR": {
         "TITLE": "Flow zurücksetzen?",
@@ -610,8 +671,8 @@
   },
   "IAM": {
     "POLICIES": {
-      "TITLE": "IAM Administration",
-      "DESCRIPTION": "Verwalte Richtlinen und Zugangseinstellungen von ZITADEL."
+      "TITLE": "System Administration",
+      "DESCRIPTION": "Verwalte die globalen Richtlinen und Zugangseinstellungen."
     },
     "EVENTSTORE": {
       "TITLE": "IAM Speicher Administration",
@@ -619,7 +680,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "Manager können die Organisation bearbeiten und Projekte verwalten."
+      "DESCRIPTION": "Diese Manager können systemweite Einstellungen vornehmen."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -665,6 +726,7 @@
       "NAME": "Name",
       "ID": "ID",
       "CREATIONDATE": "Erstelldatum",
+      "DATECHANGED": "Geändert",
       "FILTER": "Filter",
       "FILTERPLACEHOLDER": "Filtern Sie nach dem Namen",
       "LIST": "Organisationen",
@@ -755,7 +817,7 @@
       "BTN": "Preisstufe ändern"
     },
     "HEADERS": {
-      "LOGINPOLICY": "Login Richtlinie",
+      "LOGINPOLICY": "Login Einstellungen",
       "PASSWORD": "Passwort",
       "LABELPOLICY": "Privatelabelling",
       "DOMAIN": "Organisations Domänen",
@@ -803,6 +865,7 @@
   "POLICY": {
     "TITLE": "Richtlinen entdecken",
     "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
+    "APPLIEDTO": "Angewendet auf",
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
       "DESCRIPTION": "Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
@@ -812,7 +875,7 @@
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "PRIVATELABELING": {
-      "TITLE": "Private Labeling",
+      "TITLE": "Branding",
       "DESCRIPTION": "Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
       "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN": "Datei auswählen",
@@ -834,6 +897,10 @@
       "EMAILNOSVG": "Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
       "FONTINLOGINONLY": "Die Schriftart wird momentan nur im Login interface angezeigt.",
+      "VIEWS": {
+        "PREVIEW": "Vorschau",
+        "CURRENT": "Aktuelle Konfiguration"
+      },
       "PREVIEW": {
         "TITLE": "Anmeldung",
         "SECOND": "mit ZITADEL-Konto anmelden.",
@@ -855,13 +922,13 @@
       "DESCRIPTION": "Definiere die Zugangseistellungen für Benutzer."
     },
     "PRIVATELABELING_POLICY": {
-      "TITLE": "Private Labeling",
+      "TITLE": "Branding",
       "BTN": "Datei auswählen",
       "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
       "ACTIVATEPREVIEW": "Preview aktivieren"
     },
     "LOGIN_POLICY": {
-      "TITLE": "Login Richtlinien",
+      "TITLE": "Login Einstellungen",
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
@@ -937,6 +1004,7 @@
     "MESSAGE_TEXTS": {
       "TITLE": "Email Texte",
       "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
+      "TYPE": "Benachrichtigung",
       "TYPES": {
         "INIT": "Initialisierung",
         "VE": "Emailverifikation",
@@ -1021,8 +1089,7 @@
     "MEMBER": {
       "TITLE": "Mitglieder",
       "USERNAME": "Benutzername",
-      "FIRSTNAME": "Vorname",
-      "LASTNAME": "Nachname",
+      "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Loginname",
       "EMAIL": "E-Mail",
       "ROLES": "Rollen",
@@ -1044,7 +1111,7 @@
       "DESCRIPTION": "Hier kannst Du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist.",
       "DELETE": "Projekt löschen",
       "LIST": "Projekte",
-      "LISTDESCRIPTION": "Hier findest Du alle Projekte, für die Du Aktionen anzeigen oder ausführen darfst. Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+      "LISTDESCRIPTION": "Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
       "DETAIL": "Details",
       "CREATE": "Projekt erstellen",
       "CREATE_DESC": "Gebe den Namen ein.",
@@ -1053,25 +1120,27 @@
       "ZITADELPROJECT": "Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn Du diese änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt.",
       "TYPE": {
         "OWNED": "Eigene Projekte",
-        "GRANTED": "Berechtigte Projekte"
+        "GRANTED": "Berechtigte Projekte",
+        "OWNED_SINGULAR": "Eigenes Projekt",
+        "GRANTED_SINGULAR": "Berechtigtes Projekt"
       },
       "PRIVATELABEL": {
-        "TITLE": "Private Labeling Verhalten",
+        "TITLE": "Branding Verhalten",
         "0": {
           "TITLE": "Unspezifiziert",
-          "DESC": "Sobald der Nutzer identifiziert ist, wird das Privatelabeling der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
+          "DESC": "Sobald der Nutzer identifiziert ist, wird das Branding der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
         },
         "1": {
           "TITLE": "Durchsetzung der Richtlinie des Projekteigentümers",
-          "DESC": "Das Privatelabeling der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
+          "DESC": "Das Branding der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
         },
         "2": {
           "TITLE": "Durchsetzung der Richtlinie des Benutzereigentümers",
-          "DESC": "Das Privatelabeling der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
+          "DESC": "Das Branding der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
         },
         "DIALOG": {
-          "TITLE": "Privatelabeling Verhalten",
-          "DESCRIPTION": "Bestimmen Sie das Verhalten des Projektes im Bezug auf das Privatelabeling."
+          "TITLE": "Branding Verhalten",
+          "DESCRIPTION": "Bestimmen Sie das Verhalten des Projektes im Bezug auf das Branding."
         }
       },
       "PINNED": "Angepinnt",
@@ -1090,9 +1159,14 @@
         },
         "DELETE": {
           "TITLE": "Projekt löschen",
-          "DESCRIPTION": "Willst Du das Projekt wirklich löschen?"
+          "DESCRIPTION": "Willst Du das Projekt wirklich löschen?",
+          "TYPENAME": "Wiederholen Sie den Namen des Projektes um es zu löschen."
         }
       }
+    },
+    "SETTINGS": {
+      "TITLE": "Einstellungen",
+      "DESCRIPTION": ""
     },
     "STATE": {
       "TITLE": "Status",
@@ -1115,10 +1189,9 @@
     "MEMBER": {
       "TITLE": "Manager",
       "TITLEDESC": "Manager können Änderungen an diesem Projekt vornehmen, wenn sie die nötigen Rollen haben.",
-      "DESCRIPTION": "Hier findest Du alle Manager dieses Projekts. Du kannst ein neues Mitglied hinzufügen und bestehende verwalten.",
+      "DESCRIPTION": "Diese Manager können unter Umständen Ihre Projekteinstellungen verändern.",
       "USERNAME": "Benutzername",
-      "FIRSTNAME": "Vorname",
-      "LASTNAME": "Nachname",
+      "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Loginname",
       "EMAIL": "E-Mail",
       "ROLES": "Rollen",
@@ -1126,14 +1199,15 @@
     },
     "GRANT": {
       "EMPTY": "Noch keine Organisation berechtigt",
-      "TITLE": "Berechtigte Organisationen",
+      "TITLE": "Projektberechtigungen",
       "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt.",
+      "EDITTITLE": "Rollen editieren",
       "CREATE": {
         "TITLE": "Organisation berechtigen",
         "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Berechtigung.",
         "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
         "SEL_PROJECT": "Suchen nach Projekt",
-        "SEL_USER": "Suchen nach Benutzer",
+        "SEL_USER": "Benutzer auswählen",
         "SEL_ORG": "Suchen nach Domain",
         "SEL_ORG_DESC": "Gebe die vollständige Domain ein, um Resultate zu erhalten.",
         "ORG_TITLE": "Organisation",
@@ -1144,8 +1218,8 @@
         "FOR_ORG": "Die Berechtigung wird erstellt für:"
       },
       "DETAIL": {
-        "TITLE": "Organisationsberechtigung",
-        "DESC": "Hier kannst Du die Eigenschaften der gewählten Organisationsberechtigung prüfen und editieren.",
+        "TITLE": "Projektberechtigung",
+        "DESC": "Hier kannst Du die Eigenschaften der gewählten Organisationsberechtigung prüfen und Manager editieren.",
         "MEMBERTITLE": "Berechtigte Manager der Organisation",
         "MEMBERDESC": "Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
         "PROJECTNAME": "Projektname",
@@ -1157,9 +1231,11 @@
         "1": "Aktiv",
         "2": "Inaktiv"
       },
+      "ALL": "Alle",
       "SHOWDETAIL": "Details anzeigen",
       "USER": "Benutzer",
       "MEMBERS": "Manager",
+      "ORG": "Organisation",
       "PROJECTNAME": "Projektname",
       "GRANTEDORG": "Berechtigte Organisation",
       "GRANTEDORGDOMAIN": "Domain",
@@ -1170,6 +1246,7 @@
       "DATES": "Datum",
       "ROLENAMESLIST": "Rollen",
       "NOROLES": "Keine Rollen",
+      "TYPE": "Typ",
       "TOAST": {
         "PROJECTGRANTUSERGRANTADDED": "Projektberechtigung erstellt.",
         "PROJECTGRANTADDED": "Projektberechtigung erstellt.",
@@ -1178,6 +1255,10 @@
         "PROJECTGRANTMEMBERCHANGED": "Berechtigungsmanager verändert.",
         "PROJECTGRANTMEMBERREMOVED": "Berechtigungsmanager entfernt.",
         "PROJECTGRANTUPDATED": "Projectberechtigung geändert."
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Projektberechtigung löschen",
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Projectberechtigung zu entfernen. Wollen Sie fortfahren?"
       },
       "ROLES": "Projektrollen"
     },
@@ -1202,12 +1283,17 @@
       "EDITDESCRIPTION": "Gebe die Daten für die zu ändernde Rolle ein.",
       "DELETE": "Rolle löschen",
       "CREATIONDATE": "Erstelldatum",
+      "CHANGEDATE": "Letzte Änderung",
       "SELECTGROUPTOOLTIP": "Wähle alle Rollen der Gruppe {{group}} aus.",
       "OPTIONS": "Optionen",
       "ASSERTION": "Rollen bei Authentisierung mitschicken",
       "ASSERTION_DESCRIPTION": "Rolleninformationen werden auf dem UserInfo Endpoint oder je nach Applikationseinstellungen in Tokens oder anderen Methoden bereitgestellt.",
-      "CHECK": "Rollen bei Authentisierung prüfen",
-      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einer entsprechenden Rolle authentifiziert werden."
+      "CHECK": "Berechtigung bei Authentisierung prüfen",
+      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einer entsprechenden Rolle authentifiziert werden.",
+      "DIALOG": {
+        "DELETE_TITLE": "Rolle löschen",
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Rolle zu entfernen. Wollen Sie fortfahren?"
+      }
     },
     "HAS_PROJECT": "Projektbesitz bei Authentisierung prüfen",
     "HAS_PROJECT_DESCRIPTION": "Es wird überprüft, ob die Organisation des Benutzers über dieses Projekt verfügt. Wenn nicht, kann der Benutzer nicht authentifiziert werden.",
@@ -1233,10 +1319,12 @@
       "MEMBERSADDED": "Manager hinzugefügt.",
       "MEMBERADDED": "Manager hinzugefügt.",
       "MEMBERCHANGED": "Manager geändert.",
+      "ROLESCREATED": "Rollen erstellt.",
       "ROLEREMOVED": "Rolle entfernt.",
       "ROLECHANGED": "Rolle geändert.",
       "REACTIVATED": "Reaktiviert",
       "DEACTIVATED": "Deaktiviert",
+      "CREATED": "Projekt erstellt.",
       "UPDATED": "Projekt gespeichert.",
       "GRANTUPDATED": "Berechtigung geändert.",
       "DELETED": "Projekt gelöscht."
@@ -1268,7 +1356,8 @@
     },
     "TYPES": {
       "0": "unknown",
-      "1": "OIDC"
+      "1": "OIDC",
+      "3": "JWT"
     },
     "STATES": {
       "1": "aktiv",
@@ -1289,6 +1378,11 @@
     "TYPE": "Typ",
     "OWNER": "Besitzer",
     "ID": "ID",
+    "AVAILABILITY": "Verfügbarkeit",
+    "AVAILABLE": "verfügbar",
+    "AVAILABLEBUTINACTIVE": "verfügbar aber inaktiv",
+    "SETAVAILABLE": "verfügbar setzen",
+    "SETUNAVAILABLE": "auf nicht verfügbar setzen",
     "NAME": "Name",
     "CONFIG": "Konfiguration",
     "STATE": "Status",
@@ -1309,7 +1403,7 @@
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "OIDC": {
-      "TITLE": "OpenId Connect IDP",
+      "TITLE": "OIDC IDP",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."
     },
     "JWT": {
@@ -1331,10 +1425,10 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Multifaktoren",
-      "MULTIFACTORDESCRIPTION": "Definieren Sie hier Ihre Multifaktoren, die sie für die Authentifizierung verwenden können.",
-      "SECONDFACTORTITLE": "Zweitfaktoren",
-      "SECONDFACTORDESCRIPTION": "Definieren Sie hier Ihre Zweitfaktoren, die sie für die Authentifizierung verwenden können."
+      "MULTIFACTORTITLE": "Passwordless",
+      "MULTIFACTORDESCRIPTION": "Definieren Sie hier Ihre Multifaktoren, die sie für die Passwortlose Authentifizierung verwenden können.",
+      "SECONDFACTORTITLE": "Multifaktor Authentifizierung",
+      "SECONDFACTORDESCRIPTION": "Definieren Sie hier weitere mögliche Faktoren, mit dem die sie Ihre Passwordauthentifizierung absichern können."
     },
     "CREATE": {
       "TITLE": "Neuer Faktor",
@@ -1362,7 +1456,7 @@
   },
   "LOGINPOLICY": {
     "CREATE": {
-      "TITLE": "Login Policy",
+      "TITLE": "Login Einstellungen",
       "DESCRIPTION": "Definieren Sie hier, mit welchen Idps sich Ihre Benutzer anmelden können."
     },
     "IDPS": "Identity Providers",
@@ -1379,8 +1473,12 @@
   },
   "APP": {
     "LIST": "Apps",
+    "COMPLIANCE": "OIDC Einhaltung",
+    "URLS": "Urls",
+    "CONFIGURATION": "Konfiguration",
     "PAGES": {
       "TITLE": "Anwendung",
+      "ID": "ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE_OIDC": "OIDC-Anwendung",
       "CREATE_OIDC_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
@@ -1481,7 +1579,7 @@
       "REFRESHTOKEN": "Refresh Token",
       "GRANTTYPE": "Berechtigungstypen",
       "GRANT": {
-        "0": "Authorisation Code",
+        "0": "Authorization Code",
         "1": "Implicit",
         "2": "Refresh Token"
       },
@@ -1573,6 +1671,7 @@
       "OIDCUPDATED": "OIDC-Konfiguration geändert.",
       "APIUPDATED": "API Konfiguration geändert.",
       "UPDATED": "App geändert.",
+      "CREATED": "App erstellt.",
       "CLIENTSECRETREGENERATED": "Client Secret generiert.",
       "DELETED": "App gelöscht.",
       "CONFIGCHANGED": "Konfigurationsänderung entdeckt."
@@ -1592,19 +1691,24 @@
   "MEMBER": {
     "ADD": "Manager hinzufügen",
     "CREATIONTYPE": "Erstelltyp",
-    "DOCSINFO": "Weitere Informationen finden Sie in unserer Dokumentation",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organisation",
       "0": "Eigenes Projekt",
       "1": "Berechtigtes Projekt",
       "4": "Projekt"
+    },
+    "EDITROLE": "Rollen editieren",
+    "EDITFOR": "Bearbeiten Sie die Rollen für den Benutzer: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Manager entfernen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Manager zu entfernen. Wollen Sie fortfahren?"
     }
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
     "TITLE": "Berechtigungen",
-    "DESC": "Hier kannst Du die Berechtigungen Deiner Organisation verwalten.",
+    "DESC": "Hier werden alle Berechtigungen deiner Organisation angezeigt.",
     "DELETE": "Berechtigung löschen",
     "EMPTY": "Keine Berechtigungen gefunden",
     "ADD": "Berechtigung erstellen",
@@ -1621,18 +1725,29 @@
       "TITLE": "Autorisierung erstellen",
       "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
     },
+    "EDIT": {
+      "TITLE": "Autorisierung bearbeiten"
+    },
     "DETAIL": {
       "TITLE": "Autorisierungsdetails",
       "DESCRIPTION": ""
     },
     "TOAST": {
       "UPDATED": "Berechtigung geändert.",
+      "REMOVED": "Berechtigung entfernt.",
       "BULKREMOVED": "Berechtigungen entfernt."
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Authorisierung löschen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Autorisierung zu entfernen. Wollen Sie fortfahren?",
+      "BULK_DELETE_TITLE": "Autorisierungen löschen",
+      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff mehrere Autorisierungen zu entfernen. Wollen Sie fortfahren?"
     }
   },
   "CHANGES": {
     "LISTTITLE": "Letzte Änderungen",
     "BOTTOM": "Ende",
+    "LOADMORE": "Mehr laden",
     "ORG": {
       "TITLE": "Aktivität",
       "DESCRIPTION": "Hier siehst Du die letzten Vorkommnisse, die die Organisation betreffen."

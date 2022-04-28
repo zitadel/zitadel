@@ -6,11 +6,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { QrCodeModule } from 'ng-qrcode';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
@@ -22,13 +22,16 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
+import { MembershipsTableModule } from 'src/app/modules/memberships-table/memberships-table.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { PersonalAccessTokensModule } from 'src/app/modules/personal-access-tokens/personal-access-tokens.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { ShowTokenDialogModule } from 'src/app/modules/show-token-dialog/show-token-dialog.module';
+import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
+import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
+import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -48,16 +51,13 @@ import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.
 import { DialogU2FComponent } from './auth-user-detail/dialog-u2f/dialog-u2f.component';
 import { EditDialogComponent } from './auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from './auth-user-detail/resend-email-dialog/resend-email-dialog.component';
-import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
 import { ContactComponent } from './contact/contact.component';
 import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
-import { MembershipsComponent } from './memberships/memberships.component';
 import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
 import { MetadataComponent } from './metadata/metadata.component';
 import { PasswordComponent } from './password/password.component';
-import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
@@ -71,10 +71,8 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     AuthPasswordlessComponent,
     UserMfaComponent,
     PasswordlessComponent,
-    ThemeSettingComponent,
     PasswordComponent,
     CodeDialogComponent,
-    MembershipsComponent,
     ExternalIdpsComponent,
     ContactComponent,
     ResendEmailDialogComponent,
@@ -85,12 +83,13 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     MetadataComponent,
   ],
   imports: [
-    UserDetailRoutingModule,
     ChangesModule,
     CommonModule,
+    SidenavModule,
     MatTabsModule,
     FormsModule,
     ReactiveFormsModule,
+    MembershipsTableModule,
     DetailFormModule,
     DetailFormMachineModule,
     WarnDialogModule,
@@ -99,6 +98,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ShowTokenDialogModule,
     MetaLayoutModule,
     MatCheckboxModule,
+    TopViewModule,
     HasRolePipeModule,
     UserGrantsModule,
     MatButtonModule,
@@ -106,7 +106,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     MatIconModule,
     CardModule,
     MatProgressSpinnerModule,
-    MatProgressBarModule,
     HasFeatureModule,
     MatTooltipModule,
     HasRoleModule,
@@ -115,10 +114,11 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     InfoRowModule,
     PaginatorModule,
     MatMenuModule,
-    SharedModule,
+    RouterModule,
     RefreshTableModule,
     CopyToClipboardModule,
     DetailLayoutModule,
+    TableActionsModule,
     PasswordComplexityViewModule,
     MemberCreateDialogModule,
     TimestampToDatePipeModule,

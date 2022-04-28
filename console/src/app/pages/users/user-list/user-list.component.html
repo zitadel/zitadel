@@ -1,19 +1,25 @@
-<div class="enlarged-container" [ngSwitch]="type">
+<div class="max-width-container">
+  <div class="enlarged-container" [ngSwitch]="type">
     <ng-container *ngSwitchCase="Type.TYPE_HUMAN">
+      <div class="users-title-row">
         <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
-        <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
+        <a mat-icon-button href="https://docs.zitadel.ch/docs/concepts/structure/users" rel="noreferrer"
+          target="_blank">
+          <i class="las la-info-circle"></i>
+        </a>
+      </div>
+      <p class="user-list-sub cnsl-secondary-text">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
-        <cnsl-user-table [type]="Type.TYPE_HUMAN" [disabled]="(['user.write$'] | hasRole | async) === false">
-        </cnsl-user-table>
+      <cnsl-user-table [type]="Type.TYPE_HUMAN" [disabled]="(['user.write$'] | hasRole | async) === false">
+      </cnsl-user-table>
     </ng-container>
 
     <ng-container *ngSwitchCase="Type.TYPE_MACHINE">
-        <h1>{{ 'USER.PAGES.LISTMACHINE' | translate }}</h1>
-        <p class="sub">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
+      <h1>{{ 'USER.PAGES.LISTMACHINE' | translate }}</h1>
+      <p class="user-list-sub cnsl-secondary-text">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
 
-        <cnsl-user-table [type]="Type.TYPE_MACHINE"
-            [displayedColumns]="['select','name', 'username', 'description','state', 'actions']"
-            [disabled]="(['user.write$'] | hasRole | async) === false">
-        </cnsl-user-table>
+      <cnsl-user-table [type]="Type.TYPE_MACHINE" [disabled]="(['user.write$'] | hasRole | async) === false">
+      </cnsl-user-table>
     </ng-container>
+  </div>
 </div>

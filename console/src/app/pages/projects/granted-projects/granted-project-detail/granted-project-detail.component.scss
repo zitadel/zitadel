@@ -1,41 +1,14 @@
-.head {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #ffffff20;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+@use '@angular/material' as mat;
 
-  a {
-    display: block;
+@mixin granted-project-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
+
+  .zitadel-warning {
+    font-size: 14px;
+    color: $warn-color;
   }
-
-  .h1 {
-    font-size: 2rem;
-    margin: 0 1rem;
-    margin-left: 2rem;
-    font-weight: normal;
-  }
-
-  .full-width {
-    padding-top: 1rem;
-    width: 100%;
-    display: block;
-
-    .desc {
-      font-size: .9rem;
-      color: var(--grey);
-    }
-
-    .zitadel-warning {
-      font-size: 14px;
-      color: rgb(201, 51, 71);
-    }
-  }
-}
-
-.desc {
-  width: 100%;
-  display: block;
-  font-size: .9rem;
-  color: var(--grey);
 }

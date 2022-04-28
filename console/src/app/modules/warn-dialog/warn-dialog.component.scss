@@ -16,19 +16,18 @@
 }
 
 .desc {
-  color: var(--grey);
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .action {
   display: flex;
 
   button {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   .fill-space {

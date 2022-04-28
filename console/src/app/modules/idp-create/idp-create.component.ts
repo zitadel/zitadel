@@ -10,6 +10,7 @@ import { AddJWTIDPRequest, AddOIDCIDPRequest } from 'src/app/proto/generated/zit
 import { OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
 import { AddOrgJWTIDPRequest, AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -37,10 +38,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
   public currentCreateStep: number = 1;
   public loading: boolean = false;
 
-  public idpTypes: RadioItemIdpType[] = [
-    OIDC,
-    JWT,
-  ];
+  public idpTypes: RadioItemIdpType[] = [OIDC, JWT];
 
   OIDC: any = OIDC;
   JWT: any = JWT;
@@ -53,6 +51,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private _location: Location,
+    breadcrumbService: BreadcrumbService,
   ) {
     this.oidcFormGroup = new FormGroup({
       name: new FormControl('', [Validators.required]),
@@ -75,27 +74,47 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       jwtAutoRegister: new FormControl(false),
     });
 
-    this.route.data.pipe(take(1)).subscribe(data => {
+    this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data.serviceType;
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
           this.mappingFields = [
             OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
+            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
+          ];
+
+          const iamBread = new Breadcrumb({
+            type: BreadcrumbType.IAM,
+            name: 'System',
+            routerLink: ['/system'],
+          });
+          breadcrumbService.setBreadcrumb([iamBread]);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
           this.mappingFields = [
             OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
-            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL];
+            OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
+          ];
+
+          const iambread = new Breadcrumb({
+            type: BreadcrumbType.IAM,
+            name: 'System',
+            routerLink: ['/system'],
+          });
+          const bread: Breadcrumb = {
+            type: BreadcrumbType.ORG,
+            routerLink: ['/org'],
+          };
+          breadcrumbService.setBreadcrumb([iambread, bread]);
           break;
       }
     });
   }
 
   public ngOnInit(): void {
-    this.subscription = this.route.params.subscribe(params => this.getData(params));
+    this.subscription = this.route.params.subscribe((params) => this.getData(params));
   }
 
   public ngOnDestroy(): void {
@@ -120,17 +139,25 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       req.setAutoRegister(this.autoRegister?.value);
 
       this.loading = true;
-      (this.service as ManagementService).addOrgOIDCIDP(req).then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.router.navigate([
-            (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
-              this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
-            'policy', 'login']);
-        }, 2000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      (this.service as ManagementService)
+        .addOrgOIDCIDP(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.router.navigate([
+              this.serviceType === PolicyComponentServiceType.MGMT
+                ? 'org'
+                : this.serviceType === PolicyComponentServiceType.ADMIN
+                ? 'iam'
+                : '',
+              'policy',
+              'login',
+            ]);
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AddOIDCIDPRequest();
       req.setName(this.name?.value);
@@ -143,17 +170,25 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       req.setAutoRegister(this.autoRegister?.value);
 
       this.loading = true;
-      (this.service as AdminService).addOIDCIDP(req).then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.router.navigate([
-            (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
-              this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
-            'policy', 'login']);
-        }, 2000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      (this.service as AdminService)
+        .addOIDCIDP(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.router.navigate([
+              this.serviceType === PolicyComponentServiceType.MGMT
+                ? 'org'
+                : this.serviceType === PolicyComponentServiceType.ADMIN
+                ? 'iam'
+                : '',
+              'policy',
+              'login',
+            ]);
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
@@ -170,17 +205,25 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       req.setStylingType(this.jwtStylingType?.value);
 
       this.loading = true;
-      (this.service as ManagementService).addOrgJWTIDP(req).then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.router.navigate([
-            (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
-              this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
-            'policy', 'login']);
-        }, 2000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      (this.service as ManagementService)
+        .addOrgJWTIDP(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.router.navigate([
+              this.serviceType === PolicyComponentServiceType.MGMT
+                ? 'org'
+                : this.serviceType === PolicyComponentServiceType.ADMIN
+                ? 'iam'
+                : '',
+              'policy',
+              'login',
+            ]);
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     } else if (PolicyComponentServiceType.ADMIN) {
       const req = new AddJWTIDPRequest();
 
@@ -193,17 +236,25 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       req.setStylingType(this.jwtStylingType?.value);
 
       this.loading = true;
-      (this.service as AdminService).addJWTIDP(req).then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.router.navigate([
-            (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
-              this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
-            'policy', 'login']);
-        }, 2000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      (this.service as AdminService)
+        .addJWTIDP(req)
+        .then((idp) => {
+          setTimeout(() => {
+            this.loading = false;
+            this.router.navigate([
+              this.serviceType === PolicyComponentServiceType.MGMT
+                ? 'org'
+                : this.serviceType === PolicyComponentServiceType.ADMIN
+                ? 'iam'
+                : '',
+              'policy',
+              'login',
+            ]);
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 

@@ -1,3 +1,4 @@
+import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -6,16 +7,28 @@ import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
+
+const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false };
+const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false };
+const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] };
+const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false };
+const PASSWORDLESS: SidenavSetting = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false };
+const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false };
+const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS.PAT', featureRequired: false };
+const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false };
+const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false };
 
 @Component({
   selector: 'cnsl-user-detail',
@@ -29,7 +42,7 @@ export class UserDetailComponent implements OnInit {
   public languages: string[] = ['de', 'en'];
 
   public ChangeType: any = ChangeType;
-  public loading: boolean = false;
+  public loading: boolean = true;
 
   public UserState: any = UserState;
   public copied: string = '';
@@ -41,6 +54,9 @@ export class UserDetailComponent implements OnInit {
 
   public error: string = '';
 
+  public settingsList: SidenavSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
+  public currentSetting: string | undefined = 'general';
+
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
@@ -49,21 +65,61 @@ export class UserDetailComponent implements OnInit {
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
-  ) {}
+    private mediaMatcher: MediaMatcher,
+    breadcrumbService: BreadcrumbService,
+  ) {
+    breadcrumbService.setBreadcrumb([
+      new Breadcrumb({
+        type: BreadcrumbType.IAM,
+        name: 'IAM',
+        routerLink: ['/system'],
+      }),
+      new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+    ]);
+
+    const mediaq: string = '(max-width: 500px)';
+    const small = this.mediaMatcher.matchMedia(mediaq).matches;
+    if (small) {
+      this.changeSelection(small);
+    }
+    this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
+      this.changeSelection(small.matches);
+    };
+  }
+
+  private changeSelection(small: boolean): void {
+    if (small) {
+      this.currentSetting = undefined;
+    } else {
+      this.currentSetting = this.currentSetting === undefined ? 'general' : this.currentSetting;
+    }
+  }
 
   refreshUser(): void {
     this.refreshChanges$.emit();
     this.route.params.pipe(take(1)).subscribe((params) => {
+      this.loading = true;
       const { id } = params;
       this.mgmtUserService
         .getUserByID(id)
         .then((resp) => {
+          this.loading = false;
           if (resp.user) {
             this.user = resp.user;
+
+            if (this.user.human) {
+              this.settingsList = [GENERAL, MFA, PASSWORDLESS, IDP, GRANTS, MEMBERSHIPS, METADATA];
+            } else if (this.user.machine) {
+              this.settingsList = [GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA];
+            }
           }
         })
         .catch((err) => {
           this.error = err.message ?? '';
+          this.loading = false;
           this.toast.showError(err);
         });
 

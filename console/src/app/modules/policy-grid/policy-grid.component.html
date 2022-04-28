@@ -1,37 +1,41 @@
 <h2>{{'POLICY.TITLE' | translate}}</h2>
 
-<p class="top-desc">{{'POLICY.DESCRIPTION' | translate}}</p>
+<p class="top-desc cnsl-secondary-text">{{'POLICY.DESCRIPTION' | translate}}</p>
 
 <div class="tags" *ngIf="tags">
-  <span class="tag" [ngClass]="{'active': tag === tagForFilter}" (click)="tagForFilter !== tag ? tagForFilter = tag : tagForFilter = ''" *ngFor="let tag of tags"><i class="las la-hashtag"></i>{{tag}}</span>
+  <span class="tag" [ngClass]="{'active': tag === tagForFilter}"
+    (click)="tagForFilter !== tag ? tagForFilter = tag : tagForFilter = ''" *ngFor="let tag of tags"><i
+      class="las la-hashtag"></i>{{tag}}</span>
 </div>
 
 <div class="row-lyt">
   <ng-container *ngFor="let policy of filteredPolicies">
     <ng-template cnslHasRole
-        [hasRole]="type === PolicyComponentServiceType.ADMIN ? policy.iamWithRole : type === PolicyComponentServiceType.MGMT ? policy.orgWithRole : []">
-        <div class="p-item card">
-            <div class="avatar {{policy.color}}">
-                <mat-icon *ngIf="policy.svgIcon" class="icon" [svgIcon]="policy.svgIcon"></mat-icon>
-                <i *ngIf="policy.icon" class="icon {{policy.icon}}"></i>
-            </div>
-            <div class="title">
-                <span>{{policy.i18nTitle | translate}}</span>
-            </div>
-
-            <p class="desc">
-                {{policy.i18nDesc | translate}}</p>
-
-            <span class="fill-space"></span>
-            <div class="tags" *ngIf="policy.tags">
-              <span class="tag" *ngFor="let tag of policy.tags" (click)="tagForFilter !== tag ? tagForFilter = tag : tagForFilter = ''"><i class="las la-hashtag"></i>{{tag}}</span>
-            </div>
-            <div class="btn-wrapper">
-                <button
-                    [routerLink]="type === PolicyComponentServiceType.ADMIN ? policy.iamRouterLink : type === PolicyComponentServiceType.MGMT ? policy.orgRouterLink : null"
-                    mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
-            </div>
+      [hasRole]="type === PolicyComponentServiceType.ADMIN ? policy.iamWithRole : type === PolicyComponentServiceType.MGMT ? policy.orgWithRole : []">
+      <div class="p-item card" @policy [attr.data-e2e]="'policy-card'">
+        <div class="avatar {{policy.color}}">
+          <mat-icon *ngIf="policy.svgIcon" class="icon" [svgIcon]="policy.svgIcon"></mat-icon>
+          <i *ngIf="policy.icon" class="icon {{policy.icon}}"></i>
         </div>
+        <div class="title">
+          <span>{{policy.i18nTitle | translate}}</span>
+        </div>
+
+        <p class="desc cnsl-secondary-text">
+          {{policy.i18nDesc | translate}}</p>
+
+        <span class="fill-space"></span>
+        <div class="tags" *ngIf="policy.tags">
+          <span class="tag cnsl-secondary-text" *ngFor="let tag of policy.tags"
+            (click)="tagForFilter !== tag ? tagForFilter = tag : tagForFilter = ''"><i
+              class="las la-hashtag"></i>{{tag}}</span>
+        </div>
+        <div class="btn-wrapper">
+          <button
+            [routerLink]="type === PolicyComponentServiceType.ADMIN ? policy.iamRouterLink : type === PolicyComponentServiceType.MGMT ? policy.orgRouterLink : null"
+            mat-stroked-button>{{'POLICY.BTN_EDIT' | translate}}</button>
+        </div>
+      </div>
     </ng-template>
   </ng-container>
 </div>

@@ -1,0 +1,31 @@
+<div class="sidenav-container">
+  <div class="sidenav-settings-list">
+    <div class="sidenav-sticky-rel">
+      <button *ngIf="currentSetting !== undefined" (click)="value = undefined"
+        class="sidenav-setting-list-element mob-only" [ngClass]="{'active': true}">
+        <i class="las la-angle-left"></i>
+        <span>{{'USER.SETTINGS.TITLE' | translate}}</span>
+      </button>
+      <ng-container *ngFor="let setting of settingsList">
+        <ng-template *ngIf="setting.featureRequired, else btn" cnslHasFeature [hasFeature]="setting.featureRequired">
+          <button (click)="value = setting.id" class="sidenav-setting-list-element hide-on-mobile"
+            [ngClass]="{'active': currentSetting === setting.id, 'show': currentSetting === undefined}">
+            <span>{{setting.i18nKey | translate}}</span>
+          </button>
+        </ng-template>
+        <ng-template #btn>
+          <button (click)="value = setting.id" class="sidenav-setting-list-element hide-on-mobile"
+            [ngClass]="{'active': currentSetting === setting.id, 'show': currentSetting === undefined}">
+            <span>{{setting.i18nKey | translate}}</span>
+          </button>
+        </ng-template>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="sidenav-content">
+    <div class="max-width-container">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

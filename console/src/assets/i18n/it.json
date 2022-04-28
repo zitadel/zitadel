@@ -5,114 +5,77 @@
     "NEXT": "Avanti",
     "COUNT": "Risultati totali"
   },
-  "ONBOARDING": {
-    "HEADER": "Primi passi",
-    "TITLE": "Imparare ad usare ZITADEL",
-    "LOGINDESC": "\u00c8 necessario effettuare il login per controllare le impostazioni di ZITADEL.",
-    "LOGIN": "Accedi",
-    "DESCRIPTION": "Noi di ZITADEL teniamo molto alla sicurezza e alle prestazioni. Eseguite i seguenti passi e adattate ZITADEL in modo ottimale alle vostre esigenze.",
-    "STEPS_TITLE": "Completa i seguenti passi nell'ordine che vuoi:",
-    "STEPS": {
-      "1": {
-        "TITLE": "Creare un progetto",
-        "DESC": "Crea il tuo primo progetto e definisci i diritti di accesso per tutti i dipendenti."
-      },
-      "2": {
-        "TITLE": "Creare un'applicazione",
-        "DESC": "Crea un'applicazione per il tuo progetto e definisci le sue propriet\u00e0."
-      },
-      "3": {
-        "TITLE": "Migliorare la sicurezza",
-        "DESC": "Estendete le politiche di accesso e aumentate la sicurezza dei vostri utenti."
-      }
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakt",
+      "TOS": "Terms of Service",
+      "PP": "Privacy Policy"
     },
-    "START": "Inizia",
-    "DOCS": "Docs"
+    "THEME": {
+      "DARK": "Scuro",
+      "LIGHT": "Luminoso"
+    }
   },
   "HOME": {
-    "TITLE": "ZITADEL",
-    "SECURITYANDPRIVACY": "Protezione dei dati e personalizzazione",
-    "SECURITYANDPRIVACY_DESC": "Gestisci le tue informazioni e le impostazioni di sicurezza",
-    "SECURITYANDPRIVACY_BUTTON": "Personalizza",
-    "CHANGE_PWD": "Ripristina password",
-    "PROTECTION": "Impostazioni organizzative",
-    "PROTECTION_DESC": "Gestisci le tue impostazioni organizzative. Esplora soluzioni che ti fanno risparmiare tempo e garantiscono la sicurezza.",
-    "PROTECTION_BUTTON": "Esplora",
-    "PROJECTS": "Crea e gestisci le tue applicazioni e progetti",
-    "PROJECTS_DESC": "Autorizza altri ad usare i tuoi progetti o a definire ruoli personalizzati.",
-    "PROJECTS_BUTTON": "Panoramica del progetto",
-    "PROJECTS_NEW_LINK": "Crea un nuovo progetto",
-    "ORG_POLICY_COMPLEXITY": "Impostazioni complessit\u00e0 password",
-    "ORG_POLICY_IAM": "Impostazioni Org IAM",
-    "ORG_POLICY_LOGIN": "Impostazioni di accesso",
-    "ORG_POLICY_LABEL": "Impostazioni Private Labelling",
-    "IAM_CREATE_ORG": "Crea un'organizzazione",
-    "IAM_POLICY_COMPLEXITY": "Impostazioni complessit\u00e0 password di sistema",
-    "IAM_POLICY_IAM": "Impostazioni di sistema",
-    "IAM_POLICY_LOGIN": "Impostazioni di accesso di sistema",
-    "IAM_POLICY_LABEL": "Impostazioni Private Labelling di sistema",
-    "USERS": "Crea e gestisci i tuoi utenti",
-    "USERS_DESC": "Controlla il tuo concetto di ruolo in tempo reale. Prendere azioni immediate.",
-    "USERS_HUMANS": "Mostra gli utenti umani",
-    "USERS_MACHINES": "Mostra gli utenti di servizio",
-    "USERS_CREATE": "Crea utente",
-    "USERS_BUTTON": "Mostra utenti",
-    "IAM": "Identity and Access Management",
-    "IAM_DESC": "Gestisci le tue organizzazioni e i tuoi amministratori.",
-    "IAM_BUTTON": "Gestire ZITADEL",
     "WELCOME": "Iniziare con ZITADEL",
-    "WELCOMESENTENCE": "Qui puoi trovare le azioni raccomandate in base alle tue ultime autorizzazioni acquisite.",
-    "DISCLAIMER": "Puoi vedere solo le impostazioni della tua attuale organizzazione specificata nel navbar. ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
+    "DISCLAIMER": "ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
     "DISCLAIMERLINK": "Ulteriori informazioni",
+    "DOCUMENTATION": {
+      "TITLE": "Documentazione",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
+    "GETSTARTED": {
+      "TITLE": "Come iniziare con ZITADEL",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
     "QUICKSTARTS": {
       "LABEL": "Primi passi",
       "TITLE": "Quickstarts",
       "DESCRIPTION": "Iniziare rapidamente con ZITADEL."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Shortcuts",
+      "SETTINGS": "Impostazioni dell' organizazzione",
+      "PROJECTS": "Progetti",
+      "REORDER": "Per spostare, tieni premuto e trascina il riquadro",
+      "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
     }
   },
   "MENU": {
-    "DASHBOARD": "Panoramica",
+    "SYSTEM": "Sistema",
+    "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
-    "IAMPOLICIES": "IAM",
-    "IAMEVENTSTORE": "Storage",
+    "IAM": "Panoramica Sistema",
+    "VIEWS": "Views",
+    "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
-    "ADMINSECTION": "Amministrazione di ZITADEL",
-    "ORGSECTION": "Organizzazione",
-    "PROJECTSSECTION": "Sezione Progetti",
+    "DOMAINS": "Domini",
     "PROJECT": "Progetti",
-    "GRANTEDPROJECT": "Progetti concessi",
-    "USERSECTION": "Sezione utente",
+    "PROJECTOVERVIEW": "Progetto",
+    "PROJECTGRANTS": "Organizzazioni ammissibili",
+    "ROLES": "Ruoli",
+    "GRANTEDPROJECT": "Progetto delegato",
     "HUMANUSERS": "Utenti",
     "MACHINEUSERS": "Utenti di servizio",
     "LOGOUT": "Esci con tutti gli utenti",
     "NEWORG": "Nuova organizzazione",
     "IAMADMIN": "Sei un amministratore IAM. Nota che hai autorizzazioni estese.",
     "SHOWORGS": "Mostra tutte le organizzazioni",
-    "GRANTSECTION": "Sezione di autorizzazione",
     "GRANTS": "Autorizzazioni",
     "ACTIONS": "Azioni",
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
-    "TOOLTIP": {
-      "PERSONAL": "Mostra il tuo account personale, i tuoi IDP, i metodi di accesso e le autorizzazioni.",
-      "IAMPOLICIES": "Gestisci le impostazioni globali di accesso e modifica i manager di ZITADEL",
-      "IAMEVENTSTORE": "Ripristina views ed eventi falliti di ZITADEL",
-      "ORG": "Mostra le impostazioni di accesso delle tue organizzazioni e gestisci i tuoi nomi di dominio",
-      "SELFPROJECTS": "Mostra i progetti della tua organizzazione",
-      "GRANTEDPROJECTS": "Mostra i progetti a cui la tua organizzazione ha accesso",
-      "HUMANUSERS": "Mostra tutti gli utenti umani registrati nella tua organizzazione",
-      "MACHINEUSERS": "Mostra tutti gli utenti di servizio della tua organizzazione",
-      "AUTHZ": "Mostra le autorizzazioni disponibili per gli utenti della tua organizzazione",
-      "ACTIONS": "Esegui processi su certi eventi."
-    }
+    "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera"
   },
   "ACTIONS": {
     "ACTIONS": "Azioni",
+    "FILTER": "Filtra",
     "RENAME": "Rinomina",
     "SET": "Salva",
     "COPY": "Copia negli appunti",
     "COPIED": "Copiato negli appunti.",
+    "RESET": "Ripristina",
     "RESETDEFAULT": "Ripristino delle impostazioni predefinite",
     "RESETTO": "Resettare a:",
     "RESETCURRENT": "Ripristina",
@@ -135,7 +98,8 @@
     "DELETE": "Elimina",
     "REMOVE": "Rimuovi",
     "VERIFY": "Verifica",
-    "FINISH": "Crea",
+    "FINISH": "Chiudi",
+    "FINISHED": "Chiudi",
     "CHANGE": "Cambia",
     "REACTIVATE": "Riattiva",
     "DEACTIVATE": "Disattiva",
@@ -148,7 +112,63 @@
     "NEWVALUE": "Nuovo valore",
     "RESTORE": "Ripristina",
     "CONTINUEWITHOUTSAVE": "Continua senza salvare",
-    "GOTOFEATURES": "Vai alle caratteristiche"
+    "GOTOFEATURES": "Vai alle caratteristiche",
+    "OF": "di",
+    "PREVIOUS": "Precedente",
+    "NEXT": "Avanti",
+    "MORE": "azioni",
+    "TABLE": {
+      "SHOWUSER": "Mostra utente {{value}}"
+    }
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Tutte le impostazioni e le tabelle dell'organizzazione si basano su un'organizzazione selezionata. Fai clic sul pulsante per cambiare organizzazione o crearne una nuova."
+    },
+    "SYSTEM": {
+      "TEXT": "Clicca qui per accedere alle impostazioni di sistema. Tieni presente che hai accesso solo se disponi di autorizzazioni avanzate."
+    },
+    "PROFILE": {
+      "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
+    },
+    "NAV": {
+      "TEXT": "Questa navigazione cambia in base ai breadcrumb sopra."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Attenzione! L'organizzazione è appena stata cambiata."
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "STATE": "Status",
+    "DISPLAYNAME": "Utente Nome",
+    "EMAIL": "Email",
+    "USERNAME": "User Name",
+    "ORGNAME": "Nome organizzazione",
+    "PROJECTNAME": "Nome del progetto",
+    "RESOURCEOWNER": "Resource Owner",
+    "METHODS": {
+      "5": "contiene",
+      "7": "finisce con",
+      "1": "equivale"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tasti rapidi",
+    "UNDERORGCONTEXT": "All'interno delle pagine dell'organizzazione",
+    "SIDEWIDE": "Tasti rapidi globali",
+    "SHORTCUTS": {
+      "HOME": "Vai alla panoramica",
+      "SYSTEM": "Vai al pagina di sistema",
+      "ORG": "Vai all'organizzazione",
+      "ORGSWITCHER": "Cambia organizzazione",
+      "ME": "Vai al profilo",
+      "PROJECTS": "Vai ai progetti",
+      "USERS": "Vai ai utenti",
+      "USERGRANTS": "Vai ai Autorizzazioni",
+      "ACTIONS": "Vai ai azioni e processi",
+      "DOMAINS": "Vai ai domini"
+    }
   },
   "RESOURCEID": "Resource ID",
   "TABLE": {
@@ -162,6 +182,18 @@
     }
   },
   "USER": {
+    "SETTINGS": {
+      "TITLE": "Impostazioni",
+      "GENERAL": "Generale",
+      "IDP": "Identity Providers",
+      "MFA": "Autenticazione a più fattori",
+      "KEYS": "Chiavi",
+      "PAT": "Personal Access Tokens",
+      "PASSWORDLESS": "Passwordless",
+      "USERGRANTS": "Autorizzazioni",
+      "MEMBERSHIPS": "Memberships",
+      "METADATA": "Metadati"
+    },
     "TITLE": "Informazioni personali",
     "DESCRIPTION": "Gestisci le tue informazioni e le impostazioni di sicurezza.",
     "PAGES": {
@@ -209,6 +241,12 @@
     "TABLE": {
       "DEACTIVATE": "Disattiva",
       "ACTIVATE": "Attiva",
+      "CHANGEDATE": "Ultima modifica",
+      "CREATIONDATE": "creato",
+      "TYPES": {
+        "HUMAN": "Utenti",
+        "MACHINE": "Utenti di servizio"
+      },
       "FILTER": {
         "0": "Filtro per DisplayName",
         "1": "Filtro per nome utente",
@@ -226,7 +264,7 @@
       "TABLETYPE": "Tipo",
       "TABLESTATE": "Stato",
       "NAME": "Nome",
-      "TABLEACTIONS": "Azioni",
+      "EMPTY": "Nessun dispositivo impostato",
       "TITLE": "Autenticazione passwordless",
       "DESCRIPTION": "Aggiungi i metodi di autenticazione basati su WebAuthn per accedere a ZITADEL senza password.",
       "MANAGE_DESCRIPTION": "Gestisci i metodi del secondo fattore dei vostri utenti.",
@@ -277,7 +315,7 @@
       "TABLETYPE": "Tipo",
       "TABLESTATE": "Stato",
       "NAME": "Nome",
-      "TABLEACTIONS": "Azioni",
+      "EMPTY": "nessun fattore aggiuntivo",
       "TITLE": "Autenticazione a pi\u00f9 fattori",
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
@@ -310,12 +348,13 @@
       }
     },
     "EXTERNALIDP": {
-      "TITLE": "IDP esterno",
+      "TITLE": "IDP esterni",
       "DESC": "",
       "IDPCONFIGID": "IDP Config ID",
       "IDPNAME": "Nome Idp",
       "USERDISPLAYNAME": "Nome esterno",
       "EXTERNALUSERID": "ID utente esterno",
+      "EMPTY": "Nessun IDP esterno trovato",
       "DIALOG": {
         "DELETE_TITLE": "Rimuovere l'IDP",
         "DELETE_DESCRIPTION": "Stai per eliminare un Identity Provider da un utente. Vuoi continuare?"
@@ -326,7 +365,7 @@
       "DESCRIPTION": "Si prega di fornirsi delle informazioni necessarie.",
       "NAMEANDEMAILSECTION": "Nome ed e-mail",
       "GENDERLANGSECTION": "Genere e linguaggio",
-      "PHONESECTION": "Phonenumbers",
+      "PHONESECTION": "Phone numbers",
       "PASSWORDSECTION": "Password iniziale",
       "ADDRESSANDPHONESECTION": "Numero di telefono",
       "INITMAILDESCRIPTION": "Se vengono selezionate entrambe le opzioni, non verrà inviata alcuna e-mail per l'inizializzazione. Se solo una delle opzioni viene selezionata, verrà inviata una mail per fornire/verificare i dati."
@@ -378,7 +417,7 @@
       "DESCRIPTION": "Descrizione",
       "KEYSTITLE": "Chiavi",
       "KEYSDESC": "Definisci le tue chiavi e aggiungi una data di scadenza opzionale.",
-      "TOKENSTITLE": "Access Tokens",
+      "TOKENSTITLE": "Personal Access Tokens",
       "TOKENSDESC": "Questi Token d'accesso personali funzionano come i Access Token per OAuth.",
       "ID": "ID chiave",
       "TYPE": "Tipo",
@@ -397,6 +436,12 @@
       },
       "KEYTYPES": {
         "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Elimina Chiave",
+          "DESCRIPTION": "Vuoi eliminare la chiave selezionata? Questa azione non può essere annullata."
+        }
       }
     },
     "PASSWORD": {
@@ -409,11 +454,12 @@
       "CONFIRMINITIAL": "Conferma password",
       "RESET": "Ripristina la password attuale",
       "SET": "Imposta nuova password",
-      "RESENDNOTIFICATION": "Reinvia il link per la reimpostazione della password",
+      "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
       "MINLENGTHERROR": "La password deve essere lunga almeno {{valore}} caratteri.",
       "NOTEQUAL": "Le password fornite non corrispondono."
     },
+    "ID": "ID",
     "EMAIL": "E-mail",
     "PHONE": "Numero di telefono",
     "PHONEEMPTY": "Nessun numero di telefono definito",
@@ -438,6 +484,7 @@
         "VALID": "convalidato",
         "RESEND": "Reinvia il messaggio per la verifica",
         "EDITTITLE": "Cambia il numero di telefono",
+        "EDITVALUE": "Numero di telefono",
         "EDITDESC": "Inserisci il nuovo numero di telefono nel campo sottostante.",
         "DELETETITLE": "Rimuovi il numero di telefono",
         "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono"
@@ -453,6 +500,9 @@
         "TITLE": "Crea User Grant",
         "DESCRIPTION": "Cerca l'organizzazione, il progetto e i ruoli di progetto corrispondenti."
       },
+      "PROJECTNAME": "Nome del progretto",
+      "PROJECT-OWNED": "Progetto",
+      "PROJECT-GRANTED": "Progetto delegato",
       "FILTER": {
         "0": "filtro per utente",
         "1": "filtro per il dominio",
@@ -474,11 +524,15 @@
     "STATE": {
       "0": "Sconosciuto",
       "1": "Attivo",
-      "2": "Scaduto",
-      "4": "Bloccato"
+      "2": "Inattivo",
+      "3": "Rimosso",
+      "4": "Bloccato",
+      "5": "Sospeso",
+      "6": "Initializzato"
     },
     "SEARCH": {
-      "FOUND": "Trovato"
+      "ADDITIONAL": "Nome (organizzazione corrente)",
+      "ADDITIONAL-EXTERNAL": "Loginname (organizzazione esterna)"
     },
     "TARGET": {
       "SELF": "Se vuoi concedere l'accesso a un utente di un'altra organizzazione",
@@ -529,11 +583,14 @@
       "DISPLAYNAME": "DisplayName",
       "REMOVE": "Rimuovi",
       "TYPE": "Tipo",
+      "ORGID": "ID dell' organizzazione",
+      "UPDATED": "membership cambiato con successo.",
+      "NOPERMISSIONTOEDIT": "Non hai l'autorizzazione richiesta per cambiare i ruoli!",
       "TYPES": {
         "UNKNOWN": "Sconosciuto",
         "ORG": "Organizzazione",
         "PROJECT": "Progetto",
-        "GRANTEDPROJECT": "Progetto concesso"
+        "GRANTEDPROJECT": "Progetto delegato"
       }
     },
     "PERSONALACCESSTOKEN": {
@@ -560,7 +617,9 @@
     "TITLE": "Azioni e Processi",
     "DESCRIPTION": "Esegui processi su certi eventi.",
     "ACTIONSTITLE": "Azioni",
+    "ACTIONSDESCRIPTION": "Questi sono i tuoi script che puoi eseguire nei processi.",
     "FLOWSTITLE": "Processi",
+    "FLOWSDESCRIPTION": "Processi di un certo tipo eseguono azioni al momento di un trigger.",
     "ID": "ID",
     "NAME": "Nome",
     "STATE": "Stato",
@@ -578,6 +637,7 @@
       "2": "Pre creazione",
       "3": "Post creazione"
     },
+    "ADDTRIGGER": "Aggiungi trigger",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
@@ -595,7 +655,8 @@
       },
       "DELETEACTION": {
         "TITLE": "Elimina azione?",
-        "DESCRIPTION": ""
+        "DESCRIPTION": "",
+        "DELETE_SUCCESS": "Azione rimossa con successo."
       },
       "CLEAR": {
         "TITLE": "Flow zurücksetzen?",
@@ -610,8 +671,8 @@
   },
   "IAM": {
     "POLICIES": {
-      "TITLE": "Impostazioni IAM e impostazioni di accesso",
-      "DESCRIPTION": "Gestisci le tue impostazioni ZITADEL e le impostazioni di accesso alla gestione."
+      "TITLE": "Impostazioni del Sistema e impostazioni d'accesso",
+      "DESCRIPTION": "Gestisci le impostazioni del sistema e le impostazioni d'accesso."
     },
     "EVENTSTORE": {
       "TITLE": "IAM Eventstore",
@@ -619,7 +680,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "I manager possono aggiungere e modificare le organizzazioni e apportare modifiche ai loro progetti e applicazioni corrispondenti."
+      "DESCRIPTION": "Questi manager possono modificare le impostazioni del sistema."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -665,6 +726,7 @@
       "NAME": "Nome",
       "ID": "ID",
       "CREATIONDATE": "Data di creazione",
+      "DATECHANGED": "Cambiato",
       "FILTER": "Filtro",
       "FILTERPLACEHOLDER": "Filtro per il nome",
       "LIST": "Organizzazioni",
@@ -676,7 +738,7 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
       "ORGDOMAIN": {
-        "TITLE": "Verifica della propriet\u00e0 del dominio dell'organizzazione",
+        "TITLE": "Verificazione della propriet\u00e0 del dominio dell'organizzazione",
         "VERIFICATION": "Verifica la propriet\u00e0 del tuo dominio. \u00c8 necessario scaricare un file di verifica e caricarlo all'URL fornito elencato di seguito, o inserire una voce DNS TXT Record per l'URL fornito. Per completare, clicca sul pulsante di verifica.",
         "VERIFICATION_SKIP": "Puoi saltare la verifica per ora e continuare a creare la tua organizzazione, ma per usare la tua organizzazione questo passo deve essere completato!",
         "VERIFICATION_VALIDATION_DESC": "I token sono controllati regolarmente per assicurarsi che tu sia ancora proprietario del dominio.",
@@ -718,7 +780,7 @@
       "2": "Disattivato"
     },
     "MEMBER": {
-      "TITLE": "Responsabili dell'organizzazione",
+      "TITLE": "Manager dell'organizzazione",
       "DESCRIPTION": "Definisci gli utenti che possono cambiare le preferenze delle tue organizzazioni."
     },
     "TOAST": {
@@ -803,6 +865,7 @@
   "POLICY": {
     "TITLE": "Esplora le impostazioni",
     "DESCRIPTION": "Impostazioni che migliorano la tua sicurezza.",
+    "APPLIEDTO": "Applicato a",
     "PWD_COMPLEXITY": {
       "TITLE": "Complessit\u00e0 della password",
       "DESCRIPTION": "Assicura che tutte le password impostate corrispondano a un modello specifico",
@@ -812,7 +875,7 @@
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
     "PRIVATELABELING": {
-      "TITLE": "Private Labelling",
+      "TITLE": "Branding",
       "DESCRIPTION": "Dai al login il tuo stile personalizzato e modifica il suo comportamento.",
       "PREVIEW_DESCRIPTION": "Le impostazioni saranno automaticamente disponibili al preview environment.",
       "BTN": "Seleziona File",
@@ -834,6 +897,10 @@
       "EMAILNOSVG": "Il formato di file SVG non \u00e8 supportato nelle email. Perci\u00f2 carica il tuo logo in PNG o in un altro formato supportato.",
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
       "FONTINLOGINONLY": "Il carattere \u00e8 attualmente visualizzato solo nell'interfaccia di accesso.",
+      "VIEWS": {
+        "PREVIEW": "Anteprima",
+        "CURRENT": "Configurazione attuale"
+      },
       "PREVIEW": {
         "TITLE": "Accesso",
         "SECOND": "accedi con il tuo account ZITADEL.",
@@ -847,7 +914,7 @@
       "DESCRIPTION": "\u00c8 possibile impostare una impostazone per la validità delle password. Questa emette un avviso dopo che il tempo di invecchiamento specifico \u00e8 trascorso."
     },
     "PWD_LOCKOUT": {
-      "TITLE": "Impostazione di blocco",
+      "TITLE": "Impostazioni di blocco",
       "DESCRIPTION": "Imposta un numero massimo di tentativi di password, dopo i quali gli account saranno bloccati."
     },
     "IAM_POLICY": {
@@ -855,13 +922,13 @@
       "DESCRIPTION": "Definisci le propriet\u00e0 di accesso dei tuoi utenti."
     },
     "PRIVATELABELING_POLICY": {
-      "TITLE": "Private labelling",
+      "TITLE": "Branding",
       "BTN": "Seleziona File",
       "DESCRIPTION": "Personalizza l'aspetto del Login",
       "ACTIVATEPREVIEW": "Attiva la configurazione"
     },
     "LOGIN_POLICY": {
-      "TITLE": "Impostazione di accesso",
+      "TITLE": "Impostazioni di accesso",
       "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura gli Identity Provider",
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
@@ -937,6 +1004,7 @@
     "MESSAGE_TEXTS": {
       "TITLE": "Testi email",
       "DESCRIPTION": "Definite i vostri testi per le vostre mail di notifica.",
+      "TYPE": "Notifica",
       "TYPES": {
         "INIT": "Inizializzazione",
         "VE": "Verificazione l'e-mail",
@@ -1007,7 +1075,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organizzazione",
-    "DESCRIPTION": "Qui puoi modificare la configurazione della tua organizzazione e gestire i membri.",
+    "DESCRIPTION": "Qui puoi modificare la configurazione della tua organizzazione e gestire le sue membri.",
     "DETAIL": {
       "TITLE": "Dettaglio",
       "NAME": "Nome",
@@ -1021,8 +1089,7 @@
     "MEMBER": {
       "TITLE": "Member",
       "USERNAME": "Nome utente",
-      "FIRSTNAME": "Nome",
-      "LASTNAME": "Nome",
+      "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Nome di accesso",
       "EMAIL": "E-mail",
       "ROLES": "Ruoli",
@@ -1044,7 +1111,7 @@
       "DESCRIPTION": "Qui puoi definire le applicazioni, gestire i ruoli e concedere ad altre organizzazioni di usare il tuo progetto.",
       "DELETE": "Rimuovi progetto",
       "LIST": "Progetti",
-      "LISTDESCRIPTION": "Qui trovi tutti i progetti che hai il permesso di visualizzare o eseguire azioni. Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
+      "LISTDESCRIPTION": "Se non riesci a trovare il tuo progetto, contatta il proprietario o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
       "DETAIL": "Dettagli",
       "CREATE": "Crea un progetto",
       "CREATE_DESC": "Inserisci il nome del tuo progetto.",
@@ -1052,25 +1119,27 @@
       "NOITEMS": "Nessun progetto",
       "ZITADELPROJECT": "Questo appartiene al progetto ZITADEL. Attenzione: se fai delle modifiche ZITADEL potrebbe non comportarsi come previsto.",
       "TYPE": {
-        "OWNED": "Progetti di propriet\u00e0",
-        "GRANTED": "Progetti concessi"
+        "OWNED": "Progetti proprietari",
+        "GRANTED": "Progetti delegati",
+        "OWNED_SINGULAR": "Progetto proprietario",
+        "GRANTED_SINGULAR": "Progetto delegato"
       },
       "PRIVATELABEL": {
-        "TITLE": "Impostazione Private labelling",
+        "TITLE": "Impostazione Branding",
         "0": {
           "TITLE": "Non specificato",
-          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Private labelling dell'organizzazione, prima che venga mostrato il default del sistema."
+          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Branding dell'organizzazione, prima che venga mostrato il default del sistema."
         },
         "1": {
-          "TITLE": "Applica l'impostazione Private labelling delle risorse del progetto",
-          "DESC": "Private labelling dell'organizzazione del progetto sar\u00e0 mostrata"
+          "TITLE": "Applica l'impostazione Branding delle risorse del progetto",
+          "DESC": "Branding dell'organizzazione del progetto sar\u00e0 mostrata"
         },
         "2": {
-          "TITLE": "Consentire l'accesso all'impostazione Private labelling dell'utente",
-          "DESC": "Verr\u00e0 mostrata l'impostazione Private labelling dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
+          "TITLE": "Consentire l'accesso all'impostazione Branding dell'utente",
+          "DESC": "Verr\u00e0 mostrata l'impostazione Branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
         },
         "DIALOG": {
-          "TITLE": "Impostazione Private labelling",
+          "TITLE": "Impostazione Branding",
           "DESCRIPTION": "Seleziona il comportamento del login, quando usi il progetto."
         }
       },
@@ -1090,9 +1159,14 @@
         },
         "DELETE": {
           "TITLE": "Rimuovere il progetto",
-          "DESCRIPTION": "Vuoi davvero rimuovere il tuo progetto?"
+          "DESCRIPTION": "Vuoi davvero rimuovere il tuo progetto?",
+          "TYPENAME": "Ripeti il nome del progetto per eliminarlo."
         }
       }
+    },
+    "SETTINGS": {
+      "TITLE": "Impostazioni",
+      "DESCRIPTION": ""
     },
     "STATE": {
       "TITLE": "Stato",
@@ -1103,8 +1177,8 @@
     "TYPE": {
       "TITLE": "Tipo",
       "0": "Tipo sconosciuto",
-      "1": "Progetto posseduto",
-      "2": "Progetto concesso"
+      "1": "Progetto proprio",
+      "2": "Progetto delegato"
     },
     "NAME": "Nome",
     "NAMEDIALOG": {
@@ -1115,25 +1189,25 @@
     "MEMBER": {
       "TITLE": "Manager",
       "TITLEDESC": "I manager possono apportare modifiche a questo progetto in base al loro ruolo.",
-      "DESCRIPTION": "Qui puoi trovare tutti i manager di questo progetto. Puoi aggiungere un nuovo membro e gestire quelli esistenti.",
+      "DESCRIPTION": "Questi manager potrebbero apportare modifiche al tuo progetto.",
       "USERNAME": "Nome utente",
-      "FIRSTNAME": "Nome",
-      "LASTNAME": "Nome",
+      "DISPLAYNAME": "Display Name",
       "LOGINNAME": "Nome di accesso",
       "EMAIL": "E-mail",
       "ROLES": "Ruoli",
       "USERID": "ID utente"
     },
     "GRANT": {
-      "EMPTY": "Nessun organizzazione concessa.",
-      "TITLE": "Organizzazioni concesse",
+      "EMPTY": "Nessun organizzazione ammissibile.",
+      "TITLE": "Organizzazioni ammissibili",
       "DESCRIPTION": "Permetti a un'altra organizzazione di usare il tuo progetto.",
+      "EDITTITLE": "Configura ruoli",
       "CREATE": {
         "TITLE": "Crea un org grant",
         "SEL_USERS": "Seleziona gli utenti a cui vuoi concedere l'accesso",
         "SEL_PROJECT": "Cerca un progetto",
         "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere",
-        "SEL_USER": "Cerca un utente",
+        "SEL_USER": "Seleziona utenti",
         "SEL_ORG": "Impostare il dominio",
         "SEL_ORG_DESC": "Inserisci il dominio completo per specificare l'organizzazione da concedere.",
         "ORG_TITLE": "Organizzazione",
@@ -1144,12 +1218,12 @@
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {
-        "TITLE": "Managers del org grant",
-        "DESC": "Questi sono i manager dell'org grant. Puoi selezionare quali utenti sono autorizzati a mantenere il controllo del progetto.",
+        "TITLE": "Organizzazione ammissibile",
+        "DESC": "Puoi definire quali ruoli possono essere usati e gestire i manager",
         "MEMBERTITLE": "Manager",
         "MEMBERDESC": "Questi sono i manager dell'org grant. Aggiungi qui gli utenti che devono ottenere l'accesso per modificare i dati del progetto.",
         "PROJECTNAME": "Nome del progetto",
-        "GRANTEDORG": "Organizzazione concessa",
+        "GRANTEDORG": "Organizzazione ammissibile",
         "RESOURCEOWNER": "Resource owner"
       },
       "STATE": "Stato",
@@ -1157,11 +1231,13 @@
         "1": "Attivo",
         "2": "Inattivo"
       },
+      "ALL": "Tutti",
       "SHOWDETAIL": "Mostra dettagli",
       "USER": "Utente",
       "MEMBERS": "Manager",
+      "ORG": "Organizzazione",
       "PROJECTNAME": "Nome del progetto",
-      "GRANTEDORG": "Organizzazione concessa",
+      "GRANTEDORG": "Organizzazione ammissible",
       "GRANTEDORGDOMAIN": "Dominio",
       "RESOURCEOWNER": "Resource owner",
       "GRANTEDORGNAME": "Nome dell'organizzazione",
@@ -1170,6 +1246,7 @@
       "DATES": "Date",
       "ROLENAMESLIST": "Ruoli",
       "NOROLES": "Nessun ruolo",
+      "TYPE": "Tipo",
       "TOAST": {
         "PROJECTGRANTUSERGRANTADDED": "Project grant creato.",
         "PROJECTGRANTADDED": "Project grant creato.",
@@ -1178,6 +1255,10 @@
         "PROJECTGRANTMEMBERCHANGED": "Grant manager cambiato.",
         "PROJECTGRANTMEMBERREMOVED": "Grant manager rimosso.",
         "PROJECTGRANTUPDATED": "Project Grant cambiato."
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Rimuovere progetto delegato",
+        "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un progetto delegato. La organizzazione ammissibile non potrà più usare il tuo progetto. Vuoi davvero continuare?"
       },
       "ROLES": "Ruoli del progetto"
     },
@@ -1202,12 +1283,17 @@
       "EDITDESCRIPTION": "Inserisci i nuovi dati per il ruolo.",
       "DELETE": "Rimuovi ruolo",
       "CREATIONDATE": "Creato",
+      "CHANGEDATE": "Ultima modifica",
       "SELECTGROUPTOOLTIP": "Seleziona tutti i ruoli del gruppo {{group}}.",
       "OPTIONS": "Opzioni",
       "ASSERTION": "Includi ruoli con autenticazione",
       "ASSERTION_DESCRIPTION": "Le informazioni sui ruoli sono inviate dall'endpoint Userinfo e a seconda delle impostazioni dell'applicazione in token.",
-      "CHECK": "Verifica i ruoli con l'autenticazione",
-      "CHECK_DESCRIPTION": "Se impostato, gli utenti possono autenticarsi solo se un qualsiasi ruolo \u00e8 assegnato al loro account."
+      "CHECK": "Verifica l'autorizzazione durante l'autenticazione",
+      "CHECK_DESCRIPTION": "Se impostato, gli utenti possono autenticarsi solo se un qualsiasi ruolo \u00e8 assegnato al loro account.",
+      "DIALOG": {
+        "DELETE_TITLE": "Elima ruolo",
+        "DELETE_DESCRIPTION": "Stai per eliminare un ruolo del progetto. Vuoi davvero continuare?"
+      }
     },
     "HAS_PROJECT": "Controlla project grant con l'autenticazione",
     "HAS_PROJECT_DESCRIPTION": "Questa impostazione verifica il project grant dell'organizzazione. In caso di mancanza, l'utente non può essere autenticato.",
@@ -1233,13 +1319,15 @@
       "MEMBERSADDED": "Manager aggiunto con successo.",
       "MEMBERADDED": "Manager aggiunto con successo.",
       "MEMBERCHANGED": "Manager cambiato con successo.",
+      "ROLESCREATED": "Ruoli creati con successo.",
       "ROLEREMOVED": "Ruolo rimosso con successo.",
       "ROLECHANGED": "Ruolo cambiato con successo.",
       "REACTIVATED": "Riattivato con successo.",
       "DEACTIVATED": "Disattivato con successo.",
+      "CREATED": "Progetto creato con successo.",
       "UPDATED": "Progetto cambiato con successo.",
       "GRANTUPDATED": "Grant cambiato con successo.",
-      "DELETED": "Progetto rimosso con successo."
+      "DELETED": "Progetto eliminato con successo."
     }
   },
   "NEXTSTEPS": {
@@ -1268,7 +1356,8 @@
     },
     "TYPES": {
       "0": "sconosciuto",
-      "1": "OIDC"
+      "1": "OIDC",
+      "3": "JWT"
     },
     "STATES": {
       "1": "attivo",
@@ -1290,6 +1379,11 @@
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Nome",
+    "AVAILABILITY": "Disponibilità",
+    "AVAILABLE": "disponibile",
+    "AVAILABLEBUTINACTIVE": "disponible ma inattivo",
+    "SETAVAILABLE": "Imposta come disponibile",
+    "SETUNAVAILABLE": "Imposta come non disponibile",
     "CONFIG": "Configurazione",
     "STATE": "Stato",
     "ISSUER": "Issuer",
@@ -1309,7 +1403,7 @@
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "OIDC": {
-      "TITLE": "OpenId Connect IDP",
+      "TITLE": "OIDC IDP",
       "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."
     },
     "JWT": {
@@ -1331,10 +1425,10 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Multifattori",
-      "MULTIFACTORDESCRIPTION": "Definisci qui i tuoi multifattori per l'autenticazione.",
-      "SECONDFACTORTITLE": "Secondi fattori",
-      "SECONDFACTORDESCRIPTION": "Definisci qui i tuoi Secondfactor per l'autenticazione."
+      "MULTIFACTORTITLE": "Passwordless",
+      "MULTIFACTORDESCRIPTION": "Definisci qui i tuoi multifattori per l'autenticazione passwordless.",
+      "SECONDFACTORTITLE": "Autenticazione a più fattori",
+      "SECONDFACTORDESCRIPTION": "Definisci ulteriori possibili fattori con cui puoi proteggere l'autenticazione della tua password."
     },
     "CREATE": {
       "TITLE": "Nuovo fattore",
@@ -1379,8 +1473,12 @@
   },
   "APP": {
     "LIST": "Applicazioni",
+    "COMPLIANCE": "Conformità con OIDC",
+    "URLS": "Urls",
+    "CONFIGURATION": "Configurazione",
     "PAGES": {
       "TITLE": "Applicazione",
+      "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
       "CREATE_OIDC": "Applicazione OIDC",
       "CREATE_OIDC_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
@@ -1495,7 +1593,7 @@
       "TOKENTYPE0": "Bearer Token",
       "TOKENTYPE1": "JWT",
       "UNSECUREREDIRECT": "Speriamo proprio che tu sappia cosa stai facendo.",
-      "OVERVIEWSECTION": "Panoramica",
+      "OVERVIEWSECTION": "Sommario",
       "OVERVIEWTITLE": "Configurazione finita. Rivedi le tue impostazioni.",
       "ACCESSTOKENROLEASSERTION": "Aggiungere ruoli utente al Access Token",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Se selezionato, i ruoli richiesti dall'utente autenticato sono aggiunti all'Access Token",
@@ -1573,6 +1671,7 @@
       "OIDCUPDATED": "Configurazione OIDC aggiornata.",
       "APIUPDATED": "Configurazione API aggiornata",
       "UPDATED": "App aggiornata.",
+      "CREATED": "App creata.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",
       "DELETED": "App rimossa con successo.",
       "CONFIGCHANGED": "Modifiche alla configurazione rilevate"
@@ -1592,19 +1691,24 @@
   "MEMBER": {
     "ADD": "Aggiungi un manager",
     "CREATIONTYPE": "Tipo di creazione",
-    "DOCSINFO": "Per maggiori informazioni, considera leggere la nostra documentazione.",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organizzazione",
       "0": "Progetto proprio",
-      "1": "Progetto concesso",
+      "1": "Progetto delegato",
       "4": "Progetto"
+    },
+    "EDITROLE": "Modifica ruoli",
+    "EDITFOR": "Modifica i ruoli per l'utente: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Rimuovi manager",
+      "DELETE_DESCRIPTION": "Stai per rimuovere un manager. Vuoi davvero continuare?"
     }
   },
   "ROLESLABEL": "Ruoli",
   "GRANTS": {
     "TITLE": "Autorizzazioni",
-    "DESC": "Qui puoi gestire le autorizzazioni degli utenti della tua organizzazione.",
+    "DESC": "Qui puoi vedere tutte le autorizzazioni della tua organizzazione.",
     "DELETE": "Cancellare l'autorizzazione",
     "EMPTY": "Nessuna autorizzazione trovata",
     "ADD": "Creare autorizzazione",
@@ -1614,25 +1718,36 @@
       "DESCRIPTION": "Definisci le autorizzazioni per il progetto specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
     },
     "USER": {
-      "TITLE": "Autorizzazione",
+      "TITLE": "Autorizzazioni",
       "DESCRIPTION": "Definisci le autorizzazioni per l'utente specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
     },
     "CREATE": {
       "TITLE": "Creare autorizzazione",
       "DESCRIPTION": "Cerca l'organizzazione, il progetto e i ruoli corrispondenti."
     },
+    "EDIT": {
+      "TITLE": "Modifica autorizzazione"
+    },
     "DETAIL": {
       "TITLE": "Dettaglio dell'autorizzazione",
       "DESCRIPTION": "Qui potete vedere tutti i dettagli dell'autorizzazione."
     },
     "TOAST": {
-      "UPDATED": "Sovvenzione aggiornata.",
-      "BULKREMOVED": "Sussidi rimossi."
+      "UPDATED": "Autorizzazione aggiornata.",
+      "REMOVED": "Autorizzazione rimossa con successo.",
+      "BULKREMOVED": "Autorizzazioni rimossi con successo."
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Elima autorizzazione",
+      "DELETE_DESCRIPTION": "Stai per eliminare un' autorizzazione. Vuoi continuare?",
+      "BULK_DELETE_TITLE": "Elimina autorizzazioni",
+      "BULK_DELETE_DESCRIPTION": "Stai per eliminare diverse autorizzazioni. Vuoi continuare?"
     }
   },
   "CHANGES": {
     "LISTTITLE": "Ultimi cambiamenti",
     "BOTTOM": "Hai raggiunto la fine della lista.",
+    "LOADMORE": "Carica di più",
     "ORG": {
       "TITLE": "Attivit\u00e0",
       "DESCRIPTION": "Qui puoi vedere gli ultimi eventi che hanno generato un cambio di organizzazione."

@@ -1,13 +1,8 @@
 @use '@angular/material' as mat;
 
-.title {
+.action-dialog-title {
   font-size: 1.2rem;
   margin-top: 0;
-}
-
-.desc {
-  color: var(--grey);
-  font-size: .9rem;
 }
 
 @mixin action-dialog-theme($theme) {
@@ -27,6 +22,6 @@
   }
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

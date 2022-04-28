@@ -12,11 +12,13 @@
     text-transform: uppercase;
     background-color: $primary-color;
     box-sizing: border-box;
-    letter-spacing: .05em;
+    letter-spacing: 0.05em;
     font-size: 14px;
     outline: none;
     color: white;
     font-weight: bold;
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+    // box-shadow: 0 0 3px #0000001a;
 
     img {
       width: 100%;
@@ -24,6 +26,14 @@
       border-radius: 50%;
       object-fit: cover;
       object-position: center;
+      box-sizing: border-box;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .machine-icon {
+      font-size: 1.2rem;
     }
   }
 }

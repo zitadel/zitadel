@@ -1,20 +1,20 @@
 <h1 mat-dialog-title>
-    <span>{{'USER.CODEDIALOG.TITLE' | translate}} {{data?.number}}</span>
+  <span>{{'USER.CODEDIALOG.TITLE' | translate}} {{data?.number}}</span>
 </h1>
-<p class="desc">{{'USER.CODEDIALOG.DESCRIPTION' | translate}}</p>
+<p class="desc cnsl-secondary-text">{{'USER.CODEDIALOG.DESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
-    <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.CODEDIALOG.CODE' | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="code" />
-    </cnsl-form-field>
+  <cnsl-form-field class="formfield">
+    <cnsl-label>{{ 'USER.CODEDIALOG.CODE' | translate }}</cnsl-label>
+    <input cnslInput [(ngModel)]="code" />
+  </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
-    <button color="primary" mat-stroked-button class="ok-button" (click)="closeDialog()">
-        {{'ACTIONS.CLOSE' | translate}}
-    </button>
+  <button color="primary" mat-stroked-button class="ok-button" (click)="closeDialog()">
+    {{'ACTIONS.CLOSE' | translate}}
+  </button>
 
-    <button [disabled]="!code" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-        (click)="closeDialog(code)">
-        {{'ACTIONS.OK' | translate}}
-    </button>
+  <button [disabled]="!code" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+    (click)="closeDialog(code)">
+    {{'ACTIONS.OK' | translate}}
+  </button>
 </div>

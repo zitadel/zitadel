@@ -1,49 +1,90 @@
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+@use '@angular/material' as mat;
 
-  .text {
-    flex: 1;
+@mixin auth-user-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
 
-    .h1 {
-      margin: 0;
+  .user-container {
+    padding-top: 1rem;
+    display: grid;
+    position: relative;
+    grid-template-columns: 1fr;
+
+    .user-settings-list {
+      position: relative;
+
+      .user-sticky-rel {
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 50px;
+        padding: 1rem 2rem 1rem 0;
+
+        .setting-list-element {
+          border: none;
+          background: none;
+          text-align: left;
+          padding: 0.75rem 0;
+          opacity: 0.6;
+          font-size: 15px;
+          cursor: pointer;
+          color: map-get($foreground, base);
+          display: flex;
+          align-items: center;
+
+          i {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            line-height: 1.2rem;
+          }
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.mob-only {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+
+          &.hide-on-mobile {
+            @media only screen and (max-width: 500px) {
+              display: none;
+            }
+          }
+
+          &.show {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+
+          &.active {
+            font-weight: 600;
+            opacity: 1;
+          }
+        }
+      }
     }
 
-    .sub {
-      color: var(--grey);
-      max-width: 500px;
-      font-size: 14px;
+    .user-settings {
+      width: 100%;
+      overflow-x: auto;
     }
-  }
 
-  .theme {
-    min-width: 250px;
-  }
-}
+    @media only screen and (min-width: 824px) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
 
-.btn-container {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 -0.5rem;
-
-  button {
-    border-radius: 0.5rem;
-    margin: 0 0.5rem;
-  }
-}
-
-.col {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  margin: -1.5rem -0.5rem;
-
-  .app-card {
-    flex: 1;
-    margin: 0.5rem;
+      .user-settings {
+        grid-column-start: 2;
+        grid-column-end: 5;
+      }
+    }
   }
 }
 

@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @mixin input-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $primary-light-color: mat.get-color-from-palette($primary, 200);
@@ -12,25 +11,24 @@
 
   [cnslInput],
   .mat-select {
-    display: block;
     box-sizing: border-box;
     padding-inline-start: 10px;
     outline: none;
     display: inline-block;
     text-align: start;
-    background-color: inherit;
     cursor: text;
-    border-radius: 8px;
-    transform: all .2 linear;
+    transform: all 0.2 linear;
     font-size: 1rem;
     border: none;
-    border: 1px solid if($is-dark-theme, #403e3e, #00000040);
-    background-color: if($is-dark-theme, #00000020, #fafafa50);
+    border: 1px solid if($is-dark-theme, #f9f7f725, #1a191938);
+    background-color: if($is-dark-theme, #00000020, #00000005);
     border-radius: 4px;
     height: 40px;
     padding: 10px;
-    transition: border-color .2s ease-in-out, background-color .3s cubic-bezier(.645, .045, .355, 1),
-      color .3s cubic-bezier(.645, .045, .355, 1);
+    transition:
+      border-color 0.15s ease-in-out,
+      background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+      color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     width: 100%;
     color: mat.get-color-from-palette($foreground, text);
     margin-bottom: 2px;
@@ -62,7 +60,7 @@
 
   [cnslInput]::placeholder {
     font-size: 14px;
-    color: var(--grey);
+    color: map-get($foreground, placeholder-text);
     font-style: italic;
   }
 
