@@ -79,5 +79,5 @@ jobs:
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:
-          file: ./profile.cov
+          file: .artifacts/codecov/profile.cov
           name: go-codecov
