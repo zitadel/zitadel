@@ -10,14 +10,19 @@
 
     <div class="org-create-main-content">
       <ng-template cnslHasRole [hasRole]="['iam.write']">
-        <mat-slide-toggle [disabled]="currentCreateStep !== 1" class="example-margin" color="primary"
-          (change)="changeSelf($event)" [(ngModel)]="forSelf">
-          {{'ORG.PAGES.USERSELFACCOUNT' | translate}}
+        <mat-slide-toggle
+          [disabled]="currentCreateStep !== 1"
+          class="example-margin"
+          color="primary"
+          (change)="changeSelf($event)"
+          [(ngModel)]="forSelf"
+        >
+          {{ 'ORG.PAGES.USERSELFACCOUNT' | translate }}
         </mat-slide-toggle>
 
         <ng-container *ngIf="!forSelf">
           <ng-container *ngIf="currentCreateStep === 1">
-            <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}} </h1>
+            <h1>{{ 'ORG.PAGES.ORGDETAIL_TITLE' | translate }}</h1>
 
             <form [formGroup]="orgForm" (ngSubmit)="next()">
               <div class="content">
@@ -33,16 +38,22 @@
 
               <div class="btn-container">
                 <span class="fill-space"></span>
-                <button [disabled]="orgForm.invalid" color="primary" mat-raised-button class="big-button"
-                  cdkFocusInitial type="submit">
-                  {{'ACTIONS.CONTINUE' | translate}}
+                <button
+                  [disabled]="orgForm.invalid"
+                  color="primary"
+                  mat-raised-button
+                  class="big-button"
+                  cdkFocusInitial
+                  type="submit"
+                >
+                  {{ 'ACTIONS.CONTINUE' | translate }}
                 </button>
               </div>
             </form>
           </ng-container>
 
           <ng-container *ngIf="currentCreateStep === createSteps">
-            <h1>{{'ORG.PAGES.ORGDETAILUSER_TITLE' | translate}}</h1>
+            <h1>{{ 'ORG.PAGES.ORGDETAILUSER_TITLE' | translate }}</h1>
 
             <div class="user">
               <form [formGroup]="userForm" class="form">
@@ -90,7 +101,7 @@
                     <cnsl-label>{{ 'USER.PROFILE.GENDER' | translate }}</cnsl-label>
                     <mat-select formControlName="gender">
                       <mat-option *ngFor="let gender of genders" [value]="gender">
-                        {{ 'GENDERS.'+gender | translate }}
+                        {{ 'GENDERS.' + gender | translate }}
                       </mat-option>
                     </mat-select>
                     <span cnslError *ngIf="gender?.invalid && gender?.errors?.required">
@@ -101,7 +112,7 @@
                     <cnsl-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</cnsl-label>
                     <mat-select formControlName="preferredLanguage">
                       <mat-option *ngFor="let language of languages" [value]="language">
-                        {{ 'LANGUAGES.'+language | translate }}
+                        {{ 'LANGUAGES.' + language | translate }}
                       </mat-option>
                       <span cnslError *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
                         {{ 'USER.VALIDATION.REQUIRED' | translate }}
@@ -109,9 +120,14 @@
                     </mat-select>
                   </cnsl-form-field>
 
-                  <mat-checkbox class="checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}"
-                    (change)="initPwdValidators()">
-                    {{'ORG.PAGES.USEPASSWORD' | translate}}</mat-checkbox>
+                  <mat-checkbox
+                    class="checkbox"
+                    [(ngModel)]="usePassword"
+                    [ngModelOptions]="{ standalone: true }"
+                    (change)="initPwdValidators()"
+                  >
+                    {{ 'ORG.PAGES.USEPASSWORD' | translate }}</mat-checkbox
+                  >
 
                   <ng-container *ngIf="usePassword && pwdForm">
                     <p class="section cnsl-secondary-text">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
@@ -122,18 +138,27 @@
                     <form [formGroup]="pwdForm" class="pwd-form">
                       <cnsl-form-field class="pwd" *ngIf="password" appearance="outline">
                         <cnsl-label>{{ 'USER.PASSWORD.NEW' | translate }}</cnsl-label>
-                        <input cnslInput autocomplete="off" name="firstpassword" formControlName="password"
-                          type="password" />
+                        <input
+                          cnslInput
+                          autocomplete="off"
+                          name="firstpassword"
+                          formControlName="password"
+                          type="password"
+                        />
 
                         <span cnslError *ngIf="password?.errors?.required">
                           {{ 'USER.VALIDATION.REQUIRED' | translate }}
                         </span>
-
                       </cnsl-form-field>
                       <cnsl-form-field class="pwd" *ngIf="confirmPassword" appearance="outline">
                         <cnsl-label>{{ 'USER.PASSWORD.CONFIRM' | translate }}</cnsl-label>
-                        <input cnslInput autocomplete="off" name="confirmPassword" formControlName="confirmPassword"
-                          type="password" />
+                        <input
+                          cnslInput
+                          autocomplete="off"
+                          name="confirmPassword"
+                          formControlName="confirmPassword"
+                          type="password"
+                        />
 
                         <span cnslError *ngIf="confirmPassword?.errors?.required">
                           {{ 'USER.VALIDATION.REQUIRED' | translate }}
@@ -146,12 +171,19 @@
                   </ng-container>
                 </div>
                 <div class="btn-container">
-                  <button color="primary" class="small-button" type="button" (click)="previous()" mat-stroked-button>{{
-                    'ACTIONS.BACK' | translate }}</button>
+                  <button color="primary" class="small-button" type="button" (click)="previous()" mat-stroked-button>
+                    {{ 'ACTIONS.BACK' | translate }}
+                  </button>
                   <span class="fill-space"></span>
-                  <button color="primary" class="big-button" (click)="finish()"
-                    [disabled]="orgForm.invalid || userForm.invalid || ((usePassword && pwdForm) ? pwdForm?.invalid : false)"
-                    mat-raised-button>{{ 'ACTIONS.FINISH' | translate }}</button>
+                  <button
+                    color="primary"
+                    class="big-button"
+                    (click)="finish()"
+                    [disabled]="orgForm.invalid || userForm.invalid || (usePassword && pwdForm ? pwdForm?.invalid : false)"
+                    mat-raised-button
+                  >
+                    {{ 'ACTIONS.FINISH' | translate }}
+                  </button>
                 </div>
               </form>
             </div>
@@ -161,7 +193,7 @@
       <ng-template cnslHasRole [hasRole]="['org.create']">
         <div *ngIf="forSelf">
           <ng-container *ngIf="currentCreateStep === 1">
-            <h1>{{'ORG.PAGES.ORGDETAIL_TITLE_WITHOUT_DOMAIN' | translate}} </h1>
+            <h1>{{ 'ORG.PAGES.ORGDETAIL_TITLE_WITHOUT_DOMAIN' | translate }}</h1>
 
             <form [formGroup]="orgForm" (ngSubmit)="createOrgForSelf()">
               <div class="content">
@@ -173,9 +205,15 @@
 
               <div class="btn-container">
                 <span class="fill-space"></span>
-                <button [disabled]="orgForm.invalid" color="primary" mat-raised-button class="big-button"
-                  cdkFocusInitial type="submit">
-                  {{'CREATE' | translate}}
+                <button
+                  [disabled]="orgForm.invalid"
+                  color="primary"
+                  mat-raised-button
+                  class="big-button"
+                  cdkFocusInitial
+                  type="submit"
+                >
+                  {{ 'ACTIONS.CREATE' | translate }}
                 </button>
               </div>
             </form>
