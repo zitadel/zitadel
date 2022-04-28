@@ -1,22 +1,35 @@
-<cnsl-top-view [hasBackButton]="false" title="{{org?.name}}" [isActive]="org?.state === OrgState.ORG_STATE_ACTIVE"
-    [isInactive]="org?.state === OrgState.ORG_STATE_INACTIVE" [hasContributors]="true"
-    stateTooltip="{{'ORG.STATE.'+org?.state | translate}}">
-    <cnsl-contributors topContributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
-        [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-        (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
-    </cnsl-contributors>
+<cnsl-top-view
+  [hasBackButton]="false"
+  title="{{ org?.name }}"
+  [isActive]="org?.state === OrgState.ORG_STATE_ACTIVE"
+  [isInactive]="org?.state === OrgState.ORG_STATE_INACTIVE"
+  [hasContributors]="true"
+  stateTooltip="{{ 'ORG.STATE.' + org?.state | translate }}"
+>
+  <cnsl-contributors
+    topContributors
+    [totalResult]="totalMemberResult"
+    [loading]="loading$ | async"
+    [membersSubject]="membersSubject"
+    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+    (addClicked)="openAddMember()"
+    (showDetailClicked)="showDetail()"
+    (refreshClicked)="loadMembers()"
+    [disabled]="false"
+  >
+  </cnsl-contributors>
 
-    <cnsl-info-row topContent *ngIf="org" [org]="org"></cnsl-info-row>
+  <cnsl-info-row topContent *ngIf="org" [org]="org"></cnsl-info-row>
 </cnsl-top-view>
 <div class="max-width-container">
-    <cnsl-meta-layout>
-        <ng-template cnslHasRole [hasRole]="['policy.read']">
-            <cnsl-policy-grid class="policies" [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
-        </ng-template>
+  <cnsl-meta-layout>
+    <ng-template cnslHasRole [hasRole]="['policy.read']">
+      <cnsl-policy-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
+    </ng-template>
 
-        <div metainfo>
-            <cnsl-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
-        </div>
-    </cnsl-meta-layout>
+    <div metainfo>
+      <cnsl-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
+    </div>
+  </cnsl-meta-layout>
 </div>
