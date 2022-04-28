@@ -5,9 +5,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/config/hook"
-
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -16,12 +13,15 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
+	tracing "github.com/zitadel/zitadel/internal/telemetry/tracing/config"
 )
 
 type Config struct {
@@ -34,6 +34,7 @@ type Config struct {
 	HTTP1HostHeader string
 	WebAuthNName    string
 	Database        database.Config
+	Tracing         tracing.Config
 	Projections     projection.Config
 	AuthZ           authz.Config
 	Auth            auth_es.Config
@@ -63,6 +64,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 	)
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
+
+	err = config.Tracing.NewTracer()
+	logging.OnError(err).Fatal("unable to set tracer")
 
 	return config
 }
