@@ -1,141 +1,148 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="totalResult"
-    [timestamp]="viewTimestamp" [selection]="selection" [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes">
-    <cnsl-form-field @appearfade *ngIf="userSearchKey !== undefined" actions class="filtername">
-        <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
-            [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
-    </cnsl-form-field>
+  [hideRefresh]="true" [timestamp]="viewTimestamp" [selection]="selection"
+  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [showBorder]="true">
 
-    <ng-template cnslHasRole [hasRole]="['user.write']" actions>
-        <button (click)="deactivateSelectedUsers()" matTooltip="{{'USER.TABLE.DEACTIVATE' | translate}}"
-            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
-            <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
-        </button>
-        <button (click)="reactivateSelectedUsers()" matTooltip="{{'USER.TABLE.ACTIVATE' | translate}}"
-            class="icon-button" mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
-            <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
-        </button>
-        <a [routerLink]="[ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine']" color="primary"
-            mat-raised-button [disabled]="disabled">
-            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-        </a>
-    </ng-template>
+  <div leftActions class="user-table-left-actions">
+    <button class="type-button" [ngClass]="{'active': type === Type.TYPE_HUMAN}"
+      (click)="setType(Type.TYPE_HUMAN)">{{'USER.TABLE.TYPES.HUMAN' | translate}}</button>
+    <button class="type-button" [ngClass]="{'active': type === Type.TYPE_MACHINE}"
+      (click)="setType(Type.TYPE_MACHINE)">{{'USER.TABLE.TYPES.MACHINE' | translate}}</button>
+  </div>
 
-    <div class="table-wrapper">
-        <table class="table" mat-table [dataSource]="dataSource">
-            <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef class="selection">
-                    <mat-checkbox [disabled]="disabled" color="primary" (change)="$event ? masterToggle() : null"
-                        [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected()">
-                    </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let user" class="selection">
-                    <mat-checkbox [disabled]="disabled" color="primary" (click)="$event.stopPropagation()"
-                        (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
-
-                        <cnsl-avatar
-                            *ngIf="user.human && user.human.profile.displayName && user.human?.profile.firstName && user.human?.profile.lastName; else cog"
-                            class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName" [size]="32">
-                        </cnsl-avatar>
-                        <ng-template #cog>
-                            <div class="sa-icon" *ngIf="user.machine">
-                                <i class="las la-user-cog"></i>
-                            </div>
-                        </ng-template>
-                    </mat-checkbox>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="displayName">
-                <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.DISPLAY_NAME}">
-                    {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
-                    <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserListSearchKey.DISPLAY_NAME}"></template>
-                </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user.human?.profile?.displayName}}
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>
-                    {{ 'USER.MACHINE.NAME' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    <span *ngIf="user.human?.name">{{user.human?.name}}</span>
-                    <span *ngIf="user.machine?.name">{{user.machine?.name}}</span>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.DESCRIPTION' | translate }} </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    <span *ngIf="user.human?.description">{{user.human?.description}}</span>
-                    <span *ngIf="user.machine?.description">{{user.machine?.description}}</span>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="username">
-                <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.USER_NAME}">
-                    {{ 'USER.PROFILE.USERNAME' | translate }}
-                    <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserListSearchKey.USER_NAME}"></template>
-                </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    {{user.userName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef
-                    [ngClass]="{'search-active': this.UserListSearchKey === UserListSearchKey.EMAIL}">
-                    {{ 'USER.EMAIL' | translate }}
-                    <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: UserListSearchKey.EMAIL}"></template>
-                </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    <span *ngIf="user.human?.email?.email">{{user.human?.email.email}}</span>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="state">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
-                <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-                    <span class="state"
-                        [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">
-                        {{ 'USER.DATA.STATE'+user.state | translate }}
-                    </span>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="actions" stickyEnd>
-                <th mat-header-cell *matHeaderCellDef></th>
-                <td mat-cell *matCellDef="let user">
-                    <button class="dlt-button"
-                        [disabled]="(['user.delete$', 'user.delete:'+user.id] | hasRole | async) === false" color="warn"
-                        mat-icon-button matTooltip="{{'USER.PAGES.DELETE' | translate}}" (click)="deleteUser(user)">
-                        <i class="las la-trash"></i>
-                    </button>
-                </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
-
-        </table>
-        <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
-            <i class="las la-exclamation"></i>
-            <span>{{'USER.TABLE.EMPTY' | translate}}</span>
-        </div>
-        <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0" [pageSize]="10" [timestamp]="viewTimestamp"
-            [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
-    </div>
-</cnsl-refresh-table>
-
-<ng-template #templateRef let-key="key">
-    <button class="search-button" mat-icon-button (click)="setFilter(key)">
-        <mat-icon class="icon" *ngIf="this.userSearchKey !== key">search</mat-icon>
-        <mat-icon class="icon" *ngIf="this.userSearchKey === key">search_off</mat-icon>
+  <ng-template cnslHasRole [hasRole]="['user.write']" actions>
+    <button (click)="deactivateSelectedUsers()" class="cnsl-action-button bg-state inactive" mat-raised-button
+      *ngIf="selection.hasValue() && multipleDeactivatePossible" [disabled]="disabled" color="primary">
+      <span class="">{{'USER.TABLE.DEACTIVATE' | translate}}</span>
+      <cnsl-action-keys (actionTriggered)="deactivateSelectedUsers()" [type]="ActionKeysType.DEACTIVATE">
+      </cnsl-action-keys>
     </button>
-</ng-template>
+    <button (click)="reactivateSelectedUsers()" class="cnsl-action-button bg-state active margin-left" mat-raised-button
+      *ngIf="selection.hasValue() && multipleActivatePossible" [disabled]="disabled" color="primary">
+      <span class="">{{'USER.TABLE.ACTIVATE' | translate}}</span>
+      <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE">
+      </cnsl-action-keys>
+    </button>
+    <cnsl-filter-user *ngIf="!selection.hasValue()" (filterChanged)="applySearchQuery($any($event))"
+      (filterOpen)="filterOpen = $event"></cnsl-filter-user>
+    <a *ngIf="!selection.hasValue()" [routerLink]="[ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine']"
+      color="primary" mat-raised-button [disabled]="disabled" class="cnsl-action-button">
+      <mat-icon class="icon">add</mat-icon>
+      <span>{{ 'ACTIONS.NEW' | translate }}</span>
+      <cnsl-action-keys *ngIf="!filterOpen"
+        (actionTriggered)="gotoRouterLink([ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])">
+      </cnsl-action-keys>
+    </a>
+  </ng-template>
+
+  <div class="table-wrapper">
+    <table class="table" mat-table [dataSource]="dataSource" matSort (matSortChange)="sortChange($event)">
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef class="selection">
+          <mat-checkbox [disabled]="disabled" color="primary" (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let user" class="selection">
+          <mat-checkbox [disabled]="disabled" color="primary" (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(user) : null" [checked]="selection.isSelected(user)">
+
+            <cnsl-avatar
+              *ngIf="user.human && user.human.profile.displayName && user.human?.profile.firstName && user.human?.profile.lastName; else cog"
+              class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human?.profile?.avatarUrl || ''"
+              [forColor]="user?.preferredLoginName" [size]="32">
+            </cnsl-avatar>
+            <ng-template #cog>
+              <cnsl-avatar [forColor]="user?.preferredLoginName" [isMachine]="true">
+                <i class="las la-robot"></i>
+              </cnsl-avatar>
+            </ng-template>
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="displayName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header
+          [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.DISPLAY_NAME}">
+          {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
+          <span *ngIf="user.human">{{user.human.profile?.displayName}}</span>
+          <span *ngIf="user.machine">{{user.machine.name}}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header
+          [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.USER_NAME}">
+          {{ 'USER.PROFILE.USERNAME' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
+          {{user.userName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header
+          [ngClass]="{'search-active': this.UserListSearchKey === UserListSearchKey.EMAIL}">
+          {{ 'USER.EMAIL' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
+          <span *ngIf="user.human?.email?.email">{{user.human?.email.email}}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'USER.DATA.STATE' | translate }} </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
+          <span class="state"
+            [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">
+            {{ 'USER.DATA.STATE'+user.state | translate }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef> {{'USER.TABLE.CREATIONDATE' | translate}} </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
+          <span class="no-break">{{user.details.creationDate | timestampToDate | localizedDate: 'fromNow'
+            }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="changeDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.TABLE.CHANGEDATE' | translate }} </th>
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
+          <span class="no-break">{{user.details.changeDate | timestampToDate | localizedDate: 'fromNow'
+            }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef class="user-tr-actions"></th>
+        <td mat-cell *matCellDef="let user" class="user-tr-actions">
+          <cnsl-table-actions>
+            <button actions matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="deleteUser(user)"
+              mat-icon-button>
+              <i class="las la-trash"></i>
+            </button>
+          </cnsl-table-actions>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="type === Type.TYPE_HUMAN ? displayedColumnsHuman : displayedColumnsMachine">
+      </tr>
+      <tr class="highlight pointer" mat-row
+        *matRowDef="let user; columns: (type === Type.TYPE_HUMAN ? displayedColumnsHuman : displayedColumnsMachine);">
+      </tr>
+
+    </table>
+  </div>
+
+  <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
+    <i class="las la-exclamation"></i>
+    <span>{{'USER.TABLE.EMPTY' | translate}}</span>
+  </div>
+  <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0"
+    [pageSize]="INITIAL_PAGE_SIZE" [timestamp]="viewTimestamp" [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="changePage($event)"></cnsl-paginator>
+</cnsl-refresh-table>

@@ -1,282 +1,271 @@
-<cnsl-meta-layout>
-    <div class="enlarged-container">
-        <div class="head">
-            <a [routerLink]="['/projects', projectId]" mat-icon-button>
-                <mat-icon class="icon">arrow_back</mat-icon>
-            </a>
-            <div class="title-col">
-                <h1>{{app?.name}}</h1>
-                <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType |
-                    translate}}</span>
-                <span *ngIf="app?.apiConfig">API</span>
-            </div>
-            <ng-container *ngIf="isZitadel === false">
-              <span class="fill-space"></span>
-              <ng-template cnslHasRole [hasRole]="['project.app.write:'+projectId, 'project.app.write']">
-                <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
-                  <span>{{'ACTIONS.ACTIONS' | translate}}</span>
-                  <mat-icon class="icon">keyboard_arrow_down</mat-icon>
-                </button>
-                <mat-menu #actions="matMenu" xPosition="before">
-                  <button mat-menu-item (click)="openNameDialog()"
-                    aria-label="Edit project name" *ngIf="isZitadel === false">
-                    {{'ACTIONS.RENAME' | translate}}
-                  </button>
-                  <button mat-menu-item
-                    *ngIf="app?.state !== AppState.APP_STATE_INACTIVE"
-                    (click)="changeState(AppState.APP_STATE_INACTIVE)">
-                    {{'ACTIONS.DEACTIVATE' | translate}}
-                  </button>
-                  <button mat-menu-item *ngIf="app?.state === AppState.APP_STATE_INACTIVE"
-                    (click)="changeState(AppState.APP_STATE_ACTIVE)">
-                    {{'ACTIONS.REACTIVATE' | translate}}
-                  </button>
-                  <ng-template cnslHasRole [hasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
-                    <button mat-menu-item matTooltip="{{'APP.PAGES.DELETE' | translate}}"
-                        (click)="deleteApp()">
-                        <span [style.color]="'var(--warn)'">{{'APP.PAGES.DELETE' | translate}}</span>
-                    </button>
-                  </ng-template>
-                </mat-menu>
-              </ng-template>
-            </ng-container>
+<cnsl-top-view title="{{app?.name}}"
+  [hasActions]="isZitadel === false && (['project.app.write:'+projectId, 'project.app.write'] | hasRole | async)"
+  docLink="https://docs.zitadel.ch/docs/guides/basics/projects"
+  [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType | translate): 'API'"
+  [isActive]="app?.state === AppState.APP_STATE_ACTIVE" [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
+  stateTooltip="{{('APP.PAGES.DETAIL.STATE.'+app?.state) | translate}}">
+  <ng-template topActions cnslHasRole [hasRole]="['project.app.write:'+projectId, 'project.app.write']">
+    <div class="regen-secret"
+      *ngIf="isZitadel === false && this.app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')">
+      <button type="button" [disabled]="!canWrite" mat-menu-item
+        (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
+    </div>
 
-            <p class="desc">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
-            <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
-        </div>
+    <div class="regen-secret" *ngIf="isZitadel === false && this.app?.apiConfig && currentAuthMethod === 'BASIC'">
+      <button [disabled]="!canWrite" mat-menu-item (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' |
+        translate}}</button>
+    </div>
 
-        <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
+    <button *ngIf="isZitadel === false" mat-menu-item (click)="openNameDialog()" aria-label="Edit project name">
+      {{'ACTIONS.RENAME' | translate}}
+    </button>
+    <button mat-menu-item *ngIf="isZitadel === false && app?.state !== AppState.APP_STATE_INACTIVE"
+      (click)="changeState(AppState.APP_STATE_INACTIVE)">
+      {{'ACTIONS.DEACTIVATE' | translate}}
+    </button>
+    <button mat-menu-item *ngIf="isZitadel === false && app?.state === AppState.APP_STATE_INACTIVE"
+      (click)="changeState(AppState.APP_STATE_ACTIVE)">
+      {{'ACTIONS.REACTIVATE' | translate}}
+    </button>
+    <ng-template cnslHasRole [hasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
+      <button *ngIf="isZitadel === false" mat-menu-item matTooltip="{{'APP.PAGES.DELETE' | translate}}"
+        (click)="deleteApp()">
+        <span [style.color]="'var(--warn)'">{{'APP.PAGES.DELETE' | translate}}</span>
+      </button>
+    </ng-template>
+  </ng-template>
+  <span *ngIf="errorMessage" class="app-err-container">{{errorMessage}}</span>
 
-        <div class="compliance"
-          *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
-          <cnsl-info-section class="problem" [type]="InfoSectionType.WARN">
-              <ul style="margin: 0;">
-                  <li style="margin: 0 0 .5rem 0;"
-                      *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
-                      {{problem.localizedMessage}}</li>
-              </ul>
-          </cnsl-info-section>
-        </div>
+  <cnsl-info-row topContent *ngIf="app" [app]="app"></cnsl-info-row>
+</cnsl-top-view>
 
-        <cnsl-info-row *ngIf="app" [app]="app"></cnsl-info-row>
+<div class="max-width-container">
+  <cnsl-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
+    [authMethods]="authMethods" [selected]="initialAuthMethod" [current]="currentAuthMethod"
+    [isOIDC]="app?.oidcConfig !== undefined" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
+  </cnsl-auth-method-radio>
 
-        <div *ngIf="app?.oidcConfig" class="expandables">
-            <div class="expandable">
-              <p class="title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}
-                  <button mat-icon-button (click)="showRedirects = !showRedirects"
-                      matTooltip="{{(showRedirects ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
-                      <mat-icon *ngIf="!showRedirects">expand_more</mat-icon>
-                      <mat-icon *ngIf="showRedirects">expand_less</mat-icon>
-                  </button>
-              </p>
-              <ng-container *ngIf="showRedirects">
-                <cnsl-info-section *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
-                  <div class="dev-col">
-                    <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
-                    <mat-slide-toggle *ngIf="devMode" color="primary" class="devmode" [formControl]="devMode" name="devMode"
-                    matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
-                    {{ 'APP.OIDC.DEVMODE' | translate }}
-                    </mat-slide-toggle>
-                  </div>
-                </cnsl-info-section>
-                <cnsl-info-section
-                *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value === OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
-                  <div class="dev-col">
-                    <span>{{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</span>
-                    <mat-slide-toggle *ngIf="devMode" color="primary" class="devmode" [formControl]="devMode" name="devMode"
-                    matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
-                    {{ 'APP.OIDC.DEVMODE' | translate }}
-                    </mat-slide-toggle>
-                  </div>
-                </cnsl-info-section>
-    
-                <div class="content">
-                  <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
-                      [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
-                      (changedUris)="redirectUrisList = $any($event)" [urisList]="redirectUrisList"
-                      title="{{ 'APP.OIDC.REDIRECT' | translate }}"
-                      [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
-                  </cnsl-redirect-uris>
-      
-                  <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
-                      [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $any($event)"
-                      [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
-                      title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
-                      [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
-                  </cnsl-redirect-uris>
-                </div>
-              </ng-container>
-            </div>
+  <div class="app-main-content">
+    <cnsl-meta-layout>
+      <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
+        <ng-container *ngIf="currentSetting === 'redirect-uris'">
+          <cnsl-card title=" {{ 'APP.OIDC.REDIRECTSECTIONTITLE' | translate }}">
+            <cnsl-info-section *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+              <div class="dev-col">
+                <span>{{'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate}}</span>
+                <mat-slide-toggle *ngIf="devMode" color="primary" class="devmode" [formControl]="devMode" name="devMode"
+                  matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
+                  {{ 'APP.OIDC.DEVMODE' | translate }}
+                </mat-slide-toggle>
+              </div>
+            </cnsl-info-section>
+            <cnsl-info-section
+              *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value === OIDCAppType.OIDC_APP_TYPE_USER_AGENT">
+              <div class="dev-col">
+                <span>{{'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate}}</span>
+                <mat-slide-toggle *ngIf="devMode" color="primary" class="devmode" [formControl]="devMode" name="devMode"
+                  matTooltip="{{'APP.OIDC.DEVMODEDESC' | translate}}">
+                  {{ 'APP.OIDC.DEVMODE' | translate }}
+                </mat-slide-toggle>
+              </div>
+            </cnsl-info-section>
 
-            <div class="expandable">
-                <p class="title">{{'APP.ADDITIONALORIGINS' | translate}}
-                    <button mat-icon-button (click)="showAdditionalOrigins = !showAdditionalOrigins"
-                        matTooltip="{{(showAdditionalOrigins ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
-                        <mat-icon *ngIf="!showAdditionalOrigins">expand_more</mat-icon>
-                        <mat-icon *ngIf="showAdditionalOrigins">expand_less</mat-icon>
-                    </button>
-                </p>
-                <ng-container *ngIf="showAdditionalOrigins">
-                    <p class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
-                    <cnsl-additional-origins *ngIf="appType?.value !== undefined" class="input" [canWrite]="canWrite"
-                        [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $any($event)"
-                        [urisList]="additionalOriginsList" title="{{ 'APP.ORIGINS' | translate }}">
-                    </cnsl-additional-origins>
-                </ng-container>
-            </div>
+            <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
+              [devMode]="devMode?.value" [getValues]="requestRedirectValuesSubject$"
+              (changedUris)="redirectUrisList = $any($event)" [urisList]="redirectUrisList"
+              title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+              [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+            </cnsl-redirect-uris>
 
-            <div style="margin: .5rem" class="divider"></div>
-        </div>
-
-        <cnsl-auth-method-radio *ngIf="authMethods && initialAuthMethod && (app?.oidcConfig || app?.apiConfig)"
-            [authMethods]="authMethods" [selected]="initialAuthMethod" [current]="currentAuthMethod"
-            [isOIDC]="app?.oidcConfig !== undefined" (selectedMethod)="setPartialConfigFromAuthMethod($event)">
-        </cnsl-auth-method-radio>
-
-        <cnsl-card *ngIf="currentAuthMethod === 'PK_JWT' && projectId && app?.id" [expanded]="false"
-            title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}" description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
-            <cnsl-client-keys [projectId]="projectId" [appId]="app.id"></cnsl-client-keys>
-        </cnsl-card>
-
-        <div *ngIf="apiForm && app?.apiConfig" class="btn-container">
-            <button class="submit-button" (click)="saveAPIApp()" color="primary"
-                [disabled]="apiForm.invalid || !canWrite" mat-raised-button>
-                {{ 'ACTIONS.SAVE' | translate }}
-            </button>
-        </div>
-
-        <div *ngIf="currentAuthMethod === 'BASIC'">
-            <button [disabled]="!canWrite" mat-stroked-button
-                (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
-        </div>
-
-
-        <form *ngIf="oidcForm && app?.oidcConfig" [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
-            <cnsl-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
-                <div card-actions *ngIf="currentAuthMethod === 'CODE' || currentAuthMethod === 'POST'">
-                    <button type="button" [disabled]="!canWrite" mat-stroked-button
-                        (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
-                </div>
-
-                <div class="content">
-                  <div class="grid">
-                    <cnsl-form-field class="formfield" appearance="outline">
-                        <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
-                        <input cnslInput formControlName="clientId" />
-                    </cnsl-form-field>
-
-                    <cnsl-form-field appearance="outline" class="formfield">
-                      <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
-                      <mat-select formControlName="appType">
-                        <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
-                          {{ 'APP.OIDC.APPTYPE.'+type | translate }}
-                        </mat-option>
-                      </mat-select>
-                    </cnsl-form-field>
-
-                    <cnsl-form-field class="formfield" appearance="outline">
-                        <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="responseTypesList" multiple>
-                            <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
-                                {{ 'APP.OIDC.RESPONSE.'+type | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
-
-                    <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
-                        <mat-select formControlName="authMethodType">
-                            <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
-                                {{ 'APP.OIDC.AUTHMETHOD.'+type | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
-
-                    <cnsl-form-field class="formfield" appearance="outline">
-                      <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
-                      <mat-select formControlName="grantTypesList" multiple>
-                        <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
-                          {{ 'APP.OIDC.GRANT.'+grant | translate }}
-                        </mat-option>
-                      </mat-select>
-                    </cnsl-form-field>
-
-                    <mat-checkbox color="primary" class="rt"
-                        (change)="toggleRefreshToken($event)" [disabled]="!this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE)" [checked]="this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)">
-                        {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
-                    </mat-checkbox>
-                  </div>
-
-                    <div class="divider"></div>
-
-                    <p class="full-width section-title">{{'APP.OIDC.TOKENSECTIONTITLE' | translate}}</p>
-
-                    <cnsl-form-field appearance="outline" class="formfield">
-                        <cnsl-label>{{ 'APP.OIDC.TOKENTYPE' | translate }}</cnsl-label>
-                        <mat-select formControlName="accessTokenType">
-                            <mat-option *ngFor="let type of oidcTokenTypes" [value]="type">
-                                {{ 'APP.OIDC.TOKENTYPE'+type | translate }}
-                            </mat-option>
-                        </mat-select>
-                    </cnsl-form-field>
-
-                    <mat-checkbox *ngIf="accessTokenType?.value === OIDCTokenType.OIDC_TOKEN_TYPE_JWT" class="full-width"
-                        formControlName="accessTokenRoleAssertion" color="primary">
-                        {{'APP.OIDC.ACCESSTOKENROLEASSERTION' | translate}}</mat-checkbox>
-
-                    <cnsl-info-section class="full-width desc">
-                        <span>{{'APP.OIDC.ACCESSTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
-                    </cnsl-info-section>
-                    <mat-checkbox class="full-width" style="margin-bottom: .5rem" formControlName="idTokenRoleAssertion"
-                        color="primary">
-                        {{'APP.OIDC.IDTOKENROLEASSERTION' | translate}}</mat-checkbox>
-                    <cnsl-info-section class="full-width desc">
-                        <span>{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
-                    </cnsl-info-section>
-
-                    <mat-checkbox class="full-width" style="margin-bottom: .5rem"
-                        formControlName="idTokenUserinfoAssertion" color="primary">
-                        {{'APP.OIDC.IDTOKENUSERINFOASSERTION' | translate}}</mat-checkbox>
-                    <cnsl-info-section class="full-width desc">
-                        <span>{{'APP.OIDC.IDTOKENUSERINFOASSERTION_DESCRIPTION' | translate}}</span>
-                    </cnsl-info-section>
-
-                    <p class="clockskew-title">ClockSkew</p>
-                    <mat-slider color="primary" formControlName="clockSkewSeconds" class="clockskew-slider" thumbLabel
-                        [displayWith]="formatClockSkewLabel" tickInterval=".1" min="0" [step]="1" max="5">
-                    </mat-slider>
-                    <cnsl-info-section class="full-width desc">
-                        <span>{{'APP.OIDC.CLOCKSKEW' | translate}}</span>
-                    </cnsl-info-section>
-                </div>
-            </cnsl-card>
+            <cnsl-redirect-uris *ngIf="appType?.value !== undefined" class="redirect-section" [canWrite]="canWrite"
+              [devMode]="devMode?.value" (changedUris)="postLogoutRedirectUrisList = $any($event)"
+              [urisList]="postLogoutRedirectUrisList" [getValues]="requestRedirectValuesSubject$"
+              title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+              [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+            </cnsl-redirect-uris>
 
             <div class="btn-container">
+              <button class="submit-button" color="primary" (click)="saveOIDCApp()" [disabled]="!canWrite"
+                mat-raised-button>
+                {{ 'ACTIONS.SAVE' | translate }}
+              </button>
+            </div>
+          </cnsl-card>
+        </ng-container>
+
+        <ng-container *ngIf="currentSetting === 'additional-origins'">
+          <cnsl-card title=" {{ 'APP.ADDITIONALORIGINS' | translate }}">
+            <p class="app-desc cnsl-secondary-text">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
+            <cnsl-additional-origins *ngIf="additionalOriginsList && appType && appType?.value !== undefined"
+              class="app-input" [canWrite]="canWrite" [getValues]="requestRedirectValuesSubject$"
+              (changedUris)="additionalOriginsListChanged($event)" [urisList]="additionalOriginsList"
+              title="{{ 'APP.ORIGINS' | translate }}">
+            </cnsl-additional-origins>
+
+            <div class="btn-container">
+              <button class="submit-button" (click)="saveOIDCApp()" color="primary" [disabled]="!canWrite"
+                mat-raised-button>
+                {{ 'ACTIONS.SAVE' | translate }}
+              </button>
+            </div>
+          </cnsl-card>
+        </ng-container>
+
+        <ng-container *ngIf="currentSetting === 'urls'">
+          <cnsl-card title=" {{ 'APP.URLS' | translate }}">
+            <div class="app-info-row">
+              <div class="app-info-wrapper" *ngFor="let environmentV of (environmentMap | keyvalue)">
+                <p class="app-info-row-title cnsl-secondary-text">{{environmentV.key}}</p>
+                <div class="app-copy-row">
+                  <div *ngIf="environmentV.value" class="environment">
+                    <button [disabled]="copied === environmentV.value"
+                      [matTooltip]="(copied !== environmentV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
+                      cnslCopyToClipboard [valueToCopy]="environmentV.value" (copiedValue)="copied = environmentV.key">
+                      {{environmentV.value}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </cnsl-card>
+        </ng-container>
+
+        <ng-container *ngIf="currentSetting === 'configuration'">
+          <cnsl-card *ngIf="oidcForm && app?.oidcConfig" title=" {{ 'APP.OIDC.TITLE' | translate }}">
+            <form [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
+              <div class="compliance"
+                *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
+                <h2 class="compliance-title">{{'APP.COMPLIANCE' | translate}}</h2>
+                <cnsl-info-section class="problem" [type]="InfoSectionType.WARN">
+                  <ul style="margin: 0;">
+                    <li style="margin: 0 0 .5rem 0;"
+                      *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
+                      {{problem.localizedMessage}}</li>
+                  </ul>
+                </cnsl-info-section>
+              </div>
+
+              <div class="app-oidc-content">
+                <div class="app-oidc-grid">
+                  <cnsl-form-field class="app-formfield" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="clientId" />
+                  </cnsl-form-field>
+
+                  <cnsl-form-field appearance="outline" class="app-formfield">
+                    <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
+                    <mat-select formControlName="appType">
+                      <mat-option *ngFor="let type of oidcAppTypes" [value]="type">
+                        {{ 'APP.OIDC.APPTYPE.'+type | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </cnsl-form-field>
+
+                  <cnsl-form-field class="app-formfield" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
+                    <mat-select formControlName="responseTypesList" multiple>
+                      <mat-option *ngFor="let type of oidcResponseTypes" [value]="type">
+                        {{ 'APP.OIDC.RESPONSE.'+type | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </cnsl-form-field>
+
+                  <cnsl-form-field appearance="outline" class="app-formfield">
+                    <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
+                    <mat-select formControlName="authMethodType">
+                      <mat-option *ngFor="let type of oidcAuthMethodType" [value]="type">
+                        {{ 'APP.OIDC.AUTHMETHOD.'+type | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </cnsl-form-field>
+
+                  <cnsl-form-field class="app-formfield" appearance="outline">
+                    <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
+                    <mat-select formControlName="grantTypesList" multiple>
+                      <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant">
+                        {{ 'APP.OIDC.GRANT.'+grant | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </cnsl-form-field>
+
+                  <mat-checkbox color="primary" class="rt" (change)="toggleRefreshToken($event)"
+                    [disabled]="!this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE)"
+                    [checked]="this.grantTypesList?.value.includes(OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN)">
+                    {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
+                  </mat-checkbox>
+                </div>
+
+                <p class="app-full-width app-section-title">{{'APP.OIDC.TOKENSECTIONTITLE' | translate}}</p>
+
+                <cnsl-form-field appearance="outline" class="app-formfield">
+                  <cnsl-label>{{ 'APP.OIDC.TOKENTYPE' | translate }}</cnsl-label>
+                  <mat-select formControlName="accessTokenType">
+                    <mat-option *ngFor="let type of oidcTokenTypes" [value]="type">
+                      {{ 'APP.OIDC.TOKENTYPE'+type | translate }}
+                    </mat-option>
+                  </mat-select>
+                </cnsl-form-field>
+
+                <mat-checkbox *ngIf="accessTokenType?.value === OIDCTokenType.OIDC_TOKEN_TYPE_JWT" class="full-width"
+                  formControlName="accessTokenRoleAssertion" color="primary">
+                  {{'APP.OIDC.ACCESSTOKENROLEASSERTION' | translate}}</mat-checkbox>
+
+                <cnsl-info-section class="app-full-width app-desc">
+                  <span>{{'APP.OIDC.ACCESSTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
+                </cnsl-info-section>
+                <mat-checkbox class="app-full-width" style="margin-top: 1.5rem" formControlName="idTokenRoleAssertion"
+                  color="primary">
+                  {{'APP.OIDC.IDTOKENROLEASSERTION' | translate}}</mat-checkbox>
+                <cnsl-info-section class="full-width app-desc">
+                  <span>{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
+                </cnsl-info-section>
+
+                <mat-checkbox class="app-full-width" style="margin-top: 1.5rem"
+                  formControlName="idTokenUserinfoAssertion" color="primary">
+                  {{'APP.OIDC.IDTOKENUSERINFOASSERTION' | translate}}</mat-checkbox>
+                <cnsl-info-section class="app-full-width app-desc">
+                  <span>{{'APP.OIDC.IDTOKENUSERINFOASSERTION_DESCRIPTION' | translate}}</span>
+                </cnsl-info-section>
+
+                <p class="clockskew-title cnsl-secondary-text">ClockSkew</p>
+                <mat-slider color="primary" formControlName="clockSkewSeconds" class="clockskew-slider" thumbLabel
+                  [displayWith]="formatClockSkewLabel" tickInterval=".1" min="0" [step]="1" max="5">
+                </mat-slider>
+                <cnsl-info-section class="app-full-width app-desc">
+                  <span>{{'APP.OIDC.CLOCKSKEW' | translate}}</span>
+                </cnsl-info-section>
+              </div>
+
+              <div class="btn-container">
                 <button class="submit-button" type="submit" color="primary" [disabled]="oidcForm.invalid || !canWrite"
-                    mat-raised-button>
-                    {{ 'ACTIONS.SAVE' | translate }}
+                  mat-raised-button>
+                  {{ 'ACTIONS.SAVE' | translate }}
                 </button>
+              </div>
+            </form>
+          </cnsl-card>
+        </ng-container>
+
+        <ng-container *ngIf="currentSetting === 'configuration'">
+          <cnsl-card *ngIf="currentAuthMethod === 'PK_JWT' && projectId && app?.id"
+            title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}" description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
+            <cnsl-client-keys [projectId]="projectId" [appId]="app.id"></cnsl-client-keys>
+
+            <div *ngIf="apiForm && app?.apiConfig" class="btn-container">
+              <button class="submit-button" (click)="saveAPIApp()" color="primary"
+                [disabled]="apiForm.invalid || !canWrite" mat-raised-button>
+                {{ 'ACTIONS.SAVE' | translate }}
+              </button>
             </div>
-        </form>
+          </cnsl-card>
+        </ng-container>
+      </cnsl-sidenav>
 
-        <cnsl-links [links]="nextLinks"></cnsl-links>
-    </div>
+      <!-- <cnsl-links [links]="nextLinks"></cnsl-links> -->
 
-
-    <div class="side" metainfo>
-        <div class="meta-details">
-            <div class="meta-row">
-                <span class="first">{{'RESOURCEID' | translate}}:</span>
-                <span *ngIf="app?.id" class="second">{{ app.id }}</span>
-            </div>
-            <div class="meta-row">
-                <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
-                <span *ngIf="app && app.state !== undefined"
-                    [ngClass]="{'active': app.state === AppState.APP_STATE_ACTIVE, 'inactive': app.state === AppState.APP_STATE_INACTIVE}"
-                    class="state">{{'APP.PAGES.DETAIL.STATE.'+app.state | translate}}</span>
-            </div>
-        </div>
-
+      <div metainfo>
         <cnsl-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="app.id" [secId]="projectId"></cnsl-changes>
-    </div>
-</cnsl-meta-layout>
+      </div>
+    </cnsl-meta-layout>
+  </div>
+</div>

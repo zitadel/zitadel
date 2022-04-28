@@ -8,7 +8,7 @@
     h5 {
       text-transform: uppercase;
       font-size: 14px;
-      letter-spacing: .05em;
+      letter-spacing: 0.05em;
       font-weight: 400;
       margin-right: 1rem;
     }
@@ -19,27 +19,23 @@
     row-gap: 1rem;
     column-gap: 1rem;
     grid-template-columns: 1fr 1fr 1fr;
-    padding-bottom: .5rem;
+    padding-bottom: 0.5rem;
 
     @media only screen and (max-width: 1300px) {
       grid-template-columns: 1fr 1fr;
     }
 
-    @media only screen and (max-width: 450px) {
+    @media only screen and (max-width: 500px) {
       grid-template-columns: 1fr;
     }
 
     .step {
       padding: 1rem;
+      width: 100%;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
       align-items: flex-start;
-      flex: 1;
-
-      @media only screen and (min-width: 899px) {
-        max-width: 280px;
-      }
 
       i {
         font-size: 2.5rem;
@@ -56,7 +52,6 @@
       p {
         font-size: 14px;
         margin: 1rem 0;
-        color: var(--grey);
       }
 
       .fill-space {

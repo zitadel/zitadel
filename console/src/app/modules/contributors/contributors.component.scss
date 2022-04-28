@@ -1,92 +1,81 @@
-.groups {
-  padding-top: 1rem;
+@use '@angular/material' as mat;
 
-  .co-header {
-    display: block;
-    margin-bottom: 1rem;
-    font-weight: 400;
-    font-size: 14px;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-  }
+@mixin contributors-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
 
-  .sub-header {
-    font-size: .8rem;
-    color: var(--grey);
-  }
+  .contributor-groups {
+    padding: 0.5rem 0;
 
-  .people {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-
-    .owner {
-      margin-right: 1rem;
-    }
-
-    .img-list {
-      width: 100%;
-      margin-top: .5rem;
-      margin-left: 1rem;
+    .contributor-people {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
+      border-radius: 50vw;
+      padding: 6px 9px;
+      background-color: map-get($background, contributor);
+      padding-left: 9px;
+      transition: all 0.2s ease;
 
-      .spinner {
-        margin-left: -15px;
-        margin-right: 20px;
-      }
-
-      .add-img {
-        float: left;
-        margin: 0 8px 0 -15px;
-      }
-
-      .fill-space {
-        flex: 1;
-      }
-
-      .refresh-img {
-        float: left;
-        margin: 0 0 0 -15px;
-
-        .icon {
-          font-size: 1.2rem;
-        }
-      }
-
-      .avatar-circle {
-        float: left;
-        margin: 0 8px 0 -15px;
-        height: 32px;
-        width: 32px;
-        border-radius: 50%;
-        -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-        -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-        box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-        cursor: pointer;
+      .contributor-img-list {
+        width: 100%;
         display: flex;
         align-items: center;
-        justify-content: center;
 
-        .avatar {
-          pointer-events: none;
+        &.padd-left {
+          padding-left: 1rem;
         }
 
-        .sa-icon {
-          display: block;
-          width: 32px;
-          margin: 0 .5rem;
+        .spinner {
+          margin: -10px 20px -10px -15px;
+        }
 
-          i {
-            margin: auto;
-            font-size: 1.2rem;
+        .add-img {
+          float: left;
+          margin: 0 0 0 -8px;
+
+          &.no-margin {
+            margin: 0;
           }
         }
-      }
 
-      .margin-neg {
-        margin-left: -1rem;
+        .contributor-avatar-circle {
+          float: left;
+          margin: 0 8px 0 -15px;
+          height: 32px;
+          width: 32px;
+          line-height: 1rem;
+          border-radius: 50%;
+          -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: map-get($background, contributor-avatar);
+          color: white;
+
+          .contributor-avatar {
+            pointer-events: none;
+          }
+
+          .sa-icon {
+            display: block;
+            width: 32px;
+            margin: 0 0.5rem;
+
+            i {
+              margin: auto;
+              font-size: 1.2rem;
+            }
+          }
+        }
+
+        .margin-neg {
+          margin-left: -1rem;
+        }
       }
     }
   }

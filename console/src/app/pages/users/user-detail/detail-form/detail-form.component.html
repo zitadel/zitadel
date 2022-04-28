@@ -17,7 +17,7 @@
           <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="userName" />
         </cnsl-form-field>
-        <button [disabled]="user && disabled" type="button" color="primary" mat-stroked-button class="edit"
+        <button [disabled]="user && disabled" type="button" mat-stroked-button class="edit"
           (click)="changeUsername()">{{'USER.PROFILE.CHANGEUSERNAME' |
           translate}}</button>
       </div>

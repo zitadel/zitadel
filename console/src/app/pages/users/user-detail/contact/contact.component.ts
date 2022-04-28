@@ -16,15 +16,15 @@ export class ContactComponent {
   @Input() canWrite: boolean | null = false;
   @Input() human!: Human.AsObject;
   @Input() state!: UserState;
-  @Output() editType: EventEmitter<EditDialogType> = new EventEmitter();
-  @Output() resendEmailVerification: EventEmitter<void> = new EventEmitter();
-  @Output() resendPhoneVerification: EventEmitter<void> = new EventEmitter();
-  @Output() enteredPhoneCode: EventEmitter<string> = new EventEmitter();
-  @Output() deletedPhone: EventEmitter<void> = new EventEmitter();
+  @Output() editType: EventEmitter<EditDialogType> = new EventEmitter<EditDialogType>();
+  @Output() resendEmailVerification: EventEmitter<void> = new EventEmitter<void>();
+  @Output() resendPhoneVerification: EventEmitter<void> = new EventEmitter<void>();
+  @Output() enteredPhoneCode: EventEmitter<string> = new EventEmitter<string>();
+  @Output() deletedPhone: EventEmitter<void> = new EventEmitter<void>();
   public UserState: any = UserState;
 
   public EditDialogType: any = EditDialogType;
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog) {}
 
   emitDeletePhone(): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -37,7 +37,7 @@ export class ContactComponent {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         this.deletedPhone.emit();
       }
@@ -61,7 +61,7 @@ export class ContactComponent {
         width: '400px',
       });
 
-      dialogRef.afterClosed().subscribe(code => {
+      dialogRef.afterClosed().subscribe((code) => {
         if (code) {
           this.enteredPhoneCode.emit(code);
         }

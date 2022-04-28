@@ -43,7 +43,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
     this.getPasswordless();
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.loadingSubject.complete();
   }
 

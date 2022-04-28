@@ -4,6 +4,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { RefreshService } from 'src/app/services/refresh.service';
 
+import { ActionKeysType } from '../action-keys/action-keys.component';
+
 const rotate = animation([
   animate(
     '{{time}} cubic-bezier(0.785, 0.135, 0.15, 0.86)',
@@ -21,11 +23,7 @@ const rotate = animation([
   selector: 'cnsl-refresh-table',
   templateUrl: './refresh-table.component.html',
   styleUrls: ['./refresh-table.component.scss'],
-  animations: [
-    trigger('rotate', [
-      transition('* => *', [useAnimation(rotate, { params: { time: '1s' } })]),
-    ]),
-  ],
+  animations: [trigger('rotate', [transition('* => *', [useAnimation(rotate, { params: { time: '1s' } })])])],
 })
 export class RefreshTableComponent implements OnInit {
   @Input() public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
@@ -36,8 +34,11 @@ export class RefreshTableComponent implements OnInit {
   @Input() public emitRefreshOnPreviousRoutes: string[] = [];
   @Output() public refreshed: EventEmitter<void> = new EventEmitter();
   @Input() public hideRefresh: boolean = false;
+  @Input() public showBorder: boolean = false;
+  @Input() public showSelectionActionButton: boolean = true;
 
-  constructor(private refreshService: RefreshService) { }
+  public ActionKeysType: any = ActionKeysType;
+  constructor(private refreshService: RefreshService) {}
 
   ngOnInit(): void {
     if (this.emitRefreshAfterTimeoutInMs) {
@@ -46,8 +47,10 @@ export class RefreshTableComponent implements OnInit {
       }, this.emitRefreshAfterTimeoutInMs);
     }
 
-    if (this.emitRefreshOnPreviousRoutes.length && this.refreshService.previousUrls
-      .some(url => this.emitRefreshOnPreviousRoutes.includes(url))) {
+    if (
+      this.emitRefreshOnPreviousRoutes.length &&
+      this.refreshService.previousUrls.some((url) => this.emitRefreshOnPreviousRoutes.includes(url))
+    ) {
       setTimeout(() => {
         this.emitRefresh();
       }, 1000);

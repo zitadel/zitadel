@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -30,6 +29,9 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { LinksModule } from 'src/app/modules/links/links.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { NameDialogModule } from 'src/app/modules/name-dialog/name-dialog.module';
+import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
+import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { OriginPipeModule } from 'src/app/pipes/origin-pipe/origin-pipe.module';
 import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
 
@@ -60,21 +62,22 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     InfoRowModule,
     TranslateModule,
     OriginPipeModule,
-    MatMenuModule,
     ReactiveFormsModule,
     HasRoleModule,
-    MatMenuModule,
+    SidenavModule,
     MatChipsModule,
     ClientKeysModule,
+    HasRolePipeModule,
     MatIconModule,
     MatSelectModule,
-    MatButtonToggleModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
     MatDialogModule,
     MatCheckboxModule,
     CardModule,
+    TopViewModule,
+    MatMenuModule,
     MatTooltipModule,
     TranslateModule,
     MatStepperModule,
@@ -89,4 +92,4 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
   ],
   exports: [TranslateModule],
 })
-export class AppsModule { }
+export class AppsModule {}

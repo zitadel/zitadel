@@ -1,5 +1,4 @@
 .desc {
-  color: var(--grey);
   font-size: 14px;
 }
 
@@ -43,19 +42,18 @@
 
 .idp-content {
   display: flex;
-  margin: 0 -.5rem;
+  margin: 0 -0.5rem;
   flex-wrap: wrap;
 
   .desc {
     flex-basis: 100%;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
     margin-bottom: 1rem;
-    color: var(--grey);
   }
 
   .formfield {
     flex: 1;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
 
     @media only screen and (max-width: 450px) {
       flex-basis: 100%;
@@ -63,17 +61,16 @@
   }
 }
 
-.actions {
+.idp-create-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+
   button[mat-stroked-button] {
-    float: left;
-    margin-top: 1rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 
   button[mat-raised-button] {
-    float: right;
-    margin-top: 1rem;
-    border-radius: .5rem;
-    min-width: 100px;
+    border-radius: 0.5rem;
   }
 }

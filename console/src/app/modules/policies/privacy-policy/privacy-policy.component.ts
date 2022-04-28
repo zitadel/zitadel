@@ -2,8 +2,8 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 import {
   GetPrivacyPolicyResponse as AdminGetPrivacyPolicyResponse,
   UpdatePrivacyPolicyRequest,
@@ -13,9 +13,13 @@ import {
   GetPrivacyPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -41,21 +45,41 @@ export class PrivacyPolicyComponent implements OnDestroy {
   public form!: FormGroup;
   public currentPolicy: GridPolicy = PRIVACY_POLICY;
   public InfoSectionType: any = InfoSectionType;
+  public orgName: string = '';
+
+  public canWrite$: Observable<boolean> = this.authService.isAllowed([
+    this.serviceType === PolicyComponentServiceType.ADMIN
+      ? 'iam.policy.write'
+      : this.serviceType === PolicyComponentServiceType.MGMT
+      ? 'policy.write'
+      : '',
+  ]);
 
   public LANGPLACEHOLDER: string = '{{.Lang}}';
   public copied: string = '';
 
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
     private fb: FormBuilder,
+    private storageService: StorageService,
+    breadcrumbService: BreadcrumbService,
   ) {
     this.form = this.fb.group({
       tosLink: ['', []],
       privacyLink: ['', []],
       helpLink: ['', []],
+    });
+
+    this.canWrite$.pipe(take(1)).subscribe((canWrite) => {
+      if (canWrite) {
+        this.form.enable();
+      } else {
+        this.form.disable();
+      }
     });
 
     this.route.data
@@ -66,10 +90,32 @@ export class PrivacyPolicyComponent implements OnDestroy {
             case PolicyComponentServiceType.MGMT:
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
               this.loadData();
+              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+              if (org && org.id) {
+                this.orgName = org.name;
+              }
+
+              const iambread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/system'],
+              });
+              const bread: Breadcrumb = {
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              };
+              breadcrumbService.setBreadcrumb([iambread, bread]);
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
               this.loadData();
+
+              const iamBread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/system'],
+              });
+              breadcrumbService.setBreadcrumb([iamBread]);
               break;
           }
 

@@ -1,13 +1,14 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { UserTarget } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, Project, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -21,76 +22,87 @@ export class UserGrantCreateComponent implements OnDestroy {
   public context!: UserGrantContext;
 
   public org!: Org.AsObject;
-  public userId: string = '';
+  public userIds: string[] = [];
 
-  public projectId: string = '';
-  public project!: GrantedProject.AsObject | Project.AsObject;
+  public project!: Project.AsObject;
+  public grantedProject!: GrantedProject.AsObject;
 
-  public grantId: string = '';
   public rolesList: string[] = [];
 
   public STEPS: number = 2; // project, roles
   public currentCreateStep: number = 1;
 
-  public filterValue: string = '';
-
-  private subscription: Subscription = new Subscription();
-
   public UserGrantContext: any = UserGrantContext;
-
-  public grantedRoleKeysList: string[] = [];
 
   public user!: User.AsObject;
   public UserTarget: any = UserTarget;
+
+  public editState: boolean = false;
+  private destroy$: Subject<void> = new Subject();
 
   constructor(
     private userService: ManagementService,
     private toast: ToastService,
     private _location: Location,
     private route: ActivatedRoute,
-    private authService: GrpcAuthService,
     private mgmtService: ManagementService,
     private storage: StorageService,
+    breadcrumbService: BreadcrumbService,
   ) {
-    this.subscription = this.route.params.subscribe((params: Params) => {
+    breadcrumbService.setBreadcrumb([
+      new Breadcrumb({
+        type: BreadcrumbType.IAM,
+        name: 'IAM',
+        routerLink: ['/system'],
+      }),
+      new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+    ]);
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
       const { projectid, grantid, userid } = params;
       this.context = UserGrantContext.NONE;
 
-      this.projectId = projectid;
-      this.grantId = grantid;
-      this.userId = userid;
+      this.userIds = userid ? [userid] : [];
 
-      if (this.projectId && !this.grantId) {
+      if (projectid && !grantid) {
         this.context = UserGrantContext.OWNED_PROJECT;
 
-        this.mgmtService.getProjectByID(this.projectId).then(resp => {
-          if (resp.project) {
-            this.project = resp.project;
-          }
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
-      } else if (this.projectId && this.grantId) {
+        this.mgmtService
+          .getProjectByID(projectid)
+          .then((resp) => {
+            if (resp.project) {
+              this.project = resp.project;
+            }
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+          });
+      } else if (projectid && grantid) {
         this.context = UserGrantContext.GRANTED_PROJECT;
-        this.mgmtService.getGrantedProjectByID(this.projectId, this.grantId).then(resp => {
-          if (resp.grantedProject) {
-            this.project = resp.grantedProject;
-          }
-          if (resp.grantedProject?.grantedRoleKeysList) {
-            this.grantedRoleKeysList = resp.grantedProject?.grantedRoleKeysList;
-          }
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
-      } else if (this.userId) {
+        this.mgmtService
+          .getGrantedProjectByID(projectid, grantid)
+          .then((resp) => {
+            if (resp.grantedProject) {
+              this.grantedProject = resp.grantedProject;
+            }
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+          });
+      } else if (this.userIds && this.userIds.length === 1) {
         this.context = UserGrantContext.USER;
-        this.mgmtService.getUserByID(this.userId).then(resp => {
-          if (resp.user) {
-            this.user = resp.user;
-          }
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
+        this.mgmtService
+          .getUserByID(this.userIds[0])
+          .then((resp) => {
+            if (resp.user) {
+              this.user = resp.user;
+            }
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+          });
       }
     });
 
@@ -107,86 +119,95 @@ export class UserGrantCreateComponent implements OnDestroy {
   public addGrant(): void {
     switch (this.context) {
       case UserGrantContext.OWNED_PROJECT:
-        this.userService.addUserGrant(
-          this.userId,
-          this.rolesList,
-          this.projectId,
-        ).then(() => {
-          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTADDED', true);
-          this.close();
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
+        const prom = this.userIds.map((id) => this.userService.addUserGrant(id, this.rolesList, this.project.id));
+        Promise.all(prom)
+          .then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTADDED', true);
+            this.close();
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+            this.close();
+          });
         break;
       case UserGrantContext.GRANTED_PROJECT:
-        this.userService.addUserGrant(
-          this.userId,
-          this.rolesList,
-          this.projectId,
-          this.grantId,
-        ).then(() => {
-          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
-          this.close();
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
+        const promp = this.userIds.map((id) =>
+          this.userService.addUserGrant(id, this.rolesList, this.grantedProject.projectId, this.grantedProject.grantId),
+        );
+        Promise.all(promp)
+          .then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+            this.close();
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+            this.close();
+          });
         break;
       case UserGrantContext.USER:
-        let grantId;
+        let grantId: string = '';
 
-        if ((this.project as GrantedProject.AsObject)?.grantId) {
-          grantId = (this.project as GrantedProject.AsObject).grantId;
+        if (this.grantedProject?.grantId) {
+          grantId = this.grantedProject.grantId;
         }
 
-        this.userService.addUserGrant(
-          this.userId,
-          this.rolesList,
-          this.projectId,
-          grantId,
-        ).then(() => {
-          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
-          this.close();
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
+        const promu = this.userIds.map((id) =>
+          this.userService.addUserGrant(id, this.rolesList, (this.project as Project.AsObject).id, grantId),
+        );
+        Promise.all(promu)
+          .then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+            this.close();
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+            this.close();
+          });
         break;
       case UserGrantContext.NONE:
-        let tempGrantId;
+        let tempGrantId: string = '';
 
-        if ((this.project as GrantedProject.AsObject)?.grantId) {
-          tempGrantId = (this.project as GrantedProject.AsObject).grantId;
+        if (this.grantedProject?.grantId) {
+          tempGrantId = this.grantedProject.grantId;
         }
 
-        this.userService.addUserGrant(
-          this.userId,
-          this.rolesList,
-          this.projectId,
-          tempGrantId,
-        ).then(() => {
-          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
-          this.close();
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
+        const promn = this.userIds.map((id) =>
+          this.userService.addUserGrant(
+            id,
+            this.rolesList,
+            this.project ? this.project.id : this.grantedProject ? this.grantedProject.projectId : '',
+            tempGrantId,
+          ),
+        );
+        Promise.all(promn)
+          .then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+            this.close();
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+            this.close();
+          });
         break;
     }
   }
 
-  public selectProject(project: Project.AsObject | GrantedProject.AsObject | any): void {
-    this.project = project;
-    this.projectId = project.id || project.projectId;
-
-    this.grantedRoleKeysList = project.grantedRoleKeysList ?? [];
+  public selectProject(project: Project.AsObject | GrantedProject.AsObject, type: ProjectType): void {
+    if (type === ProjectType.PROJECTTYPE_OWNED) {
+      this.project = project as Project.AsObject;
+    } else if (type === ProjectType.PROJECTTYPE_GRANTED) {
+      this.grantedProject = project as GrantedProject.AsObject;
+    }
   }
 
-  public selectUser(user: User.AsObject | User.AsObject[]): void {
-    if (typeof user === 'object') {
-      this.userId = (user as User.AsObject).id;
+  public selectUsers(user: User.AsObject[]): void {
+    if (user && user.length) {
+      this.userIds = (user as User.AsObject[]).map((u) => u.id);
     }
   }
 
   public selectRoles(roles: Role.AsObject[]): void {
-    this.rolesList = roles.map(role => role.key);
+    this.rolesList = roles.map((role) => role.key);
   }
 
   public next(): void {
@@ -198,6 +219,7 @@ export class UserGrantCreateComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

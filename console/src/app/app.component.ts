@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, HostBinding, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -15,7 +15,12 @@ import { Org } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
+import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from './services/mgmt.service';
+import { NavigationService } from './services/navigation.service';
+import { OverlayWorkflowService } from './services/overlay/overlay-workflow.service';
+import { IntroWorkflowOverlays } from './services/overlay/workflows';
+import { StorageLocation, StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
@@ -25,7 +30,7 @@ import { UpdateService } from './services/update.service';
   styleUrls: ['./app.component.scss'],
   animations: [toolbarAnimation, ...navAnimations, accountCard, routeAnimations, adminLineAnimation],
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('drawer') public drawer!: MatDrawer;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
@@ -34,10 +39,13 @@ export class AppComponent implements OnDestroy {
   );
   @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
-  public showAccount: boolean = false;
-  public showOrgContext: boolean = false;
+  public yoffset: number = 0;
+  @HostListener('window:scroll', ['$event']) onScroll(event: Event): void {
+    this.yoffset = this.viewPortScroller.getScrollPosition()[1];
+  }
   public org!: Org.AsObject;
-  // public user!: User.AsObject;
+  public orgs$: Observable<Org.AsObject[]> = of([]);
+  public showAccount: boolean = false;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public showProjectSection: boolean = false;
@@ -45,12 +53,11 @@ export class AppComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public labelpolicy!: LabelPolicy.AsObject;
 
-  public hideAdminWarn: boolean = true;
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
   constructor(
-    public viewPortScroller: ViewportScroller,
     @Inject('windowObject') public window: Window,
+    public viewPortScroller: ViewportScroller,
     public translate: TranslateService,
     public authenticationService: AuthenticationService,
     public authService: GrpcAuthService,
@@ -62,7 +69,11 @@ export class AppComponent implements OnDestroy {
     public domSanitizer: DomSanitizer,
     private router: Router,
     update: UpdateService,
+    keyboardShortcuts: KeyboardShortcutsService,
     private activatedRoute: ActivatedRoute,
+    private workflowService: OverlayWorkflowService,
+    private storageService: StorageService,
+    private navigationService: NavigationService,
     @Inject(DOCUMENT) private document: Document,
   ) {
     console.log(
@@ -172,13 +183,16 @@ export class AppComponent implements OnDestroy {
     this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
       const { org } = route;
       if (org) {
-        this.authService.getActiveOrg(org).then((queriedOrg) => {
-          this.org = queriedOrg;
-        });
+        this.authService
+          .getActiveOrg(org)
+          .then((queriedOrg) => {
+            this.org = queriedOrg;
+          })
+          .catch((error) => {
+            this.router.navigate(['/users/me']);
+          });
       }
     });
-
-    this.loadPrivateLabelling();
 
     this.getProjectCount();
 
@@ -189,17 +203,18 @@ export class AppComponent implements OnDestroy {
 
     this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
       if (authenticated) {
-        this.authService.getActiveOrg().then((org) => {
-          this.org = org;
-        });
+        this.authService
+          .getActiveOrg()
+          .then((org) => {
+            this.org = org;
+
+            this.startIntroWorkflow();
+          })
+          .catch((error) => {
+            this.router.navigate(['/users/me']);
+          });
       }
     });
-
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      this.overlayContainer.getContainerElement().classList.add(theme);
-      this.componentCssClass = theme;
-    }
 
     this.isDarkTheme = this.themeService.isDarkTheme;
     this.isDarkTheme.subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
@@ -208,10 +223,22 @@ export class AppComponent implements OnDestroy {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
+  }
 
-    this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
+  private startIntroWorkflow(): void {
+    setTimeout(() => {
+      const cb = () => {
+        this.storageService.setItem('intro-dismissed', true, StorageLocation.local);
+      };
+      const dismissed = this.storageService.getItem('intro-dismissed', StorageLocation.local);
+      if (!dismissed) {
+        this.workflowService.startWorkflow(IntroWorkflowOverlays, cb);
+      }
+    }, 1000);
+  }
 
-    this.loadPolicies();
+  public ngOnInit(): void {
+    this.loadPrivateLabelling();
   }
 
   public ngOnDestroy(): void {
@@ -219,20 +246,15 @@ export class AppComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  public toggleAdminHide(): void {
-    this.hideAdminWarn = !this.hideAdminWarn;
-    localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
-  }
-
   public loadPrivateLabelling(): void {
     const setDefaultColors = () => {
-      const darkPrimary = '#5282c1';
-      const lightPrimary = '#5282c1';
+      const darkPrimary = '#bbbafa';
+      const lightPrimary = '#5469d4';
 
-      const darkWarn = '#cd3d56';
+      const darkWarn = '#ff3b5b';
       const lightWarn = '#cd3d56';
 
-      const darkBackground = '#212224';
+      const darkBackground = '#111827';
       const lightBackground = '#fafafa';
 
       const darkText = '#ffffff';
@@ -260,10 +282,10 @@ export class AppComponent implements OnDestroy {
         const isDark = (color: string) => this.themeService.isDark(color);
         const isLight = (color: string) => this.themeService.isLight(color);
 
-        const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
-        const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
+        const darkPrimary = this.labelpolicy?.primaryColorDark || '#bbbafa';
+        const lightPrimary = this.labelpolicy?.primaryColor || '#5469d4';
 
-        const darkWarn = this.labelpolicy?.warnColorDark || '#cd3d56';
+        const darkWarn = this.labelpolicy?.warnColorDark || '#ff3b5b';
         const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
 
         let darkBackground = this.labelpolicy?.backgroundColorDark;
@@ -282,9 +304,9 @@ export class AppComponent implements OnDestroy {
           console.info(
             `Background (${darkBackground}) is not dark enough for a dark theme. Falling back to zitadel background`,
           );
-          darkBackground = '#212224';
+          darkBackground = '#111827';
         }
-        this.themeService.saveBackgroundColor(darkBackground || '#212224', true);
+        this.themeService.saveBackgroundColor(darkBackground || '#111827', true);
 
         if (lightBackground && !isLight(lightBackground)) {
           console.info(
@@ -313,28 +335,21 @@ export class AppComponent implements OnDestroy {
     });
   }
 
-  public loadPolicies(): void {
-    this.mgmtService.getPrivacyPolicy().then((privacypolicy) => {
-      if (privacypolicy.policy) {
-        this.privacyPolicy = privacypolicy.policy;
-      }
-    });
-  }
-
   public prepareRoute(outlet: RouterOutlet): boolean {
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
-  }
-
-  public closeAccountCard(): void {
-    if (this.showAccount) {
-      this.showAccount = false;
-    }
   }
 
   public onSetTheme(theme: string): void {
     localStorage.setItem('theme', theme);
     this.overlayContainer.getContainerElement().classList.add(theme);
     this.componentCssClass = theme;
+  }
+
+  public changedOrg(org: Org.AsObject): void {
+    this.loadPrivateLabelling();
+    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+      this.router.navigate(['/']);
+    });
   }
 
   private setLanguage(): void {
@@ -354,16 +369,6 @@ export class AppComponent implements OnDestroy {
         this.language = lang;
         this.document.documentElement.lang = lang;
       }
-    });
-  }
-
-  public setActiveOrg(org: Org.AsObject): void {
-    console.log(this.org);
-    this.org = org;
-    this.authService.setActiveOrg(org);
-    this.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/']);
     });
   }
 

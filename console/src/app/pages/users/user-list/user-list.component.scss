@@ -1,9 +1,19 @@
-h1 {
-  margin: 0;
+.users-title-row {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+  }
+
+  a i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
 }
 
-.sub {
-  color: var(--grey);
+.user-list-sub {
   margin-bottom: 2rem;
   font-size: 14px;
 }

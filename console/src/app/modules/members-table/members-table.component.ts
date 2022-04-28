@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { MatSelectChange } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -10,11 +10,18 @@ import {
   ProjectGrantMembersDataSource,
 } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { getMembershipColor } from 'src/app/utils/color';
 
+import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
-type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | ProjectGrantMembersDataSource | IamMembersDataSource;
+type MemberDatasource =
+  | OrgMembersDataSource
+  | ProjectMembersDataSource
+  | ProjectGrantMembersDataSource
+  | IamMembersDataSource;
 
 @Component({
   selector: 'cnsl-members-table',
@@ -32,17 +39,15 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   @Input() public memberRoleOptions: string[] = [];
   @Input() public factoryLoadFunc!: Function;
   @Input() public refreshTrigger!: Observable<void>;
-  @Output() public updateRoles: EventEmitter<{ member: Member.AsObject, change: MatSelectChange; }> = new EventEmitter();
+  @Output() public updateRoles: EventEmitter<{ member: Member.AsObject; change: string[] }> = new EventEmitter();
   @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
   @Output() public deleteMember: EventEmitter<Member.AsObject> = new EventEmitter();
 
   private destroyed: Subject<void> = new Subject();
+  public displayedColumns: string[] = ['select', 'userId', 'displayName', 'loginname', 'email', 'roles'];
 
-  /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'loginname', 'email', 'roles'];
-
-  constructor() {
-    this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe(_ => {
+  constructor(private dialog: MatDialog) {
+    this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
       this.changedSelection.emit(this.selection.selected);
     });
   }
@@ -52,13 +57,59 @@ export class MembersTableComponent implements OnInit, OnDestroy {
       this.changePage(this.paginator);
     });
 
-    if (this.canDelete) {
+    if (this.canDelete || this.canWrite) {
       this.displayedColumns.push('actions');
     }
   }
 
   public ngOnDestroy(): void {
     this.destroyed.next();
+  }
+
+  public getColor(role: string) {
+    return getMembershipColor(role)[500];
+  }
+
+  public removeRole(member: Member.AsObject, role: string) {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'GRANTS.DIALOG.DELETE_TITLE',
+        descriptionKey: 'GRANTS.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        const newRoles = Object.assign([], member.rolesList);
+        const index = newRoles.findIndex((r) => r === role);
+        if (index > -1) {
+          newRoles.splice(index);
+          member.rolesList = newRoles;
+          this.updateRoles.emit({ member: member, change: newRoles });
+        }
+      }
+    });
+  }
+
+  public addRole(member: Member.AsObject) {
+    const dialogRef = this.dialog.open(AddMemberRolesDialogComponent, {
+      data: {
+        user: member.displayName,
+        allRoles: this.memberRoleOptions,
+        selectedRoles: member.rolesList,
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp && resp.length) {
+        member.rolesList = resp;
+        this.updateRoles.emit({ member: member, change: resp });
+      }
+    });
   }
 
   public isAllSelected(): boolean {
@@ -68,9 +119,9 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   }
 
   public masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.membersSubject.value.forEach(row => this.selection.select(row));
+    this.isAllSelected()
+      ? this.selection.clear()
+      : this.dataSource.membersSubject.value.forEach((row) => this.selection.select(row));
   }
 
   public changePage(event?: PageEvent): any {
@@ -79,6 +130,20 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   }
 
   public triggerDeleteMember(member: any): void {
-    this.deleteMember.emit(member);
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'MEMBER.DIALOG.DELETE_TITLE',
+        descriptionKey: 'MEMBER.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.deleteMember.emit(member);
+      }
+    });
   }
 }

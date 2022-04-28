@@ -35,7 +35,7 @@ export class AuthFactorDialogComponent {
     private translate: TranslateService,
     public dialogRef: MatDialogRef<AuthFactorDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ) { }
+  ) {}
 
   closeDialog(code: string = ''): void {
     this.dialogRef.close(code);
@@ -45,31 +45,37 @@ export class AuthFactorDialogComponent {
     this.selectedType = type;
 
     if (type === AuthFactorType.OTP) {
-      this.authService.addMyMultiFactorOTP().then((otpresp) => {
-        this.otpurl = otpresp.url;
-      }, error => {
-        this.toast.showError(error);
-      });
+      this.authService.addMyMultiFactorOTP().then(
+        (otpresp) => {
+          this.otpurl = otpresp.url;
+        },
+        (error) => {
+          this.toast.showError(error);
+        },
+      );
     } else if (type === AuthFactorType.U2F) {
-      this.authService.addMyMultiFactorU2F().then((u2fresp) => {
-        if (u2fresp.key) {
-          const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
+      this.authService.addMyMultiFactorU2F().then(
+        (u2fresp) => {
+          if (u2fresp.key) {
+            const credOptions: CredentialCreationOptions = JSON.parse(atob(u2fresp.key?.publicKey as string));
 
-          if (credOptions.publicKey?.challenge) {
-            credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
-            credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
-            if (credOptions.publicKey.excludeCredentials) {
-              credOptions.publicKey.excludeCredentials.map(cred => {
-                cred.id = _base64ToArrayBuffer(cred.id as any);
-                return cred;
-              });
+            if (credOptions.publicKey?.challenge) {
+              credOptions.publicKey.challenge = _base64ToArrayBuffer(credOptions.publicKey.challenge as any);
+              credOptions.publicKey.user.id = _base64ToArrayBuffer(credOptions.publicKey.user.id as any);
+              if (credOptions.publicKey.excludeCredentials) {
+                credOptions.publicKey.excludeCredentials.map((cred) => {
+                  cred.id = _base64ToArrayBuffer(cred.id as any);
+                  return cred;
+                });
+              }
+              this.u2fCredentialOptions = credOptions;
             }
-            this.u2fCredentialOptions = credOptions;
           }
-        }
-      }, error => {
-        this.toast.showError(error);
-      });
+        },
+        (error) => {
+          this.toast.showError(error);
+        },
+      );
     }
   }
 
@@ -82,60 +88,77 @@ export class AuthFactorDialogComponent {
   }
 
   public submitOTP(): void {
-    this.authService.verifyMyMultiFactorOTP(this.otpcode).then(() => {
-      this.dialogRef.close(true);
-    }, error => {
-      this.dialogRef.close(false);
-    });
+    this.authService.verifyMyMultiFactorOTP(this.otpcode).then(
+      () => {
+        this.dialogRef.close(true);
+      },
+      (error) => {
+        this.toast.showError(error);
+        this.dialogRef.close(false);
+      },
+    );
   }
 
   public submitU2F(): void {
     if (this.u2fname && this.u2fCredentialOptions.publicKey) {
       // this.data.credOptions.publicKey.rp.id = 'localhost';
-      navigator.credentials.create(this.u2fCredentialOptions).then((resp) => {
-        if (resp &&
-          (resp as any).response.attestationObject &&
-          (resp as any).response.clientDataJSON &&
-          (resp as any).rawId) {
+      navigator.credentials
+        .create(this.u2fCredentialOptions)
+        .then((resp) => {
+          if (
+            resp &&
+            (resp as any).response.attestationObject &&
+            (resp as any).response.clientDataJSON &&
+            (resp as any).rawId
+          ) {
+            const attestationObject = (resp as any).response.attestationObject;
+            const clientDataJSON = (resp as any).response.clientDataJSON;
+            const rawId = (resp as any).rawId;
 
-          const attestationObject = (resp as any).response.attestationObject;
-          const clientDataJSON = (resp as any).response.clientDataJSON;
-          const rawId = (resp as any).rawId;
-
-          const data = JSON.stringify({
-            id: resp.id,
-            rawId: _arrayBufferToBase64(rawId),
-            type: resp.type,
-            response: {
-              attestationObject: _arrayBufferToBase64(attestationObject),
-              clientDataJSON: _arrayBufferToBase64(clientDataJSON),
-            },
-          });
-
-          const base64 = btoa(data);
-
-          this.authService.verifyMyMultiFactorU2F(base64, this.u2fname).then(() => {
-            this.translate.get('USER.MFA.U2F_SUCCESS').pipe(take(1)).subscribe(msg => {
-              this.toast.showInfo(msg);
+            const data = JSON.stringify({
+              id: resp.id,
+              rawId: _arrayBufferToBase64(rawId),
+              type: resp.type,
+              response: {
+                attestationObject: _arrayBufferToBase64(attestationObject),
+                clientDataJSON: _arrayBufferToBase64(clientDataJSON),
+              },
             });
+
+            const base64 = btoa(data);
+
+            this.authService
+              .verifyMyMultiFactorU2F(base64, this.u2fname)
+              .then(() => {
+                this.translate
+                  .get('USER.MFA.U2F_SUCCESS')
+                  .pipe(take(1))
+                  .subscribe((msg) => {
+                    this.toast.showInfo(msg);
+                  });
+                this.dialogRef.close(true);
+                this.u2fLoading = false;
+              })
+              .catch((error) => {
+                this.u2fLoading = false;
+                this.toast.showError(error);
+              });
+          } else {
+            this.u2fLoading = false;
+            this.translate
+              .get('USER.MFA.U2F_ERROR')
+              .pipe(take(1))
+              .subscribe((msg) => {
+                this.toast.showInfo(msg);
+              });
             this.dialogRef.close(true);
-            this.u2fLoading = false;
-          }).catch(error => {
-            this.u2fLoading = false;
-            this.toast.showError(error);
-          });
-        } else {
+          }
+        })
+        .catch((error) => {
           this.u2fLoading = false;
-          this.translate.get('USER.MFA.U2F_ERROR').pipe(take(1)).subscribe(msg => {
-            this.toast.showInfo(msg);
-          });
-          this.dialogRef.close(true);
-        }
-      }).catch(error => {
-        this.u2fLoading = false;
-        this.u2fError = error;
-        this.toast.showInfo(error.message);
-      });
+          this.u2fError = error;
+          this.toast.showInfo(error.message);
+        });
     }
   }
 }

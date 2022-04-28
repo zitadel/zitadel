@@ -1,21 +1,19 @@
 @use '@angular/material' as mat;
 
 @mixin app-card-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
   $accent: map-get($theme, accent);
   $is-dark-theme: map-get($theme, is-dark);
   $accent-color: mat.get-color-from-palette($primary, 500);
   $back: map-get($background, background);
 
-  /* stylelint-enable */
-
   .cnsl-app-card {
     padding: 1rem;
     box-sizing: border-box;
     cursor: pointer;
-    animation: all .2s;
+    animation: all 0.2s;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -23,35 +21,39 @@
     font-size: 2rem;
     height: 80px;
     width: 80px;
-    margin: 1rem;
     text-transform: uppercase;
-    border-radius: .5rem;
-    font-weight: 800;
+    border-radius: 0.5rem;
+    font-weight: 600;
     background-color: $back;
-    transition: background-color box-shadow .3s ease-in;
+    transition: background-color box-shadow 0.3s ease-in;
+    color: mat.get-color-from-palette($primary, default-contrast);
+
+    &.add {
+      background-color: map-get($primary, 500);
+    }
 
     &.web {
-      background-color: rgb(80, 110, 110);
-      color: white;
+      background: linear-gradient(40deg, #059669 30%, #047857);
       border: none;
+      color: #fff;
     }
 
     &.native {
-      background-color: #595d80;
-      color: white;
+      background: linear-gradient(40deg, #306ccc 30%, #4f46e5);
       border: none;
+      color: #fff;
     }
 
     &.useragent {
-      background-color: #6a506e;
-      color: white;
+      background: linear-gradient(40deg, #dc2626 30%, #db2777);
       border: none;
+      color: #fff;
     }
 
     &.api {
-      background-color: #333;
-      color: white;
+      background: linear-gradient(40deg, #1f2937, #111827);
       border: none;
+      color: #fff;
     }
   }
 }

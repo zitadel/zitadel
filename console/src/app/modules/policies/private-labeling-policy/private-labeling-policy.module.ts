@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -24,11 +25,7 @@ import { PrivateLabelingPolicyRoutingModule } from './private-labeling-policy-ro
 import { PrivateLabelingPolicyComponent } from './private-labeling-policy.component';
 
 @NgModule({
-  declarations: [
-    PrivateLabelingPolicyComponent,
-    PreviewComponent,
-    ColorComponent,
-  ],
+  declarations: [PrivateLabelingPolicyComponent, PreviewComponent, ColorComponent],
   imports: [
     ColorChromeModule,
     PrivateLabelingPolicyRoutingModule,
@@ -36,10 +33,11 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     FormsModule,
     InputModule,
     MatButtonModule,
-    MatSlideToggleModule,
+    MatButtonToggleModule,
     OverlayModule,
     MatIconModule,
     HasRoleModule,
+    MatSlideToggleModule,
     MatTooltipModule,
     TranslateModule,
     DetailLayoutModule,
@@ -51,4 +49,4 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     HasFeaturePipeModule,
   ],
 })
-export class PrivateLabelingPolicyModule { }
+export class PrivateLabelingPolicyModule {}

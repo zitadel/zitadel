@@ -1,43 +1,15 @@
-.head {
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  padding-bottom: 2rem;
+@use '@angular/material' as mat;
 
-  a {
-    display: block;
-    margin-right: 2rem;
-  }
+@mixin user-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, default);
 
-  .head-row {
-    display: flex;
-    flex-direction: column;
-
-    h1 {
-      margin: 0;
-      margin-right: 1rem;
-    }
-
-    p {
-      margin: 0.5rem 0;
-      font-size: 14px;
-      color: var(--grey);
-    }
-  }
-
-  .fill-space {
-    flex: 1;
-  }
-
-  .actions-trigger {
-    margin-top: 0.25rem;
-    display: flex;
-    align-items: center;
-
-    .icon {
-      margin-left: 0.5rem;
-      margin-right: -0.5rem;
-    }
+  .no-user-error {
+    color: $warn-color;
+    font-size: 14px;
   }
 }
 

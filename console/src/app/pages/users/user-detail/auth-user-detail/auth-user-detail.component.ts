@@ -1,12 +1,16 @@
+import { MediaMatcher } from '@angular/cdk/layout';
+import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -33,19 +37,54 @@ export class AuthUserDetailComponent implements OnDestroy {
   public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
+  public settingsList: SidenavSetting[] = [
+    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
+    { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false },
+    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false },
+    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false },
+    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
+    { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false },
+    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
+  ];
+  public currentSetting: string | undefined = this.settingsList[0].id;
+
   constructor(
     public translate: TranslateService,
     private toast: ToastService,
     public userService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
+    private breadcrumbService: BreadcrumbService,
+    private mediaMatcher: MediaMatcher,
+    private _location: Location,
   ) {
+    const mediaq: string = '(max-width: 500px)';
+    const small = this.mediaMatcher.matchMedia(mediaq).matches;
+    if (small) {
+      this.changeSelection(small);
+    }
+    this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
+      this.changeSelection(small.matches);
+    };
+
     this.loading = true;
     this.refreshUser();
 
     this.userService.getSupportedLanguages().then((lang) => {
       this.languages = lang.languagesList;
     });
+  }
+
+  private changeSelection(small: boolean): void {
+    if (small) {
+      this.currentSetting = undefined;
+    } else {
+      this.currentSetting = this.currentSetting === undefined ? this.settingsList[0].id : this.currentSetting;
+    }
+  }
+
+  public navigateBack(): void {
+    this._location.back();
   }
 
   refreshUser(): void {
@@ -55,6 +94,14 @@ export class AuthUserDetailComponent implements OnDestroy {
       .then((resp) => {
         if (resp.user) {
           this.user = resp.user;
+
+          this.breadcrumbService.setBreadcrumb([
+            new Breadcrumb({
+              type: BreadcrumbType.AUTHUSER,
+              name: this.user.human?.profile?.displayName,
+              routerLink: ['/users', 'me'],
+            }),
+          ]);
         }
         this.loading = false;
       })
@@ -218,7 +265,7 @@ export class AuthUserDetailComponent implements OnDestroy {
           data: {
             confirmKey: 'ACTIONS.SAVE',
             cancelKey: 'ACTIONS.CANCEL',
-            labelKey: 'ACTIONS.NEWVALUE',
+            labelKey: 'USER.LOGINMETHODS.PHONE.EDITVALUE',
             titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user.human?.phone?.phone,

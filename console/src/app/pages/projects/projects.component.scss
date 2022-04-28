@@ -1,0 +1,66 @@
+.project-title-row {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+  }
+
+  a i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
+}
+
+.sub {
+  margin-bottom: 2rem;
+  font-size: 14px;
+}
+
+@mixin projects-theme($theme) {
+  $foreground: map-get($theme, foreground);
+
+  .projects-controls {
+    display: flex;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid map-get($foreground, dividers);
+
+    .project-type-actions {
+      display: flex;
+      align-items: center;
+
+      .type-button {
+        border: none;
+        background: none;
+        text-align: left;
+        padding: 0.75rem 0;
+        opacity: 0.6;
+        font-size: 15px;
+        cursor: pointer;
+        color: map-get($foreground, base);
+
+        &:first-child {
+          margin-right: 1rem;
+        }
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.active {
+          font-weight: 600;
+          opacity: 1;
+        }
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .grid-btn {
+      margin-right: 0.5rem;
+    }
+  }
+}

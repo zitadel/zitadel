@@ -1,25 +1,26 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { CodeDialogComponent } from './code-dialog.component';
+import { NameDialogComponent } from './name-dialog.component';
 
-describe('CodeDialogComponent', () => {
-    let component: CodeDialogComponent;
-    let fixture: ComponentFixture<CodeDialogComponent>;
+describe('NameDialogComponent', () => {
+  let component: NameDialogComponent;
+  let fixture: ComponentFixture<NameDialogComponent>;
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [CodeDialogComponent],
-        })
-            .compileComponents();
-    }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [NameDialogComponent],
+      }).compileComponents();
+    }),
+  );
 
-    beforeEach(() => {
-        fixture = TestBed.createComponent(CodeDialogComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-    });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(NameDialogComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
-    });
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 });

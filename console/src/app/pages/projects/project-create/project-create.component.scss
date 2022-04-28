@@ -2,33 +2,29 @@ h1 {
   font-weight: 500;
 }
 
-.container {
-  padding: 4rem 4rem 2rem 4rem;
+.abort-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
 
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
   }
 
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
   }
 }
 
+.project-create-content {
+  padding-left: 4.5rem;
+}
+
 .margin-right {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .column {
@@ -36,7 +32,8 @@ h1 {
   flex-direction: column;
 
   .formfield {
-    width: 400px;
+    max-width: 400px;
+    display: block;
 
     &.autocomplete {
       margin-top: 1rem;
@@ -46,7 +43,7 @@ h1 {
   .slider {
     margin-top: 2rem;
     margin-bottom: 1rem;
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
 
   .access-token {
@@ -57,6 +54,6 @@ h1 {
 .continue-button {
   margin-top: 3rem;
   display: block;
-  padding: .5rem 4rem;
-  border-radius: .5rem;
+  padding: 0.5rem 4rem;
+  border-radius: 0.5rem;
 }

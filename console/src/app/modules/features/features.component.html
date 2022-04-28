@@ -1,12 +1,17 @@
-<cnsl-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/iam/policies' : '/org']"
-  [title]="('FEATURES.TITLE' | translate)" [description]="'FEATURES.DESCRIPTION' | translate">
-
+<cnsl-detail-layout [hasBackButton]="true" [title]="('FEATURES.TITLE' | translate)">
+  <p class="subinfo" sub>
+    <span class="cnsl-secondary-text">{{'FEATURES.DESCRIPTION' | translate}}</span>
+    <a mat-icon-button href="https://docs.zitadel.ch/docs/legal/introduction" target="_blank">
+      <i class="las la-info-circle"></i>
+    </a>
+  </p>
   <h2>{{'FEATURES.TIER.TITLE' | translate}}</h2>
-  <p *ngIf="serviceType === FeatureServiceType.MGMT" class="tier-desc">{{'FEATURES.TIER.DESCRIPTION' | translate}}
+  <p *ngIf="serviceType === FeatureServiceType.MGMT" class="tier-desc cnsl-secondary-text">{{'FEATURES.TIER.DESCRIPTION'
+    | translate}}
     {{'FEATURES.TIER.QUESTIONS' | translate}} <a href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>
 
   <div class="detail">
-    <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
+    <p class="title cnsl-secondary-text">{{'FEATURES.TIER.NAME' | translate}}</p>
     <p class="center">{{features?.tier?.name}}
       <a class="ext" href="https://zitadel.ch/pricing" target="_blank">
         <i class="las la-external-link-alt"></i>
@@ -17,7 +22,7 @@
   <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
     <mat-spinner class="spinner" diameter="20" *ngIf="customerLoading || stripeLoading"></mat-spinner>
     <div class="detail" *ngIf="stripeCustomer || stripeCustomer === null">
-      <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}
+      <p class="title cnsl-secondary-text">{{'FEATURES.TIER.DETAILS' | translate}}
         <a (click)="setCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
       </p>
       <p>{{stripeCustomer?.contact}}</p>
@@ -31,7 +36,7 @@
       </p>
     </div>
 
-    <p class="error" *ngIf="(stripeCustomer || stripeCustomer === null) && !customerValid">
+    <p class="error-tier-message" *ngIf="(stripeCustomer || stripeCustomer === null) && !customerValid">
       {{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
 
     <div class="current-tier">
@@ -47,8 +52,6 @@
     </button>
   </ng-template>
 
-  <div class="divider"></div>
-
   <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
   <div class="content" *ngIf="features">
     <div class="row">
@@ -58,7 +61,7 @@
         translate}}</span>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.LOGINPOLICY' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.LOGINPOLICY' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar green">
@@ -138,7 +141,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.PASSWORD' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.PASSWORD' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar yellow">
@@ -168,7 +171,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.LABELPOLICY' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.LABELPOLICY' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar blue">
@@ -196,7 +199,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.DOMAIN' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.DOMAIN' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar purple">
@@ -210,7 +213,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.TEXTSANDLINKS' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.TEXTSANDLINKS' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar red">
@@ -251,7 +254,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.METADATA' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.METADATA' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar blue">

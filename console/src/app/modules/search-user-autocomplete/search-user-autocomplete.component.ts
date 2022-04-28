@@ -17,7 +17,7 @@ import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListUsersResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { SearchQuery, User, UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { DisplayNameQuery, SearchQuery, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -42,6 +42,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
 
   public loginNames: string[] = [];
   @Input() public users: Array<User.AsObject> = [];
+  @Input() public editState: boolean = true;
   public filteredUsers: Array<User.AsObject> = [];
   public isLoading: boolean = false;
   @Input() public target: UserTarget = UserTarget.SELF;
@@ -49,11 +50,11 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
   public UserTarget: any = UserTarget;
   @ViewChild('usernameInput') public usernameInput!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
-  @Output() public selectionChanged: EventEmitter<User.AsObject | User.AsObject[]> = new EventEmitter();
+  @Output() public selectionChanged: EventEmitter<User.AsObject[]> = new EventEmitter();
   @Input() public singleOutput: boolean = false;
 
   private unsubscribed$: Subject<void> = new Subject();
-  constructor(private userService: ManagementService, private toast: ToastService, private cdref: ChangeDetectorRef) { }
+  constructor(private userService: ManagementService, private toast: ToastService, private cdref: ChangeDetectorRef) {}
 
   public ngOnInit(): void {
     if (this.target === UserTarget.EXTERNAL) {
@@ -69,30 +70,33 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
   }
 
   private getFilteredResults(): void {
-    this.myControl.valueChanges.pipe(debounceTime(200),
-      takeUntil(this.unsubscribed$),
-      tap(() => this.isLoading = true),
-      switchMap(value => {
-        const query = new SearchQuery();
+    this.myControl.valueChanges
+      .pipe(
+        debounceTime(200),
+        takeUntil(this.unsubscribed$),
+        tap(() => (this.isLoading = true)),
+        switchMap((value) => {
+          const query = new SearchQuery();
 
-        const unQuery = new UserNameQuery();
-        unQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-        unQuery.setUserName(value);
+          const dnQuery = new DisplayNameQuery();
+          dnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+          dnQuery.setDisplayName(value);
 
-        query.setUserNameQuery(unQuery);
+          query.setDisplayNameQuery(dnQuery);
 
-        if (this.target === UserTarget.SELF) {
-          return from(this.userService.listUsers(10, 0, [query]));
-        } else {
-          return of();
+          if (this.target === UserTarget.SELF) {
+            return from(this.userService.listUsers(10, 0, [query]));
+          } else {
+            return of();
+          }
+        }),
+      )
+      .subscribe((userresp: ListUsersResponse.AsObject | unknown) => {
+        this.isLoading = false;
+        if (this.target === UserTarget.SELF && userresp) {
+          this.filteredUsers = (userresp as ListUsersResponse.AsObject).resultList;
         }
-      }),
-    ).subscribe((userresp: ListUsersResponse.AsObject | unknown) => {
-      this.isLoading = false;
-      if (this.target === UserTarget.SELF && userresp) {
-        this.filteredUsers = (userresp as ListUsersResponse.AsObject).resultList;
-      }
-    });
+      });
   }
 
   public displayFn(user?: User.AsObject): string {
@@ -115,8 +119,10 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         if (index > -1) {
           if (this.users && this.users.length > 0) {
             this.users.push(this.filteredUsers[index]);
+            this.selectionChanged.emit(this.users);
           } else {
             this.users = [this.filteredUsers[index]];
+            this.selectionChanged.emit(this.users);
           }
         }
       }
@@ -140,7 +146,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
     const index = this.filteredUsers.findIndex((user) => user === event.option.value);
     if (index !== -1) {
       if (this.singleOutput) {
-        this.selectionChanged.emit(this.filteredUsers[index]);
+        this.selectionChanged.emit([this.filteredUsers[index]]);
       } else {
         if (this.users && this.users.length > 0) {
           this.users.push(this.filteredUsers[index]);
@@ -148,11 +154,8 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
           this.users = [this.filteredUsers[index]];
         }
 
-        if (this.singleOutput) {
-          this.selectionChanged.emit(this.users[0]);
-        } else {
-          this.selectionChanged.emit(this.users);
-        }
+        this.selectionChanged.emit(this.users);
+
         this.usernameInput.nativeElement.value = '';
         this.myControl.setValue(null);
       }
@@ -171,16 +174,19 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
   }
 
   public getGlobalUser(): void {
-    this.userService.getUserByLoginNameGlobal(this.globalLoginNameControl.value).then(resp => {
-      if (this.singleOutput && resp.user) {
-        this.users = [resp.user];
-        this.selectionChanged.emit(this.users[0]);
-      } else if (resp.user) {
-        this.users.push(resp.user);
-        this.selectionChanged.emit(this.users);
-      }
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.userService
+      .getUserByLoginNameGlobal(this.globalLoginNameControl.value)
+      .then((resp) => {
+        if (this.singleOutput && resp.user) {
+          this.users = [resp.user];
+          this.selectionChanged.emit([this.users[0]]);
+        } else if (resp.user) {
+          this.users.push(resp.user);
+          this.selectionChanged.emit(this.users);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 }

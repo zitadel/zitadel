@@ -1,28 +1,24 @@
 <form>
-    <cnsl-form-field appearance="outline" class="full-width">
-        <cnsl-label>Project Name</cnsl-label>
-        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the project name" #nameInput
-            [formControl]="myControl" [matAutocomplete]="auto" />
+  <cnsl-form-field appearance="outline" class="full-width">
+    <cnsl-label>{{'USER.GRANTS.PROJECTNAME' | translate}}</cnsl-label>
+    <input cnslInput type="text" placeholder="Project XY" #nameInput [formControl]="myControl"
+      [matAutocomplete]="auto" />
 
-        <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
-            <mat-chip class="chip" *ngFor="let selectedProject of projects" [selectable]="selectable"
-                [removable]="removable" (removed)="remove(selectedProject)">
-                {{selectedProject?.name ? selectedProject.name + ' (owned)' : selectedProject?.projectName ? selectedProject.projectName + ' (granted)': ''}}
-                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-            </mat-chip>
-            <input cnslInput placeholder="{{'PROJECT.NAME' | translate}}" #nameInput [formControl]="myControl"
-                [matAutocomplete]="auto" [matChipInputFor]="chipList"
-                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-                (matChipInputTokenEnd)="add($event)" />
-        </mat-chip-list>
-
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
-            <mat-option *ngIf="isLoading" class="is-loading">
-                <mat-spinner diameter="30"></mat-spinner>
-            </mat-option>
-            <mat-option *ngFor="let project of filteredProjects" [value]="project">
-                {{project?.name ? project.name + ' (owned)' : project?.projectName ? project.projectName + ' (granted)': ''}}
-            </mat-option>
-        </mat-autocomplete>
-    </cnsl-form-field>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+      <mat-option *ngIf="isLoading" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let project of filteredProjects" [value]="project">
+        <div class="project-option">
+          <div class="project-option-column">
+            <span>{{project?.name ? project?.name : project?.projectName ? project?.projectName : ''}}</span>
+            <span class="fill-space"></span>
+            <span class="smaller cnsl-secondary-text">{{(project.name ? 'USER.GRANTS.PROJECT-OWNED' :
+              project?.projectName ? 'USER.GRANTS.PROJECT-GRANTED' : '') |
+              translate}}</span>
+          </div>
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
 </form>
