@@ -18,10 +18,6 @@ type Tracer interface {
 	Sampler() sdk_trace.Sampler
 }
 
-type Config interface {
-	NewTracer() error
-}
-
 var T Tracer
 
 func Sampler() sdk_trace.Sampler {

@@ -1,15 +1,33 @@
 package log
 
 import (
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing/otel"
+	"strconv"
+
 	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing/otel"
 )
 
 type Config struct {
 	Fraction     float64
 	MetricPrefix string
+}
+
+func NewTracer(rawConfig map[string]interface{}) (err error) {
+	c := new(Config)
+	c.MetricPrefix, _ = rawConfig["metricprefix"].(string)
+	fraction, ok := rawConfig["fraction"].(string)
+	if ok {
+		c.Fraction, err = strconv.ParseFloat(fraction, 32)
+		if err != nil {
+			return errors.ThrowInternal(err, "LOG-Dsag3", "could not map fraction")
+		}
+	}
+
+	return c.NewTracer()
 }
 
 type Tracer struct {
