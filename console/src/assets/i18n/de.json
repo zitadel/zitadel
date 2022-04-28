@@ -42,11 +42,11 @@
     }
   },
   "MENU": {
-    "SYSTEM": "System",
+    "INSTANCE": "Instance",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
-    "IAM": "System Übersicht",
+    "INSTANCEOVERVIEW": "Instance Übersicht",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organisation",
@@ -125,8 +125,8 @@
     "ORGSWITCHER": {
       "TEXT": "Alle Organisationseinstellungen und Tabellen basieren auf dieser ausgewählten Organisation. Klicken Sie auf diese Schaltfläche, um die Organisation zu wechseln oder eine neue zu erstellen."
     },
-    "SYSTEM": {
-      "TEXT": "Klicken Sie hier, um zu den Systemeinstellungen zu gelangen. Beachten Sie, dass Sie nur Zugriff auf diese Schaltfläche haben, wenn Sie über erweiterte Berechtigungen verfügen."
+    "INSTANCE": {
+      "TEXT": "Klicken Sie hier, um zu den Instanceeinstellungen zu gelangen. Beachten Sie, dass Sie nur Zugriff auf diese Schaltfläche haben, wenn Sie über erweiterte Berechtigungen verfügen."
     },
     "PROFILE": {
       "TEXT": "Hier können Sie zwischen Ihren Benutzerkonten wechseln und Ihre Sessions und Ihr Profil verwalten."
@@ -966,7 +966,7 @@
         "UPDATED": "Benutzerdefinierte Texte gespeichert."
       }
     },
-    "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
+    "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der Instance-Standard Einstellung.",
     "BTN_INSTALL": "Installieren",
     "BTN_EDIT": "Modifizieren",
     "DATA": {

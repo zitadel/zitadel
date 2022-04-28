@@ -14,7 +14,7 @@
     {{ 'POLICY.APPLIEDTO' | translate }}:
     <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
     <ng-template #iam
-      ><strong>{{ 'MENU.SYSTEM' | translate }}</strong>
+      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
     </ng-template>
   </p>
 

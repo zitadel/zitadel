@@ -1,39 +1,54 @@
 <div class="accounts-card" cnslOutsideClick (clickOutside)="closeCard($event)">
-  <cnsl-avatar (click)="editUserProfile()" *ngIf="user.human?.profile && user.human?.profile?.displayName"
-    class="avatar" [ngClass]="{'iam-user': iamuser}" [forColor]="user.preferredLoginName"
+  <cnsl-avatar
+    (click)="editUserProfile()"
+    *ngIf="user.human?.profile && user.human?.profile?.displayName"
+    class="avatar"
+    [ngClass]="{ 'iam-user': iamuser }"
+    [forColor]="user.preferredLoginName"
     [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-    [name]="(user.human && user.human.profile && user.human.profile?.displayName) ? user.human.profile.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
-    [size]="80">
+    [name]="
+      user.human && user.human.profile && user.human.profile?.displayName
+        ? user.human.profile.displayName
+        : user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
+    "
+    [size]="80"
+  >
   </cnsl-avatar>
 
-  <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
-  <span class="u-email" *ngIf="user.preferredLoginName">{{user.preferredLoginName}}</span>
-  <a [routerLink]="[ '/system']" class="iamuser" *ngIf="iamuser" (click)="close()">
-    <span class="label">{{'MENU.SYSTEM' | translate}}</span>
+  <span class="u-name">{{ user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A' }}</span>
+  <span class="u-email" *ngIf="user.preferredLoginName">{{ user.preferredLoginName }}</span>
+  <a [routerLink]="['/system']" class="iamuser" *ngIf="iamuser" (click)="close()">
+    <span class="label">{{ 'MENU.INSTANCE' | translate }}</span>
     <a class="iambtn">
       <i class="las la-cog"></i>
     </a>
   </a>
 
-  <a [routerLink]="[ '/org']" class="iamuser" *ngIf="isOnSystem" (click)="close()">
-    <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
+  <a [routerLink]="['/org']" class="iamuser" *ngIf="isOnSystem" (click)="close()">
+    <span class="label">{{ 'MENU.ORGANIZATION' | translate }}</span>
     <a class="iambtn">
       <i class="las la-cog"></i>
     </a>
   </a>
 
-  <button (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
+  <button (click)="editUserProfile()" mat-stroked-button>{{ 'USER.EDITACCOUNT' | translate }}</button>
   <div class="l-accounts">
     <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
     <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
-      <cnsl-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''"
-        [name]="session.displayName" [forColor]="session.loginName" [size]="32">
+      <cnsl-avatar
+        *ngIf="session && session.displayName"
+        class="small-avatar"
+        [avatarUrl]="session.avatarUrl || ''"
+        [name]="session.displayName"
+        [forColor]="session.loginName"
+        [size]="32"
+      >
       </cnsl-avatar>
 
       <div class="col">
-        <span class="user-title">{{session.displayName ? session.displayName : session.userName}} </span>
-        <span class="loginname">{{session.loginName}}</span>
-        <span class="email">{{'USER.STATE.'+session.authState | translate}}</span>
+        <span class="user-title">{{ session.displayName ? session.displayName : session.userName }} </span>
+        <span class="loginname">{{ session.loginName }}</span>
+        <span class="email">{{ 'USER.STATE.' + session.authState | translate }}</span>
       </div>
       <span class="fill-space"></span>
       <mat-icon>keyboard_arrow_right</mat-icon>
@@ -43,12 +58,12 @@
         <i class="las la-user-plus"></i>
       </div>
       <span class="col">
-        <span class="user-title">{{'USER.ADDACCOUNT' | translate}}</span>
+        <span class="user-title">{{ 'USER.ADDACCOUNT' | translate }}</span>
       </span>
       <span class="fill-space"></span>
       <mat-icon>keyboard_arrow_right</mat-icon>
     </a>
   </div>
 
-  <button (click)="logout()" color="warn" mat-stroked-button>{{'MENU.LOGOUT' | translate}}</button>
+  <button (click)="logout()" color="warn" mat-stroked-button>{{ 'MENU.LOGOUT' | translate }}</button>
 </div>

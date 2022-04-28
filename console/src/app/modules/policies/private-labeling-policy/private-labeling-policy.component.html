@@ -3,7 +3,7 @@
     {{ 'POLICY.APPLIEDTO' | translate }}:
     <strong *ngIf="org; else iam">{{ org.name }}</strong>
     <ng-template #iam
-      ><strong>{{ 'MENU.SYSTEM' | translate }}</strong>
+      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
     </ng-template>
   </p>
 

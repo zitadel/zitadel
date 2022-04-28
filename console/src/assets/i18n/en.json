@@ -42,11 +42,11 @@
     }
   },
   "MENU": {
-    "SYSTEM": "System",
+    "INSTANCE": "Instance",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
-    "IAM": "System Overview",
+    "INSTANCEOVERVIEW": "Instance Overview",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
@@ -125,8 +125,8 @@
     "ORGSWITCHER": {
       "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
     },
-    "SYSTEM": {
-      "TEXT": "Click here to get to the system settings. Note that you have only access to this button if you have enhanced permissions."
+    "INSTANCE": {
+      "TEXT": "Click here to get to the instance settings. Note that you have only access to this button if you have enhanced permissions."
     },
     "PROFILE": {
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."

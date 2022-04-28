@@ -7,7 +7,7 @@
     {{ 'POLICY.APPLIEDTO' | translate }}:
     <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
     <ng-template #iam
-      ><strong>{{ 'MENU.SYSTEM' | translate }}</strong>
+      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
     </ng-template>
   </p>
 
@@ -15,8 +15,8 @@
 
   <div class="divider"></div>
 
-  <div class="content">
-    <form *ngIf="form" [formGroup]="form">
+  <div>
+    <form *ngIf="form" [formGroup]="form" class="content">
       <cnsl-form-field class="privacy-policy-formfield">
         <cnsl-label>{{ 'POLICY.PRIVACY_POLICY.TOSLINK' | translate }}</cnsl-label>
         <input cnslInput name="tosLink" formControlName="tosLink" />

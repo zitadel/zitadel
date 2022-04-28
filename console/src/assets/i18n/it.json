@@ -42,11 +42,11 @@
     }
   },
   "MENU": {
-    "SYSTEM": "Sistema",
+    "INSTANCE": "Istanza",
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
-    "IAM": "Panoramica Sistema",
+    "INSTANCEOVERVIEW": "Panoramica Istanza",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
@@ -125,8 +125,8 @@
     "ORGSWITCHER": {
       "TEXT": "Tutte le impostazioni e le tabelle dell'organizzazione si basano su un'organizzazione selezionata. Fai clic sul pulsante per cambiare organizzazione o crearne una nuova."
     },
-    "SYSTEM": {
-      "TEXT": "Clicca qui per accedere alle impostazioni di sistema. Tieni presente che hai accesso solo se disponi di autorizzazioni avanzate."
+    "INSTANCE": {
+      "TEXT": "Clicca qui per accedere alle impostazioni dell'istanza. Tieni presente che hai accesso solo se disponi di autorizzazioni avanzate."
     },
     "PROFILE": {
       "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
