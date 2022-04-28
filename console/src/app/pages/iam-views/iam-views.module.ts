@@ -46,5 +46,6 @@ import { IamViewsComponent } from './iam-views.component';
     MatTableModule,
     MatSortModule,
   ],
+  exports: [],
 })
 export class IamViewsModule {}
