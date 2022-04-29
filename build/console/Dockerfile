@@ -1,4 +1,4 @@
-ARG NODE_VERSION=14
+ARG NODE_VERSION=16
 
 #######################
 ## With this step we prepare all node_modules, this helps caching the build
