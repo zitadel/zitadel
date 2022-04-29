@@ -341,6 +341,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public onSetTheme(theme: string): void {
     localStorage.setItem('theme', theme);
+    this.overlayContainer.getContainerElement().classList.remove(theme === 'dark-theme' ? 'light-theme' : 'dark-theme');
     this.overlayContainer.getContainerElement().classList.add(theme);
     this.componentCssClass = theme;
   }

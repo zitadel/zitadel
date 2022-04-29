@@ -145,7 +145,7 @@ SystemDefaults:
     ApplicationKeySize: 2048
   Multifactors:
     OTP:
-      Issuer: 'ZITADEL'
+      Issuer: "ZITADEL"
   DomainVerification:
     VerificationGenerator:
       Length: 32
@@ -154,7 +154,7 @@ SystemDefaults:
       IncludeDigits: true
       IncludeSymbols: false
   Notifications:
-    FileSystemPath: '.notifications/'
+    FileSystemPath: ".notifications/"
   KeyConfig:
     Size: 2048
     PrivateKeyLifetime: 6h
@@ -189,35 +189,35 @@ DefaultInstance:
       IncludeSymbols: false
     InitializeUserCode:
       Length: 6
-      Expiry: '72h'
+      Expiry: "72h"
       IncludeLowerLetters: false
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
     EmailVerificationCode:
       Length: 6
-      Expiry: '1h'
+      Expiry: "1h"
       IncludeLowerLetters: false
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
     PhoneVerificationCode:
       Length: 6
-      Expiry: '1h'
+      Expiry: "1h"
       IncludeLowerLetters: false
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
     PasswordVerificationCode:
       Length: 6
-      Expiry: '1h'
+      Expiry: "1h"
       IncludeLowerLetters: false
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
     PasswordlessInitCode:
       Length: 12
-      Expiry: '1h'
+      Expiry: "1h"
       IncludeLowerLetters: true
       IncludeUpperLetters: true
       IncludeDigits: true
@@ -278,16 +278,16 @@ DefaultInstance:
   PrivacyPolicy:
     TOSLink: https://docs.zitadel.ch/docs/legal/terms-of-service
     PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
-    HelpLink: ''
+    HelpLink: ""
   LabelPolicy:
-    PrimaryColor: '#5469d4'
-    BackgroundColor: '#fafafa'
-    WarnColor: '#f44336'
-    FontColor: '#000000'
-    PrimaryColorDark: '#5469d4'
-    BackgroundColorDark: '#212121'
-    WarnColorDark: '#f44336'
-    FontColorDark: '#ffffff'
+    PrimaryColor: "#5469d4"
+    BackgroundColor: "#fafafa"
+    WarnColor: "#cd3d56"
+    FontColor: "#000000"
+    PrimaryColorDark: "#bbbafa"
+    BackgroundColorDark: "#111827"
+    WarnColorDark: "#ff3b5b"
+    FontColorDark: "#ffffff"
     HideLoginNameSuffix: false
     ErrorMsgPopup: false
     DisableWatermark: false
@@ -379,7 +379,7 @@ DefaultInstance:
 
 InternalAuthZ:
   RolePermissionMappings:
-    - Role: 'IAM_OWNER'
+    - Role: "IAM_OWNER"
       Permissions:
         - "iam.read"
         - "iam.write"
@@ -448,7 +448,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
-    - Role: 'IAM_OWNER_VIEWER'
+    - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
         - "iam.features.read"
@@ -474,7 +474,7 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
-    - Role: 'IAM_ORG_MANAGER'
+    - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
         - "org.global.read"
@@ -524,7 +524,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
-    - Role: 'IAM_USER_MANAGER'
+    - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
         - "org.global.read"
@@ -547,7 +547,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
-    - Role: 'ORG_OWNER'
+    - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
         - "org.global.read"
@@ -596,7 +596,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
-    - Role: 'ORG_USER_MANAGER'
+    - Role: "ORG_USER_MANAGER"
       Permissions:
         - "user.read"
         - "user.global.read"
@@ -608,7 +608,7 @@ InternalAuthZ:
         - "user.membership.read"
         - "project.read"
         - "project.role.read"
-    - Role: 'ORG_OWNER_VIEWER'
+    - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
         - "org.member.read"
@@ -628,7 +628,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
-    - Role: 'ORG_USER_PERMISSION_EDITOR'
+    - Role: "ORG_USER_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
         - "org.member.read"
@@ -644,7 +644,7 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
-    - Role: 'ORG_PROJECT_PERMISSION_EDITOR'
+    - Role: "ORG_PROJECT_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
         - "org.member.read"
@@ -662,13 +662,13 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
-    - Role: 'ORG_PROJECT_CREATOR'
+    - Role: "ORG_PROJECT_CREATOR"
       Permissions:
         - "user.global.read"
         - "policy.read"
         - "project.read:self"
         - "project.create"
-    - Role: 'PROJECT_OWNER'
+    - Role: "PROJECT_OWNER"
       Permissions:
         - "org.global.read"
         - "policy.read"
@@ -696,7 +696,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
-    - Role: 'PROJECT_OWNER_VIEWER'
+    - Role: "PROJECT_OWNER_VIEWER"
       Permissions:
         - "policy.read"
         - "project.read"
@@ -709,12 +709,12 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
-    - Role: 'SELF_MANAGEMENT_GLOBAL'
+    - Role: "SELF_MANAGEMENT_GLOBAL"
       Permissions:
         - "org.create"
         - "policy.read"
         - "user.self.delete"
-    - Role: 'PROJECT_OWNER_GLOBAL'
+    - Role: "PROJECT_OWNER_GLOBAL"
       Permissions:
         - "org.global.read"
         - "policy.read"
@@ -735,7 +735,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
-    - Role: 'PROJECT_OWNER_VIEWER_GLOBAL'
+    - Role: "PROJECT_OWNER_VIEWER_GLOBAL"
       Permissions:
         - "policy.read"
         - "project.read"
@@ -747,7 +747,7 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
-    - Role: 'PROJECT_GRANT_OWNER'
+    - Role: "PROJECT_GRANT_OWNER"
       Permissions:
         - "policy.read"
         - "org.global.read"
@@ -762,7 +762,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
-    - Role: 'PROJECT_GRANT_OWNER_VIEWER'
+    - Role: "PROJECT_GRANT_OWNER_VIEWER"
       Permissions:
         - "policy.read"
         - "project.read"

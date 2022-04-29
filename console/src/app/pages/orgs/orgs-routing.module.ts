@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from 'src/app/guards/role.guard';
-import { FeatureServiceType } from 'src/app/modules/features/features.component';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
 import { OrgDetailComponent } from './org-detail/org-detail.component';
@@ -29,15 +28,6 @@ const routes: Routes = [
         },
       },
     ],
-  },
-  {
-    path: 'features',
-    loadChildren: () => import('src/app/modules/features/features.module').then((m) => m.FeaturesModule),
-    canActivate: [RoleGuard],
-    data: {
-      roles: ['features.read'],
-      serviceType: FeatureServiceType.MGMT,
-    },
   },
   {
     path: 'policy',

@@ -2,26 +2,26 @@
   <div class="footer-row">
     <div class="footer-links">
       <a target="_blank" *ngIf="policy?.tosLink" rel="noreferrer" [href]="policy.tosLink" external>
-        <span>{{'FOOTER.LINKS.TOS' | translate}}</span>
+        <span>{{ 'FOOTER.LINKS.TOS' | translate }}</span>
         <i class="las la-external-link-alt"></i>
       </a>
       <a target="_blank" *ngIf="policy?.privacyLink" rel="noreferrer" [href]="policy.privacyLink" external>
-        <span>{{'FOOTER.LINKS.PP' | translate}}</span>
+        <span>{{ 'FOOTER.LINKS.PP' | translate }}</span>
         <i class="las la-external-link-alt"></i>
       </a>
     </div>
 
     <div class="footer-socials" *ngIf="privateLabelPolicy && privateLabelPolicy.disableWatermark === false">
-      <a target="_blank" rel="noreferrer" href="https://github.com/caos">
+      <a target="_blank" rel="noreferrer" href="https://github.com/zitadel">
         <i class="text-3xl lab la-github"></i>
       </a>
-      <a target="_blank" rel="noreferrer" href="https://twitter.com/caos_ch">
+      <a target="_blank" rel="noreferrer" href="https://twitter.com/zitadel_ch">
         <i class="text-3xl lab la-twitter"></i>
       </a>
       <a target="_blank" rel="noreferrer" href="https://www.linkedin.com/company/zitadel/">
         <i class="text-3xl lab la-linkedin"></i>
       </a>
-      <a target="_blank" rel="noreferrer" href="https://discord.gg/erh5Brh7jE">
+      <a target="_blank" rel="noreferrer" href="https://zitadel.ch/chat">
         <i class="text-3xl lab la-discord"></i>
       </a>
       <a target="_blank" rel="noreferrer" href="https://www.youtube.com/channel/UCUAWJUNYaRn1yIVrZxEfsuA">

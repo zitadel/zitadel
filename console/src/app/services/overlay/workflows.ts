@@ -21,7 +21,7 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
     content: {
       number: 2,
       count: 4,
-      i18nText: 'OVERLAYS.SYSTEM.TEXT',
+      i18nText: 'OVERLAYS.INSTANCE.TEXT',
     },
     requirements: {
       media: '(min-width: 600px)',

@@ -3,23 +3,26 @@
     <div class="iam-top-row">
       <div>
         <div class="iam-title-row">
-          <h1 class="iam-title">{{'IAM.POLICIES.TITLE' | translate}}</h1>
+          <h1 class="iam-title">{{ 'IAM.POLICIES.TITLE' | translate }}</h1>
         </div>
-        <p class="iam-sub cnsl-secondary-text">{{'IAM.POLICIES.DESCRIPTION' | translate}}</p>
+        <p class="iam-sub cnsl-secondary-text">{{ 'IAM.POLICIES.DESCRIPTION' | translate }}</p>
       </div>
       <span class="fill-space"></span>
-      <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
-        [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-        (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
+      <cnsl-contributors
+        [totalResult]="totalMemberResult"
+        [loading]="loading$ | async"
+        [membersSubject]="membersSubject"
+        title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+        (addClicked)="openAddMember()"
+        (showDetailClicked)="showDetail()"
+        (refreshClicked)="loadMembers()"
+        [disabled]="false"
+      >
       </cnsl-contributors>
     </div>
   </div>
 </div>
 <div class="max-width-container">
-  <h1 class="iam-subtitle">{{'FEATURES.TITLE' | translate}}</h1>
-  <p class="iam-top-desc cnsl-secondary-text">{{'FEATURES.DESCRIPTION' | translate}} </p>
-  <cnsl-zitadel-tier [features]="features" [iam]="true"></cnsl-zitadel-tier>
-
-  <cnsl-policy-grid class="policies" [type]="PolicyComponentServiceType.ADMIN"></cnsl-policy-grid>
+  <cnsl-policy-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-policy-grid>
 </div>

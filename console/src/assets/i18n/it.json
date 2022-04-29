@@ -42,11 +42,11 @@
     }
   },
   "MENU": {
-    "SYSTEM": "Sistema",
+    "INSTANCE": "Istanza",
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
-    "IAM": "Panoramica Sistema",
+    "INSTANCEOVERVIEW": "Panoramica Istanza",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
@@ -125,8 +125,8 @@
     "ORGSWITCHER": {
       "TEXT": "Tutte le impostazioni e le tabelle dell'organizzazione si basano su un'organizzazione selezionata. Fai clic sul pulsante per cambiare organizzazione o crearne una nuova."
     },
-    "SYSTEM": {
-      "TEXT": "Clicca qui per accedere alle impostazioni di sistema. Tieni presente che hai accesso solo se disponi di autorizzazioni avanzate."
+    "INSTANCE": {
+      "TEXT": "Clicca qui per accedere alle impostazioni dell'istanza. Tieni presente che hai accesso solo se disponi di autorizzazioni avanzate."
     },
     "PROFILE": {
       "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
@@ -793,74 +793,6 @@
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo"
     }
-  },
-  "FEATURES": {
-    "TITLE": "Features",
-    "DESCRIPTION": "Qui puoi vedere le tue features in base al tuo Tier ZITADEL.",
-    "BTN-EDIT": "Visualizza features",
-    "AVAILABLE": "sbloccato",
-    "UNAVAILABLE": "bloccato",
-    "TIER": {
-      "NAME": "Nome del Tier ZITADEL",
-      "DETAILS": "Dettagli di fatturazione",
-      "DETAILS_DESC": "Inserisci qui i tuoi dati di fatturazione.",
-      "CUSTOMERINVALID": "I dati di fatturazione non sono completi!",
-      "CONTACT": "Contatta",
-      "COMPANY": "Azienda",
-      "ADDRESS": "Indirizzo",
-      "CITY": "Citt\u00e0",
-      "POSTAL_CODE": "Codice postale",
-      "COUNTRY": "Paese",
-      "TITLE": "Tier Zitadel",
-      "DESCRIPTION": "Zitadel lavora con Stripe per semplificare la fatturazione. Il seguente link reindirizza a stripe.com.",
-      "QUESTIONS": "Per domande contatta il nostro supporto",
-      "BTN": "Cambia Tier"
-    },
-    "HEADERS": {
-      "LOGINPOLICY": "Impostazioni di accesso",
-      "PASSWORD": "Password",
-      "LABELPOLICY": "Privatelabelling",
-      "DOMAIN": "Dominio dell'organizzazione",
-      "TEXTSANDLINKS": "Testi e link",
-      "METADATA": "Metadati",
-      "FLOWS": "Azioni e processi"
-    },
-    "DATA": {
-      "AUDITLOGRETENTION": "Ritenzione Audit Log",
-      "LOGINPOLICYUSERNAMELOGIN": "Permettere l'accesso con il nome utente",
-      "LOGINPOLICYPASSWORDRESET": "Nascondi il link per resettare la password",
-      "LOGINPOLICYREGISTRATION": "Permettere l'auto-registrazione",
-      "LOGINPOLICYIDP": "Identity Providers",
-      "LOGINPOLICYFACTORS": "Multifattori",
-      "LOGINPOLICYPASSWORDLESS": "Autenticazione passwordless",
-      "LOGINPOLICYCOMPLEXITYPOLICY": "Impostazioni di complessit\u00e0 delle password",
-      "LOCKOUTPOLICY": "Impostazioni di blocco",
-      "LABELPOLICYPRIVATELABEL": "Colori, logo, icona, aspetto del testo",
-      "LABELPOLICYWATERMARK": "Rimuovi la filigrana ZITADEL",
-      "CUSTOMDOMAIN": "Verifica del dominio dell'organizzazione",
-      "CUSTOMTEXTLOGIN": "Testi dell'interfaccia login",
-      "CUSTOMTEXTMESSAGE": "Testi email personalizzati",
-      "PRIVACYPOLICY": "Link personalizzati all'informativa sulla privacy e ai TOS",
-      "METADATAUSER": "Metadati utente",
-      "FLOWS": "Azioni e processi",
-      "FLOW": {
-        "ACTIONSALLOWED": {
-          "0": "Non abilitato",
-          "1": "Numero limitato",
-          "2": "Illimitato"
-        },
-        "COUNT": "Anzahl",
-        "TYPE": "Tipo di utilizzo"
-      }
-    },
-    "TIERSTATES": {
-      "0": "Attivo",
-      "1": "Azione richiesta",
-      "2": "Cancellato",
-      "3": "Grandfathered"
-    },
-    "NOTAVAILABLE": "La feature <strong>{{value}}</strong> manca nella tua organizzazione.",
-    "RETENTIONDAYS": "Giorni"
   },
   "POLICY": {
     "TITLE": "Esplora le impostazioni",

@@ -14,7 +14,6 @@ import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy
 import { HasRoleModule } from '../../../directives/has-role/has-role.module';
 import { DetailLayoutModule } from '../../../modules/detail-layout/detail-layout.module';
 import { InputModule } from '../../../modules/input/input.module';
-import { HasFeaturePipeModule } from '../../../pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from '../../../pipes/has-role-pipe/has-role-pipe.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
@@ -35,7 +34,6 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     FormFieldModule,
     CopyToClipboardModule,
     MatButtonModule,
-    HasFeaturePipeModule,
     MatIconModule,
     HasRoleModule,
     HasRolePipeModule,

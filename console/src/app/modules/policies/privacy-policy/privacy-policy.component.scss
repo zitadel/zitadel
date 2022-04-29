@@ -26,6 +26,13 @@
 
 .content {
   padding-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 1rem;
+
+  @media only screen and (min-width: 800px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 
 .privacy-policy-formfield {

@@ -10,9 +10,9 @@ import { PaginatorComponent } from 'src/app/modules/paginator/paginator.componen
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Action, ActionState } from 'src/app/proto/generated/zitadel/action_pb';
 import {
-  CreateActionRequest,
-  ListActionsResponse,
-  UpdateActionRequest,
+    CreateActionRequest,
+    ListActionsResponse,
+    UpdateActionRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -49,7 +49,7 @@ export class ActionTableComponent implements OnInit {
     });
   }
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.getData(10, 0);
   }
 

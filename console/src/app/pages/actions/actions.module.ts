@@ -22,7 +22,6 @@ import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.
 import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { DurationToSecondsPipeModule } from 'src/app/pipes/duration-to-seconds-pipe/duration-to-seconds-pipe.module';
-import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
@@ -63,7 +62,6 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     InfoSectionModule,
     HasRolePipeModule,
     TableActionsModule,
-    HasFeaturePipeModule,
     CodemirrorModule,
   ],
 })

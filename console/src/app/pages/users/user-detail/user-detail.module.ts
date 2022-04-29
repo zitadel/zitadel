@@ -38,12 +38,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
-import { HasFeatureModule } from '../../../directives/has-feature/has-feature.module';
 import { InfoRowModule } from '../../../modules/info-row/info-row.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
 import {
-  DialogPasswordlessComponent,
+    DialogPasswordlessComponent,
 } from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
@@ -106,7 +105,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     MatIconModule,
     CardModule,
     MatProgressSpinnerModule,
-    HasFeatureModule,
     MatTooltipModule,
     HasRoleModule,
     TranslateModule,

@@ -1,24 +1,31 @@
-<cnsl-top-view [hasBackButton]="false" title="{{org?.name}}" [isActive]="org?.state === OrgState.ORG_STATE_ACTIVE"
-  [isInactive]="org?.state === OrgState.ORG_STATE_INACTIVE" [hasContributors]="true"
-  stateTooltip="{{'ORG.STATE.'+org?.state | translate}}">
-  <cnsl-contributors topContributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
-    [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-    (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
+<cnsl-top-view
+  [hasBackButton]="false"
+  title="{{ org?.name }}"
+  [isActive]="org?.state === OrgState.ORG_STATE_ACTIVE"
+  [isInactive]="org?.state === OrgState.ORG_STATE_INACTIVE"
+  [hasContributors]="true"
+  stateTooltip="{{ 'ORG.STATE.' + org?.state | translate }}"
+>
+  <cnsl-contributors
+    topContributors
+    [totalResult]="totalMemberResult"
+    [loading]="loading$ | async"
+    [membersSubject]="membersSubject"
+    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+    (addClicked)="openAddMember()"
+    (showDetailClicked)="showDetail()"
+    (refreshClicked)="loadMembers()"
+    [disabled]="false"
+  >
   </cnsl-contributors>
 
   <cnsl-info-row topContent *ngIf="org" [org]="org"></cnsl-info-row>
 </cnsl-top-view>
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <ng-container *ngIf="['features.read'] | hasRole | async">
-      <h2 class="org-subtitle">{{'FEATURES.TITLE' | translate}}</h2>
-      <p class="org-top-desc cnsl-secondary-text">{{'FEATURES.DESCRIPTION' | translate}}</p>
-      <cnsl-zitadel-tier [features]="features"></cnsl-zitadel-tier>
-    </ng-container>
-
     <ng-template cnslHasRole [hasRole]="['policy.read']">
-      <cnsl-policy-grid class="policies" [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
+      <cnsl-policy-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
     </ng-template>
 
     <div metainfo>

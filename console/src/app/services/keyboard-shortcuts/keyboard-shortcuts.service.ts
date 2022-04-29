@@ -6,16 +6,16 @@ import { BehaviorSubject, Observable, of, pairwise, Subject, takeUntil } from 'r
 import { KeyboardShortcutsComponent } from '../../modules/keyboard-shortcuts/keyboard-shortcuts.component';
 import { GrpcAuthService } from '../grpc-auth.service';
 import {
-  ACTIONS,
-  DOMAINS,
-  HOME,
-  KeyboardShortcut,
-  ME,
-  ORG,
-  PROJECTS,
-  SYSTEM,
-  USERGRANTS,
-  USERS,
+    ACTIONS,
+    DOMAINS,
+    HOME,
+    KeyboardShortcut,
+    ME,
+    ORG,
+    PROJECTS,
+    SYSTEM,
+    USERGRANTS,
+    USERS,
 } from './keyboard-shortcuts';
 
 @Injectable({
@@ -54,47 +54,47 @@ export class KeyboardShortcutsService implements OnDestroy {
         }
 
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyH') {
-          if (this.hasPermission(HOME) && this.hasFeature(HOME)) {
+          if (this.hasPermission(HOME)) {
             this.router.navigate(HOME.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyS') {
-          if (this.hasPermission(SYSTEM) && this.hasFeature(SYSTEM)) {
+          if (this.hasPermission(SYSTEM)) {
             this.router.navigate(SYSTEM.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyO') {
-          if (this.hasPermission(ORG) && this.hasFeature(ORG)) {
+          if (this.hasPermission(ORG)) {
             this.router.navigate(ORG.link);
           }
         }
         if (firstKey.code === 'KeyM' && secondKey.code === 'KeyE') {
-          if (this.hasPermission(ME) && this.hasFeature(ME)) {
+          if (this.hasPermission(ME)) {
             this.router.navigate(ME.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyP') {
-          if (this.hasPermission(PROJECTS) && this.hasFeature(PROJECTS)) {
+          if (this.hasPermission(PROJECTS)) {
             this.router.navigate(PROJECTS.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyU') {
-          if (this.hasPermission(USERS) && this.hasFeature(USERS)) {
+          if (this.hasPermission(USERS)) {
             this.router.navigate(USERS.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyA') {
-          if (this.hasPermission(USERGRANTS) && this.hasFeature(USERGRANTS)) {
+          if (this.hasPermission(USERGRANTS)) {
             this.router.navigate(USERGRANTS.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyF') {
-          if (this.hasPermission(ACTIONS) && this.hasFeature(ACTIONS)) {
+          if (this.hasPermission(ACTIONS)) {
             this.router.navigate(ACTIONS.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyD') {
-          if (this.hasPermission(DOMAINS) && this.hasFeature(DOMAINS)) {
+          if (this.hasPermission(DOMAINS)) {
             this.router.navigate(DOMAINS.link);
           }
         }
@@ -132,14 +132,6 @@ export class KeyboardShortcutsService implements OnDestroy {
   private hasPermission(shortcut: KeyboardShortcut): Observable<boolean> {
     if (shortcut.permissions) {
       return this.authService.isAllowed(shortcut.permissions);
-    } else {
-      return of(true);
-    }
-  }
-
-  private hasFeature(shortcut: KeyboardShortcut): Observable<boolean> {
-    if (shortcut.features) {
-      return this.authService.canUseFeature(shortcut.features);
     } else {
       return of(true);
     }

@@ -421,6 +421,17 @@ $custom-typography: mat.define-typography-config(
     color: map-get($foreground, base);
   }
 
+  .mat-menu-panel {
+    background-color: map-get($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border-radius: 6px;
+  }
+
+  .mat-button-toggle-button {
+    background-color: mat.get-color-from-palette($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+
   .main-container,
   .mat-dialog-container {
     background-color: map-get($background, background);
@@ -462,6 +473,17 @@ $custom-typography: mat.define-typography-config(
 
   .main-container {
     color: map-get($foreground, text);
+  }
+
+  .mat-menu-panel {
+    background-color: map-get($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border-radius: 6px;
+  }
+
+  .mat-button-toggle-button {
+    background-color: mat.get-color-from-palette($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
   .main-container,

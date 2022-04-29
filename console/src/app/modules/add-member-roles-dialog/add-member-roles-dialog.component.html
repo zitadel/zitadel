@@ -1,21 +1,26 @@
-<span class="title" mat-dialog-title>{{'MEMBER.EDITROLE' | translate}}</span>
+<span class="title" mat-dialog-title>{{ 'MEMBER.EDITROLE' | translate }}</span>
 <div mat-dialog-content>
-  <p class="desc"> {{'MEMBER.EDITFOR' | translate: ({value: data.user})}}</p>
+  <p class="desc">{{ 'MEMBER.EDITFOR' | translate: { value: data.user } }}</p>
   <div class="roles-selection">
-    <mat-checkbox class="role-cb" *ngFor="let role of allRoles" color="primary" (change)="toggleRole(role)"
-      [checked]="selectedRoles.includes(role)">
+    <mat-checkbox
+      class="role-cb"
+      *ngFor="let role of allRoles"
+      color="primary"
+      (change)="toggleRole(role)"
+      [checked]="selectedRoles.includes(role)"
+    >
       <div class="role-cb-content">
         <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-        <span>{{role | roletransform}}</span>
+        <span>{{ role | roletransform }}</span>
       </div>
     </mat-checkbox>
   </div>
 </div>
 <div mat-dialog-actions class="action">
-  <button color="primary" mat-stroked-button class="close-button" (click)="closeDialog()">
-    {{'ACTIONS.CLOSE' | translate}}
+  <button mat-stroked-button class="close-button" (click)="closeDialog()">
+    {{ 'ACTIONS.CLOSE' | translate }}
   </button>
   <button color="primary" mat-raised-button class="ok-button" (click)="closeDialogWithRoles()">
-    {{'ACTIONS.CHANGE' | translate}}
+    {{ 'ACTIONS.CHANGE' | translate }}
   </button>
 </div>

@@ -89,10 +89,15 @@ h2 {
         background: linear-gradient(40deg, #1f2937, #111827);
       }
 
+      .mat-icon {
+        height: 2rem;
+        width: 2rem;
+        color: white;
+      }
+
       .icon,
       i {
         font-size: 2.5rem;
-        height: 2.5rem;
         line-height: 2.5rem;
         color: white;
       }

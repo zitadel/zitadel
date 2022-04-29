@@ -1,74 +1,84 @@
-.method-col {
-  display: flex;
-  flex-direction: column;
-  margin: -0.5rem;
+@use '@angular/material' as mat;
 
-  .method-row {
+@mixin contact-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, default);
+
+  .contact-method-col {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
-    padding-right: 0;
-    border-bottom: 1px solid #ffffff20;
-    flex-wrap: wrap;
+    flex-direction: column;
+    margin: -0.5rem;
 
-    .left {
-      .label {
-        font-size: 13px;
-        margin-bottom: 0.5rem;
-        min-width: 100px;
-        display: block;
-      }
+    .contact-method-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      padding-right: 0;
+      border-bottom: 1px solid #ffffff20;
+      flex-wrap: wrap;
 
-      .name {
-        display: block;
-        margin-bottom: 0.5rem;
-      }
-
-      .contact-state {
-        font-size: 14px;
-        margin-bottom: 0.5rem;
-
-        &.verified {
-          color: #85d996;
+      .left {
+        .label {
+          font-size: 13px;
+          margin-bottom: 0.5rem;
+          min-width: 100px;
           display: block;
         }
 
-        &.notverified {
-          color: var(--warn);
-          margin-right: 1rem;
+        .name {
+          display: block;
+          margin-bottom: 0.5rem;
+        }
+
+        .contact-state {
+          font-size: 14px;
+          margin-bottom: 0.5rem;
+
+          &.verified {
+            color: #85d996;
+            display: block;
+          }
+
+          &.notverified {
+            color: var(--warn);
+            margin-right: 1rem;
+          }
+        }
+
+        .block {
+          display: block;
         }
       }
 
-      .block {
-        display: block;
+      .right {
+        flex-basis: 70px;
+        display: flex;
+        justify-content: flex-end;
       }
-    }
 
-    .right {
-      flex-basis: 70px;
-      display: flex;
-      justify-content: flex-end;
-    }
+      .verified-icon {
+        font-size: 1.2rem;
+        line-height: 1.2rem;
+        height: 1.2rem;
+        cursor: default;
+      }
 
-    .verified-icon {
-      font-size: 1.2rem;
-      line-height: 1.2rem;
-      height: 1.2rem;
-      cursor: default;
-    }
+      .verify {
+        text-decoration: none;
+        font-size: 0.8rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        word-wrap: none;
+        white-space: nowrap;
+        margin-right: 1rem;
 
-    .verify {
-      text-decoration: none;
-      font-size: 0.8rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      word-wrap: none;
-      white-space: nowrap;
-      margin-right: 1rem;
-
-      &:hover {
-        text-decoration: underline;
+        &:hover {
+          color: map-get($foreground, text);
+        }
       }
     }
   }

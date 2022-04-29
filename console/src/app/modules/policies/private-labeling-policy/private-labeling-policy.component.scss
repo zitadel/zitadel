@@ -119,6 +119,7 @@
         .expansion {
           box-shadow: none;
           border: 1px solid $p-border-color;
+          background-color: map-get($background, cards);
 
           .header {
             justify-content: flex-start;

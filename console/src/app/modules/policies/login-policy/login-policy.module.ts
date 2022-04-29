@@ -15,7 +15,6 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { IdpTableModule } from 'src/app/modules/idp-table/idp-table.module';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
@@ -36,7 +35,6 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     InputModule,
     MatIconModule,
     MatButtonModule,
-    HasFeaturePipeModule,
     MatSlideToggleModule,
     HasRoleModule,
     MatDialogModule,

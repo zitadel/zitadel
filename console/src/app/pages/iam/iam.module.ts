@@ -21,7 +21,6 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
-import { ZitadelTierModule } from 'src/app/modules/zitadel-tier/zitadel-tier.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
@@ -44,7 +43,6 @@ import { IamComponent } from './iam.component';
     MetaLayoutModule,
     MatIconModule,
     MatTableModule,
-    ZitadelTierModule,
     InputModule,
     MatSortModule,
     MatTooltipModule,
