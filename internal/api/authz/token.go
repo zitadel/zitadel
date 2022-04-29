@@ -78,14 +78,10 @@ func (v *TokenVerifier) clientIDAndProjectIDFromMethod(ctx context.Context, meth
 		return "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-G2qrh", "Errors.Internal")
 	}
 	c := app.(*client)
-	if c.id != "" {
-		return c.id, c.projectID, nil
-	}
 	c.id, c.projectID, err = v.authZRepo.VerifierClientID(ctx, c.name)
 	if err != nil {
 		return "", "", caos_errs.ThrowPermissionDenied(err, "AUTHZ-ptTIF2", "Errors.Internal")
 	}
-	v.clients.Store(prefix, c)
 	return c.id, c.projectID, nil
 }
 func (v *TokenVerifier) SearchMyMemberships(ctx context.Context) (_ []*Membership, err error) {

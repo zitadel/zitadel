@@ -90,7 +90,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return token.UserID, "", "", "", token.ResourceOwner, nil
 	}
 	for _, aud := range token.Audience {
-		if verifierClientID == aud || projectID == aud {
+		if verifierClientID == aud || projectID == aud || authz.GetInstance(ctx).ProjectID() == aud {
 			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
 		}
 	}
@@ -236,11 +236,7 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	iam, err := repo.Query.Instance(ctx)
-	if err != nil {
-		return "", "", err
-	}
-	app, err := repo.View.ApplicationByProjecIDAndAppName(ctx, iam.IAMProjectID, appName)
+	app, err := repo.View.ApplicationByProjecIDAndAppName(ctx, authz.GetInstance(ctx).ProjectID(), appName)
 	if err != nil {
 		return "", "", err
 	}
