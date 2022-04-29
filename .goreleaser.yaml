@@ -8,9 +8,9 @@ release:
 before:
   hooks:
     - docker build -f build/grpc/Dockerfile -t zitadel-base:local .
-#    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
-#    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client
-#    - sh -c "cp -r .artifacts/grpc/go-client/* ."
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client
+    - sh -c "cp -r .artifacts/grpc/go-client/* ."
     - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
     - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console
     - sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
