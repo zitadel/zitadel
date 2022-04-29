@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/cmd/admin/initialise"
 	"github.com/zitadel/zitadel/cmd/admin/key"
 	"github.com/zitadel/zitadel/cmd/admin/setup"
@@ -32,7 +33,7 @@ Requirements:
 
 			startConfig := MustNewConfig(viper.GetViper())
 
-			err = startZitadel(startConfig, masterKey)
+			err = startZitadel(startConfig, masterKey, nil)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}

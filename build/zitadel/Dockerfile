@@ -16,14 +16,6 @@ RUN go mod download
 COPY tools ./tools
 RUN ./tools/install.sh
 
-ARG COCKROACH_BINARY=cockroach
-RUN apt install openssl tzdata tar
-
-# cockroach binary used to backup database
-RUN mkdir /usr/local/lib/cockroach
-RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v21.2.9.linux-amd64.tgz \
-    | tar  xvz && cp -i cockroach-v21.2.9.linux-amd64/cockroach /usr/local/bin/
-RUN rm -r cockroach-v21.2.9.linux-amd64
 
 #######################
 ## generates static files
@@ -91,6 +83,15 @@ COPY --from=go-stub /go/src/github.com/zitadel/zitadel/internal/api/assets/route
 ## Go test
 #######################
 FROM go-base as go-test
+
+ARG COCKROACH_BINARY=cockroach
+RUN apt install openssl tzdata tar
+
+# cockroach binary used to backup database
+RUN mkdir /usr/local/lib/cockroach
+RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v21.2.9.linux-amd64.tgz \
+    | tar  xvz && cp -i cockroach-v21.2.9.linux-amd64/cockroach /usr/local/bin/
+RUN rm -r cockroach-v21.2.9.linux-amd64
 
 # Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik \

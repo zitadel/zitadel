@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 type Server interface {
@@ -29,8 +30,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 				middleware.SentryHandler(),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
-				//TODO: Handle Ignored Services
-				middleware.InstanceInterceptor(queries, hostHeaderName, "/zitadel.system.v1.SystemService"),
+				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),

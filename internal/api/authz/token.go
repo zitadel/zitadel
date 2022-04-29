@@ -2,9 +2,16 @@ package authz
 
 import (
 	"context"
+	"crypto/rsa"
+	"os"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/zitadel/oidc/v2/pkg/op"
+	"gopkg.in/square/go-jose.v2"
+
+	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -14,9 +21,10 @@ const (
 )
 
 type TokenVerifier struct {
-	authZRepo   authZRepo
-	clients     sync.Map
-	authMethods MethodMapping
+	authZRepo        authZRepo
+	clients          sync.Map
+	authMethods      MethodMapping
+	systemJWTProfile op.JWTProfileVerifier
 }
 
 type authZRepo interface {
@@ -27,17 +35,69 @@ type authZRepo interface {
 	ExistsOrg(ctx context.Context, orgID string) error
 }
 
-func Start(authZRepo authZRepo) (v *TokenVerifier) {
-	return &TokenVerifier{authZRepo: authZRepo}
+func Start(authZRepo authZRepo, systemAPI string, keys map[string]string) (v *TokenVerifier) {
+	return &TokenVerifier{
+		authZRepo:        authZRepo,
+		systemJWTProfile: op.NewJWTProfileVerifier(&systemJWTStorage{keys: keys}, systemAPI, 1*time.Hour, time.Second),
+	}
 }
 
 func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang, resourceOwner string, err error) {
+	if strings.HasPrefix(method, "/zitadel.system.v1.SystemService") {
+		userID, err := v.verifySystemToken(ctx, token)
+		if err != nil {
+			return "", "", "", "", "", err
+		}
+		return userID, "", "", "", "", nil
+	}
 	verifierClientID, projectID, err := v.clientIDAndProjectIDFromMethod(ctx, method)
 	if err != nil {
 		return "", "", "", "", "", err
 	}
 	userID, agentID, clientID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, verifierClientID, projectID)
 	return userID, clientID, agentID, prefLang, resourceOwner, err
+}
+
+func (v *TokenVerifier) verifySystemToken(ctx context.Context, token string) (string, error) {
+	jwtReq, err := op.VerifyJWTAssertion(ctx, token, v.systemJWTProfile)
+	if err != nil {
+		return "", err
+	}
+	return jwtReq.Subject, nil
+}
+
+type systemJWTStorage struct {
+	keys       map[string]string
+	mutex      sync.Mutex
+	cachedKeys map[string]*rsa.PublicKey
+}
+
+type SystemAPIUser struct {
+	Key   *rsa.PublicKey
+	Roles string
+}
+
+func (s *systemJWTStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, _ string) (*jose.JSONWebKey, error) {
+	key, ok := s.cachedKeys[keyID]
+	if ok {
+		return &jose.JSONWebKey{KeyID: keyID, Key: key}, nil
+	}
+	path, ok := s.keys[keyID]
+	if !ok {
+
+	}
+	defer s.mutex.Unlock()
+	s.mutex.Lock()
+	keyData, err := os.ReadFile(path)
+	if err != nil {
+
+	}
+	publicKey, err := crypto.BytesToPublicKey(keyData)
+	if err != nil {
+
+	}
+	s.cachedKeys[keyID] = publicKey
+	return &jose.JSONWebKey{KeyID: keyID, Key: publicKey}, nil
 }
 
 type client struct {
@@ -77,6 +137,9 @@ func (v *TokenVerifier) clientIDAndProjectIDFromMethod(ctx context.Context, meth
 		return "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-G2qrh", "Errors.Internal")
 	}
 	c := app.(*client)
+	if c.name == "System-API" {
+		return c.id, c.projectID, nil
+	}
 	c.id, c.projectID, err = v.authZRepo.VerifierClientID(ctx, c.name)
 	if err != nil {
 		return "", "", caos_errs.ThrowPermissionDenied(err, "AUTHZ-ptTIF2", "Errors.Internal")

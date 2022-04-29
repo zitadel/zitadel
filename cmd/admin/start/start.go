@@ -2,6 +2,7 @@ package start
 
 import (
 	"context"
+	"crypto/rsa"
 	"database/sql"
 	_ "embed"
 	"fmt"
@@ -135,14 +136,14 @@ func startZitadel(config *Config, masterKey string) error {
 	notification.Start(config.Notification, config.ExternalPort, config.ExternalSecure, commands, queries, dbClient, assets.HandlerPrefix, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys)
+	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, config.SystemAPIKeys)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys, systemAPIKeys map[string]string) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -150,9 +151,9 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		authZRepo,
 		queries,
 	}
-	verifier := internal_authz.Start(repo)
+	verifier := internal_authz.Start(repo, config.ExternalDomain, systemAPIKeys)
 
-	authenticatedAPIs := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
+	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
@@ -161,21 +162,21 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.DefaultInstance)); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.DefaultInstance)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, assets.HandlerPrefix, keys.User)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, assets.HandlerPrefix, keys.User)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
 
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
-	authenticatedAPIs.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
+	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator, config.ExternalSecure)
 	if err != nil {
@@ -186,25 +187,25 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
-	authenticatedAPIs.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
+	apis.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
 
 	openAPIHandler, err := openapi.Start()
 	if err != nil {
 		return fmt.Errorf("unable to start openapi handler: %w", err)
 	}
-	authenticatedAPIs.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
+	apis.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
-	authenticatedAPIs.RegisterHandler(console.HandlerPrefix, c)
+	apis.RegisterHandler(console.HandlerPrefix, c)
 
 	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
-	authenticatedAPIs.RegisterHandler(login.HandlerPrefix, l.Handler())
+	apis.RegisterHandler(login.HandlerPrefix, l.Handler())
 
 	return nil
 }
