@@ -1,0 +1,39 @@
+name: ZITADEL PR
+
+on:
+  pull_request:
+
+jobs:
+  Go:
+    runs-on: ubuntu-20.04
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver: docker
+          install: true
+      - name: Test
+        run: docker build -f build/grpc/Dockerfile -t zitadel-base:local . && docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+
+  Angular:
+    runs-on: ubuntu-20.04
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver: docker
+          install: true
+      - name: Test
+        run: docker build -f build/grpc/Dockerfile -t zitadel-base:local . && docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-build
