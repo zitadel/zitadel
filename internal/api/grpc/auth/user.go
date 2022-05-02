@@ -56,11 +56,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
 	sequence, limit, asc := change.ChangeQueryToQuery(req.Query)
-	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).ResourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	changes, err := s.query.UserChanges(ctx, authz.GetCtxData(ctx).UserID, sequence, limit, asc, features.AuditLogRetention)
+	changes, err := s.query.UserChanges(ctx, authz.GetCtxData(ctx).UserID, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}

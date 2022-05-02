@@ -9,9 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
@@ -211,51 +209,6 @@ func GetMockSecretGenerator(t *testing.T) crypto.Generator {
 	generator.EXPECT().Expiry().Return(time.Hour * 1).AnyTimes()
 
 	return generator
-}
-
-func GetMockVerifier(t *testing.T, features ...string) *testVerifier {
-	return &testVerifier{
-		features: features,
-	}
-}
-
-type testVerifier struct {
-	features []string
-}
-
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, error) {
-	return "userID", "agentID", "clientID", "de", "orgID", nil
-}
-func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
-	return nil, nil
-}
-
-func (v *testVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
-	return "", nil, nil
-}
-
-func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {
-	return nil
-}
-
-func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, error) {
-	return "clientID", nil
-}
-
-func (v *testVerifier) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
-	for _, feature := range requiredFeatures {
-		hasFeature := false
-		for _, f := range v.features {
-			if f == feature {
-				hasFeature = true
-				break
-			}
-		}
-		if !hasFeature {
-			return errors.ThrowPermissionDenied(nil, "id", "missing feature")
-		}
-	}
-	return nil
 }
 
 type mockInstance struct{}

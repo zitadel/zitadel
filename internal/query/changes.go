@@ -87,7 +87,7 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 	}
 	changes := make([]*Change, 0, len(events))
 	for _, event := range events {
-		if event.CreationDate().Before(time.Now().Add(-auditLogRetention)) {
+		if auditLogRetention != 0 && event.CreationDate().Before(time.Now().Add(-auditLogRetention)) {
 			continue
 		}
 		change := &Change{

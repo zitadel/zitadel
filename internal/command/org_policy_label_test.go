@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/static"
@@ -22,8 +21,7 @@ import (
 
 func TestCommandSide_AddLabelPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -105,77 +103,11 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "add policy, permission denied",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LabelPolicy{
-					PrimaryColor:        "#ffffff",
-					BackgroundColor:     "#ffffff",
-					WarnColor:           "#ffffff",
-					FontColor:           "#ffffff",
-					PrimaryColorDark:    "#ffffff",
-					BackgroundColorDark: "#ffffff",
-					WarnColorDark:       "#ffffff",
-					FontColorDark:       "#ffffff",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
-			},
-		},
-		{
 			name: "add policy,ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -197,7 +129,6 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -240,8 +171,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -259,8 +189,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 
 func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -317,71 +246,6 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "permission denied error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LabelPolicy{
-					PrimaryColor:        "#000000",
-					BackgroundColor:     "#000000",
-					WarnColor:           "#000000",
-					FontColor:           "#000000",
-					PrimaryColorDark:    "#000000",
-					BackgroundColorDark: "#000000",
-					WarnColorDark:       "#000000",
-					FontColorDark:       "#000000",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
-			},
-		},
-		{
 			name: "no changes, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -404,26 +268,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -469,24 +314,6 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLabelPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -508,7 +335,6 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -551,8 +377,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {

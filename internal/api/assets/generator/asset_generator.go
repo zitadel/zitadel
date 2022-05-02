@@ -31,7 +31,6 @@ func main() {
 
 type Method struct {
 	Path        string
-	Feature     string
 	HasDarkMode bool
 	Handlers    []Handler
 }
@@ -144,15 +143,13 @@ var {{.Name}}_AuthMethods = authz.MethodMapping {
     {{ range $service := .Services}}
 	{{ range $method := .Methods}}
 	{{ range $handler := .Handlers}}
-    {{ if (or $method.Feature $handler.Permission) }}
+    {{ if $handler.Permission }}
     	"{{$handler.Method}}:{{$prefix}}{{$service.Prefix}}{{$method.Path}}{{$handler.PathSuffix}}": authz.Option{
                Permission: "{{$handler.Permission}}",
-               Feature:    "{{$method.Feature}}",
         },
 	{{ if $method.HasDarkMode }}
 		"{{$handler.Method}}:{{$prefix}}{{$service.Prefix}}{{$method.Path}}/dark{{$handler.PathSuffix}}": authz.Option{
                Permission: "{{$handler.Permission}}",
-               Feature:    "{{$method.Feature}}",
         },
 	{{end}}
 	{{end}}

@@ -1,12 +1,10 @@
 package command
 
 import (
-	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http"
-	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -50,19 +48,12 @@ type Commands struct {
 	keyAlgorithm       crypto.EncryptionAlgorithm
 	privateKeyLifetime time.Duration
 	publicKeyLifetime  time.Duration
-
-	tokenVerifier orgFeatureChecker
-}
-
-type orgFeatureChecker interface {
-	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
 func StartCommands(es *eventstore.Eventstore,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
-	authZRepo authz_repo.Repository,
 	webAuthN *webauthn_helper.Config,
 	externalDomain string,
 	externalSecure bool,
@@ -119,8 +110,6 @@ func StartCommands(es *eventstore.Eventstore,
 
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
-
-	repo.tokenVerifier = authZRepo
 	return repo, nil
 }
 
