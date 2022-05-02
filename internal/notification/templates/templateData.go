@@ -9,9 +9,7 @@ import (
 )
 
 const (
-	DefaultFont            = "http://fonts.googleapis.com/css?family=Lato:200,300,400,600"
 	DefaultFontFamily      = "-apple-system, BlinkMacSystemFont, Segoe UI, Lato, Arial, Helvetica, sans-serif"
-	DefaultLogo            = "https://static.zitadel.ch/zitadel-logo-dark@3x.png"
 	DefaultFontColor       = "#22292f"
 	DefaultBackgroundColor = "#fafafa"
 	DefaultPrimaryColor    = "#5282C1"
@@ -30,6 +28,7 @@ type TemplateData struct {
 	FontColor       string
 	LogoURL         string
 	FontURL         string
+	FontFaceFamily  string
 	FontFamily      string
 
 	IncludeFooter bool
