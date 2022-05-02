@@ -47,7 +47,7 @@ cmd/zitadel/zitadel
 tmp/
 console/src/app/proto/generated/
 
-#generated filed
+#generated files
 **.pb.go
 **.proto.mock.go
 **.pb.*.go

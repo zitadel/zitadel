@@ -20,3 +20,22 @@ comment:
     layout: "header, diff"
     behavior: default
     require_changes: no
+
+ignore:
+  - ".artifacts"
+  - ".codecov"
+  - ".github" 
+  - "build"
+  - "docs"
+  - "guides"
+  - "console"
+  - "openapi"
+  - "statik"
+  - "**.pb.go"
+  - "**.proto.mock.go"
+  - "**.pb.*.go"
+  - "**.gen.go "
+  - "openapi/**/*.json"
+  - "/internal/api/assets/authz.go"
+  - "/internal/api/assets/router.go"
+  - "/internal/api/ui/console/static/*"
