@@ -68,6 +68,7 @@ brews:
       owner: zitadel
       name: zitadel-tap
       token: "{{ steps.generate-token.outputs.token }}"
+
     folder: Formula
     goarm: "7"
     homepage:  https://zitadel.ch
