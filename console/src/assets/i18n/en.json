@@ -759,6 +759,10 @@
       "USEPASSWORD": "Set Initial Password",
       "USEPASSWORDDESC": "The user does not have to set the password during initialization."
     },
+    "LIST": {
+      "TITLE": "Organizations",
+      "DESCRIPTION": "These are the organizations on your instance"
+    },
     "DOMAINS": {
       "NEW": "Add Domain",
       "TITLE": "Domains",

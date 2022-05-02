@@ -759,6 +759,10 @@
       "USEPASSWORD": "Imposta la password iniziale",
       "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
     },
+    "LIST": {
+      "TITLE": "Organizzazioni",
+      "DESCRIPTION": "Queste sono le organizzazioni sulla tua istanza"
+    },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
       "TITLE": "Domini",

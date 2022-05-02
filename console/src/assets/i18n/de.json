@@ -759,6 +759,10 @@
       "USEPASSWORD": "Initiales Passwort setzen",
       "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initalisierung nicht setzen."
     },
+    "LIST": {
+      "TITLE": "Organisationen",
+      "DESCRIPTION": "Dies sind die Organisationen in Ihrer Instanz"
+    },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
       "TITLE": "Domains",

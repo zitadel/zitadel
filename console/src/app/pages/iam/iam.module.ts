@@ -18,6 +18,7 @@ import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
+import { OrgsModule } from 'src/app/modules/orgs/orgs.module';
 import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
@@ -50,6 +51,7 @@ import { IamComponent } from './iam.component';
     MatProgressSpinnerModule,
     FormsModule,
     TranslateModule,
+    OrgsModule,
     MatDialogModule,
     ContributorsModule,
     LocalizedDatePipeModule,
