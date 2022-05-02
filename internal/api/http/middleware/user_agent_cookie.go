@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -26,10 +27,11 @@ type UserAgent struct {
 }
 
 type userAgentHandler struct {
-	cookieHandler *http_utils.CookieHandler
-	cookieName    string
-	idGenerator   id.Generator
-	nextHandler   http.Handler
+	cookieHandler   *http_utils.CookieHandler
+	cookieName      string
+	idGenerator     id.Generator
+	nextHandler     http.Handler
+	ignoredPrefixes []string
 }
 
 type UserAgentCookieConfig struct {
@@ -37,7 +39,7 @@ type UserAgentCookieConfig struct {
 	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
+func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGenerator id.Generator, externalSecure bool, ignoredPrefixes ...string) (func(http.Handler) http.Handler, error) {
 	opts := []http_utils.CookieHandlerOpt{
 		http_utils.WithEncryption(cookieKey, cookieKey),
 		http_utils.WithMaxAge(int(config.MaxAge.Seconds())),
@@ -47,15 +49,22 @@ func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGene
 	}
 	return func(handler http.Handler) http.Handler {
 		return &userAgentHandler{
-			nextHandler:   handler,
-			cookieName:    config.Name,
-			cookieHandler: http_utils.NewCookieHandler(opts...),
-			idGenerator:   idGenerator,
+			nextHandler:     handler,
+			cookieName:      config.Name,
+			cookieHandler:   http_utils.NewCookieHandler(opts...),
+			idGenerator:     idGenerator,
+			ignoredPrefixes: ignoredPrefixes,
 		}
 	}, nil
 }
 
 func (ua *userAgentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for _, prefix := range ua.ignoredPrefixes {
+		if strings.HasPrefix(r.URL.Path, prefix) {
+			ua.nextHandler.ServeHTTP(w, r)
+			return
+		}
+	}
 	agent, err := ua.getUserAgent(r)
 	if err != nil {
 		agent, err = ua.newUserAgent()

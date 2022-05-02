@@ -136,4 +136,11 @@ func (c *CookieHandler) httpSet(w http.ResponseWriter, name, domain, value strin
 		Secure:   c.secureOnly,
 		SameSite: c.sameSite,
 	})
+	varyValues := w.Header().Values("vary")
+	for _, vary := range varyValues {
+		if vary == "Cookie" {
+			return
+		}
+	}
+	w.Header().Add("vary", "Cookie")
 }
