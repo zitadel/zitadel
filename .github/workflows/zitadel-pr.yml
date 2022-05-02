@@ -20,6 +20,11 @@ jobs:
           install: true
       - name: Test
         run: docker build -f build/grpc/Dockerfile -t zitadel-base:local . && docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+      - name: Publish go coverage
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          file: .artifacts/codecov/profile.cov
+          name: go-codecov
 
   Angular:
     runs-on: ubuntu-20.04
@@ -37,9 +42,4 @@ jobs:
           install: true
       - name: Test
         run: docker build -f build/grpc/Dockerfile -t zitadel-base:local . && docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-build
-      - name: Publish go coverage
-        uses: codecov/codecov-action@v3.1.0
-        with:
-          file: .artifacts/codecov/profile.cov
-          name: go-codecov
 
