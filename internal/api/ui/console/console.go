@@ -74,7 +74,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 
 	handler := mux.NewRouter()
 	handler.Use(cache, security)
-	handler.Handle(envRequestPath, instanceHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler.Handle(envRequestPath, middleware.TelemetryHandler()(instanceHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		instance := authz.GetInstance(r.Context())
 		if instance.InstanceID() == "" {
 			http.Error(w, "empty instanceID", http.StatusInternalServerError)
@@ -88,7 +88,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 		}
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
-	})))
+	}))))
 	handler.SkipClean(true).PathPrefix("").Handler(http.FileServer(&spaHandler{http.FS(fSys)}))
 	return handler, nil
 }

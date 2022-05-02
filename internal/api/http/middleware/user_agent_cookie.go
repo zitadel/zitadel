@@ -37,7 +37,7 @@ type UserAgentCookieConfig struct {
 	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
+func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGenerator id.Generator, externalSecure bool, ignoredPrefixes ...string) (func(http.Handler) http.Handler, error) {
 	opts := []http_utils.CookieHandlerOpt{
 		http_utils.WithEncryption(cookieKey, cookieKey),
 		http_utils.WithMaxAge(int(config.MaxAge.Seconds())),
