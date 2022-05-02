@@ -10,7 +10,7 @@ At the end of the guide you should have an application able to read the details 
 If you need any other information about the .NET SDK go to the [documentation](https://caos.github.io/zitadel-net/) of the SDK itself.
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-net) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API.
+The client [SDK](https://github.com/zitadel/zitadel-net) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API.
 All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
 However, we recommend you read the guide on [how to access ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of :
