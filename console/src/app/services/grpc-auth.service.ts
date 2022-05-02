@@ -40,8 +40,6 @@ import {
     ListMyUserGrantsResponse,
     ListMyUserSessionsRequest,
     ListMyUserSessionsResponse,
-    ListMyZitadelFeaturesRequest,
-    ListMyZitadelFeaturesResponse,
     ListMyZitadelPermissionsRequest,
     ListMyZitadelPermissionsResponse,
     RemoveMyAuthFactorOTPRequest,
@@ -397,12 +395,6 @@ export class GrpcAuthService {
   public listMyZitadelPermissions(): Promise<ListMyZitadelPermissionsResponse.AsObject> {
     return this.grpcService.auth
       .listMyZitadelPermissions(new ListMyZitadelPermissionsRequest(), null)
-      .then((resp) => resp.toObject());
-  }
-
-  public listMyZitadelFeatures(): Promise<ListMyZitadelFeaturesResponse.AsObject> {
-    return this.grpcService.auth
-      .listMyZitadelFeatures(new ListMyZitadelFeaturesRequest(), null)
       .then((resp) => resp.toObject());
   }
 

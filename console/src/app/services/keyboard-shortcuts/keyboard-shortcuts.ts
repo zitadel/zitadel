@@ -2,7 +2,6 @@ export interface KeyboardShortcut {
   keyboardKeys: string[];
   link: any[];
   i18nKey: string;
-  features?: string[] | RegExp[];
   permissions?: string[] | RegExp[];
 }
 
@@ -57,7 +56,6 @@ export const ACTIONS: KeyboardShortcut = {
   i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.ACTIONS',
   link: ['/actions'],
   keyboardKeys: ['g', 'f'],
-  features: ['actions'],
   permissions: ['org.action.read'],
 };
 

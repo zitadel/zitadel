@@ -5,7 +5,6 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
-import { Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -24,8 +23,6 @@ export class IamComponent {
   public totalMemberResult: number = 0;
   public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
 
-  public features!: Features.AsObject;
-
   constructor(
     public adminService: AdminService,
     private dialog: MatDialog,
@@ -34,8 +31,6 @@ export class IamComponent {
     private router: Router,
   ) {
     this.loadMembers();
-    this.loadFeatures();
-    this.adminService.getDefaultFeatures();
 
     const breadcrumbs = [
       new Breadcrumb({
@@ -105,14 +100,5 @@ export class IamComponent {
 
   public showDetail(): void {
     this.router.navigate(['/system', 'members']);
-  }
-
-  public loadFeatures(): void {
-    this.loadingSubject.next(true);
-    this.adminService.getDefaultFeatures().then((resp) => {
-      if (resp.features) {
-        this.features = resp.features;
-      }
-    });
   }
 }
