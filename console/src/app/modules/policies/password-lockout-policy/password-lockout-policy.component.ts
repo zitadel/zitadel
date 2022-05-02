@@ -4,9 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GetLockoutPolicyResponse as AdminGetPasswordLockoutPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import {
-    GetLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { GetLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LockoutPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -57,7 +55,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
               }
 
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -72,7 +70,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
               this.service = this.injector.get(AdminService as Type<AdminService>);
 
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });

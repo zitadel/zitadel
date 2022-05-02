@@ -25,7 +25,7 @@ export class UserListComponent {
     });
 
     const iambread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
+      type: BreadcrumbType.INSTANCE,
       name: 'Instance',
       routerLink: ['/instance'],
     });

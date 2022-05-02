@@ -40,8 +40,9 @@ export class OrgsComponent {
     this.loadOrgs(this.initialLimit, 0);
     this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
 
+    console.log('org');
     const iamBread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
+      type: BreadcrumbType.INSTANCE,
       name: 'Instance',
       routerLink: ['/instance'],
     });

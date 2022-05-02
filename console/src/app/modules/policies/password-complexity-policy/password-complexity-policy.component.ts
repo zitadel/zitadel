@@ -2,12 +2,8 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import {
-    GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse,
-} from 'src/app/proto/generated/zitadel/admin_pb';
-import {
-    GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -60,7 +56,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
               }
 
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -72,7 +68,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
               break;
             case PolicyComponentServiceType.ADMIN:
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });

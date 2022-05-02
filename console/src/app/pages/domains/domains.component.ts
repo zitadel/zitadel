@@ -27,7 +27,7 @@ export class DomainsComponent implements OnInit {
     breadcrumbService: BreadcrumbService,
   ) {
     const iambread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
+      type: BreadcrumbType.INSTANCE,
       name: 'Instance',
       routerLink: ['/instance'],
     });

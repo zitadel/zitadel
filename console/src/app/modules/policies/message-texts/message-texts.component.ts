@@ -5,35 +5,35 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-    GetCustomPasswordResetMessageTextRequest as AdminGetCustomPasswordResetMessageTextRequest,
-    GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
-    GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
-    GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
-    SetDefaultDomainClaimedMessageTextRequest,
-    SetDefaultInitMessageTextRequest,
-    SetDefaultPasswordlessRegistrationMessageTextRequest,
-    SetDefaultPasswordResetMessageTextRequest,
-    SetDefaultVerifyEmailMessageTextRequest,
-    SetDefaultVerifyPhoneMessageTextRequest,
+  GetCustomPasswordResetMessageTextRequest as AdminGetCustomPasswordResetMessageTextRequest,
+  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
+  SetDefaultDomainClaimedMessageTextRequest,
+  SetDefaultInitMessageTextRequest,
+  SetDefaultPasswordlessRegistrationMessageTextRequest,
+  SetDefaultPasswordResetMessageTextRequest,
+  SetDefaultVerifyEmailMessageTextRequest,
+  SetDefaultVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    GetCustomDomainClaimedMessageTextRequest,
-    GetCustomPasswordlessRegistrationMessageTextRequest,
-    GetCustomPasswordResetMessageTextRequest,
-    GetCustomVerifyEmailMessageTextRequest,
-    GetCustomVerifyPhoneMessageTextRequest,
-    GetDefaultDomainClaimedMessageTextRequest,
-    GetDefaultInitMessageTextRequest,
-    GetDefaultPasswordlessRegistrationMessageTextRequest,
-    GetDefaultPasswordResetMessageTextRequest,
-    GetDefaultVerifyEmailMessageTextRequest,
-    GetDefaultVerifyPhoneMessageTextRequest,
-    SetCustomDomainClaimedMessageTextRequest,
-    SetCustomInitMessageTextRequest,
-    SetCustomPasswordlessRegistrationMessageTextRequest,
-    SetCustomPasswordResetMessageTextRequest,
-    SetCustomVerifyEmailMessageTextRequest,
-    SetCustomVerifyPhoneMessageTextRequest,
+  GetCustomDomainClaimedMessageTextRequest,
+  GetCustomPasswordlessRegistrationMessageTextRequest,
+  GetCustomPasswordResetMessageTextRequest,
+  GetCustomVerifyEmailMessageTextRequest,
+  GetCustomVerifyPhoneMessageTextRequest,
+  GetDefaultDomainClaimedMessageTextRequest,
+  GetDefaultInitMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordResetMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextRequest,
+  SetCustomDomainClaimedMessageTextRequest,
+  SetCustomInitMessageTextRequest,
+  SetCustomPasswordlessRegistrationMessageTextRequest,
+  SetCustomPasswordResetMessageTextRequest,
+  SetCustomVerifyEmailMessageTextRequest,
+  SetCustomVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
@@ -428,7 +428,7 @@ export class MessageTextsComponent implements OnDestroy {
               }
 
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -446,7 +446,7 @@ export class MessageTextsComponent implements OnDestroy {
               this.loadData(this.currentType);
 
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });

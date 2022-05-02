@@ -12,11 +12,11 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'cnsl-iam',
-  templateUrl: './iam.component.html',
-  styleUrls: ['./iam.component.scss'],
+  selector: 'cnsl-instance',
+  templateUrl: './instance.component.html',
+  styleUrls: ['./instance.component.scss'],
 })
-export class IamComponent {
+export class InstanceComponent {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -33,8 +33,8 @@ export class IamComponent {
     this.loadMembers();
 
     const instanceBread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
-      name: 'INSTANCE',
+      type: BreadcrumbType.INSTANCE,
+      name: 'Instance',
       routerLink: ['/instance'],
     });
 

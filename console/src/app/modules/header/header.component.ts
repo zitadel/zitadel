@@ -63,13 +63,6 @@ export class HeaderComponent implements OnDestroy {
     this.changedActiveOrg.emit(org);
   }
 
-  public get isOnSystem(): boolean {
-    return (
-      ['/instance', '/views', '/failed-events', '/instance/members'].includes(this.router.url) ||
-      new RegExp('/instance/policy/*').test(this.router.url)
-    );
-  }
-
   public get isOnMe(): boolean {
     return this.router.url === '/users/me';
   }

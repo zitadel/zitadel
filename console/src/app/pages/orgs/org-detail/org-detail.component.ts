@@ -39,7 +39,7 @@ export class OrgDetailComponent implements OnInit {
     breadcrumbService: BreadcrumbService,
   ) {
     const iamBread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
+      type: BreadcrumbType.INSTANCE,
       name: 'Instance',
       routerLink: ['/instance'],
     });

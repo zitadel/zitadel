@@ -3,9 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GetPasswordAgePolicyResponse as AdminGetPasswordAgePolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import {
-    GetPasswordAgePolicyResponse as MgmtGetPasswordAgePolicyResponse,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { GetPasswordAgePolicyResponse as MgmtGetPasswordAgePolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordAgePolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -43,7 +41,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -57,7 +55,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
               this.service = this.injector.get(AdminService as Type<AdminService>);
 
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });

@@ -26,11 +26,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
-import { IamRoutingModule } from './iam-routing.module';
-import { IamComponent } from './iam.component';
+import { IamRoutingModule } from './instance-routing.module';
+import { InstanceComponent } from './instance.component';
 
 @NgModule({
-  declarations: [IamComponent],
+  declarations: [InstanceComponent],
   imports: [
     CommonModule,
     IamRoutingModule,
@@ -63,4 +63,4 @@ import { IamComponent } from './iam.component';
     PolicyGridModule,
   ],
 })
-export class IamModule {}
+export class InstanceModule {}

@@ -12,7 +12,7 @@ export class HomeComponent {
 
   constructor(public authService: GrpcAuthService, breadcrumbService: BreadcrumbService) {
     const instanceBread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
+      type: BreadcrumbType.INSTANCE,
       name: 'INSTANCE',
       routerLink: ['/instance'],
     });

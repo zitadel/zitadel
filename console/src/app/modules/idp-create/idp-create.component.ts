@@ -85,7 +85,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
           ];
 
           const iamBread = new Breadcrumb({
-            type: BreadcrumbType.IAM,
+            type: BreadcrumbType.INSTANCE,
             name: 'Instance',
             routerLink: ['/instance'],
           });
@@ -99,7 +99,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
           ];
 
           const iambread = new Breadcrumb({
-            type: BreadcrumbType.IAM,
+            type: BreadcrumbType.INSTANCE,
             name: 'Instance',
             routerLink: ['/instance'],
           });

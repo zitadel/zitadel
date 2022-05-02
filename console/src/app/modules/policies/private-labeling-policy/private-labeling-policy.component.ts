@@ -4,15 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import {
-    GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
-    GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
-    UpdateLabelPolicyRequest,
+  GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
+  GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
+  UpdateLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    AddCustomLabelPolicyRequest,
-    GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
-    GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
-    UpdateCustomLabelPolicyRequest,
+  AddCustomLabelPolicyRequest,
+  GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
+  GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
+  UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -115,7 +115,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
                 this.org = org;
               }
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -129,7 +129,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.service = this.injector.get(AdminService as Type<AdminService>);
 
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });

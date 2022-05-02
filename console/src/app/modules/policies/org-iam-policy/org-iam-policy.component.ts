@@ -58,7 +58,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
             this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
 
             const iambread = new Breadcrumb({
-              type: BreadcrumbType.IAM,
+              type: BreadcrumbType.INSTANCE,
               name: 'Instance',
               routerLink: ['/instance'],
             });

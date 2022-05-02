@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-    GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
-    UpdateLoginPolicyRequest,
-    UpdateLoginPolicyResponse,
+  GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
+  UpdateLoginPolicyRequest,
+  UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    AddCustomLoginPolicyRequest,
-    GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+  AddCustomLoginPolicyRequest,
+  GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -74,7 +74,7 @@ export class LoginPolicyComponent implements OnDestroy {
               }
 
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -93,7 +93,7 @@ export class LoginPolicyComponent implements OnDestroy {
               ];
 
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });

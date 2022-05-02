@@ -14,7 +14,7 @@
         [ngSwitch]="breadc[breadc.length - 1].type"
       >
         <div class="nav-row" @navrow>
-          <ng-container *ngSwitchCase="BreadcrumbType.IAM">
+          <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
             <div class="nav-row-abs" @navroworg>
               <ng-template cnslHasRole [hasRole]="['iam.read']">
                 <a

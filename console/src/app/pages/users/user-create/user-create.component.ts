@@ -67,7 +67,7 @@ export class UserCreateComponent implements OnDestroy {
   ) {
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
-        type: BreadcrumbType.IAM,
+        type: BreadcrumbType.INSTANCE,
         name: 'Instance',
         routerLink: ['/instance'],
       }),

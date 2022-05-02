@@ -6,14 +6,14 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
 import { map, pairwise, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import {
-    GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
-    GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
-    SetCustomLoginTextsRequest as AdminSetCustomLoginTextsRequest,
+  GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
+  GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
+  SetCustomLoginTextsRequest as AdminSetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    GetCustomLoginTextsRequest,
-    GetDefaultLoginTextsRequest,
-    SetCustomLoginTextsRequest,
+  GetCustomLoginTextsRequest,
+  GetDefaultLoginTextsRequest,
+  SetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -162,7 +162,7 @@ export class LoginTextsComponent implements OnDestroy {
               }
 
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -183,7 +183,7 @@ export class LoginTextsComponent implements OnDestroy {
               this.loadData();
 
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });

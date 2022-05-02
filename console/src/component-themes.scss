@@ -32,7 +32,7 @@
 @import 'src/app/pages/projects/project-grid/project-grid.component';
 @import 'src/app/app.component.scss';
 @import './styles/color.scss';
-@import 'src/app/pages/iam/iam.component.scss';
+@import 'src/app/pages/instance/instance.component.scss';
 @import 'src/app/modules/refresh-table/refresh-table.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
@@ -93,7 +93,7 @@
   @include auth-user-detail-theme($theme);
   @include edit-text-theme($theme);
   @include user-detail-theme($theme);
-  @include iam-detail-theme($theme);
+  @include instance-detail-theme($theme);
   @include meta-theme($theme);
   @include keyboard-shortcuts-theme($theme);
   @include project-grant-illustration-theme($theme);

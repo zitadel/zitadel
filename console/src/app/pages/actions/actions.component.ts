@@ -40,7 +40,7 @@ export class ActionsComponent {
     private toast: ToastService,
   ) {
     const iambread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
+      type: BreadcrumbType.INSTANCE,
       name: 'Instance',
       routerLink: ['/instance'],
     });

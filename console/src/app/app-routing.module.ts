@@ -42,7 +42,7 @@ const routes: Routes = [
   },
   {
     path: 'instance',
-    loadChildren: () => import('./pages/iam/iam.module').then((m) => m.IamModule),
+    loadChildren: () => import('./pages/instance/instance.module').then((m) => m.InstanceModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['iam.read', 'iam.write'],

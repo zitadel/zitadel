@@ -28,7 +28,7 @@ export class IamViewsComponent implements AfterViewInit {
 
     const breadcrumbs = [
       new Breadcrumb({
-        type: BreadcrumbType.IAM,
+        type: BreadcrumbType.INSTANCE,
         name: 'Instance',
         routerLink: ['/instance'],
       }),

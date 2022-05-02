@@ -4,12 +4,12 @@ import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
-import { IamComponent } from './iam.component';
+import { InstanceComponent } from './instance.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: IamComponent,
+    component: InstanceComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['iam.read'],

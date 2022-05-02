@@ -5,13 +5,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import {
-    GetPrivacyPolicyResponse as AdminGetPrivacyPolicyResponse,
-    UpdatePrivacyPolicyRequest,
+  GetPrivacyPolicyResponse as AdminGetPrivacyPolicyResponse,
+  UpdatePrivacyPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    AddCustomPrivacyPolicyRequest,
-    GetPrivacyPolicyResponse,
-    UpdateCustomPrivacyPolicyRequest,
+  AddCustomPrivacyPolicyRequest,
+  GetPrivacyPolicyResponse,
+  UpdateCustomPrivacyPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -96,7 +96,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
               }
 
               const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
@@ -111,7 +111,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
               this.loadData();
 
               const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
+                type: BreadcrumbType.INSTANCE,
                 name: 'Instance',
                 routerLink: ['/instance'],
               });
