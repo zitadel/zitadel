@@ -6,7 +6,6 @@ import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.componen
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Action, ActionState, Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
-import { ActionsAllowed } from 'src/app/proto/generated/zitadel/features_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -51,17 +50,6 @@ export class ActionsComponent {
     };
     breadcrumbService.setBreadcrumb([iambread, bread]);
 
-    this.mgmtService.getFeatures().then((featuresResp) => {
-      if (featuresResp && featuresResp.features) {
-        const features = featuresResp.features;
-        this.maxActions =
-          features && features.actionsAllowed === ActionsAllowed.ACTIONS_ALLOWED_MAX
-            ? features.maxActions
-            : features.actionsAllowed === ActionsAllowed.ACTIONS_ALLOWED_MAX
-            ? null
-            : 0;
-      }
-    });
     this.loadFlow();
   }
 

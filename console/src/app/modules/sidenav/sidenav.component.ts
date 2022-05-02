@@ -4,7 +4,6 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 export interface SidenavSetting {
   id: string;
   i18nKey: string;
-  featureRequired: string[] | false;
 }
 
 @Component({

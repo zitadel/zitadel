@@ -228,29 +228,6 @@ DefaultInstance:
       IncludeUpperLetters: true
       IncludeDigits: true
       IncludeSymbols: false
-  Features:
-    TierName: Default Tier
-    TierDescription: ""
-    State: 1 #active
-    StateDescription: ""
-    Retention: 8760h #1year
-    LoginPolicyFactors: true
-    LoginPolicyIDP: true
-    LoginPolicyPasswordless: true
-    LoginPolicyRegistration: true
-    LoginPolicyUsernameLogin: true
-    LoginPolicyPasswordReset: true
-    PasswordComplexityPolicy: true
-    LabelPolicyPrivateLabel: true
-    LabelPolicyWatermark: true
-    CustomDomain: true
-    PrivacyPolicy: true
-    MetadataUser: true
-    CustomTextMessage: true
-    CustomTextLogin: true
-    LockoutPolicy: true
-    ActionsAllowed: 2 #ActionsAllowedUnlimited
-    MaxActions: #not necessary because of ActionsAllowedUnlimited
   PasswordComplexityPolicy:
     MinLength: 8
     HasLowercase: true
@@ -383,8 +360,6 @@ InternalAuthZ:
       Permissions:
         - "iam.read"
         - "iam.write"
-        - "iam.features.read"
-        - "iam.features.write"
         - "iam.policy.read"
         - "iam.policy.write"
         - "iam.policy.delete"
@@ -425,7 +400,6 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
-        - "features.read"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -451,7 +425,6 @@ InternalAuthZ:
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
-        - "iam.features.read"
         - "iam.policy.read"
         - "iam.member.read"
         - "iam.idp.read"
@@ -466,7 +439,6 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
-        - "features.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"
@@ -501,7 +473,6 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
-        - "features.read"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -538,7 +509,6 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
-        - "features.read"
         - "project.read"
         - "project.member.read"
         - "project.role.read"
@@ -574,7 +544,6 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.credential.write"
-        - "features.read"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -619,7 +588,6 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
-        - "features.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"

@@ -29,23 +29,6 @@
       padding: .25rem 0;
     }
 
-    .action {
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      margin-left: .5rem;
-      border-radius: 50vw;
-      align-self: center;
-      padding: .25rem .5rem;
-      background: if($is-dark-theme, #00000030, #ffffff40);
-      font-weight: 600;
-
-      i {
-        font-size: 1.2rem;
-      }
-    }
-
     &.info {
       background-color: map-get($background, infosection);
       color: map-get($foreground, infosection);

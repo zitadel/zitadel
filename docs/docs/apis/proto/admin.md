@@ -423,66 +423,6 @@ all fields are updated. If no value is provided the field will be empty afterwar
     PUT: /idps/{idp_id}/jwt_config
 
 
-### GetDefaultFeatures
-
-> **rpc** GetDefaultFeatures([GetDefaultFeaturesRequest](#getdefaultfeaturesrequest))
-[GetDefaultFeaturesResponse](#getdefaultfeaturesresponse)
-
-
-
-
-
-    GET: /features
-
-
-### SetDefaultFeatures
-
-> **rpc** SetDefaultFeatures([SetDefaultFeaturesRequest](#setdefaultfeaturesrequest))
-[SetDefaultFeaturesResponse](#setdefaultfeaturesresponse)
-
-
-
-
-
-    PUT: /features
-
-
-### GetOrgFeatures
-
-> **rpc** GetOrgFeatures([GetOrgFeaturesRequest](#getorgfeaturesrequest))
-[GetOrgFeaturesResponse](#getorgfeaturesresponse)
-
-
-
-
-
-    GET: /orgs/{org_id}/features
-
-
-### SetOrgFeatures
-
-> **rpc** SetOrgFeatures([SetOrgFeaturesRequest](#setorgfeaturesrequest))
-[SetOrgFeaturesResponse](#setorgfeaturesresponse)
-
-
-
-
-
-    PUT: /orgs/{org_id}/features
-
-
-### ResetOrgFeatures
-
-> **rpc** ResetOrgFeatures([ResetOrgFeaturesRequest](#resetorgfeaturesrequest))
-[ResetOrgFeaturesResponse](#resetorgfeaturesresponse)
-
-
-
-
-
-    DELETE: /orgs/{org_id}/features
-
-
 ### GetOrgIAMPolicy
 
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
@@ -1962,23 +1902,6 @@ This is an empty request
 
 
 
-### GetDefaultFeaturesRequest
-
-
-
-
-
-### GetDefaultFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| features |  zitadel.features.v1.Features | - |  |
-
-
-
-
 ### GetDefaultInitMessageTextRequest
 
 
@@ -2287,28 +2210,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org |  zitadel.org.v1.Org | - |  |
-
-
-
-
-### GetOrgFeaturesRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetOrgFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| features |  zitadel.features.v1.Features | - |  |
 
 
 
@@ -3217,28 +3118,6 @@ This is an empty request
 
 
 
-### ResetOrgFeaturesRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### ResetOrgFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### SetCustomLoginTextsRequest
 
 
@@ -3314,50 +3193,6 @@ This is an empty request
 
 
 ### SetDefaultDomainClaimedMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### SetDefaultFeaturesRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| tier_name |  string | - | string.max_len: 200<br />  |
-| description |  string | - | string.max_len: 200<br />  |
-| audit_log_retention |  google.protobuf.Duration | - | duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
-| login_policy_username_login |  bool | - |  |
-| login_policy_registration |  bool | - |  |
-| login_policy_idp |  bool | - |  |
-| login_policy_factors |  bool | - |  |
-| login_policy_passwordless |  bool | - |  |
-| password_complexity_policy |  bool | - |  |
-| label_policy |  bool | - |  |
-| custom_domain |  bool | - |  |
-| login_policy_password_reset |  bool | - |  |
-| label_policy_private_label |  bool | - |  |
-| label_policy_watermark |  bool | - |  |
-| custom_text |  bool | - |  |
-| privacy_policy |  bool | - |  |
-| metadata_user |  bool | - |  |
-| custom_text_message |  bool | - |  |
-| custom_text_login |  bool | - |  |
-| lockout_policy |  bool | - |  |
-| actions |  bool | - |  |
-| actions_allowed |  zitadel.features.v1.ActionsAllowed | - |  |
-| max_actions |  int32 | - |  |
-
-
-
-
-### SetDefaultFeaturesResponse
 
 
 
@@ -3525,53 +3360,6 @@ This is an empty request
 
 
 ### SetDefaultVerifyPhoneMessageTextResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### SetOrgFeaturesRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| tier_name |  string | - | string.max_len: 200<br />  |
-| description |  string | - | string.max_len: 200<br />  |
-| state |  zitadel.features.v1.FeaturesState | - |  |
-| state_description |  string | - | string.max_len: 200<br />  |
-| audit_log_retention |  google.protobuf.Duration | - | duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
-| login_policy_username_login |  bool | - |  |
-| login_policy_registration |  bool | - |  |
-| login_policy_idp |  bool | - |  |
-| login_policy_factors |  bool | - |  |
-| login_policy_passwordless |  bool | - |  |
-| password_complexity_policy |  bool | - |  |
-| label_policy |  bool | - |  |
-| custom_domain |  bool | - |  |
-| login_policy_password_reset |  bool | - |  |
-| label_policy_private_label |  bool | - |  |
-| label_policy_watermark |  bool | - |  |
-| custom_text |  bool | - |  |
-| privacy_policy |  bool | - |  |
-| metadata_user |  bool | - |  |
-| custom_text_message |  bool | - |  |
-| custom_text_login |  bool | - |  |
-| lockout_policy |  bool | - |  |
-| actions |  bool | - |  |
-| actions_allowed |  zitadel.features.v1.ActionsAllowed | - |  |
-| max_actions |  int32 | - |  |
-
-
-
-
-### SetOrgFeaturesResponse
 
 
 

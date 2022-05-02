@@ -65,7 +65,7 @@ export class HeaderComponent implements OnDestroy {
 
   public get isOnSystem(): boolean {
     return (
-      ['/instance', '/views', '/failed-events', '/instance/members', '/instance/features'].includes(this.router.url) ||
+      ['/instance', '/views', '/failed-events', '/instance/members'].includes(this.router.url) ||
       new RegExp('/instance/policy/*').test(this.router.url)
     );
   }

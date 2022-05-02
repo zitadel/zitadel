@@ -79,11 +79,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	res, err := s.query.UserChanges(ctx, req.UserId, sequence, limit, asc, features.AuditLogRetention)
+	res, err := s.query.UserChanges(ctx, req.UserId, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}

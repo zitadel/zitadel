@@ -116,7 +116,6 @@ func startZitadel(config *Config, masterKey string) error {
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		storage,
-		authZRepo,
 		webAuthNConfig,
 		config.ExternalDomain,
 		config.ExternalSecure,
@@ -168,10 +167,10 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err := authenticatedAPIs.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, assets.HandlerPrefix, keys.User)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, oidc.HandlerPrefix)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
 
