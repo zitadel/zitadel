@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GetPasswordAgePolicyResponse as AdminGetPasswordAgePolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetPasswordAgePolicyResponse as MgmtGetPasswordAgePolicyResponse,
+    GetPasswordAgePolicyResponse as MgmtGetPasswordAgePolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordAgePolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -44,8 +44,8 @@ export class PasswordAgePolicyComponent implements OnDestroy {
 
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               const bread: Breadcrumb = {
                 type: BreadcrumbType.ORG,
@@ -58,8 +58,8 @@ export class PasswordAgePolicyComponent implements OnDestroy {
 
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);
               break;

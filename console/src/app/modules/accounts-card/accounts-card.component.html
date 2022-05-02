@@ -17,7 +17,7 @@
 
   <span class="u-name">{{ user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A' }}</span>
   <span class="u-email" *ngIf="user.preferredLoginName">{{ user.preferredLoginName }}</span>
-  <a [routerLink]="['/system']" class="iamuser" *ngIf="iamuser" (click)="close()">
+  <a [routerLink]="['/instance']" class="iamuser" *ngIf="iamuser" (click)="close()">
     <span class="label">{{ 'MENU.INSTANCE' | translate }}</span>
     <a class="iambtn">
       <i class="las la-cog"></i>

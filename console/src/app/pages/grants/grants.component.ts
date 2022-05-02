@@ -43,8 +43,8 @@ export class GrantsComponent implements OnDestroy {
             const breadcrumbs = [
               new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               }),
               new Breadcrumb({
                 type: BreadcrumbType.ORG,
@@ -64,8 +64,8 @@ export class GrantsComponent implements OnDestroy {
       } else if (context === UserGrantContext.NONE) {
         const iambread = new Breadcrumb({
           type: BreadcrumbType.IAM,
-          name: 'IAM',
-          routerLink: ['/system'],
+          name: 'Instance',
+          routerLink: ['/instance'],
         });
         const bread: Breadcrumb = {
           type: BreadcrumbType.ORG,

@@ -75,8 +75,8 @@ export class LoginPolicyComponent implements OnDestroy {
 
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               const bread: Breadcrumb = {
                 type: BreadcrumbType.ORG,
@@ -94,8 +94,8 @@ export class LoginPolicyComponent implements OnDestroy {
 
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);
               break;

@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GetLockoutPolicyResponse as AdminGetPasswordLockoutPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse,
+    GetLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LockoutPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -58,8 +58,8 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               const bread: Breadcrumb = {
                 type: BreadcrumbType.ORG,
@@ -73,8 +73,8 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);
 

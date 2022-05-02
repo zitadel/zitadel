@@ -52,8 +52,8 @@ export class UserGrantCreateComponent implements OnDestroy {
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
         type: BreadcrumbType.IAM,
-        name: 'IAM',
-        routerLink: ['/system'],
+        name: 'Instance',
+        routerLink: ['/instance'],
       }),
       new Breadcrumb({
         type: BreadcrumbType.ORG,

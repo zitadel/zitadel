@@ -19,9 +19,18 @@
               <ng-template cnslHasRole [hasRole]="['iam.read']">
                 <a
                   class="nav-item"
+                  [routerLinkActive]="['active']"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  [routerLink]="['/']"
+                >
+                  <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
+                </a>
+
+                <a
+                  class="nav-item"
                   [routerLinkActiveOptions]="{ exact: false }"
                   [routerLinkActive]="['active']"
-                  [routerLink]="['/system']"
+                  [routerLink]="['/instance']"
                 >
                   <div class="c_label">
                     <span> {{ 'MENU.INSTANCEOVERVIEW' | translate }} </span>

@@ -195,7 +195,7 @@ export class IdpTableComponent implements OnInit {
 
   public get createRouterLink(): RouterLink | any {
     if (this.service instanceof AdminService) {
-      return ['/system', 'idp', 'create'];
+      return ['/instance', 'idp', 'create'];
     } else if (this.service instanceof ManagementService) {
       return ['/org', 'idp', 'create'];
     }
@@ -207,13 +207,13 @@ export class IdpTableComponent implements OnInit {
         case PolicyComponentServiceType.MGMT:
           switch (row.owner) {
             case IDPOwnerType.IDP_OWNER_TYPE_SYSTEM:
-              return ['/system', 'idp', row.id];
+              return ['/instance', 'idp', row.id];
             case IDPOwnerType.IDP_OWNER_TYPE_ORG:
               return ['/org', 'idp', row.id];
           }
           break;
         case PolicyComponentServiceType.ADMIN:
-          return ['/system', 'idp', row.id];
+          return ['/instance', 'idp', row.id];
       }
     }
   }

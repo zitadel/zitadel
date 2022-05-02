@@ -20,8 +20,8 @@ export class ProjectRolesComponent {
       const breadcrumbs = [
         new Breadcrumb({
           type: BreadcrumbType.IAM,
-          name: 'IAM',
-          routerLink: ['/system'],
+          name: 'Instance',
+          routerLink: ['/instance'],
         }),
         new Breadcrumb({
           type: BreadcrumbType.ORG,

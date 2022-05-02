@@ -9,7 +9,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
-  ProjectPrivateLabelingDialogComponent,
+    ProjectPrivateLabelingDialogComponent,
 } from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -122,8 +122,8 @@ export class OwnedProjectDetailComponent implements OnInit {
             const breadcrumbs = [
               new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               }),
               new Breadcrumb({
                 type: BreadcrumbType.ORG,

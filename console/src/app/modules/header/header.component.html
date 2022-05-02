@@ -173,11 +173,11 @@
       {{ 'MENU.DOCUMENTATION' | translate }}
     </a>
 
-    <div class="system-rel" *ngIf="!isOnMe">
+    <!-- <div class="system-rel" *ngIf="!isOnMe">
       <a
         id="systembutton"
         *ngIf="!isOnSystem && (['iam.read$', 'iam.write$'] | hasRole | async)"
-        [routerLink]="['/system']"
+        [routerLink]="['/instance']"
         class="iam-settings cnsl-action-button"
         mat-stroked-button
       >
@@ -194,7 +194,7 @@
         <span class="iam-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
         <i class="las la-cog"></i>
       </a>
-    </div>
+    </div> -->
 
     <div
       cnslOutsideClick

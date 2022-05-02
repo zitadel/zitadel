@@ -28,8 +28,8 @@ export class DomainsComponent implements OnInit {
   ) {
     const iambread = new Breadcrumb({
       type: BreadcrumbType.IAM,
-      name: 'IAM',
-      routerLink: ['/system'],
+      name: 'Instance',
+      routerLink: ['/instance'],
     });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,

@@ -35,8 +35,8 @@ export class IamMembersComponent {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.IAM,
-        name: 'System',
-        routerLink: ['/system'],
+        name: 'Instance',
+        routerLink: ['/instance'],
       }),
     ];
     breadcrumbService.setBreadcrumb(breadcrumbs);

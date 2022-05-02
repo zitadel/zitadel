@@ -2,7 +2,7 @@
   [loading]="loading$ | async"
   (refreshed)="refreshPage()"
   [dataSize]="dataSource.data.length"
-  [emitRefreshOnPreviousRoutes]="['/system/idp/create']"
+  [emitRefreshOnPreviousRoutes]="['/instance/idp/create']"
   [timestamp]="idpResult?.details?.viewTimestamp"
   [selection]="selection"
   [hideRefresh]="true"

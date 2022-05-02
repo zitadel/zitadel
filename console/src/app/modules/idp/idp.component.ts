@@ -8,15 +8,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
-  UpdateIDPJWTConfigRequest,
-  UpdateIDPOIDCConfigRequest,
-  UpdateIDPRequest,
+    UpdateIDPJWTConfigRequest,
+    UpdateIDPOIDCConfigRequest,
+    UpdateIDPRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { IDP, IDPState, IDPStylingType, OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  UpdateOrgIDPJWTConfigRequest,
-  UpdateOrgIDPOIDCConfigRequest,
-  UpdateOrgIDPRequest,
+    UpdateOrgIDPJWTConfigRequest,
+    UpdateOrgIDPOIDCConfigRequest,
+    UpdateOrgIDPRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -103,8 +103,8 @@ export class IdpComponent implements OnDestroy {
 
           const iambread = new Breadcrumb({
             type: BreadcrumbType.IAM,
-            name: 'System',
-            routerLink: ['/system'],
+            name: 'Instance',
+            routerLink: ['/instance'],
           });
           const bread: Breadcrumb = {
             type: BreadcrumbType.ORG,
@@ -117,8 +117,8 @@ export class IdpComponent implements OnDestroy {
 
           const iamBread = new Breadcrumb({
             type: BreadcrumbType.IAM,
-            name: 'System',
-            routerLink: ['/system'],
+            name: 'Instance',
+            routerLink: ['/instance'],
           });
           breadcrumbService.setBreadcrumb([iamBread]);
           break;
@@ -419,7 +419,7 @@ export class IdpComponent implements OnDestroy {
       case PolicyComponentServiceType.MGMT:
         return ['/org', 'policy', 'login'];
       case PolicyComponentServiceType.ADMIN:
-        return ['/system', 'policy', 'login'];
+        return ['/instance', 'policy', 'login'];
     }
   }
 

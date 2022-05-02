@@ -81,8 +81,8 @@ export class AccountsCardComponent implements OnInit {
 
   public get isOnSystem(): boolean {
     return (
-      ['/system', '/views', '/failed-events', '/system/members', '/system/features'].includes(this.router.url) ||
-      new RegExp('/system/policy/*').test(this.router.url)
+      ['/instance', '/views', '/failed-events', '/instance/members', '/instance/features'].includes(this.router.url) ||
+      new RegExp('/instance/policy/*').test(this.router.url)
     );
   }
 }

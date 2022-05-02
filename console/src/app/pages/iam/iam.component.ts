@@ -40,8 +40,8 @@ export class IamComponent {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.IAM,
-        name: 'System',
-        routerLink: ['/system'],
+        name: 'Instance',
+        routerLink: ['/instance'],
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
@@ -104,7 +104,7 @@ export class IamComponent {
   }
 
   public showDetail(): void {
-    this.router.navigate(['/system', 'members']);
+    this.router.navigate(['/instance', 'members']);
   }
 
   public loadFeatures(): void {

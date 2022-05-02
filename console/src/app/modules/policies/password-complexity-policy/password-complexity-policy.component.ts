@@ -3,10 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-  GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse,
+    GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse,
+    GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -61,8 +61,8 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               const bread: Breadcrumb = {
                 type: BreadcrumbType.ORG,
@@ -73,8 +73,8 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
             case PolicyComponentServiceType.ADMIN:
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
+                name: 'Instance',
+                routerLink: ['/instance'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);
 
