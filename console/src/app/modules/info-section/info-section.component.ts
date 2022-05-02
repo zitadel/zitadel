@@ -14,5 +14,4 @@ export enum InfoSectionType {
 export class InfoSectionComponent {
 
   @Input() type: InfoSectionType = InfoSectionType.INFO;
-  @Input() featureLink: string | string[] = '';
 }

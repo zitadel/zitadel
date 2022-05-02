@@ -131,8 +131,6 @@ import {
   GetDefaultVerifyEmailMessageTextResponse,
   GetDefaultVerifyPhoneMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextResponse,
-  GetFeaturesRequest,
-  GetFeaturesResponse,
   GetFlowRequest,
   GetFlowResponse,
   GetGrantedProjectByIDRequest,
@@ -1167,13 +1165,6 @@ export class ManagementService {
   public listOrgMemberRoles(): Promise<ListOrgMemberRolesResponse.AsObject> {
     const req = new ListOrgMemberRolesRequest();
     return this.grpcService.mgmt.listOrgMemberRoles(req, null).then((resp) => resp.toObject());
-  }
-
-  // Features
-
-  public getFeatures(): Promise<GetFeaturesResponse.AsObject> {
-    const req = new GetFeaturesRequest();
-    return this.grpcService.mgmt.getFeatures(req, null).then((resp) => resp.toObject());
   }
 
   // Policy

@@ -11,7 +11,7 @@
         <span>{{ 'USER.SETTINGS.TITLE' | translate }}</span>
       </button>
       <ng-container *ngFor="let setting of settingsList">
-        <ng-container *ngIf="setting.featureRequired; else btn">
+        <ng-container>
           <button
             (click)="value = setting.id"
             class="sidenav-setting-list-element hide-on-mobile"
