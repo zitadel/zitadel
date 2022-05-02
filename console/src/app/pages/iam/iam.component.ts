@@ -27,19 +27,18 @@ export class IamComponent {
     public adminService: AdminService,
     private dialog: MatDialog,
     private toast: ToastService,
-    private breadcrumbService: BreadcrumbService,
+    breadcrumbService: BreadcrumbService,
     private router: Router,
   ) {
     this.loadMembers();
 
-    const breadcrumbs = [
-      new Breadcrumb({
-        type: BreadcrumbType.IAM,
-        name: 'Instance',
-        routerLink: ['/instance'],
-      }),
-    ];
-    this.breadcrumbService.setBreadcrumb(breadcrumbs);
+    const instanceBread = new Breadcrumb({
+      type: BreadcrumbType.IAM,
+      name: 'INSTANCE',
+      routerLink: ['/instance'],
+    });
+
+    breadcrumbService.setBreadcrumb([instanceBread]);
   }
 
   public loadMembers(): void {
