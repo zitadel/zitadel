@@ -67,7 +67,7 @@ changelog:
 brews:
   - tap:
       owner: zitadel
-      name: zitadel-tap
+      name: homebrew-tap
       token: "{{ .Env.GORELEASER_TOKEN_TAP }}"
     folder: Formula
     goarm: "7"
@@ -89,5 +89,5 @@ brews:
 
 announce:
   discord:
-    enabled: true
+    enabled: false #enable when we release v2
     message_template: 'ZITADEL {{ .Tag }} is ready! Check the notes: https://github.com/zitadel/zitadel/releases/tag/{{ .Tag }}'
