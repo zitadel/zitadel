@@ -670,6 +670,8 @@
     }
   },
   "IAM": {
+    "TITLE": "Istanza",
+    "DESCRIPTION": "Gestisci la tua istanza e le tue organizzazioni",
     "POLICIES": {
       "TITLE": "Impostazioni del Sistema e impostazioni d'accesso",
       "DESCRIPTION": "Gestisci le impostazioni del sistema e le impostazioni d'accesso."
@@ -680,7 +682,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "Questi manager possono modificare le impostazioni del sistema."
+      "DESCRIPTION": "Questi manager possono modificare le impostazioni dell'istanza."
     },
     "VIEWS": {
       "TITLE": "Views",

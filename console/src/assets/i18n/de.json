@@ -670,6 +670,8 @@
     }
   },
   "IAM": {
+    "TITLE": "Instanz",
+    "DESCRIPTION": "Verwalten Sie Ihre Instanzeinstellungen und Organisationen",
     "POLICIES": {
       "TITLE": "System Administration",
       "DESCRIPTION": "Verwalte die globalen Richtlinen und Zugangseinstellungen."
@@ -680,7 +682,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "Diese Manager können systemweite Einstellungen vornehmen."
+      "DESCRIPTION": "Diese Manager können instanzweite Einstellungen vornehmen."
     },
     "VIEWS": {
       "TITLE": "Views",

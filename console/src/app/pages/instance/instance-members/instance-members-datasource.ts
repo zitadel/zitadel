@@ -10,7 +10,7 @@ import { AdminService } from 'src/app/services/admin.service';
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class IamMembersDataSource extends DataSource<Member.AsObject> {
+export class InstanceMembersDataSource extends DataSource<Member.AsObject> {
   public totalResult: number = 0;
   public viewTimestamp!: Timestamp.AsObject;
   public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
@@ -21,27 +21,27 @@ export class IamMembersDataSource extends DataSource<Member.AsObject> {
     super();
   }
 
-  public loadMembers(
-    pageIndex: number, pageSize: number): void {
+  public loadMembers(pageIndex: number, pageSize: number): void {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
 
-    from(this.service.listIAMMembers(pageSize, offset)).pipe(
-      map(resp => {
-        this.totalResult = resp.details?.totalResult || 0;
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details?.viewTimestamp;
-        }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(members => {
-      this.membersSubject.next(members);
-    });
+    from(this.service.listIAMMembers(pageSize, offset))
+      .pipe(
+        map((resp) => {
+          this.totalResult = resp.details?.totalResult || 0;
+          if (resp.details?.viewTimestamp) {
+            this.viewTimestamp = resp.details?.viewTimestamp;
+          }
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((members) => {
+        this.membersSubject.next(members);
+      });
   }
-
 
   /**
    * Connect this data source to the table. The table will only update when

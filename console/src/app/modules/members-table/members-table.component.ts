@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { IamMembersDataSource } from 'src/app/pages/instance/iam-members/iam-members-datasource';
+import { InstanceMembersDataSource } from 'src/app/pages/instance/instance-members/instance-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
 import {
     ProjectGrantMembersDataSource,
@@ -21,7 +21,7 @@ type MemberDatasource =
   | OrgMembersDataSource
   | ProjectMembersDataSource
   | ProjectGrantMembersDataSource
-  | IamMembersDataSource;
+  | InstanceMembersDataSource;
 
 @Component({
   selector: 'cnsl-members-table',

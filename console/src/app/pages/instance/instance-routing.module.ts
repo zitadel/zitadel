@@ -17,7 +17,7 @@ const routes: Routes = [
   },
   {
     path: 'members',
-    loadChildren: () => import('./iam-members/iam-members.module').then((m) => m.IamMembersModule),
+    loadChildren: () => import('./instance-members/instance-members.module').then((m) => m.InstanceMembersModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['iam.member.read'],

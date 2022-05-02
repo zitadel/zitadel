@@ -670,6 +670,8 @@
     }
   },
   "IAM": {
+    "TITLE": "Instance",
+    "DESCRIPTION": "Manage your instance settings and Organizations",
     "POLICIES": {
       "TITLE": "System Policies and Access Settings",
       "DESCRIPTION": "Manage your global Policies and Management Access Settings."
@@ -680,7 +682,7 @@
     },
     "MEMBER": {
       "TITLE": "Managers",
-      "DESCRIPTION": "These Managers are allowed to make changes in your system."
+      "DESCRIPTION": "These Managers are allowed to make changes in your instance."
     },
     "VIEWS": {
       "TITLE": "Views",

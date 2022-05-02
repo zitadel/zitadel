@@ -9,16 +9,16 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { IamMembersDataSource } from './iam-members-datasource';
+import { InstanceMembersDataSource } from './instance-members-datasource';
 
 @Component({
-  selector: 'cnsl-iam-members',
-  templateUrl: './iam-members.component.html',
-  styleUrls: ['./iam-members.component.scss'],
+  selector: 'cnsl-instance-members',
+  templateUrl: './instance-members.component.html',
+  styleUrls: ['./instance-members.component.scss'],
 })
-export class IamMembersComponent {
+export class InstanceMembersComponent {
   public INITIALPAGESIZE: number = 25;
-  public dataSource!: IamMembersDataSource;
+  public dataSource!: InstanceMembersDataSource;
 
   public memberRoleOptions: string[] = [];
   public changePageFactory!: Function;
@@ -41,7 +41,7 @@ export class IamMembersComponent {
     ];
     breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.dataSource = new IamMembersDataSource(this.adminService);
+    this.dataSource = new InstanceMembersDataSource(this.adminService);
     this.dataSource.loadMembers(0, 25);
     this.getRoleOptions();
 

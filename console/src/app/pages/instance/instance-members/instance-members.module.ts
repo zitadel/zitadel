@@ -11,11 +11,11 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
-import { IamMembersRoutingModule } from './iam-members-routing.module';
-import { IamMembersComponent } from './iam-members.component';
+import { IamMembersRoutingModule } from './instance-members-routing.module';
+import { InstanceMembersComponent } from './instance-members.component';
 
 @NgModule({
-  declarations: [IamMembersComponent],
+  declarations: [InstanceMembersComponent],
   imports: [
     IamMembersRoutingModule,
     DetailLayoutModule,
@@ -31,4 +31,4 @@ import { IamMembersComponent } from './iam-members.component';
     MemberCreateDialogModule,
   ],
 })
-export class IamMembersModule {}
+export class InstanceMembersModule {}
