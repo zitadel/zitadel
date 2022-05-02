@@ -10,7 +10,6 @@ import "zitadel/policy.proto";
 import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
-import "zitadel/features.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -890,58 +889,6 @@ service AdminService {
                     };
                 };
             };
-        };
-    }
-
-    rpc GetDefaultFeatures(GetDefaultFeaturesRequest) returns (GetDefaultFeaturesResponse) {
-        option(google.api.http) = {
-            get: "/features"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.read"
-        };
-    }
-
-    rpc SetDefaultFeatures(SetDefaultFeaturesRequest) returns (SetDefaultFeaturesResponse) {
-        option(google.api.http) = {
-            put: "/features"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.write"
-        };
-    }
-
-    rpc GetOrgFeatures(GetOrgFeaturesRequest) returns (GetOrgFeaturesResponse) {
-        option(google.api.http) = {
-            get: "/orgs/{org_id}/features"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.read"
-        };
-    }
-
-    rpc SetOrgFeatures(SetOrgFeaturesRequest) returns (SetOrgFeaturesResponse) {
-        option(google.api.http) = {
-            put: "/orgs/{org_id}/features"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.write"
-        };
-    }
-
-    rpc ResetOrgFeatures(ResetOrgFeaturesRequest) returns (ResetOrgFeaturesResponse) {
-        option(google.api.http) = {
-            delete: "/orgs/{org_id}/features"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.write"
         };
     }
 
@@ -3377,92 +3324,6 @@ message UpdateIDPJWTConfigRequest {
 }
 
 message UpdateIDPJWTConfigResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message GetDefaultFeaturesRequest {}
-
-message GetDefaultFeaturesResponse {
-    zitadel.features.v1.Features features = 1;
-}
-
-message SetDefaultFeaturesRequest {
-    string tier_name = 1 [(validate.rules).string = {max_len: 200}];
-    string description = 2 [(validate.rules).string = {max_len: 200}];
-
-    google.protobuf.Duration audit_log_retention = 5 [(validate.rules).duration = {gte: {seconds: 0}}];
-    bool login_policy_username_login = 6;
-    bool login_policy_registration = 7;
-    bool login_policy_idp = 8;
-    bool login_policy_factors = 9;
-    bool login_policy_passwordless = 10;
-    bool password_complexity_policy = 11;
-    bool label_policy = 12;
-    bool custom_domain = 13;
-    bool login_policy_password_reset = 14;
-    bool label_policy_private_label = 15;
-    bool label_policy_watermark = 16;
-    bool custom_text = 17;
-    bool privacy_policy = 18;
-    bool metadata_user = 19;
-    bool custom_text_message = 20;
-    bool custom_text_login = 21;
-    bool lockout_policy = 22;
-    bool actions = 23;
-    zitadel.features.v1.ActionsAllowed actions_allowed = 24;
-    int32 max_actions = 25;
-}
-
-message SetDefaultFeaturesResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message GetOrgFeaturesRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message GetOrgFeaturesResponse {
-    zitadel.features.v1.Features features = 1;
-}
-
-message SetOrgFeaturesRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string tier_name = 2 [(validate.rules).string = {max_len: 200}];
-    string description = 3 [(validate.rules).string = {max_len: 200}];
-    zitadel.features.v1.FeaturesState state = 4;
-    string state_description = 5 [(validate.rules).string = {max_len: 200}];
-
-    google.protobuf.Duration audit_log_retention = 6 [(validate.rules).duration = {gte: {seconds: 0}}];
-    bool login_policy_username_login = 7;
-    bool login_policy_registration = 8;
-    bool login_policy_idp = 9;
-    bool login_policy_factors = 10;
-    bool login_policy_passwordless = 11;
-    bool password_complexity_policy = 12;
-    bool label_policy = 13;
-    bool custom_domain = 14;
-    bool login_policy_password_reset = 15;
-    bool label_policy_private_label = 16;
-    bool label_policy_watermark = 17;
-    bool custom_text = 18;
-    bool privacy_policy = 19;
-    bool metadata_user = 20;
-    bool custom_text_message = 21;
-    bool custom_text_login = 22;
-    bool lockout_policy = 23;
-    bool actions = 24;
-    zitadel.features.v1.ActionsAllowed actions_allowed = 25;
-    int32 max_actions = 26;
-}
-
-message SetOrgFeaturesResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message ResetOrgFeaturesRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-message ResetOrgFeaturesResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

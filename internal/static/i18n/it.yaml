@@ -377,8 +377,6 @@ Errors:
       AlreadyExists: Il passo iniziato già esistente
     Done:
       AlreadyExists: Il passo fatto già esistente
-  Features:
-    NotChanged: La caratteristica non è cambiata
   CustomText:
     AlreadyExists: Il testo personalizzato già esistente
     Invalid: Testo personalizzato non valido
@@ -611,9 +609,6 @@ EventTypes:
         set: Set di dominio primario
       reserved: Dominio riservato
       released: Dominio rilasciato
-    features:
-      set: Caratteristica aggiunta
-      removed: Caratteristica rimossa
     name:
       reserved: Nome dell'organizzazione riservato
       released: Nome dell'organizzazione rilasciata

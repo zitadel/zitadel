@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -28,8 +27,7 @@ var (
 
 func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -111,76 +109,11 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "loginpolicy not allowed, permission denied error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								false,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LoginPolicy{
-					AllowRegister:              true,
-					AllowUsernamePassword:      true,
-					AllowExternalIDP:           true,
-					ForceMFA:                   true,
-					PasswordlessType:           domain.PasswordlessTypeAllowed,
-					PasswordCheckLifetime:      time.Hour * 1,
-					ExternalLoginCheckLifetime: time.Hour * 2,
-					MFAInitSkipLifetime:        time.Hour * 3,
-					SecondFactorCheckLifetime:  time.Hour * 4,
-					MultiFactorCheckLifetime:   time.Hour * 5,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
-			},
-		},
-		{
 			name: "add policy,ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								false,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -202,7 +135,6 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -245,8 +177,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -264,8 +195,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 
 func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -327,70 +257,6 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "not allowed, permission denied error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								true,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								false,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LoginPolicy{
-					AllowRegister:              true,
-					AllowUsernamePassword:      true,
-					AllowExternalIDP:           true,
-					ForceMFA:                   true,
-					PasswordlessType:           domain.PasswordlessTypeAllowed,
-					PasswordCheckLifetime:      time.Hour * 1,
-					ExternalLoginCheckLifetime: time.Hour * 2,
-					MFAInitSkipLifetime:        time.Hour * 3,
-					SecondFactorCheckLifetime:  time.Hour * 4,
-					MultiFactorCheckLifetime:   time.Hour * 5,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
-			},
-		},
-		{
 			name: "no changes, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -413,26 +279,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								false,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -478,24 +325,6 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								false,
-								false,
-								false,
-								false,
-								false,
-								domain.PasswordlessTypeNotAllowed,
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -517,7 +346,6 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -559,8 +387,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {

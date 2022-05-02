@@ -29,34 +29,10 @@ const (
 )
 
 type InstanceSetup struct {
-	zitadel      ZitadelConfig
-	InstanceName string
-	CustomDomain string
-	Org          OrgSetup
-	Features     struct {
-		TierName                 string
-		TierDescription          string
-		Retention                time.Duration
-		State                    domain.FeaturesState
-		StateDescription         string
-		LoginPolicyFactors       bool
-		LoginPolicyIDP           bool
-		LoginPolicyPasswordless  bool
-		LoginPolicyRegistration  bool
-		LoginPolicyUsernameLogin bool
-		LoginPolicyPasswordReset bool
-		PasswordComplexityPolicy bool
-		LabelPolicyPrivateLabel  bool
-		LabelPolicyWatermark     bool
-		CustomDomain             bool
-		PrivacyPolicy            bool
-		MetadataUser             bool
-		CustomTextMessage        bool
-		CustomTextLogin          bool
-		LockoutPolicy            bool
-		ActionsAllowed           domain.ActionsAllowed
-		MaxActions               int
-	}
+	zitadel          ZitadelConfig
+	InstanceName     string
+	CustomDomain     string
+	Org              OrgSetup
 	SecretGenerators struct {
 		PasswordSaltCost         uint
 		ClientSecret             *crypto.GeneratorConfig
@@ -191,31 +167,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	validations := []preparation.Validation{
 		addInstance(instanceAgg, setup.InstanceName),
-		SetDefaultFeatures(
-			instanceAgg,
-			setup.Features.TierName,
-			setup.Features.TierDescription,
-			setup.Features.State,
-			setup.Features.StateDescription,
-			setup.Features.Retention,
-			setup.Features.LoginPolicyFactors,
-			setup.Features.LoginPolicyIDP,
-			setup.Features.LoginPolicyPasswordless,
-			setup.Features.LoginPolicyRegistration,
-			setup.Features.LoginPolicyUsernameLogin,
-			setup.Features.LoginPolicyPasswordReset,
-			setup.Features.PasswordComplexityPolicy,
-			setup.Features.LabelPolicyPrivateLabel,
-			setup.Features.LabelPolicyWatermark,
-			setup.Features.CustomDomain,
-			setup.Features.PrivacyPolicy,
-			setup.Features.MetadataUser,
-			setup.Features.CustomTextMessage,
-			setup.Features.CustomTextLogin,
-			setup.Features.LockoutPolicy,
-			setup.Features.ActionsAllowed,
-			setup.Features.MaxActions,
-		),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),

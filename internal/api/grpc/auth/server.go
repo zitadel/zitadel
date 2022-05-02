@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"time"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -22,13 +24,14 @@ const (
 
 type Server struct {
 	auth.UnimplementedAuthServiceServer
-	command         *command.Commands
-	query           *query.Queries
-	repo            repository.Repository
-	defaults        systemdefaults.SystemDefaults
-	assetsAPIDomain string
-	userCodeAlg     crypto.EncryptionAlgorithm
-	externalSecure  bool
+	command           *command.Commands
+	query             *query.Queries
+	repo              repository.Repository
+	defaults          systemdefaults.SystemDefaults
+	assetsAPIDomain   string
+	userCodeAlg       crypto.EncryptionAlgorithm
+	externalSecure    bool
+	auditLogRetention time.Duration
 }
 
 type Config struct {
@@ -42,15 +45,17 @@ func CreateServer(command *command.Commands,
 	assetsAPIDomain string,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	externalSecure bool,
+	auditLogRetention time.Duration,
 ) *Server {
 	return &Server{
-		command:         command,
-		query:           query,
-		repo:            authRepo,
-		defaults:        defaults,
-		assetsAPIDomain: assetsAPIDomain,
-		userCodeAlg:     userCodeAlg,
-		externalSecure:  externalSecure,
+		command:           command,
+		query:             query,
+		repo:              authRepo,
+		defaults:          defaults,
+		assetsAPIDomain:   assetsAPIDomain,
+		userCodeAlg:       userCodeAlg,
+		externalSecure:    externalSecure,
+		auditLogRetention: auditLogRetention,
 	}
 }
 

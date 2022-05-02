@@ -533,18 +533,6 @@ Returns a list of organisations where the authorized user has a user grant (auth
     POST: /global/projectorgs/_search
 
 
-### ListMyZitadelFeatures
-
-> **rpc** ListMyZitadelFeatures([ListMyZitadelFeaturesRequest](#listmyzitadelfeaturesrequest))
-[ListMyZitadelFeaturesResponse](#listmyzitadelfeaturesresponse)
-
-Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
-
-
-
-    POST: /features/zitadel/me/_search
-
-
 ### ListMyZitadelPermissions
 
 > **rpc** ListMyZitadelPermissions([ListMyZitadelPermissionsRequest](#listmyzitadelpermissionsrequest))
@@ -1083,23 +1071,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated zitadel.user.v1.Session | - |  |
-
-
-
-
-### ListMyZitadelFeaturesRequest
-This is an empty request
-
-
-
-
-### ListMyZitadelFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| result | repeated string | - |  |
 
 
 

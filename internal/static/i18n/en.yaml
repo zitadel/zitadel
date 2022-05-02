@@ -379,8 +379,6 @@ Errors:
       AlreadyExists: Step started already exists
     Done:
       AlreadyExists: Step done already exists
-  Features:
-    NotChanged: Feature hat nicht geändert
   CustomText:
     AlreadyExists: Custom text already exists
     Invalid: Custom text invalid
@@ -613,9 +611,6 @@ EventTypes:
         set: Primary domain set
       reserved: Domain reserved
       released: Domain released
-    features:
-      set: Feature added
-      removed: Feature removed
     name:
       reserved: Organization name reserved
       released: Organization name released

@@ -1,6 +1,8 @@
 package management
 
 import (
+	"time"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -20,14 +22,15 @@ var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
 	management.UnimplementedManagementServiceServer
-	command         *command.Commands
-	query           *query.Queries
-	systemDefaults  systemdefaults.SystemDefaults
-	assetAPIPrefix  string
-	passwordHashAlg crypto.HashAlgorithm
-	userCodeAlg     crypto.EncryptionAlgorithm
-	externalSecure  bool
-	issuerPath      string
+	command           *command.Commands
+	query             *query.Queries
+	systemDefaults    systemdefaults.SystemDefaults
+	assetAPIPrefix    string
+	passwordHashAlg   crypto.HashAlgorithm
+	userCodeAlg       crypto.EncryptionAlgorithm
+	externalSecure    bool
+	issuerPath        string
+	auditLogRetention time.Duration
 }
 
 func CreateServer(
@@ -38,16 +41,18 @@ func CreateServer(
 	userCodeAlg crypto.EncryptionAlgorithm,
 	externalSecure bool,
 	issuerPath string,
+	auditLogRetention time.Duration,
 ) *Server {
 	return &Server{
-		command:         command,
-		query:           query,
-		systemDefaults:  sd,
-		assetAPIPrefix:  assetAPIPrefix,
-		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
-		userCodeAlg:     userCodeAlg,
-		externalSecure:  externalSecure,
-		issuerPath:      issuerPath,
+		command:           command,
+		query:             query,
+		systemDefaults:    sd,
+		assetAPIPrefix:    assetAPIPrefix,
+		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
+		userCodeAlg:       userCodeAlg,
+		externalSecure:    externalSecure,
+		issuerPath:        issuerPath,
+		auditLogRetention: auditLogRetention,
 	}
 }
 

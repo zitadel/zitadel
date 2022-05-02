@@ -50,7 +50,6 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		mig.zitadelRoles,
 		nil,
 		nil,
-		nil,
 		mig.externalDomain,
 		mig.externalSecure,
 		mig.externalPort,
