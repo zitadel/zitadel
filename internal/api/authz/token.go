@@ -35,10 +35,18 @@ type authZRepo interface {
 	ExistsOrg(ctx context.Context, orgID string) error
 }
 
-func Start(authZRepo authZRepo, systemAPI string, keys map[string]string) (v *TokenVerifier) {
+func Start(authZRepo authZRepo, systemAPI string, keys map[string]*SystemAPIUser) (v *TokenVerifier) {
 	return &TokenVerifier{
-		authZRepo:        authZRepo,
-		systemJWTProfile: op.NewJWTProfileVerifier(&systemJWTStorage{keys: keys}, systemAPI, 1*time.Hour, time.Second),
+		authZRepo: authZRepo,
+		systemJWTProfile: op.NewJWTProfileVerifier(
+			&systemJWTStorage{
+				keys:       keys,
+				cachedKeys: make(map[string]*rsa.PublicKey),
+			},
+			systemAPI,
+			1*time.Hour,
+			time.Second,
+		),
 	}
 }
 
@@ -67,37 +75,36 @@ func (v *TokenVerifier) verifySystemToken(ctx context.Context, token string) (st
 }
 
 type systemJWTStorage struct {
-	keys       map[string]string
+	keys       map[string]*SystemAPIUser
 	mutex      sync.Mutex
 	cachedKeys map[string]*rsa.PublicKey
 }
 
 type SystemAPIUser struct {
-	Key   *rsa.PublicKey
-	Roles string
+	Path string
 }
 
-func (s *systemJWTStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, _ string) (*jose.JSONWebKey, error) {
-	key, ok := s.cachedKeys[keyID]
+func (s *systemJWTStorage) GetKeyByIDAndUserID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {
+	cachedKey, ok := s.cachedKeys[userID]
 	if ok {
-		return &jose.JSONWebKey{KeyID: keyID, Key: key}, nil
+		return &jose.JSONWebKey{KeyID: userID, Key: cachedKey}, nil
 	}
-	path, ok := s.keys[keyID]
+	key, ok := s.keys[userID]
 	if !ok {
-
+		return nil, caos_errs.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
 	}
 	defer s.mutex.Unlock()
 	s.mutex.Lock()
-	keyData, err := os.ReadFile(path)
+	keyData, err := os.ReadFile(key.Path)
 	if err != nil {
-
+		return nil, caos_errs.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
 	}
 	publicKey, err := crypto.BytesToPublicKey(keyData)
 	if err != nil {
-
+		return nil, err
 	}
-	s.cachedKeys[keyID] = publicKey
-	return &jose.JSONWebKey{KeyID: keyID, Key: publicKey}, nil
+	s.cachedKeys[userID] = publicKey
+	return &jose.JSONWebKey{KeyID: userID, Key: publicKey}, nil
 }
 
 type client struct {

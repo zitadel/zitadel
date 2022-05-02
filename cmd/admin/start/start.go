@@ -2,7 +2,6 @@ package start
 
 import (
 	"context"
-	"crypto/rsa"
 	"database/sql"
 	_ "embed"
 	"fmt"
@@ -136,14 +135,14 @@ func startZitadel(config *Config, masterKey string) error {
 	notification.Start(config.Notification, config.ExternalPort, config.ExternalSecure, commands, queries, dbClient, assets.HandlerPrefix, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, config.SystemAPIKeys)
+	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, config.SystemAPIUsers)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys, systemAPIKeys map[string]string) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys, systemAPIKeys map[string]*internal_authz.SystemAPIUser) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries

@@ -137,10 +137,12 @@ EncryptionKeys:
   CSRFCookieKeyID: "csrfCookieKey"
   UserAgentCookieKeyID: "userAgentCookieKey"
 
-SystemAPIKeys:
+SystemAPIUsers:
   # add keys for authentication of the systemAPI here:
-  # - superuser: /path/to/superuser/key.pem
-  # - superuser2: /path/to/superuser2/key.pem
+  # - superuser:
+  #     Path: /path/to/superuser/key.pem
+  # - superuser2:
+  #     Path: /path/to/superuser2/key.pem
 
 #TODO: remove as soon as possible
 SystemDefaults:
