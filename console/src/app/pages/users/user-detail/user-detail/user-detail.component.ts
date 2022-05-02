@@ -22,10 +22,10 @@ import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dia
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
-const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA'};
+const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' };
 const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' };
 const PASSWORDLESS: SidenavSetting = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS' };
-const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA'};
+const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA' };
 const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS.PAT' };
 const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS' };
 const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' };
@@ -71,8 +71,8 @@ export class UserDetailComponent implements OnInit {
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
         type: BreadcrumbType.IAM,
-        name: 'IAM',
-        routerLink: ['/system'],
+        name: 'Instance',
+        routerLink: ['/instance'],
       }),
       new Breadcrumb({
         type: BreadcrumbType.ORG,

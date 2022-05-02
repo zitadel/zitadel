@@ -23,8 +23,8 @@ export class ProjectCreateComponent {
   ) {
     const iambread = new Breadcrumb({
       type: BreadcrumbType.IAM,
-      name: 'IAM',
-      routerLink: ['/system'],
+      name: 'Instance',
+      routerLink: ['/instance'],
     });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -40,7 +40,7 @@ export class ProjectCreateComponent {
     this.mgmtService
       .addProject(this.project)
       .then((resp: AddProjectResponse.AsObject) => {
-        this.toast.showInfo('PROJECT.TOAST.CREATED', true)
+        this.toast.showInfo('PROJECT.TOAST.CREATED', true);
         this.router.navigate(['projects', resp.id]);
       })
       .catch((error) => {
