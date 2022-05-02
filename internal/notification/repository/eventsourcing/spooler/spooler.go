@@ -29,7 +29,8 @@ func StartSpooler(c SpoolerConfig,
 	externalPort uint16,
 	externalSecure bool,
 	dir http.FileSystem,
-	assetsPrefix string,
+	assetsPrefix,
+	fileSystemPath string,
 	userEncryption crypto.EncryptionAlgorithm,
 	smtpEncryption crypto.EncryptionAlgorithm,
 	smsEncryption crypto.EncryptionAlgorithm,
@@ -38,7 +39,7 @@ func StartSpooler(c SpoolerConfig,
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, externalPort, externalSecure, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, externalPort, externalSecure, dir, assetsPrefix, fileSystemPath, userEncryption, smtpEncryption, smsEncryption),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

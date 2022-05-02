@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"encoding/base64"
 	"reflect"
 
 	"github.com/mitchellh/mapstructure"
@@ -20,6 +21,6 @@ func Base64ToBytesHookFunc() mapstructure.DecodeHookFuncType {
 			return data, nil
 		}
 
-		return []byte(data.(string)), nil
+		return base64.StdEncoding.DecodeString(data.(string))
 	}
 }
