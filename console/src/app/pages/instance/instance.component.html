@@ -24,11 +24,11 @@
   </div>
 </div>
 <div class="max-width-container">
-  <h2>{{ 'ORG.LIST.TITLE' | translate }}</h2>
+  <h2 class="org-table-title">{{ 'ORG.LIST.TITLE' | translate }}</h2>
 
-  <p class="top-desc cnsl-secondary-text">{{ 'ORG.LIST.DESCRIPTION' | translate }}</p>
+  <p class="org-table-desc cnsl-secondary-text">{{ 'ORG.LIST.DESCRIPTION' | translate }}</p>
 
-  <cnsl-orgs></cnsl-orgs>
+  <cnsl-org-table></cnsl-org-table>
 
   <cnsl-policy-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-policy-grid>
 </div>

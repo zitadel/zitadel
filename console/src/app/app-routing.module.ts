@@ -14,6 +14,10 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'orgs',
+    loadChildren: () => import('./pages/org-list/org-list.module').then((m) => m.OrgListModule),
+  },
+  {
     path: 'granted-projects',
     loadChildren: () =>
       import('./pages/projects/granted-projects/granted-projects.module').then((m) => m.GrantedProjectsModule),
@@ -59,7 +63,7 @@ const routes: Routes = [
   },
   {
     path: 'org',
-    loadChildren: () => import('./pages/orgs/orgs.module').then((m) => m.OrgsModule),
+    loadChildren: () => import('./pages/orgs/org.module').then((m) => m.OrgModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['org.read'],

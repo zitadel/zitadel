@@ -7,10 +7,10 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { OrgListRoutingModule } from 'src/app/pages/orgs/org-list/org-list-routing.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
@@ -19,13 +19,12 @@ import { FilterOrgModule } from '../filter-org/filter-org.module';
 import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
-import { OrgsComponent } from './orgs.component';
+import { OrgTableComponent } from './org-table.component';
 
 @NgModule({
-  declarations: [OrgsComponent],
+  declarations: [OrgTableComponent],
   imports: [
     CommonModule,
-    OrgListRoutingModule,
     MatTableModule,
     TranslateModule,
     RefreshTableModule,
@@ -37,6 +36,7 @@ import { OrgsComponent } from './orgs.component';
     MatIconModule,
     PaginatorModule,
     HasRoleModule,
+    RouterModule,
     MatButtonModule,
     MatTooltipModule,
     CopyToClipboardModule,
@@ -44,6 +44,6 @@ import { OrgsComponent } from './orgs.component';
     InputModule,
     FormsModule,
   ],
-  exports: [OrgsComponent],
+  exports: [OrgTableComponent],
 })
-export class OrgsModule {}
+export class OrgTableModule {}

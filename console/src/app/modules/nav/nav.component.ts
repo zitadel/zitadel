@@ -3,7 +3,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, map, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -95,8 +95,6 @@ export class NavComponent implements OnDestroy {
     private breakpointObserver: BreakpointObserver,
   ) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
-
-    breadcrumbService.breadcrumbsExtended$.pipe(takeUntil(this.destroy$)).subscribe(console.log);
   }
 
   public toggleAdminHide(): void {

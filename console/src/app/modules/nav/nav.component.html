@@ -39,6 +39,17 @@
 
                 <a
                   class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/orgs']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.ORGS' | translate }} </span>
+                  </div>
+                </a>
+
+                <a
+                  class="nav-item"
                   [routerLinkActiveOptions]="{ exact: false }"
                   [routerLinkActive]="['active']"
                   [routerLink]="['/views']"
@@ -66,14 +77,14 @@
 
           <ng-container *ngSwitchCase="BreadcrumbType.ORG">
             <div class="nav-row-abs" @navroworg>
-              <a
+              <!-- <a
                 class="nav-item"
                 [routerLinkActive]="['active']"
                 [routerLinkActiveOptions]="{ exact: true }"
                 [routerLink]="['/']"
               >
                 <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
-              </a>
+              </a> -->
 
               <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
                 <ng-template cnslHasRole [hasRole]="['org.read']">

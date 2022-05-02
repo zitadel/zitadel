@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, catchError, finalize, from, map, Observable, of } from 'rxjs';
 import { Org, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
@@ -14,11 +13,11 @@ enum OrgListSearchKey {
 }
 
 @Component({
-  selector: 'cnsl-orgs',
-  templateUrl: './orgs.component.html',
-  styleUrls: ['./orgs.component.scss'],
+  selector: 'cnsl-org-table',
+  templateUrl: './org-table.component.html',
+  styleUrls: ['./org-table.component.scss'],
 })
-export class OrgsComponent {
+export class OrgTableComponent {
   public orgSearchKey: OrgListSearchKey | undefined = undefined;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -36,21 +35,9 @@ export class OrgsComponent {
   public filterOpen: boolean = false;
   public OrgState: any = OrgState;
   public copied: string = '';
-  constructor(private authService: GrpcAuthService, private router: Router, breadcrumbService: BreadcrumbService) {
+  constructor(private authService: GrpcAuthService, private router: Router) {
     this.loadOrgs(this.initialLimit, 0);
     this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
-
-    console.log('org');
-    const iamBread = new Breadcrumb({
-      type: BreadcrumbType.INSTANCE,
-      name: 'Instance',
-      routerLink: ['/instance'],
-    });
-    const bread: Breadcrumb = {
-      type: BreadcrumbType.ORG,
-      routerLink: ['/org'],
-    };
-    breadcrumbService.setBreadcrumb([iamBread, bread]);
   }
 
   public loadOrgs(limit: number, offset: number, queries?: OrgQuery[]): void {

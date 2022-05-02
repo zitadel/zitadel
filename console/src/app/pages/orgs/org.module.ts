@@ -26,14 +26,14 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
-import { OrgsRoutingModule } from './orgs-routing.module';
+import { OrgRoutingModule } from './org-routing.module';
 
 @NgModule({
   declarations: [OrgDetailComponent],
   imports: [
     CommonModule,
     HasRolePipeModule,
-    OrgsRoutingModule,
+    OrgRoutingModule,
     FormsModule,
     InfoRowModule,
     HasRoleModule,
@@ -60,4 +60,4 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     PolicyGridModule,
   ],
 })
-export class OrgsModule {}
+export class OrgModule {}

@@ -114,7 +114,7 @@ export class OrgCreateComponent {
     this.adminService
       .SetUpOrg(createOrgRequest, humanRequest)
       .then((resp) => {
-        this.router.navigate(['/org/overview']);
+        this.router.navigate(['/orgs']);
 
         // const orgResp = org.getOrg();
         // if (orgResp) {
@@ -211,7 +211,7 @@ export class OrgCreateComponent {
       this.mgmtService
         .addOrg(this.name.value)
         .then(() => {
-          this.router.navigate(['/org/overview']);
+          this.router.navigate(['/orgs']);
         })
         .catch((error) => {
           this.toast.showError(error);
