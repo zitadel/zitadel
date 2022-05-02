@@ -69,7 +69,7 @@ jobs:
           args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GORELEASER_TOKEN_TAP: ${{ steps.generate_token.outputs.token }}
+          GORELEASER_TOKEN_TAP: ${{ steps.generate-token.outputs.token }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
