@@ -18,7 +18,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.3
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2
-	github.com/cockroachdb/cockroach-go/v2 v2.2.4
+	github.com/cockroachdb/cockroach-go/v2 v2.2.8
 	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51
 	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d
 	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
@@ -72,7 +72,6 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.10
 	google.golang.org/api v0.74.0
-	google.golang.org/genproto v0.0.0-20220324131243-acbaeb5b85eb
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/square/go-jose.v2 v2.6.0
@@ -213,6 +212,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto v0.0.0-20220324131243-acbaeb5b85eb // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
