@@ -27,7 +27,6 @@ builds:
     goarch:
       - amd64
       - arm64
-      
 dist: .artifacts/goreleaser
 
 dockers:
