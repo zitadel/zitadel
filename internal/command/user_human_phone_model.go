@@ -67,8 +67,12 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 			wm.CodeExpiry = e.Expiry
 		case *user.HumanPhoneRemovedEvent:
 			wm.State = domain.PhoneStateRemoved
+			wm.IsPhoneVerified = false
+			wm.Phone = ""
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
+			wm.IsPhoneVerified = false
+			wm.Phone = ""
 		}
 	}
 	return wm.WriteModel.Reduce()
