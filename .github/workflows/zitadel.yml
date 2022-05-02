@@ -51,6 +51,11 @@ jobs:
           registry: europe-docker.pkg.dev
           username: _json_key_base64
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'

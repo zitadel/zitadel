@@ -55,7 +55,7 @@ gomod:
 
 checksum:
   name_template: 'checksums.txt'
-  
+
 changelog:
   sort: asc
   filters:
@@ -67,6 +67,8 @@ brews:
   - tap:
       owner: zitadel
       name: zitadel-tap
+      token: "{{ steps.generate-token.outputs.token }}"
+
     folder: Formula
     goarm: "7"
     homepage:  https://zitadel.ch
