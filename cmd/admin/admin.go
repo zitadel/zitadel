@@ -2,9 +2,9 @@ package admin
 
 import (
 	_ "embed"
+	"errors"
 
 	"github.com/spf13/cobra"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin/initialise"
 	"github.com/zitadel/zitadel/cmd/admin/key"
@@ -17,8 +17,8 @@ func New() *cobra.Command {
 		Use:   "admin",
 		Short: "The ZITADEL admin CLI let's you interact with your instance",
 		Long:  `The ZITADEL admin CLI let's you interact with your instance`,
-		Run: func(cmd *cobra.Command, args []string) {
-			logging.New().Info("hello world")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return errors.New("no additional command provided")
 		},
 	}
 
