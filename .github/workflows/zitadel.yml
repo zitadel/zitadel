@@ -22,6 +22,10 @@ jobs:
           go-version: 1.17
       - name: Source checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Fetch all tags
+        run: git fetch --force --tags
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -44,6 +48,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Google Artifact Registry Login
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v1
@@ -51,11 +60,6 @@ jobs:
           registry: europe-docker.pkg.dev
           username: _json_key_base64
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      - uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: goreleaser/goreleaser-action@v2
         name: Publish ZITADEL
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
@@ -65,6 +69,7 @@ jobs:
           args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_TOKEN_TAP: ${{ steps.generate-token.outputs.token }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0

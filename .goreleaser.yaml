@@ -27,6 +27,7 @@ builds:
     goarch:
       - amd64
       - arm64
+      
 dist: .artifacts/goreleaser
 
 dockers:
@@ -67,8 +68,7 @@ brews:
   - tap:
       owner: zitadel
       name: zitadel-tap
-      token: "{{ steps.generate-token.outputs.token }}"
-
+      token: "{{ .Env.GORELEASER_TOKEN_TAP }}"
     folder: Formula
     goarm: "7"
     homepage:  https://zitadel.ch

@@ -174,10 +174,10 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return err
 	}
 
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	authenticatedAPIs.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator, config.ExternalSecure)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator, config.ExternalSecure, login.EndpointResources)
 	if err != nil {
 		return err
 	}

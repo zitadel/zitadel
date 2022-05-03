@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -93,7 +94,7 @@ func CreateLogin(config Config,
 	}
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources), issuerInterceptor)
+	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil
@@ -109,12 +110,20 @@ func csp() *middleware.CSP {
 
 func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecure bool, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
 	path := "/"
-	return csrf.Protect(csrfCookieKey,
-		csrf.Secure(externalSecure),
-		csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
-		csrf.Path(path),
-		csrf.ErrorHandler(errorHandler),
-	), nil
+	return func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasPrefix(r.URL.Path, EndpointResources) {
+				handler.ServeHTTP(w, r)
+				return
+			}
+			csrf.Protect(csrfCookieKey,
+				csrf.Secure(externalSecure),
+				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
+				csrf.Path(path),
+				csrf.ErrorHandler(errorHandler),
+			)(handler).ServeHTTP(w, r)
+		})
+	}, nil
 }
 
 func (l *Login) Handler() http.Handler {
