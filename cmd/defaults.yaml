@@ -162,6 +162,7 @@ SystemDefaults:
 
 DefaultInstance:
   InstanceName:
+  DefaultLanguage: en
   Org:
     Name:
     Human:

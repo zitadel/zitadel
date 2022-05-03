@@ -233,6 +233,7 @@ failed event. You can find out if it worked on the `failure_count`
 | owner_email |  AddInstanceRequest.Email | - | message.required: true<br />  |
 | owner_profile |  AddInstanceRequest.Profile | - | message.required: false<br />  |
 | owner_password |  AddInstanceRequest.Password | - | message.required: false<br />  |
+| default_language |  string | - | string.max_len: 10<br />  |
 
 
 
