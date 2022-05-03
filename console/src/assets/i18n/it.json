@@ -67,7 +67,8 @@
     "ACTIONS": "Azioni",
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
-    "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera"
+    "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera",
+    "SETTINGS": "Impostazioni"
   },
   "ACTIONS": {
     "ACTIONS": "Azioni",
@@ -798,6 +799,12 @@
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo"
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Impostazioni dell'istanza",
+      "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
     }
   },
   "POLICY": {

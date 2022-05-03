@@ -69,6 +69,17 @@
                     <span> {{ 'MENU.FAILEDEVENTS' | translate }} </span>
                   </div>
                 </a>
+
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/settings']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.SETTINGS' | translate }} </span>
+                  </div>
+                </a>
               </ng-template>
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>

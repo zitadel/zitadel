@@ -67,7 +67,8 @@
     "ACTIONS": "Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
-    "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen"
+    "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen",
+    "SETTINGS": "Einstellungen"
   },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
@@ -798,6 +799,12 @@
       "MEMBERREMOVED": "Manager entfernt.",
       "MEMBERCHANGED": "Manager geändert.",
       "SETPRIMARY": "Primäre Domain gesetzt."
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Instanz Einstellungen",
+      "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewand sofern die Einstellung nicht überschrieben wurde."
     }
   },
   "POLICY": {

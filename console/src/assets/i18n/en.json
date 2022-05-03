@@ -67,7 +67,8 @@
     "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
-    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts"
+    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts",
+    "SETTINGS": "Settings"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",
@@ -798,6 +799,12 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set."
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Instance Settings",
+      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
     }
   },
   "POLICY": {

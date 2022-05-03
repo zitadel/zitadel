@@ -145,6 +145,14 @@ const routes: Routes = [
     },
   },
   {
+    path: 'settings',
+    loadChildren: () => import('./pages/instance-settings/instance-settings.module').then((m) => m.InstanceSettingsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read', 'iam.write'],
+    },
+  },
+  {
     path: 'domains',
     loadChildren: () => import('./pages/domains/domains.module').then((m) => m.DomainsModule),
     canActivate: [AuthGuard, RoleGuard],
