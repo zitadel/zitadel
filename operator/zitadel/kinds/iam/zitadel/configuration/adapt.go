@@ -150,6 +150,7 @@ func AdaptFunc(
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
+						necessaryUsers,
 					),
 				)
 				if err != nil {
@@ -198,6 +199,7 @@ func AdaptFunc(
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
+						necessaryUsers,
 					),
 				),
 				consoleCMName: getHash(

@@ -3,7 +3,6 @@
 package v1
 
 import (
-	"github.com/caos/orbos/pkg/tree"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -28,18 +27,13 @@ type Database struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   Spec   `json:"spec,omitempty"`
-	Status Status `json:"status,omitempty"`
+	Spec   unstructured.Unstructured `json:"spec" yaml:"spec"`
+	Status Status                    `json:"status,omitempty"`
 }
 
 type Status struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-}
-
-type Spec struct {
-	Common *tree.Common              `json:",inline" yaml:",inline"`
-	Spec   unstructured.Unstructured `json:"spec" yaml:"spec"`
 }
 
 type Empty struct{}

@@ -98,10 +98,10 @@ jobs:
           target: go-codecov
           cache-from: type=gha,scope=${{ github.workflow }}
           outputs: type=local,dest=/tmp/zitadel
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3.1.0
         with:
-          name: zitadel-codecov
-          files: /tmp/zitadel/profile.cov
+          file: /tmp/zitadel/profile.cov
+          name: codecov-go
 
   zitadel-console:
     name: Build ZITADEL Console
