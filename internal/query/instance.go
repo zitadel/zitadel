@@ -281,6 +281,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 					&lang,
 					&count,
 				)
+				instance.DefaultLang = language.Make(lang)
 				if err != nil {
 					return nil, err
 				}
@@ -378,6 +379,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					InstanceID:   instance.ID,
 				})
 			}
+			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
 				return nil, errors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
 			}
