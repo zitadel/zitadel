@@ -98,9 +98,6 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			return nil, errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
 		}
 
-		if human.PreferredLanguage == language.Und {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-Sfd11", "Errors.Invalid.Argument")
-		}
 		if human.FirstName = strings.TrimSpace(human.FirstName); human.FirstName == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument")
 		}

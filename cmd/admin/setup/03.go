@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -15,9 +17,10 @@ import (
 )
 
 type DefaultInstance struct {
-	InstanceName string
-	CustomDomain string
-	Org          command.OrgSetup
+	InstanceName    string
+	CustomDomain    string
+	DefaultLanguage language.Tag
+	Org             command.OrgSetup
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
@@ -67,6 +70,7 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 
 	mig.instanceSetup.InstanceName = mig.InstanceName
 	mig.instanceSetup.CustomDomain = mig.CustomDomain
+	mig.instanceSetup.DefaultLanguage = mig.DefaultLanguage
 	mig.instanceSetup.Org = mig.Org
 	mig.instanceSetup.Org.Human.Email.Address = strings.TrimSpace(mig.instanceSetup.Org.Human.Email.Address)
 	if mig.instanceSetup.Org.Human.Email.Address == "" {
