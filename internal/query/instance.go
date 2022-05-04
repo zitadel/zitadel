@@ -11,7 +11,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -56,14 +55,6 @@ var (
 		name:  projection.InstanceColumnConsoleAppID,
 		table: instanceTable,
 	}
-	InstanceColumnSetupStarted = Column{
-		name:  projection.InstanceColumnSetUpStarted,
-		table: instanceTable,
-	}
-	InstanceColumnSetupDone = Column{
-		name:  projection.InstanceColumnSetUpDone,
-		table: instanceTable,
-	}
 	InstanceColumnDefaultLanguage = Column{
 		name:  projection.InstanceColumnDefaultLanguage,
 		table: instanceTable,
@@ -82,8 +73,6 @@ type Instance struct {
 	ConsoleID    string
 	ConsoleAppID string
 	DefaultLang  language.Tag
-	SetupStarted domain.Step
-	SetupDone    domain.Step
 	Domains      []*InstanceDomain
 	host         string
 }
@@ -211,8 +200,6 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
-			InstanceColumnSetupStarted.identifier(),
-			InstanceColumnSetupDone.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
 		).
 			From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
@@ -228,8 +215,6 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				&instance.IAMProjectID,
 				&instance.ConsoleID,
 				&instance.ConsoleAppID,
-				&instance.SetupStarted,
-				&instance.SetupDone,
 				&lang,
 			)
 			if err != nil {
@@ -254,8 +239,6 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
-			InstanceColumnSetupStarted.identifier(),
-			InstanceColumnSetupDone.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
 			countColumn.identifier(),
 		).From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
@@ -276,8 +259,6 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
 					&instance.ConsoleAppID,
-					&instance.SetupStarted,
-					&instance.SetupDone,
 					&lang,
 					&count,
 				)
@@ -312,8 +293,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
-			InstanceColumnSetupStarted.identifier(),
-			InstanceColumnSetupDone.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
 			InstanceDomainDomainCol.identifier(),
 			InstanceDomainIsPrimaryCol.identifier(),
@@ -350,8 +329,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
 					&instance.ConsoleAppID,
-					&instance.SetupStarted,
-					&instance.SetupDone,
 					&lang,
 					&domain,
 					&isPrimary,
