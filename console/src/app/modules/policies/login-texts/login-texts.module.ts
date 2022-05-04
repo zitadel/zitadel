@@ -16,6 +16,7 @@ import { HasRoleModule } from '../../../directives/has-role/has-role.module';
 import { DetailLayoutModule } from '../../../modules/detail-layout/detail-layout.module';
 import { InputModule } from '../../../modules/input/input.module';
 import { HasRolePipeModule } from '../../../pipes/has-role-pipe/has-role-pipe.module';
+import { CardModule } from '../../card/card.module';
 import { EditTextModule } from '../../edit-text/edit-text.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
@@ -48,9 +49,11 @@ import { LoginTextsComponent } from './login-texts.component';
     TextFieldModule,
     MatDialogModule,
     WarnDialogModule,
+    CardModule,
     PolicyGridModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
   ],
+  exports: [LoginTextsComponent],
 })
 export class LoginTextsPolicyModule {}

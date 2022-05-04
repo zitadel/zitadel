@@ -1,20 +1,19 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import {
-  GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
-  UpdateLoginPolicyRequest,
-  UpdateLoginPolicyResponse,
+    GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
+    UpdateLoginPolicyRequest,
+    UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  AddCustomLoginPolicyRequest,
-  GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+    AddCustomLoginPolicyRequest,
+    GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -29,7 +28,7 @@ import { LoginMethodComponentType } from './mfa-table/mfa-table.component';
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
 })
-export class LoginPolicyComponent implements OnDestroy {
+export class LoginPolicyComponent implements OnInit {
   public LoginMethodComponentType: any = LoginMethodComponentType;
   public passwordlessTypes: Array<PasswordlessType> = [
     PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
@@ -40,7 +39,7 @@ export class LoginPolicyComponent implements OnDestroy {
   private sub: Subscription = new Subscription();
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public loading: boolean = false;
   public disabled: boolean = true;
@@ -56,58 +55,7 @@ export class LoginPolicyComponent implements OnDestroy {
     private injector: Injector,
     breadcrumbService: BreadcrumbService,
     private storageService: StorageService,
-  ) {
-    this.sub = this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-          switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-              this.service = this.injector.get(ManagementService as Type<ManagementService>);
-              this.passwordlessTypes = [
-                PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
-                PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
-              ];
-              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-              if (org && org.id) {
-                this.orgName = org.name;
-              }
-
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
-
-              break;
-            case PolicyComponentServiceType.ADMIN:
-              this.service = this.injector.get(AdminService as Type<AdminService>);
-              this.passwordlessTypes = [
-                PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
-                PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
-              ];
-
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
-              break;
-          }
-
-          return this.route.params;
-        }),
-      )
-      .subscribe(() => {
-        this.fetchData();
-      });
-  }
+  ) {}
 
   private fetchData(): void {
     this.getData().then((resp) => {
@@ -119,8 +67,28 @@ export class LoginPolicyComponent implements OnDestroy {
     });
   }
 
-  public ngOnDestroy(): void {
-    this.sub.unsubscribe();
+  public ngOnInit(): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+        this.passwordlessTypes = [
+          PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+          PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+        ];
+        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+        if (org && org.id) {
+          this.orgName = org.name;
+        }
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+        this.passwordlessTypes = [
+          PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+          PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+        ];
+        break;
+    }
+    this.fetchData();
   }
 
   private async getData(): Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {

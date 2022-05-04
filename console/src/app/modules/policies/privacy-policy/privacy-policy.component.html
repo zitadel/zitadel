@@ -1,16 +1,7 @@
-<cnsl-detail-layout
-  [hasBackButton]="true"
+<cnsl-card
   [title]="'POLICY.PRIVACY_POLICY.TITLE' | translate"
   [description]="'POLICY.PRIVACY_POLICY.DESCRIPTION' | translate"
 >
-  <p class="policy-applied-to" sub>
-    {{ 'POLICY.APPLIEDTO' | translate }}:
-    <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
-    <ng-template #iam
-      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
-    </ng-template>
-  </p>
-
   <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
   <div class="divider"></div>
@@ -60,9 +51,7 @@
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
   </div>
-
-  <cnsl-policy-grid [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
-</cnsl-detail-layout>
+</cnsl-card>
 
 <ng-template #templateRef let-key="key">
   <div class="chips">

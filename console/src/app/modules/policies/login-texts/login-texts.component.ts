@@ -1,23 +1,21 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
-import { map, pairwise, startWith, switchMap, takeUntil } from 'rxjs/operators';
+import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
-  GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
-  GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
-  SetCustomLoginTextsRequest as AdminSetCustomLoginTextsRequest,
+    GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
+    GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
+    SetCustomLoginTextsRequest as AdminSetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetCustomLoginTextsRequest,
-  GetDefaultLoginTextsRequest,
-  SetCustomLoginTextsRequest,
+    GetCustomLoginTextsRequest,
+    GetDefaultLoginTextsRequest,
+    SetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
@@ -97,7 +95,7 @@ const REQUESTMAP = {
   templateUrl: './login-texts.component.html',
   styleUrls: ['./login-texts.component.scss'],
 })
-export class LoginTextsComponent implements OnDestroy {
+export class LoginTextsComponent implements OnInit, OnDestroy {
   public currentPolicyChangeDate!: Timestamp.AsObject | undefined;
   public newerPolicyChangeDate!: Timestamp.AsObject | undefined;
 
@@ -108,7 +106,7 @@ export class LoginTextsComponent implements OnDestroy {
 
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public KeyNamesArray: string[] = KeyNamesArray;
   public LOCALES: string[] = ['en', 'de', 'it'];
@@ -135,76 +133,11 @@ export class LoginTextsComponent implements OnDestroy {
   ]);
   constructor(
     private authService: GrpcAuthService,
-    private route: ActivatedRoute,
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
     private storageService: StorageService,
-    breadcrumbService: BreadcrumbService,
   ) {
-    this.sub = this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-          switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-              this.service = this.injector.get(ManagementService as Type<ManagementService>);
-
-              this.service.getSupportedLanguages().then((lang) => {
-                this.LOCALES = lang.languagesList;
-              });
-
-              this.loadData();
-
-              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-              if (org && org.id) {
-                this.orgName = org.name;
-              }
-
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
-
-              break;
-            case PolicyComponentServiceType.ADMIN:
-              this.service = this.injector.get(AdminService as Type<AdminService>);
-
-              this.service.getSupportedLanguages().then((lang) => {
-                this.LOCALES = lang.languagesList;
-              });
-
-              this.loadData();
-
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
-              break;
-          }
-
-          return this.route.params;
-        }),
-      )
-      .subscribe(() => {
-        interval(10000)
-          .pipe(
-            // debounceTime(5000),
-            takeUntil(this.destroy$),
-          )
-          .subscribe((x) => {
-            this.checkForChanges();
-          });
-      });
-
     this.form.valueChanges
       .pipe(startWith({ currentSubMap: 'emailVerificationDoneText', locale: 'en' }), pairwise(), takeUntil(this.destroy$))
       .subscribe((pair) => {
@@ -222,6 +155,43 @@ export class LoginTextsComponent implements OnDestroy {
             this.loadData();
           }
         });
+      });
+  }
+
+  ngOnInit(): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+
+        this.service.getSupportedLanguages().then((lang) => {
+          this.LOCALES = lang.languagesList;
+        });
+
+        this.loadData();
+
+        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+        if (org && org.id) {
+          this.orgName = org.name;
+        }
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+
+        this.service.getSupportedLanguages().then((lang) => {
+          this.LOCALES = lang.languagesList;
+        });
+
+        this.loadData();
+        break;
+    }
+
+    interval(10000)
+      .pipe(
+        // debounceTime(5000),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((x) => {
+        this.checkForChanges();
       });
   }
 

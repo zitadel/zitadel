@@ -806,10 +806,15 @@
       "TITLE": "Instance Settings",
       "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
     },
+    "ORG": {
+      "TITLE": "Organization Settings",
+      "DESCRIPTION": "These settings extend and overwrite your instance settings."
+    },
     "LIST": {
       "GENERAL": "General",
       "LOGIN": "Login and Access",
       "NOTIFICATIONS": "Notifications",
+      "NOTIFICATIONPROVIDERS": "Notification providers and SMTP",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Login Interface Texts",
@@ -818,7 +823,10 @@
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
-      "LOGIN": "Login and Access"
+      "LOGIN": "Login and Access",
+      "TEXTS": "Texts and Languages",
+      "APPEARANCE": "Appearance",
+      "OTHER": "Other"
     }
   },
   "POLICY": {

@@ -1,16 +1,4 @@
-<cnsl-detail-layout
-  [hasBackButton]="true"
-  [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
-  [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate"
->
-  <p class="policy-applied-to" sub>
-    {{ 'POLICY.APPLIEDTO' | translate }}:
-    <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
-    <ng-template #iam
-      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
-    </ng-template>
-  </p>
-
+<cnsl-card [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate" [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
   <div class="message-texts-top-actions">
     <cnsl-form-field class="type">
       <cnsl-label>{{ 'POLICY.MESSAGE_TEXTS.TYPE' | translate }}</cnsl-label>
@@ -72,6 +60,4 @@
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
   </div>
-
-  <cnsl-policy-grid [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
-</cnsl-detail-layout>
+</cnsl-card>

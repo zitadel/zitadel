@@ -173,6 +173,17 @@
                     <span class="label">{{ 'MENU.DOMAINS' | translate }}</span>
                   </a>
                 </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    [routerLink]="['/org-settings']"
+                  >
+                    <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
+                  </a>
+                </ng-template>
               </ng-container>
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>

@@ -1,25 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, Injector, OnDestroy, OnInit, Type } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import {
-  GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
-  GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
-  UpdateLabelPolicyRequest,
+    GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
+    GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
+    UpdateLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  AddCustomLabelPolicyRequest,
-  GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
-  GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
-  UpdateCustomLabelPolicyRequest,
+    AddCustomLabelPolicyRequest,
+    GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
+    GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
+    UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ThemeService } from 'src/app/services/theme.service';
@@ -59,7 +56,7 @@ const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public theme: Theme = Theme.LIGHT;
 
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
   public previewData!: LabelPolicy.AsObject;
@@ -90,60 +87,12 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public view: View = View.PREVIEW;
   constructor(
-    private authService: GrpcAuthService,
-    private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private assetService: AssetService,
     private storageService: StorageService,
     private themeService: ThemeService,
-    breadcrumbService: BreadcrumbService,
-  ) {
-    this.route.data
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-
-          switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-              this.service = this.injector.get(ManagementService as Type<ManagementService>);
-
-              const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
-
-              if (org) {
-                this.org = org;
-              }
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
-              break;
-            case PolicyComponentServiceType.ADMIN:
-              this.service = this.injector.get(AdminService as Type<AdminService>);
-
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
-              break;
-          }
-
-          return this.route.params;
-        }),
-      )
-      .subscribe(() => {
-        this.fetchData();
-      });
-  }
+  ) {}
 
   public toggleHoverLogo(theme: Theme, isHovering: boolean): void {
     if (theme === Theme.DARK) {
@@ -194,6 +143,24 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         this.theme = Theme.LIGHT;
       }
     });
+
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+
+        const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
+
+        if (org) {
+          this.org = org;
+        }
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+
+        break;
+    }
+
+    this.fetchData();
   }
 
   public onDropFont(filelist: FileList | null): Promise<any> | void {

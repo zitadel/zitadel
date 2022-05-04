@@ -1,13 +1,13 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import { GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { Component, Injector, Input, OnInit, Type } from '@angular/core';
+import {
+    GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import {
+    GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -17,17 +17,16 @@ import { COMPLEXITY_POLICY, GridPolicy } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-password-policy',
+  selector: 'cnsl-password-complexity-policy',
   templateUrl: './password-complexity-policy.component.html',
   styleUrls: ['./password-complexity-policy.component.scss'],
 })
-export class PasswordComplexityPolicyComponent implements OnDestroy {
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+export class PasswordComplexityPolicyComponent implements OnInit {
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
   public complexityData!: PasswordComplexityPolicy.AsObject;
 
-  private sub: Subscription = new Subscription();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
@@ -35,55 +34,22 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
   public InfoSectionType: any = InfoSectionType;
 
   public orgName: string = '';
-  constructor(
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private injector: Injector,
-    private storageService: StorageService,
-    breadcrumbService: BreadcrumbService,
-  ) {
-    this.sub = this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
+  constructor(private toast: ToastService, private injector: Injector, private storageService: StorageService) {}
 
-          switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-              this.service = this.injector.get(ManagementService as Type<ManagementService>);
-              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-              if (org && org.id) {
-                this.orgName = org.name;
-              }
-
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
-              break;
-            case PolicyComponentServiceType.ADMIN:
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
-
-              this.service = this.injector.get(AdminService as Type<AdminService>);
-              break;
-          }
-
-          return this.route.params;
-        }),
-      )
-      .subscribe(() => {
-        this.fetchData();
-      });
+  public ngOnInit(): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+        if (org && org.id) {
+          this.orgName = org.name;
+        }
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+        break;
+    }
+    this.fetchData();
   }
 
   public fetchData(): void {
@@ -95,10 +61,6 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
         this.loading = false;
       }
     });
-  }
-
-  public ngOnDestroy(): void {
-    this.sub.unsubscribe();
   }
 
   private async getData(): Promise<

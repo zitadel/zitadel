@@ -1,9 +1,8 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import {
     GetPrivacyPolicyResponse as AdminGetPrivacyPolicyResponse,
     UpdatePrivacyPolicyRequest,
@@ -16,7 +15,6 @@ import {
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
@@ -33,10 +31,10 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   templateUrl: './privacy-policy.component.html',
   styleUrls: ['./privacy-policy.component.scss'],
 })
-export class PrivacyPolicyComponent implements OnDestroy {
+export class PrivacyPolicyComponent implements OnInit, OnDestroy {
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public nextLinks: CnslLinks[] = [];
   private sub: Subscription = new Subscription();
@@ -60,13 +58,11 @@ export class PrivacyPolicyComponent implements OnDestroy {
 
   constructor(
     private authService: GrpcAuthService,
-    private route: ActivatedRoute,
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
     private fb: FormBuilder,
     private storageService: StorageService,
-    breadcrumbService: BreadcrumbService,
   ) {
     this.form = this.fb.group({
       tosLink: ['', []],
@@ -81,48 +77,23 @@ export class PrivacyPolicyComponent implements OnDestroy {
         this.form.disable();
       }
     });
+  }
 
-    this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-          switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-              this.service = this.injector.get(ManagementService as Type<ManagementService>);
-              this.loadData();
-              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-              if (org && org.id) {
-                this.orgName = org.name;
-              }
-
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
-              break;
-            case PolicyComponentServiceType.ADMIN:
-              this.service = this.injector.get(AdminService as Type<AdminService>);
-              this.loadData();
-
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.INSTANCE,
-                name: 'Instance',
-                routerLink: ['/instance'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
-              break;
-          }
-
-          return this.route.params;
-        }),
-      )
-      .subscribe();
+  ngOnInit(): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+        this.loadData();
+        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+        if (org && org.id) {
+          this.orgName = org.name;
+        }
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+        this.loadData();
+        break;
+    }
   }
 
   public addChip(formControlName: string, value: string): void {

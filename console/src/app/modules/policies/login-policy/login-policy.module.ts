@@ -13,7 +13,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { IdpTableModule } from 'src/app/modules/idp-table/idp-table.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
@@ -41,7 +40,6 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     HasRolePipeModule,
     MatTooltipModule,
     DetailLayoutModule,
-    IdpTableModule,
     MatProgressSpinnerModule,
     MatSelectModule,
     MatRippleModule,

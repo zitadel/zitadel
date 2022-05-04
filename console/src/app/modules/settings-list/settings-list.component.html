@@ -6,9 +6,41 @@
         <cnsl-password-complexity-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-password-complexity-policy>
         <cnsl-password-lockout-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-password-lockout-policy>
         <cnsl-login-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-login-policy>
+        <cnsl-org-iam-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-org-iam-policy>
+      </ng-container>
+      <ng-container *ngIf="currentSetting === 'idp'">
+        <ng-template cnslHasRole [hasRole]="['org.idp.read']">
+          <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
+            <!-- <cnsl-idp-table
+              [service]="service"
+              [serviceType]="PolicyComponentServiceType.ADMIN"
+              [disabled]="
+                ([
+                  serviceType === PolicyComponentServiceType.ADMIN
+                    ? 'iam.idp.write'
+                    : serviceType === PolicyComponentServiceType.MGMT
+                    ? 'org.idp.write'
+                    : ''
+                ]
+                  | hasRole
+                  | async) === false
+              "
+            > 
+            </cnsl-idp-table> -->
+          </cnsl-card>
+        </ng-template>
       </ng-container>
       <ng-container *ngIf="currentSetting === 'branding'">
         <cnsl-private-labeling-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-private-labeling-policy>
+      </ng-container>
+      <ng-container *ngIf="currentSetting === 'messagetexts'">
+        <cnsl-message-texts [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-message-texts>
+      </ng-container>
+      <ng-container *ngIf="currentSetting === 'logintexts'">
+        <cnsl-login-texts [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-login-texts>
+      </ng-container>
+      <ng-container *ngIf="currentSetting === 'privacypolicy'">
+        <cnsl-privacy-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-privacy-policy>
       </ng-container>
     </div>
   </cnsl-sidenav>

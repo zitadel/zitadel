@@ -810,6 +810,7 @@
       "GENERAL": "Generale",
       "LOGIN": "Accesso e login",
       "NOTIFICATIONS": "Notifiche",
+      "NOTIFICATIONPROVIDERS": "Fornitori e SMTP",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Testi dell'interfaccia login",
@@ -818,7 +819,10 @@
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
-      "LOGIN": "Accesso e login"
+      "LOGIN": "Accesso e login",
+      "TEXTS": "Testi e lingue",
+      "APPEARANCE": "Aussehen",
+      "OTHER": "Altro"
     }
   },
   "POLICY": {

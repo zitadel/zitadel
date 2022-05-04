@@ -806,10 +806,15 @@
       "TITLE": "Instanz Einstellungen",
       "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewand sofern die Einstellung nicht überschrieben wurde."
     },
+    "ORG": {
+      "TITLE": "Organisation Einstellungen",
+      "DESCRIPTION": "Diese Einstellungen erweitern bzw. überschreiben die Einstellungen Ihrer Instanz."
+    },
     "LIST": {
       "GENERAL": "Allgemein",
       "LOGIN": "Login und Zugriff",
       "NOTIFICATIONS": "Benachrichtigungen",
+      "NOTIFICATIONPROVIDERS": "Anbieter und SMTP",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identity Provider",
       "LOGINTEXTS": "Login Interface Texte",
@@ -818,7 +823,10 @@
     },
     "GROUPS": {
       "NOTIFICATIONS": "Benachrichtigungen",
-      "LOGIN": "Login und Zugriff"
+      "LOGIN": "Login und Zugriff",
+      "TEXTS": "Texte und Sprachen",
+      "APPEARANCE": "Erscheinungsbild",
+      "OTHER": "Anderes"
     }
   },
   "POLICY": {

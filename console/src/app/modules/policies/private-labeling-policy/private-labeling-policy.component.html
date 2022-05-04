@@ -1,12 +1,4 @@
-<cnsl-detail-layout [hasBackButton]="true" [title]="'POLICY.PRIVATELABELING.TITLE' | translate">
-  <p class="policy-applied-to" sub>
-    {{ 'POLICY.APPLIEDTO' | translate }}:
-    <strong *ngIf="org; else iam">{{ org.name }}</strong>
-    <ng-template #iam
-      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
-    </ng-template>
-  </p>
-
+<cnsl-card [title]="'POLICY.PRIVATELABELING.TITLE' | translate">
   <div class="privatelabeling-policy">
     <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
@@ -434,8 +426,5 @@
         </div>
       </div>
     </div>
-
-    <cnsl-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text">
-    </cnsl-policy-grid>
   </div>
-</cnsl-detail-layout>
+</cnsl-card>

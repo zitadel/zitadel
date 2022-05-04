@@ -161,6 +161,14 @@ const routes: Routes = [
     },
   },
   {
+    path: 'org-settings',
+    loadChildren: () => import('./pages/org-settings/org-settings.module').then((m) => m.OrgSettingsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read', 'iam.write'],
+    },
+  },
+  {
     path: 'signedout',
     loadChildren: () => import('./pages/signedout/signedout.module').then((m) => m.SignedoutModule),
   },

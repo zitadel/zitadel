@@ -1,15 +1,4 @@
-<cnsl-detail-layout
-  [hasBackButton]="true"
-  [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate"
-  [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate"
->
-  <p class="policy-applied-to" sub>
-    {{ 'POLICY.APPLIEDTO' | translate }}:
-    <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
-    <ng-template #iam
-      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
-    </ng-template>
-  </p>
+<cnsl-card [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate" [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
   <div class="date">
     <div>
       <p class="newer-title" *ngIf="newerVersionExists">{{ 'POLICY.LOGIN_TEXTS.NEWERVERSIONEXISTS' | translate }}</p>
@@ -89,6 +78,4 @@
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
   </div>
-
-  <cnsl-policy-grid [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
-</cnsl-detail-layout>
+</cnsl-card>
