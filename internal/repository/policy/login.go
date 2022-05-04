@@ -26,6 +26,7 @@ type LoginPolicyAddedEvent struct {
 	HidePasswordReset      bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames bool                    `json:"ignoreUnknownUsernames,omitempty"`
 	PasswordlessType       domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI     string                  `json:"defaultRedirectURI,omitempty"`
 }
 
 func (e *LoginPolicyAddedEvent) Data() interface{} {
@@ -45,6 +46,7 @@ func NewLoginPolicyAddedEvent(
 	hidePasswordReset,
 	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		BaseEvent:              *base,
@@ -55,6 +57,7 @@ func NewLoginPolicyAddedEvent(
 		PasswordlessType:       passwordlessType,
 		HidePasswordReset:      hidePasswordReset,
 		IgnoreUnknownUsernames: ignoreUnknownUsernames,
+		DefaultRedirectURI:     defaultRedirectURI,
 	}
 }
 
@@ -81,6 +84,7 @@ type LoginPolicyChangedEvent struct {
 	HidePasswordReset      *bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames *bool                    `json:"ignoreUnknownUsernames,omitempty"`
 	PasswordlessType       *domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI     *string                  `json:"defaultRedirectURI,omitempty"`
 }
 
 func (e *LoginPolicyChangedEvent) Data() interface{} {
@@ -148,6 +152,12 @@ func ChangeHidePasswordReset(hidePasswordReset bool) func(*LoginPolicyChangedEve
 func ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames bool) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.IgnoreUnknownUsernames = &ignoreUnknownUsernames
+	}
+}
+
+func ChangeDefaultRedirectURI(defaultRedirectURI string) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.DefaultRedirectURI = &defaultRedirectURI
 	}
 }
 

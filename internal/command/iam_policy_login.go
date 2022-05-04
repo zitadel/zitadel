@@ -60,6 +60,7 @@ func (c *Commands) addDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 	), nil
 }
 
@@ -99,6 +100,7 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventst
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")

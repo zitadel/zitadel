@@ -74,7 +74,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authReq == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		l.defaultRedirect(w, r)
 		return
 	}
 	l.handleIDP(w, r, authReq, data.IDPConfigID)

@@ -3039,6 +3039,7 @@ This is an empty request
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
 | ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
 
 
 
@@ -7756,6 +7757,7 @@ This is an empty request
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
 | ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
 
 
 

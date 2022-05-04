@@ -43,7 +43,8 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 			policy.ForceMFA,
 			policy.HidePasswordReset,
 			policy.IgnoreUnknownUsernames,
-			policy.PasswordlessType))
+			policy.PasswordlessType,
+			policy.DefaultRedirectURI))
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,8 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 		policy.ForceMFA,
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
-		policy.PasswordlessType)
+		policy.PasswordlessType,
+		policy.DefaultRedirectURI)
 
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")

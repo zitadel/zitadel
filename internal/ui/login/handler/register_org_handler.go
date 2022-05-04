@@ -71,7 +71,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authRequest == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		l.defaultRedirect(w, r)
 		return
 	}
 	l.renderNextStep(w, r, authRequest)

@@ -16,6 +16,7 @@ type LoginPolicy struct {
 	PasswordlessType       PasswordlessType
 	HidePasswordReset      bool
 	IgnoreUnknownUsernames bool
+	DefaultRedirectURI     string
 }
 
 type IDPProvider struct {

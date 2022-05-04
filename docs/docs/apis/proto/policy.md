@@ -64,6 +64,7 @@ title: zitadel/policy.proto
 | is_default |  bool | - |  |
 | hide_password_reset |  bool | - |  |
 | ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
 
 
 

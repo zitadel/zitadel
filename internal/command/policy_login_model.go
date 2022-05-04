@@ -15,6 +15,7 @@ type LoginPolicyWriteModel struct {
 	ForceMFA               bool
 	HidePasswordReset      bool
 	IgnoreUnknownUsernames bool
+	DefaultRedirectURI     string
 	PasswordlessType       domain.PasswordlessType
 	State                  domain.PolicyState
 }
@@ -30,6 +31,7 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.PasswordlessType = e.PasswordlessType
 			wm.HidePasswordReset = e.HidePasswordReset
 			wm.IgnoreUnknownUsernames = e.IgnoreUnknownUsernames
+			wm.DefaultRedirectURI = e.DefaultRedirectURI
 			wm.State = domain.PolicyStateActive
 		case *policy.LoginPolicyChangedEvent:
 			if e.AllowRegister != nil {
@@ -52,6 +54,9 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			}
 			if e.PasswordlessType != nil {
 				wm.PasswordlessType = *e.PasswordlessType
+			}
+			if e.DefaultRedirectURI != nil {
+				wm.DefaultRedirectURI = *e.DefaultRedirectURI
 			}
 		case *policy.LoginPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved

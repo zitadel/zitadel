@@ -23,7 +23,7 @@ func SendPasswordCode(mailhtml string, translator *i18n.Translator, user *view_m
 	if err != nil {
 		return err
 	}
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.PasswordReset, &UrlData{UserID: user.ID, Code: codeString})
+	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.PasswordReset, &UrlData{UserID: user.ID, Code: codeString, OrgID: user.ResourceOwner})
 	if err != nil {
 		return err
 	}
