@@ -22,8 +22,6 @@ const (
 	InstanceColumnConsoleID       = "console_client_id"
 	InstanceColumnConsoleAppID    = "console_app_id"
 	InstanceColumnSequence        = "sequence"
-	InstanceColumnSetUpStarted    = "setup_started"
-	InstanceColumnSetUpDone       = "setup_done"
 	InstanceColumnDefaultLanguage = "default_language"
 )
 
@@ -46,8 +44,6 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleAppID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(InstanceColumnSetUpStarted, crdb.ColumnTypeInt64, crdb.Default(0)),
-			crdb.NewColumn(InstanceColumnSetUpDone, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(InstanceColumnDefaultLanguage, crdb.ColumnTypeText, crdb.Default("")),
 		},
 			crdb.NewPrimaryKey(InstanceColumnID),
@@ -81,14 +77,6 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.DefaultLanguageSetEventType,
 					Reduce: p.reduceDefaultLanguageSet,
-				},
-				{
-					Event:  instance.SetupStartedEventType,
-					Reduce: p.reduceSetupEvent,
-				},
-				{
-					Event:  instance.SetupDoneEventType,
-					Reduce: p.reduceSetupEvent,
 				},
 			},
 		},
@@ -182,26 +170,5 @@ func (p *InstanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*
 		[]handler.Condition{
 			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
-	), nil
-}
-
-func (p *InstanceProjection) reduceSetupEvent(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SetupStepEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-d9nfw", "reduce.wrong.event.type %v", []eventstore.EventType{instance.SetupDoneEventType, instance.SetupStartedEventType})
-	}
-	columns := []handler.Column{
-		handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
-		handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
-		handler.NewCol(InstanceColumnSequence, e.Sequence()),
-	}
-	if e.EventType == instance.SetupStartedEventType {
-		columns = append(columns, handler.NewCol(InstanceColumnSetUpStarted, e.Step))
-	} else {
-		columns = append(columns, handler.NewCol(InstanceColumnSetUpDone, e.Step))
-	}
-	return crdb.NewUpsertStatement(
-		e,
-		columns,
 	), nil
 }

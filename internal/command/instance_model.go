@@ -15,9 +15,6 @@ type InstanceWriteModel struct {
 	State           domain.InstanceState
 	GeneratedDomain string
 
-	SetUpStarted domain.Step
-	SetUpDone    domain.Step
-
 	GlobalOrgID     string
 	ProjectID       string
 	DefaultLanguage language.Tag
@@ -53,12 +50,6 @@ func (wm *InstanceWriteModel) Reduce() error {
 			wm.GlobalOrgID = e.OrgID
 		case *instance.DefaultLanguageSetEvent:
 			wm.DefaultLanguage = e.Language
-		case *instance.SetupStepEvent:
-			if e.Done {
-				wm.SetUpDone = e.Step
-			} else {
-				wm.SetUpStarted = e.Step
-			}
 		}
 	}
 	return nil
@@ -78,9 +69,7 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.InstanceDomainRemovedEventType,
 			instance.ProjectSetEventType,
 			instance.GlobalOrgSetEventType,
-			instance.DefaultLanguageSetEventType,
-			instance.SetupStartedEventType,
-			instance.SetupDoneEventType).
+			instance.DefaultLanguageSetEventType).
 		Builder()
 }
 

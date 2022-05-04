@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/authz/repository"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -136,19 +135,6 @@ func (a *API) healthHandler() http.Handler {
 		func(ctx context.Context) error {
 			if err := a.health.Health(ctx); err != nil {
 				return errors.ThrowInternal(err, "API-F24h2", "DB CONNECTION ERROR")
-			}
-			return nil
-		},
-		func(ctx context.Context) error {
-			iam, err := a.health.Instance(ctx)
-			if err != nil && !errors.IsNotFound(err) {
-				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
-			}
-			if iam == nil || iam.SetupStarted < domain.StepCount-1 {
-				return errors.ThrowPreconditionFailed(nil, "API-HBfs3", "IAM NOT SET UP")
-			}
-			if iam.SetupDone < domain.StepCount-1 {
-				return errors.ThrowPreconditionFailed(nil, "API-DASs2", "IAM SETUP RUNNING")
 			}
 			return nil
 		},
