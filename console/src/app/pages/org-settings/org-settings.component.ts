@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
   templateUrl: './org-settings.component.html',
   styleUrls: ['./org-settings.component.scss'],
 })
-export class OrgSettingsComponent implements OnInit {
+export class OrgSettingsComponent {
   constructor(breadcrumbService: BreadcrumbService) {
     const breadcrumbs = [
       new Breadcrumb({
@@ -16,6 +16,4 @@ export class OrgSettingsComponent implements OnInit {
     ];
     breadcrumbService.setBreadcrumb(breadcrumbs);
   }
-
-  ngOnInit(): void {}
 }

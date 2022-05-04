@@ -17,7 +17,7 @@
             [ngClass]="{ show: currentSetting === undefined }"
             *ngIf="
               (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
-              (i == 0 && setting.groupI18nKey)
+              (i === 0 && setting.groupI18nKey)
             "
             >{{ setting.groupI18nKey | translate }}</span
           >

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
@@ -44,7 +44,7 @@ const BRANDING: SidenavSetting = {
   templateUrl: './settings-list.component.html',
   styleUrls: ['./settings-list.component.scss'],
 })
-export class SettingsListComponent implements OnInit {
+export class SettingsListComponent {
   public settingsList: SidenavSetting[] = [
     GENERAL,
     LOGIN,
@@ -59,8 +59,6 @@ export class SettingsListComponent implements OnInit {
   public currentSetting: string | undefined = 'general';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   constructor() {}
-
-  ngOnInit(): void {}
 
   private changeSelection(small: boolean): void {
     if (small) {
