@@ -48,5 +48,7 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     TranslateModule,
     PolicyGridModule,
   ],
+
+  exports: [LoginPolicyComponent],
 })
 export class LoginPolicyModule {}

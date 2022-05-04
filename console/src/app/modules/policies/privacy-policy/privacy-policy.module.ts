@@ -48,5 +48,6 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     PolicyGridModule,
     InfoSectionModule,
   ],
+  exports: [PrivacyPolicyComponent],
 })
 export class PrivacyPolicyModule {}

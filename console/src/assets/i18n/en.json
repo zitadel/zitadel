@@ -805,6 +805,20 @@
     "INSTANCE": {
       "TITLE": "Instance Settings",
       "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
+    },
+    "LIST": {
+      "GENERAL": "General",
+      "LOGIN": "Login and Access",
+      "NOTIFICATIONS": "Notifications",
+      "MESSAGETEXTS": "Message Texts",
+      "IDP": "Identity Providers",
+      "LOGINTEXTS": "Login Interface Texts",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Privacy Policy"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Notifications",
+      "LOGIN": "Login and Access"
     }
   },
   "POLICY": {

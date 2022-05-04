@@ -11,6 +11,7 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
+import { CardModule } from '../../card/card.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { PasswordLockoutPolicyRoutingModule } from './password-lockout-policy-routing.module';
@@ -29,10 +30,12 @@ import { PasswordLockoutPolicyComponent } from './password-lockout-policy.compon
     MatIconModule,
     HasRoleModule,
     MatTooltipModule,
+    CardModule,
     TranslateModule,
     DetailLayoutModule,
     PolicyGridModule,
     InfoSectionModule,
   ],
+  exports: [PasswordLockoutPolicyComponent],
 })
 export class PasswordLockoutPolicyModule {}

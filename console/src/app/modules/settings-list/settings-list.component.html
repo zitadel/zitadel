@@ -1,1 +1,15 @@
-<p>settings-list works!</p>
+<div class="max-width-container">
+  <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
+    <div class="max-width-container">
+      <ng-container *ngIf="currentSetting === 'general'"></ng-container>
+      <ng-container *ngIf="currentSetting === 'login'">
+        <cnsl-password-complexity-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-password-complexity-policy>
+        <cnsl-password-lockout-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-password-lockout-policy>
+        <cnsl-login-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-login-policy>
+      </ng-container>
+      <ng-container *ngIf="currentSetting === 'branding'">
+        <cnsl-private-labeling-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-private-labeling-policy>
+      </ng-container>
+    </div>
+  </cnsl-sidenav>
+</div>

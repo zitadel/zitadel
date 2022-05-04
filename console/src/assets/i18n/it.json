@@ -805,6 +805,20 @@
     "INSTANCE": {
       "TITLE": "Impostazioni dell'istanza",
       "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
+    },
+    "LIST": {
+      "GENERAL": "Generale",
+      "LOGIN": "Accesso e login",
+      "NOTIFICATIONS": "Notifiche",
+      "MESSAGETEXTS": "Testi di notifica",
+      "IDP": "Identity Providers",
+      "LOGINTEXTS": "Testi dell'interfaccia login",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Informativa sulla privacy e TOS"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Notifiche",
+      "LOGIN": "Accesso e login"
     }
   },
   "POLICY": {

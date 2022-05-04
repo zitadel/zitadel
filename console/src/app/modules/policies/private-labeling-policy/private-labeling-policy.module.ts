@@ -14,6 +14,7 @@ import { ColorChromeModule } from 'ngx-color/chrome';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
 import { DropzoneModule } from '../../../directives/dropzone/dropzone.module';
+import { CardModule } from '../../card/card.module';
 import { DetailLayoutModule } from '../../detail-layout/detail-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
@@ -34,6 +35,7 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     MatButtonModule,
     MatButtonToggleModule,
     OverlayModule,
+    CardModule,
     MatIconModule,
     HasRoleModule,
     MatSlideToggleModule,
@@ -46,5 +48,6 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     MatExpansionModule,
     InfoSectionModule,
   ],
+  exports: [PrivateLabelingPolicyComponent],
 })
 export class PrivateLabelingPolicyModule {}

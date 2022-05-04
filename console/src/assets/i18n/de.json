@@ -805,6 +805,20 @@
     "INSTANCE": {
       "TITLE": "Instanz Einstellungen",
       "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewand sofern die Einstellung nicht überschrieben wurde."
+    },
+    "LIST": {
+      "GENERAL": "Allgemein",
+      "LOGIN": "Login und Zugriff",
+      "NOTIFICATIONS": "Benachrichtigungen",
+      "MESSAGETEXTS": "Benachrichtigungstexte",
+      "IDP": "Identity Provider",
+      "LOGINTEXTS": "Login Interface Texte",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Datenschutzrichtlinie"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Benachrichtigungen",
+      "LOGIN": "Login und Zugriff"
     }
   },
   "POLICY": {
