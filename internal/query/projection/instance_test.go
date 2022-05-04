@@ -3,7 +3,6 @@ package projection
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -135,66 +134,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 								uint64(15),
 								"en",
 								"instance-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceSetupStarted",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SetupStartedEventType),
-					instance.AggregateType,
-					[]byte(`{"Step": 1}`),
-				), instance.SetupStepMapper),
-			},
-			reduce: (&InstanceProjection{}).reduceSetupEvent,
-			want: wantReduce{
-				projection:       InstanceProjectionTable,
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, setup_started) VALUES ($1, $2, $3, $4)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								anyArg{},
-								uint64(15),
-								domain.Step1,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceSetupDone",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SetupDoneEventType),
-					instance.AggregateType,
-					[]byte(`{"Step": 1}`),
-				), instance.SetupStepMapper),
-			},
-			reduce: (&InstanceProjection{}).reduceSetupEvent,
-			want: wantReduce{
-				projection:       InstanceProjectionTable,
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPSERT INTO projections.instances (id, change_date, sequence, setup_done) VALUES ($1, $2, $3, $4)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								anyArg{},
-								uint64(15),
-								domain.Step1,
 							},
 						},
 					},
