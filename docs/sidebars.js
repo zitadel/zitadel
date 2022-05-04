@@ -221,6 +221,7 @@ module.exports = {
       collapsed: true,
       items: [
         "concepts/structure/overview",
+        "concepts/structure/instance",
         "concepts/structure/organizations",
         "concepts/structure/policies",
         "concepts/structure/projects",
