@@ -9,28 +9,10 @@ h2 {
   font-size: 14px;
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  margin: 0 -0.5rem 1rem -0.5rem;
-
-  .tag {
-    display: flex;
-    align-items: center;
-    margin: 0 0.5rem;
-    cursor: pointer;
-
-    &:hover,
-    &.active {
-      color: var(--color-main);
-    }
-  }
-}
-
 .row-lyt {
   margin: 0;
   display: grid;
+  margin-top: 1.5rem;
   row-gap: 1rem;
   column-gap: 1rem;
   grid-template-columns: 1fr 1fr 1fr;
@@ -39,8 +21,24 @@ h2 {
     grid-template-columns: 1fr 1fr;
   }
 
-  @media only screen and (max-width: 450px) {
+  @media only screen and (max-width: 500px) {
     grid-template-columns: 1fr;
+  }
+
+  &.more {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+
+    @media only screen and (max-width: 1300px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    @media only screen and (max-width: 850px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media only screen and (max-width: 500px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   .p-item {
@@ -135,16 +133,6 @@ h2 {
 
     .fill-space {
       flex: 1;
-    }
-
-    .tags {
-      .tag {
-        font-size: 13px;
-
-        i {
-          font-size: 18px;
-        }
-      }
     }
 
     .btn-wrapper {

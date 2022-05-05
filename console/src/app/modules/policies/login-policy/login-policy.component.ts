@@ -1,5 +1,4 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
@@ -10,16 +9,13 @@ import {
     AddCustomLoginPolicyRequest,
     GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { GridPolicy, LOGIN_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './mfa-table/mfa-table.component';
 
@@ -44,18 +40,10 @@ export class LoginPolicyComponent implements OnInit {
   public loading: boolean = false;
   public disabled: boolean = true;
 
-  public currentPolicy: GridPolicy = LOGIN_POLICY;
   public InfoSectionType: any = InfoSectionType;
-  public orgName: string = '';
   public PasswordlessType: any = PasswordlessType;
 
-  constructor(
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private injector: Injector,
-    breadcrumbService: BreadcrumbService,
-    private storageService: StorageService,
-  ) {}
+  constructor(private toast: ToastService, private injector: Injector, private storageService: StorageService) {}
 
   private fetchData(): void {
     this.getData().then((resp) => {
@@ -75,10 +63,6 @@ export class LoginPolicyComponent implements OnInit {
           PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
           PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
         ];
-        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-        if (org && org.id) {
-          this.orgName = org.name;
-        }
         break;
       case PolicyComponentServiceType.ADMIN:
         this.service = this.injector.get(AdminService as Type<AdminService>);

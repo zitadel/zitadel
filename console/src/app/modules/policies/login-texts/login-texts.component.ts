@@ -14,15 +14,12 @@ import {
     GetDefaultLoginTextsRequest,
     SetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { GridPolicy, LOGIN_TEXTS_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
@@ -114,11 +111,9 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   private sub: Subscription = new Subscription();
 
   public updateRequest!: SetCustomLoginTextsRequest;
-  public currentPolicy: GridPolicy = LOGIN_TEXTS_POLICY;
 
   public destroy$: Subject<void> = new Subject();
   public InfoSectionType: any = InfoSectionType;
-  public orgName: string = '';
   public form: FormGroup = new FormGroup({
     currentSubMap: new FormControl('emailVerificationDoneText'),
     locale: new FormControl('en'),
@@ -136,7 +131,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
-    private storageService: StorageService,
   ) {
     this.form.valueChanges
       .pipe(startWith({ currentSubMap: 'emailVerificationDoneText', locale: 'en' }), pairwise(), takeUntil(this.destroy$))
@@ -168,11 +162,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
         });
 
         this.loadData();
-
-        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-        if (org && org.id) {
-          this.orgName = org.name;
-        }
         break;
       case PolicyComponentServiceType.ADMIN:
         this.service = this.injector.get(AdminService as Type<AdminService>);

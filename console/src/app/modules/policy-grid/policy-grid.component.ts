@@ -2,7 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Input } from '@angular/core';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
-import { GridPolicy, POLICIES } from './policies';
+import { SETTINGLINKS, SettingLinks } from './policies';
 
 @Component({
   selector: 'cnsl-policy-grid',
@@ -40,17 +40,5 @@ export class PolicyGridComponent {
   @Input() public tag: string = '';
   public PolicyComponentType: any = PolicyComponentType;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public POLICIES: GridPolicy[] = POLICIES;
-  public tags: Set<string> = new Set(POLICIES.map((p) => p.tags).flat());
-
-  @Input() public tagForFilter: string = '';
-  @Input() public currentPolicy!: GridPolicy;
-
-  public get filteredPolicies(): GridPolicy[] {
-    if (this.tagForFilter) {
-      return POLICIES.filter((p) => p !== this.currentPolicy && p.tags.includes(this.tagForFilter));
-    } else {
-      return POLICIES.filter((p) => p !== this.currentPolicy);
-    }
-  }
+  public SETTINGS: SettingLinks[] = SETTINGLINKS;
 }

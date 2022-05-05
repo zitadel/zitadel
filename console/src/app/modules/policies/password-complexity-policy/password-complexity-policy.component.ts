@@ -5,15 +5,12 @@ import {
 import {
     GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { COMPLEXITY_POLICY, GridPolicy } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -30,20 +27,14 @@ export class PasswordComplexityPolicyComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public loading: boolean = false;
-  public currentPolicy: GridPolicy = COMPLEXITY_POLICY;
   public InfoSectionType: any = InfoSectionType;
 
-  public orgName: string = '';
-  constructor(private toast: ToastService, private injector: Injector, private storageService: StorageService) {}
+  constructor(private toast: ToastService, private injector: Injector) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         this.service = this.injector.get(ManagementService as Type<ManagementService>);
-        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-        if (org && org.id) {
-          this.orgName = org.name;
-        }
         break;
       case PolicyComponentServiceType.ADMIN:
         this.service = this.injector.get(AdminService as Type<AdminService>);

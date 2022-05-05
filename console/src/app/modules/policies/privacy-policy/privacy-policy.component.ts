@@ -12,17 +12,14 @@ import {
     GetPrivacyPolicyResponse,
     UpdateCustomPrivacyPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { CnslLinks } from '../../links/links.component';
-import { GridPolicy, PRIVACY_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -41,9 +38,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
 
   public privacyPolicy: PrivacyPolicy.AsObject | undefined = undefined;
   public form!: FormGroup;
-  public currentPolicy: GridPolicy = PRIVACY_POLICY;
   public InfoSectionType: any = InfoSectionType;
-  public orgName: string = '';
 
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
@@ -62,7 +57,6 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private toast: ToastService,
     private fb: FormBuilder,
-    private storageService: StorageService,
   ) {
     this.form = this.fb.group({
       tosLink: ['', []],
@@ -84,10 +78,6 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
       case PolicyComponentServiceType.MGMT:
         this.service = this.injector.get(ManagementService as Type<ManagementService>);
         this.loadData();
-        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-        if (org && org.id) {
-          this.orgName = org.name;
-        }
         break;
       case PolicyComponentServiceType.ADMIN:
         this.service = this.injector.get(AdminService as Type<AdminService>);

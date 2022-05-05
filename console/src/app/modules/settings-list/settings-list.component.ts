@@ -1,50 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
-
-const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'SETTINGS.LIST.GENERAL' };
-const LOGIN: SidenavSetting = { id: 'login', i18nKey: 'SETTINGS.LIST.LOGIN', groupI18nKey: 'SETTINGS.GROUPS.LOGIN' };
-const IDP: SidenavSetting = { id: 'idp', i18nKey: 'SETTINGS.LIST.IDP', groupI18nKey: 'SETTINGS.GROUPS.LOGIN' };
-const NOTIFICATIONPROVIDERS: SidenavSetting = {
-  id: 'notificationproviders',
-  i18nKey: 'SETTINGS.LIST.NOTIFICATIONPROVIDERS',
-  groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
-};
-
-const NOTIFICATIONS: SidenavSetting = {
-  id: 'notifications',
-  i18nKey: 'SETTINGS.LIST.NOTIFICATIONS',
-  groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
-};
-const MESSAGETEXTS: SidenavSetting = {
-  id: 'messagetexts',
-  i18nKey: 'SETTINGS.LIST.MESSAGETEXTS',
-  groupI18nKey: 'SETTINGS.GROUPS.APPEARANCE',
-};
-
-const LOGINTEXTS: SidenavSetting = {
-  id: 'logintexts',
-  i18nKey: 'SETTINGS.LIST.LOGINTEXTS',
-  groupI18nKey: 'SETTINGS.GROUPS.APPEARANCE',
-};
-const PRIVACYPOLICY: SidenavSetting = {
-  id: 'privacypolicy',
-  i18nKey: 'SETTINGS.LIST.PRIVACYPOLICY',
-  groupI18nKey: 'SETTINGS.GROUPS.OTHER',
-};
-const BRANDING: SidenavSetting = {
-  id: 'branding',
-  i18nKey: 'SETTINGS.LIST.BRANDING',
-  groupI18nKey: 'SETTINGS.GROUPS.APPEARANCE',
-};
+import {
+    BRANDING,
+    GENERAL,
+    IDP,
+    LOGIN,
+    LOGINTEXTS,
+    MESSAGETEXTS,
+    NOTIFICATIONPROVIDERS,
+    NOTIFICATIONS,
+    PRIVACYPOLICY,
+} from './settings';
 
 @Component({
   selector: 'cnsl-settings-list',
   templateUrl: './settings-list.component.html',
   styleUrls: ['./settings-list.component.scss'],
 })
-export class SettingsListComponent {
+export class SettingsListComponent implements OnChanges {
+  @Input() public serviceType!: PolicyComponentServiceType;
+  @Input() public selectedId: string = 'general';
   public settingsList: SidenavSetting[] = [
     GENERAL,
     LOGIN,
@@ -59,6 +36,13 @@ export class SettingsListComponent {
   public currentSetting: string | undefined = 'general';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   constructor() {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes);
+    if (changes.selectedId) {
+      this.currentSetting = this.selectedId;
+    }
+  }
 
   private changeSelection(small: boolean): void {
     if (small) {

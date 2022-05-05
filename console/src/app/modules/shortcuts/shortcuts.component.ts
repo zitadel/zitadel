@@ -7,7 +7,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 
-import { POLICIES } from '../policy-grid/policies';
+import { SETTINGLINKS } from '../policy-grid/policies';
 
 export interface ShortcutItem {
   id: string;
@@ -132,7 +132,7 @@ export class ShortcutsComponent implements OnDestroy {
         });
 
         const routesShortcuts = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT, CREATE_USER];
-        const policyShortcuts = POLICIES.map((p) => {
+        const settingsShortcuts = SETTINGLINKS.map((p) => {
           const policy: ShortcutItem = {
             id: p.i18nTitle,
             type: ShortcutType.POLICY,
@@ -148,7 +148,7 @@ export class ShortcutsComponent implements OnDestroy {
           return policy;
         });
 
-        this.ALL_SHORTCUTS = [...routesShortcuts, ...policyShortcuts, ...mapped];
+        this.ALL_SHORTCUTS = [...routesShortcuts, ...settingsShortcuts, ...mapped];
         this.loadShortcuts(this.org);
       }
     });

@@ -1,121 +1,57 @@
-import { PolicyComponentType } from '../policies/policy-component-types.enum';
-
-export interface GridPolicy {
+export interface SettingLinks {
   i18nTitle: string;
   i18nDesc: string;
   iamRouterLink: any;
   orgRouterLink: any;
   iamWithRole: string[];
   orgWithRole: string[];
-  tags: string[];
   icon?: string;
   svgIcon?: string;
   color: string;
 }
 
-export const COMPLEXITY_POLICY: GridPolicy = {
-  i18nTitle: 'POLICY.PWD_COMPLEXITY.TITLE',
-  i18nDesc: 'POLICY.PWD_COMPLEXITY.DESCRIPTION',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.COMPLEXITY],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.COMPLEXITY],
+export const LOGIN_GROUP: SettingLinks = {
+  i18nTitle: 'SETTINGS.GROUPS.LOGIN',
+  i18nDesc: '',
+  iamRouterLink: ['/settings?id=login'],
+  orgRouterLink: ['/org-settings?id=login'],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
-  tags: ['login', 'security'],
-  svgIcon: 'mdi_textbox_password',
-  color: 'yellow',
-};
-
-export const LOCKOUT_POLICY: GridPolicy = {
-  i18nTitle: 'POLICY.PWD_LOCKOUT.TITLE',
-  i18nDesc: 'POLICY.PWD_LOCKOUT.DESCRIPTION',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.LOCKOUT],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.LOCKOUT],
-  iamWithRole: ['iam.policy.read'],
-  orgWithRole: ['policy.read'],
-  tags: ['login', 'security'],
-  icon: 'las la-lock',
-  color: 'yellow',
-};
-
-export const IAM_POLICY = {
-  i18nTitle: 'POLICY.IAM_POLICY.TITLE',
-  i18nDesc: 'POLICY.IAM_POLICY.DESCRIPTION',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.IAM],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.IAM],
-  iamWithRole: ['iam.policy.read'],
-  orgWithRole: ['iam.policy.read'],
-  tags: ['login'],
-  icon: 'las la-sign-in-alt',
-  color: 'purple',
-};
-
-export const LOGIN_POLICY = {
-  i18nTitle: 'POLICY.LOGIN_POLICY.TITLE',
-  i18nDesc: 'POLICY.LOGIN_POLICY.DESCRIPTION',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.LOGIN],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.LOGIN],
-  iamWithRole: ['iam.policy.read'],
-  orgWithRole: ['policy.read'],
-  tags: ['login', 'security'],
   icon: 'las la-sign-in-alt',
   color: 'green',
 };
 
-export const PRIVATELABEL_POLICY = {
-  i18nTitle: 'POLICY.PRIVATELABELING.TITLE',
-  i18nDesc: 'POLICY.PRIVATELABELING.DESCRIPTION',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.PRIVATELABEL],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.PRIVATELABEL],
+export const APPEARANCE_GROUP: SettingLinks = {
+  i18nTitle: 'SETTINGS.GROUPS.APPEARANCE',
+  i18nDesc: '',
+  iamRouterLink: ['/settings?id=branding'],
+  orgRouterLink: ['/org-settings?id=branding'],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
-  tags: ['login', 'appearance'],
   icon: 'las la-swatchbook',
   color: 'blue',
 };
 
-export const PRIVACY_POLICY = {
-  i18nTitle: 'POLICY.PRIVACY_POLICY.TITLE',
-  i18nDesc: 'POLICY.PRIVACY_POLICY.DESCRIPTION',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.PRIVACYPOLICY],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.PRIVACYPOLICY],
+export const PRIVACY_POLICY: SettingLinks = {
+  i18nTitle: 'SETTINGS.LIST.PRIVACYPOLICY',
+  i18nDesc: '',
+  iamRouterLink: ['/settings?id=privacypolicy'],
+  orgRouterLink: ['/org-settings?id=privacypolicy'],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
-  tags: ['documents', 'text'],
   icon: 'las la-file-contract',
   color: 'black',
 };
 
-export const MESSAGE_TEXTS_POLICY = {
-  i18nTitle: 'POLICY.MESSAGE_TEXTS.TITLE',
-  i18nDesc: 'POLICY.MESSAGE_TEXTS.DESCRIPTION',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.MESSAGETEXTS],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.MESSAGETEXTS],
+export const NOTIFICATION_GROUP: SettingLinks = {
+  i18nTitle: 'SETTINGS.GROUPS.NOTIFICATIONS',
+  i18nDesc: '',
+  iamRouterLink: ['/settings?id=notifications'],
+  orgRouterLink: ['/org-settings?id=notifications'],
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
-  tags: ['appearance', 'text'],
-  icon: 'las la-paragraph',
+  icon: 'las la-bell',
   color: 'red',
 };
 
-export const LOGIN_TEXTS_POLICY = {
-  i18nTitle: 'POLICY.LOGIN_TEXTS.TITLE',
-  i18nDesc: 'POLICY.LOGIN_TEXTS.DESCRIPTION_SHORT',
-  iamRouterLink: ['/instance', 'policy', PolicyComponentType.LOGINTEXTS],
-  orgRouterLink: ['/org', 'policy', PolicyComponentType.LOGINTEXTS],
-  iamWithRole: ['iam.policy.read'],
-  orgWithRole: ['policy.read'],
-  tags: ['appearance', 'text'],
-  icon: 'las la-paragraph',
-  color: 'red',
-};
-
-export const POLICIES: GridPolicy[] = [
-  COMPLEXITY_POLICY,
-  LOCKOUT_POLICY,
-  IAM_POLICY,
-  LOGIN_POLICY,
-  PRIVATELABEL_POLICY,
-  PRIVACY_POLICY,
-  MESSAGE_TEXTS_POLICY,
-  LOGIN_TEXTS_POLICY,
-];
+export const SETTINGLINKS: SettingLinks[] = [LOGIN_GROUP, APPEARANCE_GROUP, PRIVACY_POLICY, NOTIFICATION_GROUP];

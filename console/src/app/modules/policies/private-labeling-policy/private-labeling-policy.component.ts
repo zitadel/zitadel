@@ -23,7 +23,6 @@ import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -81,7 +80,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public org!: Org.AsObject;
-  public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   public InfoSectionType: any = InfoSectionType;
 
   private destroy$: Subject<void> = new Subject();
