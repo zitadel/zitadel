@@ -67,7 +67,7 @@ func StartCommands(es *eventstore.Eventstore,
 	oidcEncryption crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "not external domain specified")
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
 	repo = &Commands{
 		eventstore:            es,

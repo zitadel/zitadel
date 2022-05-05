@@ -25,7 +25,7 @@ func (c *Commands) AddOrgMemberCommand(a *org.Aggregate, userID string, roles ..
 			return nil, errors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-				if exists, err := ExistsUser(ctx, filter, userID, a.ID); err != nil || !exists {
+				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
 					return nil, errors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsOrgMember(ctx, filter, a.ID, userID); err != nil || isMember {
@@ -73,7 +73,7 @@ func IsOrgMember(ctx context.Context, filter preparation.FilterToQueryReducer, o
 	return isMember, nil
 }
 
-func (c *Commands) AddOrgMember(ctx context.Context, userID, orgID string, roles ...string) (*domain.Member, error) {
+func (c *Commands) AddOrgMember(ctx context.Context, orgID, userID string, roles ...string) (*domain.Member, error) {
 	orgAgg := org.NewAggregate(orgID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddOrgMemberCommand(orgAgg, userID, roles...))
 	if err != nil {
