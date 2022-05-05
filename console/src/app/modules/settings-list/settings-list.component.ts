@@ -41,6 +41,8 @@ export class SettingsListComponent implements OnChanges {
     console.log(changes);
     if (changes.selectedId) {
       this.currentSetting = this.selectedId;
+    } else {
+      this.currentSetting = 'general';
     }
   }
 

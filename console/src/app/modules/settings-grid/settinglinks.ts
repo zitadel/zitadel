@@ -3,6 +3,7 @@ export interface SettingLinks {
   i18nDesc: string;
   iamRouterLink: any;
   orgRouterLink: any;
+  queryParams: any;
   iamWithRole: string[];
   orgWithRole: string[];
   icon?: string;
@@ -13,8 +14,9 @@ export interface SettingLinks {
 export const LOGIN_GROUP: SettingLinks = {
   i18nTitle: 'SETTINGS.GROUPS.LOGIN',
   i18nDesc: '',
-  iamRouterLink: ['/settings?id=login'],
-  orgRouterLink: ['/org-settings?id=login'],
+  iamRouterLink: ['/settings'],
+  orgRouterLink: ['/org-settings'],
+  queryParams: { id: 'login' },
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
   icon: 'las la-sign-in-alt',
@@ -24,8 +26,9 @@ export const LOGIN_GROUP: SettingLinks = {
 export const APPEARANCE_GROUP: SettingLinks = {
   i18nTitle: 'SETTINGS.GROUPS.APPEARANCE',
   i18nDesc: '',
-  iamRouterLink: ['/settings?id=branding'],
-  orgRouterLink: ['/org-settings?id=branding'],
+  iamRouterLink: ['/settings'],
+  orgRouterLink: ['/org-settings'],
+  queryParams: { id: 'branding' },
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
   icon: 'las la-swatchbook',
@@ -35,8 +38,9 @@ export const APPEARANCE_GROUP: SettingLinks = {
 export const PRIVACY_POLICY: SettingLinks = {
   i18nTitle: 'SETTINGS.LIST.PRIVACYPOLICY',
   i18nDesc: '',
-  iamRouterLink: ['/settings?id=privacypolicy'],
-  orgRouterLink: ['/org-settings?id=privacypolicy'],
+  iamRouterLink: ['/settings'],
+  orgRouterLink: ['/org-settings'],
+  queryParams: { id: 'privacypolicy' },
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
   icon: 'las la-file-contract',
@@ -46,8 +50,9 @@ export const PRIVACY_POLICY: SettingLinks = {
 export const NOTIFICATION_GROUP: SettingLinks = {
   i18nTitle: 'SETTINGS.GROUPS.NOTIFICATIONS',
   i18nDesc: '',
-  iamRouterLink: ['/settings?id=notifications'],
-  orgRouterLink: ['/org-settings?id=notifications'],
+  iamRouterLink: ['/settings'],
+  orgRouterLink: ['/org-settings'],
+  queryParams: { id: 'notifications' },
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
   icon: 'las la-bell',

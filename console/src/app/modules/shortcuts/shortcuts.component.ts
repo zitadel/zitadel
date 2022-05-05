@@ -108,8 +108,8 @@ export class ShortcutsComponent implements OnDestroy {
         const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
         if (org && org.id) {
           this.org = org;
+          this.loadProjectShortcuts();
         }
-        this.loadProjectShortcuts();
       });
   }
 
