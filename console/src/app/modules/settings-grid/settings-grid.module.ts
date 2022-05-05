@@ -9,10 +9,10 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../info-section/info-section.module';
-import { PolicyGridComponent } from './policy-grid.component';
+import { SettingsGridComponent } from './settings-grid.component';
 
 @NgModule({
-  declarations: [PolicyGridComponent],
+  declarations: [SettingsGridComponent],
   imports: [
     CommonModule,
     HasRolePipeModule,
@@ -24,6 +24,6 @@ import { PolicyGridComponent } from './policy-grid.component';
     MatTooltipModule,
     InfoSectionModule,
   ],
-  exports: [PolicyGridComponent],
+  exports: [SettingsGridComponent],
 })
-export class PolicyGridModule {}
+export class SettingsGridModule {}

@@ -2,12 +2,12 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Input } from '@angular/core';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
-import { SETTINGLINKS, SettingLinks } from './policies';
+import { SETTINGLINKS, SettingLinks } from './settinglinks';
 
 @Component({
-  selector: 'cnsl-policy-grid',
-  templateUrl: './policy-grid.component.html',
-  styleUrls: ['./policy-grid.component.scss'],
+  selector: 'cnsl-settings-grid',
+  templateUrl: './settings-grid.component.html',
+  styleUrls: ['./settings-grid.component.scss'],
   animations: [
     trigger('policy', [
       transition(':enter', [
@@ -35,7 +35,7 @@ import { SETTINGLINKS, SettingLinks } from './policies';
     ]),
   ],
 })
-export class PolicyGridComponent {
+export class SettingsGridComponent {
   @Input() public type!: PolicyComponentServiceType;
   @Input() public tag: string = '';
   public PolicyComponentType: any = PolicyComponentType;

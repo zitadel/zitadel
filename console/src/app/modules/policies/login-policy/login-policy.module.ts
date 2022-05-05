@@ -17,7 +17,6 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
 import { DialogAddTypeComponent } from './mfa-table/dialog-add-type/dialog-add-type.component';
@@ -44,7 +43,6 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     MatSelectModule,
     MatRippleModule,
     TranslateModule,
-    PolicyGridModule,
   ],
 
   exports: [LoginPolicyComponent],

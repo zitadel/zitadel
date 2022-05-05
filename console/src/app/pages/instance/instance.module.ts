@@ -19,8 +19,8 @@ import { ContributorsModule } from 'src/app/modules/contributors/contributors.mo
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { OrgTableModule } from 'src/app/modules/org-table/org-table.module';
-import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
+import { SettingsGridModule } from 'src/app/modules/settings-grid/settings-grid.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
@@ -60,7 +60,7 @@ import { InstanceComponent } from './instance.component';
     RefreshTableModule,
     HasRolePipeModule,
     MatSortModule,
-    PolicyGridModule,
+    SettingsGridModule,
   ],
 })
 export class InstanceModule {}

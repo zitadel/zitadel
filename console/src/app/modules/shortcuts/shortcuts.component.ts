@@ -7,7 +7,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 
-import { SETTINGLINKS } from '../policy-grid/policies';
+import { SETTINGLINKS } from '../settings-grid/settinglinks';
 
 export interface ShortcutItem {
   id: string;

@@ -18,7 +18,6 @@ import { CardModule } from '../../card/card.module';
 import { DetailLayoutModule } from '../../detail-layout/detail-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
-import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { ColorComponent } from './color/color.component';
 import { PreviewComponent } from './preview/preview.component';
 import { PrivateLabelingPolicyRoutingModule } from './private-labeling-policy-routing.module';
@@ -44,7 +43,6 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     DetailLayoutModule,
     DropzoneModule,
     MatProgressSpinnerModule,
-    PolicyGridModule,
     MatExpansionModule,
     InfoSectionModule,
   ],

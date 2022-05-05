@@ -18,7 +18,7 @@ import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
-import { PolicyGridModule } from 'src/app/modules/policy-grid/policy-grid.module';
+import { SettingsGridModule } from 'src/app/modules/settings-grid/settings-grid.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
@@ -55,9 +55,9 @@ import { OrgRoutingModule } from './org-routing.module';
     MatProgressSpinnerModule,
     TranslateModule,
     SharedModule,
+    SettingsGridModule,
     ContributorsModule,
     CopyToClipboardModule,
-    PolicyGridModule,
   ],
 })
 export class OrgModule {}

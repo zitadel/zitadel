@@ -13,7 +13,6 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { CardModule } from '../../card/card.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { OrgIamPolicyRoutingModule } from './org-iam-policy-routing.module';
 import { OrgIamPolicyComponent } from './org-iam-policy.component';
 
@@ -34,7 +33,6 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
     InfoSectionModule,
     TranslateModule,
     DetailLayoutModule,
-    PolicyGridModule,
   ],
   exports: [OrgIamPolicyComponent],
 })

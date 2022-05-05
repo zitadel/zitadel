@@ -18,7 +18,6 @@ import { HasRolePipeModule } from '../../../pipes/has-role-pipe/has-role-pipe.mo
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { PrivacyPolicyRoutingModule } from './privacy-policy-routing.module';
 import { PrivacyPolicyComponent } from './privacy-policy.component';
@@ -47,7 +46,6 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     TextFieldModule,
     MatDialogModule,
     WarnDialogModule,
-    PolicyGridModule,
     InfoSectionModule,
   ],
   exports: [PrivacyPolicyComponent],
