@@ -315,11 +315,19 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, user
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+	err = repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+	if isIgnoreUserInvalidPasswordError(err, request) {
+		return errors.ThrowInvalidArgument(nil, "EVENT-Jsf32", "Errors.User.UsernameOrPassword.Invalid")
+	}
+	return err
 }
 
 func isIgnoreUserNotFoundError(err error, request *domain.AuthRequest) bool {
 	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && errors.IsNotFound(err) && errors.Contains(err, "Errors.User.NotFound")
+}
+
+func isIgnoreUserInvalidPasswordError(err error, request *domain.AuthRequest) bool {
+	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && errors.IsErrorInvalidArgument(err) && errors.Contains(err, "Errors.User.Password.Invalid")
 }
 
 func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
@@ -622,8 +630,8 @@ func (repo *AuthRequestRepo) tryUsingOnlyUserSession(request *domain.AuthRequest
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginName string) (err error) {
 	user := new(user_view_model.UserView)
+	preferredLoginName := loginName
 	if request.RequestedOrgID != "" {
-		preferredLoginName := loginName
 		if request.RequestedOrgID != "" {
 			preferredLoginName += "@" + request.RequestedPrimaryDomain
 		}
@@ -638,11 +646,13 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		}
 	}
 	if request.LoginPolicy.IgnoreUnknownUsernames {
-		if err != nil && !errors.IsNotFound(err) {
-			return err
+		if errors.IsNotFound(err) || (user != nil && user.State == int32(domain.UserStateInactive)) {
+			if request.LabelPolicy.HideLoginNameSuffix {
+				preferredLoginName = loginName
+			}
+			request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)
+			return nil
 		}
-		request.SetUserInfo(unknownUserID, loginName, loginName, "", "", request.RequestedOrgID)
-		return nil
 	}
 	if err != nil {
 		return err
@@ -770,7 +780,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
-	request.LoginName = user.PreferredLoginName
+	if user.PreferredLoginName != "" {
+		request.LoginName = user.PreferredLoginName
+	}
 	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
 	if err != nil {
 		return nil, err
