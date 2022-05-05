@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Input } from '@angular/core';
-import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 
 import { SETTINGLINKS, SettingLinks } from './settinglinks';
 
@@ -38,7 +38,6 @@ import { SETTINGLINKS, SettingLinks } from './settinglinks';
 export class SettingsGridComponent {
   @Input() public type!: PolicyComponentServiceType;
   @Input() public tag: string = '';
-  public PolicyComponentType: any = PolicyComponentType;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public SETTINGS: SettingLinks[] = SETTINGLINKS;
 }
