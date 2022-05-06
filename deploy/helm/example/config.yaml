@@ -1,0 +1,10 @@
+# This file doesn't contain sensible information and can be checked into VCS
+
+zitadel:
+  # The following ZITADEL config is written to a Kubernetes ConfigMap
+  # See all defaults here:
+  # https://github.com/zitadel/zitadel/blob/v2/cmd/defaults.yaml
+  configmapConfig:
+    ExternalDomain: "my.domain"
+    Database:
+      Host: "my.database"

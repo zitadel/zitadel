@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zitadel.fullname" . }}
+  labels:
+    {{- include "zitadel.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "zitadel.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "zitadel.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "zitadel.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 14 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - admin
+            - start-from-init
+            - --config
+            - /config/zitadel-config-yaml
+            - --config
+            - /.secrets/zitadel-secrets-yaml
+            - --steps
+            - /config/zitadel-config-yaml
+            - --masterkeyFile
+            - /.secrets/zitadel-masterkey
+            - start          
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: ZITADEL_DATABASE_USER_SSL_ROOTCERT
+              value: /.secrets/db-ssl-root-crt
+            - name: ZITADEL_ADMINUSER_SSL_ROOTCERT
+              value: /.secrets/db-ssl-root-crt
+          ports:
+          - containerPort: 8080
+            name: server
+            protocol: TCP
+          volumeMounts:
+          - name: zitadel-config-yaml
+            mountPath: /config
+          - name: chowned-secrets
+            mountPath: /.secrets
+          resources:
+            {{- toYaml .Values.resources | nindent 14 }}
+      initContainers:
+        - args:
+          - cp /zitadel-secrets-yaml/* /chowned-secrets/ && cp /db-ssl-root-crt/* /chowned-secrets/ && cp /zitadel-masterkey/* /chowned-secrets/ && ls -la /chowned-secrets/ && chown -R 1000:1000 /chowned-secrets/* && chmod 400 /chowned-secrets/*
+          command:
+          - sh
+          - -c
+          image: "{{ .Values.chownImage.repository }}:{{ .Values.chownImage.tag }}"
+          imagePullPolicy: {{ .Values.chownImage.pullPolicy }}
+          name: chown
+          volumeMounts:
+          - name: chowned-secrets
+            mountPath: /chowned-secrets          
+          - name: zitadel-secrets-yaml
+            mountPath: /zitadel-secrets-yaml
+          - name: db-ssl-root-crt
+            mountPath: /db-ssl-root-crt
+          - name: zitadel-masterkey
+            mountPath: /zitadel-masterkey
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0      
+        - args:
+          - cat /config/zitadel-config-yaml
+          command:
+          - sh
+          - -c
+          image: "{{ .Values.chownImage.repository }}:{{ .Values.chownImage.tag }}"
+          imagePullPolicy: {{ .Values.chownImage.pullPolicy }}
+          name: debug
+          volumeMounts:
+          - name: zitadel-config-yaml
+            mountPath: /config
+          - name: chowned-secrets
+            mountPath: /.secrets
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 14 }}
+      volumes:
+      - name: zitadel-config-yaml
+        configMap:
+          name: zitadel-config-yaml
+      - name: zitadel-secrets-yaml
+        secret:
+          secretName: zitadel-secrets-yaml
+      - name: db-ssl-root-crt
+        secret:
+          secretName: db-ssl-root-crt
+      - name: zitadel-masterkey
+        secret:
+          secretName: zitadel-masterkey
+      - name: chowned-secrets
+        emptyDir: {}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

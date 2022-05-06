@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "zitadel.fullname" . }}-test-connection"
+  labels:
+    {{- include "zitadel.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "zitadel.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

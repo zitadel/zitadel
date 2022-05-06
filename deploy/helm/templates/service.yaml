@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zitadel.fullname" . }}
+  labels:
+    {{- include "zitadel.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: server
+      protocol: TCP
+      name: server
+  selector:
+    {{- include "zitadel.selectorLabels" . | nindent 4 }}
