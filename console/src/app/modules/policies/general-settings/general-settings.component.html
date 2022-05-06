@@ -1,13 +1,12 @@
 <div class="spinner-wr">
   <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
-
-  <h2>{{ 'SETTING.DEFAULTLANGUAGE' | translate }}</h2>
-  <cnsl-form-field class="default-language" label="Default Language" required="true">
-    <cnsl-label>{{ 'SETTING.DEFAULTLANGUAGE' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="defaultLanguage">
-      <mat-option *ngFor="let lang of defaultLanguageOptions" [value]="lang">
-        {{ 'SETTING.LANGUAGES.' + lang | translate }}
-      </mat-option>
-    </mat-select>
-  </cnsl-form-field>
 </div>
+<h2>{{ 'SETTING.DEFAULTLANGUAGE' | translate }}</h2>
+<cnsl-form-field class="default-language" label="Default Language" required="true">
+  <cnsl-label>{{ 'SETTING.DEFAULTLANGUAGE' | translate }}</cnsl-label>
+  <mat-select [(ngModel)]="defaultLanguage">
+    <mat-option *ngFor="let lang of defaultLanguageOptions" [value]="lang">
+      {{ 'SETTING.LANGUAGES.' + lang | translate }}
+    </mat-option>
+  </mat-select>
+</cnsl-form-field>

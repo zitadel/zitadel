@@ -825,6 +825,9 @@
       "OTHER": "Altro"
     }
   },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Lingua standard"
+  },
   "POLICY": {
     "TITLE": "Esplora le impostazioni",
     "DESCRIPTION": "Impostazioni che migliorano la tua sicurezza.",

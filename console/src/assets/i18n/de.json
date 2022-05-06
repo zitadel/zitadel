@@ -829,6 +829,9 @@
       "OTHER": "Anderes"
     }
   },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Standardsprache"
+  },
   "POLICY": {
     "TITLE": "Richtlinen entdecken",
     "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",

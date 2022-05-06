@@ -829,6 +829,9 @@
       "OTHER": "Other"
     }
   },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Default Language"
+  },
   "POLICY": {
     "TITLE": "Explore Settings",
     "DESCRIPTION": "Pre-packaged settings that enhance your security.",
