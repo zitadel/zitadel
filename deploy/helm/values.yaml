@@ -4,7 +4,8 @@
 
 zitadel:
   configmapConfig:
-    Database: {}
+    Database:
+      Host: ""
 
 replicaCount: 1
 
@@ -42,7 +43,7 @@ podSecurityContext:
 securityContext: {}
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 80
 
 ingress:
@@ -55,7 +56,7 @@ ingress:
     - host: chart-example.local
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
