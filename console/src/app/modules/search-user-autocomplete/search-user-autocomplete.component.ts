@@ -17,7 +17,7 @@ import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListUsersResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { DisplayNameQuery, SearchQuery, User } from 'src/app/proto/generated/zitadel/user_pb';
+import { SearchQuery, User, UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -78,11 +78,11 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         switchMap((value) => {
           const query = new SearchQuery();
 
-          const dnQuery = new DisplayNameQuery();
-          dnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-          dnQuery.setDisplayName(value);
+          const unQuery = new UserNameQuery();
+          unQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+          unQuery.setUserName(value);
 
-          query.setDisplayNameQuery(dnQuery);
+          query.setUserNameQuery(unQuery);
 
           if (this.target === UserTarget.SELF) {
             return from(this.userService.listUsers(10, 0, [query]));

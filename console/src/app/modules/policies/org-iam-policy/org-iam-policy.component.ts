@@ -95,7 +95,6 @@ export class OrgIamPolicyComponent implements OnDestroy {
   }
 
   public savePolicy(): void {
-    console.log(this.iamData);
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.iamData as OrgIAMPolicy.AsObject).isDefault) {

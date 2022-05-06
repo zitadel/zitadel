@@ -1,12 +1,14 @@
 <div class="max-width-container">
   <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
     <div class="max-width-container">
-      <ng-container *ngIf="currentSetting === 'general'"></ng-container>
+      <ng-container *ngIf="currentSetting === 'general'">
+        <cnsl-general-settings [serviceType]="serviceType"></cnsl-general-settings>
+      </ng-container>
       <ng-container *ngIf="currentSetting === 'login'">
-        <cnsl-password-complexity-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-password-complexity-policy>
-        <cnsl-password-lockout-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-password-lockout-policy>
-        <cnsl-login-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-login-policy>
-        <cnsl-org-iam-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-org-iam-policy>
+        <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
+        <cnsl-password-lockout-policy [serviceType]="serviceType"></cnsl-password-lockout-policy>
+        <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
+        <cnsl-org-iam-policy [serviceType]="serviceType"></cnsl-org-iam-policy>
       </ng-container>
       <ng-container *ngIf="currentSetting === 'idp'">
         <ng-template cnslHasRole [hasRole]="['org.idp.read']">
@@ -31,13 +33,13 @@
         </ng-template>
       </ng-container>
       <ng-container *ngIf="currentSetting === 'branding'">
-        <cnsl-private-labeling-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-private-labeling-policy>
+        <cnsl-private-labeling-policy [serviceType]="serviceType"></cnsl-private-labeling-policy>
       </ng-container>
       <ng-container *ngIf="currentSetting === 'messagetexts'">
-        <cnsl-message-texts [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-message-texts>
+        <cnsl-message-texts [serviceType]="serviceType"></cnsl-message-texts>
       </ng-container>
       <ng-container *ngIf="currentSetting === 'logintexts'">
-        <cnsl-login-texts [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-login-texts>
+        <cnsl-login-texts [serviceType]="serviceType"></cnsl-login-texts>
       </ng-container>
       <ng-container *ngIf="currentSetting === 'privacypolicy'">
         <cnsl-privacy-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-privacy-policy>

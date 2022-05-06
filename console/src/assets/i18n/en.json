@@ -532,7 +532,7 @@
       "6": "Initial"
     },
     "SEARCH": {
-      "ADDITIONAL": "User Name (selected organization)",
+      "ADDITIONAL": "Loginname (current organization)",
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {

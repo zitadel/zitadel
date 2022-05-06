@@ -1,5 +1,4 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { Subscription } from 'rxjs';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
     UpdateLoginPolicyRequest,
@@ -12,7 +11,6 @@ import {
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -32,7 +30,6 @@ export class LoginPolicyComponent implements OnInit {
   ];
   public loginData!: LoginPolicy.AsObject;
 
-  private sub: Subscription = new Subscription();
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
@@ -43,7 +40,7 @@ export class LoginPolicyComponent implements OnInit {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
 
-  constructor(private toast: ToastService, private injector: Injector, private storageService: StorageService) {}
+  constructor(private toast: ToastService, private injector: Injector) {}
 
   private fetchData(): void {
     this.getData().then((resp) => {

@@ -38,9 +38,8 @@ export class SettingsListComponent implements OnChanges {
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
-    if (changes.selectedId) {
-      this.currentSetting = this.selectedId;
+    if (changes.selectedId.currentValue) {
+      this.currentSetting = changes.selectedId.currentValue;
     } else {
       this.currentSetting = 'general';
     }
