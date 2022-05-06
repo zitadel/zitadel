@@ -7,25 +7,14 @@
         *ngIf="
           breadc[breadc.length - 1] &&
           !breadc[breadc.length - 1].hideNav &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.GRANTEDPROJECT &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.APP &&
           breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER
         "
-        [ngSwitch]="breadc[breadc.length - 1].type"
+        [ngSwitch]="breadc[0].type"
       >
         <div class="nav-row" @navrow>
           <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
             <div class="nav-row-abs" @navroworg>
               <ng-template cnslHasRole [hasRole]="['iam.read']">
-                <a
-                  class="nav-item"
-                  [routerLinkActive]="['active']"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  [routerLink]="['/']"
-                >
-                  <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
-                </a>
-
                 <a
                   class="nav-item"
                   [routerLinkActiveOptions]="{ exact: false }"
@@ -88,14 +77,14 @@
 
           <ng-container *ngSwitchCase="BreadcrumbType.ORG">
             <div class="nav-row-abs" @navroworg>
-              <!-- <a
+              <a
                 class="nav-item"
                 [routerLinkActive]="['active']"
                 [routerLinkActiveOptions]="{ exact: true }"
                 [routerLink]="['/']"
               >
                 <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
-              </a> -->
+              </a>
 
               <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
                 <ng-template cnslHasRole [hasRole]="['org.read']">
@@ -190,7 +179,7 @@
             </div>
           </ng-container>
 
-          <ng-container *ngSwitchCase="BreadcrumbType.PROJECT">
+          <!-- <ng-container *ngSwitchCase="BreadcrumbType.PROJECT">
             <div *ngIf="breadc[breadc.length - 1]?.param?.value" class="nav-row-abs" @navrowproject>
               <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
                 <a
@@ -249,7 +238,7 @@
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
-          </ng-container>
+          </ng-container> -->
         </div>
       </ng-container>
     </ng-container>

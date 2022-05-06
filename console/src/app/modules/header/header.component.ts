@@ -66,4 +66,8 @@ export class HeaderComponent implements OnDestroy {
   public get isOnMe(): boolean {
     return this.router.url === '/users/me';
   }
+
+  public get isOnInstance(): boolean {
+    return ['/instance', '/views', '/orgs', '/settings', '/failed-events', '/instance/members'].includes(this.router.url);
+  }
 }

@@ -98,16 +98,11 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
           ];
 
-          const iambread = new Breadcrumb({
-            type: BreadcrumbType.INSTANCE,
-            name: 'Instance',
-            routerLink: ['/instance'],
-          });
           const bread: Breadcrumb = {
             type: BreadcrumbType.ORG,
             routerLink: ['/org'],
           };
-          breadcrumbService.setBreadcrumb([iambread, bread]);
+          breadcrumbService.setBreadcrumb([bread]);
           break;
       }
     });

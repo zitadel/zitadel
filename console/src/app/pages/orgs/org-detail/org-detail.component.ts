@@ -39,16 +39,11 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     breadcrumbService: BreadcrumbService,
     activatedRoute: ActivatedRoute,
   ) {
-    const iamBread = new Breadcrumb({
-      type: BreadcrumbType.INSTANCE,
-      name: 'Instance',
-      routerLink: ['/instance'],
-    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([iamBread, bread]);
+    breadcrumbService.setBreadcrumb([bread]);
 
     activatedRoute.fragment.pipe(takeUntil(this.destroy$)).subscribe((orgId) => {
       this.getData();

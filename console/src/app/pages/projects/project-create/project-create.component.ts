@@ -21,16 +21,11 @@ export class ProjectCreateComponent {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    const iambread = new Breadcrumb({
-      type: BreadcrumbType.INSTANCE,
-      name: 'Instance',
-      routerLink: ['/instance'],
-    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([iambread, bread]);
+    breadcrumbService.setBreadcrumb([bread]);
   }
 
   public createSteps: number = 1;

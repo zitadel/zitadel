@@ -72,11 +72,6 @@ export class ProjectMembersComponent {
                 const isZitadel = iam.iamProjectId === (this.project as Project.AsObject).id;
                 const breadcrumbs = [
                   new Breadcrumb({
-                    type: BreadcrumbType.INSTANCE,
-                    name: 'Instance',
-                    routerLink: ['/instance'],
-                  }),
-                  new Breadcrumb({
                     type: BreadcrumbType.ORG,
                     routerLink: ['/org'],
                   }),

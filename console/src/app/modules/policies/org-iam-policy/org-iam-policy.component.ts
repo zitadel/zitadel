@@ -1,15 +1,11 @@
-import { Component, Injector, Input, OnDestroy, Type } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import { GetCustomOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -19,7 +15,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   templateUrl: './org-iam-policy.component.html',
   styleUrls: ['./org-iam-policy.component.scss'],
 })
-export class OrgIamPolicyComponent implements OnDestroy {
+export class OrgIamPolicyComponent implements OnInit, OnDestroy {
   private managementService!: ManagementService;
   @Input() public serviceType!: PolicyComponentServiceType;
 
@@ -30,42 +26,13 @@ export class OrgIamPolicyComponent implements OnDestroy {
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
-  constructor(
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private storage: StorageService,
-    private injector: Injector,
-    private adminService: AdminService,
-    breadcrumbService: BreadcrumbService,
-  ) {
-    const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.session) as Org.AsObject;
-    if (temporg) {
-      this.org = temporg;
-    }
-    this.sub = this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-          if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
+  constructor(private toast: ToastService, private injector: Injector, private adminService: AdminService) {}
 
-            const iambread = new Breadcrumb({
-              type: BreadcrumbType.INSTANCE,
-              name: 'Instance',
-              routerLink: ['/instance'],
-            });
-            const bread: Breadcrumb = {
-              type: BreadcrumbType.ORG,
-              routerLink: ['/org'],
-            };
-            breadcrumbService.setBreadcrumb([iambread, bread]);
-          }
-          return this.route.params;
-        }),
-      )
-      .subscribe((_) => {
-        this.fetchData();
-      });
+  ngOnInit(): void {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
+    }
+    this.fetchData();
   }
 
   public ngOnDestroy(): void {

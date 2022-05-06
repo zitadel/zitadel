@@ -11,13 +11,13 @@ export class HomeComponent {
   public dark: boolean = true;
 
   constructor(public authService: GrpcAuthService, breadcrumbService: BreadcrumbService) {
-    const instanceBread = new Breadcrumb({
-      type: BreadcrumbType.INSTANCE,
-      name: 'INSTANCE',
-      routerLink: ['/instance'],
-    });
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
 
-    breadcrumbService.setBreadcrumb([instanceBread]);
+    breadcrumbService.setBreadcrumb([bread]);
+
     const theme = localStorage.getItem('theme');
     this.dark = theme === 'dark-theme' ? true : theme === 'light-theme' ? false : true;
   }

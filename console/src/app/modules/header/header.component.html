@@ -173,6 +173,29 @@
       {{ 'MENU.DOCUMENTATION' | translate }}
     </a>
 
+    <div class="system-rel" *ngIf="!isOnMe">
+      <a
+        id="systembutton"
+        *ngIf="!isOnInstance && (['iam.read$', 'iam.write$'] | hasRole | async)"
+        [routerLink]="['/instance']"
+        class="iam-settings cnsl-action-button"
+        mat-stroked-button
+      >
+        <span class="iam-label">{{ 'MENU.INSTANCE' | translate }}</span>
+        <i class="las la-cog"></i>
+      </a>
+      <a
+        id="orgbutton"
+        *ngIf="isOnInstance && (['org.read'] | hasRole | async)"
+        [routerLink]="['/org']"
+        class="org-settings cnsl-action-button"
+        mat-stroked-button
+      >
+        <span class="iam-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
+        <i class="las la-cog"></i>
+      </a>
+    </div>
+
     <div
       cnslOutsideClick
       (clickOutside)="closeAccountCard()"

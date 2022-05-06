@@ -200,11 +200,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     if (projectId) {
       const breadcrumbs = [
         new Breadcrumb({
-          type: BreadcrumbType.INSTANCE,
-          name: 'Instance',
-          routerLink: ['/instance'],
-        }),
-        new Breadcrumb({
           type: BreadcrumbType.ORG,
           routerLink: ['/org'],
         }),

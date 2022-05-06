@@ -101,16 +101,11 @@ export class IdpComponent implements OnDestroy {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
-          const iambread = new Breadcrumb({
-            type: BreadcrumbType.INSTANCE,
-            name: 'Instance',
-            routerLink: ['/instance'],
-          });
           const bread: Breadcrumb = {
             type: BreadcrumbType.ORG,
             routerLink: ['/org'],
           };
-          breadcrumbService.setBreadcrumb([iambread, bread]);
+          breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
