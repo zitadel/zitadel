@@ -9,6 +9,8 @@ type EventUniqueConstraint struct {
 	Action UniqueConstraintAction
 	//ErrorMessage defines the translation file key for the error message
 	ErrorMessage string
+	//IsGlobal defines if the unique constraint is globally unique or just within a single instance
+	IsGlobal bool
 }
 
 type UniqueConstraintAction int32
@@ -36,6 +38,30 @@ func NewRemoveEventUniqueConstraint(
 	return &EventUniqueConstraint{
 		UniqueType:  uniqueType,
 		UniqueField: uniqueField,
+		Action:      UniqueConstraintRemove,
+	}
+}
+
+func NewAddGlobalEventUniqueConstraint(
+	uniqueType,
+	uniqueField,
+	errMessage string) *EventUniqueConstraint {
+	return &EventUniqueConstraint{
+		UniqueType:   uniqueType,
+		UniqueField:  uniqueField,
+		ErrorMessage: errMessage,
+		IsGlobal:     true,
+		Action:       UniqueConstraintAdd,
+	}
+}
+
+func NewRemoveGlobalEventUniqueConstraint(
+	uniqueType,
+	uniqueField string) *EventUniqueConstraint {
+	return &EventUniqueConstraint{
+		UniqueType:  uniqueType,
+		UniqueField: uniqueField,
+		IsGlobal:    true,
 		Action:      UniqueConstraintRemove,
 	}
 }
