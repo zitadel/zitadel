@@ -20,6 +20,8 @@ import {
   styleUrls: ['./settings-list.component.scss'],
 })
 export class SettingsListComponent implements OnChanges {
+  @Input() public title: string = '';
+  @Input() public description: string = '';
   @Input() public serviceType!: PolicyComponentServiceType;
   @Input() public selectedId: string = 'general';
   public settingsList: SidenavSetting[] = [

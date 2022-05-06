@@ -1,6 +1,9 @@
 <div class="sidenav-container">
-  <div class="sidenav-settings-list">
+  <div class="sidenav-settings-list" [ngClass]="{ indented: indented }">
     <div class="sidenav-sticky-rel">
+      <h1 *ngIf="title">{{ title }}</h1>
+      <p *ngIf="description" class="cnsl-secondary-text">{{ description }}</p>
+
       <button
         *ngIf="currentSetting !== undefined"
         (click)="value = undefined"

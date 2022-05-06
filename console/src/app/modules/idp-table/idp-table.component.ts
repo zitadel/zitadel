@@ -24,7 +24,6 @@ import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 export class IdpTableComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
   @Input() service!: AdminService | ManagementService;
-  @Input() disabled: boolean = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public dataSource: MatTableDataSource<IDP.AsObject> = new MatTableDataSource<IDP.AsObject>();
   public selection: SelectionModel<IDP.AsObject> = new SelectionModel<IDP.AsObject>(true, []);
@@ -54,10 +53,6 @@ export class IdpTableComponent implements OnInit {
 
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       this.displayedColumns = ['availability', 'name', 'type', 'owner', 'creationDate', 'changeDate', 'state'];
-    }
-
-    if (!this.disabled) {
-      this.displayedColumns.push('actions');
     }
   }
 
@@ -288,5 +283,9 @@ export class IdpTableComponent implements OnInit {
 
   public isEnabled(idp: IDP.AsObject): boolean {
     return this.idps.findIndex((i) => i.idpId === idp.id) > -1;
+  }
+
+  public get displayedColumnsWithActions(): string[] {
+    return ['actions', ...this.displayedColumns];
   }
 }

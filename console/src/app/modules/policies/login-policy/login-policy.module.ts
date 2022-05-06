@@ -44,7 +44,6 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     MatRippleModule,
     TranslateModule,
   ],
-
   exports: [LoginPolicyComponent],
 })
 export class LoginPolicyModule {}

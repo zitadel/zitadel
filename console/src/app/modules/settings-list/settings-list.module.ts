@@ -5,8 +5,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../card/card.module';
-import { IdpTableModule } from '../idp-table/idp-table.module';
 import { GeneralSettingsModule } from '../policies/general-settings/general-settings.module';
+import { IdpSettingsModule } from '../policies/idp-settings/idp-settings.module';
 import { LoginPolicyModule } from '../policies/login-policy/login-policy.module';
 import { LoginTextsPolicyModule } from '../policies/login-texts/login-texts.module';
 import { MessageTextsPolicyModule } from '../policies/message-texts/message-texts.module';
@@ -30,7 +30,7 @@ import { SettingsListComponent } from './settings-list.component';
     PasswordLockoutPolicyModule,
     PrivateLabelingPolicyModule,
     GeneralSettingsModule,
-    IdpTableModule,
+    IdpSettingsModule,
     PrivacyPolicyModule,
     MessageTextsPolicyModule,
     LoginTextsPolicyModule,

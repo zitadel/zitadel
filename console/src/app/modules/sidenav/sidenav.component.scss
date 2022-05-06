@@ -2,10 +2,10 @@
 
 @mixin sidenav-theme($theme) {
   $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
   $is-dark-theme: map-get($theme, is-dark);
 
   .sidenav-container {
-    padding-top: 1rem;
     display: grid;
     position: relative;
     grid-template-columns: 1fr;
@@ -13,11 +13,21 @@
     .sidenav-settings-list {
       position: relative;
 
+      &.indented {
+        margin-right: 2rem;
+
+        .sidenav-sticky-rel {
+          margin-left: -2rem;
+          padding-left: 2rem;
+          background: map-get($background, footer);
+        }
+      }
+
       .sidenav-sticky-rel {
         display: flex;
         flex-direction: column;
         position: sticky;
-        top: 50px;
+        top: 36px;
         padding: 1rem 2rem 1rem 0;
 
         .sidenav-setting-group {

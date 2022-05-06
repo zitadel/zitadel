@@ -14,6 +14,9 @@ export interface SidenavSetting {
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SidenavComponent), multi: true }],
 })
 export class SidenavComponent {
+  @Input() public title: string = '';
+  @Input() public description: string = '';
+  @Input() public indented: boolean = false;
   @Input() public currentSetting: string | undefined = 'general';
   @Input() public settingsList: SidenavSetting[] = [];
 
