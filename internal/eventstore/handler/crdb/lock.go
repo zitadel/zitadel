@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -34,11 +33,8 @@ type locker struct {
 }
 
 func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
-	workerName, err := os.Hostname()
-	if err != nil || workerName == "" {
-		workerName, err = id.SonyFlakeGenerator.Next()
-		logging.OnError(err).Panic("unable to generate lockID")
-	}
+	workerName, err := id.SonyFlakeGenerator.Next()
+	logging.OnError(err).Panic("unable to generate lockID")
 	return &locker{
 		client:         client,
 		lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),

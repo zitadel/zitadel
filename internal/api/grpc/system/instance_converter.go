@@ -47,6 +47,9 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 		defaultInstance.Org.Human.Password = req.OwnerPassword.Password
 		defaultInstance.Org.Human.PasswordChangeRequired = req.OwnerPassword.PasswordChangeRequired
 	}
+	if lang := language.Make(req.DefaultLanguage); lang != language.Und {
+		defaultInstance.DefaultLanguage = lang
+	}
 
 	return &defaultInstance
 }

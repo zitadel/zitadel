@@ -2857,21 +2857,6 @@ func TestAddHumanCommand(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid preferred language",
-			args: args{
-				a: agg,
-				human: &AddHuman{
-					Username: "username",
-					Email: Email{
-						Address: "support@zitadel.ch",
-					},
-				},
-			},
-			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-Sfd11", "Errors.Invalid.Argument"),
-			},
-		},
-		{
 			name: "invalid first name",
 			args: args{
 				a: agg,
