@@ -2,9 +2,9 @@
   margin: 0.5rem 0;
 }
 
-.policy-applied-to {
-  margin: -1rem 0 0 0;
-  font-size: 14px;
+.max-card-width {
+  max-width: 400px;
+  display: block;
 }
 
 .passwordless-allowed {
@@ -17,8 +17,6 @@
 }
 
 .login-policy-content {
-  padding-top: 1rem;
-
   .login-policy-row {
     padding-bottom: 1.5rem;
 

@@ -2,7 +2,21 @@ import { SidenavSetting } from '../sidenav/sidenav.component';
 
 export const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'SETTINGS.LIST.GENERAL' };
 
-export const LOGIN: SidenavSetting = { id: 'login', i18nKey: 'SETTINGS.LIST.LOGIN', groupI18nKey: 'SETTINGS.GROUPS.LOGIN' };
+export const LOGIN: SidenavSetting = {
+  id: 'login',
+  i18nKey: 'SETTINGS.LIST.LOGIN',
+  groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
+};
+export const LOCKOUT: SidenavSetting = {
+  id: 'lockout',
+  i18nKey: 'SETTINGS.LIST.LOCKOUT',
+  groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
+};
+export const COMPLEXITY: SidenavSetting = {
+  id: 'complexity',
+  i18nKey: 'SETTINGS.LIST.COMPLEXITY',
+  groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
+};
 
 export const IDP: SidenavSetting = { id: 'idp', i18nKey: 'SETTINGS.LIST.IDP', groupI18nKey: 'SETTINGS.GROUPS.LOGIN' };
 

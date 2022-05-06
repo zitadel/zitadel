@@ -5,18 +5,20 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'cnsl-project-role-detail',
-  templateUrl: './project-role-detail.component.html',
-  styleUrls: ['./project-role-detail.component.scss'],
+  selector: 'cnsl-project-role-detail-dialog',
+  templateUrl: './project-role-detail-dialog.component.html',
+  styleUrls: ['./project-role-detail-dialog.component.scss'],
 })
-export class ProjectRoleDetailComponent {
+export class ProjectRoleDetailDialogComponent {
   public projectId: string = '';
 
   public formGroup!: FormGroup;
-  constructor(private mgmtService: ManagementService, private toast: ToastService,
-    public dialogRef: MatDialogRef<ProjectRoleDetailComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
-
+  constructor(
+    private mgmtService: ManagementService,
+    private toast: ToastService,
+    public dialogRef: MatDialogRef<ProjectRoleDetailDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.projectId = data.projectId;
     this.formGroup = new FormGroup({
       key: new FormControl({ value: '', disabled: true }, [Validators.required]),
@@ -29,11 +31,13 @@ export class ProjectRoleDetailComponent {
 
   submitForm(): void {
     if (this.formGroup.valid && this.key?.value && this.group?.value && this.displayName?.value) {
-      this.mgmtService.updateProjectRole(this.projectId, this.key.value, this.displayName.value, this.group.value)
+      this.mgmtService
+        .updateProjectRole(this.projectId, this.key.value, this.displayName.value, this.group.value)
         .then(() => {
           this.toast.showInfo('PROJECT.TOAST.ROLECHANGED', true);
           this.dialogRef.close(true);
-        }).catch(error => {
+        })
+        .catch((error) => {
           this.toast.showError(error);
         });
     }

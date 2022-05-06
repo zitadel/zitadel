@@ -8,13 +8,14 @@
   <ng-container *ngIf="currentSetting === 'general'">
     <cnsl-general-settings [serviceType]="serviceType"></cnsl-general-settings>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'login'">
+  <ng-container *ngIf="currentSetting === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
-    <!-- <mat-divider class="divider"></mat-divider> -->
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'lockout'">
     <cnsl-password-lockout-policy [serviceType]="serviceType"></cnsl-password-lockout-policy>
-    <!-- <mat-divider class="divider"></mat-divider> -->
-    <cnsl-org-iam-policy [serviceType]="serviceType"></cnsl-org-iam-policy>
-    <!-- <mat-divider class="divider"></mat-divider> -->
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'login'">
+    <!-- <cnsl-org-iam-policy [serviceType]="serviceType"></cnsl-org-iam-policy> -->
     <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'idp'">

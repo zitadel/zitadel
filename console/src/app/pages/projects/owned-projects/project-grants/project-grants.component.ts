@@ -1,15 +1,14 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -30,7 +29,7 @@ const ROUTEPARAM = 'projectid';
   ],
 })
 export class ProjectGrantsComponent implements OnInit, AfterViewInit {
-  public projectId: string = '';
+  @Input() public projectId: string = '';
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
   public dataSource!: ProjectGrantsDataSource;
@@ -43,30 +42,9 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   constructor(
     private mgmtService: ManagementService,
     private toast: ToastService,
-    private route: ActivatedRoute,
     private dialog: MatDialog,
-    private breadcrumbService: BreadcrumbService,
     private router: Router,
-  ) {
-    const projectId = this.route.snapshot.paramMap.get(ROUTEPARAM);
-    if (projectId) {
-      this.projectId = projectId;
-
-      const breadcrumbs = [
-        new Breadcrumb({
-          type: BreadcrumbType.ORG,
-          routerLink: ['/org'],
-        }),
-        new Breadcrumb({
-          type: BreadcrumbType.PROJECT,
-          name: '',
-          param: { key: ROUTEPARAM, value: projectId },
-          routerLink: ['/projects', projectId],
-        }),
-      ];
-      this.breadcrumbService.setBreadcrumb(breadcrumbs);
-    }
-  }
+  ) {}
 
   public gotoRouterLink(rL: any) {
     this.router.navigate(rL);

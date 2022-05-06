@@ -46,7 +46,7 @@
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
-    "INSTANCEOVERVIEW": "Instance Übersicht",
+    "INSTANCEOVERVIEW": "Instanz",
     "ORGS": "Organisationen",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
@@ -812,7 +812,9 @@
     },
     "LIST": {
       "GENERAL": "Allgemein",
-      "LOGIN": "Login und Zugriff",
+      "LOGIN": "Loginverhalten und Sicherheit",
+      "LOCKOUT": "Sperrmechanismen",
+      "COMPLEXITY": "Passwordkomplexität",
       "NOTIFICATIONS": "Benachrichtigungen",
       "NOTIFICATIONPROVIDERS": "Anbieter und SMTP",
       "MESSAGETEXTS": "Benachrichtigungstexte",
@@ -830,7 +832,12 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Standardsprache"
+    "DEFAULTLANGUAGE": "Standardsprache",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English"
+    }
   },
   "POLICY": {
     "TITLE": "Richtlinen entdecken",

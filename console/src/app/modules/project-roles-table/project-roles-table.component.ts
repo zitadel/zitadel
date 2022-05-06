@@ -7,10 +7,8 @@ import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-  ProjectRoleDetailComponent,
-} from '../../pages/projects/owned-projects/project-roles/project-role-detail/project-role-detail.component';
 import { PaginatorComponent } from '../paginator/paginator.component';
+import { ProjectRoleDetailDialogComponent } from '../project-role-detail-dialog/project-role-detail-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { ProjectRolesDataSource } from './project-roles-table-datasource';
 
@@ -126,7 +124,7 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   public openDetailDialog(role: Role.AsObject): void {
-    this.dialog.open(ProjectRoleDetailComponent, {
+    this.dialog.open(ProjectRoleDetailDialogComponent, {
       data: {
         role,
         projectId: this.projectId,

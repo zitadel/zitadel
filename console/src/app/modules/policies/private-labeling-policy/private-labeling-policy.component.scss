@@ -1,10 +1,5 @@
 @use '@angular/material' as mat;
 
-.policy-applied-to {
-  margin: -1rem 0 0 0;
-  font-size: 14px;
-}
-
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
@@ -97,7 +92,6 @@
       padding-top: 2rem;
       display: flex;
       flex-direction: column;
-      margin: 0 -1rem;
 
       @media only screen and (min-width: 950px) {
         flex-direction: row;
@@ -109,12 +103,14 @@
             min-width: 400px;
           }
         }
+
+        .settings {
+          margin-right: 1rem;
+        }
       }
 
       .settings {
         flex: 1;
-        // min-width: 350px;
-        margin: 0 1rem;
 
         .expansion {
           box-shadow: none;
@@ -298,12 +294,15 @@
     }
 
     .preview-wrapper {
-      margin: 0 1rem;
       flex: 2;
       position: relative;
       background-color: #00000010;
       border: 1px solid $border-color;
       box-sizing: border-box;
+
+      @media only screen and (min-width: 950px) {
+        margin-left: 1rem;
+      }
 
       .col {
         display: flex;

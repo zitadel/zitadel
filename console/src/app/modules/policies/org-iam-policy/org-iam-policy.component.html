@@ -1,5 +1,5 @@
 <h2>{{ 'POLICY.IAM_POLICY.TITLE' | translate }}</h2>
-<p>{{ 'POLICY.IAM_POLICY.DESCRIPTION' | translate }}</p>
+<p class="cnsl-secondary-text">{{ 'POLICY.IAM_POLICY.DESCRIPTION' | translate }}</p>
 <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
 <ng-template cnslHasRole [hasRole]="['iam.policy.delete']">

@@ -4,8 +4,10 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
 import { SidenavSetting } from '../sidenav/sidenav.component';
 import {
     BRANDING,
+    COMPLEXITY,
     GENERAL,
     IDP,
+    LOCKOUT,
     LOGIN,
     LOGINTEXTS,
     MESSAGETEXTS,
@@ -27,6 +29,8 @@ export class SettingsListComponent implements OnChanges {
   public settingsList: SidenavSetting[] = [
     GENERAL,
     LOGIN,
+    COMPLEXITY,
+    LOCKOUT,
     IDP,
     NOTIFICATIONS,
     NOTIFICATIONPROVIDERS,

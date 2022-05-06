@@ -117,7 +117,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         const prom = this.userIds.map((id) => this.userService.addUserGrant(id, this.rolesList, this.project.id));
         Promise.all(prom)
           .then(() => {
-            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTADDED', true);
+            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             this.close();
           })
           .catch((error: any) => {
@@ -131,7 +131,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         );
         Promise.all(promp)
           .then(() => {
-            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             this.close();
           })
           .catch((error: any) => {
@@ -151,7 +151,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         );
         Promise.all(promu)
           .then(() => {
-            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             this.close();
           })
           .catch((error: any) => {
@@ -176,7 +176,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         );
         Promise.all(promn)
           .then(() => {
-            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUSERGRANTADDED', true);
+            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
             this.close();
           })
           .catch((error: any) => {

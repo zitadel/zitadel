@@ -15,7 +15,7 @@ export class GeneralSettingsComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
   public service!: ManagementService | AdminService;
 
-  public defaultLanguage: string = 'en';
+  public defaultLanguage: string = '';
   public defaultLanguageOptions: string[] = [];
 
   public loading: boolean = false;

@@ -11,6 +11,7 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
     ProjectPrivateLabelingDialogComponent,
 } from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { App } from 'src/app/proto/generated/zitadel/app_pb';
@@ -25,6 +26,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { NameDialogComponent } from '../../../../modules/name-dialog/name-dialog.component';
 
 const ROUTEPARAM = 'projectid';
+
+const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
+const ROLES: SidenavSetting = { id: 'roles', i18nKey: 'MENU.ROLES' };
+const PROJECTGRANTS: SidenavSetting = { id: 'projectgrants', i18nKey: 'MENU.PROJECTGRANTS' };
+const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'MENU.GRANTS' };
 
 @Component({
   selector: 'cnsl-owned-project-detail',
@@ -56,6 +62,8 @@ export class OwnedProjectDetailComponent implements OnInit {
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
+  public settingsList: SidenavSetting[] = [GENERAL, ROLES, PROJECTGRANTS, GRANTS];
+  public currentSetting: string | undefined = 'general';
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,

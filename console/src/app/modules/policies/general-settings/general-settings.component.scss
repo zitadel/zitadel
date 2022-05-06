@@ -4,4 +4,14 @@
 
 .default-language {
   max-width: 400px;
+  display: block;
+}
+
+.general-btn-container {
+  display: flex;
+  justify-content: flex-start;
+
+  .save-button {
+    display: block;
+  }
 }

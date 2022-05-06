@@ -46,7 +46,7 @@
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
-    "INSTANCEOVERVIEW": "Instance Overview",
+    "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organizations",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
@@ -812,7 +812,9 @@
     },
     "LIST": {
       "GENERAL": "General",
-      "LOGIN": "Login and Access",
+      "LOGIN": "Login Behaviour and Security",
+      "LOCKOUT": "Lockout",
+      "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notifications",
       "NOTIFICATIONPROVIDERS": "Notification providers and SMTP",
       "MESSAGETEXTS": "Message Texts",
@@ -830,7 +832,12 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Default Language"
+    "DEFAULTLANGUAGE": "Default Language",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English"
+    }
   },
   "POLICY": {
     "TITLE": "Explore Settings",

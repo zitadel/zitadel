@@ -46,7 +46,7 @@
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
-    "INSTANCEOVERVIEW": "Panoramica Istanza",
+    "INSTANCEOVERVIEW": "Istanza",
     "ORGS": "Organizzazioni",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Eventi falliti",
@@ -808,7 +808,9 @@
     },
     "LIST": {
       "GENERAL": "Generale",
-      "LOGIN": "Accesso e login",
+      "LOGIN": "Comportamento login e sicurezza",
+      "LOCKOUT": "Meccanismi di bloccaggio",
+      "COMPLEXITY": "complessità della password",
       "NOTIFICATIONS": "Notifiche",
       "NOTIFICATIONPROVIDERS": "Fornitori e SMTP",
       "MESSAGETEXTS": "Testi di notifica",
@@ -826,7 +828,12 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Lingua standard"
+    "DEFAULTLANGUAGE": "Lingua standard",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English"
+    }
   },
   "POLICY": {
     "TITLE": "Esplora le impostazioni",

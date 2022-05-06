@@ -285,7 +285,7 @@ $caos-light-theme-background: (
   unselected-chip: map_get($caos-light-background, 300),
   disabled-list-option: map_get($caos-light-background, 200),
   tooltip: map_get($mat-gray, 700),
-  infosection: #e4e4e4,
+  infosection: map_get($caos-light-primary, 100),
   warninfosection: #ffc1c1,
   successinfosection: #cbf4c9,
   toolbar: rgba(map_get($caos-light-background, 500), 0.9),

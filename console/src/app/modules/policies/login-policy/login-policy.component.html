@@ -1,87 +1,59 @@
+<cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
+
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+</div>
+
 <h2>{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
 
-<cnsl-mfa-table
-  [service]="service"
-  [serviceType]="serviceType"
-  [componentType]="LoginMethodComponentType.MultiFactor"
-  [disabled]="
-    loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
-    ([
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? 'iam.policy.write'
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? 'policy.write'
-        : ''
-    ]
-      | hasRole
-      | async) === false
-  "
->
-</cnsl-mfa-table>
-
-<!-- <mat-divider class="divider"></mat-divider> -->
+<cnsl-card class="max-card-width">
+  <cnsl-mfa-table
+    [service]="service"
+    [serviceType]="serviceType"
+    [componentType]="LoginMethodComponentType.MultiFactor"
+    [disabled]="
+      loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
+  </cnsl-mfa-table>
+</cnsl-card>
 
 <h2>{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
 
-<cnsl-mfa-table
-  [service]="service"
-  [serviceType]="serviceType"
-  [componentType]="LoginMethodComponentType.SecondFactor"
-  [disabled]="
-    ([
-      serviceType === PolicyComponentServiceType.ADMIN
-        ? 'iam.policy.write'
-        : serviceType === PolicyComponentServiceType.MGMT
-        ? 'policy.write'
-        : ''
-    ]
-      | hasRole
-      | async) === false
-  "
->
-</cnsl-mfa-table>
-
-<!-- <mat-divider class="divider"></mat-divider> -->
+<cnsl-card class="max-card-width">
+  <cnsl-mfa-table
+    [service]="service"
+    [serviceType]="serviceType"
+    [componentType]="LoginMethodComponentType.SecondFactor"
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
+  </cnsl-mfa-table>
+</cnsl-card>
 
 <h2>{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}</h2>
 
-<div>
-  <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
-
-  <div class="spinner-wr">
-    <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
-  </div>
-
-  <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
-    <ng-template cnslHasRole [hasRole]="['policy.delete']">
-      <button
-        *ngIf="!isDefault"
-        color="primary"
-        matTooltip="{{ 'POLICY.RESET' | translate }}"
-        color="warn"
-        (click)="removePolicy()"
-        mat-stroked-button
-      >
-        {{ 'POLICY.RESET' | translate }}
-      </button>
-    </ng-template>
-
-    <ng-template cnslHasRole [hasRole]="['policy.write']">
-      <button
-        *ngIf="isDefault"
-        color="primary"
-        matTooltip="{{ 'POLICY.CREATECUSTOM' | translate }}"
-        (click)="savePolicy()"
-        mat-raised-button
-      >
-        {{ 'POLICY.CREATECUSTOM' | translate }}
-      </button>
-    </ng-template>
-  </ng-container>
-</div>
-<div class="login-policy-content" *ngIf="loginData">
+<cnsl-card class="max-card-width login-policy-content" *ngIf="loginData">
   <div class="login-policy-row">
     <cnsl-form-field class="passwordless-allowed" label="Access Code" required="true">
       <cnsl-label>{{ 'LOGINPOLICY.PASSWORDLESS' | translate }}</cnsl-label>
@@ -175,7 +147,7 @@
       </cnsl-info-section>
     </ng-template>
   </div>
-</div>
+</cnsl-card>
 
 <div class="login-policy-btn-container">
   <button
@@ -189,3 +161,18 @@
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>
+
+<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
+  <ng-template cnslHasRole [hasRole]="['policy.delete']">
+    <button
+      *ngIf="!isDefault"
+      color="primary"
+      matTooltip="{{ 'POLICY.RESET' | translate }}"
+      color="warn"
+      (click)="removePolicy()"
+      mat-stroked-button
+    >
+      {{ 'POLICY.RESET' | translate }}
+    </button>
+  </ng-template>
+</ng-container>
