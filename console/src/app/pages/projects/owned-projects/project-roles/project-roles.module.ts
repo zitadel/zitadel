@@ -8,15 +8,12 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
-import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
-import { ProjectRolesRoutingModule } from './project-roles-routing.module';
 import { ProjectRolesComponent } from './project-roles.component';
 
 @NgModule({
-  declarations: [ProjectRolesComponent, ProjectRoleDetailComponent],
+  declarations: [ProjectRolesComponent],
   imports: [
     CommonModule,
-    ProjectRolesRoutingModule,
     HasRoleModule,
     ProjectRolesTableModule,
     ReactiveFormsModule,

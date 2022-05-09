@@ -4,11 +4,10 @@ import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GetPasswordAgePolicyResponse as AdminGetPasswordAgePolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetPasswordAgePolicyResponse as MgmtGetPasswordAgePolicyResponse,
+    GetPasswordAgePolicyResponse as MgmtGetPasswordAgePolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordAgePolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -28,12 +27,7 @@ export class PasswordAgePolicyComponent implements OnDestroy {
   private sub: Subscription = new Subscription();
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  constructor(
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private injector: Injector,
-    breadcrumbService: BreadcrumbService,
-  ) {
+  constructor(private route: ActivatedRoute, private toast: ToastService, private injector: Injector) {
     this.sub = this.route.data
       .pipe(
         switchMap((data) => {
@@ -41,27 +35,9 @@ export class PasswordAgePolicyComponent implements OnDestroy {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
-
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
-                name: 'IAM',
-                routerLink: ['/system'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
-
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
-                name: 'IAM',
-                routerLink: ['/system'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
               break;
           }
 

@@ -34,16 +34,11 @@ export class ProjectsComponent {
       this.zitadelProjectId = iam.iamProjectId;
     });
 
-    const iambread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
-      name: 'IAM',
-      routerLink: ['/system'],
-    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([iambread, bread]);
+    breadcrumbService.setBreadcrumb([bread]);
   }
 
   public addProject(): void {

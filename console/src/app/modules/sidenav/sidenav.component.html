@@ -1,6 +1,9 @@
 <div class="sidenav-container">
-  <div class="sidenav-settings-list">
+  <div class="sidenav-settings-list" [ngClass]="{ indented: indented }">
     <div class="sidenav-sticky-rel">
+      <h1 *ngIf="title">{{ title }}</h1>
+      <p *ngIf="description" class="cnsl-secondary-text">{{ description }}</p>
+
       <button
         *ngIf="currentSetting !== undefined"
         (click)="value = undefined"
@@ -10,8 +13,19 @@
         <i class="las la-angle-left"></i>
         <span>{{ 'USER.SETTINGS.TITLE' | translate }}</span>
       </button>
-      <ng-container *ngFor="let setting of settingsList">
+
+      <ng-container *ngFor="let setting of settingsList; index as i">
         <ng-container>
+          <span
+            class="sidenav-setting-group hide-on-mobile"
+            [ngClass]="{ show: currentSetting === undefined }"
+            *ngIf="
+              (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
+              (i === 0 && setting.groupI18nKey)
+            "
+            >{{ setting.groupI18nKey | translate }}</span
+          >
+
           <button
             (click)="value = setting.id"
             class="sidenav-setting-list-element hide-on-mobile"
@@ -34,8 +48,6 @@
   </div>
 
   <div class="sidenav-content">
-    <div class="max-width-container">
-      <ng-content></ng-content>
-    </div>
+    <ng-content></ng-content>
   </div>
 </div>

@@ -37,7 +37,7 @@
     </ng-template>
 
     <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async as bc; index as i">
-      <ng-container *ngIf="bread.type === BreadcrumbType.IAM">
+      <ng-container *ngIf="bread.type === BreadcrumbType.INSTANCE">
         <ng-template cnslHasRole [hasRole]="['iam.read']">
           <svg
             class="slash hide-on-small"
@@ -132,7 +132,7 @@
         </div>
       </ng-container>
 
-      <ng-container *ngIf="bread.type !== BreadcrumbType.IAM && bread.type !== BreadcrumbType.ORG">
+      <ng-container *ngIf="bread.type !== BreadcrumbType.INSTANCE && bread.type !== BreadcrumbType.ORG">
         <svg
           class="slash"
           viewBox="0 0 24 24"
@@ -176,8 +176,8 @@
     <div class="system-rel" *ngIf="!isOnMe">
       <a
         id="systembutton"
-        *ngIf="!isOnSystem && (['iam.read$', 'iam.write$'] | hasRole | async)"
-        [routerLink]="['/system']"
+        *ngIf="!isOnInstance && (['iam.read$', 'iam.write$'] | hasRole | async)"
+        [routerLink]="['/instance']"
         class="iam-settings cnsl-action-button"
         mat-stroked-button
       >
@@ -186,7 +186,7 @@
       </a>
       <a
         id="orgbutton"
-        *ngIf="isOnSystem && (['org.read'] | hasRole | async)"
+        *ngIf="isOnInstance && (['org.read'] | hasRole | async)"
         [routerLink]="['/org']"
         class="org-settings cnsl-action-button"
         mat-stroked-button

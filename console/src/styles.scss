@@ -238,6 +238,7 @@ $caos-dark-theme-background: (
   // set fixed color due to https://github.com/angular/components/pull/14253
   // change where a scss mix function can't use a css var
   cards: map_get($caos-dark-background, 400),
+  cardhovered: map_get($caos-dark-background, 300),
   contributor: map_get($caos-dark-background, 400),
   contributor-avatar: map_get($caos-dark-background, 300),
   dialog: map_get($caos-dark-background, 500),
@@ -273,6 +274,7 @@ $caos-light-theme-background: (
   // set fixed color due to https://github.com/angular/components/pull/14253
   // change where a scss mix function can't use a css var
   cards: map_get($caos-light-background, 400),
+  cardhovered: map_get($caos-light-background, 300),
   dialog: map_get($caos-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -283,7 +285,7 @@ $caos-light-theme-background: (
   unselected-chip: map_get($caos-light-background, 300),
   disabled-list-option: map_get($caos-light-background, 200),
   tooltip: map_get($mat-gray, 700),
-  infosection: #e4e4e4,
+  infosection: map_get($caos-light-primary, 100),
   warninfosection: #ffc1c1,
   successinfosection: #cbf4c9,
   toolbar: rgba(map_get($caos-light-background, 500), 0.9),
@@ -427,6 +429,14 @@ $custom-typography: mat.define-typography-config(
     border-radius: 6px;
   }
 
+  .mat-option {
+    background-color: map-get($background, cards);
+
+    &:hover {
+      background-color: map-get($background, cardhovered);
+    }
+  }
+
   .mat-button-toggle-button {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -479,6 +489,14 @@ $custom-typography: mat.define-typography-config(
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
+  }
+
+  .mat-option {
+    background-color: map-get($background, cards);
+
+    &:hover {
+      background-color: map-get($background, cardhovered);
+    }
   }
 
   .mat-button-toggle-button {

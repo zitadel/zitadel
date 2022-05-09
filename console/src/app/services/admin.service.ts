@@ -39,6 +39,8 @@ import {
     GetDefaultDomainClaimedMessageTextResponse,
     GetDefaultInitMessageTextRequest,
     GetDefaultInitMessageTextResponse,
+    GetDefaultLanguageRequest,
+    GetDefaultLanguageResponse,
     GetDefaultLoginTextsRequest,
     GetDefaultLoginTextsResponse,
     GetDefaultPasswordlessRegistrationMessageTextRequest,
@@ -120,6 +122,8 @@ import {
     SetDefaultDomainClaimedMessageTextResponse,
     SetDefaultInitMessageTextRequest,
     SetDefaultInitMessageTextResponse,
+    SetDefaultLanguageRequest,
+    SetDefaultLanguageResponse,
     SetDefaultPasswordlessRegistrationMessageTextRequest,
     SetDefaultPasswordlessRegistrationMessageTextResponse,
     SetDefaultPasswordResetMessageTextRequest,
@@ -413,6 +417,20 @@ export class AdminService {
     req.setExpireWarnDays(expireWarnDays);
 
     return this.grpcService.admin.updatePasswordAgePolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  /* default language */
+
+  public getDefaultLanguage(): Promise<GetDefaultLanguageResponse.AsObject> {
+    const req = new GetDefaultLanguageRequest();
+    return this.grpcService.admin.getDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultLanguage(language: string): Promise<SetDefaultLanguageResponse.AsObject> {
+    const req = new SetDefaultLanguageRequest();
+    req.setLanguage(language);
+
+    return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
   }
 
   /* lockout */

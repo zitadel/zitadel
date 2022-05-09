@@ -349,7 +349,7 @@ export class AppComponent implements OnInit, OnDestroy {
   public changedOrg(org: Org.AsObject): void {
     this.loadPrivateLabelling();
     this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/']);
+      this.router.navigate(['/org'],{fragment: org.id} );
     });
   }
 
