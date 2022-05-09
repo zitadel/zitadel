@@ -43,7 +43,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
 						` zitadel.projections.login_policies.hide_password_reset,`+
-						` zitadel.projections.login_policies.ignore_unknown_usernames`+
+						` zitadel.projections.login_policies.ignore_unknown_usernames,`+
+						` zitadel.projections.login_policies.default_redirect_uri`+
 						` FROM zitadel.projections.login_policies`),
 					nil,
 					nil,
@@ -75,7 +76,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
 						` zitadel.projections.login_policies.hide_password_reset,`+
-						` zitadel.projections.login_policies.ignore_unknown_usernames`+
+						` zitadel.projections.login_policies.ignore_unknown_usernames,`+
+						` zitadel.projections.login_policies.default_redirect_uri`+
 						` FROM zitadel.projections.login_policies`),
 					[]string{
 						"aggregate_id",
@@ -92,6 +94,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"is_default",
 						"hide_password_reset",
 						"ignore_unknown_usernames",
+						"default_redirect_uri",
 					},
 					[]driver.Value{
 						"ro",
@@ -108,6 +111,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						"https://example.com/redirect",
 					},
 				),
 			},
@@ -126,6 +130,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				IsDefault:              true,
 				HidePasswordReset:      true,
 				IgnoreUnknownUsernames: true,
+				DefaultRedirectURI:     "https://example.com/redirect",
 			},
 		},
 		{
@@ -146,7 +151,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
 						` zitadel.projections.login_policies.hide_password_reset,`+
-						` zitadel.projections.login_policies.ignore_unknown_usernames`+
+						` zitadel.projections.login_policies.ignore_unknown_usernames,`+
+						` zitadel.projections.login_policies.default_redirect_uri`+
 						` FROM zitadel.projections.login_policies`),
 					sql.ErrConnDone,
 				),

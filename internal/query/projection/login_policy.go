@@ -185,7 +185,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 		cols = append(cols, handler.NewCol(IgnoreUnknownUsernames, *policyEvent.IgnoreUnknownUsernames))
 	}
 	if policyEvent.DefaultRedirectURI != nil {
-		cols = append(cols, handler.NewCol(DefaultRedirectURI, policyEvent.DefaultRedirectURI))
+		cols = append(cols, handler.NewCol(DefaultRedirectURI, *policyEvent.DefaultRedirectURI))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,
