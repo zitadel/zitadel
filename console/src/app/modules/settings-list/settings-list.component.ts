@@ -2,19 +2,6 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
-import {
-    BRANDING,
-    COMPLEXITY,
-    GENERAL,
-    IDP,
-    LOCKOUT,
-    LOGIN,
-    LOGINTEXTS,
-    MESSAGETEXTS,
-    NOTIFICATIONPROVIDERS,
-    NOTIFICATIONS,
-    PRIVACYPOLICY,
-} from './settings';
 
 @Component({
   selector: 'cnsl-settings-list',
@@ -25,37 +12,20 @@ export class SettingsListComponent implements OnChanges {
   @Input() public title: string = '';
   @Input() public description: string = '';
   @Input() public serviceType!: PolicyComponentServiceType;
-  @Input() public selectedId: string = 'general';
-  public settingsList: SidenavSetting[] = [
-    GENERAL,
-    LOGIN,
-    COMPLEXITY,
-    LOCKOUT,
-    IDP,
-    NOTIFICATIONS,
-    NOTIFICATIONPROVIDERS,
-    BRANDING,
-    MESSAGETEXTS,
-    LOGINTEXTS,
-    PRIVACYPOLICY,
-  ];
+  @Input() public selectedId: string = '';
+  @Input() public settingsList: SidenavSetting[] = [];
   public currentSetting: string | undefined = 'general';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.selectedId.currentValue) {
-      this.currentSetting = changes.selectedId.currentValue;
+      this.currentSetting =
+        this.settingsList && this.settingsList.find((l) => l.id === changes.selectedId.currentValue)
+          ? changes.selectedId.currentValue
+          : '';
     } else {
-      this.currentSetting = 'general';
-    }
-  }
-
-  private changeSelection(small: boolean): void {
-    if (small) {
-      this.currentSetting = undefined;
-    } else {
-      this.currentSetting = this.currentSetting === undefined ? 'general' : this.currentSetting;
+      this.currentSetting = this.settingsList ? this.settingsList[0].id : '';
     }
   }
 }

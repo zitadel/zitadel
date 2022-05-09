@@ -1011,7 +1011,7 @@
         "UPDATED": "Custom Texts saved."
       }
     },
-    "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
+    "DEFAULTLABEL": "The current settings corresponds to the standard of your Instance.",
     "BTN_INSTALL": "Setup",
     "BTN_EDIT": "Modify",
     "DATA": {
@@ -1040,7 +1040,7 @@
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark"
     },
-    "RESET": "Reset Policy",
+    "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
     "TOAST": {
       "SET": "Policy set successfully!",

@@ -1011,7 +1011,7 @@
         "UPDATED": "Benutzerdefinierte Texte gespeichert."
       }
     },
-    "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der Instance-Standard Einstellung.",
+    "DEFAULTLABEL": "Die aktuelle Einstellung entspricht der Einstellung Ihrer Instanz.",
     "BTN_INSTALL": "Installieren",
     "BTN_EDIT": "Modifizieren",
     "DATA": {
@@ -1040,7 +1040,7 @@
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden"
     },
-    "RESET": "Richtlinie zurücksetzen",
+    "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
     "TOAST": {
       "SET": "Richtline erfolgreich gesetzt!",

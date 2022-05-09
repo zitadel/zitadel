@@ -3,18 +3,14 @@
     <div>
       <div class="settings-title-row">
         <h1>{{ 'SETTINGS.ORG.TITLE' | translate }}</h1>
-        <!-- <a
-              mat-icon-button
-              href="https://docs.zitadel.ch/docs/guides/basics/organizations#how-zitadel-handles-usernames"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <i class="las la-info-circle"></i>
-            </a> -->
       </div>
       <p class="desc cnsl-secondary-text">{{ 'SETTINGS.ORG.DESCRIPTION' | translate }}</p>
     </div>
     <span class="fill-space"></span>
   </div>
-  <cnsl-settings-list [selectedId]="id" [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-settings-list>
+  <cnsl-settings-list
+    [selectedId]="id"
+    [serviceType]="PolicyComponentServiceType.MGMT"
+    [settingsList]="settingsList"
+  ></cnsl-settings-list>
 </div>

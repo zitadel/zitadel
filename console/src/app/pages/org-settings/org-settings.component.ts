@@ -2,7 +2,21 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { take } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+
+import {
+    BRANDING,
+    COMPLEXITY,
+    IDP,
+    LOCKOUT,
+    LOGIN,
+    LOGINTEXTS,
+    MESSAGETEXTS,
+    NOTIFICATIONPROVIDERS,
+    NOTIFICATIONS,
+    PRIVACYPOLICY,
+} from '../../modules/settings-list/settings';
 
 @Component({
   selector: 'cnsl-org-settings',
@@ -12,6 +26,18 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 export class OrgSettingsComponent {
   public id: string = '';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
+  public settingsList: SidenavSetting[] = [
+    LOGIN,
+    COMPLEXITY,
+    LOCKOUT,
+    IDP,
+    NOTIFICATIONS,
+    NOTIFICATIONPROVIDERS,
+    BRANDING,
+    MESSAGETEXTS,
+    LOGINTEXTS,
+    PRIVACYPOLICY,
+  ];
 
   constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute) {
     const breadcrumbs = [

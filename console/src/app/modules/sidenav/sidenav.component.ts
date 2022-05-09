@@ -1,10 +1,14 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 
 export interface SidenavSetting {
   id: string;
   i18nKey: string;
   groupI18nKey?: string;
+  requiredRoles?: { [serviceType in PolicyComponentServiceType]: string[] };
 }
 
 @Component({
@@ -13,14 +17,21 @@ export interface SidenavSetting {
   styleUrls: ['./sidenav.component.scss'],
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SidenavComponent), multi: true }],
 })
-export class SidenavComponent {
+export class SidenavComponent implements OnInit {
   @Input() public title: string = '';
   @Input() public description: string = '';
   @Input() public indented: boolean = false;
-  @Input() public currentSetting: string | undefined = 'general';
+  @Input() public currentSetting: string | undefined = undefined;
   @Input() public settingsList: SidenavSetting[] = [];
+  @Input() public queryParam: string = '';
 
-  constructor() {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    if (!this.currentSetting) {
+      this.value = this.settingsList[0].id;
+    }
+  }
 
   private onChange: any = () => {};
   private onTouch: any = () => {};
@@ -29,6 +40,17 @@ export class SidenavComponent {
     this.currentSetting = setting;
     this.onChange(setting);
     this.onTouch(setting);
+
+    if (this.queryParam && setting) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          [this.queryParam]: setting,
+        },
+        queryParamsHandling: 'merge',
+        skipLocationChange: false,
+      });
+    }
   }
 
   public writeValue(value: any) {

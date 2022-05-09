@@ -12,13 +12,9 @@
   display: block;
 }
 
-.force-mfa-toggle {
-  margin-right: 1rem;
-}
-
 .login-policy-content {
   .login-policy-row {
-    padding-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
 
     .login-policy-toggle {
       margin: 0.3rem 0;
@@ -37,10 +33,6 @@
   .login-policy-save-button {
     display: block;
   }
-}
-
-.divider {
-  margin: 2rem 0;
 }
 
 .grid {

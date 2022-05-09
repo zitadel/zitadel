@@ -35,8 +35,6 @@ export class LoginPolicyComponent implements OnInit {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public loading: boolean = false;
-  public disabled: boolean = true;
-
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
 
@@ -47,7 +45,6 @@ export class LoginPolicyComponent implements OnInit {
       if (resp.policy) {
         this.loginData = resp.policy;
         this.loading = false;
-        this.disabled = this.isDefault;
       }
     });
   }

@@ -4,8 +4,9 @@
   [indented]="true"
   [(ngModel)]="currentSetting"
   [settingsList]="settingsList"
+  queryParam="id"
 >
-  <ng-container *ngIf="currentSetting === 'general'">
+  <ng-container *ngIf="currentSetting === 'general' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-general-settings [serviceType]="serviceType"></cnsl-general-settings>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'complexity'">
@@ -19,9 +20,7 @@
     <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'idp'">
-    <ng-template cnslHasRole [hasRole]="['org.idp.read']">
-      <cnsl-idp-settings></cnsl-idp-settings>
-    </ng-template>
+    <cnsl-idp-settings [serviceType]="serviceType"></cnsl-idp-settings>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'branding'">
     <cnsl-private-labeling-policy [serviceType]="serviceType"></cnsl-private-labeling-policy>

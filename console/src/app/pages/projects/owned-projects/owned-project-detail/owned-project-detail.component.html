@@ -66,7 +66,7 @@
 
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
+    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" [queryParam]="'id'">
       <ng-container *ngIf="currentSetting === 'general' && project">
         <ng-template cnslHasRole [hasRole]="['project.app.read:' + project.id, 'project.app.read']">
           <cnsl-application-grid *ngIf="grid" [disabled]="isZitadel" (changeView)="grid = false" [projectId]="projectId">

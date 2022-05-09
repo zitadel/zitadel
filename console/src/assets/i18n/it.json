@@ -1007,7 +1007,7 @@
         "UPDATED": "Testi personalizzati salvati."
       }
     },
-    "DEFAULTLABEL": "L'impostazione attuale corrisponde all'impostazione standard IAM.",
+    "DEFAULTLABEL": "L'impostazione attuale corrisponde all'impostazione dell' istanza.",
     "BTN_INSTALL": "Impostazione",
     "BTN_EDIT": "Modifica",
     "DATA": {
@@ -1036,7 +1036,7 @@
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana"
     },
-    "RESET": "Ripristina l'impostazione",
+    "RESET": "Ripristina l'impostazione dell'istanza",
     "CREATECUSTOM": "Crea un'impostazione personalizzata",
     "TOAST": {
       "SET": "Impostazione cambiata con successo!",
