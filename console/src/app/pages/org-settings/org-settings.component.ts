@@ -13,8 +13,6 @@ import {
     LOGIN,
     LOGINTEXTS,
     MESSAGETEXTS,
-    NOTIFICATIONPROVIDERS,
-    NOTIFICATIONS,
     PRIVACYPOLICY,
 } from '../../modules/settings-list/settings';
 
@@ -31,8 +29,6 @@ export class OrgSettingsComponent {
     COMPLEXITY,
     LOCKOUT,
     IDP,
-    NOTIFICATIONS,
-    NOTIFICATIONPROVIDERS,
     BRANDING,
     MESSAGETEXTS,
     LOGINTEXTS,

@@ -34,22 +34,16 @@ export class GeneralSettingsComponent implements OnInit {
   }
 
   private fetchData(): void {
-    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      (this.service as AdminService).getDefaultLanguage().then((langResp) => {
-        this.defaultLanguage = langResp.language;
-      });
-      (this.service as AdminService).getSupportedLanguages().then((supportedResp) => {
-        this.defaultLanguageOptions = supportedResp.languagesList;
-      });
-    }
+    (this.service as AdminService).getDefaultLanguage().then((langResp) => {
+      this.defaultLanguage = langResp.language;
+    });
+    (this.service as AdminService).getSupportedLanguages().then((supportedResp) => {
+      this.defaultLanguageOptions = supportedResp.languagesList;
+    });
   }
 
-  private updateData(): Promise<SetDefaultLanguageResponse.AsObject> | void {
-    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      return (this.service as AdminService).setDefaultLanguage(this.defaultLanguage);
-    } else {
-      return;
-    }
+  private updateData(): Promise<SetDefaultLanguageResponse.AsObject> {
+    return (this.service as AdminService).setDefaultLanguage(this.defaultLanguage);
   }
 
   public savePolicy(): void {
@@ -58,23 +52,6 @@ export class GeneralSettingsComponent implements OnInit {
       prom
         .then(() => {
           this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
-          this.loading = true;
-          setTimeout(() => {
-            this.fetchData();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
-  }
-
-  public removePolicy(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService)
-        .resetLoginPolicyToDefault()
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
           this.loading = true;
           setTimeout(() => {
             this.fetchData();

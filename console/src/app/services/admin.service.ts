@@ -69,6 +69,8 @@ import {
     GetPreviewLabelPolicyResponse,
     GetPrivacyPolicyRequest,
     GetPrivacyPolicyResponse,
+    GetSMTPConfigRequest,
+    GetSMTPConfigResponse,
     GetSupportedLanguagesRequest,
     GetSupportedLanguagesResponse,
     IDPQuery,
@@ -158,6 +160,8 @@ import {
     UpdatePasswordComplexityPolicyResponse,
     UpdatePrivacyPolicyRequest,
     UpdatePrivacyPolicyResponse,
+    UpdateSMTPConfigRequest,
+    UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -431,6 +435,17 @@ export class AdminService {
     req.setLanguage(language);
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* notification settings */
+
+  public getSMTPConfig(): Promise<GetSMTPConfigResponse.AsObject> {
+    const req = new GetSMTPConfigRequest();
+    return this.grpcService.admin.getSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMTPConfig(req: UpdateSMTPConfigRequest): Promise<UpdateSMTPConfigResponse.AsObject> {
+    return this.grpcService.admin.updateSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
   /* lockout */

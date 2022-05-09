@@ -29,15 +29,19 @@ export class InstanceSettingsComponent {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public settingsList: SidenavSetting[] = [
     GENERAL,
+    // notifications
+    NOTIFICATIONS,
+    NOTIFICATIONPROVIDERS,
+    // login
     LOGIN,
     COMPLEXITY,
     LOCKOUT,
     IDP,
-    NOTIFICATIONS,
-    NOTIFICATIONPROVIDERS,
+    // appearance
     BRANDING,
     MESSAGETEXTS,
     LOGINTEXTS,
+    // others
     PRIVACYPOLICY,
   ];
   constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute) {
