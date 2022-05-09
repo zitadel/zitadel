@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, take } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import {
@@ -63,7 +63,7 @@ export class OwnedProjectDetailComponent implements OnInit {
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
   public settingsList: SidenavSetting[] = [GENERAL, ROLES, PROJECTGRANTS, GRANTS];
-  public currentSetting: string | undefined = 'general';
+  public currentSetting: string | undefined = '';
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
@@ -73,7 +73,14 @@ export class OwnedProjectDetailComponent implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private breadcrumbService: BreadcrumbService,
-  ) {}
+  ) {
+    route.queryParams.pipe(take(1)).subscribe((params: Params) => {
+      const { id } = params;
+      if (id) {
+        this.currentSetting = id;
+      }
+    });
+  }
 
   public ngOnInit(): void {
     const projectId = this.route.snapshot.paramMap.get(ROUTEPARAM);

@@ -13,7 +13,7 @@ export interface SettingLinks {
 
 export const LOGIN_GROUP: SettingLinks = {
   i18nTitle: 'SETTINGS.GROUPS.LOGIN',
-  i18nDesc: '',
+  i18nDesc: 'POLICY.LOGIN_POLICY.DESCRIPTION',
   iamRouterLink: ['/settings'],
   orgRouterLink: ['/org-settings'],
   queryParams: { id: 'login' },
@@ -25,7 +25,7 @@ export const LOGIN_GROUP: SettingLinks = {
 
 export const APPEARANCE_GROUP: SettingLinks = {
   i18nTitle: 'SETTINGS.GROUPS.APPEARANCE',
-  i18nDesc: '',
+  i18nDesc: 'POLICY.PRIVATELABELING.DESCRIPTION',
   iamRouterLink: ['/settings'],
   orgRouterLink: ['/org-settings'],
   queryParams: { id: 'branding' },
@@ -37,7 +37,7 @@ export const APPEARANCE_GROUP: SettingLinks = {
 
 export const PRIVACY_POLICY: SettingLinks = {
   i18nTitle: 'SETTINGS.LIST.PRIVACYPOLICY',
-  i18nDesc: '',
+  i18nDesc: 'POLICY.PRIVACY_POLICY.DESCRIPTION',
   iamRouterLink: ['/settings'],
   orgRouterLink: ['/org-settings'],
   queryParams: { id: 'privacypolicy' },

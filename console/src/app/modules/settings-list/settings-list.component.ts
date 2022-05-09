@@ -14,12 +14,12 @@ export class SettingsListComponent implements OnChanges {
   @Input() public serviceType!: PolicyComponentServiceType;
   @Input() public selectedId: string = '';
   @Input() public settingsList: SidenavSetting[] = [];
-  public currentSetting: string | undefined = 'general';
+  public currentSetting: string | undefined = '';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.selectedId.currentValue) {
+    if (changes.selectedId?.currentValue) {
       this.currentSetting =
         this.settingsList && this.settingsList.find((l) => l.id === changes.selectedId.currentValue)
           ? changes.selectedId.currentValue
