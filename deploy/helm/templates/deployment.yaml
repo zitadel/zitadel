@@ -42,7 +42,6 @@ spec:
             - /config/zitadel-config-yaml
             - --masterkeyFile
             - /.secrets/zitadel-masterkey
-            - start          
           env:
             - name: POD_IP
               valueFrom:
