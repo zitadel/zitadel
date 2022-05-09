@@ -43,11 +43,22 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 		userData: l.getUserData(r, authReq, "Login Successful", errID, errMessage),
 	}
 	if authReq != nil {
-		data.RedirectURI = l.oidcAuthCallbackURL(r.Context(), "") //the id will be set via the html (maybe change this with the login refactoring)
+		//the id will be set via the html (maybe change this with the login refactoring)
+		if _, ok := authReq.Request.(*domain.AuthRequestOIDC); ok {
+			data.RedirectURI = l.oidcAuthCallbackURL(r.Context(), "")
+		} else if _, ok := authReq.Request.(*domain.AuthRequestSAML); ok {
+			data.RedirectURI = l.samlAuthCallbackURL(r.Context(), "")
+		}
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplLoginSuccess], data, nil)
 }
 
 func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	http.Redirect(w, r, l.oidcAuthCallbackURL(r.Context(), authReq.ID), http.StatusFound)
+	callback := ""
+	if _, ok := authReq.Request.(*domain.AuthRequestOIDC); ok {
+		callback = l.oidcAuthCallbackURL(r.Context(), authReq.ID)
+	} else if _, ok := authReq.Request.(*domain.AuthRequestSAML); ok {
+		callback = l.samlAuthCallbackURL(r.Context(), authReq.ID)
+	}
+	http.Redirect(w, r, callback, http.StatusFound)
 }

@@ -20,10 +20,11 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Usage      domain.KeyUsage `json:"usage"`
-	Algorithm  string          `json:"algorithm"`
-	PrivateKey *Key            `json:"privateKey"`
-	PublicKey  *Key            `json:"publicKey"`
+	Usage       domain.KeyUsage `json:"usage"`
+	Algorithm   string          `json:"algorithm"`
+	PrivateKey  *Key            `json:"privateKey"`
+	PublicKey   *Key            `json:"publicKey"`
+	Certificate *Key            `json:"certificate"`
 }
 
 type Key struct {
@@ -45,9 +46,11 @@ func NewAddedEvent(
 	usage domain.KeyUsage,
 	algorithm string,
 	privateCrypto,
-	publicCrypto *crypto.CryptoValue,
+	publicCrypto,
+	certificateCrypto *crypto.CryptoValue,
 	privateKeyExpiration,
-	publicKeyExpiration time.Time) *AddedEvent {
+	publicKeyExpiration,
+	certificateExpiration time.Time) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
@@ -63,6 +66,10 @@ func NewAddedEvent(
 		PublicKey: &Key{
 			Key:    publicCrypto,
 			Expiry: publicKeyExpiration,
+		},
+		Certificate: &Key{
+			Key:    certificateCrypto,
+			Expiry: certificateExpiration,
 		},
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	_ "embed"
 	"fmt"
+	"github.com/zitadel/saml/pkg/provider"
+	"github.com/zitadel/zitadel/internal/api/saml"
 	"net"
 	"net/http"
 	"os"
@@ -93,7 +95,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, keys.OIDC, config.InternalAuthZ.RolePermissionMappings)
+	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, keys.OIDC, keys.SAML, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
@@ -128,6 +130,7 @@ func startZitadel(config *Config, masterKey string) error {
 		keys.User,
 		keys.DomainVerification,
 		keys.OIDC,
+		keys.SAML,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -189,6 +192,12 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	authenticatedAPIs.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
 
+	samlProvider, err := saml.NewProvider(ctx, config.SAML, commands, queries, authRepo, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor)
+	if err != nil {
+		return fmt.Errorf("unable to start saml provider: %w", err)
+	}
+	authenticatedAPIs.RegisterHandler(saml.HandlerPrefix, samlProvider.HttpHandler())
+
 	openAPIHandler, err := openapi.Start()
 	if err != nil {
 		return fmt.Errorf("unable to start openapi handler: %w", err)
@@ -201,7 +210,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	authenticatedAPIs.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

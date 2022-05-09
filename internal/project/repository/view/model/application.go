@@ -57,6 +57,10 @@ type ApplicationView struct {
 	IDTokenUserinfoAssertion   bool           `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
 	ClockSkew                  time.Duration  `json:"clockSkew" gorm:"column:clock_skew"`
 
+	IsSAML      bool   `json:"-" gorm:"column:is_saml"`
+	Metadata    string `json:"metadata" gorm:"column:metadata"`
+	MetadataURL string `json:"metadata_url" gorm:"column:metadata_url"`
+
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
 
@@ -90,7 +94,9 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 		project.APIConfigAddedType,
 		project.APIConfigChangedType,
 		project.ApplicationDeactivatedType,
-		project.ApplicationReactivatedType:
+		project.ApplicationReactivatedType,
+		project.SAMLConfigAddedType,
+		project.SAMLConfigChangedType:
 		err = view.SetData(event)
 		if err != nil {
 			return err
@@ -130,6 +136,9 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
+	case project.SAMLConfigAddedType:
+		a.IsSAML = true
+		return a.SetData(event)
 	case project.APIConfigAddedType:
 		a.IsOIDC = false
 		return a.SetData(event)
@@ -142,6 +151,8 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
+	case project.SAMLConfigChangedType:
+		return a.SetData(event)
 	case project.APIConfigChangedType:
 		return a.SetData(event)
 	case project.ProjectChangedType:

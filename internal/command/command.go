@@ -44,12 +44,15 @@ type Commands struct {
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 
-	multifactors       domain.MultifactorConfigs
-	webauthnConfig     *webauthn_helper.Config
-	keySize            int
-	keyAlgorithm       crypto.EncryptionAlgorithm
-	privateKeyLifetime time.Duration
-	publicKeyLifetime  time.Duration
+	multifactors         domain.MultifactorConfigs
+	webauthnConfig       *webauthn_helper.Config
+	keySize              int
+	keyAlgorithm         crypto.EncryptionAlgorithm
+	certificateAlgorithm crypto.EncryptionAlgorithm
+	certKeySize          int
+	privateKeyLifetime   time.Duration
+	publicKeyLifetime    time.Duration
+	certificateLifetime  time.Duration
 
 	tokenVerifier orgFeatureChecker
 }
@@ -73,7 +76,8 @@ func StartCommands(es *eventstore.Eventstore,
 	smsEncryption,
 	userEncryption,
 	domainVerificationEncryption,
-	oidcEncryption crypto.EncryptionAlgorithm,
+	oidcEncryption,
+	samlEncryption crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "not external domain specified")
@@ -87,14 +91,17 @@ func StartCommands(es *eventstore.Eventstore,
 		externalSecure:        externalSecure,
 		externalPort:          externalPort,
 		keySize:               defaults.KeyConfig.Size,
+		certKeySize:           defaults.KeyConfig.CertificateSize,
 		privateKeyLifetime:    defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:     defaults.KeyConfig.PublicKeyLifetime,
+		certificateLifetime:   defaults.KeyConfig.CertificateLifetime,
 		idpConfigEncryption:   idpConfigEncryption,
 		smtpEncryption:        smtpEncryption,
 		smsEncryption:         smsEncryption,
 		userEncryption:        userEncryption,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
+		certificateAlgorithm:  samlEncryption,
 		webauthnConfig:        webAuthN,
 	}
 

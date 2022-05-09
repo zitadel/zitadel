@@ -37,7 +37,9 @@ type Notifications struct {
 }
 
 type KeyConfig struct {
-	Size               int
-	PrivateKeyLifetime time.Duration
-	PublicKeyLifetime  time.Duration
+	Size                int
+	PrivateKeyLifetime  time.Duration
+	PublicKeyLifetime   time.Duration
+	CertificateSize     int
+	CertificateLifetime time.Duration
 }

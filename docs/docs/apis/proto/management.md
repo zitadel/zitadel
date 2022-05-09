@@ -1254,6 +1254,19 @@ Returns a new generated secret if needed (Depending on the configuration)
     POST: /projects/{project_id}/apps/oidc
 
 
+### AddSAMLApp
+
+> **rpc** AddSAMLApp([AddSAMLAppRequest](#addsamlapprequest))
+[AddSAMLAppResponse](#addsamlappresponse)
+
+Adds a new saml service provider
+Returns a entityID
+
+
+
+    POST: /projects/{project_id}/apps/saml
+
+
 ### AddAPIApp
 
 > **rpc** AddAPIApp([AddAPIAppRequest](#addapiapprequest))
@@ -1290,6 +1303,18 @@ Changes the configuration of the oidc client
 
 
     PUT: /projects/{project_id}/apps/{app_id}/oidc_config
+
+
+### UpdateSAMLAppConfig
+
+> **rpc** UpdateSAMLAppConfig([UpdateSAMLAppConfigRequest](#updatesamlappconfigrequest))
+[UpdateSAMLAppConfigResponse](#updatesamlappconfigresponse)
+
+Changes the configuration of the saml application
+
+
+
+    PUT: /projects/{project_id}/apps/{app_id}/saml_config
 
 
 ### UpdateAPIAppConfig
@@ -3647,6 +3672,31 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddSAMLAppRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sp_config |  zitadel.app.v1.SAMLConfig | - |  |
+
+
+
+
+### AddSAMLAppResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -8257,6 +8307,30 @@ This is an empty request
 
 
 ### UpdateProjectRoleResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSAMLAppConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sp_config |  zitadel.app.v1.SAMLConfig | - |  |
+
+
+
+
+### UpdateSAMLAppConfigResponse
 
 
 

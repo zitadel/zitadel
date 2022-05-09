@@ -35,6 +35,7 @@ type App struct {
 	Name      string
 
 	OIDCConfig *OIDCApp
+	SAMLConfig *SAMLApp
 	APIConfig  *APIApp
 }
 
@@ -56,6 +57,11 @@ type OIDCApp struct {
 	ClockSkew              time.Duration
 	AdditionalOrigins      []string
 	AllowedOrigins         []string
+}
+
+type SAMLApp struct {
+	Metadata    string
+	MetadataURL string
 }
 
 type APIApp struct {
@@ -115,6 +121,28 @@ var (
 	AppColumnSequence = Column{
 		name:  projection.AppColumnSequence,
 		table: appsTable,
+	}
+)
+
+var (
+	appSAMLConfigsTable = table{
+		name: projection.AppSAMLTable,
+	}
+	AppSAMLConfigColumnAppID = Column{
+		name:  projection.AppSAMLConfigColumnAppID,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnEntityID = Column{
+		name:  projection.AppSAMLConfigColumnEntityID,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnMetadata = Column{
+		name:  projection.AppSAMLConfigColumnMetadata,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnMetadataURL = Column{
+		name:  projection.AppSAMLConfigColumnMetadataURL,
+		table: appSAMLConfigsTable,
 	}
 )
 
@@ -233,6 +261,38 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App, error) {
+	stmt, scan := prepareAppQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			AppSAMLConfigColumnEntityID.identifier(): entityID,
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (*Project, error) {
+	stmt, scan := prepareProjectByAppQuery()
+	query, args, err := stmt.Where(
+		sq.Or{
+			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+			sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -403,6 +463,11 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+
+			AppSAMLConfigColumnAppID.identifier(),
+			AppSAMLConfigColumnEntityID.identifier(),
+			AppSAMLConfigColumnMetadata.identifier(),
+			AppSAMLConfigColumnMetadataURL.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
@@ -412,6 +477,7 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			var (
 				apiConfig  = sqlAPIConfig{}
 				oidcConfig = sqlOIDCConfig{}
+				samlConfig = sqlSAMLConfig{}
 			)
 
 			err := row.Scan(
@@ -444,6 +510,11 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.iDTokenUserinfoAssertion,
 				&oidcConfig.clockSkew,
 				&oidcConfig.additionalOrigins,
+
+				&samlConfig.appID,
+				&samlConfig.entityID,
+				&samlConfig.metadata,
+				&samlConfig.metadataURL,
 			)
 
 			if err != nil {
@@ -455,6 +526,7 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 
 			apiConfig.set(app)
 			oidcConfig.set(app)
+			samlConfig.set(app)
 
 			return app, nil
 		}
@@ -466,6 +538,7 @@ func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID s
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
 			err = row.Scan(
 				&projectID,
@@ -556,6 +629,11 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+
+			AppSAMLConfigColumnAppID.identifier(),
+			AppSAMLConfigColumnEntityID.identifier(),
+			AppSAMLConfigColumnMetadata.identifier(),
+			AppSAMLConfigColumnMetadataURL.identifier(),
 			countColumn.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
@@ -568,6 +646,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 				var (
 					apiConfig  = sqlAPIConfig{}
 					oidcConfig = sqlOIDCConfig{}
+					samlConfig = sqlSAMLConfig{}
 				)
 
 				err := row.Scan(
@@ -600,6 +679,12 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&oidcConfig.iDTokenUserinfoAssertion,
 					&oidcConfig.clockSkew,
 					&oidcConfig.additionalOrigins,
+
+					&samlConfig.appID,
+					&samlConfig.entityID,
+					&samlConfig.metadata,
+					&samlConfig.metadataURL,
+
 					&apps.Count,
 				)
 
@@ -609,6 +694,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 
 				apiConfig.set(app)
 				oidcConfig.set(app)
+				samlConfig.set(app)
 
 				apps.Apps = append(apps.Apps, app)
 			}
@@ -693,6 +779,23 @@ func (c sqlOIDCConfig) set(app *App) {
 	var err error
 	app.OIDCConfig.AllowedOrigins, err = domain.OIDCOriginAllowList(app.OIDCConfig.RedirectURIs, app.OIDCConfig.AdditionalOrigins)
 	logging.LogWithFields("app", app.ID).OnError(err).Warn("unable to set allowed origins")
+}
+
+type sqlSAMLConfig struct {
+	appID       sql.NullString
+	entityID    sql.NullString
+	metadataURL sql.NullString
+	metadata    sql.NullString
+}
+
+func (c sqlSAMLConfig) set(app *App) {
+	if !c.appID.Valid {
+		return
+	}
+	app.SAMLConfig = &SAMLApp{
+		MetadataURL: c.metadataURL.String,
+		Metadata:    c.metadata.String,
+	}
 }
 
 type sqlAPIConfig struct {

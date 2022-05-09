@@ -16,6 +16,7 @@ type Application struct {
 	Type       int32       `json:"appType,omitempty"`
 	OIDCConfig *OIDCConfig `json:"-"`
 	APIConfig  *APIConfig  `json:"-"`
+	SAMLConfig *SAMLConfig `json:"-"`
 }
 
 type ApplicationID struct {

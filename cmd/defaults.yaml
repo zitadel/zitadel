@@ -89,6 +89,24 @@ OIDC:
     SharedMaxAge: 168h #7d
   CustomEndpoints:
 
+SAML:
+  ProviderConfig:
+    MetadataConfig:
+      Path: "/metadata"
+      SignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+    IDPConfig:
+      SignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+      WantAuthRequestsSigned: true
+      Endpoints:
+    Organisation:
+      Name: ZITADEL
+      URL: https://zitadel.ch
+    ContactPerson:
+      ContactType: "technical"
+      Company: ZITADEL
+      EmailAddress: hi@caos.ch
+
+
 Login:
   LanguageCookieName: zitadel.login.lang
   CSRFCookieName: zitadel.login.csrf
@@ -121,6 +139,9 @@ EncryptionKeys:
     DecryptionKeyIDs:
   OIDC:
     EncryptionKeyID: "oidcKey"
+    DecryptionKeyIDs:
+  SAML:
+    EncryptionKeyID: "samlKey"
     DecryptionKeyIDs:
   OTP:
     EncryptionKeyID: "otpKey"
@@ -157,8 +178,10 @@ SystemDefaults:
     FileSystemPath: ".notifications/"
   KeyConfig:
     Size: 2048
+    CertificateSize: 4096
     PrivateKeyLifetime: 6h
     PublicKeyLifetime: 30h
+    CertificateLifetime: 8766h
 
 DefaultInstance:
   InstanceName:

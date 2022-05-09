@@ -37,7 +37,7 @@ type Queries struct {
 	zitadelRoles                        []authz.RoleMapping
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login statik dir")
@@ -66,7 +66,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
 
-	err = projection.Start(ctx, sqlClient, es, projections, keyEncryptionAlgorithm)
+	err = projection.Start(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {
 		return nil, err
 	}

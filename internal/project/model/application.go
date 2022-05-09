@@ -13,6 +13,7 @@ type Application struct {
 	Type       AppType
 	OIDCConfig *OIDCConfig
 	APIConfig  *APIConfig
+	SAMLConfig *SAMLConfig
 }
 
 type AppState int32
@@ -43,6 +44,9 @@ func (a *Application) IsValid(includeConfig bool) bool {
 		return false
 	}
 	if a.Type == AppTypeAPI && !a.APIConfig.IsValid() {
+		return false
+	}
+	if a.Type == AppTypeSAML && !a.SAMLConfig.IsValid() {
 		return false
 	}
 	return true

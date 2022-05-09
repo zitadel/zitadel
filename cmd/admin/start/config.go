@@ -4,6 +4,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/api/saml"
 
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -41,6 +42,7 @@ type Config struct {
 	Admin           admin_es.Config
 	UserAgentCookie *middleware.UserAgentCookieConfig
 	OIDC            oidc.Config
+	SAML            saml.Config
 	Login           login.Config
 	Console         console.Config
 	Notification    notification.Config
@@ -75,6 +77,7 @@ type encryptionKeyConfig struct {
 	DomainVerification   *crypto.KeyConfig
 	IDPConfig            *crypto.KeyConfig
 	OIDC                 *crypto.KeyConfig
+	SAML                 *crypto.KeyConfig
 	OTP                  *crypto.KeyConfig
 	SMS                  *crypto.KeyConfig
 	SMTP                 *crypto.KeyConfig

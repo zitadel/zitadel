@@ -35,6 +35,7 @@ type Login struct {
 	externalSecure      bool
 	consolePath         string
 	oidcAuthCallbackURL func(context.Context, string) string
+	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 }
@@ -58,6 +59,7 @@ func CreateLogin(config Config,
 	staticStorage static.Storage,
 	consolePath string,
 	oidcAuthCallbackURL func(context.Context, string) string,
+	samlAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
 	userAgentCookie,
 	issuerInterceptor,
@@ -69,6 +71,7 @@ func CreateLogin(config Config,
 
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
+		samlAuthCallbackURL: samlAuthCallbackURL,
 		externalSecure:      externalSecure,
 		consolePath:         consolePath,
 		command:             command,

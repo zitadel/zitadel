@@ -57,6 +57,17 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 	}
 }
 
+func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.SAMLApp {
+	return &domain.SAMLApp{
+		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:       writeModel.AppID,
+		AppName:     writeModel.AppName,
+		State:       writeModel.State,
+		Metadata:    writeModel.Metadata,
+		MetadataURL: writeModel.MetadataURL,
+	}
+}
+
 func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIApp {
 	return &domain.APIApp{
 		ObjectRoot:     writeModelToObjectRoot(writeModel.WriteModel),

@@ -59,6 +59,17 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
 	}
 }
 
+func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) *domain.SAMLApp {
+	return &domain.SAMLApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: req.ProjectId,
+		},
+		AppName:     req.Name,
+		Metadata:    req.SpConfig.GetMetadataXml(),
+		MetadataURL: req.SpConfig.GetMetadataUrl(),
+	}
+}
+
 func AddAPIAppRequestToDomain(app *mgmt_pb.AddAPIAppRequest) *domain.APIApp {
 	return &domain.APIApp{
 		ObjectRoot: models.ObjectRoot{
@@ -95,6 +106,17 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
 		ClockSkew:                app.ClockSkew.AsDuration(),
 		AdditionalOrigins:        app.AdditionalOrigins,
+	}
+}
+
+func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest) *domain.SAMLApp {
+	return &domain.SAMLApp{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: app.ProjectId,
+		},
+		AppID:       app.AppId,
+		Metadata:    app.SpConfig.GetMetadataXml(),
+		MetadataURL: app.SpConfig.GetMetadataUrl(),
 	}
 }
 

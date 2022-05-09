@@ -16,6 +16,7 @@ const (
 	KeyProjectionTable = "projections.keys"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
+	CertificateTable   = KeyProjectionTable + "_" + certificateTableSuffix
 
 	KeyColumnID            = "id"
 	KeyColumnCreationDate  = "creation_date"
@@ -35,14 +36,20 @@ const (
 	KeyPublicColumnID     = "id"
 	KeyPublicColumnExpiry = "expiry"
 	KeyPublicColumnKey    = "key"
+
+	certificateTableSuffix  = "certificate"
+	CertificateColumnID     = "id"
+	CertificateColumnExpiry = "expiry"
+	CertificateColumnKey    = "key"
 )
 
 type KeyProjection struct {
 	crdb.StatementHandler
-	encryptionAlgorithm crypto.EncryptionAlgorithm
+	encryptionAlgorithm     crypto.EncryptionAlgorithm
+	certEncryptionAlgorithm crypto.EncryptionAlgorithm
 }
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) *KeyProjection {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) *KeyProjection {
 	p := new(KeyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
@@ -76,9 +83,18 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewPrimaryKey(KeyPublicColumnID),
 			publicKeyTableSuffix,
 		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(CertificateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(CertificateColumnExpiry, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(CertificateColumnKey, crdb.ColumnTypeBytes),
+		},
+			crdb.NewPrimaryKey(CertificateColumnID),
+			certificateTableSuffix,
+		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.encryptionAlgorithm = keyEncryptionAlgorithm
+	p.certEncryptionAlgorithm = certEncryptionAlgorithm
 
 	return p
 }
@@ -119,29 +135,54 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			},
 		),
 	}
-	if e.PrivateKey.Expiry.After(time.Now()) {
-		creates = append(creates, crdb.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
-				handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
-			},
-			crdb.WithTableSuffix(privateKeyTableSuffix),
-		))
-	}
-	if e.PublicKey.Expiry.After(time.Now()) {
-		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
-		if err != nil {
-			return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
+	if e.Certificate == nil || e.Certificate.Key == nil {
+		if e.PrivateKey.Expiry.After(time.Now()) {
+			creates = append(creates, crdb.AddCreateStatement(
+				[]handler.Column{
+					handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
+					handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
+					handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
+				},
+				crdb.WithTableSuffix(privateKeyTableSuffix),
+			))
 		}
-		creates = append(creates, crdb.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(KeyPublicColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyPublicColumnExpiry, e.PublicKey.Expiry),
-				handler.NewCol(KeyPublicColumnKey, publicKey),
-			},
-			crdb.WithTableSuffix(publicKeyTableSuffix),
-		))
+		if e.PublicKey.Expiry.After(time.Now()) {
+			publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
+			if err != nil {
+				return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
+			}
+			creates = append(creates, crdb.AddCreateStatement(
+				[]handler.Column{
+					handler.NewCol(KeyPublicColumnID, e.Aggregate().ID),
+					handler.NewCol(KeyPublicColumnExpiry, e.PublicKey.Expiry),
+					handler.NewCol(KeyPublicColumnKey, publicKey),
+				},
+				crdb.WithTableSuffix(publicKeyTableSuffix),
+			))
+		}
 	}
+	if e.Certificate != nil && e.Certificate.Key != nil {
+		if e.PrivateKey.Expiry.After(time.Now()) {
+			creates = append(creates, crdb.AddCreateStatement(
+				[]handler.Column{
+					handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
+					handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
+					handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
+				},
+				crdb.WithTableSuffix(privateKeyTableSuffix),
+			))
+		}
+		if e.Certificate.Expiry.After(time.Now()) {
+			creates = append(creates, crdb.AddCreateStatement(
+				[]handler.Column{
+					handler.NewCol(CertificateColumnID, e.Aggregate().ID),
+					handler.NewCol(CertificateColumnExpiry, e.Certificate.Expiry),
+					handler.NewCol(CertificateColumnKey, e.Certificate.Key),
+				},
+				crdb.WithTableSuffix(certificateTableSuffix),
+			))
+		}
+	}
+
 	return crdb.NewMultiStatement(e, creates...), nil
 }

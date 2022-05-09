@@ -19,7 +19,7 @@ services:
 
 # starts the backend (API's) of ZITADEL
 # Port 50001 serves the GRPC API
-# Port 50002 serves the REST API
+# Port 50002 serves the REST APIa
 # Port 50003 serves the login GUI
   backend-run:
     restart: on-failure
