@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
-  GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
-  UpdateLoginPolicyRequest,
-  UpdateLoginPolicyResponse,
+    GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
+    UpdateLoginPolicyRequest,
+    UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  AddCustomLoginPolicyRequest,
-  GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+    AddCustomLoginPolicyRequest,
+    GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -41,53 +41,51 @@ export class LoginPolicyComponent implements OnDestroy {
 
   public currentPolicy: GridPolicy = LOGIN_POLICY;
   public InfoSectionType: any = InfoSectionType;
-  constructor(
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private injector: Injector,
-  ) {
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.passwordlessTypes = [
-            PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
-            PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
-          ];
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.passwordlessTypes = [
-            PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
-            PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
-          ];
-          break;
-      }
+  constructor(private route: ActivatedRoute, private toast: ToastService, private injector: Injector) {
+    this.sub = this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.service = this.injector.get(ManagementService as Type<ManagementService>);
+              this.passwordlessTypes = [
+                PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+                PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+              ];
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.service = this.injector.get(AdminService as Type<AdminService>);
+              this.passwordlessTypes = [
+                PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+                PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+              ];
+              break;
+          }
 
-      return this.route.params;
-    })).subscribe(() => {
-      this.fetchData();
-    });
+          return this.route.params;
+        }),
+      )
+      .subscribe(() => {
+        this.fetchData();
+      });
   }
 
   private fetchData(): void {
-    this.getData().then(resp => {
+    this.getData().then((resp) => {
       if (resp.policy) {
         this.loginData = resp.policy;
         this.loading = false;
         this.disabled = this.isDefault;
       }
     });
-
   }
 
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  private async getData():
-    Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {
+  private async getData(): Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).getLoginPolicy();
@@ -96,8 +94,7 @@ export class LoginPolicyComponent implements OnDestroy {
     }
   }
 
-  private async updateData():
-    Promise<UpdateLoginPolicyResponse.AsObject> {
+  private async updateData(): Promise<UpdateLoginPolicyResponse.AsObject> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         const mgmtreq = new AddCustomLoginPolicyRequest();
@@ -108,6 +105,8 @@ export class LoginPolicyComponent implements OnDestroy {
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
         mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+        mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
         if ((this.loginData as LoginPolicy.AsObject).isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
         } else {
@@ -122,34 +121,40 @@ export class LoginPolicyComponent implements OnDestroy {
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
         adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
         adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+        adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }
   }
 
   public savePolicy(): void {
-    this.updateData().then(() => {
-      this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
-      this.loading = true;
-      setTimeout(() => {
-        this.fetchData();
-      }, 2000);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
-  }
-
-  public removePolicy(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).resetLoginPolicyToDefault().then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+    this.updateData()
+      .then(() => {
+        this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
         this.loading = true;
         setTimeout(() => {
           this.fetchData();
         }, 2000);
-      }).catch(error => {
+      })
+      .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public removePolicy(): void {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      (this.service as ManagementService)
+        .resetLoginPolicyToDefault()
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+          this.loading = true;
+          setTimeout(() => {
+            this.fetchData();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
