@@ -1,0 +1,34 @@
+.settings-top-view {
+  display: flex;
+  align-items: center;
+  padding-top: 2rem;
+
+  .settings-title-row {
+    display: flex;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+    }
+
+    a i {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+    }
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.desc {
+  margin-bottom: 2rem;
+  font-size: 14px;
+}

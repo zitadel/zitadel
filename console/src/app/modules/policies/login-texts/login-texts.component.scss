@@ -32,18 +32,16 @@
 }
 
 .top-actions {
-  display: flex;
-  margin: 0 -0.5rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  column-gap: 1rem;
 
   .keys {
-    flex: 1;
-    margin: 0 0.5rem;
     min-width: 150px;
+    grid-column: span 3;
   }
 
   .language {
-    margin: 0 0.5rem;
     min-width: 150px;
 
     .lighter {

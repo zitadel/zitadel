@@ -85,9 +85,9 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
           ];
 
           const iamBread = new Breadcrumb({
-            type: BreadcrumbType.IAM,
-            name: 'System',
-            routerLink: ['/system'],
+            type: BreadcrumbType.INSTANCE,
+            name: 'Instance',
+            routerLink: ['/instance'],
           });
           breadcrumbService.setBreadcrumb([iamBread]);
           break;
@@ -98,16 +98,11 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
           ];
 
-          const iambread = new Breadcrumb({
-            type: BreadcrumbType.IAM,
-            name: 'System',
-            routerLink: ['/system'],
-          });
           const bread: Breadcrumb = {
             type: BreadcrumbType.ORG,
             routerLink: ['/org'],
           };
-          breadcrumbService.setBreadcrumb([iambread, bread]);
+          breadcrumbService.setBreadcrumb([bread]);
           break;
       }
     });

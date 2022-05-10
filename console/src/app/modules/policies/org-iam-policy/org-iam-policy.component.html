@@ -1,55 +1,41 @@
-<cnsl-detail-layout
-  [hasBackButton]="true"
-  [title]="'POLICY.IAM_POLICY.TITLE' | translate"
-  [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate"
->
-  <p class="policy-applied-to" sub>
-    {{ 'POLICY.APPLIEDTO' | translate }}:
-    <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
-    <ng-template #iam
-      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
-    </ng-template>
-  </p>
+<h2>{{ 'POLICY.IAM_POLICY.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'POLICY.IAM_POLICY.DESCRIPTION' | translate }}</p>
+<cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
-  <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
+<ng-template cnslHasRole [hasRole]="['iam.policy.delete']">
+  <button
+    *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+    matTooltip="{{ 'POLICY.RESET' | translate }}"
+    color="warn"
+    (click)="removePolicy()"
+    mat-stroked-button
+  >
+    {{ 'POLICY.RESET' | translate }}
+  </button>
+</ng-template>
 
-  <ng-template cnslHasRole [hasRole]="['iam.policy.delete']">
-    <button
-      *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-      matTooltip="{{ 'POLICY.RESET' | translate }}"
-      color="warn"
-      (click)="removePolicy()"
-      mat-stroked-button
-    >
-      {{ 'POLICY.RESET' | translate }}
-    </button>
-  </ng-template>
-
-  <div class="content" *ngIf="iamData">
-    <div class="row">
-      <mat-slide-toggle
-        color="primary"
-        name="hasNumber"
-        ngDefaultControl
-        [disabled]="(['iam.policy.write'] | hasRole | async) === false"
-        [(ngModel)]="iamData.userLoginMustBeDomain"
-      >
-        {{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate }}
-      </mat-slide-toggle>
-    </div>
-  </div>
-
-  <div class="btn-container">
-    <button
-      (click)="savePolicy()"
-      [disabled]="(['iam.policy.write'] | hasRole | async) === false"
+<div class="content" *ngIf="iamData">
+  <div class="row">
+    <mat-slide-toggle
       color="primary"
-      type="submit"
-      mat-raised-button
+      name="hasNumber"
+      ngDefaultControl
+      [disabled]="(['iam.policy.write'] | hasRole | async) === false"
+      [(ngModel)]="iamData.userLoginMustBeDomain"
     >
-      {{ 'ACTIONS.SAVE' | translate }}
-    </button>
+      {{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate }}
+    </mat-slide-toggle>
   </div>
+</div>
 
-  <cnsl-policy-grid [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="login"></cnsl-policy-grid>
-</cnsl-detail-layout>
+<div class="btn-container">
+  <button
+    (click)="savePolicy()"
+    [disabled]="(['iam.policy.write'] | hasRole | async) === false"
+    color="primary"
+    type="submit"
+    mat-raised-button
+  >
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
+</div>

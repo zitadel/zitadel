@@ -21,6 +21,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
+import { ProjectRoleDetailDialogModule } from '../project-role-detail-dialog/project-role-detail-dialog.module';
 import { TableActionsModule } from '../table-actions/table-actions.module';
 import { ProjectRolesTableComponent } from './project-roles-table.component';
 
@@ -46,6 +47,7 @@ import { ProjectRolesTableComponent } from './project-roles-table.component';
     HasRolePipeModule,
     TranslateModule,
     TableActionsModule,
+    ProjectRoleDetailDialogModule,
     MatMenuModule,
     TimestampToDatePipeModule,
     RefreshTableModule,
