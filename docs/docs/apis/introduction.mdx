@@ -208,14 +208,14 @@ In the table below you can see the URI of those calls.
 
 | Service | URI                                                                                                                                            |
 | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| REST    | [https://api.zitadel.ch/auth/v1/users/me](https://api.zitadel.ch/auth/v1/users/me)                                                             |
-| GRPC    | [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser) |
+| REST    | [{your_domain}/auth/v1/users/me]({your_domain}/auth/v1/users/me)                                                             |
+| GRPC    | [{your_domain}/caos.zitadel.auth.api.v1.AuthService/GetMyUser]({your_domain}/caos.zitadel.auth.api.v1.AuthService/GetMyUser) |
 
 ## Domains
 
 | Domain Name | Example               | Description                                                                                                                           |
 | :---------- | :-------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| base_url      | `{instance}.zitadel.cloud` or custom domain  | ZITADEL has only one url, the different apis will be found under different paths.                               |
+| base_url      | `{instance}.zitadel.cloud` or custom domain {your_domain} | ZITADEL has only one url, the different apis will be found under different paths.                               |
 | issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](openidoauth/endpoints#openid-connect-10-discovery)                               |
 | api         | `{base_rul}/api`      | All ZITADEL API's are located under this domain.                                                                                      |
 | login       | `{base_url}/ui/login` | The accounts.\* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
