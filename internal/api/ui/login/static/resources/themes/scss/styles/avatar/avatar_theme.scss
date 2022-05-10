@@ -8,7 +8,7 @@
 @mixin lgn-avatar-color() {
   .lgn-avatar:not(.transparent) {
     @include _lgn-avatar-theme-property("background-color", false);
-    @include lgn-avatar-elevation(2);
+    // @include lgn-avatar-elevation(2);
   }
 
   //   .lgn-avatar .initials {
