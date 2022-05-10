@@ -100,7 +100,7 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 		config.AutoRegister)
 
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-jf9w", "Errors.Org.IDPConfig.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {

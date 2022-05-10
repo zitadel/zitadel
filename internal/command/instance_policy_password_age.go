@@ -54,7 +54,7 @@ func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *d
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PasswordAgePolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.ExpireWarnDays, policy.MaxAgeDays)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-180sf", "Errors.IAM.PasswordAgePolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
