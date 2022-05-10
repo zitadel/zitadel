@@ -1,6 +1,30 @@
 version: '3.8'
 
 services:
+  zitadel:
+    restart: always
+    networks:
+      - zitadel
+    image: ghcr.io/caos/zitadel:latest
+    command: admin --config /.zitadel/local-conf.yaml start-from-init --masterkeyFromEnv
+    volumes:
+    - ${PWD}/build/local/local-conf.yaml:/.zitadel/local-conf.yaml
+    environment:
+    #Warning: This key should be recreated for security reasons!
+      - ZITADEL_MASTERKEY=JIzH+ZGMn2Vk7PPGAcGmdFL3ZkFTXaU=
+      - ZITADEL_DATABASE_HOST=db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/debug"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 40s
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+
   db:
     restart: always
     networks:
@@ -14,35 +38,8 @@ services:
       retries: 5
       start_period: 20s
     ports:
-      - 8080:8080
+      - 9090:8080
       - 26257:26257
 
-# starts the backend (API's) of ZITADEL
-# Port 50001 serves the GRPC API
-# Port 50002 serves the REST API
-# Port 50003 serves the login GUI
-  backend-run:
-    restart: on-failure
-    networks:
-      - zitadel
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:50002/management/v1/healthz"]
-      interval: 10s
-      timeout: 30s
-      retries: 5
-      start_period: 20s
-    depends_on:
-      db:
-        condition: service_healthy
-    build:
-      context: ../..
-      dockerfile: build/zitadel/Dockerfile
-      target: dev-go-build
-    environment:
-      - ZITADEL_EVENTSTORE_HOST=db
-    ports:
-      - 50001:50001
-    command:
-      [
-        'start',
-      ]
+networks:
+  zitadel:
