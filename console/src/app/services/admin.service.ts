@@ -53,6 +53,8 @@ import {
     GetDefaultVerifyEmailMessageTextResponse,
     GetDefaultVerifyPhoneMessageTextRequest,
     GetDefaultVerifyPhoneMessageTextResponse,
+    GetFileSystemNotificationProviderRequest,
+    GetFileSystemNotificationProviderResponse,
     GetIDPByIDRequest,
     GetIDPByIDResponse,
     GetLabelPolicyRequest,
@@ -61,6 +63,8 @@ import {
     GetLockoutPolicyResponse,
     GetLoginPolicyRequest,
     GetLoginPolicyResponse,
+    GetLogNotificationProviderRequest,
+    GetLogNotificationProviderResponse,
     GetOIDCSettingsRequest,
     GetOIDCSettingsResponse,
     GetOrgIAMPolicyRequest,
@@ -560,6 +564,19 @@ export class AdminService {
 
   public updateOIDCSettings(req: UpdateOIDCSettingsRequest): Promise<UpdateOIDCSettingsResponse.AsObject> {
     return this.grpcService.admin.updateOIDCSettings(req, null).then((resp) => resp.toObject());
+  }
+
+  /* LOG and FILE Notifications */
+
+  public getLogNotificationProvider(): Promise<GetLogNotificationProviderResponse.AsObject> {
+    const req = new GetLogNotificationProviderRequest();
+    return this.grpcService.admin.getLogNotificationProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public getFileSystemNotificationProvider(
+    req: GetFileSystemNotificationProviderRequest,
+  ): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+    return this.grpcService.admin.getFileSystemNotificationProvider(req, null).then((resp) => resp.toObject());
   }
 
   /* org iam */

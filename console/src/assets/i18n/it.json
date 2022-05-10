@@ -816,7 +816,6 @@
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "complessità della password",
       "NOTIFICATIONS": "Notifiche",
-      "NOTIFICATIONPROVIDERS": "Fornitori e SMTP",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Testi dell'interfaccia login",

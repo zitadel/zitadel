@@ -34,12 +34,6 @@ export const COMPLEXITY: SidenavSetting = {
 
 export const IDP: SidenavSetting = { id: 'idp', i18nKey: 'SETTINGS.LIST.IDP', groupI18nKey: 'SETTINGS.GROUPS.LOGIN' };
 
-export const NOTIFICATIONPROVIDERS: SidenavSetting = {
-  id: 'notificationproviders',
-  i18nKey: 'SETTINGS.LIST.NOTIFICATIONPROVIDERS',
-  groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
-};
-
 export const NOTIFICATIONS: SidenavSetting = {
   id: 'notifications',
   i18nKey: 'SETTINGS.LIST.NOTIFICATIONS',

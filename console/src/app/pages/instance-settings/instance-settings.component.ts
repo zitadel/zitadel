@@ -14,7 +14,6 @@ import {
     LOGIN,
     LOGINTEXTS,
     MESSAGETEXTS,
-    NOTIFICATIONPROVIDERS,
     NOTIFICATIONS,
     OIDC,
     PRIVACYPOLICY,
@@ -32,7 +31,6 @@ export class InstanceSettingsComponent {
     GENERAL,
     // notifications
     NOTIFICATIONS,
-    NOTIFICATIONPROVIDERS,
     // login
     LOGIN,
     COMPLEXITY,
