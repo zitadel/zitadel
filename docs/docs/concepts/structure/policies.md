@@ -88,3 +88,11 @@ Make sure you click the "Set preview as current configuration" button after you 
 
 Each organization is able to configure its own privacy policy and terms of service.
 A link to the current policies can be provided. On register each user has to accept these policies.
+
+
+## Domain policy
+
+In the domain policy you have two different settings. 
+One is the "user_login_must_be_domain", by setting this all the users within an organisation will be suffixed with the domain of the organisation.
+The second is "validate_org_domains" if this is set to true all created domains on an organisation must be verified per acme challenge. [Verify Domain] (../../guides/basics/organizations#domain-verification-and-primary-domain)
+If it is set to false, all registered domain will automatically be created as verified and the users will be able to use the domain for login.
