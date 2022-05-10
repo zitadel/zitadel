@@ -95,7 +95,7 @@ export class NotificationSettingsComponent implements OnInit {
     if (prom) {
       prom
         .then(() => {
-          this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
+          this.toast.showInfo('SETTING.SMTP.SAVED', true);
           this.loading = true;
           setTimeout(() => {
             this.fetchData();
@@ -123,7 +123,7 @@ export class NotificationSettingsComponent implements OnInit {
         this.service
           .addSMSProviderTwilio(req)
           .then(() => {
-            this.toast.showInfo('SETTING.SMS.TWILIO.ADDED');
+            this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
           })
           .catch((error) => {
             this.toast.showError(error);

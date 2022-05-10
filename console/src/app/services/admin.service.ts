@@ -61,6 +61,8 @@ import {
     GetLockoutPolicyResponse,
     GetLoginPolicyRequest,
     GetLoginPolicyResponse,
+    GetOIDCSettingsRequest,
+    GetOIDCSettingsResponse,
     GetOrgIAMPolicyRequest,
     GetOrgIAMPolicyResponse,
     GetPasswordAgePolicyRequest,
@@ -158,6 +160,8 @@ import {
     UpdateLockoutPolicyResponse,
     UpdateLoginPolicyRequest,
     UpdateLoginPolicyResponse,
+    UpdateOIDCSettingsRequest,
+    UpdateOIDCSettingsResponse,
     UpdateOrgIAMPolicyRequest,
     UpdateOrgIAMPolicyResponse,
     UpdatePasswordAgePolicyRequest,
@@ -545,6 +549,17 @@ export class AdminService {
 
   public updateLoginPolicy(req: UpdateLoginPolicyRequest): Promise<UpdateLoginPolicyResponse.AsObject> {
     return this.grpcService.admin.updateLoginPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  /* OIDC Configuration */
+
+  public getOIDCSettings(): Promise<GetOIDCSettingsResponse.AsObject> {
+    const req = new GetOIDCSettingsRequest();
+    return this.grpcService.admin.getOIDCSettings(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateOIDCSettings(req: UpdateOIDCSettingsRequest): Promise<UpdateOIDCSettingsResponse.AsObject> {
+    return this.grpcService.admin.updateOIDCSettings(req, null).then((resp) => resp.toObject());
   }
 
   /* org iam */

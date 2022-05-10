@@ -7,7 +7,7 @@
   queryParam="id"
 >
   <ng-container *ngIf="currentSetting === 'general' && serviceType === PolicyComponentServiceType.ADMIN">
-    <cnsl-general-settings [serviceType]="serviceType"></cnsl-general-settings>
+    <cnsl-general-settings></cnsl-general-settings>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
@@ -25,6 +25,11 @@
   <ng-container *ngIf="currentSetting === 'notifications' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-notification-settings [serviceType]="serviceType"></cnsl-notification-settings>
   </ng-container>
+
+  <ng-container *ngIf="currentSetting === 'oidc' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-oidc-configuration></cnsl-oidc-configuration>
+  </ng-container>
+
   <ng-container *ngIf="currentSetting === 'branding'">
     <cnsl-private-labeling-policy [serviceType]="serviceType"></cnsl-private-labeling-policy>
   </ng-container>

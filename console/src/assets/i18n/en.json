@@ -821,7 +821,8 @@
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Privacy Policy"
+      "PRIVACYPOLICY": "Privacy Policy",
+      "OIDC": "OIDC Configuration"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -845,7 +846,8 @@
       "HOST": "Host",
       "USER": "User",
       "PASSWORD": "Password",
-      "TLS": "Transport Layer Security (TLS)"
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Saved successfully!"
     },
     "SMS": {
       "TITLE": "SMS Settings",
@@ -859,6 +861,15 @@
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully."
       }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Settings",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "hours",
+      "INDAYS": "Days"
     }
   },
   "POLICY": {

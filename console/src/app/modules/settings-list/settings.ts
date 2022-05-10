@@ -5,6 +5,11 @@ export const GENERAL: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.GENERAL',
 };
 
+export const OIDC: SidenavSetting = {
+  id: 'oidc',
+  i18nKey: 'SETTINGS.LIST.OIDC',
+};
+
 export const LOGIN: SidenavSetting = {
   id: 'login',
   i18nKey: 'SETTINGS.LIST.LOGIN',

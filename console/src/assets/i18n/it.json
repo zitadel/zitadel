@@ -806,6 +806,10 @@
       "TITLE": "Impostazioni dell'istanza",
       "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
     },
+    "ORG": {
+      "TITLE": "Impostazioni dell'organizzazione",
+      "DESCRIPTION": "Queste impostazioni si applicheranno alla organizzazione corrente."
+    },
     "LIST": {
       "GENERAL": "Generale",
       "LOGIN": "Comportamento login e sicurezza",
@@ -817,7 +821,8 @@
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Informativa sulla privacy e TOS"
+      "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
+      "OIDC": "OIDC Configuration"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
@@ -841,7 +846,8 @@
       "HOST": "Host",
       "USER": "Utente",
       "PASSWORD": "Password",
-      "TLS": "Transport Layer Security (TLS)"
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Salvato con successo!"
     },
     "SMS": {
       "TITLE": "Impostazioni SMS",
@@ -855,6 +861,15 @@
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio aggiunto con successo."
       }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Einstellungen",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "ore",
+      "INDAYS": "giorni"
     }
   },
   "POLICY": {
