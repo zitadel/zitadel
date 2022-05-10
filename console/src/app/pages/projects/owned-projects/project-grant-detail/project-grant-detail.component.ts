@@ -11,8 +11,8 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import {
-  ProjectGrantMembersCreateDialogComponent,
-  ProjectGrantMembersCreateDialogExportType,
+    ProjectGrantMembersCreateDialogComponent,
+    ProjectGrantMembersCreateDialogExportType,
 } from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrantMembersDataSource } from './project-grant-members-datasource';
 
@@ -74,11 +74,6 @@ export class ProjectGrantDetailComponent {
           this.grant = resp.projectGrant;
 
           const breadcrumbs = [
-            new Breadcrumb({
-              type: BreadcrumbType.IAM,
-              name: 'IAM',
-              routerLink: ['/system'],
-            }),
             new Breadcrumb({
               type: BreadcrumbType.ORG,
               routerLink: ['/org'],

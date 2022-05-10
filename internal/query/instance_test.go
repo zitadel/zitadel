@@ -11,7 +11,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -41,8 +40,6 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
 						` projections.instances.console_app_id,`+
-						` projections.instances.setup_started,`+
-						` projections.instances.setup_done,`+
 						` projections.instances.default_language`+
 						` FROM projections.instances`),
 					nil,
@@ -72,8 +69,6 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
 						` projections.instances.console_app_id,`+
-						` projections.instances.setup_started,`+
-						` projections.instances.setup_done,`+
 						` projections.instances.default_language`+
 						` FROM projections.instances`),
 					[]string{
@@ -85,8 +80,6 @@ func Test_InstancePrepares(t *testing.T) {
 						"iam_project_id",
 						"console_client_id",
 						"console_app_id",
-						"setup_started",
-						"setup_done",
 						"default_language",
 					},
 					[]driver.Value{
@@ -98,8 +91,6 @@ func Test_InstancePrepares(t *testing.T) {
 						"project-id",
 						"client-id",
 						"app-id",
-						domain.Step2,
-						domain.Step1,
 						"en",
 					},
 				),
@@ -113,8 +104,6 @@ func Test_InstancePrepares(t *testing.T) {
 				IAMProjectID: "project-id",
 				ConsoleID:    "client-id",
 				ConsoleAppID: "app-id",
-				SetupStarted: domain.Step2,
-				SetupDone:    domain.Step1,
 				DefaultLang:  language.English,
 			},
 		},
@@ -133,8 +122,6 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
 						` projections.instances.console_app_id,`+
-						` projections.instances.setup_started,`+
-						` projections.instances.setup_done,`+
 						` projections.instances.default_language`+
 						` FROM projections.instances`),
 					sql.ErrConnDone,

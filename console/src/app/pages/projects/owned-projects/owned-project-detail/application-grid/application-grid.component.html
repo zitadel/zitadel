@@ -1,20 +1,24 @@
 <div class="app-grid-header">
-  <h3>{{'APP.LIST' | translate}}</h3>
+  <h2 class="app-grid-h2">{{ 'APP.LIST' | translate }}</h2>
   <span class="fill-space"></span>
   <button mat-icon-button (click)="closeView()">
     <i class="show list view las la-th-list"></i>
   </button>
 </div>
 <div class="app-container">
-  <div class="sp-container" *ngIf="(loading$ | async)">
+  <div class="sp-container" *ngIf="loading$ | async">
     <mat-spinner color="primary" diameter="50"></mat-spinner>
   </div>
 
-  <div [routerLink]="['/projects', projectId, 'apps', app.id ]" [attr.data-e2e]="'app-card'" class="app-wrap"
-    *ngFor="let app of appsSubject | async" matTooltip="{{'ACTIONS.EDIT' | translate}}">
-    <cnsl-app-card class="grid-card" matRipple [type]="app.oidcConfig?.appType"
-      [isApiApp]="app.apiConfig !== undefined">
-      {{ app.name.charAt(0)}}
+  <div
+    [routerLink]="['/projects', projectId, 'apps', app.id]"
+    [attr.data-e2e]="'app-card'"
+    class="app-wrap"
+    *ngFor="let app of appsSubject | async"
+    matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
+  >
+    <cnsl-app-card class="grid-card" matRipple [type]="app.oidcConfig?.appType" [isApiApp]="app.apiConfig !== undefined">
+      {{ app.name.charAt(0) }}
       <ng-container *ngIf="app.oidcConfig?.appType !== undefined">
         <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE" class="las la-mobile"></i>
         <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_WEB" class="las la-code"></i>
@@ -22,15 +26,20 @@
         <i *ngIf="app.apiConfig" class="las la-robot"></i>
       </ng-container>
     </cnsl-app-card>
-    <span class="name">{{app.name}}</span>
+    <span class="name">{{ app.name }}</span>
     <span *ngIf="app.oidcConfig?.appType !== undefined && app.oidcConfig?.appType !== null" class="type">
-      {{'APP.OIDC.APPTYPE.'+app.oidcConfig?.appType | translate}}</span>
+      {{ 'APP.OIDC.APPTYPE.' + app.oidcConfig?.appType | translate }}</span
+    >
     <span *ngIf="app.apiConfig !== undefined" class="type"> API</span>
   </div>
 
   <ng-template cnslHasRole [hasRole]="['project.app.write']">
-    <div class="app-wrap" *ngIf="!disabled" [attr.data-e2e]="'app-card-add'"
-      [routerLink]="[ '/projects', projectId, 'apps', 'create']">
+    <div
+      class="app-wrap"
+      *ngIf="!disabled"
+      [attr.data-e2e]="'app-card-add'"
+      [routerLink]="['/projects', projectId, 'apps', 'create']"
+    >
       <cnsl-app-card class="grid-card" matRipple [type]="OIDCAppType.ADD">
         <mat-icon>add</mat-icon>
       </cnsl-app-card>

@@ -18,22 +18,24 @@ export class ApplicationGridComponent implements OnInit {
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public OIDCAppType: any = OIDCAppType;
 
-  constructor(private mgmtService: ManagementService) { }
+  constructor(private mgmtService: ManagementService) {}
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.loadApps();
   }
 
   public loadApps(): void {
-    from(this.mgmtService.listApps(this.projectId, 100, 0)).pipe(
-      map(resp => {
-        return resp.resultList;
-      }),
-      // catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe((apps) => {
-      this.appsSubject.next(apps as App.AsObject[]);
-    });
+    from(this.mgmtService.listApps(this.projectId, 100, 0))
+      .pipe(
+        map((resp) => {
+          return resp.resultList;
+        }),
+        // catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((apps) => {
+        this.appsSubject.next(apps as App.AsObject[]);
+      });
   }
 
   public closeView(): void {

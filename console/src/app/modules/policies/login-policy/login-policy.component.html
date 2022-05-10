@@ -1,236 +1,153 @@
-<cnsl-detail-layout
-  [hasBackButton]="true"
-  [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
-  [description]="
-    (serviceType === PolicyComponentServiceType.MGMT
-      ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT'
-      : PolicyComponentServiceType.ADMIN
-      ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN'
-      : ''
-    ) | translate
-  "
->
-  <p class="policy-applied-to" sub>
-    {{ 'POLICY.APPLIEDTO' | translate }}:
-    <strong *ngIf="orgName; else iam">{{ orgName }}</strong>
-    <ng-template #iam
-      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
-    </ng-template>
-  </p>
+<!-- <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section> -->
 
-  <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+</div>
 
-  <div class="spinner-wr">
-    <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
-  </div>
+<h2>{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
 
-  <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
-    <ng-template cnslHasRole [hasRole]="['policy.delete']">
-      <button
-        *ngIf="!isDefault"
-        color="primary"
-        matTooltip="{{ 'POLICY.RESET' | translate }}"
-        color="warn"
-        (click)="removePolicy()"
-        mat-stroked-button
-      >
-        {{ 'POLICY.RESET' | translate }}
-      </button>
-    </ng-template>
+<div class="login-policy-row" *ngIf="loginData">
+  <cnsl-form-field class="passwordless-allowed" label="Access Code" required="true">
+    <cnsl-label>{{ 'LOGINPOLICY.PASSWORDLESS' | translate }}</cnsl-label>
+    <mat-select [(ngModel)]="loginData.passwordlessType">
+      <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
+        {{ 'LOGINPOLICY.PASSWORDLESSTYPE.' + pt | translate }}
+      </mat-option>
+    </mat-select>
+  </cnsl-form-field>
+</div>
 
-    <ng-template cnslHasRole [hasRole]="['policy.write']">
-      <button
-        *ngIf="isDefault"
-        color="primary"
-        matTooltip="{{ 'POLICY.CREATECUSTOM' | translate }}"
-        (click)="savePolicy()"
-        mat-raised-button
-      >
-        {{ 'POLICY.CREATECUSTOM' | translate }}
-      </button>
-    </ng-template>
-  </ng-container>
-
-  <ng-template cnslHasRole [hasRole]="['org.idp.read']">
-    <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
-      <cnsl-idp-table
-        [service]="service"
-        [serviceType]="serviceType"
-        [disabled]="
-          ([
-            serviceType === PolicyComponentServiceType.ADMIN
-              ? 'iam.idp.write'
-              : serviceType === PolicyComponentServiceType.MGMT
-              ? 'org.idp.write'
-              : ''
-          ]
-            | hasRole
-            | async) === false
-        "
-      >
-      </cnsl-idp-table>
-    </cnsl-card>
-  </ng-template>
-
-  <cnsl-card
-    title="{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}"
-    description="{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}"
-    [expanded]="true"
+<cnsl-card class="max-card-width">
+  <cnsl-mfa-table
+    [service]="service"
+    [serviceType]="serviceType"
+    [componentType]="LoginMethodComponentType.MultiFactor"
+    [disabled]="
+      loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
   >
-    <div class="login-policy-row">
-      <cnsl-form-field *ngIf="loginData" class="passwordless-allowed" label="Access Code" required="true">
-        <cnsl-label>{{ 'LOGINPOLICY.PASSWORDLESS' | translate }}</cnsl-label>
-        <mat-select [(ngModel)]="loginData.passwordlessType" [disabled]="disabled">
-          <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
-            {{ 'LOGINPOLICY.PASSWORDLESSTYPE.' + pt | translate }}
-          </mat-option>
-        </mat-select>
-      </cnsl-form-field>
-    </div>
+  </cnsl-mfa-table>
+</cnsl-card>
 
-    <cnsl-mfa-table
-      [service]="service"
-      [serviceType]="serviceType"
-      [componentType]="LoginMethodComponentType.MultiFactor"
-      [disabled]="
-        loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.policy.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-    </cnsl-mfa-table>
-  </cnsl-card>
+<br />
 
-  <cnsl-card
-    *ngIf="loginData"
-    title="{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}"
-    description="{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}"
-    [expanded]="true"
+<h2>{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
+
+<div *ngIf="loginData" class="login-policy-row">
+  <mat-slide-toggle
+    card-actions
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    [(ngModel)]="loginData.forceMfa"
   >
+    {{ 'POLICY.DATA.FORCEMFA' | translate }}
+  </mat-slide-toggle>
+</div>
+<cnsl-card class="max-card-width">
+  <cnsl-mfa-table
+    [service]="service"
+    [serviceType]="serviceType"
+    [componentType]="LoginMethodComponentType.SecondFactor"
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
+  </cnsl-mfa-table>
+</cnsl-card>
+
+<br />
+
+<h2>{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}</h2>
+
+<cnsl-card class="max-card-width login-policy-content" *ngIf="loginData">
+  <div class="login-policy-row">
     <mat-slide-toggle
-      card-actions
-      class="force-mfa-toggle"
+      class="login-policy-toggle"
       color="primary"
-      [disabled]="disabled"
+      matTooltip="{{ 'POLICY.DATA.FORCEMFA_DESC' | translate }}"
       ngDefaultControl
-      [(ngModel)]="loginData.forceMfa"
+      [(ngModel)]="loginData.allowUsernamePassword"
     >
-      {{ 'POLICY.DATA.FORCEMFA' | translate }}
+      {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate }}
     </mat-slide-toggle>
 
-    <cnsl-mfa-table
-      [service]="service"
-      [serviceType]="serviceType"
-      [componentType]="LoginMethodComponentType.SecondFactor"
-      [disabled]="
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.policy.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-    </cnsl-mfa-table>
-  </cnsl-card>
+    <!-- <cnsl-info-section class="info">
+      {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate }}
+    </cnsl-info-section> -->
+  </div>
+  <div class="login-policy-row">
+    <mat-slide-toggle class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.allowRegister">
+      {{ 'POLICY.DATA.ALLOWREGISTER' | translate }}
+    </mat-slide-toggle>
 
-  <cnsl-card title="{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}">
-    <div class="login-policy-content" *ngIf="loginData">
-      <div class="login-policy-row">
-        <mat-slide-toggle
-          color="primary"
-          matTooltip="{{ 'POLICY.DATA.FORCEMFA_DESC' | translate }}"
-          [disabled]="disabled"
-          ngDefaultControl
-          [(ngModel)]="loginData.allowUsernamePassword"
-        >
-          {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate }}
-        </mat-slide-toggle>
+    <!-- <ng-template #regInfo>
+      <cnsl-info-section class="info">
+        {{ 'POLICY.DATA.ALLOWREGISTER_DESC' | translate }}
+      </cnsl-info-section>
+    </ng-template> -->
+  </div>
+  <div class="login-policy-row">
+    <mat-slide-toggle class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.allowExternalIdp">
+      {{ 'POLICY.DATA.ALLOWEXTERNALIDP' | translate }}
+    </mat-slide-toggle>
 
-        <ng-template #usernameInfo>
-          <cnsl-info-section class="info">
-            {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate }}
-          </cnsl-info-section>
-        </ng-template>
-      </div>
-      <div class="login-policy-row">
-        <mat-slide-toggle
-          class="login-policy-toggle"
-          color="primary"
-          [disabled]="disabled"
-          ngDefaultControl
-          [(ngModel)]="loginData.allowRegister"
-        >
-          {{ 'POLICY.DATA.ALLOWREGISTER' | translate }}
-        </mat-slide-toggle>
-
-        <ng-template #regInfo>
-          <cnsl-info-section class="info">
-            {{ 'POLICY.DATA.ALLOWREGISTER_DESC' | translate }}
-          </cnsl-info-section>
-        </ng-template>
-      </div>
-      <div class="login-policy-row">
-        <mat-slide-toggle
-          class="login-policy-toggle"
-          color="primary"
-          [disabled]="disabled"
-          ngDefaultControl
-          [(ngModel)]="loginData.allowExternalIdp"
-        >
-          {{ 'POLICY.DATA.ALLOWEXTERNALIDP' | translate }}
-        </mat-slide-toggle>
-
-        <ng-template #idpInfo>
-          <cnsl-info-section class="info">
-            {{ 'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate }}
-          </cnsl-info-section>
-        </ng-template>
-      </div>
-
-      <div class="login-policy-row">
-        <mat-slide-toggle
-          class="login-policy-toggle"
-          color="primary"
-          [disabled]="disabled"
-          ngDefaultControl
-          [(ngModel)]="loginData.hidePasswordReset"
-        >
-          {{ 'POLICY.DATA.HIDEPASSWORDRESET' | translate }}
-        </mat-slide-toggle>
-
-        <ng-template #passwordResetInfo>
-          <cnsl-info-section class="info">
-            {{ 'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate }}
-          </cnsl-info-section>
-        </ng-template>
-      </div>
-    </div>
-  </cnsl-card>
-
-  <div class="login-policy-btn-container">
-    <button
-      [disabled]="disabled"
-      class="login-policy-save-button"
-      (click)="savePolicy()"
-      color="primary"
-      type="submit"
-      mat-raised-button
-    >
-      {{ 'ACTIONS.SAVE' | translate }}
-    </button>
+    <!-- <ng-template #idpInfo>
+      <cnsl-info-section class="info">
+        {{ 'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate }}
+      </cnsl-info-section>
+    </ng-template> -->
   </div>
 
-  <cnsl-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="security">
-  </cnsl-policy-grid>
-</cnsl-detail-layout>
+  <div class="login-policy-row">
+    <mat-slide-toggle class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.hidePasswordReset">
+      {{ 'POLICY.DATA.HIDEPASSWORDRESET' | translate }}
+    </mat-slide-toggle>
+
+    <!-- <ng-template #passwordResetInfo>
+      <cnsl-info-section class="info">
+        {{ 'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate }}
+      </cnsl-info-section>
+    </ng-template> -->
+  </div>
+</cnsl-card>
+
+<div class="login-policy-btn-container">
+  <button class="login-policy-save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
+</div>
+
+<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
+  <ng-template cnslHasRole [hasRole]="['policy.delete']">
+    <button
+      *ngIf="!isDefault"
+      color="primary"
+      matTooltip="{{ 'POLICY.RESET' | translate }}"
+      color="warn"
+      (click)="removePolicy()"
+      mat-stroked-button
+    >
+      {{ 'POLICY.RESET' | translate }}
+    </button>
+  </ng-template>
+</ng-container>

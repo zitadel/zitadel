@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -18,7 +19,6 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
-import { ProjectGrantsRoutingModule } from './project-grants-routing.module';
 import { ProjectGrantsComponent } from './project-grants.component';
 
 @NgModule({
@@ -26,12 +26,12 @@ import { ProjectGrantsComponent } from './project-grants.component';
   imports: [
     CommonModule,
     FormsModule,
-    ProjectGrantsRoutingModule,
     TimestampToDatePipeModule,
     TableActionsModule,
     MatTooltipModule,
     MatCheckboxModule,
     RefreshTableModule,
+    RouterModule,
     LocalizedDatePipeModule,
     ProjectRoleChipModule,
     MatButtonModule,
@@ -44,5 +44,6 @@ import { ProjectGrantsComponent } from './project-grants.component';
     MatSelectModule,
     PaginatorModule,
   ],
+  exports: [ProjectGrantsComponent],
 })
 export class ProjectGrantsModule {}

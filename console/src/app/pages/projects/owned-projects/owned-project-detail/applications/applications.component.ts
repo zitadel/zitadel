@@ -26,7 +26,7 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
   public AppState: any = AppState;
   constructor(private mgmtService: ManagementService) {}
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataSource = new ProjectApplicationsDataSource(this.mgmtService);
     this.dataSource.loadApps(this.projectId, 0, 25);
   }

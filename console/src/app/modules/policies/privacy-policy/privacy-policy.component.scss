@@ -2,29 +2,7 @@
   margin: 0.5rem 0;
 }
 
-.policy-applied-to {
-  margin: -1rem 0 0 0;
-  font-size: 14px;
-}
-
-.top-actions {
-  display: flex;
-  margin: 0 -0.5rem;
-  flex-wrap: wrap;
-
-  .keys {
-    flex: 1;
-    margin: 0 0.5rem;
-    min-width: 150px;
-  }
-}
-
-.centerline {
-  display: flex;
-  align-items: center;
-}
-
-.content {
+.policy-content {
   padding-top: 1rem;
   display: grid;
   grid-template-columns: 1fr;
@@ -40,7 +18,7 @@
     display: flex;
     flex-wrap: wrap;
     opacity: 0;
-    margin: 0 -0.25rem;
+    margin: 0;
     transition: all 0.2s ease;
 
     .chip {
@@ -49,7 +27,7 @@
       font-size: 12px;
       background: #5282c1;
       color: white;
-      margin: 0.25rem;
+      margin-right: 0.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -79,22 +57,14 @@
   }
 }
 
-.divider {
-  width: 100%;
-  height: 1px;
-  background-color: rgba(#81868a, 0.5);
-  margin: 1.5rem 0 0 0;
-}
-
-.actions {
+.policy-actions {
   display: flex;
-  justify-content: flex-end;
-  margin: 0 -0.25rem;
+  justify-content: flex-start;
 
   .save-button,
   .reset-button {
     display: block;
-    margin: 0 0.25rem 3rem 0.25rem;
+    margin: 0 1rem 0 0;
   }
 
   .reset-button {
