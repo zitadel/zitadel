@@ -7,9 +7,12 @@ services:
       - zitadel
     image: ghcr.io/caos/zitadel:latest
     command: admin --config /.zitadel/local-conf.yaml start-from-init --masterkeyFromEnv
+    volumes:
+    - ${PWD}/build/local/local-conf.yaml:/.zitadel/local-conf.yaml
     environment:
     #Warning: This key should be recreated for security reasons!
       - ZITADEL_MASTERKEY=JIzH+ZGMn2Vk7PPGAcGmdFL3ZkFTXaU=
+      - ZITADEL_DATABASE_HOST=db
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/debug"]
       interval: 10s
@@ -20,7 +23,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - 9090:8080
+      - 8080:8080
 
   db:
     restart: always
@@ -35,7 +38,7 @@ services:
       retries: 5
       start_period: 20s
     ports:
-      - 8080:8080
+      - 9090:8080
       - 26257:26257
 
 networks:
