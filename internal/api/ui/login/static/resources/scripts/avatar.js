@@ -186,7 +186,10 @@ for (let i = 0; i < avatars.length; i++) {
     const isDark =
       document.documentElement.classList.includes("lgn-dark-theme");
 
-    avatars[i].style.background = colorPalette[isDark ? 900 : 300];
-    avatars[i].style.color = colorPalette[isDark ? 200 : 900];
+    const backgroundShade = isDark ? 900 : 300;
+    const foregroundShade = isDark ? 200 : 900;
+
+    avatars[i].style.background = colorPalette[backgroundShade];
+    avatars[i].style.color = colorPalette[foregroundShade];
   }
 }
