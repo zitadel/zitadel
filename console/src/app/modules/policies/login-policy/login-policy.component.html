@@ -348,7 +348,7 @@
       <div class="row">
         <cnsl-form-field class="form-field" label="Access Code" required="true">
           <cnsl-label>{{ 'LOGINPOLICY.DEFAULTREDIRECTURI' | translate }}</cnsl-label>
-          <input cnslInput [(ngModel)]="loginData.defaultRedirectUri" [disabled]="disabled" />
+          <input cnslInput placeholder="https://" [(ngModel)]="loginData.defaultRedirectUri" [disabled]="disabled" />
         </cnsl-form-field>
 
         <cnsl-info-section class="info">
