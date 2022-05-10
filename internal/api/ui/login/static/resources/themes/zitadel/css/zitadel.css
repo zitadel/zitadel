@@ -2814,19 +2814,6 @@ a:hover, a:active {
   background-color: var(--itadel-color-button-disabled-background);
 }
 
-.lgn-avatar .initials.lgn-primary {
-  color: var(--zitadel-color-primary-contrast);
-}
-.lgn-avatar .initials.lgn-accent {
-  color: var(--zitadel-color-primary-contrast);
-}
-.lgn-avatar .initials.lgn-warn {
-  color: var(--zitadel-color-primary-contrast);
-}
-.lgn-avatar .initials.lgn-primary[disabled], .lgn-avatar .initials.lgn-accent[disabled], .lgn-avatar .initials.lgn-warn[disabled], .lgn-avatar .initials[disabled][disabled] {
-  color: var(--zitadel-color-button-disabled);
-}
-
 .lgn-select, select {
   background-image: var(--zitadel-icon-select);
 }
