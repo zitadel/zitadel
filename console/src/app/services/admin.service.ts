@@ -17,6 +17,8 @@ import {
     AddOIDCIDPResponse,
     AddSecondFactorToLoginPolicyRequest,
     AddSecondFactorToLoginPolicyResponse,
+    AddSMSProviderTwilioRequest,
+    AddSMSProviderTwilioResponse,
     DeactivateIDPRequest,
     DeactivateIDPResponse,
     GetCustomDomainClaimedMessageTextRequest,
@@ -69,6 +71,8 @@ import {
     GetPreviewLabelPolicyResponse,
     GetPrivacyPolicyRequest,
     GetPrivacyPolicyResponse,
+    GetSMSProviderRequest,
+    GetSMSProviderResponse,
     GetSMTPConfigRequest,
     GetSMTPConfigResponse,
     GetSupportedLanguagesRequest,
@@ -88,6 +92,8 @@ import {
     ListLoginPolicyMultiFactorsResponse,
     ListLoginPolicySecondFactorsRequest,
     ListLoginPolicySecondFactorsResponse,
+    ListSMSProvidersRequest,
+    ListSMSProvidersResponse,
     ListViewsRequest,
     ListViewsResponse,
     ReactivateIDPRequest,
@@ -160,6 +166,8 @@ import {
     UpdatePasswordComplexityPolicyResponse,
     UpdatePrivacyPolicyRequest,
     UpdatePrivacyPolicyResponse,
+    UpdateSMTPConfigPasswordRequest,
+    UpdateSMTPConfigPasswordResponse,
     UpdateSMTPConfigRequest,
     UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
@@ -446,6 +454,26 @@ export class AdminService {
 
   public updateSMTPConfig(req: UpdateSMTPConfigRequest): Promise<UpdateSMTPConfigResponse.AsObject> {
     return this.grpcService.admin.updateSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMTPConfigPassword(req: UpdateSMTPConfigPasswordRequest): Promise<UpdateSMTPConfigPasswordResponse.AsObject> {
+    return this.grpcService.admin.updateSMTPConfigPassword(req, null).then((resp) => resp.toObject());
+  }
+
+  /* sms */
+
+  public listSMSProviders(): Promise<ListSMSProvidersResponse.AsObject> {
+    const req = new ListSMSProvidersRequest();
+    return this.grpcService.admin.listSMSProviders(req, null).then((resp) => resp.toObject());
+  }
+
+  public getSMSProvider(): Promise<GetSMSProviderResponse.AsObject> {
+    const req = new GetSMSProviderRequest();
+    return this.grpcService.admin.getSMSProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addSMSProviderTwilio(req: AddSMSProviderTwilioRequest): Promise<AddSMSProviderTwilioResponse.AsObject> {
+    return this.grpcService.admin.addSMSProviderTwilio(req, null).then((resp) => resp.toObject());
   }
 
   /* lockout */

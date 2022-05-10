@@ -1,23 +1,32 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
+import { InputModule } from '../../input/input.module';
+import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSettingsComponent } from './notification-settings.component';
 
 @NgModule({
-  declarations: [NotificationSettingsComponent],
+  declarations: [NotificationSettingsComponent, DialogAddSMSProviderComponent],
   imports: [
     CommonModule,
     CardModule,
     FormsModule,
+    ReactiveFormsModule,
     MatButtonModule,
+    MatCheckboxModule,
+    InputModule,
+    MatIconModule,
     FormFieldModule,
+    MatSelectModule,
     MatProgressSpinnerModule,
     MatSelectModule,
     TranslateModule,

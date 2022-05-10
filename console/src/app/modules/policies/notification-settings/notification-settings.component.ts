@@ -1,11 +1,17 @@
-import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { SetDefaultLanguageResponse, UpdateSMTPConfigRequest } from 'src/app/proto/generated/zitadel/admin_pb';
-import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
+import { Component, Input, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import {
+    AddSMSProviderTwilioRequest,
+    UpdateSMTPConfigPasswordResponse,
+    UpdateSMTPConfigRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
+import { SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
+import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 
 @Component({
   selector: 'cnsl-notification-settings',
@@ -14,51 +20,74 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 })
 export class NotificationSettingsComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
-  public service!: ManagementService | AdminService;
-
-  public smtpConfig!: SMTPConfig.AsObject;
+  public smsProviders: SMSProvider.AsObject[] = [];
 
   public loading: boolean = false;
-  constructor(private injector: Injector, private toast: ToastService) {}
+  public form!: FormGroup;
+
+  public SMSProviderConfigState: any = SMSProviderConfigState;
+  constructor(
+    private service: AdminService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+    private fb: FormBuilder,
+  ) {
+    this.form = this.fb.group({
+      senderAddress: ['', [Validators.required]],
+      senderName: ['', [Validators.required]],
+      tls: [true, [Validators.required]],
+      host: ['', [Validators.required]],
+      user: ['', [Validators.required]],
+      password: ['', [Validators.required]],
+    });
+  }
 
   ngOnInit(): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        this.service = this.injector.get(ManagementService as Type<ManagementService>);
-        break;
-      case PolicyComponentServiceType.ADMIN:
-        this.service = this.injector.get(AdminService as Type<AdminService>);
-        break;
-    }
     this.fetchData();
   }
 
   private fetchData(): void {
-    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      (this.service as AdminService)
-        .getSMTPConfig()
-        .then((smtpConfig) => {
-          if (smtpConfig.smtpConfig) {
-            this.smtpConfig = smtpConfig.smtpConfig;
-          }
-        })
-        .catch((error) => {
-          if (error && error.code === 5) {
-            console.log(error);
-          }
-        });
-    }
+    this.service
+      .getSMTPConfig()
+      .then((smtpConfig) => {
+        if (smtpConfig.smtpConfig) {
+          this.form.patchValue(smtpConfig.smtpConfig);
+        }
+      })
+      .catch((error) => {
+        if (error && error.code === 5) {
+          console.log(error);
+        }
+      });
+
+    this.service.listSMSProviders().then((smsProviders) => {
+      if (smsProviders.resultList) {
+        this.smsProviders = smsProviders.resultList;
+        console.log(this.smsProviders);
+      }
+    });
   }
 
-  private updateData(): Promise<SetDefaultLanguageResponse.AsObject> | void {
+  private updateData(): Promise<UpdateSMTPConfigPasswordResponse.AsObject> | any {
     const req = new UpdateSMTPConfigRequest();
-    req.setHost(this.smtpConfig.host);
-    req.setSenderAddress(this.smtpConfig.senderAddress);
-    req.setSenderName(this.smtpConfig.senderName);
-    req.setTls(this.smtpConfig.tls);
-    req.setUser(this.smtpConfig.user);
+    req.setHost(this.host?.value ?? '');
+    req.setSenderAddress(this.senderAddress?.value ?? '');
+    req.setSenderName(this.senderName?.value ?? '');
+    req.setTls(this.tls?.value ?? false);
+    req.setUser(this.user?.value ?? '');
 
-    return (this.service as AdminService).updateSMTPConfig(req);
+    console.log(req.toObject());
+
+    // return this.service.updateSMTPConfig(req).then(() => {
+    //   let passwordReq: UpdateSMTPConfigPasswordRequest;
+    //   if (this.password) {
+    //     passwordReq = new UpdateSMTPConfigPasswordRequest();
+    //     passwordReq.setPassword(this.password.value);
+    //     return this.service.updateSMTPConfigPassword(passwordReq);
+    //   } else {
+    //     return;
+    //   }
+    // });
   }
 
   public savePolicy(): void {
@@ -72,26 +101,58 @@ export class NotificationSettingsComponent implements OnInit {
             this.fetchData();
           }, 2000);
         })
-        .catch((error) => {
+        .catch((error: unknown) => {
           this.toast.showError(error);
         });
     }
   }
 
-  public removePolicy(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService)
-        .resetLoginPolicyToDefault()
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-          this.loading = true;
-          setTimeout(() => {
-            this.fetchData();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
+  public addSMSProvider(): void {
+    const dialogRef = this.dialog.open(DialogAddSMSProviderComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'IDP.DELETE_TITLE',
+        descriptionKey: 'IDP.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((req: AddSMSProviderTwilioRequest) => {
+      if (req) {
+        this.service
+          .addSMSProviderTwilio(req)
+          .then(() => {
+            this.toast.showInfo('SETTING.SMS.TWILIO.ADDED');
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
+  public get senderAddress(): AbstractControl | null {
+    return this.form.get('senderAddress');
+  }
+
+  public get senderName(): AbstractControl | null {
+    return this.form.get('senderName');
+  }
+
+  public get tls(): AbstractControl | null {
+    return this.form.get('tls');
+  }
+
+  public get user(): AbstractControl | null {
+    return this.form.get('user');
+  }
+
+  public get host(): AbstractControl | null {
+    return this.form.get('host');
+  }
+
+  public get password(): AbstractControl | null {
+    return this.form.get('password');
   }
 }

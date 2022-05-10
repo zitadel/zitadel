@@ -833,6 +833,28 @@
       "de": "Deutsch",
       "it": "Italiano",
       "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "Impostazioni SMTP",
+      "SENDERADDRESS": "Indirizzo email del mittente",
+      "SENDERNAME": "Nome del mittente",
+      "HOST": "Host",
+      "USER": "Utente",
+      "PASSWORD": "Password",
+      "TLS": "Transport Layer Security (TLS)"
+    },
+    "SMS": {
+      "TITLE": "Impostazioni SMS",
+      "PROVIDERS": "Fornitori",
+      "PROVIDER": "Fornitore SMS",
+      "ADDPROVIDER": "Aggiungi fornitore SMS",
+      "ADDPROVIDERDESCRIPTION": "Scegli uno dei provider disponibili e inserisci i dati richiesti.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio aggiunto con successo."
+      }
     }
   },
   "POLICY": {

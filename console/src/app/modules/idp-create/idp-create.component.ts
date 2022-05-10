@@ -83,13 +83,12 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             OIDCMappingField.OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
             OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
           ];
+          const bread: Breadcrumb = {
+            type: BreadcrumbType.ORG,
+            routerLink: ['/org'],
+          };
 
-          const iamBread = new Breadcrumb({
-            type: BreadcrumbType.INSTANCE,
-            name: 'Instance',
-            routerLink: ['/instance'],
-          });
-          breadcrumbService.setBreadcrumb([iamBread]);
+          breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
@@ -98,11 +97,12 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
             OIDCMappingField.OIDC_MAPPING_FIELD_EMAIL,
           ];
 
-          const bread: Breadcrumb = {
+          const iamBread = new Breadcrumb({
             type: BreadcrumbType.ORG,
-            routerLink: ['/org'],
-          };
-          breadcrumbService.setBreadcrumb([bread]);
+            name: 'Instance',
+            routerLink: ['/instance'],
+          });
+          breadcrumbService.setBreadcrumb([iamBread]);
           break;
       }
     });
@@ -139,15 +139,16 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate([
-              this.serviceType === PolicyComponentServiceType.MGMT
-                ? 'org'
-                : this.serviceType === PolicyComponentServiceType.ADMIN
-                ? 'iam'
-                : '',
-              'policy',
-              'login',
-            ]);
+            this.router.navigate(
+              [
+                this.serviceType === PolicyComponentServiceType.MGMT
+                  ? '/org-settings'
+                  : this.serviceType === PolicyComponentServiceType.ADMIN
+                  ? '/settings'
+                  : '',
+              ],
+              { queryParams: { id: 'idp' } },
+            );
           }, 2000);
         })
         .catch((error) => {
