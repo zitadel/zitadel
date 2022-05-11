@@ -184,7 +184,7 @@ for (let i = 0; i < avatars.length; i++) {
     const colorPalette = this.getColor(displayName);
 
     const isDark =
-      document.documentElement.classList.includes("lgn-dark-theme");
+      document.documentElement.classList.contains("lgn-dark-theme");
 
     const backgroundShade = isDark ? 900 : 300;
     const foregroundShade = isDark ? 200 : 900;
