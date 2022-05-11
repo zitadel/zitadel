@@ -24,6 +24,9 @@ type LoginPolicy struct {
 }
 
 func ValidateDefaultRedirectURI(rawURL string) bool {
+	if rawURL == "" {
+		return true
+	}
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return false

@@ -57,6 +57,13 @@ func TestValidateDefaultRedirectURI(t *testing.T) {
 			},
 			true,
 		},
+		{
+			"empty url, ok",
+			args{
+				rawURL: "",
+			},
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
