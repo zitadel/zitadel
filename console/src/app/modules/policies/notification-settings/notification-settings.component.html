@@ -1,0 +1,75 @@
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+</div>
+
+<h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
+
+<form (ngSubmit)="savePolicy()" [formGroup]="form" autocomplete="off">
+  <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>
+    <input cnslInput name="senderAddress" formControlName="senderAddress" />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="smtp-form-field" label="Sender Name" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</cnsl-label>
+    <input cnslInput name="senderName" formControlName="senderName" />
+  </cnsl-form-field>
+
+  <mat-checkbox class="smtp-checkbox" formControlName="tls">
+    {{ 'SETTING.SMTP.TLS' | translate }}
+  </mat-checkbox>
+
+  <cnsl-form-field class="smtp-form-field" label="Host" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.HOST' | translate }}</cnsl-label>
+    <input cnslInput name="host" formControlName="host" />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="smtp-form-field" label="User" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
+    <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="smtp-form-field" label="Password" required="true">
+    <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
+    <input
+      id="smtp-password"
+      cnslInput
+      name="smtp-password"
+      autocomplete="smtp-password"
+      type="password"
+      formControlName="password"
+    />
+  </cnsl-form-field>
+
+  <div class="general-btn-container">
+    <button class="save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+      {{ 'ACTIONS.SAVE' | translate }}
+    </button>
+  </div>
+</form>
+
+<br />
+<h2>{{ 'SETTING.SMS.TITLE' | translate }}</h2>
+<h3>{{ 'SETTING.SMS.PROVIDERS' | translate }}</h3>
+<div class="sms-providers">
+  <cnsl-card *ngFor="let provider of smsProviders" class="sms-card">
+    <div *ngIf="provider.twilio" class="sms-provider">
+      <h4 class="title">Twilio</h4>
+      <span class="cnsl-secondary-text">{{ 'SETTING.SMS.PROVIDER' | translate }}</span>
+
+      <span
+        class="state"
+        [ngClass]="{
+          active: provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
+          inactive: provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
+        }"
+      ></span>
+    </div>
+  </cnsl-card>
+  <button mat-stroked-button (click)="addSMSProvider()">
+    <div class="sms-card add">
+      <mat-icon>add</mat-icon>
+      <span>{{ 'ACTIONS.ADD' | translate }}</span>
+    </div>
+  </button>
+</div>
