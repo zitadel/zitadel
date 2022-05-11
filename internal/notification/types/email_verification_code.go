@@ -21,7 +21,7 @@ func SendEmailVerificationCode(mailhtml string, translator *i18n.Translator, use
 	if err != nil {
 		return err
 	}
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.VerifyEmail, &UrlData{UserID: user.ID, Code: codeString})
+	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.VerifyEmail, &UrlData{UserID: user.ID, Code: codeString, OrgID: user.ResourceOwner})
 	if err != nil {
 		return err
 	}

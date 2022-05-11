@@ -251,6 +251,7 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 	)
 	if hasChanged {
 		events = append(events, changedEvent)

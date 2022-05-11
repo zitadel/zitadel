@@ -66,6 +66,7 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	hidePasswordReset,
 	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
 ) (*iam.LoginPolicyChangedEvent, bool) {
 
 	changes := make([]policy.LoginPolicyChanges, 0)
@@ -89,6 +90,9 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.IgnoreUnknownUsernames != ignoreUnknownUsernames {
 		changes = append(changes, policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames))
+	}
+	if wm.DefaultRedirectURI != defaultRedirectURI {
+		changes = append(changes, policy.ChangeDefaultRedirectURI(defaultRedirectURI))
 	}
 	if len(changes) == 0 {
 		return nil, false

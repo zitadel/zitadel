@@ -10,8 +10,9 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/notification/templates"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/notification/templates"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -341,8 +342,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
-		PrivateLabelingOrgID:   l.getPrivateLabelingID(authReq),
-		OrgID:                  l.getOrgID(authReq),
+		PrivateLabelingOrgID:   l.getPrivateLabelingID(r, authReq),
+		OrgID:                  l.getOrgID(r, authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
 		DisplayLoginNameSuffix: l.isDisplayLoginNameSuffix(authReq),
@@ -360,6 +361,10 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		}
 		privacyPolicy = authReq.PrivacyPolicy
 	} else {
+		labelPolicy, _ := l.query.ActiveLabelPolicyByOrg(r.Context(), baseData.PrivateLabelingOrgID)
+		if labelPolicy != nil {
+			baseData.LabelPolicy = labelPolicy.ToDomain()
+		}
 		policy, err := l.query.DefaultPrivacyPolicy(r.Context())
 		if err != nil {
 			return baseData
@@ -445,9 +450,9 @@ func (l *Login) isDarkMode(r *http.Request) bool {
 	return strings.HasSuffix(cookie.Value, "dark")
 }
 
-func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
+func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 	if authReq == nil {
-		return ""
+		return r.FormValue(queryOrgID)
 	}
 	if authReq.RequestedOrgID != "" {
 		return authReq.RequestedOrgID
@@ -455,9 +460,12 @@ func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
-func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
+func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
 	privateLabelingOrgID := domain.IAMID
 	if authReq == nil {
+		if id := r.FormValue(queryOrgID); id != "" {
+			return id
+		}
 		return privateLabelingOrgID
 	}
 	if authReq.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {

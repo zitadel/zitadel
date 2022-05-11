@@ -60,6 +60,7 @@ func (c *Commands) addDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 	), nil
 }
 
@@ -82,6 +83,9 @@ func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.
 }
 
 func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, existingPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.Command, error) {
+	if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
+	}
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
@@ -99,6 +103,7 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventst
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")

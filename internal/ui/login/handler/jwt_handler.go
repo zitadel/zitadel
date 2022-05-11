@@ -120,7 +120,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	resourceOwner := l.getOrgID(authReq)
+	resourceOwner := l.getOrgID(r, authReq)
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)

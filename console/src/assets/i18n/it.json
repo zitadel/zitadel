@@ -1379,7 +1379,9 @@
     "PASSWORDLESSTYPE": {
       "0": "Non consentito",
       "1": "Consentito"
-    }
+    },
+    "DEFAULTREDIRECTURI": "Default Redirect URI",
+    "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)"
   },
   "APP": {
     "LIST": "Applicazioni",

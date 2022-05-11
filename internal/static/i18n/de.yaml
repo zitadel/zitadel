@@ -157,6 +157,7 @@ Errors:
     LoginPolicy:
       NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig
+      RedirectURIInvalid: Default Redirect URI ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
@@ -266,6 +267,7 @@ Errors:
       NotChanged: Default Login Policy wurde nicht verändert
       NotExisting: Default Login Policy existiert nicht
       AlreadyExists: Default Login Policy existiert bereits
+      RedirectURIInvalid: Default Redirect URI ist ungültig
       MFA:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht

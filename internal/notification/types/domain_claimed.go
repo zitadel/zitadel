@@ -17,7 +17,7 @@ type DomainClaimedData struct {
 }
 
 func SendDomainClaimed(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *query.LabelPolicy, apiDomain string) error {
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID})
+	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID, OrgID: user.ResourceOwner})
 	if err != nil {
 		return err
 	}

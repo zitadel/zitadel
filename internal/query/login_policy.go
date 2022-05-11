@@ -29,6 +29,7 @@ type LoginPolicy struct {
 	IsDefault              bool
 	HidePasswordReset      bool
 	IgnoreUnknownUsernames bool
+	DefaultRedirectURI     string
 }
 
 type SecondFactors struct {
@@ -99,6 +100,10 @@ var (
 	}
 	LoginPolicyColumnIgnoreUnknownUsernames = Column{
 		name:  projection.IgnoreUnknownUsernames,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnDefaultRedirectURI = Column{
+		name:  projection.DefaultRedirectURI,
 		table: loginPolicyTable,
 	}
 )
@@ -241,11 +246,13 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			LoginPolicyColumnIsDefault.identifier(),
 			LoginPolicyColumnHidePasswordReset.identifier(),
 			LoginPolicyColumnIgnoreUnknownUsernames.identifier(),
+			LoginPolicyColumnDefaultRedirectURI.identifier(),
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
 			secondFactors := pq.Int32Array{}
 			multiFactors := pq.Int32Array{}
+			defaultRedirectURI := sql.NullString{}
 			err := row.Scan(
 				&p.OrgID,
 				&p.CreationDate,
@@ -261,6 +268,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				&p.IsDefault,
 				&p.HidePasswordReset,
 				&p.IgnoreUnknownUsernames,
+				&defaultRedirectURI,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -268,7 +276,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
 			}
-
+			p.DefaultRedirectURI = defaultRedirectURI.String
 			p.MultiFactors = make([]domain.MultiFactorType, len(multiFactors))
 			for i, mfa := range multiFactors {
 				p.MultiFactors[i] = domain.MultiFactorType(mfa)

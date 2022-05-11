@@ -112,6 +112,7 @@ const (
 	LoginPolicyIsDefaultCol             = "is_default"
 	LoginPolicyHidePWResetCol           = "hide_password_reset"
 	IgnoreUnknownUsernames              = "ignore_unknown_usernames"
+	DefaultRedirectURI                  = "default_redirect_uri"
 )
 
 func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -142,6 +143,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
 		handler.NewCol(IgnoreUnknownUsernames, policyEvent.IgnoreUnknownUsernames),
+		handler.NewCol(DefaultRedirectURI, policyEvent.DefaultRedirectURI),
 	}), nil
 }
 
@@ -181,6 +183,9 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	}
 	if policyEvent.IgnoreUnknownUsernames != nil {
 		cols = append(cols, handler.NewCol(IgnoreUnknownUsernames, *policyEvent.IgnoreUnknownUsernames))
+	}
+	if policyEvent.DefaultRedirectURI != nil {
+		cols = append(cols, handler.NewCol(DefaultRedirectURI, *policyEvent.DefaultRedirectURI))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,

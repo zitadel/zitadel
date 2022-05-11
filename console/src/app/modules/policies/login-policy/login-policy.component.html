@@ -1,7 +1,16 @@
-<cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+<cnsl-detail-layout
+  [backRouterLink]="[serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
   [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
-  [description]="(serviceType === PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
-  <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
+  [description]="
+    (serviceType === PolicyComponentServiceType.MGMT
+      ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT'
+      : PolicyComponentServiceType.ADMIN
+      ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN'
+      : ''
+    ) | translate
+  "
+>
+  <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
   <div class="spinner-wr">
     <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
@@ -9,16 +18,27 @@
 
   <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
     <ng-template cnslHasRole [hasRole]="['policy.delete']">
-      <button *ngIf="!isDefault" color="primary" matTooltip="{{'POLICY.RESET' | translate}}" color="warn"
-        (click)="removePolicy()" mat-stroked-button>
-        {{'POLICY.RESET' | translate}}
+      <button
+        *ngIf="!isDefault"
+        color="primary"
+        matTooltip="{{ 'POLICY.RESET' | translate }}"
+        color="warn"
+        (click)="removePolicy()"
+        mat-stroked-button
+      >
+        {{ 'POLICY.RESET' | translate }}
       </button>
     </ng-template>
 
     <ng-template cnslHasRole [hasRole]="['policy.write']">
-      <button *ngIf="isDefault" color="primary" matTooltip="{{'POLICY.CREATECUSTOM' | translate}}"
-        (click)="savePolicy()" mat-raised-button>
-        {{'POLICY.CREATECUSTOM' | translate}}
+      <button
+        *ngIf="isDefault"
+        color="primary"
+        matTooltip="{{ 'POLICY.CREATECUSTOM' | translate }}"
+        (click)="savePolicy()"
+        mat-raised-button
+      >
+        {{ 'POLICY.CREATECUSTOM' | translate }}
       </button>
     </ng-template>
   </ng-container>
@@ -26,189 +46,346 @@
   <cnsl-card title="{{ 'IDP.LIST.ACTIVETITLE' | translate }}" [expanded]="true">
     <cnsl-info-section
       *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false"
-      [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.idp'})"></span>
+      [featureLink]="['/org/features']"
+      class="info"
+      [type]="InfoSectionType.WARN"
+    >
+      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.idp' }"></span>
     </cnsl-info-section>
 
-    <cnsl-login-policy-idps [serviceType]="serviceType" [service]="service"
-      [disabled]="disabled || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false)">
+    <cnsl-login-policy-idps
+      [serviceType]="serviceType"
+      [service]="service"
+      [disabled]="
+        disabled ||
+        (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false)
+      "
+    >
     </cnsl-login-policy-idps>
   </cnsl-card>
 
-
-  <cnsl-card title="{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}"
-    description="{{'MFA.LIST.MULTIFACTORDESCRIPTION' | translate}}" [expanded]="false">
+  <cnsl-card
+    title="{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}"
+    description="{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}"
+    [expanded]="false"
+  >
     <cnsl-info-section
       *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false"
-      [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})"></span>
+      [featureLink]="['/org/features']"
+      class="info"
+      [type]="InfoSectionType.WARN"
+    >
+      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.factors' }"></span>
     </cnsl-info-section>
 
-    <cnsl-mfa-table [service]="service" [serviceType]="serviceType"
+    <cnsl-mfa-table
+      [service]="service"
+      [serviceType]="serviceType"
       [componentType]="LoginMethodComponentType.MultiFactor"
-      [disabled]="(([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType === PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) === false) || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false)">
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false ||
+        (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false)
+      "
+    >
     </cnsl-mfa-table>
   </cnsl-card>
 
-  <cnsl-card title="{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}"
-    description="{{'MFA.LIST.SECONDFACTORDESCRIPTION' | translate}}" [expanded]="false">
+  <cnsl-card
+    title="{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}"
+    description="{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}"
+    [expanded]="false"
+  >
     <cnsl-info-section
       *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false"
-      [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})"></span>
+      [featureLink]="['/org/features']"
+      class="info"
+      [type]="InfoSectionType.WARN"
+    >
+      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.factors' }"></span>
     </cnsl-info-section>
 
-    <cnsl-mfa-table [service]="service" [serviceType]="serviceType"
+    <cnsl-mfa-table
+      [service]="service"
+      [serviceType]="serviceType"
       [componentType]="LoginMethodComponentType.SecondFactor"
-      [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType === PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) === false || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false)">
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false ||
+        (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false)
+      "
+    >
     </cnsl-mfa-table>
   </cnsl-card>
-
-
 
   <cnsl-card title="{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}" [expanded]="false">
     <div class="content" *ngIf="loginData">
       <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
-          [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) === false"
-          ngDefaultControl [(ngModel)]="loginData.allowUsernamePassword">
-          {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
+        <mat-slide-toggle
+          class="toggle"
+          color="primary"
+          [disabled]="
+            disabled ||
+            (serviceType === PolicyComponentServiceType.MGMT &&
+              (['login_policy.username_login'] | hasFeature | async) === false)
+          "
+          ngDefaultControl
+          [(ngModel)]="loginData.allowUsernamePassword"
+        >
+          {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate }}
         </mat-slide-toggle>
 
         <cnsl-info-section
-          *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) === false; else usernameInfo"
-          [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.username_login'})"></span>
+          *ngIf="
+            serviceType === PolicyComponentServiceType.MGMT &&
+              (['login_policy.username_login'] | hasFeature | async) === false;
+            else usernameInfo
+          "
+          [featureLink]="['/org/features']"
+          class="info"
+          [type]="InfoSectionType.WARN"
+        >
+          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.username_login' }"></span>
         </cnsl-info-section>
 
         <ng-template #usernameInfo>
           <cnsl-info-section class="info">
-            {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate}}
+            {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD_DESC' | translate }}
           </cnsl-info-section>
         </ng-template>
       </div>
       <div class="row">
-
-
-        <mat-slide-toggle class="toggle" color="primary"
-          [disabled]="disabled || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.registration'] | hasFeature | async) === false)"
-          ngDefaultControl [(ngModel)]="loginData.allowRegister">
-          {{'POLICY.DATA.ALLOWREGISTER' | translate}}
+        <mat-slide-toggle
+          class="toggle"
+          color="primary"
+          [disabled]="
+            disabled ||
+            (serviceType === PolicyComponentServiceType.MGMT &&
+              (['login_policy.registration'] | hasFeature | async) === false)
+          "
+          ngDefaultControl
+          [(ngModel)]="loginData.allowRegister"
+        >
+          {{ 'POLICY.DATA.ALLOWREGISTER' | translate }}
         </mat-slide-toggle>
 
         <cnsl-info-section
-          *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.registration'] | hasFeature | async) === false; else regInfo"
-          [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.registration'})"></span>
+          *ngIf="
+            serviceType === PolicyComponentServiceType.MGMT &&
+              (['login_policy.registration'] | hasFeature | async) === false;
+            else regInfo
+          "
+          [featureLink]="['/org/features']"
+          class="info"
+          [type]="InfoSectionType.WARN"
+        >
+          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.registration' }"></span>
         </cnsl-info-section>
 
         <ng-template #regInfo>
           <cnsl-info-section class="info">
-            {{'POLICY.DATA.ALLOWREGISTER_DESC' | translate}}
+            {{ 'POLICY.DATA.ALLOWREGISTER_DESC' | translate }}
           </cnsl-info-section>
         </ng-template>
       </div>
       <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
-          [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false"
-          ngDefaultControl [(ngModel)]="loginData.allowExternalIdp">
-          {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
+        <mat-slide-toggle
+          class="toggle"
+          color="primary"
+          [disabled]="
+            disabled ||
+            (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false)
+          "
+          ngDefaultControl
+          [(ngModel)]="loginData.allowExternalIdp"
+        >
+          {{ 'POLICY.DATA.ALLOWEXTERNALIDP' | translate }}
         </mat-slide-toggle>
 
         <cnsl-info-section
-          *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false; else idpInfo"
-          [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.idp'})"></span>
+          *ngIf="
+            serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false;
+            else idpInfo
+          "
+          [featureLink]="['/org/features']"
+          class="info"
+          [type]="InfoSectionType.WARN"
+        >
+          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.idp' }"></span>
         </cnsl-info-section>
 
         <ng-template #idpInfo>
           <cnsl-info-section class="info">
-            {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}}
+            {{ 'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate }}
           </cnsl-info-section>
         </ng-template>
       </div>
       <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
-          [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false"
-          ngDefaultControl [(ngModel)]="loginData.forceMfa">
-          {{'POLICY.DATA.FORCEMFA' | translate}}
+        <mat-slide-toggle
+          class="toggle"
+          color="primary"
+          [disabled]="
+            disabled ||
+            (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false)
+          "
+          ngDefaultControl
+          [(ngModel)]="loginData.forceMfa"
+        >
+          {{ 'POLICY.DATA.FORCEMFA' | translate }}
         </mat-slide-toggle>
 
         <cnsl-info-section
-          *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false; else factorsInfo"
-          [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.factors'})"></span>
+          *ngIf="
+            serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false;
+            else factorsInfo
+          "
+          [featureLink]="['/org/features']"
+          class="info"
+          [type]="InfoSectionType.WARN"
+        >
+          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.factors' }"></span>
         </cnsl-info-section>
 
         <ng-template #factorsInfo>
           <cnsl-info-section class="info">
-            {{'POLICY.DATA.FORCEMFA_DESC' | translate}}
+            {{ 'POLICY.DATA.FORCEMFA_DESC' | translate }}
           </cnsl-info-section>
         </ng-template>
       </div>
       <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
-          [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) === false"
-          ngDefaultControl [(ngModel)]="loginData.hidePasswordReset">
-          {{'POLICY.DATA.HIDEPASSWORDRESET' | translate}}
+        <mat-slide-toggle
+          class="toggle"
+          color="primary"
+          [disabled]="
+            disabled ||
+            (serviceType === PolicyComponentServiceType.MGMT &&
+              (['login_policy.password_reset'] | hasFeature | async) === false)
+          "
+          ngDefaultControl
+          [(ngModel)]="loginData.hidePasswordReset"
+        >
+          {{ 'POLICY.DATA.HIDEPASSWORDRESET' | translate }}
         </mat-slide-toggle>
 
         <cnsl-info-section
-          *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) === false; else passwordResetInfo"
-          [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.password_reset'})"></span>
+          *ngIf="
+            serviceType === PolicyComponentServiceType.MGMT &&
+              (['login_policy.password_reset'] | hasFeature | async) === false;
+            else passwordResetInfo
+          "
+          [featureLink]="['/org/features']"
+          class="info"
+          [type]="InfoSectionType.WARN"
+        >
+          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.password_reset' }"></span>
         </cnsl-info-section>
 
         <ng-template #passwordResetInfo>
           <cnsl-info-section class="info">
-            {{'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate}}
+            {{ 'POLICY.DATA.HIDEPASSWORDRESET_DESC' | translate }}
           </cnsl-info-section>
         </ng-template>
       </div>
       <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
+        <mat-slide-toggle
+          class="toggle"
+          color="primary"
           [disabled]="disabled"
-          ngDefaultControl [(ngModel)]="loginData.ignoreUnknownUsernames">
-          {{'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate}}
+          ngDefaultControl
+          [(ngModel)]="loginData.ignoreUnknownUsernames"
+        >
+          {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate }}
         </mat-slide-toggle>
 
         <cnsl-info-section class="info">
-          {{'POLICY.DATA.IGNOREUNKNOWNUSERNAMES_DESC' | translate}}
+          {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES_DESC' | translate }}
         </cnsl-info-section>
       </div>
 
       <div class="row">
         <cnsl-form-field class="form-field" label="Access Code" required="true">
-          <cnsl-label>{{'LOGINPOLICY.PASSWORDLESS' | translate}}</cnsl-label>
-          <mat-select [(ngModel)]="loginData.passwordlessType"
-            [disabled]="disabled || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.passwordless'] | hasFeature | async) === false)">
+          <cnsl-label>{{ 'LOGINPOLICY.PASSWORDLESS' | translate }}</cnsl-label>
+          <mat-select
+            [(ngModel)]="loginData.passwordlessType"
+            [disabled]="
+              disabled ||
+              (serviceType === PolicyComponentServiceType.MGMT &&
+                (['login_policy.passwordless'] | hasFeature | async) === false)
+            "
+          >
             <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
-              {{'LOGINPOLICY.PASSWORDLESSTYPE.'+pt | translate}}
+              {{ 'LOGINPOLICY.PASSWORDLESSTYPE.' + pt | translate }}
             </mat-option>
           </mat-select>
         </cnsl-form-field>
 
         <cnsl-info-section
-          *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.passwordless'] | hasFeature | async) === false"
-          [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.passwordless'})"></span>
+          *ngIf="
+            serviceType === PolicyComponentServiceType.MGMT && (['login_policy.passwordless'] | hasFeature | async) === false
+          "
+          [featureLink]="['/org/features']"
+          class="info"
+          [type]="InfoSectionType.WARN"
+        >
+          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'login_policy.passwordless' }"></span>
+        </cnsl-info-section>
+      </div>
+
+      <div class="row">
+        <cnsl-form-field class="form-field" label="Access Code" required="true">
+          <cnsl-label>{{ 'LOGINPOLICY.DEFAULTREDIRECTURI' | translate }}</cnsl-label>
+          <input cnslInput placeholder="https://" [(ngModel)]="loginData.defaultRedirectUri" [disabled]="disabled" />
+        </cnsl-form-field>
+
+        <cnsl-info-section class="info">
+          {{ 'LOGINPOLICY.DEFAULTREDIRECTURI_DESC' | translate }}
         </cnsl-info-section>
       </div>
     </div>
   </cnsl-card>
 
-  <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
-    mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+  <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
 
   <div class="divider"></div>
 
-
   <ng-template cnslHasRole [hasRole]="['org.idp.read']">
-    <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
-      [expanded]="false">
-
-      <cnsl-idp-table [service]="service" [serviceType]="serviceType"
-        [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))">
+    <cnsl-card
+      title="{{ 'IDP.LIST.TITLE' | translate }}"
+      description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
+      [expanded]="false"
+    >
+      <cnsl-idp-table
+        [service]="service"
+        [serviceType]="serviceType"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.idp.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+              ? 'org.idp.write'
+              : ''
+          ]
+            | hasRole
+            | async) === false ||
+          (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false)
+        "
+      >
       </cnsl-idp-table>
     </cnsl-card>
   </ng-template>

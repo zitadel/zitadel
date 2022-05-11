@@ -1379,7 +1379,9 @@
     "PASSWORDLESSTYPE": {
       "0": "Nicht erlaubt",
       "1": "Erlaubt"
-    }
+    },
+    "DEFAULTREDIRECTURI": "Default Redirect URI",
+    "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)"
   },
   "APP": {
     "LIST": "Apps",

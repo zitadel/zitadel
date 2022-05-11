@@ -20,6 +20,7 @@ type UrlData struct {
 	UserID      string
 	Code        string
 	PasswordSet bool
+	OrgID       string
 }
 
 func SendUserInitCode(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
@@ -27,7 +28,7 @@ func SendUserInitCode(mailhtml string, translator *i18n.Translator, user *view_m
 	if err != nil {
 		return err
 	}
-	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.InitCode, &UrlData{UserID: user.ID, Code: codeString, PasswordSet: user.PasswordSet})
+	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.InitCode, &UrlData{UserID: user.ID, Code: codeString, PasswordSet: user.PasswordSet, OrgID: user.ResourceOwner})
 	if err != nil {
 		return err
 	}

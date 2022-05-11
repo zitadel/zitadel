@@ -80,7 +80,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authRequest == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		l.defaultRedirect(w, r)
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())

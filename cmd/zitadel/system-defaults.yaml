@@ -77,10 +77,10 @@ SystemDefaults:
   Notifications:
     DebugMode: $DEBUG_MODE
     Endpoints:
-      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}'
-      PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
-      VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
-      DomainClaimed: '$ZITADEL_ACCOUNTS/login'
+      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}&orgID={{.OrgID}}'
+      PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}'
+      VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}'
+      DomainClaimed: '$ZITADEL_ACCOUNTS/login&orgID={{.OrgID}}'
       PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init'
     Providers:
       Email:
