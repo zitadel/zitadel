@@ -70,6 +70,7 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	hidePasswordReset,
 	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
 	passwordCheckLifetime,
 	externalLoginCheckLifetime,
 	mfaInitSkipLifetime,
@@ -113,6 +114,9 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))
+	}
+	if wm.DefaultRedirectURI != defaultRedirectURI {
+		changes = append(changes, policy.ChangeDefaultRedirectURI(defaultRedirectURI))
 	}
 	if len(changes) == 0 {
 		return nil, false

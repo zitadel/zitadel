@@ -59,6 +59,7 @@ func (c *Commands) addDefaultLoginPolicy(ctx context.Context, instanceAgg *event
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 		policy.PasswordCheckLifetime,
 		policy.ExternalLoginCheckLifetime,
 		policy.MFAInitSkipLifetime,
@@ -85,6 +86,9 @@ func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.
 }
 
 func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, instanceAgg *eventstore.Aggregate, existingPolicy *InstanceLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.Command, error) {
+	if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
+	}
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
@@ -101,11 +105,13 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, instanceAgg *ev
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 		policy.PasswordCheckLifetime,
 		policy.ExternalLoginCheckLifetime,
 		policy.MFAInitSkipLifetime,
 		policy.SecondFactorCheckLifetime,
-		policy.MultiFactorCheckLifetime)
+		policy.MultiFactorCheckLifetime,
+	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
 	}

@@ -42,8 +42,8 @@ type initUserData struct {
 	HasSymbol                 string
 }
 
-func InitUserLink(origin, userID, code string, passwordSet bool) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s&passwordset=%t", externalLink(origin), EndpointInitUser, userID, code, passwordSet)
+func InitUserLink(origin, userID, code, orgID string, passwordSet bool) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s&passwordset=%t&orgID=%s", externalLink(origin), EndpointInitUser, userID, code, passwordSet, orgID)
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {

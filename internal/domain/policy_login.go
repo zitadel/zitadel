@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -20,11 +21,30 @@ type LoginPolicy struct {
 	PasswordlessType           PasswordlessType
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
+	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
 	MFAInitSkipLifetime        time.Duration
 	SecondFactorCheckLifetime  time.Duration
 	MultiFactorCheckLifetime   time.Duration
+}
+
+func ValidateDefaultRedirectURI(rawURL string) bool {
+	if rawURL == "" {
+		return true
+	}
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return false
+	}
+	switch parsedURL.Scheme {
+	case "":
+		return false
+	case "http", "https":
+		return parsedURL.Host != ""
+	default:
+		return true
+	}
 }
 
 type IDPProvider struct {

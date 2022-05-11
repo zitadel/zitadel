@@ -249,6 +249,7 @@ DefaultInstance:
     HidePasswordReset: false
     IgnoreUnknownUsernames: false
     PasswordlessType: 1 #1: allowed 0: not allowed
+    DefaultRedirectURI: #empty because we use the Console UI
     PasswordCheckLifetime: 240h #10d
     ExternalLoginCheckLifetime: 240h #10d
     MfaInitSkipLifetime: 720h #30d

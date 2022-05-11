@@ -21,7 +21,7 @@ type DomainClaimedData struct {
 }
 
 func SendDomainClaimed(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), colors *query.LabelPolicy, assetsPrefix string, origin string) error {
-	url := login.LoginLink(origin)
+	url := login.LoginLink(origin, user.ResourceOwner)
 	var args = mapNotifyUserToArgs(user)
 	args["TempUsername"] = username
 	args["Domain"] = strings.Split(user.LastEmail, "@")[1]

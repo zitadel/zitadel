@@ -34,6 +34,7 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 		IgnoreUnknownUsernames:     wm.IgnoreUnknownUsernames,
 		ForceMFA:                   wm.ForceMFA,
 		PasswordlessType:           wm.PasswordlessType,
+		DefaultRedirectURI:         wm.DefaultRedirectURI,
 		PasswordCheckLifetime:      wm.PasswordCheckLifetime,
 		ExternalLoginCheckLifetime: wm.ExternalLoginCheckLifetime,
 		MFAInitSkipLifetime:        wm.MFAInitSkipLifetime,

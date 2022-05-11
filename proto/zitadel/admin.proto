@@ -3479,7 +3479,7 @@ message AddCustomDomainPolicyRequest {
 			required: ["org_id"]
 		};
 	};
-    
+
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3683,11 +3683,16 @@ message UpdateLoginPolicyRequest {
             description: "defines if unknown username on login screen directly return an error or always display the password screen"
         }
     ];
-    google.protobuf.Duration password_check_lifetime = 8;
-    google.protobuf.Duration external_login_check_lifetime = 9;
-    google.protobuf.Duration mfa_init_skip_lifetime = 10;
-    google.protobuf.Duration second_factor_check_lifetime = 11;
-    google.protobuf.Duration multi_factor_check_lifetime = 12;
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message UpdateLoginPolicyResponse {

@@ -135,6 +135,13 @@
       {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate }}
     </mat-slide-toggle>
   </div>
+
+  <div class="login-policy-row">
+    <cnsl-form-field class="form-field" label="Access Code" required="true">
+      <cnsl-label>{{ 'POLICY.DATA.DEFAULTREDIRECTURI' | translate }}</cnsl-label>
+      <input cnslInput placeholder="https://" [(ngModel)]="loginData.defaultRedirectUri" />
+    </cnsl-form-field>
+  </div>
 </cnsl-card>
 
 <div class="login-policy-btn-container">

@@ -16,6 +16,9 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Fn8ds", "Errors.ResourceOwnerMissing")
 	}
+	if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-WSfdq", "Errors.Org.LoginPolicy.RedirectURIInvalid")
+	}
 	addedPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
@@ -38,6 +41,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 			policy.HidePasswordReset,
 			policy.IgnoreUnknownUsernames,
 			policy.PasswordlessType,
+			policy.DefaultRedirectURI,
 			policy.PasswordCheckLifetime,
 			policy.ExternalLoginCheckLifetime,
 			policy.MFAInitSkipLifetime,
@@ -77,6 +81,9 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
 	}
+	if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Sfd21", "Errors.Org.LoginPolicy.RedirectURIInvalid")
+	}
 	existingPolicy := NewOrgLoginPolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
 	if err != nil {
@@ -97,6 +104,7 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
 		policy.PasswordlessType,
+		policy.DefaultRedirectURI,
 		policy.PasswordCheckLifetime,
 		policy.ExternalLoginCheckLifetime,
 		policy.MFAInitSkipLifetime,

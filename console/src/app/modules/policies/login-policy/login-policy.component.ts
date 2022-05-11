@@ -89,6 +89,8 @@ export class LoginPolicyComponent implements OnInit {
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
         mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+        mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
         // if(this.loginData.passwordCheckLifetime) {
         // mgmtreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
         // }
@@ -106,6 +108,7 @@ export class LoginPolicyComponent implements OnInit {
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
         adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
         adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+        adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
         // adminreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
