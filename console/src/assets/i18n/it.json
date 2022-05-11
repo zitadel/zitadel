@@ -806,18 +806,22 @@
       "TITLE": "Impostazioni dell'istanza",
       "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
     },
+    "ORG": {
+      "TITLE": "Impostazioni dell'organizzazione",
+      "DESCRIPTION": "Queste impostazioni si applicheranno alla organizzazione corrente."
+    },
     "LIST": {
       "GENERAL": "Generale",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "complessità della password",
       "NOTIFICATIONS": "Notifiche",
-      "NOTIFICATIONPROVIDERS": "Fornitori e SMTP",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Informativa sulla privacy e TOS"
+      "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
+      "OIDC": "OIDC Configuration"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
@@ -833,6 +837,38 @@
       "de": "Deutsch",
       "it": "Italiano",
       "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "Impostazioni SMTP",
+      "SENDERADDRESS": "Indirizzo email del mittente",
+      "SENDERNAME": "Nome del mittente",
+      "HOST": "Host",
+      "USER": "Utente",
+      "PASSWORD": "Password",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Salvato con successo!"
+    },
+    "SMS": {
+      "TITLE": "Impostazioni SMS",
+      "PROVIDERS": "Fornitori",
+      "PROVIDER": "Fornitore SMS",
+      "ADDPROVIDER": "Aggiungi fornitore SMS",
+      "ADDPROVIDERDESCRIPTION": "Scegli uno dei provider disponibili e inserisci i dati richiesti.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio aggiunto con successo."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Einstellungen",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "ore",
+      "INDAYS": "giorni"
     }
   },
   "POLICY": {

@@ -815,13 +815,13 @@
       "LOGIN": "Login Behaviour and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notifications",
-      "NOTIFICATIONPROVIDERS": "Notification providers and SMTP",
+      "NOTIFICATIONS": "Notification providers and SMTP",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Privacy Policy"
+      "PRIVACYPOLICY": "Privacy Policy",
+      "OIDC": "OIDC Configuration"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -837,6 +837,38 @@
       "de": "Deutsch",
       "it": "Italiano",
       "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "SMTP Settings",
+      "SENDERADDRESS": "Sender Email address",
+      "SENDERNAME": "Sender Name",
+      "HOST": "Host",
+      "USER": "User",
+      "PASSWORD": "Password",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Saved successfully!"
+    },
+    "SMS": {
+      "TITLE": "SMS Settings",
+      "PROVIDERS": "Providers",
+      "PROVIDER": "SMS Provider",
+      "ADDPROVIDER": "Add SMS Provider",
+      "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio added successfully."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Settings",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "hours",
+      "INDAYS": "Days"
     }
   },
   "POLICY": {

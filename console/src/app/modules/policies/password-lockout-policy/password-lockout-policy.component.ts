@@ -42,9 +42,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
   }
 
   private fetchData(): void {
-    console.log(this.serviceType);
     this.getData().then((resp) => {
-      console.log(resp);
       if (resp.policy) {
         this.lockoutData = resp.policy;
       }
