@@ -78,6 +78,8 @@ export class OwnedProjectDetailComponent implements OnInit {
       const { id } = params;
       if (id) {
         this.currentSetting = id;
+      } else {
+        this.currentSetting = 'general';
       }
     });
   }
