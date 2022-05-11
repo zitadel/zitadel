@@ -83,6 +83,9 @@ func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.
 }
 
 func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, existingPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.Command, error) {
+	if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
+	}
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return nil, err

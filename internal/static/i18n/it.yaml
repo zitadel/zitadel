@@ -157,6 +157,7 @@ Errors:
     LoginPolicy:
       NotFound: Impostazioni di accesso non trovati
       Invalid: Impostazioni di accesso non sono validi
+      RedirectURIInvalid: Default Redirect URI non valido
       NotExisting: Impostazioni di accesso non esistenti
       AlreadyExists: Impostazioni di accesso già esistenti
       IdpProviderAlreadyExisting: IDP già esistente
@@ -264,6 +265,7 @@ Errors:
       NotChanged: Le impostazioni di accesso predefinite non sono state cambiate
       NotExisting: Impostazioni di accesso predefinite non esistenti
       AlreadyExists: Impostazioni di accesso predefinite già esistenti
+      RedirectURIInvalid: Default Redirect URI non valido
       MFA:
         AlreadyExists: Multifattore già esistente
         NotExisting: Multifattore non esistente

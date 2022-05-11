@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+import (
+	"net/url"
+
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+)
 
 type LoginPolicy struct {
 	models.ObjectRoot
@@ -17,6 +21,21 @@ type LoginPolicy struct {
 	HidePasswordReset      bool
 	IgnoreUnknownUsernames bool
 	DefaultRedirectURI     string
+}
+
+func ValidateDefaultRedirectURI(rawURL string) bool {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return false
+	}
+	switch parsedURL.Scheme {
+	case "":
+		return false
+	case "http", "https":
+		return parsedURL.Host != ""
+	default:
+		return true
+	}
 }
 
 type IDPProvider struct {
