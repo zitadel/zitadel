@@ -63,7 +63,8 @@ func CreateLogin(config Config,
 	externalSecure bool,
 	userAgentCookie,
 	issuerInterceptor,
-	instanceHandler mux.MiddlewareFunc,
+	oidcInstanceHandler,
+	samlInstanceHandler mux.MiddlewareFunc,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
@@ -96,7 +97,7 @@ func CreateLogin(config Config,
 	}
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources), issuerInterceptor)
+	login.router = CreateRouter(login, statikFS, oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources), issuerInterceptor)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil

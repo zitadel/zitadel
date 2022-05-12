@@ -96,12 +96,12 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
 	UserGrantsByProjectAndUserID(string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
-	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*project_view_model.OrgProjectMapping, error)
 }
 
@@ -121,7 +121,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	project, err := repo.ProjectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
+	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -1019,11 +1019,14 @@ func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID stri
 }
 
 func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *domain.AuthRequest, provider applicationProvider) (bool, error) {
-	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
-	if err != nil {
-		return false, err
+	if _, ok := request.Request.(*domain.AuthRequestOIDC); ok {
+		app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+		return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
 	}
-	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
+	return false, nil
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
@@ -1222,8 +1225,8 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, 
 func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC:
-		project, err = userGrantProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
+		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
@@ -1243,8 +1246,8 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC:
-		project, err = projectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
+		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}

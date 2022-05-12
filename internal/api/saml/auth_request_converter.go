@@ -1,8 +1,10 @@
 package saml
 
 import (
+	"context"
 	"github.com/zitadel/saml/pkg/provider/models"
 	"github.com/zitadel/saml/pkg/provider/xml/samlp"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"time"
@@ -75,13 +77,14 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ models.AuthRequestI
 	return &AuthRequest{authReq}, nil
 }
 
-func CreateAuthRequestToBusiness(authReq *samlp.AuthnRequestType, acsUrl, protocolBinding, applicationID, relayState, userAgentID string) *domain.AuthRequest {
+func CreateAuthRequestToBusiness(ctx context.Context, authReq *samlp.AuthnRequestType, acsUrl, protocolBinding, applicationID, relayState, userAgentID string) *domain.AuthRequest {
 	return &domain.AuthRequest{
 		CreationDate:  time.Now(),
 		AgentID:       userAgentID,
 		ApplicationID: applicationID,
 		CallbackURI:   acsUrl,
 		TransferState: relayState,
+		InstanceID:    authz.GetInstance(ctx).InstanceID(),
 		Request: &domain.AuthRequestSAML{
 			ID:          authReq.Id,
 			BindingType: protocolBinding,

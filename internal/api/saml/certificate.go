@@ -146,14 +146,14 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 
 		switch usage {
 		case domain.KeyUsageSAMLMetadataSigning:
-			return p.command.GenerateSAMLMetadataCertificate(ctx, p.certificateAlgorithm, keyWebKey.Key.(*rsa.PrivateKey), certWebKey.Key.([]byte))
+			return p.command.GenerateSAMLMetadataCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, keyWebKey.Key.(*rsa.PrivateKey), certWebKey.Key.([]byte))
 		case domain.KeyUsageSAMLResponseSinging:
-			return p.command.GenerateSAMLResponseCertificate(ctx, p.certificateAlgorithm, keyWebKey.Key.(*rsa.PrivateKey), certWebKey.Key.([]byte))
+			return p.command.GenerateSAMLResponseCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, keyWebKey.Key.(*rsa.PrivateKey), certWebKey.Key.([]byte))
 		default:
 			return fmt.Errorf("unknown usage")
 		}
 	case domain.KeyUsageSAMLCA:
-		return p.command.GenerateSAMLCACertificate(ctx)
+		return p.command.GenerateSAMLCACertificate(setSAMLCtx(ctx))
 	default:
 		return fmt.Errorf("unknown certificate usage")
 	}
@@ -162,7 +162,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return p.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			ResourceOwner(domain.IAMID).
+			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().
 			AggregateTypes(keypair.AggregateType).
 			Builder(),

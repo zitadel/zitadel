@@ -59,7 +59,7 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 		return err
 	}
 
-	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
+	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
 	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
@@ -91,7 +91,7 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 		return err
 	}
 
-	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
+	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
 	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
@@ -123,7 +123,7 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorith
 		return err
 	}
 
-	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
+	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
 	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,

@@ -29,6 +29,7 @@ type Config struct {
 func NewProvider(
 	ctx context.Context,
 	conf Config,
+	externalSecure bool,
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
@@ -52,10 +53,7 @@ func NewProvider(
 		return nil, err
 	}
 
-	return provider.NewProvider(
-		ctx,
-		provStorage,
-		conf.ProviderConfig,
+	options := []provider.Option{
 		provider.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
@@ -64,8 +62,18 @@ func NewProvider(
 			userAgentCookie,
 			http_utils.CopyHeadersToContext,
 		),
-	)
+	}
+	if !externalSecure {
+		options = append(options, provider.WithAllowInsecure())
+	}
 
+	return provider.NewProvider(
+		ctx,
+		provStorage,
+		HandlerPrefix,
+		conf.ProviderConfig,
+		options...,
+	)
 }
 
 func newStorage(

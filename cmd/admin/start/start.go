@@ -192,7 +192,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	authenticatedAPIs.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
 
-	samlProvider, err := saml.NewProvider(ctx, config.SAML, commands, queries, authRepo, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor)
+	samlProvider, err := saml.NewProvider(ctx, config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start saml provider: %w", err)
 	}
@@ -210,7 +210,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	authenticatedAPIs.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

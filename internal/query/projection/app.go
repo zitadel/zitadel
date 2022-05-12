@@ -187,6 +187,14 @@ func (p *AppProjection) reducers() []handler.AggregateReducer {
 					Event:  project.OIDCConfigSecretChangedType,
 					Reduce: p.reduceOIDCConfigSecretChanged,
 				},
+				{
+					Event:  project.SAMLConfigAddedType,
+					Reduce: p.reduceSAMLConfigAdded,
+				},
+				{
+					Event:  project.SAMLConfigChangedType,
+					Reduce: p.reduceSAMLConfigChanged,
+				},
 			},
 		},
 	}

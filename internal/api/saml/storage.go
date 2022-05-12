@@ -102,7 +102,7 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
 
-	authRequest := CreateAuthRequestToBusiness(req, acsUrl, protocolBinding, applicationID, relayState, userAgentID)
+	authRequest := CreateAuthRequestToBusiness(ctx, req, acsUrl, protocolBinding, applicationID, relayState, userAgentID)
 
 	resp, err := p.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {

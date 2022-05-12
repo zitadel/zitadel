@@ -61,6 +61,16 @@ func (wm *ApplicationKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *project.SAMLConfigAddedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *project.SAMLConfigChangedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
 		case *project.ApplicationKeyAddedEvent:
 			if e.AppID != wm.AppID || e.KeyID != wm.KeyID {
 				continue
@@ -86,6 +96,10 @@ func (wm *ApplicationKeyWriteModel) Reduce() error {
 			wm.appendAddOIDCEvent(e)
 		case *project.OIDCConfigChangedEvent:
 			wm.appendChangeOIDCEvent(e)
+		case *project.SAMLConfigAddedEvent:
+			wm.appendAddSAMLEvent(e)
+		case *project.SAMLConfigChangedEvent:
+			wm.appendChangeSAMLEvent(e)
 		case *project.APIConfigAddedEvent:
 			wm.appendAddAPIEvent(e)
 		case *project.APIConfigChangedEvent:
@@ -115,6 +129,14 @@ func (wm *ApplicationKeyWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigC
 	}
 }
 
+func (wm *ApplicationKeyWriteModel) appendAddSAMLEvent(e *project.SAMLConfigAddedEvent) {
+	wm.ClientID = e.EntityID
+}
+
+func (wm *ApplicationKeyWriteModel) appendChangeSAMLEvent(e *project.SAMLConfigChangedEvent) {
+	wm.ClientID = e.EntityID
+}
+
 func (wm *ApplicationKeyWriteModel) appendAddAPIEvent(e *project.APIConfigAddedEvent) {
 	wm.ClientID = e.ClientID
 	wm.KeysAllowed = e.AuthMethodType == domain.APIAuthMethodTypePrivateKeyJWT
@@ -138,6 +160,8 @@ func (wm *ApplicationKeyWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.OIDCConfigChangedType,
 			project.APIConfigAddedType,
 			project.APIConfigChangedType,
+			project.SAMLConfigAddedType,
+			project.SAMLConfigChangedType,
 			project.ApplicationKeyAddedEventType,
 			project.ApplicationKeyRemovedEventType,
 			project.ProjectRemovedType).
