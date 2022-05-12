@@ -1,51 +1,46 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
-import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import {
-  GetCustomPasswordResetMessageTextRequest as AdminGetCustomPasswordResetMessageTextRequest,
-  GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
-  GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
-  GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
-  SetDefaultDomainClaimedMessageTextRequest,
-  SetDefaultInitMessageTextRequest,
-  SetDefaultPasswordlessRegistrationMessageTextRequest,
-  SetDefaultPasswordResetMessageTextRequest,
-  SetDefaultVerifyEmailMessageTextRequest,
-  SetDefaultVerifyPhoneMessageTextRequest,
+    GetCustomPasswordResetMessageTextRequest as AdminGetCustomPasswordResetMessageTextRequest,
+    GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
+    GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
+    GetDefaultVerifyPhoneMessageTextRequest as AdminGetDefaultVerifyPhoneMessageTextRequest,
+    SetDefaultDomainClaimedMessageTextRequest,
+    SetDefaultInitMessageTextRequest,
+    SetDefaultPasswordlessRegistrationMessageTextRequest,
+    SetDefaultPasswordResetMessageTextRequest,
+    SetDefaultVerifyEmailMessageTextRequest,
+    SetDefaultVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  GetCustomDomainClaimedMessageTextRequest,
-  GetCustomPasswordlessRegistrationMessageTextRequest,
-  GetCustomPasswordResetMessageTextRequest,
-  GetCustomVerifyEmailMessageTextRequest,
-  GetCustomVerifyPhoneMessageTextRequest,
-  GetDefaultDomainClaimedMessageTextRequest,
-  GetDefaultInitMessageTextRequest,
-  GetDefaultPasswordlessRegistrationMessageTextRequest,
-  GetDefaultPasswordResetMessageTextRequest,
-  GetDefaultVerifyEmailMessageTextRequest,
-  GetDefaultVerifyPhoneMessageTextRequest,
-  SetCustomDomainClaimedMessageTextRequest,
-  SetCustomInitMessageTextRequest,
-  SetCustomPasswordlessRegistrationMessageTextRequest,
-  SetCustomPasswordResetMessageTextRequest,
-  SetCustomVerifyEmailMessageTextRequest,
-  SetCustomVerifyPhoneMessageTextRequest,
+    GetCustomDomainClaimedMessageTextRequest,
+    GetCustomPasswordlessRegistrationMessageTextRequest,
+    GetCustomPasswordResetMessageTextRequest,
+    GetCustomVerifyEmailMessageTextRequest,
+    GetCustomVerifyPhoneMessageTextRequest,
+    GetDefaultDomainClaimedMessageTextRequest,
+    GetDefaultInitMessageTextRequest,
+    GetDefaultPasswordlessRegistrationMessageTextRequest,
+    GetDefaultPasswordResetMessageTextRequest,
+    GetDefaultVerifyEmailMessageTextRequest,
+    GetDefaultVerifyPhoneMessageTextRequest,
+    SetCustomDomainClaimedMessageTextRequest,
+    SetCustomInitMessageTextRequest,
+    SetCustomPasswordlessRegistrationMessageTextRequest,
+    SetCustomPasswordResetMessageTextRequest,
+    SetCustomVerifyEmailMessageTextRequest,
+    SetCustomVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { GridPolicy, MESSAGE_TEXTS_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -279,7 +274,7 @@ const REQUESTMAP = {
   templateUrl: './message-texts.component.html',
   styleUrls: ['./message-texts.component.scss'],
 })
-export class MessageTextsComponent implements OnDestroy {
+export class MessageTextsComponent implements OnInit, OnDestroy {
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
   public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({}); // boolean because of isDefault
 
@@ -287,7 +282,7 @@ export class MessageTextsComponent implements OnDestroy {
 
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public MESSAGETYPES: any = MESSAGETYPES;
 
@@ -392,8 +387,6 @@ export class MessageTextsComponent implements OnDestroy {
   public locale: string = 'en';
   public LOCALES: string[] = ['en', 'de', 'it'];
   private sub: Subscription = new Subscription();
-  public currentPolicy: GridPolicy = MESSAGE_TEXTS_POLICY;
-  public orgName: string = '';
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
       ? 'iam.policy.write'
@@ -404,61 +397,29 @@ export class MessageTextsComponent implements OnDestroy {
 
   constructor(
     private authService: GrpcAuthService,
-    private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private dialog: MatDialog,
     private storageService: StorageService,
-    breadcrumbService: BreadcrumbService,
-  ) {
-    this.sub = this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-          switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-              this.service = this.injector.get(ManagementService as Type<ManagementService>);
-              this.service.getSupportedLanguages().then((lang) => {
-                this.LOCALES = lang.languagesList;
-              });
-              this.loadData(this.currentType);
-              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-              if (org && org.id) {
-                this.orgName = org.name;
-              }
+  ) {}
 
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
-              break;
-            case PolicyComponentServiceType.ADMIN:
-              this.service = this.injector.get(AdminService as Type<AdminService>);
-              this.service.getSupportedLanguages().then((lang) => {
-                this.LOCALES = lang.languagesList;
-              });
-              this.loadData(this.currentType);
-
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
-
-              break;
-          }
-
-          return this.route.params;
-        }),
-      )
-      .subscribe();
+  ngOnInit(): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+        this.service.getSupportedLanguages().then((lang) => {
+          this.LOCALES = lang.languagesList;
+        });
+        this.loadData(this.currentType);
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+        this.service.getSupportedLanguages().then((lang) => {
+          this.LOCALES = lang.languagesList;
+        });
+        this.loadData(this.currentType);
+        break;
+    }
   }
 
   public getDefaultValues(type: MESSAGETYPES, req: any): Promise<any> {

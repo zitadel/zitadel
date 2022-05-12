@@ -7,24 +7,33 @@
         *ngIf="
           breadc[breadc.length - 1] &&
           !breadc[breadc.length - 1].hideNav &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.GRANTEDPROJECT &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.APP &&
           breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER
         "
-        [ngSwitch]="breadc[breadc.length - 1].type"
+        [ngSwitch]="breadc[0].type"
       >
         <div class="nav-row" @navrow>
-          <ng-container *ngSwitchCase="BreadcrumbType.IAM">
+          <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
             <div class="nav-row-abs" @navroworg>
               <ng-template cnslHasRole [hasRole]="['iam.read']">
                 <a
                   class="nav-item"
                   [routerLinkActiveOptions]="{ exact: false }"
                   [routerLinkActive]="['active']"
-                  [routerLink]="['/system']"
+                  [routerLink]="['/instance']"
                 >
                   <div class="c_label">
                     <span> {{ 'MENU.INSTANCEOVERVIEW' | translate }} </span>
+                  </div>
+                </a>
+
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/orgs']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.ORGS' | translate }} </span>
                   </div>
                 </a>
 
@@ -49,6 +58,17 @@
                     <span> {{ 'MENU.FAILEDEVENTS' | translate }} </span>
                   </div>
                 </a>
+
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/settings']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.SETTINGS' | translate }} </span>
+                  </div>
+                </a>
               </ng-template>
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>
@@ -56,7 +76,7 @@
           </ng-container>
 
           <ng-container *ngSwitchCase="BreadcrumbType.ORG">
-            <div class="nav-row-abs" @navroworg>
+            <div class="nav-row-abs" @navrowproject>
               <a
                 class="nav-item"
                 [routerLinkActive]="['active']"
@@ -142,13 +162,24 @@
                     <span class="label">{{ 'MENU.DOMAINS' | translate }}</span>
                   </a>
                 </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="['/org-settings']"
+                  >
+                    <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
+                  </a>
+                </ng-template>
               </ng-container>
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
           </ng-container>
 
-          <ng-container *ngSwitchCase="BreadcrumbType.PROJECT">
+          <!-- <ng-container *ngSwitchCase="BreadcrumbType.PROJECT">
             <div *ngIf="breadc[breadc.length - 1]?.param?.value" class="nav-row-abs" @navrowproject>
               <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
                 <a
@@ -207,7 +238,7 @@
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
-          </ng-container>
+          </ng-container> -->
         </div>
       </ng-container>
     </ng-container>

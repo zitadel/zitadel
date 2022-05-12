@@ -11,8 +11,8 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
+import { CardModule } from '../../card/card.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { OrgIamPolicyRoutingModule } from './org-iam-policy-routing.module';
 import { OrgIamPolicyComponent } from './org-iam-policy.component';
 
@@ -22,6 +22,7 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
     OrgIamPolicyRoutingModule,
     CommonModule,
     FormsModule,
+    CardModule,
     InputModule,
     MatButtonModule,
     HasRolePipeModule,
@@ -32,7 +33,7 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
     InfoSectionModule,
     TranslateModule,
     DetailLayoutModule,
-    PolicyGridModule,
   ],
+  exports: [OrgIamPolicyComponent],
 })
 export class OrgIamPolicyModule {}
