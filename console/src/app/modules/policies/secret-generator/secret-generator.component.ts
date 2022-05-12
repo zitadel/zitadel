@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { UpdateSecretGeneratorResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import { OIDCSettings, SecretGenerator } from 'src/app/proto/generated/zitadel/settings_pb';
+import { UpdateSecretGeneratorRequest, UpdateSecretGeneratorResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { OIDCSettings, SecretGenerator, SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -17,6 +17,15 @@ export class SecretGeneratorComponent implements OnInit {
   public oidcSettings!: OIDCSettings.AsObject;
 
   public loading: boolean = false;
+
+  public readonly AVAILABLEGENERATORS: SecretGeneratorType[] = [
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_INIT_CODE,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_VERIFY_EMAIL_CODE,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_VERIFY_PHONE_CODE,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_PASSWORD_RESET_CODE,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_PASSWORDLESS_INIT_CODE,
+    SecretGeneratorType.SECRET_GENERATOR_TYPE_APP_SECRET,
+  ];
   constructor(private service: AdminService, private toast: ToastService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
@@ -29,6 +38,7 @@ export class SecretGeneratorComponent implements OnInit {
       .then((generators) => {
         if (generators.resultList) {
           this.generators = generators.resultList;
+          console.log(this.generators);
         }
       })
       .catch((error) => {
@@ -41,22 +51,41 @@ export class SecretGeneratorComponent implements OnInit {
 
   private updateData(): Promise<UpdateSecretGeneratorResponse.AsObject> | void {
     const dialogRef = this.dialog.open(DialogAddSecretGeneratorComponent, {
+      data: {},
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((req: UpdateSecretGeneratorRequest) => {
+      if (req) {
+        return (this.service as AdminService).updateSecretGenerator(req);
+      } else {
+        return;
+      }
+    });
+  }
+
+  public openGeneratorDialog(generatorType: SecretGeneratorType): void {
+    const dialogRef = this.dialog.open(DialogAddSecretGeneratorComponent, {
       data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'IDP.DELETE_TITLE',
-        descriptionKey: 'IDP.DELETE_DESCRIPTION',
+        type: generatorType,
       },
       width: '400px',
     });
 
-    // dialogRef.afterClosed().subscribe((req: UpdateSecretGeneratorRequest) => {
-    //   if (req) {
-    //     return (this.service as AdminService).updateSecretGenerator(req);
-    //   } else {
-    //     return;
-    //   }
-    // });
+    dialogRef.afterClosed().subscribe((req: UpdateSecretGeneratorRequest) => {
+      if (req) {
+        return (this.service as AdminService)
+          .updateSecretGenerator(req)
+          .then(() => {
+            this.toast.showInfo('SETTING.SECRETS.UPDATED', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      } else {
+        return;
+      }
+    });
   }
 
   public savePolicy(): void {

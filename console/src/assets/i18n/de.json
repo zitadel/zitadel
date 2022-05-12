@@ -870,6 +870,27 @@
       "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
       "INHOURS": "Stunden",
       "INDAYS": "Tage"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Erscheinungsbild",
+      "TYPES": "Schlüsseltypen",
+      "TYPE": {
+        "1": "Email Initialisierungscode",
+        "2": "Email Verifikationscode",
+        "3": "Telefonnummer Verificationscode",
+        "4": "Passwort Zurücksetzen Code",
+        "5": "Passwordless Initialisierungscode",
+        "6": "Applicationssecret"
+      },
+      "ADDGENERATOR": "Secret Erscheinungsbild definieren",
+      "GENERATORTYPE": "Typ",
+      "EXPIRY": "Ablauf (in Stunden)",
+      "INCLUDEDIGITS": "Enthält Zahlen",
+      "INCLUDESYMBOLS": "Enthält Symbole",
+      "INCLUDELOWERLETTERS": "Enthält Kleinbuchstaben",
+      "INCLUDEUPPERLETTERS": "Enthält Grossbuchstaben",
+      "LENGTH": "Länge",
+      "UPDATED": "Einstellungen geändert"
     }
   },
   "POLICY": {
