@@ -4,6 +4,10 @@
 
 <h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
 
+<cnsl-info-section class="info-section-warn" [fitWidth]="true" [type]="InfoSectionType.ALERT">{{
+  'SETTING.SMTP.REQUIREDWARN' | translate
+}}</cnsl-info-section>
+
 <form (ngSubmit)="savePolicy()" [formGroup]="form" autocomplete="off">
   <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
     <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>

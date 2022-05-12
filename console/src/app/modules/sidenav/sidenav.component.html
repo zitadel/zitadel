@@ -32,6 +32,7 @@
             [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
           >
             <span>{{ setting.i18nKey | translate }}</span>
+            <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
           </button>
         </ng-container>
         <ng-template #btn>

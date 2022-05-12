@@ -10,6 +10,7 @@ import { SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zit
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 
@@ -26,6 +27,7 @@ export class NotificationSettingsComponent implements OnInit {
   public form!: FormGroup;
 
   public SMSProviderConfigState: any = SMSProviderConfigState;
+  public InfoSectionType: any = InfoSectionType;
   constructor(
     private service: AdminService,
     private dialog: MatDialog,

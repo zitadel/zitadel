@@ -2,9 +2,14 @@
   margin: 0.5rem 0;
 }
 
-.smtp-form-field {
+.smtp-form-field,
+.info-section-warn {
   max-width: 400px;
   display: block;
+}
+
+.info-section-warn {
+  margin-bottom: 0.5rem;
 }
 
 .smtp-checkbox {
