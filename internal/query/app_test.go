@@ -44,10 +44,16 @@ var (
 		` projections.apps_oidc_configs.id_token_role_assertion,` +
 		` projections.apps_oidc_configs.id_token_userinfo_assertion,` +
 		` projections.apps_oidc_configs.clock_skew,` +
-		` projections.apps_oidc_configs.additional_origins` +
+		` projections.apps_oidc_configs.additional_origins,` +
+		//saml config
+		` projections.apps_saml_configs.app_id,` +
+		` projections.apps_saml_configs.entity_id,` +
+		` projections.apps_saml_configs.metadata,` +
+		` projections.apps_saml_configs.metadata_url` +
 		` FROM projections.apps` +
 		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps_saml_configs ON projections.apps.id = projections.apps_saml_configs.app_id`)
 	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps.id,` +
 		` projections.apps.name,` +
 		` projections.apps.project_id,` +
@@ -77,10 +83,16 @@ var (
 		` projections.apps_oidc_configs.id_token_userinfo_assertion,` +
 		` projections.apps_oidc_configs.clock_skew,` +
 		` projections.apps_oidc_configs.additional_origins,` +
+		//saml config
+		` projections.apps_saml_configs.app_id,` +
+		` projections.apps_saml_configs.entity_id,` +
+		` projections.apps_saml_configs.metadata,` +
+		` projections.apps_saml_configs.metadata_url,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.apps` +
 		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps_saml_configs ON projections.apps.id = projections.apps_saml_configs.app_id`)
 	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps_api_configs.client_id,` +
 		` projections.apps_oidc_configs.client_id` +
 		` FROM projections.apps` +
@@ -89,7 +101,8 @@ var (
 	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps.project_id` +
 		` FROM projections.apps` +
 		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps_saml_configs ON projections.apps.id = projections.apps_saml_configs.app_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects.id,` +
 		` projections.projects.creation_date,` +
 		` projections.projects.change_date,` +
@@ -104,7 +117,8 @@ var (
 		` FROM projections.projects` +
 		` JOIN projections.apps ON projections.projects.id = projections.apps.project_id` +
 		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps_saml_configs ON projections.apps.id = projections.apps_saml_configs.app_id`)
 
 	appCols = []string{
 		"id",
@@ -136,6 +150,11 @@ var (
 		"id_token_userinfo_assertion",
 		"clock_skew",
 		"additional_origins",
+		//saml config
+		"app_id",
+		"entity_id",
+		"metadata",
+		"metadata_url",
 	}
 	appsCols = append(appCols, "count")
 )
@@ -201,6 +220,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -257,6 +281,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml config
 							nil,
 							nil,
 							nil,
@@ -325,6 +354,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -404,6 +438,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -483,6 +522,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -562,6 +606,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -641,6 +690,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -720,6 +774,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"api-app-id",
@@ -747,6 +806,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml config
 							nil,
 							nil,
 							nil,
@@ -897,6 +961,11 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// saml config
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -945,6 +1014,11 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml config
 							nil,
 							nil,
 							nil,
@@ -1006,6 +1080,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1078,6 +1157,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1150,6 +1234,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1222,6 +1311,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1294,6 +1388,11 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
