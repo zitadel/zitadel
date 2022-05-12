@@ -111,11 +111,7 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 
 func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjectChangesRequest) (*mgmt_pb.ListProjectChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	res, err := s.query.ProjectChanges(ctx, req.ProjectId, sequence, limit, asc, features.AuditLogRetention)
+	res, err := s.query.ProjectChanges(ctx, req.ProjectId, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}

@@ -13,6 +13,7 @@
       justify-content: space-between;
       padding: 0.5rem 0;
       min-height: 40px;
+      max-width: 400px;
       border-bottom: 1px solid map-get($foreground, dividers);
 
       &:last-child {
@@ -42,7 +43,8 @@
 
     .mfa-list-btns {
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start;
+      max-width: 400px;
 
       .new-mfa {
         margin-top: 0.5rem;

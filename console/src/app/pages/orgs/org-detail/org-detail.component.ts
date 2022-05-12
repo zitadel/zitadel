@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
-import { Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -19,7 +18,7 @@ import { ToastService } from 'src/app/services/toast.service';
   templateUrl: './org-detail.component.html',
   styleUrls: ['./org-detail.component.scss'],
 })
-export class OrgDetailComponent implements OnInit {
+export class OrgDetailComponent implements OnInit, OnDestroy {
   public org!: Org.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
@@ -31,29 +30,33 @@ export class OrgDetailComponent implements OnInit {
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public totalMemberResult: number = 0;
   public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
-  public features!: Features.AsObject;
-
+  private destroy$: Subject<void> = new Subject();
   constructor(
     private dialog: MatDialog,
     public mgmtService: ManagementService,
     private toast: ToastService,
     private router: Router,
     breadcrumbService: BreadcrumbService,
+    activatedRoute: ActivatedRoute,
   ) {
-    const iamBread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
-      name: 'IAM',
-      routerLink: ['/system'],
-    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([iamBread, bread]);
+    breadcrumbService.setBreadcrumb([bread]);
+
+    activatedRoute.fragment.pipe(takeUntil(this.destroy$)).subscribe((orgId) => {
+      this.getData();
+    });
   }
 
   public ngOnInit(): void {
     this.getData();
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private async getData(): Promise<void> {
@@ -68,7 +71,6 @@ export class OrgDetailComponent implements OnInit {
         this.toast.showError(error);
       });
     this.loadMembers();
-    this.loadFeatures();
   }
 
   public openAddMember(): void {
@@ -129,20 +131,6 @@ export class OrgDetailComponent implements OnInit {
       )
       .subscribe((members) => {
         this.membersSubject.next(members);
-      });
-  }
-
-  public loadFeatures(): void {
-    this.loadingSubject.next(true);
-    this.mgmtService
-      .getFeatures()
-      .then((resp) => {
-        if (resp.features) {
-          this.features = resp.features;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
       });
   }
 }

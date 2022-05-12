@@ -34,11 +34,7 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, features.AuditLogRetention)
+	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}

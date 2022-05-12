@@ -4,7 +4,7 @@ import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { ManagementService } from './mgmt.service';
 
 export enum BreadcrumbType {
-  IAM,
+  INSTANCE,
   ORG,
   PROJECT,
   GRANTEDPROJECT,

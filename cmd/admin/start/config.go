@@ -1,6 +1,8 @@
 package start
 
 import (
+	"time"
+
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -26,31 +28,32 @@ import (
 )
 
 type Config struct {
-	Log             *logging.Config
-	Port            uint16
-	ExternalPort    uint16
-	ExternalDomain  string
-	ExternalSecure  bool
-	HTTP2HostHeader string
-	HTTP1HostHeader string
-	WebAuthNName    string
-	Database        database.Config
-	Tracing         tracing.Config
-	Projections     projection.Config
-	AuthZ           authz.Config
-	Auth            auth_es.Config
-	Admin           admin_es.Config
-	UserAgentCookie *middleware.UserAgentCookieConfig
-	OIDC            oidc.Config
-	SAML            saml.Config
-	Login           login.Config
-	Console         console.Config
-	Notification    notification.Config
-	AssetStorage    static_config.AssetStorageConfig
-	InternalAuthZ   internal_authz.Config
-	SystemDefaults  systemdefaults.SystemDefaults
-	EncryptionKeys  *encryptionKeyConfig
-	DefaultInstance command.InstanceSetup
+	Log               *logging.Config
+	Port              uint16
+	ExternalPort      uint16
+	ExternalDomain    string
+	ExternalSecure    bool
+	HTTP2HostHeader   string
+	HTTP1HostHeader   string
+	WebAuthNName      string
+	Database          database.Config
+	Tracing           tracing.Config
+	Projections       projection.Config
+	AuthZ             authz.Config
+	Auth              auth_es.Config
+	Admin             admin_es.Config
+	UserAgentCookie   *middleware.UserAgentCookieConfig
+	OIDC              oidc.Config
+	SAML              saml.Config
+	Login             login.Config
+	Console           console.Config
+	Notification      notification.Config
+	AssetStorage      static_config.AssetStorageConfig
+	InternalAuthZ     internal_authz.Config
+	SystemDefaults    systemdefaults.SystemDefaults
+	EncryptionKeys    *encryptionKeyConfig
+	DefaultInstance   command.InstanceSetup
+	AuditLogRetention time.Duration
 }
 
 func MustNewConfig(v *viper.Viper) *Config {

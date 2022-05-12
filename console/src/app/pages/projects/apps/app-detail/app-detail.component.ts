@@ -19,21 +19,21 @@ import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.com
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
-  APIAuthMethodType,
-  APIConfig,
-  App,
-  AppState,
-  OIDCAppType,
-  OIDCAuthMethodType,
-  OIDCConfig,
-  OIDCGrantType,
-  OIDCResponseType,
-  OIDCTokenType,
+    APIAuthMethodType,
+    APIConfig,
+    App,
+    AppState,
+    OIDCAppType,
+    OIDCAuthMethodType,
+    OIDCConfig,
+    OIDCGrantType,
+    OIDCResponseType,
+    OIDCTokenType,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
-  GetOIDCInformationResponse,
-  UpdateAPIAppConfigRequest,
-  UpdateOIDCAppConfigRequest,
+    GetOIDCInformationResponse,
+    UpdateAPIAppConfigRequest,
+    UpdateOIDCAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -42,15 +42,15 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
-  BASIC_AUTH_METHOD,
-  CODE_METHOD,
-  CUSTOM_METHOD,
-  getAuthMethodFromPartialConfig,
-  getPartialConfigFromAuthMethod,
-  IMPLICIT_METHOD,
-  PK_JWT_METHOD,
-  PKCE_METHOD,
-  POST_METHOD,
+    BASIC_AUTH_METHOD,
+    CODE_METHOD,
+    CUSTOM_METHOD,
+    getAuthMethodFromPartialConfig,
+    getPartialConfigFromAuthMethod,
+    IMPLICIT_METHOD,
+    PK_JWT_METHOD,
+    PKCE_METHOD,
+    POST_METHOD,
 } from '../authmethods';
 
 @Component({
@@ -126,7 +126,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
   public copied: string = '';
 
-  public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false }];
+  public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
   constructor(
@@ -254,11 +254,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
               const breadcrumbs = [
                 new Breadcrumb({
-                  type: BreadcrumbType.IAM,
-                  name: 'IAM',
-                  routerLink: ['/system'],
-                }),
-                new Breadcrumb({
                   type: BreadcrumbType.ORG,
                   routerLink: ['/org'],
                 }),
@@ -281,10 +276,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.getAuthMethodOptions('OIDC');
 
                 this.settingsList = [
-                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
-                  { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE', featureRequired: false },
-                  { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS', featureRequired: false },
-                  { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
+                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                  { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
+                  { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
+                  { id: 'urls', i18nKey: 'APP.URLS' },
                 ];
 
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
@@ -302,12 +297,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
 
                 if (this.initialAuthMethod === 'BASIC') {
-                  this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS', featureRequired: false }];
+                  this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
                   this.currentSetting = 'urls';
                 } else {
                   this.settingsList = [
-                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
-                    { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                    { id: 'urls', i18nKey: 'APP.URLS' },
                   ];
                 }
                 this.currentAuthMethod = this.initialAuthMethod;
@@ -591,12 +586,12 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             this.currentAuthMethod = this.authMethodFromPartialConfig(config);
 
             if (this.currentAuthMethod === 'BASIC') {
-              this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS', featureRequired: false }];
+              this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
               this.currentSetting = 'urls';
             } else {
               this.settingsList = [
-                { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
-                { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
+                { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                { id: 'urls', i18nKey: 'APP.URLS' },
               ];
               this.currentSetting = 'configuration';
             }

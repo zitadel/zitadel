@@ -3,14 +3,10 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/instance.proto";
-import "zitadel/text.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/duration.proto";
-
 import "protoc-gen-openapiv2/options/annotations.proto";
-
 import "validate/validate.proto";
 
 package zitadel.system.v1;
@@ -346,6 +342,7 @@ message AddInstanceRequest {
     Email owner_email = 5 [(validate.rules).message.required = true];
     Profile owner_profile = 6 [(validate.rules).message.required = false];
     Password owner_password = 7 [(validate.rules).message.required = false];
+    string default_language = 8 [(validate.rules).string = {max_len: 10}];
 }
 
 message AddInstanceResponse {

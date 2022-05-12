@@ -551,17 +551,6 @@ service AuthService {
         };
     }
 
-    // Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
-    rpc ListMyZitadelFeatures(ListMyZitadelFeaturesRequest) returns (ListMyZitadelFeaturesResponse) {
-        option (google.api.http) = {
-            post: "/features/zitadel/me/_search"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
     // Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g ORG_OWNER)
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
@@ -1001,13 +990,6 @@ message ListMyProjectOrgsRequest {
 message ListMyProjectOrgsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.org.v1.Org result = 2;
-}
-
-//This is an empty request
-message ListMyZitadelFeaturesRequest {}
-
-message ListMyZitadelFeaturesResponse {
-    repeated string result = 1;
 }
 
 //This is an empty request

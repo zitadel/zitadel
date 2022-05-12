@@ -46,7 +46,8 @@
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
-    "INSTANCEOVERVIEW": "Instance Overview",
+    "INSTANCEOVERVIEW": "Instance",
+    "ORGS": "Organizations",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
@@ -66,7 +67,8 @@
     "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
-    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts"
+    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts",
+    "SETTINGS": "Settings"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",
@@ -112,7 +114,6 @@
     "NEWVALUE": "New Value",
     "RESTORE": "Restore",
     "CONTINUEWITHOUTSAVE": "Continue without saving",
-    "GOTOFEATURES": "Go to features",
     "OF": "of",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
@@ -531,7 +532,7 @@
       "6": "Initial"
     },
     "SEARCH": {
-      "ADDITIONAL": "User Name (selected organization)",
+      "ADDITIONAL": "Loginname (current organization)",
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {
@@ -670,6 +671,8 @@
     }
   },
   "IAM": {
+    "TITLE": "Instance",
+    "DESCRIPTION": "Manage your instance settings and Organizations",
     "POLICIES": {
       "TITLE": "System Policies and Access Settings",
       "DESCRIPTION": "Manage your global Policies and Management Access Settings."
@@ -680,7 +683,7 @@
     },
     "MEMBER": {
       "TITLE": "Managers",
-      "DESCRIPTION": "These Managers are allowed to make changes in your system."
+      "DESCRIPTION": "These Managers are allowed to make changes in your instance."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -760,6 +763,10 @@
       "USEPASSWORD": "Set Initial Password",
       "USEPASSWORDDESC": "The user does not have to set the password during initialization."
     },
+    "LIST": {
+      "TITLE": "Organizations",
+      "DESCRIPTION": "These are the organizations on your instance"
+    },
     "DOMAINS": {
       "NEW": "Add Domain",
       "TITLE": "Domains",
@@ -792,6 +799,76 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set."
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Instance Settings",
+      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
+    },
+    "ORG": {
+      "TITLE": "Organization Settings",
+      "DESCRIPTION": "These settings extend and overwrite your instance settings."
+    },
+    "LIST": {
+      "GENERAL": "General",
+      "LOGIN": "Login Behaviour and Security",
+      "LOCKOUT": "Lockout",
+      "COMPLEXITY": "Password complexity",
+      "NOTIFICATIONS": "Notification providers and SMTP",
+      "MESSAGETEXTS": "Message Texts",
+      "IDP": "Identity Providers",
+      "LOGINTEXTS": "Login Interface Texts",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Privacy Policy",
+      "OIDC": "OIDC Configuration"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Notifications",
+      "LOGIN": "Login and Access",
+      "TEXTS": "Texts and Languages",
+      "APPEARANCE": "Appearance",
+      "OTHER": "Other"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Default Language",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "SMTP Settings",
+      "SENDERADDRESS": "Sender Email address",
+      "SENDERNAME": "Sender Name",
+      "HOST": "Host",
+      "USER": "User",
+      "PASSWORD": "Password",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Saved successfully!"
+    },
+    "SMS": {
+      "TITLE": "SMS Settings",
+      "PROVIDERS": "Providers",
+      "PROVIDER": "SMS Provider",
+      "ADDPROVIDER": "Add SMS Provider",
+      "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio added successfully."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Settings",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "hours",
+      "INDAYS": "Days"
     }
   },
   "POLICY": {
@@ -966,7 +1043,7 @@
         "UPDATED": "Custom Texts saved."
       }
     },
-    "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
+    "DEFAULTLABEL": "The current settings corresponds to the standard of your Instance.",
     "BTN_INSTALL": "Setup",
     "BTN_EDIT": "Modify",
     "DATA": {
@@ -995,7 +1072,7 @@
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark"
     },
-    "RESET": "Reset Policy",
+    "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
     "TOAST": {
       "SET": "Policy set successfully!",

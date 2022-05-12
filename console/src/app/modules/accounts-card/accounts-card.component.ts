@@ -78,11 +78,4 @@ export class AccountsCardComponent implements OnInit {
     this.authService.signout();
     this.closedCard.emit();
   }
-
-  public get isOnSystem(): boolean {
-    return (
-      ['/system', '/views', '/failed-events', '/system/members', '/system/features'].includes(this.router.url) ||
-      new RegExp('/system/policy/*').test(this.router.url)
-    );
-  }
 }

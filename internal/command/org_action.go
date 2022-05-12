@@ -15,10 +15,6 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 	if !addAction.IsValid() {
 		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
 	}
-	err = c.checkAdditionalActionAllowed(ctx, resourceOwner)
-	if err != nil {
-		return "", nil, err
-	}
 	addAction.AggregateID, err = c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -42,27 +38,6 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 		return "", nil, err
 	}
 	return actionModel.AggregateID, writeModelToObjectDetails(&actionModel.WriteModel), nil
-}
-
-func (c *Commands) checkAdditionalActionAllowed(ctx context.Context, resourceOwner string) error {
-	features, err := c.getOrgFeaturesOrDefault(ctx, resourceOwner)
-	if err != nil {
-		return err
-	}
-	existingActions, err := c.getActionsByOrgWriteModelByID(ctx, resourceOwner)
-	if err != nil {
-		return err
-	}
-	activeActions := make([]*ActionWriteModel, 0, len(existingActions.Actions))
-	for _, existingAction := range existingActions.Actions {
-		if existingAction.State == domain.ActionStateActive {
-			activeActions = append(activeActions, existingAction)
-		}
-	}
-	if features.ActionsAllowed == domain.ActionsAllowedUnlimited || len(activeActions) < features.MaxActions {
-		return nil
-	}
-	return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dfwg2", "Errors.Action.MaxAllowed")
 }
 
 func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action, resourceOwner string) (*domain.ObjectDetails, error) {
@@ -144,10 +119,6 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 	}
 	if existingAction.State != domain.ActionStateInactive {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J53zh", "Errors.Action.NotInactive")
-	}
-	err = c.checkAdditionalActionAllowed(ctx, resourceOwner)
-	if err != nil {
-		return nil, err
 	}
 
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)

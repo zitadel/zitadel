@@ -1,14 +1,14 @@
-h3 {
+.app-grid-h2 {
   font-weight: 400;
   font-size: 16px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin: 2rem 0 1rem 0;
 }
 
 .app-grid-header {
   display: flex;
   align-items: center;
-  padding-top: 1rem;
 
   .fill-space {
     flex: 1;
@@ -18,7 +18,7 @@ h3 {
 .app-container {
   display: flex;
   flex-wrap: wrap;
-  margin: 0 -1rem;
+  margin-left: -1rem;
   padding-bottom: 2rem;
 
   .sp-container {

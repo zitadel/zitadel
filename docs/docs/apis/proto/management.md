@@ -1705,18 +1705,6 @@ remove a list of user grants in one request
     DELETE: /user_grants/_bulk
 
 
-### GetFeatures
-
-> **rpc** GetFeatures([GetFeaturesRequest](#getfeaturesrequest))
-[GetFeaturesResponse](#getfeaturesresponse)
-
-
-
-
-
-    GET: /features
-
-
 ### GetOrgIAMPolicy
 
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
@@ -4616,23 +4604,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.DomainPolicy | - |  |
-
-
-
-
-### GetFeaturesRequest
-
-
-
-
-
-### GetFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| features |  zitadel.features.v1.Features | - |  |
 
 
 

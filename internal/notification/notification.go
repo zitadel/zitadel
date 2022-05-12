@@ -24,7 +24,8 @@ func Start(config Config,
 	command *command.Commands,
 	queries *query.Queries,
 	dbClient *sql.DB,
-	assetsPrefix string,
+	assetsPrefix,
+	fileSystemPath string,
 	userEncryption crypto.EncryptionAlgorithm,
 	smtpEncryption crypto.EncryptionAlgorithm,
 	smsEncryption crypto.EncryptionAlgorithm,
@@ -32,6 +33,6 @@ func Start(config Config,
 	statikFS, err := fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
 
-	_, err = eventsourcing.Start(config.Repository, statikFS, externalPort, externalSecure, command, queries, dbClient, assetsPrefix, userEncryption, smtpEncryption, smsEncryption)
+	_, err = eventsourcing.Start(config.Repository, statikFS, externalPort, externalSecure, command, queries, dbClient, assetsPrefix, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	logging.OnError(err).Panic("unable to start app")
 }

@@ -59,7 +59,8 @@ func newNotification(
 	externalPort uint16,
 	externalSecure bool,
 	statikDir http.FileSystem,
-	assetsPrefix string,
+	assetsPrefix,
+	fileSystemPath string,
 	userEncryption crypto.EncryptionAlgorithm,
 	smtpEncryption crypto.EncryptionAlgorithm,
 	smsEncryption crypto.EncryptionAlgorithm,
@@ -75,6 +76,7 @@ func newNotification(
 		smsTokenCrypto:     smsEncryption,
 		externalSecure:     externalSecure,
 		externalPort:       externalPort,
+		fileSystemPath:     fileSystemPath,
 	}
 
 	h.subscribe()

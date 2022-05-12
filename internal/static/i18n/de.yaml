@@ -379,8 +379,6 @@ Errors:
       AlreadyExists: Schritt gestartet existiert bereits
     Done:
       AlreadyExists: Schritt ausgeführt existiert bereits
-  Features:
-    NotChanged: Feature hat nicht geändert
   CustomText:
     AlreadyExists: Kundenspezifischer Text existiert bereits
     Invalid: Kundenspezifischer Text ist ungültig
@@ -613,9 +611,6 @@ EventTypes:
         set: Primäre Domäne gesetzt
       reserved: Domäne reserviert
       released: Domäne freigegeben
-    features:
-      set: Feature hinzugefügt
-      removed: Feature entfernt
     name:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben

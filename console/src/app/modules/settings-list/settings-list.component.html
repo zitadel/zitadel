@@ -1,0 +1,45 @@
+<cnsl-sidenav
+  [title]="title"
+  [description]="description"
+  [indented]="true"
+  [(ngModel)]="currentSetting"
+  [settingsList]="settingsList"
+  queryParam="id"
+>
+  <ng-container *ngIf="currentSetting === 'general' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-general-settings></cnsl-general-settings>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'complexity'">
+    <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'lockout'">
+    <cnsl-password-lockout-policy [serviceType]="serviceType"></cnsl-password-lockout-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'login'">
+    <!-- <cnsl-org-iam-policy [serviceType]="serviceType"></cnsl-org-iam-policy> -->
+    <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'idp'">
+    <cnsl-idp-settings [serviceType]="serviceType"></cnsl-idp-settings>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'notifications' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-notification-settings [serviceType]="serviceType"></cnsl-notification-settings>
+  </ng-container>
+
+  <ng-container *ngIf="currentSetting === 'oidc' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-oidc-configuration></cnsl-oidc-configuration>
+  </ng-container>
+
+  <ng-container *ngIf="currentSetting === 'branding'">
+    <cnsl-private-labeling-policy [serviceType]="serviceType"></cnsl-private-labeling-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'messagetexts'">
+    <cnsl-message-texts [serviceType]="serviceType"></cnsl-message-texts>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'logintexts'">
+    <cnsl-login-texts [serviceType]="serviceType"></cnsl-login-texts>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'privacypolicy'">
+    <cnsl-privacy-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-privacy-policy>
+  </ng-container>
+</cnsl-sidenav>

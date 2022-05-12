@@ -2,7 +2,7 @@
   [loading]="loading$ | async"
   (refreshed)="refreshPage()"
   [dataSize]="dataSource.data.length"
-  [emitRefreshOnPreviousRoutes]="['/system/idp/create']"
+  [emitRefreshOnPreviousRoutes]="['/instance/idp/create']"
   [timestamp]="idpResult?.details?.viewTimestamp"
   [selection]="selection"
   [hideRefresh]="true"
@@ -14,7 +14,17 @@
       class="margin-right bg-state inactive"
       mat-stroked-button
       *ngIf="selection.hasValue()"
-      [disabled]="disabled"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.idp.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'org.idp.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
     >
       {{ 'IDP.DEACTIVATE' | translate }}
     </button>
@@ -24,12 +34,38 @@
       class="bg-state active"
       mat-stroked-button
       *ngIf="selection.hasValue()"
-      [disabled]="disabled"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.idp.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'org.idp.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
     >
       {{ 'IDP.ACTIVATE' | translate }}
     </button>
 
-    <a [routerLink]="createRouterLink" class="cnsl-action-button" color="primary" mat-raised-button [disabled]="disabled">
+    <a
+      [routerLink]="createRouterLink"
+      class="cnsl-action-button"
+      color="primary"
+      mat-raised-button
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.idp.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'org.idp.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
       <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
     </a>
   </div>
@@ -193,7 +229,22 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-header-row
+        *matHeaderRowDef="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.idp.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+              ? 'org.idp.write'
+              : ''
+          ]
+          | hasRole
+          | async)
+            ? displayedColumnsWithActions
+            : displayedColumns
+        "
+      ></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>

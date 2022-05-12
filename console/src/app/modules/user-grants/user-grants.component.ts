@@ -84,7 +84,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     'actions',
   ];
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataSource = new UserGrantsDataSource(this.userService);
 
     switch (this.context) {

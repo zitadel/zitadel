@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -29,34 +31,11 @@ const (
 )
 
 type InstanceSetup struct {
-	zitadel      ZitadelConfig
-	InstanceName string
-	CustomDomain string
-	Org          OrgSetup
-	Features     struct {
-		TierName                 string
-		TierDescription          string
-		Retention                time.Duration
-		State                    domain.FeaturesState
-		StateDescription         string
-		LoginPolicyFactors       bool
-		LoginPolicyIDP           bool
-		LoginPolicyPasswordless  bool
-		LoginPolicyRegistration  bool
-		LoginPolicyUsernameLogin bool
-		LoginPolicyPasswordReset bool
-		PasswordComplexityPolicy bool
-		LabelPolicyPrivateLabel  bool
-		LabelPolicyWatermark     bool
-		CustomDomain             bool
-		PrivacyPolicy            bool
-		MetadataUser             bool
-		CustomTextMessage        bool
-		CustomTextLogin          bool
-		LockoutPolicy            bool
-		ActionsAllowed           domain.ActionsAllowed
-		MaxActions               int
-	}
+	zitadel          ZitadelConfig
+	InstanceName     string
+	CustomDomain     string
+	DefaultLanguage  language.Tag
+	Org              OrgSetup
 	SecretGenerators struct {
 		PasswordSaltCost         uint
 		ClientSecret             *crypto.GeneratorConfig
@@ -190,32 +169,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
-		addInstance(instanceAgg, setup.InstanceName),
-		SetDefaultFeatures(
-			instanceAgg,
-			setup.Features.TierName,
-			setup.Features.TierDescription,
-			setup.Features.State,
-			setup.Features.StateDescription,
-			setup.Features.Retention,
-			setup.Features.LoginPolicyFactors,
-			setup.Features.LoginPolicyIDP,
-			setup.Features.LoginPolicyPasswordless,
-			setup.Features.LoginPolicyRegistration,
-			setup.Features.LoginPolicyUsernameLogin,
-			setup.Features.LoginPolicyPasswordReset,
-			setup.Features.PasswordComplexityPolicy,
-			setup.Features.LabelPolicyPrivateLabel,
-			setup.Features.LabelPolicyWatermark,
-			setup.Features.CustomDomain,
-			setup.Features.PrivacyPolicy,
-			setup.Features.MetadataUser,
-			setup.Features.CustomTextMessage,
-			setup.Features.CustomTextLogin,
-			setup.Features.LockoutPolicy,
-			setup.Features.ActionsAllowed,
-			setup.Features.MaxActions,
-		),
+		addInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
 		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
@@ -381,11 +335,30 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}, nil
 }
 
-func addInstance(a *instance.Aggregate, instanceName string) preparation.Validation {
+func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareSetDefaultLanguage(instanceAgg, defaultLanguage)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func addInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
 				instance.NewInstanceAddedEvent(ctx, &a.Aggregate, instanceName),
+				instance.NewDefaultLanguageSetEvent(ctx, &a.Aggregate, defaultLanguage),
 			}, nil
 		}, nil
 	}
@@ -433,4 +406,36 @@ func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggrega
 		return nil, errors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
 	}
 	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
+}
+
+func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if defaultLanguage == language.Und {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			if writeModel.DefaultLanguage == defaultLanguage {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-DS3rq", "Errors.Instance.NotChanged")
+			}
+			return []eventstore.Command{instance.NewDefaultLanguageSetEvent(ctx, &a.Aggregate, defaultLanguage)}, nil
+		}, nil
+	}
+}
+
+func getInstanceWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (*InstanceWriteModel, error) {
+	writeModel := NewInstanceWriteModel(authz.GetInstance(ctx).InstanceID())
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return writeModel, nil
+	}
+	writeModel.AppendEvents(events...)
+	err = writeModel.Reduce()
+	return writeModel, err
 }
