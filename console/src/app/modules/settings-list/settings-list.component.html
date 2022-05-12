@@ -30,6 +30,10 @@
     <cnsl-oidc-configuration></cnsl-oidc-configuration>
   </ng-container>
 
+  <ng-container *ngIf="currentSetting === 'secrets' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-secret-generator></cnsl-secret-generator>
+  </ng-container>
+
   <ng-container *ngIf="currentSetting === 'branding'">
     <cnsl-private-labeling-policy [serviceType]="serviceType"></cnsl-private-labeling-policy>
   </ng-container>

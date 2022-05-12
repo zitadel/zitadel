@@ -821,7 +821,8 @@
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
-      "OIDC": "OIDC Configuration"
+      "OIDC": "OIDC Token lifetime e scadenza",
+      "SECRETS": "Aspetto dei segreti"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
