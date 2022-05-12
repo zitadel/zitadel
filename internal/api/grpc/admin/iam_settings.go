@@ -56,7 +56,7 @@ func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigR
 }
 
 func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
-	details, err := s.command.ChangeSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), UpdateSMTPToConfig(req))
+	details, err := s.command.ChangeSMTPConfig(ctx, UpdateSMTPToConfig(req))
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 }
 
 func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
-	details, err := s.command.ChangeSMTPConfigPassword(ctx, authz.GetInstance(ctx).InstanceID(), req.Password)
+	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.Password)
 	if err != nil {
 		return nil, err
 	}
