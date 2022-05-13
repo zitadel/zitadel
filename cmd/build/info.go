@@ -3,7 +3,7 @@ package build
 import "time"
 
 var (
-	version  = "dev"
+	version  = ""
 	commit   = ""
 	date     = ""
 	dateTime time.Time
