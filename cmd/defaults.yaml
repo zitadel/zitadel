@@ -98,8 +98,8 @@ Login:
 
 Console:
   ShortCache:
-    MaxAge: 5m
-    SharedMaxAge: 15m
+    MaxAge: 0m
+    SharedMaxAge: 5m
   LongCache:
     MaxAge: 12h
     SharedMaxAge: 168h

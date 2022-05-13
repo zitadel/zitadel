@@ -21,15 +21,15 @@ type OrgSetup struct {
 	Human AddHuman
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDetails, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (string, *domain.ObjectDetails, error) {
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	userID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	orgAgg := org.NewAggregate(orgID)
@@ -41,14 +41,14 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDet
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 	)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	return &domain.ObjectDetails{
+	return userID, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,

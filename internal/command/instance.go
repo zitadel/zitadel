@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -96,8 +97,9 @@ type InstanceSetup struct {
 		MaxAttempts              uint64
 		ShouldShowLockoutFailure bool
 	}
-	EmailTemplate []byte
-	MessageTexts  []*domain.CustomMessageText
+	EmailTemplate     []byte
+	MessageTexts      []*domain.CustomMessageText
+	SMTPConfiguration *smtp.EmailConfig
 }
 
 type ZitadelConfig struct {
@@ -259,6 +261,20 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		IDTokenRoleAssertion:     false,
 		IDTokenUserinfoAssertion: false,
 		ClockSkew:                0,
+	}
+
+	if setup.SMTPConfiguration != nil {
+		validations = append(validations,
+			c.prepareAddSMTPConfig(
+				instanceAgg,
+				setup.SMTPConfiguration.From,
+				setup.SMTPConfiguration.FromName,
+				setup.SMTPConfiguration.SMTP.Host,
+				setup.SMTPConfiguration.SMTP.User,
+				[]byte(setup.SMTPConfiguration.SMTP.Password),
+				setup.SMTPConfiguration.Tls,
+			),
+		)
 	}
 
 	validations = append(validations,

@@ -61,6 +61,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 
 	steps.S3DefaultInstance.instanceSetup = config.DefaultInstance
 	steps.S3DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
+	steps.S3DefaultInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
 	steps.S3DefaultInstance.masterKey = masterKey
 	steps.S3DefaultInstance.db = dbClient
 	steps.S3DefaultInstance.es = eventstoreClient
