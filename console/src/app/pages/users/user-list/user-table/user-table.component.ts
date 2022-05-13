@@ -241,7 +241,12 @@ export class UserTableComponent implements OnInit {
 
   public applySearchQuery(searchQueries: SearchQuery[]): void {
     this.selection.clear();
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, searchQueries);
+    this.getData(
+      this.paginator ? this.paginator.pageSize : this.INITIAL_PAGE_SIZE,
+      this.paginator ? this.paginator.pageIndex * this.paginator.pageSize : 0,
+      this.type,
+      searchQueries,
+    );
   }
 
   public deleteUser(user: User.AsObject): void {

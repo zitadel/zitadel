@@ -3,10 +3,11 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { MatDialog } from '@angular/material/dialog';
 import {
     AddSMSProviderTwilioRequest,
+    UpdateSMTPConfigPasswordRequest,
     UpdateSMTPConfigPasswordResponse,
     UpdateSMTPConfigRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
+import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -22,7 +23,8 @@ import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-
 export class NotificationSettingsComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
   public smsProviders: SMSProvider.AsObject[] = [];
-
+  public logNotificationProvider!: DebugNotificationProvider.AsObject;
+  public fileNotificationProvider!: DebugNotificationProvider.AsObject;
   public loading: boolean = false;
   public form!: FormGroup;
 
@@ -71,6 +73,30 @@ export class NotificationSettingsComponent implements OnInit {
         console.log(this.smsProviders);
       }
     });
+
+    this.service
+      .getLogNotificationProvider()
+      .then((logNotificationProvider) => {
+        if (logNotificationProvider.provider) {
+          this.logNotificationProvider = logNotificationProvider.provider;
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+
+    this.service
+      .getFileSystemNotificationProvider()
+      .then((fileNotificationProvider) => {
+        if (fileNotificationProvider.provider) {
+          console.log(fileNotificationProvider);
+          this.fileNotificationProvider = fileNotificationProvider.provider;
+        }
+      })
+      .catch((error) => {
+        console.log('hehe');
+        this.toast.showError(error);
+      });
   }
 
   private updateData(): Promise<UpdateSMTPConfigPasswordResponse.AsObject> | any {
@@ -81,18 +107,16 @@ export class NotificationSettingsComponent implements OnInit {
     req.setTls(this.tls?.value ?? false);
     req.setUser(this.user?.value ?? '');
 
-    console.log(req.toObject());
-
-    // return this.service.updateSMTPConfig(req).then(() => {
-    //   let passwordReq: UpdateSMTPConfigPasswordRequest;
-    //   if (this.password) {
-    //     passwordReq = new UpdateSMTPConfigPasswordRequest();
-    //     passwordReq.setPassword(this.password.value);
-    //     return this.service.updateSMTPConfigPassword(passwordReq);
-    //   } else {
-    //     return;
-    //   }
-    // });
+    return this.service.updateSMTPConfig(req).then(() => {
+      let passwordReq: UpdateSMTPConfigPasswordRequest;
+      if (this.password) {
+        passwordReq = new UpdateSMTPConfigPasswordRequest();
+        passwordReq.setPassword(this.password.value);
+        return this.service.updateSMTPConfigPassword(passwordReq);
+      } else {
+        return;
+      }
+    });
   }
 
   public savePolicy(): void {

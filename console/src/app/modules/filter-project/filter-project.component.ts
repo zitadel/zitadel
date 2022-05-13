@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
+import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { ProjectNameQuery, ProjectQuery, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
@@ -17,13 +18,43 @@ enum SubQuery {
   templateUrl: './filter-project.component.html',
   styleUrls: ['./filter-project.component.scss'],
 })
-export class FilterProjectComponent extends FilterComponent {
+export class FilterProjectComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: ProjectQuery[] = [];
 
   public states: ProjectState[] = [ProjectState.PROJECT_STATE_ACTIVE, ProjectState.PROJECT_STATE_INACTIVE];
   constructor(router: Router, route: ActivatedRoute) {
     super(router, route);
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
+      const { filter } = params;
+      if (filter) {
+        const stringifiedFilters = filter as string;
+        const filters: ProjectQuery.AsObject[] = JSON.parse(stringifiedFilters) as ProjectQuery.AsObject[];
+
+        const projectQueries = filters.map((filter) => {
+          if (filter.nameQuery) {
+            const nameQuery = new ProjectNameQuery();
+
+            const projectQuery = new ProjectQuery();
+            nameQuery.setName(filter.nameQuery.name);
+            nameQuery.setMethod(filter.nameQuery.method);
+
+            projectQuery.setNameQuery(nameQuery);
+            return projectQuery;
+          } else {
+            return undefined;
+          }
+        });
+
+        this.searchQueries = projectQueries.filter((q) => q !== undefined) as ProjectQuery[];
+        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        // this.showFilter = true;
+        // this.filterOpen.emit(true);
+      }
+    });
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {

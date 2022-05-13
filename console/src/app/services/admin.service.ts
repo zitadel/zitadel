@@ -573,9 +573,8 @@ export class AdminService {
     return this.grpcService.admin.getLogNotificationProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public getFileSystemNotificationProvider(
-    req: GetFileSystemNotificationProviderRequest,
-  ): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+  public getFileSystemNotificationProvider(): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+    const req = new GetFileSystemNotificationProviderRequest();
     return this.grpcService.admin.getFileSystemNotificationProvider(req, null).then((resp) => resp.toObject());
   }
 
