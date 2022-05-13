@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
-  DisplayNameQuery,
-  EmailQuery,
-  SearchQuery as UserSearchQuery,
-  StateQuery,
-  UserNameQuery,
-  UserState,
+    DisplayNameQuery,
+    EmailQuery,
+    SearchQuery as UserSearchQuery,
+    StateQuery,
+    UserNameQuery,
+    UserState,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
@@ -36,8 +37,8 @@ export class FilterUserComponent extends FilterComponent {
     UserState.USER_STATE_LOCKED,
     UserState.USER_STATE_SUSPEND,
   ];
-  constructor() {
-    super();
+  constructor(router: Router, route: ActivatedRoute) {
+    super(router, route);
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {

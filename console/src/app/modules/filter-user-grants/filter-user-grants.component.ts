@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
-  DisplayNameQuery,
-  UserGrantOrgNameQuery,
-  UserGrantProjectNameQuery,
-  UserGrantQuery,
-  UserNameQuery,
+    DisplayNameQuery,
+    UserGrantOrgNameQuery,
+    UserGrantProjectNameQuery,
+    UserGrantQuery,
+    UserNameQuery,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
@@ -26,8 +27,9 @@ enum SubQuery {
 export class FilterUserGrantsComponent extends FilterComponent {
   public SubQuery: any = SubQuery;
   public searchQueries: UserGrantQuery[] = [];
-  constructor() {
-    super();
+
+  constructor(router: Router, route: ActivatedRoute) {
+    super(router, route);
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {

@@ -1,5 +1,4 @@
 <cnsl-refresh-table
-  *ngIf="dataSource"
   [hideRefresh]="true"
   (refreshed)="refresh()"
   [dataSize]="dataSource.data.length"
@@ -101,6 +100,6 @@
     [length]="totalResult || 0"
     [pageSize]="initialLimit"
     [pageSizeOptions]="[10, 20, 50, 100]"
-    (page)="changePage($event)"
+    (page)="changePage()"
   ></cnsl-paginator>
 </cnsl-refresh-table>

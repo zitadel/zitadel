@@ -28,6 +28,9 @@ export class NotificationSettingsComponent implements OnInit {
 
   public SMSProviderConfigState: any = SMSProviderConfigState;
   public InfoSectionType: any = InfoSectionType;
+
+  // show available providers
+
   constructor(
     private service: AdminService,
     private dialog: MatDialog,
@@ -132,6 +135,10 @@ export class NotificationSettingsComponent implements OnInit {
           });
       }
     });
+  }
+
+  public get twilio(): SMSProvider.AsObject | undefined {
+    return this.smsProviders.find((p) => p.twilio);
   }
 
   public get senderAddress(): AbstractControl | null {

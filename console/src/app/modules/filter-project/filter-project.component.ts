@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { ProjectNameQuery, ProjectQuery, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
@@ -21,8 +22,8 @@ export class FilterProjectComponent extends FilterComponent {
   public searchQueries: ProjectQuery[] = [];
 
   public states: ProjectState[] = [ProjectState.PROJECT_STATE_ACTIVE, ProjectState.PROJECT_STATE_INACTIVE];
-  constructor() {
-    super();
+  constructor(router: Router, route: ActivatedRoute) {
+    super(router, route);
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
