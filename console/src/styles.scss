@@ -262,7 +262,7 @@ $caos-dark-theme-background: (
   moz-toolbar: map_get($caos-dark-background, 500),
   footer: #00000020,
   metadata-section: #00000020,
-  alert: #fbbf24//rgb(252, 211, 77),
+  alert: #fbbf24,
 );
 
 $caos-light-theme-background: (
@@ -318,7 +318,6 @@ $caos-dark-theme-foreground: (
   infosection: #f0f0f0,
   warninfosection: #ffc1c1,
   alertinfosection: rgb(251, 191, 36),
-  //rgb(146, 64, 14),
   successinfosection: #cbf4c9,
   toolbar-items: map-get(map-get($caos-dark-primary, contrast), 500),
   slash: #ffffff6e,
