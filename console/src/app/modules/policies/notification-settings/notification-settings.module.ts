@@ -10,6 +10,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSettingsComponent } from './notification-settings.component';
@@ -19,6 +20,7 @@ import { NotificationSettingsComponent } from './notification-settings.component
   imports: [
     CommonModule,
     CardModule,
+    InfoSectionModule,
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,

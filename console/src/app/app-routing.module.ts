@@ -16,6 +16,7 @@ const routes: Routes = [
   {
     path: 'orgs',
     loadChildren: () => import('./pages/org-list/org-list.module').then((m) => m.OrgListModule),
+    canActivate: [AuthGuard],
   },
   {
     path: 'granted-projects',

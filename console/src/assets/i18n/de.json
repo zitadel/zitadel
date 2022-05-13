@@ -847,7 +847,8 @@
       "USER": "Benutzer",
       "PASSWORD": "Passwort",
       "TLS": "Transport Layer Security (TLS)",
-      "SAVED": "Erfolgreich gespeichert."
+      "SAVED": "Erfolgreich gespeichert.",
+      "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
     },
     "SMS": {
       "TITLE": "SMS Einstellungen",

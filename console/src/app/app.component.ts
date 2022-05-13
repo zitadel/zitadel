@@ -164,6 +164,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.matIconRegistry.addSvgIcon('mdi_symbol', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'));
 
     this.matIconRegistry.addSvgIcon(
+      'mdi_shield_alert',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/shield-alert.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
       'mdi_numeric',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/numeric.svg'),
     );
@@ -349,7 +354,7 @@ export class AppComponent implements OnInit, OnDestroy {
   public changedOrg(org: Org.AsObject): void {
     this.loadPrivateLabelling();
     this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/org'],{fragment: org.id} );
+      this.router.navigate(['/org'], { fragment: org.id });
     });
   }
 

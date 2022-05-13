@@ -1,20 +1,20 @@
 <h1 mat-dialog-title class="title">
-  <span>{{ 'SETTING.SMS.ADDPROVIDER' | translate }}</span>
+  <span>{{ provider === SMSProviderType.Twilio ? 'Twilio' : ('SETTING.SMS.ADDPROVIDER' | translate) }}</span>
 </h1>
 <div mat-dialog-content>
-  <p class="desc cnsl-secondary-text">{{ 'SETTING.SMS.ADDPROVIDERDESCRIPTION' | translate }}</p>
+  <!-- <p class="desc cnsl-secondary-text">{{ 'SETTING.SMS.ADDPROVIDERDESCRIPTION' | translate }}</p> -->
 
-  <cnsl-form-field class="form-field" label="Access Code" required="true">
+  <!-- <cnsl-form-field class="form-field" label="Access Code" required="true">
     <cnsl-label>{{ 'MFA.TYPE' | translate }}</cnsl-label>
     <mat-select [(ngModel)]="provider">
       <mat-option *ngFor="let prov of availableSMSProviders" [value]="prov">
         <span *ngIf="prov === SMSProviderType.Twilio">Twilio</span>
       </mat-option>
     </mat-select>
-  </cnsl-form-field>
+  </cnsl-form-field> -->
 
   <form *ngIf="provider === SMSProviderType.Twilio" (ngSubmit)="closeDialogWithRequest()" [formGroup]="twilioForm">
-    <h2>Twilio</h2>
+    <!-- <h2>Twilio</h2> -->
 
     <cnsl-form-field class="sms-form-field" label="sid">
       <cnsl-label>{{ 'SETTING.SMS.TWILIO.SID' | translate }}</cnsl-label>
@@ -43,6 +43,6 @@
     color="primary"
     (click)="closeDialogWithRequest()"
   >
-    <span>{{ 'ACTIONS.OK' | translate }}</span>
+    <span>{{ 'ACTIONS.SAVE' | translate }}</span>
   </button>
 </div>

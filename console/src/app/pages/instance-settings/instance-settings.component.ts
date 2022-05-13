@@ -31,7 +31,7 @@ export class InstanceSettingsComponent {
   public settingsList: SidenavSetting[] = [
     GENERAL,
     // notifications
-    NOTIFICATIONS,
+    { showWarn: true, ...NOTIFICATIONS },
     // login
     LOGIN,
     COMPLEXITY,

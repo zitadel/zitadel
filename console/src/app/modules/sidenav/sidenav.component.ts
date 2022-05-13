@@ -9,6 +9,7 @@ export interface SidenavSetting {
   i18nKey: string;
   groupI18nKey?: string;
   requiredRoles?: { [serviceType in PolicyComponentServiceType]: string[] };
+  showWarn?: boolean;
 }
 
 @Component({

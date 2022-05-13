@@ -847,7 +847,8 @@
       "USER": "Utente",
       "PASSWORD": "Password",
       "TLS": "Transport Layer Security (TLS)",
-      "SAVED": "Salvato con successo!"
+      "SAVED": "Salvato con successo!",
+      "REQUIREDWARN": "Per inviare notifiche dal tuo dominio, devi inserire i tuoi dati SMTP."
     },
     "SMS": {
       "TITLE": "Impostazioni SMS",

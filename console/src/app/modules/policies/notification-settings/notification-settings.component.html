@@ -4,6 +4,10 @@
 
 <h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
 
+<cnsl-info-section *ngIf="!form.valid" class="info-section-warn" [fitWidth]="true" [type]="InfoSectionType.ALERT">{{
+  'SETTING.SMTP.REQUIREDWARN' | translate
+}}</cnsl-info-section>
+
 <form (ngSubmit)="savePolicy()" [formGroup]="form" autocomplete="off">
   <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
     <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>
@@ -50,26 +54,28 @@
 
 <br />
 <h2>{{ 'SETTING.SMS.TITLE' | translate }}</h2>
-<h3>{{ 'SETTING.SMS.PROVIDERS' | translate }}</h3>
 <div class="sms-providers">
-  <cnsl-card *ngFor="let provider of smsProviders" class="sms-card">
-    <div *ngIf="provider.twilio" class="sms-provider">
+  <cnsl-card class="sms-card" [nomargin]="true">
+    <div class="sms-provider">
       <h4 class="title">Twilio</h4>
-      <span class="cnsl-secondary-text">{{ 'SETTING.SMS.PROVIDER' | translate }}</span>
 
       <span
+        *ngIf="twilio"
         class="state"
         [ngClass]="{
-          active: provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
-          inactive: provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
+          active: twilio?.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
+          inactive: twilio?.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
         }"
       ></span>
+
+      <span class="fill-space"></span>
+      <button mat-icon-button (click)="addSMSProvider()"><i class="las la-pen"></i></button>
     </div>
   </cnsl-card>
-  <button mat-stroked-button (click)="addSMSProvider()">
+  <!-- <button mat-stroked-button (click)="addSMSProvider()">
     <div class="sms-card add">
       <mat-icon>add</mat-icon>
       <span>{{ 'ACTIONS.ADD' | translate }}</span>
     </div>
-  </button>
+  </button> -->
 </div>
