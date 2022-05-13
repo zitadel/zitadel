@@ -27,6 +27,8 @@ builds:
     goarch:
       - amd64
       - arm64
+    ldflags:
+      -s -w -X github.com/zitadel/zitadel/cmd/build.version={{.Version}} -X github.com/zitadel/zitadel/cmd/build.commit={{.Commit}} -X github.com/zitadel/zitadel/cmd/build.date={{.Date}}
       
 dist: .artifacts/goreleaser
 
