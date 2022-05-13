@@ -138,12 +138,6 @@ export class NotificationSettingsComponent implements OnInit {
 
   public addSMSProvider(): void {
     const dialogRef = this.dialog.open(DialogAddSMSProviderComponent, {
-      data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'IDP.DELETE_TITLE',
-        descriptionKey: 'IDP.DELETE_DESCRIPTION',
-      },
       width: '400px',
     });
 

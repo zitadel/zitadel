@@ -821,7 +821,8 @@
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
-      "OIDC": "OIDC Configuration"
+      "OIDC": "OIDC Token lifetime and expiration",
+      "SECRETS": "Secret Appearance"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -870,6 +871,27 @@
       "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
       "INHOURS": "hours",
       "INDAYS": "Days"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Appearance",
+      "TYPES": "Secret Types",
+      "TYPE": {
+        "1": "Initialization Mail",
+        "2": "Email verification",
+        "3": "Phone verification",
+        "4": "Password Reset",
+        "5": "Passwordless Initialization",
+        "6": "App Secret"
+      },
+      "ADDGENERATOR": "Define Secret Appearance",
+      "GENERATORTYPE": "Type",
+      "EXPIRY": "Expiration (in hours)",
+      "INCLUDEDIGITS": "Include Numbers",
+      "INCLUDESYMBOLS": "Include Symbols",
+      "INCLUDELOWERLETTERS": "Include Lower letters",
+      "INCLUDEUPPERLETTERS": "Include Upper letters",
+      "LENGTH": "Length",
+      "UPDATED": "Settings updated."
     }
   },
   "POLICY": {
