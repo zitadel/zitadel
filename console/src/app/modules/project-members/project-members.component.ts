@@ -77,11 +77,9 @@ export class ProjectMembersComponent {
                   }),
                   new Breadcrumb({
                     type: BreadcrumbType.PROJECT,
-                    // name: this.project.name,
                     param: { key: 'projectid', value: (this.project as Project.AsObject).id },
                     routerLink: ['/projects', (this.project as Project.AsObject).id],
                     isZitadel: isZitadel,
-                    hideNav: true,
                   }),
                 ];
                 breadcrumbService.setBreadcrumb(breadcrumbs);
