@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
@@ -61,7 +60,7 @@ func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 func (p *SMTPConfigProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: project.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.SMTPConfigAddedEventType,
