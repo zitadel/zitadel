@@ -2725,6 +2725,7 @@ message UpdateOIDCSettingsResponse {
 }
 
 // if name or domain is already in use, org is not unique
+// at least one argument has to be provided
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
@@ -2734,18 +2735,16 @@ message IsOrgUniqueRequest {
 	};
 
     string name = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"CAOS AG\"";
-            min_length: 1;
             max_length: 200;
         }
     ];
     string domain = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"caos.ch\"";
-            min_length: 1;
             max_length: 200;
         }
     ];

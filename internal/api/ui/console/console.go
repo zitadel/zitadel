@@ -8,12 +8,14 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/op"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -56,7 +58,30 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 		return ret, err
 	}
 
-	return i.fileSystem.Open("/index.html")
+	f, err := i.fileSystem.Open("/index.html")
+	if err != nil {
+		return nil, err
+	}
+	return &file{File: f}, nil
+}
+
+//file wraps the http.File and fs.FileInfo interfaces
+//to return the build.Date() as ModTime() of the file
+type file struct {
+	http.File
+	fs.FileInfo
+}
+
+func (f *file) ModTime() time.Time {
+	return build.Date()
+}
+
+func (f *file) Stat() (_ fs.FileInfo, err error) {
+	f.FileInfo, err = f.File.Stat()
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
@@ -119,7 +144,7 @@ func assetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMa
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			for _, file := range shortCacheFiles {
-				if r.URL.Path == file {
+				if r.URL.Path == file || isIndexOrSubPath(r.URL.Path) {
 					middleware.AssetsCacheInterceptor(shortMaxAge, shortSharedMaxAge, handler).ServeHTTP(w, r)
 					return
 				}
@@ -128,4 +153,9 @@ func assetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMa
 			return
 		})
 	}
+}
+
+func isIndexOrSubPath(path string) bool {
+	//files will have an extension
+	return !strings.Contains(path, ".")
 }

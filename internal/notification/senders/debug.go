@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 )
 
-func debugChannels(ctx context.Context, getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) (*Chain, error) {
+func debugChannels(ctx context.Context, getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) []channels.NotificationChannel {
 	var (
 		providers []channels.NotificationChannel
 	)
@@ -24,5 +24,5 @@ func debugChannels(ctx context.Context, getFileSystemProvider func(ctx context.C
 		providers = append(providers, log.InitStdoutChannel(*logProvider))
 	}
 
-	return chainChannels(providers...), nil
+	return providers
 }

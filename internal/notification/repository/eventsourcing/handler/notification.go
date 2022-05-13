@@ -483,6 +483,7 @@ func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, er
 	return &smtp.EmailConfig{
 		From:     config.SenderAddress,
 		FromName: config.SenderName,
+		Tls:      config.TLS,
 		SMTP: smtp.SMTP{
 			Host:     config.Host,
 			User:     config.User,
