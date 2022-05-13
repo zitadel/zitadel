@@ -57,7 +57,7 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	org := setUpOrgOrgToDomain(req.Org)                                                //TODO: handle domain
 	_ = org
 
-	objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
+	userID, objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
 		Name:  req.Org.Name,
 		Human: human,
 	})
@@ -66,6 +66,8 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	}
 	return &admin_pb.SetUpOrgResponse{
 		Details: object.DomainToAddDetailsPb(objectDetails),
+		OrgId:   objectDetails.ResourceOwner,
+		UserId:  userID,
 	}, nil
 }
 
