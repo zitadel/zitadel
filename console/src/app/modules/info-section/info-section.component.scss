@@ -10,23 +10,27 @@
   .info-section-row {
     display: flex;
     border-radius: 4px;
-    padding: .5rem 0;
+    padding: 0.5rem 0;
     padding-right: 1rem;
     font-size: 14px;
-    margin: .5rem 0;
+    margin: 0.5rem 0;
+
+    &.fit {
+      width: fit-content;
+    }
 
     .icon {
       margin-right: 1rem;
       height: 1.2rem;
       line-height: 1.2rem;
       font-size: 1.2rem;
-      margin-left: .5rem;
-      padding: .25rem 0;
+      margin-left: 0.5rem;
+      padding: 0.25rem 0;
     }
 
     .info-section-content {
       flex: 1;
-      padding: .25rem 0;
+      padding: 0.25rem 0;
     }
 
     &.info {
@@ -53,6 +57,15 @@
 
       .icon {
         color: map-get($foreground, warninfosection);
+      }
+    }
+
+    &.alert {
+      background-color: map-get($background, alertinfosection);
+      color: map-get($foreground, alertinfosection);
+
+      .icon {
+        color: map-get($foreground, alertinfosection);
       }
     }
   }

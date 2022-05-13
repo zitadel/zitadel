@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FilterOrgComponent } from './filter-org.component';
+import { SecretGeneratorComponent } from './secret-generator.component';
 
-describe('FilterOrgComponent', () => {
-  let component: FilterOrgComponent;
-  let fixture: ComponentFixture<FilterOrgComponent>;
+describe('OIDCConfigurationComponent', () => {
+  let component: SecretGeneratorComponent;
+  let fixture: ComponentFixture<SecretGeneratorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FilterOrgComponent],
+      declarations: [SecretGeneratorComponent],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FilterOrgComponent);
+    fixture = TestBed.createComponent(SecretGeneratorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

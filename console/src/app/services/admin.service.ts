@@ -77,6 +77,8 @@ import {
     GetPreviewLabelPolicyResponse,
     GetPrivacyPolicyRequest,
     GetPrivacyPolicyResponse,
+    GetSecretGeneratorRequest,
+    GetSecretGeneratorResponse,
     GetSMSProviderRequest,
     GetSMSProviderResponse,
     GetSMTPConfigRequest,
@@ -98,6 +100,8 @@ import {
     ListLoginPolicyMultiFactorsResponse,
     ListLoginPolicySecondFactorsRequest,
     ListLoginPolicySecondFactorsResponse,
+    ListSecretGeneratorsRequest,
+    ListSecretGeneratorsResponse,
     ListSMSProvidersRequest,
     ListSMSProvidersResponse,
     ListViewsRequest,
@@ -174,6 +178,8 @@ import {
     UpdatePasswordComplexityPolicyResponse,
     UpdatePrivacyPolicyRequest,
     UpdatePrivacyPolicyResponse,
+    UpdateSecretGeneratorRequest,
+    UpdateSecretGeneratorResponse,
     UpdateSMTPConfigPasswordRequest,
     UpdateSMTPConfigPasswordResponse,
     UpdateSMTPConfigRequest,
@@ -573,10 +579,24 @@ export class AdminService {
     return this.grpcService.admin.getLogNotificationProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public getFileSystemNotificationProvider(
-    req: GetFileSystemNotificationProviderRequest,
-  ): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+  public getFileSystemNotificationProvider(): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+    const req = new GetFileSystemNotificationProviderRequest();
     return this.grpcService.admin.getFileSystemNotificationProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  /* secrets generator */
+
+  public listSecretGenerators(): Promise<ListSecretGeneratorsResponse.AsObject> {
+    const req = new ListSecretGeneratorsRequest();
+    return this.grpcService.admin.listSecretGenerators(req, null).then((resp) => resp.toObject());
+  }
+
+  public getSecretGenerator(req: GetSecretGeneratorRequest): Promise<GetSecretGeneratorResponse.AsObject> {
+    return this.grpcService.admin.getSecretGenerator(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSecretGenerator(req: UpdateSecretGeneratorRequest): Promise<UpdateSecretGeneratorResponse.AsObject> {
+    return this.grpcService.admin.updateSecretGenerator(req, null).then((resp) => resp.toObject());
   }
 
   /* org iam */

@@ -17,6 +17,7 @@ import { PasswordComplexityPolicyModule } from '../policies/password-complexity-
 import { PasswordLockoutPolicyModule } from '../policies/password-lockout-policy/password-lockout-policy.module';
 import { PrivacyPolicyModule } from '../policies/privacy-policy/privacy-policy.module';
 import { PrivateLabelingPolicyModule } from '../policies/private-labeling-policy/private-labeling-policy.module';
+import { SecretGeneratorModule } from '../policies/secret-generator/secret-generator.module';
 import { SidenavModule } from '../sidenav/sidenav.module';
 import { SettingsListComponent } from './settings-list.component';
 
@@ -41,6 +42,7 @@ import { SettingsListComponent } from './settings-list.component';
     HasRolePipeModule,
     NotificationSettingsModule,
     OIDCConfigurationModule,
+    SecretGeneratorModule,
   ],
   exports: [SettingsListComponent],
 })
