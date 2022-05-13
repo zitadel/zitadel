@@ -24,6 +24,7 @@ type DefaultInstance struct {
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
+	smtpEncryptionKey *crypto.KeyConfig
 	masterKey         string
 	db                *sql.DB
 	es                *eventstore.Eventstore
@@ -42,8 +43,15 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 	if err = verifyKey(mig.userEncryptionKey, keyStorage); err != nil {
 		return err
 	}
-
 	userAlg, err := crypto.NewAESCrypto(mig.userEncryptionKey, keyStorage)
+	if err != nil {
+		return err
+	}
+
+	if err = verifyKey(mig.smtpEncryptionKey, keyStorage); err != nil {
+		return err
+	}
+	smtpEncryption, err := crypto.NewAESCrypto(mig.smtpEncryptionKey, keyStorage)
 	if err != nil {
 		return err
 	}
@@ -58,7 +66,7 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 		mig.externalPort,
 		nil,
 		nil,
-		nil,
+		smtpEncryption,
 		nil,
 		userAlg,
 		nil,

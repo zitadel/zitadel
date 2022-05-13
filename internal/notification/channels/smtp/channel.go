@@ -29,6 +29,7 @@ func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context
 	}
 	client, err := smtpConfig.SMTP.connectToSMTP(smtpConfig.Tls)
 	if err != nil {
+		logging.New().WithError(err).Error("could not connect to smtp")
 		return nil, err
 	}
 
