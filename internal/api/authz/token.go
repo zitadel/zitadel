@@ -32,11 +32,7 @@ func Start(authZRepo authZRepo) (v *TokenVerifier) {
 }
 
 func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang, resourceOwner string, err error) {
-	verifierClientID, projectID, err := v.clientIDAndProjectIDFromMethod(ctx, method)
-	if err != nil {
-		return "", "", "", "", "", err
-	}
-	userID, agentID, clientID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, verifierClientID, projectID)
+	userID, agentID, clientID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, "", GetInstance(ctx).ProjectID())
 	return userID, clientID, agentID, prefLang, resourceOwner, err
 }
 

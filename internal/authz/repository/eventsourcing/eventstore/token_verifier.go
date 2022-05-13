@@ -89,7 +89,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return token.UserID, "", "", "", token.ResourceOwner, nil
 	}
 	for _, aud := range token.Audience {
-		if verifierClientID == aud || projectID == aud || authz.GetInstance(ctx).ProjectID() == aud {
+		if verifierClientID == aud || projectID == aud {
 			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
 		}
 	}
