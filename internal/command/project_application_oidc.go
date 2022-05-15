@@ -72,7 +72,7 @@ func AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) pr
 				return nil, errors.ThrowNotFound(err, "PROJE-6swVG", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator, project.Name)
+			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator(), project.Name)
 			if err != nil {
 				return nil, errors.ThrowInternal(err, "V2-VMSQ1", "Errors.Internal")
 			}

@@ -18,7 +18,7 @@ type Config struct {
 }
 
 func (c *Config) New() *Spooler {
-	lockID, err := id.SonyFlakeGenerator.Next()
+	lockID, err := id.SonyFlakeGenerator().Next()
 	logging.OnError(err).Panic("unable to generate lockID")
 
 	//shuffle the handlers for better balance when running multiple pods

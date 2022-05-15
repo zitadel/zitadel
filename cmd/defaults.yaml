@@ -38,6 +38,39 @@ AdminUser:
     Cert: ""
     Key: ""
 
+Machine:
+  # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
+  Identification:
+    # Use private IP to identify machines uniquely
+    PrivateIp:
+      Enabled: true
+    # Use hostname to identify machines uniquely
+    # You want the process to be identified uniquely, so this works well in k8s where each pod gets its own
+    # unique host name, but not as well in some other hosting environments.
+    Hostname:
+      Enabled: false
+    # Use a webhook response to identify machines uniquely
+    # Google Cloud Configuration
+    Webhook:
+      Enabled: true
+      Url: "http://metadata.google.internal/computeMetadata/v1/instance/id"
+      Headers:
+        "Metadata-Flavor": "Google"
+    #
+    # AWS EC2 IMDSv1 Configuration: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
+    # Webhook:
+    #   Url: "http://169.254.169.254/latest/meta-data/ami-id"
+    #
+    # AWS ECS v4 Configuration: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-metadata-endpoint-v4.html
+    # Webhook:
+    #   Url: "${ECS_CONTAINER_METADATA_URI_V4}"
+    #   JPath: "$.DockerId"
+    #
+    # Azure Configuration: https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service?tabs=linux
+    # Webhook:
+    #   Url: "http://169.254.169.254/metadata/instance?api-version=2021-02-01"
+    #   JPath: "$.compute.vmId"
+
 Projections:
   RequeueEvery: 10s
   RetryFailedAfter: 1s

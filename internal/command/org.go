@@ -22,12 +22,12 @@ type OrgSetup struct {
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (string, *domain.ObjectDetails, error) {
-	orgID, err := id.SonyFlakeGenerator.Next()
+	orgID, err := id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	userID, err := id.SonyFlakeGenerator.Next()
+	userID, err := id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return "", nil, err
 	}

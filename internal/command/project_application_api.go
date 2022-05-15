@@ -39,7 +39,7 @@ func AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashAlgorithm) prep
 				return nil, errors.ThrowNotFound(err, "PROJE-Sf2gb", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator, project.Name)
+			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator(), project.Name)
 			if err != nil {
 				return nil, errors.ThrowInternal(err, "V2-f0pgP", "Errors.Internal")
 			}

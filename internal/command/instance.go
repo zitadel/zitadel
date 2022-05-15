@@ -111,27 +111,27 @@ type ZitadelConfig struct {
 }
 
 func (s *InstanceSetup) generateIDs() (err error) {
-	s.zitadel.projectID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.projectID, err = id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.mgmtAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.mgmtAppID, err = id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.adminAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.adminAppID, err = id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.authAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.authAppID, err = id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.consoleAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.consoleAppID, err = id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (s *InstanceSetup) generateIDs() (err error) {
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
-	instanceID, err := id.SonyFlakeGenerator.Next()
+	instanceID, err := id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -150,12 +150,12 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
-	orgID, err := id.SonyFlakeGenerator.Next()
+	orgID, err := id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	userID, err := id.SonyFlakeGenerator.Next()
+	userID, err := id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return "", nil, err
 	}

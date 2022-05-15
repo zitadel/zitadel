@@ -4,11 +4,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 type Config struct {
 	Database  database.Config
 	AdminUser database.User
+	Machine   *id.Config
 	Log       *logging.Config
 }
 

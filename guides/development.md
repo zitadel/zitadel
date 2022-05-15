@@ -5,38 +5,40 @@ You should stay in the ZITADEL root directory to execute the statements in the f
 ## Prerequisite
 
 - Buildkit compatible docker installation
+- [go](https://go.dev/doc/install)
+- [goreleaser](https://goreleaser.com/install/)
 
 Minimum resources:
 
 - CPU's: 2
 - Memory: 4Gb
 
+### Installing goreleaser
+
+If you get the error `Failed to fetch https://repo.goreleaser.com/apt/Packages  Certificate verification failed: The certificate is NOT trusted. The certificate chain uses expired certificate.` while installing goreleaser with `apt`, then ensure that ca-certificates are installed:
+
+```sh
+sudo apt install ca-certificates
+```
+
 ### env variables
 
 You can use the default vars provided in [this .env-file](../build/local/local.env) or create your own and update the paths in the [docker compose file](../build/local/docker-compose-local.yml).
 
-## Generate required files
+## Local Build
 
-This part is relevant if you start the backend or console without docker compose.
+Simply run goreleaser to build locally. This will generate all the required files, such as angular and grpc automatically.
 
-### Console
-
-This command generates the grpc stub for console into the folder console/src/app/proto/generated for local development.
-
-```bash
-DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . -t zitadel:gen-fe --target js-client -o .
+```sh
+goreleaser build --snapshot --rm-dist --single-target
 ```
 
-### Start the Backend
+## Production Build & Release
 
-With these commands you can generate the stub for the backend.
+Simply use goreleaser:
 
-```bash
-# generates grpc stub
-DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-client -o .
-# generates keys for cryptography
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
-&& docker compose -f ./build/local/docker-compose-local.yml --profile backend-stub up --exit-code-from keys
+```sh
+goreleaser release
 ```
 
 ## Run
