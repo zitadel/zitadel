@@ -190,7 +190,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
-	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner, "")
+	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner, user.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -230,7 +230,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner, "")
+	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner, event.InstanceID)
 	if err != nil {
 		return err
 	}
