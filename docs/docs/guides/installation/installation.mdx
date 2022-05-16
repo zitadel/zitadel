@@ -1,0 +1,45 @@
+---
+title: Installation
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Linux from './linux.mdx'
+import Windows from './windows.mdx'
+import Compose from './compose.mdx'
+import Helm from './helm.mdx'
+import Configuration from './configuration.mdx'
+
+# Run ZITADEL
+
+Choose your platform and run ZITADEL with the most minimal configuration possible.
+
+<Tabs
+    groupId="installation-target"
+    default="saas"
+    values={[
+        {'label': 'SaaS', 'value': 'saas'},
+        {'label': 'MacOS/Linux Binaries', 'value': 'unix'},
+        {'label': 'Windows', 'value': 'windows'},
+        {'label': 'Docker Compose', 'value': 'compose'},
+        {'label': 'Kubernetes', 'value': 'k8s'}
+    ]}
+>
+    <TabItem value="saas">
+        Try our <a href="https://zitadel.com">SaaS offering</a>. The first 25k requests are free.
+    </TabItem>
+    <TabItem value="unix">
+        <Linux/>
+        <Configuration/>
+    </TabItem>
+    <TabItem value="windows">
+        <Windows/>
+    </TabItem>
+    <TabItem value="compose">
+        <Compose/>
+        <Configuration/>
+    </TabItem>
+    <TabItem value="k8s">
+        <Helm/>
+    </TabItem>
+</Tabs>
