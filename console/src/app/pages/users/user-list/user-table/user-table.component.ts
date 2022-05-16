@@ -231,7 +231,7 @@ export class UserTableComponent implements OnInit {
 
   public sortChange(sortState: Sort) {
     if (sortState.direction && sortState.active) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction} ending`);
       this.refreshPage();
     } else {
       this._liveAnnouncer.announce('Sorting cleared');

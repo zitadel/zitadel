@@ -1,5 +1,6 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
     UpdateLoginPolicyRequest,
@@ -41,9 +42,9 @@ export class LoginPolicyComponent implements OnInit {
   public lifetimeForm!: FormGroup;
   constructor(private toast: ToastService, private injector: Injector, private fb: FormBuilder) {
     this.lifetimeForm = this.fb.group({
-      passwordCheckLifetime: [12, [Validators.required]],
+      passwordCheckLifetime: [240, [Validators.required]],
       externalLoginCheckLifetime: [12, [Validators.required]],
-      mfaInitSkipLifetime: [12, [Validators.required]],
+      mfaInitSkipLifetime: [720, [Validators.required]],
       secondFactorCheckLifetime: [12, [Validators.required]],
       multiFactorCheckLifetime: [12, [Validators.required]],
     });
@@ -56,7 +57,7 @@ export class LoginPolicyComponent implements OnInit {
         this.loading = false;
 
         this.passwordCheckLifetime?.setValue(
-          this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 12,
+          this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 240,
         );
 
         this.externalLoginCheckLifetime?.setValue(
@@ -66,7 +67,7 @@ export class LoginPolicyComponent implements OnInit {
         );
 
         this.mfaInitSkipLifetime?.setValue(
-          this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 12,
+          this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 720,
         );
 
         this.secondFactorCheckLifetime?.setValue(
@@ -121,9 +122,21 @@ export class LoginPolicyComponent implements OnInit {
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-        // if(this.loginData.passwordCheckLifetime) {
-        // mgmtreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
-        // }
+
+        const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+        mgmtreq.setPasswordCheckLifetime(pcl);
+
+        const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+        mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+        const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+        mgmtreq.setMfaInitSkipLifetime(misl);
+
+        const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+        const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        mgmtreq.setMultiFactorCheckLifetime(mficl);
 
         if ((this.loginData as LoginPolicy.AsObject).isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
@@ -138,7 +151,21 @@ export class LoginPolicyComponent implements OnInit {
         adminreq.setForceMfa(this.loginData.forceMfa);
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
         adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-        // adminreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
+
+        const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+        adminreq.setPasswordCheckLifetime(admin_pcl);
+
+        const admin_elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+        adminreq.setExternalLoginCheckLifetime(admin_elcl);
+
+        const admin_misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+        adminreq.setMfaInitSkipLifetime(admin_misl);
+
+        const admin_sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        adminreq.setSecondFactorCheckLifetime(admin_sfcl);
+
+        const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        adminreq.setMultiFactorCheckLifetime(admin_mficl);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }
