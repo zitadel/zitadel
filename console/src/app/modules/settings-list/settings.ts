@@ -21,6 +21,12 @@ export const LOGIN: SidenavSetting = {
   groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
 };
 
+export const DOMAIN: SidenavSetting = {
+  id: 'domain',
+  i18nKey: 'SETTINGS.LIST.DOMAIN',
+  groupI18nKey: 'SETTINGS.GROUPS.DOMAIN',
+};
+
 export const LOCKOUT: SidenavSetting = {
   id: 'lockout',
   i18nKey: 'SETTINGS.LIST.LOCKOUT',

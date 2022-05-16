@@ -131,6 +131,8 @@ import {
     GetDefaultVerifyEmailMessageTextResponse,
     GetDefaultVerifyPhoneMessageTextRequest,
     GetDefaultVerifyPhoneMessageTextResponse,
+    GetDomainPolicyRequest,
+    GetDomainPolicyResponse,
     GetFlowRequest,
     GetFlowResponse,
     GetGrantedProjectByIDRequest,
@@ -155,8 +157,6 @@ import {
     GetOIDCInformationResponse,
     GetOrgByDomainGlobalRequest,
     GetOrgByDomainGlobalResponse,
-    GetOrgIAMPolicyRequest,
-    GetOrgIAMPolicyResponse,
     GetOrgIDPByIDRequest,
     GetOrgIDPByIDResponse,
     GetPasswordAgePolicyRequest,
@@ -1225,9 +1225,10 @@ export class ManagementService {
     const req = new RemoveCustomLabelPolicyLogoDarkRequest();
     return this.grpcService.mgmt.removeCustomLabelPolicyLogoDark(req, null).then((resp) => resp.toObject());
   }
-  public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
-    const req = new GetOrgIAMPolicyRequest();
-    return this.grpcService.mgmt.getOrgIAMPolicy(req, null).then((resp) => resp.toObject());
+
+  public getDomainPolicy(): Promise<GetDomainPolicyResponse.AsObject> {
+    const req = new GetDomainPolicyRequest();
+    return this.grpcService.mgmt.getDomainPolicy(req, null).then((resp) => resp.toObject());
   }
 
   public getPasswordAgePolicy(): Promise<GetPasswordAgePolicyResponse.AsObject> {

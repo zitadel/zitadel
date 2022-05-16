@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
@@ -13,13 +14,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { CardModule } from '../../card/card.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { OrgIamPolicyRoutingModule } from './org-iam-policy-routing.module';
-import { OrgIamPolicyComponent } from './org-iam-policy.component';
+import { DomainPolicyComponent } from './domain-policy.component';
 
 @NgModule({
-  declarations: [OrgIamPolicyComponent],
+  declarations: [DomainPolicyComponent],
   imports: [
-    OrgIamPolicyRoutingModule,
     CommonModule,
     FormsModule,
     CardModule,
@@ -29,11 +28,12 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
     MatSlideToggleModule,
     MatIconModule,
     HasRoleModule,
+    MatProgressSpinnerModule,
     MatTooltipModule,
     InfoSectionModule,
     TranslateModule,
     DetailLayoutModule,
   ],
-  exports: [OrgIamPolicyComponent],
+  exports: [DomainPolicyComponent],
 })
-export class OrgIamPolicyModule {}
+export class DomainPolicyModule {}
