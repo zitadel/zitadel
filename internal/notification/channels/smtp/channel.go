@@ -36,7 +36,9 @@ func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context
 	logging.New().Debug("successfully initialized smtp email channel")
 
 	return &Email{
-		smtpClient: client,
+		smtpClient:    client,
+		senderName:    smtpConfig.FromName,
+		senderAddress: smtpConfig.From,
 	}, nil
 }
 
