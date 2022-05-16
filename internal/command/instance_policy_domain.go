@@ -52,7 +52,7 @@ func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, policy *domain
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-pl9fN", "Errors.IAM.DomainPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
