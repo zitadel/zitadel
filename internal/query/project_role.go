@@ -53,10 +53,6 @@ var (
 		name:  projection.ProjectRoleColumnGroupName,
 		table: projectRolesTable,
 	}
-	ProjectRoleColumnCreator = Column{
-		name:  projection.ProjectRoleColumnCreator,
-		table: projectRolesTable,
-	}
 )
 
 type ProjectRoles struct {

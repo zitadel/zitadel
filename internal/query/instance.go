@@ -248,7 +248,6 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 			for rows.Next() {
 				instance := new(Instance)
 				lang := ""
-				//TODO: Get Host
 				err := rows.Scan(
 					&instance.ID,
 					&instance.CreationDate,

@@ -138,7 +138,6 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
-                //TODO: errors
             };
         };
     }
@@ -2952,7 +2951,7 @@ message AddHumanUserRequest {
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        string email = 1 [(validate.rules).string.email = true];
         bool is_email_verified = 2;
     }
     message Phone {
@@ -2984,7 +2983,7 @@ message ImportHumanUserRequest {
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        string email = 1 [(validate.rules).string.email = true];
         bool is_email_verified = 2;
     }
     message Phone {

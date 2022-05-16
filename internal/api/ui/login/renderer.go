@@ -432,7 +432,7 @@ func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg strin
 }
 
 func (l *Login) getTheme(r *http.Request) string {
-	return "zitadel" //TODO: impl
+	return "zitadel"
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
