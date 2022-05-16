@@ -90,6 +90,10 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, host,
 			return nil, errors.ThrowInvalidArgument(nil, "INST-SF3g1", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			err := checkSenderAddress(ctx, filter, from)
+			if err != nil {
+				return nil, err
+			}
 			writeModel, err := getSMTPConfigWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
@@ -128,7 +132,12 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 		if host = strings.TrimSpace(host); host == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-VDwvq", "Errors.Invalid.Argument")
 		}
+
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			err := checkSenderAddress(ctx, filter, from)
+			if err != nil {
+				return nil, err
+			}
 			writeModel, err := getSMTPConfigWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
@@ -153,6 +162,19 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 			}, nil
 		}, nil
 	}
+}
+
+func checkSenderAddress(ctx context.Context, filter preparation.FilterToQueryReducer, from string) error {
+	fromSplitted := strings.Split(from, "@")
+	senderDomain := fromSplitted[len(fromSplitted)-1]
+	domainWriteModel, err := getInstanceDomainWriteModel(ctx, filter, senderDomain)
+	if err != nil {
+		return err
+	}
+	if !domainWriteModel.State.Exists() {
+		return errors.ThrowInvalidArgument(nil, "INST-83nl8", "Errors.SMTPConfig.SenderAdressNotCustomDomain")
+	}
+	return nil
 }
 
 func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (_ *InstanceSMTPConfigWriteModel, err error) {

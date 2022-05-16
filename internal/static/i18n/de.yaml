@@ -44,6 +44,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP Konfiguration nicht gefunden
     AlreadyExists: SMTP Konfiguration existiert bereits
+    SenderAdressNotCustomDomain: Die Sender Adresse muss als Custom Domain auf der Instanz registriert sein.
   Notification:
     NoDomain: Keine Domäne für Nachricht gefunden
   User:
