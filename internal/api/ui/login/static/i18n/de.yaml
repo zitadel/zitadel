@@ -322,6 +322,8 @@ Errors:
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       InvalidAndLocked: Password ist undgültig und Benutzer wurde gesperrt, melden Sie sich bei ihrem Administrator.
+    UsernameOrPassword:
+      Invalid: Username oder Passwort ist ungültig
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz

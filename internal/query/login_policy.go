@@ -10,7 +10,6 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -30,6 +29,8 @@ type LoginPolicy struct {
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
+	IgnoreUnknownUsernames     bool
+	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
 	MFAInitSkipLifetime        time.Duration
@@ -105,6 +106,14 @@ var (
 	}
 	LoginPolicyColumnHidePasswordReset = Column{
 		name:  projection.LoginPolicyHidePWResetCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnIgnoreUnknownUsernames = Column{
+		name:  projection.IgnoreUnknownUsernames,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnDefaultRedirectURI = Column{
+		name:  projection.DefaultRedirectURI,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnPasswordCheckLifetime = Column{
@@ -284,6 +293,8 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			LoginPolicyColumnPasswordlessType.identifier(),
 			LoginPolicyColumnIsDefault.identifier(),
 			LoginPolicyColumnHidePasswordReset.identifier(),
+			LoginPolicyColumnIgnoreUnknownUsernames.identifier(),
+			LoginPolicyColumnDefaultRedirectURI.identifier(),
 			LoginPolicyColumnPasswordCheckLifetime.identifier(),
 			LoginPolicyColumnExternalLoginCheckLifetime.identifier(),
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
@@ -294,6 +305,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			p := new(LoginPolicy)
 			secondFactors := pq.Int32Array{}
 			multiFactors := pq.Int32Array{}
+			defaultRedirectURI := sql.NullString{}
 			err := row.Scan(
 				&p.OrgID,
 				&p.CreationDate,
@@ -308,6 +320,8 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				&p.PasswordlessType,
 				&p.IsDefault,
 				&p.HidePasswordReset,
+				&p.IgnoreUnknownUsernames,
+				&defaultRedirectURI,
 				&p.PasswordCheckLifetime,
 				&p.ExternalLoginCheckLifetime,
 				&p.MFAInitSkipLifetime,
@@ -320,7 +334,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
 			}
-
+			p.DefaultRedirectURI = defaultRedirectURI.String
 			p.MultiFactors = make([]domain.MultiFactorType, len(multiFactors))
 			for i, mfa := range multiFactors {
 				p.MultiFactors[i] = domain.MultiFactorType(mfa)
