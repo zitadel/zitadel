@@ -68,12 +68,15 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 	}, nil
 }
 
-func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.Aggregate, instanceName string) []preparation.Validation {
-	domain := domain.NewGeneratedInstanceDomain(instanceName, authz.GetInstance(ctx).RequestedDomain())
+func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.Aggregate, instanceName string) ([]preparation.Validation, error) {
+	domain, err := domain.NewGeneratedInstanceDomain(instanceName, authz.GetInstance(ctx).RequestedDomain())
+	if err != nil {
+		return nil, err
+	}
 	return []preparation.Validation{
 		c.addInstanceDomain(a, domain, true),
 		setPrimaryInstanceDomain(a, domain),
-	}
+	}, nil
 }
 
 func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {

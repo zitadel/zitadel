@@ -2892,7 +2892,7 @@ message SetUpOrgRequest {
                     min_length: 1;
                     example: "\"gigi@caos.ch\"";
                 }
-            ];  //TODO: check if no value is allowed
+            ];
             bool is_email_verified = 2;
         }
         message Phone {
@@ -3444,6 +3444,7 @@ message GetDomainPolicyResponse {
 message UpdateDomainPolicyRequest {
     bool user_login_must_be_domain = 1;
     bool validate_org_domains = 2;
+    bool smtp_sender_address_matches_instance_domain = 3;
 }
 
 message UpdateDomainPolicyResponse {
@@ -3478,7 +3479,7 @@ message AddCustomDomainPolicyRequest {
 			required: ["org_id"]
 		};
 	};
-    
+
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3495,6 +3496,11 @@ message AddCustomDomainPolicyRequest {
     bool validate_org_domains = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if organisation domains should be validated org count as validated automatically"
+        }
+    ];
+    bool smtp_sender_address_matches_instance_domain = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the smtp sender address domain should match an existing domain on the instance"
         }
     ];
 }
@@ -3526,6 +3532,11 @@ message UpdateCustomDomainPolicyRequest {
     bool validate_org_domains = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if organisation domains should be validated org count as validated automatically"
+        }
+    ];
+    bool smtp_sender_address_matches_instance_domain = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the smtp sender address domain should match an existing domain on the instance"
         }
     ];
 }
@@ -3677,11 +3688,21 @@ message UpdateLoginPolicyRequest {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
-    google.protobuf.Duration password_check_lifetime = 7;
-    google.protobuf.Duration external_login_check_lifetime = 8;
-    google.protobuf.Duration mfa_init_skip_lifetime = 9;
-    google.protobuf.Duration second_factor_check_lifetime = 10;
-    google.protobuf.Duration multi_factor_check_lifetime = 11;
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message UpdateLoginPolicyResponse {

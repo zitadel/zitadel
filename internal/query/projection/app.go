@@ -94,17 +94,17 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			crdb.NewColumn(AppOIDCConfigColumnResponseTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()), //TODO: null?
-			crdb.NewColumn(AppOIDCConfigColumnGrantTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),    //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnResponseTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnGrantTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),
 			crdb.NewColumn(AppOIDCConfigColumnApplicationType, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppOIDCConfigColumnAuthMethodType, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppOIDCConfigColumnPostLogoutRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
 			crdb.NewColumn(AppOIDCConfigColumnDevMode, crdb.ColumnTypeBool),
 			crdb.NewColumn(AppOIDCConfigColumnAccessTokenType, crdb.ColumnTypeEnum),
-			crdb.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
-			crdb.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()),     //TODO: null?
-			crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
-			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Nullable()),               //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID),

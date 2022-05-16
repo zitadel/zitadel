@@ -172,6 +172,24 @@
       </cnsl-info-section>
     </ng-template> -->
   </div>
+
+  <div class="login-policy-row">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.ignoreUnknownUsernames"
+    >
+      {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate }}
+    </mat-checkbox>
+  </div>
+
+  <div class="login-policy-row">
+    <cnsl-form-field class="form-field" label="Access Code" required="true">
+      <cnsl-label>{{ 'POLICY.DATA.DEFAULTREDIRECTURI' | translate }}</cnsl-label>
+      <input cnslInput placeholder="https://" [(ngModel)]="loginData.defaultRedirectUri" />
+    </cnsl-form-field>
+  </div>
 </div>
 
 <ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault">

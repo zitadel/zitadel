@@ -138,6 +138,12 @@ export class LoginPolicyComponent implements OnInit {
         const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
         mgmtreq.setMultiFactorCheckLifetime(mficl);
 
+        mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+        mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
+        // if(this.loginData.passwordCheckLifetime) {
+        // mgmtreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
+        // }
         if ((this.loginData as LoginPolicy.AsObject).isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
         } else {
@@ -166,6 +172,9 @@ export class LoginPolicyComponent implements OnInit {
 
         const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
         adminreq.setMultiFactorCheckLifetime(admin_mficl);
+        adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+        adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+        // adminreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }

@@ -44,6 +44,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.passwordless_type,`+
 						` projections.login_policies.is_default,`+
 						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.ignore_unknown_usernames,`+
+						` projections.login_policies.default_redirect_uri,`+
 						` projections.login_policies.password_check_lifetime,`+
 						` projections.login_policies.external_login_check_lifetime,`+
 						` projections.login_policies.mfa_init_skip_lifetime,`+
@@ -80,6 +82,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.passwordless_type,`+
 						` projections.login_policies.is_default,`+
 						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.ignore_unknown_usernames,`+
+						` projections.login_policies.default_redirect_uri,`+
 						` projections.login_policies.password_check_lifetime,`+
 						` projections.login_policies.external_login_check_lifetime,`+
 						` projections.login_policies.mfa_init_skip_lifetime,`+
@@ -100,6 +104,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"passwordless_type",
 						"is_default",
 						"hide_password_reset",
+						"ignore_unknown_usernames",
+						"default_redirect_uri",
 						"password_check_lifetime",
 						"external_login_check_lifetime",
 						"mfa_init_skip_lifetime",
@@ -120,6 +126,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
+						true,
+						"https://example.com/redirect",
 						time.Hour * 2,
 						time.Hour * 2,
 						time.Hour * 2,
@@ -142,6 +150,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				PasswordlessType:           domain.PasswordlessTypeAllowed,
 				IsDefault:                  true,
 				HidePasswordReset:          true,
+				IgnoreUnknownUsernames:     true,
+				DefaultRedirectURI:         "https://example.com/redirect",
 				PasswordCheckLifetime:      time.Hour * 2,
 				ExternalLoginCheckLifetime: time.Hour * 2,
 				MFAInitSkipLifetime:        time.Hour * 2,
@@ -167,6 +177,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.passwordless_type,`+
 						` projections.login_policies.is_default,`+
 						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.ignore_unknown_usernames,`+
+						` projections.login_policies.default_redirect_uri,`+
 						` projections.login_policies.password_check_lifetime,`+
 						` projections.login_policies.external_login_check_lifetime,`+
 						` projections.login_policies.mfa_init_skip_lifetime,`+

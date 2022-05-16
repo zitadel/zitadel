@@ -26,7 +26,6 @@ const (
 	ProjectGrantColumnProjectID     = "project_id"
 	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
 	ProjectGrantColumnRoleKeys      = "granted_role_keys"
-	ProjectGrantColumnCreator       = "creator_id" //TODO: necessary?
 )
 
 type ProjectGrantProjection struct {
@@ -49,7 +48,6 @@ func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(ProjectGrantColumnCreator, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ProjectGrantColumnResourceOwner})),
@@ -116,7 +114,6 @@ func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnGrantedOrgID, e.GrantedOrgID),
 			handler.NewCol(ProjectGrantColumnRoleKeys, pq.StringArray(e.RoleKeys)),
-			handler.NewCol(ProjectGrantColumnCreator, e.EditorUser()),
 		},
 	), nil
 }

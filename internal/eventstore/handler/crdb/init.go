@@ -344,7 +344,7 @@ func columnType(columnType ColumnType) string {
 	case ColumnTypeBytes:
 		return "BYTES"
 	default:
-		panic("") //TODO: remove?
+		panic("unknown column type")
 		return ""
 	}
 }

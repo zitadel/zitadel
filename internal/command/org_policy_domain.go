@@ -39,7 +39,7 @@ func (c *Commands) addOrgDomainPolicy(ctx context.Context, orgAgg *eventstore.Ag
 	if addedPolicy.State == domain.PolicyStateActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.DomainPolicy.AlreadyExists")
 	}
-	return org.NewDomainPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains), nil
+	return org.NewDomainPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains, policy.SMTPSenderAddressMatchesInstanceDomain), nil
 }
 
 func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner string, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
@@ -55,7 +55,7 @@ func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner stri
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains, policy.SMTPSenderAddressMatchesInstanceDomain)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}

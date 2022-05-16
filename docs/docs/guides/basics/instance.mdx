@@ -1,0 +1,90 @@
+---
+title: Instance
+---
+
+
+| | |
+| --- | --- |
+| Description | Learn what an instance in ZITADEL is and what kind of configurations you are able to do. |
+| Learning Outcomes | In this module you will: <ul><li>Learn about the instance</li><li>Create a new instance</li><li>Add a custom domain</li><li>configure some settings</li></ul> |
+|Prerequisites|None|
+
+## What is an instance?
+
+import InstanceDescription from '../../concepts/structure/_instance_description.mdx';
+import Column from '../../../src/components/column';
+
+<InstanceDescription name="InstanceDescription" />
+
+## Exercise - Create a new instance
+
+The creation and management of an instance takes place in the Customer Portal.
+To manage your existing instances you need login with your Customer Portal user. Be aware that this is not the same user as in the instance itself.
+
+![Create new instance](/img/console_org_register.png)
+
+## Exercise - Add a custom domain
+
+1. Browse to your instance
+2. Click **Add custom domain**
+3. To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
+4. For example, create a TXT record with your DNS provider for the used domain and click verify. ZITADEL will then proceed an check your DNS.
+5. When the verification is successful you have the option to activate the domain by clicking **Set as primary**
+
+![Verify Domain](/img/console_verify_domain.gif)
+
+> **_Please note:_** Do not delete the verification code, as ZITADEL Customer Portal will re-check the ownership of your domain from time to time
+
+## Exercise - Change default settings of the instance
+
+Redirect to your instance and login with your generated user ???
+Go to the settings with the button at the top right of the header.
+You will find all different kind of default settings here.
+From password policy, to branding to texts of the login ui.
+
+For this case we will change the branding.
+Choose modify on the setting "branding".
+You can switch between the light and the dark mode. Upload your logo and define the colors you like to have.
+Make sure to click the button "apply configuration" after you are finish to trigger your settings.
+
+## Knowledge Check
+
+* Instance has to be configured in the Customer Portal
+    - [ ] yes
+    - [ ] no
+* I can use the same user for the Customer Portal as for my created instance
+    - [ ] yes
+    - [ ] no
+* I will find the default settings in the Customer Portal
+    - [ ] yes
+    - [ ] no
+
+<details>
+    <summary>
+        Solutions
+    </summary>
+
+* Users exist only within projects or clients
+    - [x] yes
+    - [ ] no
+* I can use the same user for the Customer Portal as for my created instance
+    - [ ] yes
+    - [x] no (Due to separation of concern you will not be able to use the same user for both)
+* I will find the default settings in the Customer Portal
+    - [ ] yes
+    - [x] no (The default settings are after login to you instance on the settings page)
+
+</details>
+
+## Summary
+
+* Create your instance in the customer portal
+* Verify your domain in the Customer Portal to improve user experience; remember to not delete the verification code to allow recheck of ownership
+* You can manage all your default settings in the instance itself
+
+Where to go from here:
+
+* Create an organization
+* Create a project
+* Setup Passwordless MFA
+* Manage ZITADEL Roles

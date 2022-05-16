@@ -19,7 +19,7 @@ In this session your second level support will gain an understanding on how to e
 * Validation of tokens
 * Q&A
 
-**Price**: [Get a quote](https://zitadel.ch/contact)
+**Price**: [Get a quote](https://zitadel.com/contact)
 
 ## ZITADEL Administrator
 
@@ -37,4 +37,4 @@ In this hands-on training your employees will get a complete overview of the sys
 * Client integration best-practices
 * Q&A
 
-**Price**: [Get a quote](https://zitadel.ch/contact)
+**Price**: [Get a quote](https://zitadel.com/contact)

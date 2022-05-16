@@ -11,6 +11,7 @@ import (
 	"github.com/muesli/gamut"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
@@ -31,16 +32,13 @@ type Styling struct {
 	handler
 	static       static.Storage
 	subscription *v1.Subscription
-	resourceUrl  string
 }
 
-func newStyling(handler handler, static static.Storage, loginPrefix string) *Styling {
+func newStyling(handler handler, static static.Storage) *Styling {
 	h := &Styling{
 		handler: handler,
 		static:  static,
 	}
-	h.resourceUrl = loginPrefix + "/resources/dynamic" //TODO: ?
-
 	h.subscribe()
 
 	return h
@@ -218,7 +216,7 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 	}
 	cssContent += "}"
 	if policy.FontURL != "" {
-		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, m.resourceUrl, policy.AggregateID, policy.FontURL)
+		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, login.HandlerPrefix+login.EndpointDynamicResources, policy.AggregateID, policy.FontURL)
 	}
 	cssContent += ".lgn-dark-theme {"
 	if policy.PrimaryColorDark != "" {
