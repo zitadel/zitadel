@@ -44,8 +44,6 @@ func AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashAlgorithm) prep
 				return nil, errors.ThrowInternal(err, "V2-f0pgP", "Errors.Internal")
 			}
 
-			//requires client secret
-			// TODO(release blocking):we have to return the secret
 			if app.AuthMethodType == domain.APIAuthMethodTypeBasic {
 				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
 				if err != nil {

@@ -2892,7 +2892,7 @@ message SetUpOrgRequest {
                     min_length: 1;
                     example: "\"gigi@caos.ch\"";
                 }
-            ];  //TODO: check if no value is allowed
+            ];
             bool is_email_verified = 2;
         }
         message Phone {
