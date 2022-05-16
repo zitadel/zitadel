@@ -846,6 +846,8 @@
       "HOST": "Host",
       "USER": "Benutzer",
       "PASSWORD": "Passwort",
+      "SETPASSWORD": "SMTP Passwort setzen",
+      "PASSWORDSET": "SMTP Passwort erfolgrech gesetzt.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Erfolgreich gespeichert.",
       "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."

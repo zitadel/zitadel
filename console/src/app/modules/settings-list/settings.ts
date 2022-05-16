@@ -19,10 +19,6 @@ export const LOGIN: SidenavSetting = {
   id: 'login',
   i18nKey: 'SETTINGS.LIST.LOGIN',
   groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
-  //   requiredRoles: {
-  //     [PolicyComponentServiceType.ADMIN]: true,
-  //     [PolicyComponentServiceType.MGMT]: true,
-  //   }
 };
 
 export const LOCKOUT: SidenavSetting = {

@@ -846,6 +846,8 @@
       "HOST": "Host",
       "USER": "Utente",
       "PASSWORD": "Password",
+      "SETPASSWORD": "Imposta SMTP Password",
+      "PASSWORDSET": "SMTP Password impostata con successo.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Salvato con successo!",
       "REQUIREDWARN": "Per inviare notifiche dal tuo dominio, devi inserire i tuoi dati SMTP."
