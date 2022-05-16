@@ -178,7 +178,7 @@ func (m *UserMembership) processOrg(event *es_models.Event) (err error) {
 }
 
 func (m *UserMembership) fillOrgName(member *usr_es_model.UserMembershipView) (err error) {
-	org, err := m.getOrgByID(context.Background(), member.ResourceOwner)
+	org, err := m.getOrgByID(context.Background(), member.ResourceOwner, member.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -190,7 +190,7 @@ func (m *UserMembership) fillOrgName(member *usr_es_model.UserMembershipView) (e
 }
 
 func (m *UserMembership) updateOrgName(event *es_models.Event) error {
-	org, err := m.getOrgByID(context.Background(), event.AggregateID)
+	org, err := m.getOrgByID(context.Background(), event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -300,8 +300,8 @@ func (m *UserMembership) OnSuccess() error {
 	return spooler.HandleSuccess(m.view.UpdateUserMembershipSpoolerRunTimestamp)
 }
 
-func (u *UserMembership) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
-	query, err := org_view.OrgByIDQuery(orgID, 0)
+func (u *UserMembership) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
+	query, err := org_view.OrgByIDQuery(orgID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}

@@ -23,8 +23,9 @@ type DomainPolicy struct {
 	ResourceOwner string
 	State         domain.PolicyState
 
-	UserLoginMustBeDomain bool
-	ValidateOrgDomains    bool
+	UserLoginMustBeDomain                  bool
+	ValidateOrgDomains                     bool
+	SMTPSenderAddressMatchesInstanceDomain bool
 
 	IsDefault bool
 }
@@ -63,6 +64,10 @@ var (
 	}
 	DomainPolicyColValidateOrgDomains = Column{
 		name:  projection.DomainPolicyValidateOrgDomainsCol,
+		table: domainPolicyTable,
+	}
+	DomainPolicyColSMTPSenderAddressMatchesInstanceDomain = Column{
+		name:  projection.DomainPolicySMTPSenderAddressMatchesInstanceDomainCol,
 		table: domainPolicyTable,
 	}
 	DomainPolicyColIsDefault = Column{
@@ -126,6 +131,7 @@ func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy
 			DomainPolicyColResourceOwner.identifier(),
 			DomainPolicyColUserLoginMustBeDomain.identifier(),
 			DomainPolicyColValidateOrgDomains.identifier(),
+			DomainPolicyColSMTPSenderAddressMatchesInstanceDomain.identifier(),
 			DomainPolicyColIsDefault.identifier(),
 			DomainPolicyColState.identifier(),
 		).
@@ -140,6 +146,7 @@ func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy
 				&policy.ResourceOwner,
 				&policy.UserLoginMustBeDomain,
 				&policy.ValidateOrgDomains,
+				&policy.SMTPSenderAddressMatchesInstanceDomain,
 				&policy.IsDefault,
 				&policy.State,
 			)

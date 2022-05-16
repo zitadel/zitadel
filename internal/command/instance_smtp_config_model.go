@@ -19,14 +19,39 @@ type InstanceSMTPConfigWriteModel struct {
 	User          string
 	Password      *crypto.CryptoValue
 	State         domain.SMTPConfigState
+
+	domain                                 string
+	domainState                            domain.InstanceDomainState
+	smtpSenderAddressMatchesInstanceDomain bool
 }
 
-func NewInstanceSMTPConfigWriteModel(instanceID string) *InstanceSMTPConfigWriteModel {
+func NewInstanceSMTPConfigWriteModel(instanceID, domain string) *InstanceSMTPConfigWriteModel {
 	return &InstanceSMTPConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
 		},
+		domain: domain,
+	}
+}
+
+func (wm *InstanceSMTPConfigWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *instance.DomainAddedEvent:
+			if e.Domain != wm.domain {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		case *instance.DomainRemovedEvent:
+			if e.Domain != wm.domain {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
+		default:
+			wm.WriteModel.AppendEvents(e)
+		}
+
 	}
 }
 
@@ -57,6 +82,16 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			if e.User != nil {
 				wm.User = *e.User
 			}
+		case *instance.DomainAddedEvent:
+			wm.domainState = domain.InstanceDomainStateActive
+		case *instance.DomainRemovedEvent:
+			wm.domainState = domain.InstanceDomainStateRemoved
+		case *instance.DomainPolicyAddedEvent:
+			wm.smtpSenderAddressMatchesInstanceDomain = e.SMTPSenderAddressMatchesInstanceDomain
+		case *instance.DomainPolicyChangedEvent:
+			if e.SMTPSenderAddressMatchesInstanceDomain != nil {
+				wm.smtpSenderAddressMatchesInstanceDomain = *e.SMTPSenderAddressMatchesInstanceDomain
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -71,7 +106,11 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			instance.SMTPConfigAddedEventType,
 			instance.SMTPConfigChangedEventType,
-			instance.SMTPConfigPasswordChangedEventType).
+			instance.SMTPConfigPasswordChangedEventType,
+			instance.InstanceDomainAddedEventType,
+			instance.InstanceDomainRemovedEventType,
+			instance.DomainPolicyAddedEventType,
+			instance.DomainPolicyChangedEventType).
 		Builder()
 }
 

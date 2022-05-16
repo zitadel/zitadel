@@ -4343,11 +4343,21 @@ message AddCustomLoginPolicyRequest {
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
-    google.protobuf.Duration password_check_lifetime = 7;
-    google.protobuf.Duration external_login_check_lifetime = 8;
-    google.protobuf.Duration mfa_init_skip_lifetime = 9;
-    google.protobuf.Duration second_factor_check_lifetime = 10;
-    google.protobuf.Duration multi_factor_check_lifetime = 11;
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message AddCustomLoginPolicyResponse {
@@ -4361,11 +4371,21 @@ message UpdateCustomLoginPolicyRequest {
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
-    google.protobuf.Duration password_check_lifetime = 7;
-    google.protobuf.Duration external_login_check_lifetime = 8;
-    google.protobuf.Duration mfa_init_skip_lifetime = 9;
-    google.protobuf.Duration second_factor_check_lifetime = 10;
-    google.protobuf.Duration multi_factor_check_lifetime = 11;
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message UpdateCustomLoginPolicyResponse {

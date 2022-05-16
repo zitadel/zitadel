@@ -2,19 +2,19 @@
 module.exports = {
   title: "ZITADEL Docs",
   trailingSlash: false,
-  url: "https://docs.zitadel.ch",
+  url: "https://docs.zitadel.com",
   baseUrl: "/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "caos",
+  organizationName: "zitadel",
   projectName: "zitadel",
   scripts: [
     {
       src: "/proxy/js/script.js",
       async: true,
       defer: true,
-      "data-domain": "docs.zitadel.ch",
+      "data-domain": "docs.zitadel.com",
       "data-api": "/proxy/api/event",
     },
   ],
@@ -82,15 +82,15 @@ module.exports = {
             },
             {
               label: "Twitter",
-              href: "https://twitter.com/zitadel_ch",
+              href: "https://twitter.com/zitadel",
             },
             {
               label: "Linkedin",
-              href: "https://www.linkedin.com/company/caos-ag/",
+              href: "https://www.linkedin.com/company/zitadel/",
             },
             {
               label: "Blog",
-              href: "https://zitadel.ch/blog",
+              href: "https://zitadel.com/blog",
             },
           ],
         },
@@ -98,16 +98,16 @@ module.exports = {
           title: "Company",
           items: [
             {
-              label: "About CAOS Ltd.",
-              href: "https://caos.ch/#about",
+              label: "Team.",
+              href: "https://zitadel.com/team",
             },
             {
               label: "Contact",
-              href: "https://zitadel.ch/contact/",
+              href: "https://zitadel.com/contact/",
             },
             {
               label: "GitHub",
-              href: "https://github.com/caos",
+              href: "https://github.com/zitadel",
             },
             {
               label: "Status",
@@ -115,16 +115,16 @@ module.exports = {
             },
             {
               label: "Terms and Conditions",
-              href: "https://docs.zitadel.ch/docs/legal/terms-of-service",
+              href: "https://docs.zitadel.com/docs/legal/terms-of-service",
             },
             {
               label: "Privacy Policy",
-              href: "https://docs.zitadel.ch/docs/legal/privacy-policy",
+              href: "https://docs.zitadel.com/docs/legal/privacy-policy",
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} CAOS Ltd. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} ZITADEL - Built with Docusaurus.`,
     },
     algolia: {
       appId: "8H6ZKXENLO",
