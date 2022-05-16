@@ -53,6 +53,7 @@ type Steps struct {
 
 type encryptionKeyConfig struct {
 	User *crypto.KeyConfig
+	SMTP *crypto.KeyConfig
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

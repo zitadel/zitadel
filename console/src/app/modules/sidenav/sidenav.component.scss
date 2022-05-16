@@ -67,12 +67,15 @@
           background: none;
           text-align: left;
           padding: 0.75rem 0;
-          opacity: 0.6;
           font-size: 15px;
           cursor: pointer;
           color: map-get($foreground, base);
           display: flex;
           align-items: center;
+
+          span {
+            opacity: 0.6;
+          }
 
           i {
             font-size: 1.2rem;
@@ -80,8 +83,19 @@
             line-height: 1.2rem;
           }
 
+          .warn-icon {
+            color: map-get($background, alert);
+            margin-left: 0.5rem;
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            flex-shrink: 0;
+          }
+
           &:hover {
-            opacity: 1;
+            span {
+              opacity: 1;
+            }
           }
 
           &.mob-only {
@@ -108,7 +122,10 @@
 
           &.active {
             font-weight: 600;
-            opacity: 1;
+
+            span {
+              opacity: 1;
+            }
           }
         }
       }

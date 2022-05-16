@@ -519,7 +519,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddOrgMember(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.roles...)
+			got, err := r.AddOrgMember(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.roles...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

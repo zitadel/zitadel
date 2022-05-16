@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { ActivatedRoute, Router } from '@angular/router';
+import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
-  DisplayNameQuery,
-  UserGrantOrgNameQuery,
-  UserGrantProjectNameQuery,
-  UserGrantQuery,
-  UserNameQuery,
+    DisplayNameQuery,
+    UserGrantOrgNameQuery,
+    UserGrantProjectNameQuery,
+    UserGrantQuery,
+    UserNameQuery,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
@@ -23,11 +25,68 @@ enum SubQuery {
   templateUrl: './filter-user-grants.component.html',
   styleUrls: ['./filter-user-grants.component.scss'],
 })
-export class FilterUserGrantsComponent extends FilterComponent {
+export class FilterUserGrantsComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: UserGrantQuery[] = [];
-  constructor() {
-    super();
+
+  constructor(router: Router, route: ActivatedRoute) {
+    super(router, route);
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
+      const { filter } = params;
+      if (filter) {
+        const stringifiedFilters = filter as string;
+        const filters: UserGrantQuery.AsObject[] = JSON.parse(stringifiedFilters) as UserGrantQuery.AsObject[];
+
+        const userQueries = filters.map((filter) => {
+          if (filter.userNameQuery) {
+            const userGrantQuery = new UserGrantQuery();
+
+            const userNameQuery = new UserNameQuery();
+            userNameQuery.setUserName(filter.userNameQuery.userName);
+            userNameQuery.setMethod(filter.userNameQuery.method);
+
+            userGrantQuery.setUserNameQuery(userNameQuery);
+            return userGrantQuery;
+          } else if (filter.displayNameQuery) {
+            const userGrantQuery = new UserGrantQuery();
+
+            const displayNameQuery = new DisplayNameQuery();
+            displayNameQuery.setDisplayName(filter.displayNameQuery.displayName);
+            displayNameQuery.setMethod(filter.displayNameQuery.method);
+
+            userGrantQuery.setDisplayNameQuery(displayNameQuery);
+            return userGrantQuery;
+          } else if (filter.orgNameQuery) {
+            const userGrantQuery = new UserGrantQuery();
+
+            const orgNameQuery = new UserGrantOrgNameQuery();
+            orgNameQuery.setOrgName(filter.orgNameQuery.orgName);
+            orgNameQuery.setMethod(filter.orgNameQuery.method);
+
+            userGrantQuery.setOrgNameQuery(orgNameQuery);
+            return userGrantQuery;
+          } else if (filter.projectNameQuery) {
+            const userGrantQuery = new UserGrantQuery();
+
+            const projectNameQuery = new UserGrantProjectNameQuery();
+            projectNameQuery.setProjectName(filter.projectNameQuery.projectName);
+
+            userGrantQuery.setProjectNameQuery(projectNameQuery);
+            return userGrantQuery;
+          } else {
+            return undefined;
+          }
+        });
+
+        this.searchQueries = userQueries.filter((q) => q !== undefined) as UserGrantQuery[];
+        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        // this.showFilter = true;
+        // this.filterOpen.emit(true);
+      }
+    });
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {

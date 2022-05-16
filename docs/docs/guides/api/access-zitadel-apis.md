@@ -32,7 +32,7 @@ title: Access ZITADEL APIs
 
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers. 
 
-- **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole IAM. 
+- **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole instance. 
 - **Org Managers**: Managers in the Organization Level are able to manage everything within the granted Organization.
 - **Project Mangers**: In this level the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
@@ -69,7 +69,7 @@ Use the scope `urn:zitadel:iam:org:project:id:{projectid}:aud` to include the pr
 
 ```bash
 curl --request POST \
-  --url https://api.zitadel.ch/oauth/v2/token \
+  --url {your_domain}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile email urn:zitadel:iam:org:project:id:69234237810729019:aud' \

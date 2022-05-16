@@ -2403,12 +2403,13 @@ This is an empty response
 
 ### IsOrgUniqueRequest
 if name or domain is already in use, org is not unique
+at least one argument has to be provided
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.max_len: 200<br />  |
+| domain |  string | - | string.max_len: 200<br />  |
 
 
 

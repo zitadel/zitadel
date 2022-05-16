@@ -821,7 +821,8 @@
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
-      "OIDC": "OIDC Konfiguration"
+      "OIDC": "OIDC Token Lifetime und Expiration",
+      "SECRETS": "Secret Erscheinungsbild"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Benachrichtigungen",
@@ -846,7 +847,8 @@
       "USER": "Benutzer",
       "PASSWORD": "Passwort",
       "TLS": "Transport Layer Security (TLS)",
-      "SAVED": "Erfolgreich gespeichert."
+      "SAVED": "Erfolgreich gespeichert.",
+      "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
     },
     "SMS": {
       "TITLE": "SMS Einstellungen",
@@ -869,6 +871,27 @@
       "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
       "INHOURS": "Stunden",
       "INDAYS": "Tage"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Erscheinungsbild",
+      "TYPES": "Schlüsseltypen",
+      "TYPE": {
+        "1": "Email Initialisierungscode",
+        "2": "Email Verifikationscode",
+        "3": "Telefonnummer Verificationscode",
+        "4": "Passwort Zurücksetzen Code",
+        "5": "Passwordless Initialisierungscode",
+        "6": "Applicationssecret"
+      },
+      "ADDGENERATOR": "Secret Erscheinungsbild definieren",
+      "GENERATORTYPE": "Typ",
+      "EXPIRY": "Ablauf (in Stunden)",
+      "INCLUDEDIGITS": "Enthält Zahlen",
+      "INCLUDESYMBOLS": "Enthält Symbole",
+      "INCLUDELOWERLETTERS": "Enthält Kleinbuchstaben",
+      "INCLUDEUPPERLETTERS": "Enthält Grossbuchstaben",
+      "LENGTH": "Länge",
+      "UPDATED": "Einstellungen geändert"
     }
   },
   "POLICY": {

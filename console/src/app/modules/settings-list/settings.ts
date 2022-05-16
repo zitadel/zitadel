@@ -10,6 +10,11 @@ export const OIDC: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.OIDC',
 };
 
+export const SECRETS: SidenavSetting = {
+  id: 'secrets',
+  i18nKey: 'SETTINGS.LIST.SECRETS',
+};
+
 export const LOGIN: SidenavSetting = {
   id: 'login',
   i18nKey: 'SETTINGS.LIST.LOGIN',

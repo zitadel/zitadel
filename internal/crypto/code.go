@@ -102,7 +102,7 @@ func newGenerator(config GeneratorConfig) generator {
 }
 
 func NewCode(g Generator) (*CryptoValue, string, error) {
-	code, err := generateRandomString(g.Length(), g.Runes())
+	code, err := GenerateRandomString(g.Length(), g.Runes())
 	if err != nil {
 		return nil, "", err
 	}
@@ -133,7 +133,7 @@ func VerifyCode(creationDate time.Time, expiry time.Duration, cryptoCode *Crypto
 	return errors.ThrowInvalidArgument(nil, "CODE-fW2gNa", "Errors.User.Code.GeneratorAlgNotSupported")
 }
 
-func generateRandomString(length uint, chars []rune) (string, error) {
+func GenerateRandomString(length uint, chars []rune) (string, error) {
 	if length == 0 {
 		return "", nil
 	}
