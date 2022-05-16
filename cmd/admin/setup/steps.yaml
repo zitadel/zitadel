@@ -1,6 +1,7 @@
 S3DefaultInstance:
   InstanceName: Localhost
   CustomDomain: localhost
+  DefaultLanguage: en
   Org:
     Name: ZITADEL
     Human:

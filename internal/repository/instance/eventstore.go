@@ -5,9 +5,7 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(SetupStartedEventType, SetupStepMapper).
-		RegisterFilterEventMapper(SetupDoneEventType, SetupStepMapper).
-		RegisterFilterEventMapper(GlobalOrgSetEventType, GlobalOrgSetMapper).
+	es.RegisterFilterEventMapper(GlobalOrgSetEventType, GlobalOrgSetMapper).
 		RegisterFilterEventMapper(ProjectSetEventType, ProjectSetMapper).
 		RegisterFilterEventMapper(ConsoleSetEventType, ConsoleSetMapper).
 		RegisterFilterEventMapper(DefaultLanguageSetEventType, DefaultLanguageSetMapper).
@@ -17,7 +15,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(SMTPConfigAddedEventType, SMTPConfigAddedEventMapper).
 		RegisterFilterEventMapper(SMTPConfigChangedEventType, SMTPConfigChangedEventMapper).
 		RegisterFilterEventMapper(SMTPConfigPasswordChangedEventType, SMTPConfigPasswordChangedEventMapper).
-		RegisterFilterEventMapper(UniqueConstraintsMigratedEventType, MigrateUniqueConstraintEventMapper).
 		RegisterFilterEventMapper(SMSConfigTwilioAddedEventType, SMSConfigTwilioAddedEventMapper).
 		RegisterFilterEventMapper(SMSConfigTwilioChangedEventType, SMSConfigTwilioChangedEventMapper).
 		RegisterFilterEventMapper(SMSConfigTwilioTokenChangedEventType, SMSConfigTwilioTokenChangedEventMapper).

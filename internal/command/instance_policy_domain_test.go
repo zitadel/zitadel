@@ -44,6 +44,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -52,8 +53,9 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				},
 			},
 			res: res{
@@ -74,6 +76,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 									true,
+									true,
 								),
 							),
 						},
@@ -83,8 +86,9 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				},
 			},
 			res: res{
@@ -94,8 +98,9 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				},
 			},
 		},
@@ -148,8 +153,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				},
 			},
 			res: res{
@@ -167,6 +173,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -175,8 +182,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				},
 			},
 			res: res{
@@ -194,13 +202,14 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultDomainPolicyChangedEvent(context.Background(), false, false),
+								newDefaultDomainPolicyChangedEvent(context.Background(), false, false, false),
 							),
 						},
 					),
@@ -209,8 +218,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: false,
-					ValidateOrgDomains:    false,
+					UserLoginMustBeDomain:                  false,
+					ValidateOrgDomains:                     false,
+					SMTPSenderAddressMatchesInstanceDomain: false,
 				},
 			},
 			res: res{
@@ -219,8 +229,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
-					UserLoginMustBeDomain: false,
-					ValidateOrgDomains:    false,
+					UserLoginMustBeDomain:                  false,
+					ValidateOrgDomains:                     false,
+					SMTPSenderAddressMatchesInstanceDomain: false,
 				},
 			},
 		},
@@ -244,12 +255,13 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain, validateOrgDomains bool) *instance.DomainPolicyChangedEvent {
+func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) *instance.DomainPolicyChangedEvent {
 	event, _ := instance.NewDomainPolicyChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.DomainPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
 			policy.ChangeValidateOrgDomains(validateOrgDomains),
+			policy.ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddressMatchesInstanceDomain),
 		},
 	)
 	return event

@@ -771,7 +771,7 @@ message GetMyEmailResponse {
 }
 
 message SetMyEmailRequest {
-    string email = 1 [(validate.rules).string.email = true]; //TODO: check if no value is allowed
+    string email = 1 [(validate.rules).string.email = true];
 }
 
 message SetMyEmailResponse {

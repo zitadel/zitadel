@@ -1,13 +1,13 @@
 import {
-  animate,
-  animateChild,
-  AnimationTriggerMetadata,
-  group,
-  query,
-  stagger,
-  style,
-  transition,
-  trigger,
+    animate,
+    animateChild,
+    AnimationTriggerMetadata,
+    group,
+    query,
+    stagger,
+    style,
+    transition,
+    trigger,
 } from '@angular/animations';
 
 export const toolbarAnimation: AnimationTriggerMetadata = trigger('toolbar', [
@@ -121,10 +121,10 @@ export const enterAnimations: Array<AnimationTriggerMetadata> = [
 
 export const routeAnimations: AnimationTriggerMetadata = trigger('routeAnimations', [
   transition('HomePage => AddPage', [
-    style({ transform: 'translateX(50%)', opacity: 0.5 }),
+    style({ transform: 'translateX(30vw)', opacity: 0 }),
     animate('250ms ease-out', style({ transform: 'translateX(0%)', opacity: 1 })),
   ]),
-  transition('AddPage => HomePage', [animate('250ms', style({ transform: 'translateX(50%)', opacity: 0.5 }))]),
+  transition('AddPage => HomePage', [animate('250ms', style({ transform: 'translateX(30vw)', opacity: 0 }))]),
   transition('HomePage => DetailPage', [
     query(':enter, :leave', style({ position: 'absolute', left: 0, right: 0 }), {
       optional: true,
@@ -135,7 +135,7 @@ export const routeAnimations: AnimationTriggerMetadata = trigger('routeAnimation
         [
           style({
             transform: 'translateX(20%)',
-            opacity: 0.5,
+            opacity: 0,
           }),
           animate(
             '.35s ease-in',

@@ -2,7 +2,6 @@ package spooler
 
 import (
 	"math/rand"
-	"os"
 
 	"github.com/zitadel/logging"
 
@@ -19,11 +18,8 @@ type Config struct {
 }
 
 func (c *Config) New() *Spooler {
-	lockID, err := os.Hostname()
-	if err != nil || lockID == "" {
-		lockID, err = id.SonyFlakeGenerator.Next()
-		logging.OnError(err).Panic("unable to generate lockID")
-	}
+	lockID, err := id.SonyFlakeGenerator.Next()
+	logging.OnError(err).Panic("unable to generate lockID")
 
 	//shuffle the handlers for better balance when running multiple pods
 	rand.Shuffle(len(c.ViewHandlers), func(i, j int) {

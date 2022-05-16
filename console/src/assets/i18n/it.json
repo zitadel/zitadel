@@ -46,7 +46,8 @@
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
-    "INSTANCEOVERVIEW": "Panoramica Istanza",
+    "INSTANCEOVERVIEW": "Istanza",
+    "ORGS": "Organizzazioni",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
@@ -66,7 +67,8 @@
     "ACTIONS": "Azioni",
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
-    "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera"
+    "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera",
+    "SETTINGS": "Impostazioni"
   },
   "ACTIONS": {
     "ACTIONS": "Azioni",
@@ -669,6 +671,8 @@
     }
   },
   "IAM": {
+    "TITLE": "Istanza",
+    "DESCRIPTION": "Gestisci la tua istanza e le tue organizzazioni",
     "POLICIES": {
       "TITLE": "Impostazioni del Sistema e impostazioni d'accesso",
       "DESCRIPTION": "Gestisci le impostazioni del sistema e le impostazioni d'accesso."
@@ -679,7 +683,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "Questi manager possono modificare le impostazioni del sistema."
+      "DESCRIPTION": "Questi manager possono modificare le impostazioni dell'istanza."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -759,6 +763,10 @@
       "USEPASSWORD": "Imposta la password iniziale",
       "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
     },
+    "LIST": {
+      "TITLE": "Organizzazioni",
+      "DESCRIPTION": "Queste sono le organizzazioni sulla tua istanza"
+    },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
       "TITLE": "Domini",
@@ -791,6 +799,99 @@
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo"
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Impostazioni dell'istanza",
+      "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
+    },
+    "ORG": {
+      "TITLE": "Impostazioni dell'organizzazione",
+      "DESCRIPTION": "Queste impostazioni si applicheranno alla organizzazione corrente."
+    },
+    "LIST": {
+      "GENERAL": "Generale",
+      "LOGIN": "Comportamento login e sicurezza",
+      "LOCKOUT": "Meccanismi di bloccaggio",
+      "COMPLEXITY": "complessità della password",
+      "NOTIFICATIONS": "Notifiche",
+      "MESSAGETEXTS": "Testi di notifica",
+      "IDP": "Identity Providers",
+      "LOGINTEXTS": "Testi dell'interfaccia login",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
+      "OIDC": "OIDC Token lifetime e scadenza",
+      "SECRETS": "Aspetto dei segreti"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Notifiche",
+      "LOGIN": "Accesso e login",
+      "TEXTS": "Testi e lingue",
+      "APPEARANCE": "Aussehen",
+      "OTHER": "Altro"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Lingua standard",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "Impostazioni SMTP",
+      "SENDERADDRESS": "Indirizzo email del mittente",
+      "SENDERNAME": "Nome del mittente",
+      "HOST": "Host",
+      "USER": "Utente",
+      "PASSWORD": "Password",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Salvato con successo!",
+      "REQUIREDWARN": "Per inviare notifiche dal tuo dominio, devi inserire i tuoi dati SMTP."
+    },
+    "SMS": {
+      "TITLE": "Impostazioni SMS",
+      "PROVIDERS": "Fornitori",
+      "PROVIDER": "Fornitore SMS",
+      "ADDPROVIDER": "Aggiungi fornitore SMS",
+      "ADDPROVIDERDESCRIPTION": "Scegli uno dei provider disponibili e inserisci i dati richiesti.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio aggiunto con successo."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Einstellungen",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "ore",
+      "INDAYS": "giorni"
+    },
+    "SECRETS": {
+      "TITLE": "Aspetto dei segreti",
+      "TYPES": "Tipi di segreti",
+      "TYPE": {
+        "1": "Initializzazione email",
+        "2": "Verificazione dell' email",
+        "3": "Verificazione del numero di telefono",
+        "4": "Ripristino Password",
+        "5": "Inizializzazione Passwordless",
+        "6": "Segreto dell'applicazione"
+      },
+      "ADDGENERATOR": "Definisci aspetto",
+      "GENERATORTYPE": "Tipo",
+      "EXPIRY": "Scadenza (in ore)",
+      "INCLUDEDIGITS": "Contiene numeri",
+      "INCLUDESYMBOLS": "Contiene simboli",
+      "INCLUDELOWERLETTERS": "Contiene lettere minuscole",
+      "INCLUDEUPPERLETTERS": "Contiene lettere maiuscole",
+      "LENGTH": "Lunghezza",
+      "UPDATED": "Impostazioni aggiornati"
     }
   },
   "POLICY": {
@@ -965,7 +1066,7 @@
         "UPDATED": "Testi personalizzati salvati."
       }
     },
-    "DEFAULTLABEL": "L'impostazione attuale corrisponde all'impostazione standard IAM.",
+    "DEFAULTLABEL": "L'impostazione attuale corrisponde all'impostazione dell' istanza.",
     "BTN_INSTALL": "Impostazione",
     "BTN_EDIT": "Modifica",
     "DATA": {
@@ -991,10 +1092,14 @@
       "HIDEPASSWORDRESET": "Nascondi ripristino della password",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
+      "IGNOREUNKNOWNUSERNAMES": "Ignora un nome utente sconosciuto",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione \u00e8 selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
+      "DEFAULTREDIRECTURI": "Default Redirect URI",
+      "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana"
     },
-    "RESET": "Ripristina l'impostazione",
+    "RESET": "Ripristina l'impostazione dell'istanza",
     "CREATECUSTOM": "Crea un'impostazione personalizzata",
     "TOAST": {
       "SET": "Impostazione cambiata con successo!",

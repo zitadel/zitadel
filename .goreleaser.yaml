@@ -1,10 +1,12 @@
 project_name: zitadel
+
 release:
   github:
     owner: zitadel
     name: zitadel
   draft: true
   prerelease: auto
+
 before:
   hooks:
     - docker build -f build/grpc/Dockerfile -t zitadel-base:local .
@@ -14,6 +16,7 @@ before:
     - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
     - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console
     - sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -24,7 +27,11 @@ builds:
     goarch:
       - amd64
       - arm64
+    ldflags:
+      -s -w -X github.com/zitadel/zitadel/cmd/build.version={{.Version}} -X github.com/zitadel/zitadel/cmd/build.commit={{.Commit}} -X github.com/zitadel/zitadel/cmd/build.date={{.Date}}
+      
 dist: .artifacts/goreleaser
+
 dockers:
 - image_templates:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
@@ -42,15 +49,47 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/arm64"
+
 archives:
 - format: binary
+
 gomod:
   proxy: false
+
 checksum:
   name_template: 'checksums.txt'
+
 changelog:
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
+
+brews:
+  - tap:
+      owner: zitadel
+      name: homebrew-tap
+      token: "{{ .Env.GORELEASER_TOKEN_TAP }}"
+    folder: Formula
+    goarm: "7"
+    homepage:  https://zitadel.ch
+    description: Open source identity solution built for the container and cloud era
+    license: Apache 2.0
+    test: |
+      system "#{bin}/zitadel -v"
+    dependencies:
+    - name: go
+      type: optional
+    - name: git
+    install: |-
+      bin.install "zitadel"
+      bash_completion.install "completions/zitadel.bash" => "zitadel"
+      zsh_completion.install "completions/zitadel.zsh" => "zitadel"
+      fish_completion.install "completions/gorezitadelleaser.fish"
+      man1.install "manpages/zitadel.1.gz"
+
+announce:
+  discord:
+    enabled: false #enable when we release v2
+    message_template: 'ZITADEL {{ .Tag }} is ready! Check the notes: https://github.com/zitadel/zitadel/releases/tag/{{ .Tag }}'

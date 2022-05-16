@@ -1,18 +1,13 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import { GetCustomOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { GridPolicy, IAM_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -20,9 +15,9 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
   templateUrl: './org-iam-policy.component.html',
   styleUrls: ['./org-iam-policy.component.scss'],
 })
-export class OrgIamPolicyComponent implements OnDestroy {
+export class OrgIamPolicyComponent implements OnInit, OnDestroy {
   private managementService!: ManagementService;
-  public serviceType!: PolicyComponentServiceType;
+  @Input() public serviceType!: PolicyComponentServiceType;
 
   public iamData!: OrgIAMPolicy.AsObject;
 
@@ -30,50 +25,14 @@ export class OrgIamPolicyComponent implements OnDestroy {
   private org!: Org.AsObject;
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public currentPolicy: GridPolicy = IAM_POLICY;
-  public orgName: string = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private toast: ToastService,
-    private storage: StorageService,
-    private injector: Injector,
-    private adminService: AdminService,
-    private storageService: StorageService,
-    breadcrumbService: BreadcrumbService,
-  ) {
-    const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.session) as Org.AsObject;
-    if (temporg) {
-      this.org = temporg;
+  constructor(private toast: ToastService, private injector: Injector, private adminService: AdminService) {}
+
+  ngOnInit(): void {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
     }
-    this.sub = this.route.data
-      .pipe(
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-          if (this.serviceType === PolicyComponentServiceType.MGMT) {
-            const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-            if (org && org.id) {
-              this.orgName = org.name;
-            }
-            this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
-
-            const iambread = new Breadcrumb({
-              type: BreadcrumbType.IAM,
-              name: 'System',
-              routerLink: ['/system'],
-            });
-            const bread: Breadcrumb = {
-              type: BreadcrumbType.ORG,
-              routerLink: ['/org'],
-            };
-            breadcrumbService.setBreadcrumb([iambread, bread]);
-          }
-          return this.route.params;
-        }),
-      )
-      .subscribe((_) => {
-        this.fetchData();
-      });
+    this.fetchData();
   }
 
   public ngOnDestroy(): void {
@@ -103,7 +62,6 @@ export class OrgIamPolicyComponent implements OnDestroy {
   }
 
   public savePolicy(): void {
-    console.log(this.iamData);
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.iamData as OrgIAMPolicy.AsObject).isDefault) {

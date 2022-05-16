@@ -2,75 +2,75 @@
   font-size: 14px;
 }
 
-.container {
-  padding: 4rem 4rem 2rem 4rem;
+.abort-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
 
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
   }
 
-  .abort-container {
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
+  }
+}
+
+.add-line-btn {
+  margin-bottom: 1rem;
+}
+
+.idp-create-content {
+  padding: 0 0 0 72px;
+
+  .first-step-actions {
+    margin-top: 1rem;
+  }
+
+  .auto-reg-info {
+    display: block;
+    width: 100%;
+
+    .auto-reg-desc {
+      margin: 0 0 1rem 0;
+    }
+  }
+
+  .idp-content {
     display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
+    margin: 0 -0.5rem;
+    flex-wrap: wrap;
 
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
-  }
-
-  .add-line-btn {
-    margin-bottom: 1rem;
-  }
-}
-
-.auto-reg-info {
-  display: block;
-  width: 100%;
-
-  .auto-reg-desc {
-    margin: 0 0 1rem 0;
-  }
-}
-
-.idp-content {
-  display: flex;
-  margin: 0 -0.5rem;
-  flex-wrap: wrap;
-
-  .desc {
-    flex-basis: 100%;
-    margin: 0 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .formfield {
-    flex: 1;
-    margin: 0 0.5rem;
-
-    @media only screen and (max-width: 450px) {
+    .desc {
       flex-basis: 100%;
+      margin: 0 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .formfield {
+      flex: 1;
+      margin: 0 0.5rem;
+
+      @media only screen and (max-width: 450px) {
+        flex-basis: 100%;
+      }
     }
   }
-}
 
-.idp-create-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
+  .idp-create-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
 
-  button[mat-stroked-button] {
-    border-radius: 0.5rem;
-  }
+    button[mat-stroked-button] {
+      border-radius: 0.5rem;
+    }
 
-  button[mat-raised-button] {
-    border-radius: 0.5rem;
+    button[mat-raised-button] {
+      border-radius: 0.5rem;
+    }
   }
 }

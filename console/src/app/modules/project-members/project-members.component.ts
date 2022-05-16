@@ -72,21 +72,14 @@ export class ProjectMembersComponent {
                 const isZitadel = iam.iamProjectId === (this.project as Project.AsObject).id;
                 const breadcrumbs = [
                   new Breadcrumb({
-                    type: BreadcrumbType.IAM,
-                    name: 'IAM',
-                    routerLink: ['/system'],
-                  }),
-                  new Breadcrumb({
                     type: BreadcrumbType.ORG,
                     routerLink: ['/org'],
                   }),
                   new Breadcrumb({
                     type: BreadcrumbType.PROJECT,
-                    // name: this.project.name,
                     param: { key: 'projectid', value: (this.project as Project.AsObject).id },
                     routerLink: ['/projects', (this.project as Project.AsObject).id],
                     isZitadel: isZitadel,
-                    hideNav: true,
                   }),
                 ];
                 breadcrumbService.setBreadcrumb(breadcrumbs);

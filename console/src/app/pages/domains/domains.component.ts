@@ -26,16 +26,11 @@ export class DomainsComponent implements OnInit {
     private dialog: MatDialog,
     breadcrumbService: BreadcrumbService,
   ) {
-    const iambread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
-      name: 'IAM',
-      routerLink: ['/system'],
-    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([iambread, bread]);
+    breadcrumbService.setBreadcrumb([bread]);
   }
 
   ngOnInit(): void {

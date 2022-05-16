@@ -3,21 +3,18 @@ package senders
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
+	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 )
 
 func EmailChannels(ctx context.Context, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) (chain *Chain, err error) {
+	channels := make([]channels.NotificationChannel, 0, 3)
 	p, err := smtp.InitSMTPChannel(ctx, emailConfig)
 	if err == nil {
-		chain.channels = append(chain.channels, p)
+		channels = append(channels, p)
 	}
-	chain, err = debugChannels(ctx, getFileSystemProvider, getLogProvider)
-	if err != nil {
-		logging.New().Info("Error in creating debug channels")
-	}
-	return chain, nil
+	channels = append(channels, debugChannels(ctx, getFileSystemProvider, getLogProvider)...)
+	return chainChannels(channels...), nil
 }

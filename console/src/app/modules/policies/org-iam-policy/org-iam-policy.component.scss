@@ -36,12 +36,10 @@
 
 .btn-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   width: 100%;
-  margin-bottom: 50px;
 
   button {
-    margin-top: 3rem;
     display: block;
   }
 }

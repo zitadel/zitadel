@@ -2,9 +2,9 @@
   margin: 0.5rem 0;
 }
 
-.policy-applied-to {
-  margin: -1rem 0 0 0;
-  font-size: 14px;
+.max-card-width {
+  max-width: 400px;
+  display: block;
 }
 
 .passwordless-allowed {
@@ -12,15 +12,9 @@
   display: block;
 }
 
-.force-mfa-toggle {
-  margin-right: 1rem;
-}
-
 .login-policy-content {
-  padding-top: 1rem;
-
   .login-policy-row {
-    padding-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
 
     .login-policy-toggle {
       margin: 0.3rem 0;
@@ -34,10 +28,9 @@
 
 .login-policy-btn-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 
   .login-policy-save-button {
-    margin-bottom: 3rem;
     display: block;
   }
 }

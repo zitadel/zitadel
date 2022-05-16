@@ -390,6 +390,7 @@ message AddInstanceRequest {
     Email owner_email = 5 [(validate.rules).message.required = true];
     Profile owner_profile = 6 [(validate.rules).message.required = false];
     Password owner_password = 7 [(validate.rules).message.required = false];
+    string default_language = 8 [(validate.rules).string = {max_len: 10}];
 }
 
 message AddInstanceResponse {

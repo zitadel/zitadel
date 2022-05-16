@@ -12,6 +12,14 @@
     color: $warn-color;
   }
 
+  .section-h2 {
+    font-weight: 400;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 2rem 0 1rem 0;
+  }
+
   .project-detail-privatelabel-info {
     display: flex;
     flex-direction: column;

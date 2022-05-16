@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
-	DefaultLanguageSetEventType eventstore.EventType = "iam.default.language.set"
+	DefaultLanguageSetEventType eventstore.EventType = "instance.default.language.set"
 )
 
 type DefaultLanguageSetEvent struct {

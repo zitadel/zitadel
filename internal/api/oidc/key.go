@@ -201,11 +201,11 @@ func setOIDCCtx(ctx context.Context) context.Context {
 
 func retry(retryable func() error) (err error) {
 	for i := 0; i < retryCount; i++ {
-		time.Sleep(retryBackoff)
 		err = retryable()
 		if err == nil {
 			return nil
 		}
+		time.Sleep(retryBackoff)
 	}
 	return err
 }

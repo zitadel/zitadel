@@ -46,6 +46,15 @@ const (
 	EndpointDynamicResources = "/resources/dynamic"
 )
 
+var (
+	IgnoreInstanceEndpoints = []string{
+		EndpointResources + "/fonts",
+		EndpointResources + "/images",
+		EndpointResources + "/scripts",
+		EndpointResources + "/themes",
+	}
+)
+
 func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.MiddlewareFunc) *mux.Router {
 	router := mux.NewRouter()
 	router.Use(interceptors...)

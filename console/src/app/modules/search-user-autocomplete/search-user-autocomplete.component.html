@@ -3,26 +3,36 @@
   <div class="found-user-row" *ngFor="let user of users; index as i">
     <div class="circle">
       <cnsl-avatar
-        *ngIf="user.human && user.human.profile && user.human.profile.displayName && user.human.profile.firstName && user.human.profile.lastName; else cog"
-        class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human.profile?.avatarUrl || ''"
-        [forColor]="user.preferredLoginName" [size]="32">
+        *ngIf="
+          user.human &&
+            user.human.profile &&
+            user.human.profile.displayName &&
+            user.human.profile.firstName &&
+            user.human.profile.lastName;
+          else cog
+        "
+        class="avatar"
+        [name]="user.human.profile.displayName"
+        [avatarUrl]="user.human.profile?.avatarUrl || ''"
+        [forColor]="user.preferredLoginName"
+        [size]="32"
+      >
       </cnsl-avatar>
       <ng-template #cog>
-        <cnsl-avatar class="avatar" [forColor]="user.preferredLoginName" [isMachine]="true" [size]="32">
-        </cnsl-avatar>
+        <cnsl-avatar class="avatar" [forColor]="user.preferredLoginName" [isMachine]="true" [size]="32"> </cnsl-avatar>
       </ng-template>
     </div>
 
     <div class="user-name-column" *ngIf="user.human">
-      <span>{{user.human?.profile?.displayName}}</span>
-      <span class="smaller cnsl-secondary-text">{{user.preferredLoginName}}</span>
+      <span>{{ user.human?.profile?.displayName }}</span>
+      <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
     </div>
     <div class="user-name-column" *ngIf="user.machine">
-      <span>{{user.machine.name}}</span>
-      <span class="smaller cnsl-secondary-text">{{user.preferredLoginName}}</span>
+      <span>{{ user.machine.name }}</span>
+      <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
     </div>
     <span class="fill-space"></span>
-    <button class="search-user-dl-btn" matTooltip="{{'ACTIONS.REMOVE' | translate}}" mat-icon-button color="warn">
+    <button class="search-user-dl-btn" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" mat-icon-button color="warn">
       <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
     </button>
   </div>
@@ -37,13 +47,26 @@
   <ng-container *ngIf="target && target === UserTarget.SELF">
     <div class="line">
       <cnsl-form-field class="user-create-form-field more-space">
-        <cnsl-label>{{'USER.SEARCH.ADDITIONAL' | translate}}</cnsl-label>
+        <cnsl-label>{{ 'USER.SEARCH.ADDITIONAL' | translate }}</cnsl-label>
 
-        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
-          [formControl]="myControl" [matAutocomplete]="auto" />
+        <input
+          cnslInput
+          *ngIf="singleOutput"
+          type="text"
+          placeholder="Search for the user loginname"
+          #usernameInput
+          [formControl]="myControl"
+          [matAutocomplete]="auto"
+        />
 
-        <input *ngIf="!singleOutput" cnslInput #usernameInput [formControl]="myControl" placeholder="John Doe"
-          [matAutocomplete]="auto" />
+        <input
+          *ngIf="!singleOutput"
+          cnslInput
+          #usernameInput
+          [formControl]="myControl"
+          placeholder="johndoe@domain.com"
+          [matAutocomplete]="auto"
+        />
 
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
           <mat-option *ngIf="isLoading" class="is-loading">
@@ -53,9 +76,20 @@
             <div class="user-option">
               <div class="circle">
                 <cnsl-avatar
-                  *ngIf="user.human && user.human.profile && user.human.profile.displayName && user.human.profile.firstName && user.human.profile.lastName; else cog"
-                  class="avatar" [name]="user.human.profile.displayName"
-                  [avatarUrl]="user.human.profile?.avatarUrl || ''" [forColor]="user.preferredLoginName" [size]="32">
+                  *ngIf="
+                    user.human &&
+                      user.human.profile &&
+                      user.human.profile.displayName &&
+                      user.human.profile.firstName &&
+                      user.human.profile.lastName;
+                    else cog
+                  "
+                  class="avatar"
+                  [name]="user.human.profile.displayName"
+                  [avatarUrl]="user.human.profile?.avatarUrl || ''"
+                  [forColor]="user.preferredLoginName"
+                  [size]="32"
+                >
                 </cnsl-avatar>
                 <ng-template #cog>
                   <cnsl-avatar class="avatar" [forColor]="user.preferredLoginName" [isMachine]="true" [size]="32">
@@ -63,19 +97,21 @@
                 </ng-template>
               </div>
               <div class="user-option-column">
-                <span>{{(user.human && user.human.profile && user.human.profile.displayName) ?
-                  user.human.profile.displayName :
-                  user.machine?.name}}</span>
+                <span>{{
+                  user.human && user.human.profile && user.human.profile.displayName
+                    ? user.human.profile.displayName
+                    : user.machine?.name
+                }}</span>
                 <span class="fill-space"></span>
-                <span class="smaller cnsl-secondary-text">{{user.preferredLoginName}}</span>
+                <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
               </div>
             </div>
           </mat-option>
         </mat-autocomplete>
 
         <span class="target-desc">
-          {{'USER.TARGET.SELF'| translate}}
-          <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+          {{ 'USER.TARGET.SELF' | translate }}
+          <a (click)="changeTarget()">{{ 'USER.TARGET.CLICKHERE' | translate }}</a>
         </span>
       </cnsl-form-field>
     </div>
@@ -84,11 +120,11 @@
   <ng-container *ngIf="target && target === UserTarget.EXTERNAL">
     <div class="line">
       <cnsl-form-field class="user-create-form-field more-space">
-        <cnsl-label>{{'USER.SEARCH.ADDITIONAL-EXTERNAL' | translate}}</cnsl-label>
+        <cnsl-label>{{ 'USER.SEARCH.ADDITIONAL-EXTERNAL' | translate }}</cnsl-label>
         <input cnslInput type="text" [formControl]="globalLoginNameControl" placeholder="example@externaldomain.com" />
         <span class="target-desc">
-          {{(target === UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
-          <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+          {{ (target === UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate }}
+          <a (click)="changeTarget()">{{ 'USER.TARGET.CLICKHERE' | translate }}</a>
         </span>
       </cnsl-form-field>
 

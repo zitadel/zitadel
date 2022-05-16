@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, Observable } from 'rxjs';
+import { BehaviorSubject, from, lastValueFrom, Observable } from 'rxjs';
 
 import { StatehandlerService } from './statehandler/statehandler.service';
 
@@ -41,7 +41,7 @@ export class AuthenticationService {
 
     this._authenticated = this.oauthService.hasValidAccessToken();
     if (!this.oauthService.hasValidIdToken() || !this.authenticated || partialConfig || force) {
-      const newState = await this.statehandler.createState().toPromise();
+      const newState = await lastValueFrom(this.statehandler.createState());
       this.oauthService.initCodeFlow(newState);
     }
     this._authenticationChanged.next(this.authenticated);

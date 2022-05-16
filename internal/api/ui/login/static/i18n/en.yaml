@@ -323,6 +323,8 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       InvalidAndLocked: Password is invalid and user is locked, contact your administrator.
+    UsernameOrPassword:
+      Invalid: Username or Password is invalid
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is to short

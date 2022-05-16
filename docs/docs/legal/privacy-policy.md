@@ -5,7 +5,7 @@ custom_edit_url: null
 
 ## Introduction
 
-This privacy policy applies to CAOS Ltd., the websites it operates (including caos.ch and zitadel.ch) and the services and products it provides (including ZITADEL). This privacy policy describes how we process personal data for the provision of this websites and our products.
+This privacy policy applies to CAOS Ltd., the websites it operates (including caos.ch, zitadel.ch, zitadel.cloud and zitadel.com) and the services and products it provides (including ZITADEL). This privacy policy describes how we process personal data for the provision of this websites and our products.
 
 If any inconsistencies arise between this Privacy Policy and the otherwise applicable contractual terms, framework agreement, or general terms of service, the provisions of this Privacy Policy shall prevail. This privacy policy covers both existing personal data and personal data collected from you in the future.
 
@@ -176,7 +176,7 @@ The fulfillment of the contract includes in particular, but is not limited to, t
 
 ## Disclosure to third parties
 
-We use third-party services to provide the website and our offers. An up-to-date list of all the providers we use and their areas of activity can be found on our "[Trust Page](https://zitadel.ch/trust)".
+We use third-party services to provide the website and our offers. An up-to-date list of all the providers we use and their areas of activity can be found on our "[Trust Page](https://zitadel.com/trust)".
 
 This website uses external payment service providers through whose platforms users and we can make payment transactions. For example via
 

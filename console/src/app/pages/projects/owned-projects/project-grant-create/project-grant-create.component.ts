@@ -1,12 +1,14 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+const ROUTEPARAM = 'projectid';
 
 @Component({
   selector: 'cnsl-project-grant-create',
@@ -22,39 +24,52 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
   public STEPS: number = 2;
   public currentCreateStep: number = 1;
 
-  private routeSubscription: Subscription = new Subscription();
+  private destroy$: Subject<void> = new Subject();
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
     private mgmtService: ManagementService,
-    private authService: GrpcAuthService,
     private _location: Location,
-  ) { }
+    private breadcrumbService: BreadcrumbService,
+  ) {}
 
   public ngOnInit(): void {
-    this.routeSubscription = this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       this.projectId = params.projectid;
+
+      const breadcrumbs = [
+        new Breadcrumb({
+          type: BreadcrumbType.ORG,
+          routerLink: ['/org'],
+        }),
+        new Breadcrumb({
+          type: BreadcrumbType.PROJECT,
+          name: '',
+          param: { key: ROUTEPARAM, value: this.projectId },
+          routerLink: ['/projects', this.projectId],
+        }),
+      ];
+      this.breadcrumbService.setBreadcrumb(breadcrumbs);
     });
   }
 
   public ngOnDestroy(): void {
-    this.routeSubscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public searchOrg(domain: string): void {
-    this.mgmtService.getOrgByDomainGlobal(domain).then((ret) => {
-      if (ret.org) {
-        const tmp = ret.org;
-        this.authService.getActiveOrg().then((org) => {
-          if (tmp !== org) {
-            this.org = tmp;
-          }
-        });
-        this.org = ret.org;
-      }
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .getOrgByDomainGlobal(domain)
+      .then((ret) => {
+        if (ret.org) {
+          const tmp = ret.org;
+          this.org = tmp;
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public close(): void {
@@ -67,13 +82,13 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
       .then(() => {
         this.close();
       })
-      .catch(error => {
+      .catch((error) => {
         this.toast.showError(error);
       });
   }
 
   public selectRoles(roles: Role.AsObject[]): void {
-    this.rolesKeyList = roles.map(role => role.key);
+    this.rolesKeyList = roles.map((role) => role.key);
   }
 
   public next(): void {
@@ -84,4 +99,3 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     this.currentCreateStep--;
   }
 }
-

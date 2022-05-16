@@ -238,6 +238,7 @@ $caos-dark-theme-background: (
   // set fixed color due to https://github.com/angular/components/pull/14253
   // change where a scss mix function can't use a css var
   cards: map_get($caos-dark-background, 400),
+  cardhovered: map_get($caos-dark-background, 300),
   contributor: map_get($caos-dark-background, 400),
   contributor-avatar: map_get($caos-dark-background, 300),
   dialog: map_get($caos-dark-background, 500),
@@ -252,6 +253,7 @@ $caos-dark-theme-background: (
   tooltip: map_get($mat-gray, 700),
   infosection: map_get($caos-dark-background, 300),
   warninfosection: #741f2c4a,
+  alertinfosection: #92400e50,
   successinfosection: map_get($caos-dark-background, 300),
   state: map_get($caos-dark-background, 300),
   state-active: #68cf8340,
@@ -260,6 +262,7 @@ $caos-dark-theme-background: (
   moz-toolbar: map_get($caos-dark-background, 500),
   footer: #00000020,
   metadata-section: #00000020,
+  alert: #fbbf24,
 );
 
 $caos-light-theme-background: (
@@ -273,6 +276,7 @@ $caos-light-theme-background: (
   // set fixed color due to https://github.com/angular/components/pull/14253
   // change where a scss mix function can't use a css var
   cards: map_get($caos-light-background, 400),
+  cardhovered: map_get($caos-light-background, 300),
   dialog: map_get($caos-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -283,13 +287,15 @@ $caos-light-theme-background: (
   unselected-chip: map_get($caos-light-background, 300),
   disabled-list-option: map_get($caos-light-background, 200),
   tooltip: map_get($mat-gray, 700),
-  infosection: #e4e4e4,
+  infosection: map_get($caos-light-primary, 100),
   warninfosection: #ffc1c1,
+  alertinfosection: rgb(251, 191, 36),
   successinfosection: #cbf4c9,
   toolbar: rgba(map_get($caos-light-background, 500), 0.9),
   moz-toolbar: map_get($caos-light-background, 500),
   footer: #00000008,
   metadata-section: #605f5f08,
+  alert: rgb(251, 191, 36),
 );
 
 $caos-dark-theme-foreground: (
@@ -311,6 +317,7 @@ $caos-dark-theme-foreground: (
   slider-off-active: rgba(white, 0.38),
   infosection: #f0f0f0,
   warninfosection: #ffc1c1,
+  alertinfosection: rgb(251, 191, 36),
   successinfosection: #cbf4c9,
   toolbar-items: map-get(map-get($caos-dark-primary, contrast), 500),
   slash: #ffffff6e,
@@ -335,6 +342,7 @@ $caos-light-theme-foreground: (
   slider-off-active: rgba(black, 0.38),
   infosection: #4a4a4a,
   warninfosection: #620e0e,
+  alertinfosection: rgb(146, 64, 14),
   successinfosection: #0e6245,
   toolbar-items: map-get(map-get($caos-light-primary, contrast), 500),
   slash: #0000006e,
@@ -427,6 +435,14 @@ $custom-typography: mat.define-typography-config(
     border-radius: 6px;
   }
 
+  .mat-option {
+    background-color: map-get($background, cards);
+
+    &:hover {
+      background-color: map-get($background, cardhovered);
+    }
+  }
+
   .mat-button-toggle-button {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -479,6 +495,14 @@ $custom-typography: mat.define-typography-config(
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
+  }
+
+  .mat-option {
+    background-color: map-get($background, cards);
+
+    &:hover {
+      background-color: map-get($background, cardhovered);
+    }
   }
 
   .mat-button-toggle-button {

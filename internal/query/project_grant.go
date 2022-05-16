@@ -65,10 +65,6 @@ var (
 		name:  projection.ProjectGrantColumnRoleKeys,
 		table: projectGrantsTable,
 	}
-	ProjectGrantColumnCreator = Column{
-		name:  projection.ProjectGrantColumnCreator,
-		table: projectGrantsTable,
-	}
 	ProjectGrantColumnGrantedOrgName = Column{
 		name:  projection.OrgColumnName,
 		table: orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias),
