@@ -140,9 +140,9 @@ The technical and organizational security measures are described in more detail 
 
 ### Involvement of subcontracted processors
 
-A current and complete list of involved and approved sub-processors can be found at [https://zitadel.ch/trust/](https://zitadel.ch/trust/).
+A current and complete list of involved and approved sub-processors can be found at [https://zitadel.com/trust/](https://zitadel.com/trust/).
 
-The Processor is entitled to involve additional sub-processors. In this case, the Processor shall inform the Responsible Party about any intended change regarding sub-processors and update the list at <https://zitadel.ch/trust>. The Customer has the right to object to such changes. If the Parties are unable to reach a mutual agreement within 90 days of receipt of the objection by the Processor, the Customer may terminate the Agreement extraordinarily.
+The Processor is entitled to involve additional sub-processors. In this case, the Processor shall inform the Responsible Party about any intended change regarding sub-processors and update the list at <https://zitadel.com/trust>. The Customer has the right to object to such changes. If the Parties are unable to reach a mutual agreement within 90 days of receipt of the objection by the Processor, the Customer may terminate the Agreement extraordinarily.
 
 The Processor obligates itself to impose on all sub-processors, by means of a contract (or in another appropriate manner), the same data protection obligations as are imposed on it by this Annex. In particular, sufficient guarantees shall be provided that the appropriate technical and organizational measures are implemented in such a way that the processing by the sub-processor is carried out in accordance with the legal requirements. If the sub-processor fails to comply with its data protection obligations, the processor shall be liable to the customer for this as for its own conduct.
 

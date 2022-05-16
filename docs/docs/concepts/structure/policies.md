@@ -1,13 +1,13 @@
 ---
-title: Policies
+title: Settings/Policies
 ---
 
-Policies are configurations of all the different parts of the IAM. For all parts we have a suitable default in the IAM.
+Settings and policies are configurations of all the different parts of the Instance or an organization. For all parts we have a suitable default in the Instance.
 The default configuration can be overridden for each organization.
 
 ## General
 
-You can find these settings in the menu organization in the section polcies.
+You can find these settings in the instance page under settings, or on a specific organization menu organization in the section polycies.
 Each policy can be overridden and reset to the default.
 
 ## Password Complexity
@@ -88,3 +88,11 @@ Make sure you click the "Set preview as current configuration" button after you 
 
 Each organization is able to configure its own privacy policy and terms of service.
 A link to the current policies can be provided. On register each user has to accept these policies.
+
+
+## Domain policy
+
+In the domain policy you have two different settings. 
+One is the "user_login_must_be_domain", by setting this all the users within an organisation will be suffixed with the domain of the organisation.
+The second is "validate_org_domains" if this is set to true all created domains on an organisation must be verified per acme challenge. [Verify Domain] (../../guides/basics/organizations#domain-verification-and-primary-domain)
+If it is set to false, all registered domain will automatically be created as verified and the users will be able to use the domain for login.

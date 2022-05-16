@@ -2,7 +2,7 @@
 title: Customized Texts
 ---
 
-You are able to customize the texts used from ZITADEL.
+You are able to customize the texts used from ZITADEL. This is possibly on the instance or organization level.
 
 ## Message Texts
 Sometimes the users will get an email or phone message from ZITADEL (e.g Password Reset Request).
