@@ -325,9 +325,11 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
-	validations = append(validations,
-		c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)...,
-	)
+	addGenerateddDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
+	if err != nil {
+		return "", nil, err
+	}
+	validations = append(validations, addGenerateddDomain...)
 	if setup.CustomDomain != "" {
 		validations = append(validations,
 			c.addInstanceDomain(instanceAgg, setup.CustomDomain, false),
