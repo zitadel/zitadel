@@ -1,0 +1,48 @@
+<h1 mat-dialog-title class="title">
+  <span>{{ provider === SMSProviderType.Twilio ? 'Twilio' : ('SETTING.SMS.ADDPROVIDER' | translate) }}</span>
+</h1>
+<div mat-dialog-content>
+  <!-- <p class="desc cnsl-secondary-text">{{ 'SETTING.SMS.ADDPROVIDERDESCRIPTION' | translate }}</p> -->
+
+  <!-- <cnsl-form-field class="form-field" label="Access Code" required="true">
+    <cnsl-label>{{ 'MFA.TYPE' | translate }}</cnsl-label>
+    <mat-select [(ngModel)]="provider">
+      <mat-option *ngFor="let prov of availableSMSProviders" [value]="prov">
+        <span *ngIf="prov === SMSProviderType.Twilio">Twilio</span>
+      </mat-option>
+    </mat-select>
+  </cnsl-form-field> -->
+
+  <form *ngIf="provider === SMSProviderType.Twilio" (ngSubmit)="closeDialogWithRequest()" [formGroup]="twilioForm">
+    <!-- <h2>Twilio</h2> -->
+
+    <cnsl-form-field class="sms-form-field" label="sid">
+      <cnsl-label>{{ 'SETTING.SMS.TWILIO.SID' | translate }}</cnsl-label>
+      <input cnslInput name="sid" formControlName="sid" />
+    </cnsl-form-field>
+
+    <cnsl-form-field class="sms-form-field" label="Token">
+      <cnsl-label>{{ 'SETTING.SMS.TWILIO.TOKEN' | translate }}</cnsl-label>
+      <input cnslInput name="token" formControlName="token" />
+    </cnsl-form-field>
+
+    <cnsl-form-field class="sms-form-field" label="Sender Number">
+      <cnsl-label>{{ 'SETTING.SMS.TWILIO.SENDERNUMBER' | translate }}</cnsl-label>
+      <input cnslInput name="senderNumber" formControlName="senderNumber" />
+    </cnsl-form-field>
+  </form>
+</div>
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="closeDialog()">
+    <span>{{ 'ACTIONS.CLOSE' | translate }}</span>
+  </button>
+  <button
+    [disabled]="provider === SMSProviderType.Twilio && !twilioForm.valid"
+    mat-raised-button
+    class="ok-button"
+    color="primary"
+    (click)="closeDialogWithRequest()"
+  >
+    <span>{{ 'ACTIONS.SAVE' | translate }}</span>
+  </button>
+</div>

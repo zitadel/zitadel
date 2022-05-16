@@ -815,13 +815,14 @@
       "LOGIN": "Login Behaviour and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notifications",
-      "NOTIFICATIONPROVIDERS": "Notification providers and SMTP",
+      "NOTIFICATIONS": "Notification providers and SMTP",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Privacy Policy"
+      "PRIVACYPOLICY": "Privacy Policy",
+      "OIDC": "OIDC Token lifetime and expiration",
+      "SECRETS": "Secret Appearance"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -837,6 +838,60 @@
       "de": "Deutsch",
       "it": "Italiano",
       "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "SMTP Settings",
+      "SENDERADDRESS": "Sender Email address",
+      "SENDERNAME": "Sender Name",
+      "HOST": "Host",
+      "USER": "User",
+      "PASSWORD": "Password",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Saved successfully!",
+      "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
+    },
+    "SMS": {
+      "TITLE": "SMS Settings",
+      "PROVIDERS": "Providers",
+      "PROVIDER": "SMS Provider",
+      "ADDPROVIDER": "Add SMS Provider",
+      "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio added successfully."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Settings",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "hours",
+      "INDAYS": "Days"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Appearance",
+      "TYPES": "Secret Types",
+      "TYPE": {
+        "1": "Initialization Mail",
+        "2": "Email verification",
+        "3": "Phone verification",
+        "4": "Password Reset",
+        "5": "Passwordless Initialization",
+        "6": "App Secret"
+      },
+      "ADDGENERATOR": "Define Secret Appearance",
+      "GENERATORTYPE": "Type",
+      "EXPIRY": "Expiration (in hours)",
+      "INCLUDEDIGITS": "Include Numbers",
+      "INCLUDESYMBOLS": "Include Symbols",
+      "INCLUDELOWERLETTERS": "Include Lower letters",
+      "INCLUDEUPPERLETTERS": "Include Upper letters",
+      "LENGTH": "Length",
+      "UPDATED": "Settings updated."
     }
   },
   "POLICY": {

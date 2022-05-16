@@ -5,6 +5,16 @@ export const GENERAL: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.GENERAL',
 };
 
+export const OIDC: SidenavSetting = {
+  id: 'oidc',
+  i18nKey: 'SETTINGS.LIST.OIDC',
+};
+
+export const SECRETS: SidenavSetting = {
+  id: 'secrets',
+  i18nKey: 'SETTINGS.LIST.SECRETS',
+};
+
 export const LOGIN: SidenavSetting = {
   id: 'login',
   i18nKey: 'SETTINGS.LIST.LOGIN',
@@ -28,12 +38,6 @@ export const COMPLEXITY: SidenavSetting = {
 };
 
 export const IDP: SidenavSetting = { id: 'idp', i18nKey: 'SETTINGS.LIST.IDP', groupI18nKey: 'SETTINGS.GROUPS.LOGIN' };
-
-export const NOTIFICATIONPROVIDERS: SidenavSetting = {
-  id: 'notificationproviders',
-  i18nKey: 'SETTINGS.LIST.NOTIFICATIONPROVIDERS',
-  groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
-};
 
 export const NOTIFICATIONS: SidenavSetting = {
   id: 'notifications',

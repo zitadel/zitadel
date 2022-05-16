@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	smtpConfigPrefix                   = "smtp.config"
+	smtpConfigPrefix                   = "smtp.config."
 	SMTPConfigAddedEventType           = instanceEventTypePrefix + smtpConfigPrefix + "added"
 	SMTPConfigChangedEventType         = instanceEventTypePrefix + smtpConfigPrefix + "changed"
 	SMTPConfigPasswordChangedEventType = instanceEventTypePrefix + smtpConfigPrefix + "password.changed"

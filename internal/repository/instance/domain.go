@@ -19,14 +19,14 @@ const (
 )
 
 func NewAddInstanceDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewAddEventUniqueConstraint(
+	return eventstore.NewAddGlobalEventUniqueConstraint(
 		UniqueInstanceDomain,
 		orgDomain,
 		"Errors.Instance.Domain.AlreadyExists")
 }
 
 func NewRemoveInstanceDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+	return eventstore.NewRemoveGlobalEventUniqueConstraint(
 		UniqueInstanceDomain,
 		orgDomain)
 }

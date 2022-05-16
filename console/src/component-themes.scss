@@ -12,6 +12,7 @@
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/modules/contributors/contributors.component';
 @import 'src/app/modules/nav/nav.component';
+@import './styles/toast.scss';
 @import 'src/app/modules/table-actions/table-actions.component';
 @import 'src/app/modules/org-context/org-context.component.scss';
 @import 'src/app/modules/action-keys/action-keys.component.scss';
@@ -95,6 +96,7 @@
   @include user-detail-theme($theme);
   @include instance-detail-theme($theme);
   @include meta-theme($theme);
+  @include toast-theme($theme);
   @include keyboard-shortcuts-theme($theme);
   @include project-grant-illustration-theme($theme);
   @include refresh-table-theme($theme);

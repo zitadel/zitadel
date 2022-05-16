@@ -14,9 +14,10 @@ import {
     LOGIN,
     LOGINTEXTS,
     MESSAGETEXTS,
-    NOTIFICATIONPROVIDERS,
     NOTIFICATIONS,
+    OIDC,
     PRIVACYPOLICY,
+    SECRETS,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -29,16 +30,21 @@ export class InstanceSettingsComponent {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public settingsList: SidenavSetting[] = [
     GENERAL,
+    // notifications
+    { showWarn: true, ...NOTIFICATIONS },
+    // login
     LOGIN,
     COMPLEXITY,
     LOCKOUT,
     IDP,
-    NOTIFICATIONS,
-    NOTIFICATIONPROVIDERS,
+    // appearance
     BRANDING,
     MESSAGETEXTS,
     LOGINTEXTS,
+    // others
     PRIVACYPOLICY,
+    OIDC,
+    SECRETS,
   ];
   constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute) {
     const breadcrumbs = [

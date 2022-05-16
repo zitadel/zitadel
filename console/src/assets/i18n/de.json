@@ -816,12 +816,13 @@
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",
       "NOTIFICATIONS": "Benachrichtigungen",
-      "NOTIFICATIONPROVIDERS": "Anbieter und SMTP",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identity Provider",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Datenschutzrichtlinie"
+      "PRIVACYPOLICY": "Datenschutzrichtlinie",
+      "OIDC": "OIDC Token Lifetime und Expiration",
+      "SECRETS": "Secret Erscheinungsbild"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Benachrichtigungen",
@@ -837,6 +838,60 @@
       "de": "Deutsch",
       "it": "Italiano",
       "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "SMTP Einstellungen",
+      "SENDERADDRESS": "Sender Email-Adresse",
+      "SENDERNAME": "Sender Name",
+      "HOST": "Host",
+      "USER": "Benutzer",
+      "PASSWORD": "Passwort",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Erfolgreich gespeichert.",
+      "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
+    },
+    "SMS": {
+      "TITLE": "SMS Einstellungen",
+      "PROVIDERS": "Anbieter",
+      "PROVIDER": "SMS Anbieter",
+      "ADDPROVIDER": "Anbieter hinzufügen",
+      "ADDPROVIDERDESCRIPTION": "Wählen Sie einen der verfügbaren Anbieter und geben Sie die erforderlichen Daten ein.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio erfolgreich hinzugefügt."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Einstellungen",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "Stunden",
+      "INDAYS": "Tage"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Erscheinungsbild",
+      "TYPES": "Schlüsseltypen",
+      "TYPE": {
+        "1": "Email Initialisierungscode",
+        "2": "Email Verifikationscode",
+        "3": "Telefonnummer Verificationscode",
+        "4": "Passwort Zurücksetzen Code",
+        "5": "Passwordless Initialisierungscode",
+        "6": "Applicationssecret"
+      },
+      "ADDGENERATOR": "Secret Erscheinungsbild definieren",
+      "GENERATORTYPE": "Typ",
+      "EXPIRY": "Ablauf (in Stunden)",
+      "INCLUDEDIGITS": "Enthält Zahlen",
+      "INCLUDESYMBOLS": "Enthält Symbole",
+      "INCLUDELOWERLETTERS": "Enthält Kleinbuchstaben",
+      "INCLUDEUPPERLETTERS": "Enthält Grossbuchstaben",
+      "LENGTH": "Länge",
+      "UPDATED": "Einstellungen geändert"
     }
   },
   "POLICY": {
