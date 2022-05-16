@@ -19,6 +19,7 @@ title: zitadel/policy.proto
 | user_login_must_be_domain |  bool | - |  |
 | is_default |  bool | - |  |
 | validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
 
 
 

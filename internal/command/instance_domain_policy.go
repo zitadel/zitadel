@@ -11,7 +11,8 @@ import (
 func AddDefaultDomainPolicy(
 	a *instance.Aggregate,
 	userLoginMustBeDomain,
-	validateOrgDomains bool,
+	validateOrgDomains,
+	smtpSenderAddressMatchesInstanceDomain bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -20,6 +21,7 @@ func AddDefaultDomainPolicy(
 				instance.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
 					userLoginMustBeDomain,
 					validateOrgDomains,
+					smtpSenderAddressMatchesInstanceDomain,
 				),
 			}, nil
 		}, nil

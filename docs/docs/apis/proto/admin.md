@@ -1431,6 +1431,7 @@ This is an empty request
 | org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_login_must_be_domain |  bool | the username has to end with the domain of it's organisation (uniqueness is organisation based) |  |
 | validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
 
 
 
@@ -3472,6 +3473,7 @@ This is an empty request
 | org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_login_must_be_domain |  bool | - |  |
 | validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
 
 
 
@@ -3518,6 +3520,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | user_login_must_be_domain |  bool | - |  |
 | validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
 
 
 

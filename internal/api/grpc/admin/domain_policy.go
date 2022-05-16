@@ -27,7 +27,7 @@ func (s *Server) GetCustomDomainPolicy(ctx context.Context, req *admin_pb.GetCus
 }
 
 func (s *Server) AddCustomDomainPolicy(ctx context.Context, req *admin_pb.AddCustomDomainPolicyRequest) (*admin_pb.AddCustomDomainPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, req.ValidateOrgDomains))
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, req.ValidateOrgDomains, req.SmtpSenderAddressMatchesInstanceDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +76,11 @@ func (s *Server) ResetCustomDomainPolicyTo(ctx context.Context, req *admin_pb.Re
 	return nil, nil //TOOD: return data
 }
 
-func domainPolicyToDomain(userLoginMustBeDomain, validateOrgDomains bool) *domain.DomainPolicy {
+func domainPolicyToDomain(userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
-		UserLoginMustBeDomain: userLoginMustBeDomain,
-		ValidateOrgDomains:    validateOrgDomains,
+		UserLoginMustBeDomain:                  userLoginMustBeDomain,
+		ValidateOrgDomains:                     validateOrgDomains,
+		SMTPSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
 	}
 }
 
@@ -88,8 +89,9 @@ func updateDomainPolicyToDomain(req *admin_pb.UpdateDomainPolicyRequest) *domain
 		// ObjectRoot: models.ObjectRoot{
 		// 	// AggreagateID: //TODO: there should only be ONE default
 		// },
-		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
-		ValidateOrgDomains:    req.ValidateOrgDomains,
+		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     req.ValidateOrgDomains,
+		SMTPSenderAddressMatchesInstanceDomain: req.SmtpSenderAddressMatchesInstanceDomain,
 	}
 }
 
@@ -98,13 +100,14 @@ func updateCustomDomainPolicyToDomain(req *admin_pb.UpdateCustomDomainPolicyRequ
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.OrgId,
 		},
-		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
-		ValidateOrgDomains:    req.ValidateOrgDomains,
+		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     req.ValidateOrgDomains,
+		SMTPSenderAddressMatchesInstanceDomain: req.SmtpSenderAddressMatchesInstanceDomain,
 	}
 }
 
 func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCustomOrgIAMPolicyRequest) (*admin_pb.AddCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, true))
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, true, true))
 	if err != nil {
 		return nil, err
 	}
@@ -163,8 +166,9 @@ func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCus
 
 func updateOrgIAMPolicyToDomain(req *admin_pb.UpdateOrgIAMPolicyRequest) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
-		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
-		ValidateOrgDomains:    true,
+		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     true,
+		SMTPSenderAddressMatchesInstanceDomain: true,
 	}
 }
 
@@ -173,7 +177,8 @@ func updateCustomOrgIAMPolicyToDomain(req *admin_pb.UpdateCustomOrgIAMPolicyRequ
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.OrgId,
 		},
-		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
-		ValidateOrgDomains:    true,
+		UserLoginMustBeDomain:                  req.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     true,
+		SMTPSenderAddressMatchesInstanceDomain: true,
 	}
 }

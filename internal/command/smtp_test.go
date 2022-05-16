@@ -41,7 +41,16 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
 				),
 			},
 			args: args{
@@ -74,8 +83,12 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								false,
 							),
 						),
-					),
-					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
@@ -120,8 +133,13 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								false,
 							),
 						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
 					),
-					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
@@ -241,11 +259,11 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: caos_errs.IsNotFound,
 			},
 		},
 		{
-			name: "smtp not existing, not found error",
+			name: "smtp domain not matched",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -257,15 +275,32 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								false,
 							),
 						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, true,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
+								"from@domain.ch",
+								"name",
+								"host",
+								"user",
+								&crypto.CryptoValue{},
+							),
+						),
 					),
-					expectFilter(),
 				),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				smtp: &smtp.EmailConfig{
 					Tls:      true,
-					From:     "from@domain.ch",
+					From:     "from@wrongdomain.ch",
 					FromName: "name",
 					SMTP: smtp.SMTP{
 						Host: "host",
@@ -274,7 +309,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -290,8 +325,12 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								false,
 							),
 						),
-					),
-					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, true,
+							),
+						),
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),
@@ -336,8 +375,12 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								false,
 							),
 						),
-					),
-					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, true,
+							),
+						),
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(
 								context.Background(),

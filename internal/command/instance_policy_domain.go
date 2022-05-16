@@ -37,7 +37,7 @@ func (c *Commands) addDefaultDomainPolicy(ctx context.Context, instanceAgg *even
 	if addedPolicy.State == domain.PolicyStateActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.IAM.DomainPolicy.AlreadyExists")
 	}
-	return iam_repo.NewDomainPolicyAddedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains), nil
+	return iam_repo.NewDomainPolicyAddedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains, policy.SMTPSenderAddressMatchesInstanceDomain), nil
 }
 
 func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
@@ -50,7 +50,7 @@ func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, policy *domain
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains, policy.SMTPSenderAddressMatchesInstanceDomain)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}

@@ -19,8 +19,9 @@ const (
 type DomainPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserLoginMustBeDomain bool `json:"userLoginMustBeDomain,omitempty"`
-	ValidateOrgDomains    bool `json:"validateOrgDomains,omitempty"`
+	UserLoginMustBeDomain                  bool `json:"userLoginMustBeDomain,omitempty"`
+	ValidateOrgDomains                     bool `json:"validateOrgDomains,omitempty"`
+	SMTPSenderAddressMatchesInstanceDomain bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
 func (e *DomainPolicyAddedEvent) Data() interface{} {
@@ -34,13 +35,15 @@ func (e *DomainPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueCo
 func NewDomainPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	userLoginMustBeDomain,
-	validateOrgDomains bool,
+	validateOrgDomains,
+	smtpSenderAddressMatchesInstanceDomain bool,
 ) *DomainPolicyAddedEvent {
 
 	return &DomainPolicyAddedEvent{
-		BaseEvent:             *base,
-		UserLoginMustBeDomain: userLoginMustBeDomain,
-		ValidateOrgDomains:    validateOrgDomains,
+		BaseEvent:                              *base,
+		UserLoginMustBeDomain:                  userLoginMustBeDomain,
+		ValidateOrgDomains:                     validateOrgDomains,
+		SMTPSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
 	}
 }
 
@@ -60,8 +63,9 @@ func DomainPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, er
 type DomainPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserLoginMustBeDomain *bool `json:"userLoginMustBeDomain,omitempty"`
-	ValidateOrgDomains    *bool `json:"validateOrgDomains,omitempty"`
+	UserLoginMustBeDomain                  *bool `json:"userLoginMustBeDomain,omitempty"`
+	ValidateOrgDomains                     *bool `json:"validateOrgDomains,omitempty"`
+	SMTPSenderAddressMatchesInstanceDomain *bool `json:"smtpSenderAddressMatchesInstanceDomain,omitempty"`
 }
 
 func (e *DomainPolicyChangedEvent) Data() interface{} {
@@ -99,6 +103,12 @@ func ChangeUserLoginMustBeDomain(userLoginMustBeDomain bool) func(*DomainPolicyC
 func ChangeValidateOrgDomains(validateOrgDomain bool) func(*DomainPolicyChangedEvent) {
 	return func(e *DomainPolicyChangedEvent) {
 		e.ValidateOrgDomains = &validateOrgDomain
+	}
+}
+
+func ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddressMatchesInstanceDomain bool) func(*DomainPolicyChangedEvent) {
+	return func(e *DomainPolicyChangedEvent) {
+		e.SMTPSenderAddressMatchesInstanceDomain = &smtpSenderAddressMatchesInstanceDomain
 	}
 }
 
