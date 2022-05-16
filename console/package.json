@@ -18,7 +18,7 @@
     "@angular/compiler": "~13.3.1",
     "@angular/core": "~13.3.1",
     "@angular/forms": "~13.3.1",
-    "@angular/material": "~13.3.2",
+    "@angular/material": "~13.3.7",
     "@angular/material-moment-adapter": "~13.3.2",
     "@angular/platform-browser": "~13.3.1",
     "@angular/platform-browser-dynamic": "~13.3.1",
