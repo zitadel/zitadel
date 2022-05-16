@@ -34,8 +34,8 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 
 ### Software-as-a-Service
 
-* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
-* **ZITADEL Dedicated:** We operate and support a dedicated instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
+* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.com) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
+* **ZITADEL Dedicated:** We operate and support a dedicated instance of **ZITADEL** for you. [Get in touch!](https://zitadel.com/contact/)
 
 ## Start using ZITADEL
 
@@ -53,7 +53,7 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 ## Help and Documentation
 
 * [Documentation](https://docs.zitadel.ch)
-* [Say hello](https://zitadel.ch/contact/)
+* [Say hello](https://zitadel.com/contact/)
 * [Join our Discord channel](https://discord.gg/erh5Brh7jE)
 
 ## How To Contribute
@@ -118,15 +118,14 @@ Customize login and console with your design
 ![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
 
 
-## Other CAOS Projects
+## Other ZITADEL Projects
 
-* [**ORBOS**](https://github.com/caos/orbos/) - GitOps everything
 * [**OIDC for GO**](https://github.com/zitadel/oidc) - OpenID Connect SDK (client and server) for Go
 * [**ZITADEL Tools**](https://github.com/zitadel/zitadel-tools) - Go tool to convert  key file to privately signed JWT
 
 ## Usage Data
 
-ZITADEL components send errors and usage data to CAOS Ltd., so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-analytics` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-analytics` flag.
+ZITADEL components send errors and usage data, so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-analytics` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `--disable-analytics` flag.
 
 We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
 
