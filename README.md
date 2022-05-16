@@ -5,25 +5,19 @@
 
 **[🏡 website](https://zitadel.com) [💬 chat](https://zitadel.com/chat) [📞 contact](https://zitadel.com/contact/) [📋 guide](https://docs.zitadel.ch/docs/guides/overview) [🧑‍💻 api docs](https://docs.zitadel.ch/docs/apis/introduction) [❓user manuals](https://docs.zitadel.ch/docs/manuals/introduction)**
 
-[![stable version](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases/latest)
-[![license](https://badgen.net/github/license/caos/zitadel)](#license)
-[![code coverage](https://badgen.net/codecov/c/github/caos/zitadel)](https://app.codecov.io/gh/caos/zitadel)
-[![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
+[![stable version](https://badgen.net/github/release/zitadel/zitadel/stable)](https://github.com/zitadel/zitadel/releases/latest)
+[![license](https://badgen.net/github/license/zitadel/zitadel)](#license)
+[![code coverage](https://badgen.net/codecov/c/github/zitadel/zitadel)](https://app.codecov.io/gh/zitadel/zitadel)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zitadel/zitadel)](https://goreportcard.com/report/github.com/zitadel/zitadel)
 [![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://zitadel.com/chat)
 [![follow us](https://badgen.net/twitter/follow/zitadel)](https://twitter.com/zitadel)
 <a href="https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL"><img src="./docs/static/logos/oidc-cert.png" alt="OpenID certification" height="35px" width="auto" /></a>
 
 ---
 
-The identity and access management (IAM) solution with the **strongest change track** built for modern **global scale** cloud capabilities. Thanks to it's unique approach to store user **activities as events**, every change of an object is tracable.
+TODO Place a video here
 
-ZITADEL is more than just IAM. It's a superb open source TODO:plattform built for and from its community to handle **secure user login and account management** the simplest way possible.
-
-Zitadel is [OpenID Connect](https://openid.net/connect) certified ([certification](https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL)), [oauth 2.0](https://datatracker.ietf.org/doc/html/rfc6749) and [saml 2.0](https://datatracker.ietf.org/doc/html/rfc7522) compliant to keep your authentication implementation efforts as low as possible.
-
-The modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and [**CockroachDB**](https://www.cockroachlabs.com/) forms a solid basic framework to build the IAM you are looking for.
-
-## Why?
+## Why ZITADEL
 
 - [API-first](https://docs.zitadel.ch/docs/apis/introduction)
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.ch/docs/concepts/eventstore)
@@ -31,7 +25,7 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 - [Private labeling](https://docs.zitadel.ch/docs/guides/customization/branding) for a uniform user experience
 - [cockroach database](https://www.cockroachlabs.com/) is the only dependency
 
-### Authentication possibities
+## Features
 
 - Single Sign On (SSO)
 - Passwordless with FIDO2
@@ -40,45 +34,25 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 - [Identity Brokering](https://docs.zitadel.ch/docs/guides/authentication/identity-brokering)
 - [Machine-to-machine (JWT profile)](https://docs.zitadel.ch/docs/guides/authentication/serviceusers)
 - Personal Access Tokens (PAT)
-
-### Access Management possibilities
-
 - Role Based Access Control (RBAC)
 - Delegate role management to third-parties
-
-### Identity Management possibilities
-
 - Self-registration including verification
 - User self service
 - [Service Accounts](https://docs.zitadel.ch/docs/guides/authentication/serviceusers)
 
 ## Getting started
 
-Run it locally or [create your organisation within seconds online](https://accounts.zitadel.ch/register/org) for free, no credit card required.
+TODO Link to quickstarts in the docs
 
-If you want to integrate ZITADEL in your app check out the [clients section](###client-libraries)
+## Quick starts
 
-Locally it is recommended to run ZITADEL and the database using docker but you can also run the executable.
+TODO Link to quickstarts in the docs
 
-### Run with docker compose
+If your use case is missing please let us know [here](https://github.com/zitadel/zitadel/discussions/1717)
 
-Simply clone the repo and execute the following command in the cloned folder:
+## Contribute
 
-```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose.yml up
-```
-
-### Run on your machine
-
-First of all you need to start the cockroach database [using their guide to start a cluster](https://www.cockroachlabs.com/docs/v21.2/start-a-local-cluster)
-
-After the database is up and running you can start ZITADEL:
-
-<!-- TODO: install zitadel cli -->
-
-```bash
-zitadel admin start-with-init
-```
+Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
 
 ### Client libraries
 
@@ -86,10 +60,10 @@ zitadel admin start-with-init
 
 | Language | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
 |----------|--------|--------------|----------|---------|---------------------------|
-| .NET     | [zitadel-net](https://github.com/caos/zitadel-net) | GRPC | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
-| Dart     | [zitadel-dart](https://github.com/caos/zitadel-dart) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
+| .NET     | [zitadel-net](https://github.com/zitadel/zitadel-net) | GRPC | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
+| Dart     | [zitadel-dart](https://github.com/zitadel/zitadel-dart) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
 | Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
-| Go       | [zitadel-go](https://github.com/caos/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
+| Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
 | Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
 | JVM      | ❓ | ❓ | ❓ | | Maybe you? |
 | Python   | ❓ | ❓ | ❓ | | Maybe you? |
@@ -97,27 +71,6 @@ zitadel admin start-with-init
 
 (\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.ch/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
 (\*\*) Automatically check if the access token is valid and claims match
-
-### Quick starts
-
-To start developing your app as fast as possible check out our [quick start guides](https://docs.zitadel.ch/docs/quickstarts/introduction) where we describe basic examples for many use cases.
-
-- **Login using ZITADEL**: [Angular](https://docs.zitadel.ch/docs/quickstarts/login/angular), [React](https://docs.zitadel.ch/docs/quickstarts/login/react), [Flutter](https://docs.zitadel.ch/docs/quickstarts/login/flutter), [Next.js](https://docs.zitadel.ch/docs/quickstarts/login/nextjs)
-- **Secure your API**: [Go](https://docs.zitadel.ch/docs/quickstarts/secure-api/go), [.Net](https://docs.zitadel.ch/docs/quickstarts/secure-api/dot-net)
-- **Use the ZITADEL API**: [Go](https://docs.zitadel.ch/docs/quickstarts/call-zitadel-api/go), [.Net](https://docs.zitadel.ch/docs/quickstarts/call-zitadel-api/dot-net)
-- **Use ZITADEL as identity proxy**: using [oauth2-proxy](https://docs.zitadel.ch/docs/quickstarts/identity-proxy/oauth2-proxy)
-
-If your use case is missing please let us know [here](https://github.com/caos/zitadel/discussions/1717)
-
-## Help and Documentation
-
-- Visit our [docs page](https://docs.zitadel.ch) for more detailed documentation
-- Join the community on [Discord](https://zitadel.com/chat)
-- Get [in touch with us](https://zitadel.com/contact/) through different channels
-
-## Contribute
-
-Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
 
 ## Security
 
@@ -129,15 +82,9 @@ See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-## Other CAOS Projects
-
-- [**OIDC for GO**](https://github.com/caos/oidc) - OpenID Connect certified SDK (client and server) for Go
-- [**ZITADEL Tools**](https://github.com/caos/zitadel-tools) - Go tool to convert  key file to privately signed JWT
-- [**ORBOS**](https://github.com/caos/orbos/) - GitOps everything
-
 ## Usage data
 
-ZITADEL components send errors and usage data to CAOS Ltd., so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, add the following lines to your custom configuration:
+ZITADEL components send errors and usage data, so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, add the following lines to your custom configuration:
 
 ```yaml
 TODO: add proper configuration

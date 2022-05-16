@@ -20,21 +20,21 @@ Thank you for your interest about how to contribute! As you might know there is 
 
 Please give us and our community the chance to get rid of security vularbilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
 
-The strongest part of a community is the possibility to share thoughts. That's why we give try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/caos/zitadel/issues) and [discussions](https://github.com/caos/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
+The strongest part of a community is the possibility to share thoughts. That's why we give try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
 If you want to give an answer or be part of discussion please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
 
 ## What can I contribute?
 
-For people who are new to ZITADEL: We flag issues which are a good starting point to start contributing. You find them [here](https://github.com/caos/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+For people who are new to ZITADEL: We flag issues which are a good starting point to start contributing. You find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
 Make ZITADEL more popular and give it a ⭐
 
 Help shaping the future of ZITADEL by
 
 - Join our [chat](https://zitadel.com/chat) and discuss with us or others.
-- Ask or answer questions in the [issues section](https://github.com/caos/zitadel/issues)
-- Share your thoughts and ideas in the [discussions section](https://github.com/caos/zitadel/discussions)
+- Ask or answer questions in the [issues section](https://github.com/zitadel/zitadel/issues)
+- Share your thoughts and ideas in the [discussions section](https://github.com/zitadel/zitadel/discussions)
 
 [Contribute](#how-to-contribute)
 
@@ -55,7 +55,7 @@ We accept contributions through pull requests. You need a github account for tha
 1. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request correct tagging is required and will be requested by the reviewers.
 1. Request a [review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from one of the authors. The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
 
-## Contribute Code
+## Contribute
 
 The code consists of the following parts:
 
@@ -65,6 +65,7 @@ The code consists of the following parts:
 | console | Frontend the user inertacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) |
 | login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) |
 | API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) |
+| docs | Project documentation made with docusaurus | [Docusaurus](https://docusaurus.io/) | [./docs](./docs) |
 
 Please validate and test the code before you contribute.
 
@@ -76,18 +77,7 @@ To start the backend with a debugger run the [`main.go`-file](./main.go) located
 
 Make sure to use the following configurations:
 
-Environment variables:
-
-```bash
-export CAOS_OIDC_DEV=true
-export ZITADEL_MASTERKEY=JIzH+ZGMn2Vk7PPGAcGmdFL3ZkFTXaU=
-```
-
-Args:
-
-```bash
-admin --config build/local/local-conf.yaml start-from-init
-```
+TODO document workflow
 
 ### Console
 
@@ -125,15 +115,7 @@ Make sure you use semantic release:
 
 ## Want to start ZITADEL?
 
-Checkout the following chapters to start ZITADEL locally.
-
-### Build for local development
-
-* Check out our [development guide](guides/development.md).
-
-### Quick start
-
-* Check out our [quick start guide](guides/quickstart.md).
+TODO Link to public docs
 
 ## **Did you find a security flaw?**
 
