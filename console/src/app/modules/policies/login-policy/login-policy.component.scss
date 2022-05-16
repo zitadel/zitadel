@@ -17,8 +17,8 @@
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 1rem;
 
-  @media only screen and (max-width: 800px) {
-    grid-template-columns: 1fr;
+  @media only screen and (max-width: 950px) {
+    grid-template-columns: 1fr 1fr;
   }
 
   @media only screen and (max-width: 500px) {
@@ -38,6 +38,11 @@
       display: block;
     }
   }
+}
+
+.loginpolicy-reset-button {
+  margin: 1rem 0;
+  display: block;
 }
 
 .login-policy-btn-container {

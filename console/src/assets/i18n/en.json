@@ -818,7 +818,7 @@
       "NOTIFICATIONS": "Notification providers and SMTP",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
-      "DOMAIN": "Domains",
+      "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",

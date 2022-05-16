@@ -34,6 +34,10 @@
       <mat-button-toggle [value]="View.PREVIEW">
         <div class="toggle-row">
           <span>{{ 'POLICY.PRIVATELABELING.VIEWS.PREVIEW' | translate }}</span>
+          <i
+            class="info-i las la-question-circle"
+            matTooltip="{{ 'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate }}"
+          ></i>
           <div *ngIf="view === View.PREVIEW" class="current-dot"></div>
         </div>
       </mat-button-toggle>
@@ -70,10 +74,6 @@
       {{ 'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate }}
     </button>
   </div>
-
-  <cnsl-info-section *ngIf="view === View.PREVIEW" class="desc cnsl-secondary-text">
-    {{ 'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate }}
-  </cnsl-info-section>
 
   <div *ngIf="previewData && data" class="lab-policy-content">
     <mat-accordion class="settings">

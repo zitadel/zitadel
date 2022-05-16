@@ -174,19 +174,11 @@
   </div>
 </div>
 
-<br />
-
-<div class="login-policy-btn-container">
-  <button class="login-policy-save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
-    {{ 'ACTIONS.SAVE' | translate }}
-  </button>
-</div>
-
-<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT">
+<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault">
   <ng-template cnslHasRole [hasRole]="['policy.delete']">
     <button
-      *ngIf="!isDefault"
       color="primary"
+      class="loginpolicy-reset-button"
       matTooltip="{{ 'POLICY.RESET' | translate }}"
       color="warn"
       (click)="removePolicy()"
@@ -196,3 +188,11 @@
     </button>
   </ng-template>
 </ng-container>
+
+<br />
+
+<div class="login-policy-btn-container">
+  <button class="login-policy-save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
+</div>

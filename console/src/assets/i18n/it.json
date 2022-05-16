@@ -818,7 +818,7 @@
       "NOTIFICATIONS": "Notifiche",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
-      "DOMAIN": "Domini",
+      "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
@@ -828,7 +828,7 @@
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
       "LOGIN": "Accesso e login",
-      "DOMAIN": "Domini",
+      "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aussehen",
       "OTHER": "Altro"
