@@ -17,11 +17,12 @@ import (
 )
 
 type OrgSetup struct {
-	Name  string
-	Human AddHuman
+	Name         string
+	CustomDomain string
+	Human        AddHuman
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (string, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string) (string, *domain.ObjectDetails, error) {
 	orgID, err := id.SonyFlakeGenerator().Next()
 	if err != nil {
 		return "", nil, err
@@ -35,11 +36,19 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (string, *domain.O
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
-		AddOrgCommand(ctx, orgAgg, o.Name),
+	validations := []preparation.Validation{
+		AddOrgCommand(ctx, orgAgg, o.Name, userIDs...),
 		AddHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.userEncryption),
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
-	)
+	}
+	if o.CustomDomain != "" {
+		validations = append(validations, AddOrgDomain(orgAgg, o.CustomDomain))
+		for _, userID := range userIDs {
+			validations = append(validations, c.prepareUserDomainClaimed(userID))
+		}
+	}
+
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -57,7 +66,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (string, *domain.O
 
 //AddOrgCommand defines the commands to create a new org,
 // this includes the verified default domain
-func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string) preparation.Validation {
+func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")

@@ -55,7 +55,7 @@ If we fail to provide the initial response time objective, you will be entitled 
 
 Support Feature | Contact information
 --- | ---
-eMail Support | support@zitadel.ch
+eMail Support | support@zitadel.com
 Chat Support | Private chat channel between CAOS and Customer that is opened when Subscription becomes active
 Phone Support | +41 43 215 27 34
 
@@ -70,7 +70,7 @@ CAOS will enhance its support offering by providing eligible clients with a Tech
 - Provide support and advice regarding best practices on platform, product and configuration covered by the applicable Support Services;
 - Participate in review calls every other week at mutually agreed times addressing customer’s operational issues.
 
-We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans. If you require consulting for your projects, please request a quote via our [website](https://zitadel.ch/contact).
+We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans. If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).
 
 ## Support
 

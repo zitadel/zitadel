@@ -22,7 +22,6 @@ const (
 	ProjectRoleColumnInstanceID    = "instance_id"
 	ProjectRoleColumnDisplayName   = "display_name"
 	ProjectRoleColumnGroupName     = "group_name"
-	ProjectRoleColumnCreator       = "creator_id" //TODO: necessary?
 )
 
 type ProjectRoleProjection struct {
@@ -44,7 +43,6 @@ func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(ProjectRoleColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnDisplayName, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnGroupName, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectRoleColumnCreator, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(ProjectRoleColumnInstanceID, ProjectRoleColumnProjectID, ProjectRoleColumnKey),
 		),
@@ -96,7 +94,6 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (
 			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectRoleColumnDisplayName, e.DisplayName),
 			handler.NewCol(ProjectRoleColumnGroupName, e.Group),
-			handler.NewCol(ProjectRoleColumnCreator, e.EditorUser()),
 		},
 	), nil
 }

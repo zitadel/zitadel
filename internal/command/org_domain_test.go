@@ -54,7 +54,7 @@ func TestAddDomain(t *testing.T) {
 				domain: "domain",
 				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
-						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true),
+						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
 					}, nil
 				},
 			},
@@ -71,7 +71,7 @@ func TestAddDomain(t *testing.T) {
 				domain: "domain",
 				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
-						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, false),
+						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, false, false),
 					}, nil
 				},
 			},
@@ -1043,7 +1043,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org2").Aggregate,
-								false, false))),
+								false, false, false))),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),

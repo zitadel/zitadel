@@ -20,7 +20,7 @@ C. Enable selfregistration for User
  1. Create an organization as above
  2. Create custom policy
  3. Enable the "Register allowed" flag in the Login Policy
- 4. Connect your application and add the applications [scope](https://docs.zitadel.ch/architecture/#Custom_Scopes) to the redirect URL.
+ 4. Connect your application and add the applications [scope](https://docs.zitadel.com/architecture/#Custom_Scopes) to the redirect URL.
 
 This will enable the register option in the login dialog and will register the user within your organization if he does not already have an account.
 
