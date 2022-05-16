@@ -10,8 +10,8 @@ services:
     environment:
       - ZITADEL_MASTERKEY=${ZITADEL_MASTERKEY}
       - ZITADEL_DATABASE_HOST=db
-      # TODO: Use the following variables as defaults
       - ZITADEL_EXTERNALSECURE=false
+      # TODO: Use the following variables as defaults
       - ZITADEL_EXTERNALDOMAIN=localhost
       - ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
     healthcheck:
