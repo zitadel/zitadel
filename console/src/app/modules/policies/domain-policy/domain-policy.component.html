@@ -20,16 +20,16 @@
 <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
 <div class="content" *ngIf="domainData">
   <div class="row">
-    <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.userLoginMustBeDomain">
+    <mat-checkbox color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.userLoginMustBeDomain">
       {{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate }}
-    </mat-slide-toggle>
+    </mat-checkbox>
   </div>
 
   <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
   <div class="row">
-    <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.validateOrgDomains">
+    <mat-checkbox color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.validateOrgDomains">
       {{ 'POLICY.DATA.VALIDATEORGDOMAINS' | translate }}
-    </mat-slide-toggle>
+    </mat-checkbox>
   </div>
 </div>
 

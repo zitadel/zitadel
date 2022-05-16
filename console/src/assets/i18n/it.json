@@ -968,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "ADVANCED": "Impostazioni avanzate",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Salvato con successo!"
     },
     "PRIVACY_POLICY": {
@@ -1097,7 +1098,13 @@
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
-      "DISABLEWATERMARK": "Nascondi la filigrana"
+      "DISABLEWATERMARK": "Nascondi la filigrana",
+      "PASSWORDCHECKLIFETIME": "Lifetime verificazione password",
+      "EXTERNALLOGINCHECKLIFETIME": "Lifetime verificazione login esterno",
+      "MFAINITSKIPLIFETIME": "Lifetime Initalizzazione Multifattore",
+      "SECONDFACTORCHECKLIFETIME": "Lifetime Second Factor Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Lifetime Multi Factor",
+      "INHOURS": "ore"
     },
     "RESET": "Ripristina l'impostazione dell'istanza",
     "CREATECUSTOM": "Crea un'impostazione personalizzata",

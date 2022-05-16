@@ -968,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "ADVANCED": "Erweitert",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
@@ -1097,7 +1098,13 @@
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
-      "DISABLEWATERMARK": "Wasserzeichen ausblenden"
+      "DISABLEWATERMARK": "Wasserzeichen ausblenden",
+      "PASSWORDCHECKLIFETIME": "Passwort Check Lifetime",
+      "EXTERNALLOGINCHECKLIFETIME": "Externer Login Check Lifetime",
+      "MFAINITSKIPLIFETIME": "Multifaktor Init Lifetime",
+      "SECONDFACTORCHECKLIFETIME": "Zweitfaktor Check Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Multifaktor Check Lifetime",
+      "INHOURS": "Stunden"
     },
     "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",

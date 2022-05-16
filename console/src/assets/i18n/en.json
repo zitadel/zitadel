@@ -968,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "ADVANCED": "Advanced",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -1097,7 +1098,13 @@
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
       "ERRORMSGPOPUP": "Show Error in Dialog",
-      "DISABLEWATERMARK": "Hide Watermark"
+      "DISABLEWATERMARK": "Hide Watermark",
+      "PASSWORDCHECKLIFETIME": "Password Check Lifetime",
+      "EXTERNALLOGINCHECKLIFETIME": "External Login Check Lifetime",
+      "MFAINITSKIPLIFETIME": "Multifactor Init Lifetime",
+      "SECONDFACTORCHECKLIFETIME": "Second Factor Check Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Multifactor Check Lifetime",
+      "INHOURS": "hours"
     },
     "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",

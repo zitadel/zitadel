@@ -1,4 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
     UpdateLoginPolicyRequest,
@@ -37,14 +38,46 @@ export class LoginPolicyComponent implements OnInit {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
-
-  constructor(private toast: ToastService, private injector: Injector) {}
+  public lifetimeForm!: FormGroup;
+  constructor(private toast: ToastService, private injector: Injector, private fb: FormBuilder) {
+    this.lifetimeForm = this.fb.group({
+      passwordCheckLifetime: [12, [Validators.required]],
+      externalLoginCheckLifetime: [12, [Validators.required]],
+      mfaInitSkipLifetime: [12, [Validators.required]],
+      secondFactorCheckLifetime: [12, [Validators.required]],
+      multiFactorCheckLifetime: [12, [Validators.required]],
+    });
+  }
 
   private fetchData(): void {
     this.getData().then((resp) => {
       if (resp.policy) {
         this.loginData = resp.policy;
         this.loading = false;
+
+        this.passwordCheckLifetime?.setValue(
+          this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 12,
+        );
+
+        this.externalLoginCheckLifetime?.setValue(
+          this.loginData.externalLoginCheckLifetime?.seconds
+            ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
+            : 12,
+        );
+
+        this.mfaInitSkipLifetime?.setValue(
+          this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 12,
+        );
+
+        this.secondFactorCheckLifetime?.setValue(
+          this.loginData.secondFactorCheckLifetime?.seconds
+            ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
+            : 12,
+        );
+
+        this.multiFactorCheckLifetime?.setValue(
+          this.loginData.multiFactorCheckLifetime?.seconds ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60 : 12,
+        );
       }
     });
   }
@@ -148,5 +181,25 @@ export class LoginPolicyComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  public get passwordCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('passwordCheckLifetime');
+  }
+
+  public get externalLoginCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('externalLoginCheckLifetime');
+  }
+
+  public get mfaInitSkipLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('mfaInitSkipLifetime');
+  }
+
+  public get secondFactorCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('secondFactorCheckLifetime');
+  }
+
+  public get multiFactorCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('multiFactorCheckLifetime');
   }
 }

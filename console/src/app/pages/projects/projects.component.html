@@ -10,12 +10,20 @@
 
     <div class="projects-controls">
       <div class="project-type-actions">
-        <button class="type-button" [ngClass]="{'active': (projectType$ | async) === ProjectType.PROJECTTYPE_OWNED}"
-          (click)="setType(ProjectType.PROJECTTYPE_OWNED)">{{'PROJECT.PAGES.TYPE.OWNED' | translate}}
-          ({{((mgmtService?.ownedProjectsCount | async) ?? 0)}})</button>
-        <button class="type-button" [ngClass]="{'active': (projectType$ | async) === ProjectType.PROJECTTYPE_GRANTED}"
-          (click)="setType(ProjectType.PROJECTTYPE_GRANTED)">{{'PROJECT.PAGES.TYPE.GRANTED' | translate}}
-          ({{((mgmtService?.grantedProjectsCount | async) ?? 0)}})</button>
+        <button
+          class="type-button"
+          [ngClass]="{ active: (projectType$ | async) === ProjectType.PROJECTTYPE_OWNED }"
+          (click)="setType(ProjectType.PROJECTTYPE_OWNED)"
+        >
+          {{ 'PROJECT.PAGES.TYPE.OWNED' | translate }} ({{ (mgmtService?.ownedProjectsCount | async) ?? 0 }})
+        </button>
+        <button
+          class="type-button"
+          [ngClass]="{ active: (projectType$ | async) === ProjectType.PROJECTTYPE_GRANTED }"
+          (click)="setType(ProjectType.PROJECTTYPE_GRANTED)"
+        >
+          {{ 'PROJECT.PAGES.TYPE.GRANTED' | translate }} ({{ (mgmtService?.grantedProjectsCount | async) ?? 0 }})
+        </button>
       </div>
       <span class="fill-space"></span>
       <button class="grid-btn" (click)="grid = !grid" mat-icon-button [attr.data-e2e]="'toggle-grid'">
@@ -24,8 +32,12 @@
       </button>
     </div>
 
-    <cnsl-project-grid *ngIf="grid" [projectType$]="projectType$" [zitadelProjectId]="zitadelProjectId"
-      (emitAddProject)="addProject()">
+    <cnsl-project-grid
+      *ngIf="grid"
+      [projectType$]="projectType$"
+      [zitadelProjectId]="zitadelProjectId"
+      (emitAddProject)="addProject()"
+    >
     </cnsl-project-grid>
 
     <cnsl-project-list *ngIf="!grid" [projectType$]="projectType$" [zitadelProjectId]="zitadelProjectId">

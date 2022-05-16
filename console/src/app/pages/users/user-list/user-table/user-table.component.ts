@@ -76,6 +76,7 @@ export class UserTableComponent implements OnInit {
   public ActionKeysType: any = ActionKeysType;
   public filterOpen: boolean = false;
 
+  private searchQueries: SearchQuery[] = [];
   constructor(
     private router: Router,
     public translate: TranslateService,
@@ -225,12 +226,10 @@ export class UserTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, this.searchQueries);
   }
 
   public sortChange(sortState: Sort) {
-    console.log(sortState.active, sortState.direction);
-
     if (sortState.direction && sortState.active) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
       this.refreshPage();
@@ -241,6 +240,7 @@ export class UserTableComponent implements OnInit {
 
   public applySearchQuery(searchQueries: SearchQuery[]): void {
     this.selection.clear();
+    this.searchQueries = searchQueries;
     this.getData(
       this.paginator ? this.paginator.pageSize : this.INITIAL_PAGE_SIZE,
       this.paginator ? this.paginator.pageIndex * this.paginator.pageSize : 0,
