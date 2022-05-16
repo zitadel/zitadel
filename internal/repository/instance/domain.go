@@ -25,7 +25,7 @@ func NewAddInstanceDomainUniqueConstraint(domain string) *eventstore.EventUnique
 		"Errors.Instance.Domain.AlreadyExists")
 }
 
-func NewRemoveInstanceDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+func NewRemoveInstanceDomainUniqueConstraint(domain string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveGlobalEventUniqueConstraint(
 		UniqueInstanceDomain,
 		domain)
