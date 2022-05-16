@@ -94,7 +94,6 @@ export class NotificationSettingsComponent implements OnInit {
         }
       })
       .catch((error) => {
-        console.log('hehe');
         this.toast.showError(error);
       });
   }
