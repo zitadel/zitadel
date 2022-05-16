@@ -44,6 +44,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
+    SenderAdressNotCustomDomain: The sender adress must be configured as custom domain on the instance.
   Notification:
     NoDomain: No Domain found for message
   User:

@@ -59,8 +59,9 @@ type InstanceSetup struct {
 		MaxAgeDays     uint64
 	}
 	DomainPolicy struct {
-		UserLoginMustBeDomain bool
-		ValidateOrgDomains    bool
+		UserLoginMustBeDomain                  bool
+		ValidateOrgDomains                     bool
+		SMTPSenderAddressMatchesInstanceDomain bool
 	}
 	LoginPolicy struct {
 		AllowUsernamePassword      bool
@@ -199,6 +200,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
 			setup.DomainPolicy.ValidateOrgDomains,
+			setup.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
 		),
 		AddDefaultLoginPolicy(
 			instanceAgg,
