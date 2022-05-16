@@ -63,6 +63,8 @@ message AppNameQuery {
 }
 
 message OIDCConfig {
+    reserved "client_secret";
+    reserved 6;
     repeated string redirect_uris = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://console.zitadel.ch/auth/callback\"]";
@@ -88,12 +90,6 @@ message OIDCConfig {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334@ZITADEL\"";
             description: "generated oauth2/oidc client id";
-        }
-    ];
-    string client_secret = 6 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
-            description: "generated secret for this config";
         }
     ];
     OIDCAuthMethodType auth_method_type = 7 [
@@ -208,16 +204,12 @@ enum APIAuthMethodType {
 }
 
 message APIConfig {
+    reserved "client_secret";
+    reserved 2;
     string client_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334@ZITADEL\"";
             description: "generated oauth2/oidc client_id";
-        }
-    ];
-    string client_secret = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
-            description: "generated secret for this config";
         }
     ];
     APIAuthMethodType auth_method_type = 3 [

@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	//TODO: use for org events as suffix (when possible)
 	DomainPolicyAddedEventType   = "policy.domain.added"
 	DomainPolicyChangedEventType = "policy.domain.changed"
 	DomainPolicyRemovedEventType = "policy.domain.removed"

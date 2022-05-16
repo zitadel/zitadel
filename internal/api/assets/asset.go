@@ -81,7 +81,7 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 		query:           queries,
 	}
 
-	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?
+	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
 	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle, instanceInterceptor)
 	RegisterRoutes(router, h)

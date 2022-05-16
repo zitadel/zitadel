@@ -85,9 +85,6 @@ func domainPolicyToDomain(userLoginMustBeDomain, validateOrgDomains bool) *domai
 
 func updateDomainPolicyToDomain(req *admin_pb.UpdateDomainPolicyRequest) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
-		// ObjectRoot: models.ObjectRoot{
-		// 	// AggreagateID: //TODO: there should only be ONE default
-		// },
 		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
 		ValidateOrgDomains:    req.ValidateOrgDomains,
 	}
