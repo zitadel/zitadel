@@ -12,21 +12,21 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type UserMetadataProjection struct {
+type userMetadataProjection struct {
 	crdb.StatementHandler
 }
 
 const UserMetadataProjectionTable = "zitadel.projections.user_metadata"
 
-func NewUserMetadataProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserMetadataProjection {
-	p := &UserMetadataProjection{}
+func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userMetadataProjection {
+	p := &userMetadataProjection{}
 	config.ProjectionName = UserMetadataProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *UserMetadataProjection) reducers() []handler.AggregateReducer {
+func (p *userMetadataProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -62,7 +62,7 @@ const (
 	UserMetadataColumnValue         = "value"
 )
 
-func (p *UserMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataSetEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Sgn5w", "seq", event.Sequence(), "expectedType", user.MetadataSetType).Error("wrong event type")
@@ -82,7 +82,7 @@ func (p *UserMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *UserMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Dbfg2", "seq", event.Sequence(), "expectedType", user.MetadataRemovedType).Error("wrong event type")
@@ -97,7 +97,7 @@ func (p *UserMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (
 	), nil
 }
 
-func (p *UserMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
+func (p *userMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *user.MetadataRemovedAllEvent,
 		*user.UserRemovedEvent:

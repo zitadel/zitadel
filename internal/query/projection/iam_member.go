@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type IAMMemberProjection struct {
+type iamMemberProjection struct {
 	crdb.StatementHandler
 }
 
@@ -21,15 +21,15 @@ const (
 	IAMMemberProjectionTable = "zitadel.projections.iam_members"
 )
 
-func NewIAMMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IAMMemberProjection {
-	p := &IAMMemberProjection{}
+func newIAMMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *iamMemberProjection {
+	p := &iamMemberProjection{}
 	config.ProjectionName = IAMMemberProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
+func (p *iamMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: iam.AggregateType,
@@ -70,7 +70,7 @@ const (
 	IAMMemberIAMIDCol = "iam_id"
 )
 
-func (p *IAMMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-c8SBb", "seq", event.Sequence(), "expectedType", iam.MemberAddedEventType).Error("wrong event type")
@@ -79,7 +79,7 @@ func (p *IAMMemberProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(IAMMemberIAMIDCol, e.Aggregate().ID))
 }
 
-func (p *IAMMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-QsjwO", "seq", event.Sequence(), "expected", iam.MemberChangedEventType).Error("wrong event type")
@@ -88,7 +88,7 @@ func (p *IAMMemberProjection) reduceChanged(event eventstore.Event) (*handler.St
 	return reduceMemberChanged(e.MemberChangedEvent)
 }
 
-func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberCascadeRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-mOncs", "seq", event.Sequence(), "expected", iam.MemberCascadeRemovedEventType).Error("wrong event type")
@@ -97,7 +97,7 @@ func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*han
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent)
 }
 
-func (p *IAMMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-lW1Zv", "seq", event.Sequence(), "expected", iam.MemberRemovedEventType).Error("wrong event type")
@@ -106,7 +106,7 @@ func (p *IAMMemberProjection) reduceRemoved(event eventstore.Event) (*handler.St
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.UserID))
 }
 
-func (p *IAMMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-rBuvT", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")

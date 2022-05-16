@@ -30,7 +30,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 					nil,
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&ProjectProjection{}).reduceProjectRemoved,
+			reduce: (&projectProjection{}).reduceProjectRemoved,
 			want: wantReduce{
 				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -57,7 +57,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 					nil,
 				), project.ProjectReactivatedEventMapper),
 			},
-			reduce: (&ProjectProjection{}).reduceProjectReactivated,
+			reduce: (&projectProjection{}).reduceProjectReactivated,
 			want: wantReduce{
 				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -87,7 +87,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 					nil,
 				), project.ProjectDeactivatedEventMapper),
 			},
-			reduce: (&ProjectProjection{}).reduceProjectDeactivated,
+			reduce: (&projectProjection{}).reduceProjectDeactivated,
 			want: wantReduce{
 				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -117,7 +117,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "new name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
 				), project.ProjectChangeEventMapper),
 			},
-			reduce: (&ProjectProjection{}).reduceProjectChanged,
+			reduce: (&projectProjection{}).reduceProjectChanged,
 			want: wantReduce{
 				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -151,7 +151,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), project.ProjectChangeEventMapper),
 			},
-			reduce: (&ProjectProjection{}).reduceProjectChanged,
+			reduce: (&projectProjection{}).reduceProjectChanged,
 			want: wantReduce{
 				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -169,7 +169,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "name", "projectRoleAssertion": true, "projectRoleCheck": true, "hasProjectCheck": true, "privateLabelingSetting": 1}`),
 				), project.ProjectAddedEventMapper),
 			},
-			reduce: (&ProjectProjection{}).reduceProjectAdded,
+			reduce: (&projectProjection{}).reduceProjectAdded,
 			want: wantReduce{
 				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),

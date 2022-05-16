@@ -34,7 +34,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				}`),
 				), org.MemberAddedEventMapper),
 			},
-			reduce: (&OrgMemberProjection{}).reduceAdded,
+			reduce: (&orgMemberProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -70,7 +70,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				}`),
 				), org.MemberChangedEventMapper),
 			},
-			reduce: (&OrgMemberProjection{}).reduceChanged,
+			reduce: (&orgMemberProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -103,7 +103,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				}`),
 				), org.MemberCascadeRemovedEventMapper),
 			},
-			reduce: (&OrgMemberProjection{}).reduceCascadeRemoved,
+			reduce: (&orgMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -133,7 +133,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				}`),
 				), org.MemberRemovedEventMapper),
 			},
-			reduce: (&OrgMemberProjection{}).reduceRemoved,
+			reduce: (&orgMemberProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -161,7 +161,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&OrgMemberProjection{}).reduceUserRemoved,
+			reduce: (&orgMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -188,7 +188,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgRemovedEventMapper),
 			},
-			reduce: (&OrgMemberProjection{}).reduceOrgRemoved,
+			reduce: (&orgMemberProjection{}).reduceOrgRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,

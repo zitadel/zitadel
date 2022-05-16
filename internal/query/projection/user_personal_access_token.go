@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type PersonalAccessTokenProjection struct {
+type personalAccessTokenProjection struct {
 	crdb.StatementHandler
 }
 
@@ -21,15 +21,15 @@ const (
 	PersonalAccessTokenProjectionTable = "zitadel.projections.personal_access_tokens"
 )
 
-func NewPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PersonalAccessTokenProjection {
-	p := &PersonalAccessTokenProjection{}
+func newPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *personalAccessTokenProjection {
+	p := &personalAccessTokenProjection{}
 	config.ProjectionName = PersonalAccessTokenProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *PersonalAccessTokenProjection) reducers() []handler.AggregateReducer {
+func (p *personalAccessTokenProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -62,7 +62,7 @@ const (
 	PersonalAccessTokenColumnScopes        = "scopes"
 )
 
-func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Dbfg2", "seq", event.Sequence(), "expectedType", user.PersonalAccessTokenAddedType).Error("wrong event type")
@@ -83,7 +83,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 	), nil
 }
 
-func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Edf32", "seq", event.Sequence(), "expectedType", user.PersonalAccessTokenRemovedType).Error("wrong event type")
@@ -97,7 +97,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 	), nil
 }
 
-func (p *PersonalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-GEg43", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")

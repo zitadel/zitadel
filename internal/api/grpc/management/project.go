@@ -13,7 +13,7 @@ import (
 )
 
 func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByIDRequest) (*mgmt_pb.GetProjectByIDResponse, error) {
-	project, err := s.query.ProjectByID(ctx, req.Id)
+	project, err := s.query.ProjectByID(ctx, true, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByID
 }
 
 func (s *Server) GetGrantedProjectByID(ctx context.Context, req *mgmt_pb.GetGrantedProjectByIDRequest) (*mgmt_pb.GetGrantedProjectByIDResponse, error) {
-	project, err := s.query.ProjectGrantByID(ctx, req.GrantId)
+	project, err := s.query.ProjectGrantByID(ctx, true, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	if err != nil {
 		return nil, err
 	}
-	roles, err := s.query.SearchProjectRoles(ctx, queries)
+	roles, err := s.query.SearchProjectRoles(ctx, false, queries)
 	if err != nil {
 		return nil, err
 	}

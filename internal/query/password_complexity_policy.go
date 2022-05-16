@@ -29,7 +29,10 @@ type PasswordComplexityPolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID string) (*PasswordComplexityPolicy, error) {
+func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldRealTime bool, orgID string) (*PasswordComplexityPolicy, error) {
+	if shouldRealTime {
+		projection.PasswordComplexityProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := preparePasswordComplexityPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
@@ -50,7 +53,10 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID strin
 	return scan(row)
 }
 
-func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context) (*PasswordComplexityPolicy, error) {
+func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldRealTime bool) (*PasswordComplexityPolicy, error) {
+	if shouldRealTime {
+		projection.PasswordComplexityProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := preparePasswordComplexityPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		PasswordComplexityColID.identifier(): q.iamID,

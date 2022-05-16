@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type UserProjection struct {
+type userProjection struct {
 	crdb.StatementHandler
 }
 
@@ -24,8 +24,8 @@ const (
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 )
 
-func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserProjection {
-	p := &UserProjection{}
+func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userProjection {
+	p := &userProjection{}
 	config.ProjectionName = UserTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -73,7 +73,7 @@ const (
 	MachineDescriptionCol = "description"
 )
 
-func (p *UserProjection) reducers() []handler.AggregateReducer {
+func (p *userProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -203,7 +203,7 @@ func (p *UserProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *UserProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Cw9BX", "seq", event.Sequence(), "expectedType", user.HumanAddedType).Error("wrong event type")
@@ -240,7 +240,7 @@ func (p *UserProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 	), nil
 }
 
-func (p *UserProjection) reduceHumanRegistered(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanRegisteredEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-qoZyC", "seq", event.Sequence(), "expectedType", user.HumanRegisteredType).Error("wrong event type")
@@ -277,7 +277,7 @@ func (p *UserProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *UserProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanInitialCodeAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-DSfe2", "seq", event.Sequence(), "expectedType", user.HumanInitialCodeAddedType).Error("wrong event type")
@@ -294,7 +294,7 @@ func (p *UserProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*hand
 	), nil
 }
 
-func (p *UserProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanInitializedCheckSucceededEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Dgff2", "seq", event.Sequence(), "expectedType", user.HumanInitializedCheckSucceededType).Error("wrong event type")
@@ -311,7 +311,7 @@ func (p *UserProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*
 	), nil
 }
 
-func (p *UserProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserLockedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-c6irw", "seq", event.Sequence(), "expectedType", user.UserLockedType).Error("wrong event type")
@@ -331,7 +331,7 @@ func (p *UserProjection) reduceUserLocked(event eventstore.Event) (*handler.Stat
 	), nil
 }
 
-func (p *UserProjection) reduceUserUnlocked(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceUserUnlocked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserUnlockedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-eyHv5", "seq", event.Sequence(), "expectedType", user.UserUnlockedType).Error("wrong event type")
@@ -351,7 +351,7 @@ func (p *UserProjection) reduceUserUnlocked(event eventstore.Event) (*handler.St
 	), nil
 }
 
-func (p *UserProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserDeactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-EqbaJ", "seq", event.Sequence(), "expectedType", user.UserDeactivatedType).Error("wrong event type")
@@ -371,7 +371,7 @@ func (p *UserProjection) reduceUserDeactivated(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *UserProjection) reduceUserReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceUserReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-kAaBr", "seq", event.Sequence(), "expectedType", user.UserReactivatedType).Error("wrong event type")
@@ -391,7 +391,7 @@ func (p *UserProjection) reduceUserReactivated(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *UserProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-n2JMe", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
@@ -406,7 +406,7 @@ func (p *UserProjection) reduceUserRemoved(event eventstore.Event) (*handler.Sta
 	), nil
 }
 
-func (p *UserProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UsernameChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-7J5xL", "seq", event.Sequence(), "expectedType", user.UserUserNameChangedType).Error("wrong event type")
@@ -426,7 +426,7 @@ func (p *UserProjection) reduceUserNameChanged(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *UserProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanProfileChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Dwfyn", "seq", event.Sequence(), "expectedType", user.HumanProfileChangedType).Error("wrong event type")
@@ -478,7 +478,7 @@ func (p *UserProjection) reduceHumanProfileChanged(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *UserProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-pnRqf", "seq", event.Sequence(), "expectedType", user.HumanPhoneChangedType).Error("wrong event type")
@@ -509,7 +509,7 @@ func (p *UserProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *UserProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-eMpOG", "seq", event.Sequence(), "expectedType", user.HumanPhoneRemovedType).Error("wrong event type")
@@ -540,7 +540,7 @@ func (p *UserProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *UserProjection) reduceHumanPhoneVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneVerifiedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-GhFOY", "seq", event.Sequence(), "expectedType", user.HumanPhoneVerifiedType).Error("wrong event type")
@@ -570,7 +570,7 @@ func (p *UserProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 	), nil
 }
 
-func (p *UserProjection) reduceHumanEmailChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanEmailChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-MDfHX", "seq", event.Sequence(), "expectedType", user.HumanEmailChangedType).Error("wrong event type")
@@ -601,7 +601,7 @@ func (p *UserProjection) reduceHumanEmailChanged(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *UserProjection) reduceHumanEmailVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailVerifiedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-FdN0b", "seq", event.Sequence(), "expectedType", user.HumanEmailVerifiedType).Error("wrong event type")
@@ -631,7 +631,7 @@ func (p *UserProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 	), nil
 }
 
-func (p *UserProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanAvatarAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-naQue", "seq", event.Sequence(), "expectedType", user.HumanAvatarAddedType).Error("wrong event type")
@@ -661,7 +661,7 @@ func (p *UserProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *UserProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanAvatarRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-c6zoV", "seq", event.Sequence(), "expectedType", user.HumanAvatarRemovedType).Error("wrong event type")
@@ -691,7 +691,7 @@ func (p *UserProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*hand
 	), nil
 }
 
-func (p *UserProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-8xr78", "seq", event.Sequence(), "expectedType", user.MachineAddedEventType).Error("wrong event type")
@@ -723,7 +723,7 @@ func (p *UserProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 	), nil
 }
 
-func (p *UserProjection) reduceMachineChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-uUFCy", "seq", event.Sequence(), "expectedType", user.MachineChangedEventType).Error("wrong event type")

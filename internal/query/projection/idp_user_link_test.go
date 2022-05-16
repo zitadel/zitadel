@@ -35,7 +35,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 }`),
 				), user.UserIDPLinkAddedEventMapper),
 			},
-			reduce: (&IDPUserLinkProjection{}).reduceAdded,
+			reduce: (&idpUserLinkProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -72,7 +72,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 }`),
 				), user.UserIDPLinkRemovedEventMapper),
 			},
-			reduce: (&IDPUserLinkProjection{}).reduceRemoved,
+			reduce: (&idpUserLinkProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -104,7 +104,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 }`),
 				), user.UserIDPLinkCascadeRemovedEventMapper),
 			},
-			reduce: (&IDPUserLinkProjection{}).reduceCascadeRemoved,
+			reduce: (&idpUserLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -133,7 +133,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgRemovedEventMapper),
 			},
-			reduce: (&IDPUserLinkProjection{}).reduceOrgRemoved,
+			reduce: (&idpUserLinkProjection{}).reduceOrgRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -160,7 +160,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&IDPUserLinkProjection{}).reduceUserRemoved,
+			reduce: (&idpUserLinkProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -189,7 +189,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 					}`),
 				), org.IDPConfigRemovedEventMapper),
 			},
-			reduce: (&IDPUserLinkProjection{}).reduceIDPConfigRemoved,
+			reduce: (&idpUserLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -219,7 +219,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 					}`),
 				), iam.IDPConfigRemovedEventMapper),
 			},
-			reduce: (&IDPUserLinkProjection{}).reduceIDPConfigRemoved,
+			reduce: (&idpUserLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
 				aggregateType:    iam.AggregateType,
 				sequence:         15,

@@ -15,7 +15,7 @@ import (
 )
 
 func (s *Server) GetLoginPolicy(ctx context.Context, req *mgmt_pb.GetLoginPolicyRequest) (*mgmt_pb.GetLoginPolicyResponse, error) {
-	policy, err := s.query.LoginPolicyByID(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.LoginPolicyByID(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

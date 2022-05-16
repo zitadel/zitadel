@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type PasswordComplexityProjection struct {
+type passwordComplexityProjection struct {
 	crdb.StatementHandler
 }
 
@@ -22,15 +22,15 @@ const (
 	PasswordComplexityTable = "zitadel.projections.password_complexity_policies"
 )
 
-func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordComplexityProjection {
-	p := &PasswordComplexityProjection{}
+func newPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *passwordComplexityProjection {
+	p := &passwordComplexityProjection{}
 	config.ProjectionName = PasswordComplexityTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
+func (p *passwordComplexityProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -65,7 +65,7 @@ func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordComplexityProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordComplexityPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -97,7 +97,7 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 		}), nil
 }
 
-func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordComplexityProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordComplexityPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyChangedEvent:
@@ -135,7 +135,7 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 		}), nil
 }
 
-func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordComplexityProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordComplexityPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-ibd0c", "seq", event.Sequence(), "expectedType", org.PasswordComplexityPolicyRemovedEventType).Error("wrong event type")

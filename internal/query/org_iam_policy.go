@@ -63,7 +63,10 @@ var (
 	}
 )
 
-func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
+func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, shouldRealTime bool, orgID string) (*OrgIAMPolicy, error) {
+	if shouldRealTime {
+		projection.OrgIAMPolicyProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{

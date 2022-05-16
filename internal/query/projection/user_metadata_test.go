@@ -32,7 +32,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					}`),
 				), user.MetadataSetEventMapper),
 			},
-			reduce: (&UserMetadataProjection{}).reduceMetadataSet,
+			reduce: (&userMetadataProjection{}).reduceMetadataSet,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -67,7 +67,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					}`),
 				), user.MetadataRemovedEventMapper),
 			},
-			reduce: (&UserMetadataProjection{}).reduceMetadataRemoved,
+			reduce: (&userMetadataProjection{}).reduceMetadataRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -95,7 +95,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					nil,
 				), user.MetadataRemovedAllEventMapper),
 			},
-			reduce: (&UserMetadataProjection{}).reduceMetadataRemovedAll,
+			reduce: (&userMetadataProjection{}).reduceMetadataRemovedAll,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -122,7 +122,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					nil,
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&UserMetadataProjection{}).reduceMetadataRemovedAll,
+			reduce: (&userMetadataProjection{}).reduceMetadataRemovedAll,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,

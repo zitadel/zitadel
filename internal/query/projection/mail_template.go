@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type MailTemplateProjection struct {
+type mailTemplateProjection struct {
 	crdb.StatementHandler
 }
 
@@ -30,15 +30,15 @@ const (
 	MailTemplateIsDefaultCol    = "is_default"
 )
 
-func NewMailTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *MailTemplateProjection {
-	p := &MailTemplateProjection{}
+func newMailTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *mailTemplateProjection {
+	p := &mailTemplateProjection{}
 	config.ProjectionName = MailTemplateTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *MailTemplateProjection) reducers() []handler.AggregateReducer {
+func (p *mailTemplateProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -73,7 +73,7 @@ func (p *MailTemplateProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *MailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *mailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.MailTemplateAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -100,7 +100,7 @@ func (p *MailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 		}), nil
 }
 
-func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *mailTemplateProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.MailTemplateChangedEvent
 	switch e := event.(type) {
 	case *org.MailTemplateChangedEvent:
@@ -126,7 +126,7 @@ func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 		}), nil
 }
 
-func (p *MailTemplateProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *mailTemplateProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.MailTemplateRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-2m0fp", "seq", event.Sequence(), "expectedType", org.MailTemplateRemovedEventType).Error("wrong event type")

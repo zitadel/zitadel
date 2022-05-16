@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type LoginPolicyProjection struct {
+type loginPolicyProjection struct {
 	crdb.StatementHandler
 }
 
@@ -22,15 +22,15 @@ const (
 	LoginPolicyTable = "zitadel.projections.login_policies"
 )
 
-func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginPolicyProjection {
-	p := &LoginPolicyProjection{}
+func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *loginPolicyProjection {
+	p := &loginPolicyProjection{}
 	config.ProjectionName = LoginPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *LoginPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -114,7 +114,7 @@ const (
 	IgnoreUnknownUsernames              = "ignore_unknown_usernames"
 )
 
-func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LoginPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -145,7 +145,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 	}), nil
 }
 
-func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LoginPolicyChangedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyChangedEvent:
@@ -191,7 +191,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.MultiFactorAddedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyMultiFactorAddedEvent:
@@ -216,7 +216,7 @@ func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.MultiFactorRemovedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyMultiFactorRemovedEvent:
@@ -241,7 +241,7 @@ func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.LoginPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-gF5q6", "seq", event.Sequence(), "expectedType", org.LoginPolicyRemovedEventType).Error("wrong event type")
@@ -255,7 +255,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicySecondFactorAddedEvent:
@@ -280,7 +280,7 @@ func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicySecondFactorRemovedEvent:

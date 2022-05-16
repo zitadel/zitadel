@@ -74,7 +74,10 @@ type PersonalAccessTokenSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) PersonalAccessTokenByID(ctx context.Context, id string, queries ...SearchQuery) (*PersonalAccessToken, error) {
+func (q *Queries) PersonalAccessTokenByID(ctx context.Context, id string, shouldRealTime bool, queries ...SearchQuery) (*PersonalAccessToken, error) {
+	if shouldRealTime {
+		projection.PersonalAccessTokenProjection.TriggerBulk(ctx)
+	}
 	query, scan := preparePersonalAccessTokenQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)

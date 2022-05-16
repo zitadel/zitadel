@@ -34,7 +34,7 @@ func (s *Server) ListMyProjectPermissions(ctx context.Context, _ *auth_pb.ListMy
 	if err != nil {
 		return nil, err
 	}
-	userGrant, err := s.query.UserGrant(ctx, userGrantOrgID, userGrantProjectID, userGrantUserID)
+	userGrant, err := s.query.UserGrant(ctx, true, userGrantOrgID, userGrantProjectID, userGrantUserID)
 	if err != nil {
 		return nil, err
 	}

@@ -180,9 +180,9 @@ func (i *ExternalIDP) OnSuccess() error {
 }
 
 func (i *ExternalIDP) getOrgIDPConfig(ctx context.Context, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, aggregateID)
+	return i.queries.IDPByIDAndResourceOwner(ctx, false, idpConfigID, aggregateID)
 }
 
 func (i *ExternalIDP) getDefaultIDPConfig(ctx context.Context, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, domain.IAMID)
+	return i.queries.IDPByIDAndResourceOwner(ctx, false, idpConfigID, domain.IAMID)
 }

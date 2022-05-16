@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type IDPLoginPolicyLinkProjection struct {
+type idpLoginPolicyLinkProjection struct {
 	crdb.StatementHandler
 }
 
@@ -22,15 +22,15 @@ const (
 	IDPLoginPolicyLinkTable = "zitadel.projections.idp_login_policy_links"
 )
 
-func NewIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPLoginPolicyLinkProjection {
-	p := &IDPLoginPolicyLinkProjection{}
+func newIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *idpLoginPolicyLinkProjection {
+	p := &idpLoginPolicyLinkProjection{}
 	config.ProjectionName = IDPLoginPolicyLinkTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *IDPLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
+func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -91,7 +91,7 @@ const (
 	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
 )
 
-func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		idp          policy.IdentityProviderAddedEvent
 		providerType domain.IdentityProviderType
@@ -122,7 +122,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idp policy.IdentityProviderRemovedEvent
 
 	switch e := event.(type) {
@@ -143,7 +143,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idp policy.IdentityProviderCascadeRemovedEvent
 
 	switch e := event.(type) {
@@ -164,7 +164,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idpID string
 
 	switch e := event.(type) {
@@ -185,7 +185,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-WTYC1", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")

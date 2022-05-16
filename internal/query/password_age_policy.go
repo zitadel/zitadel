@@ -68,7 +68,10 @@ var (
 	}
 )
 
-func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*PasswordAgePolicy, error) {
+func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldRealTime bool, orgID string) (*PasswordAgePolicy, error) {
+	if shouldRealTime {
+		projection.PasswordAgeProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := preparePasswordAgePolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
@@ -89,7 +92,10 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*Pa
 	return scan(row)
 }
 
-func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context) (*PasswordAgePolicy, error) {
+func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldRealTime bool) (*PasswordAgePolicy, error) {
+	if shouldRealTime {
+		projection.PasswordAgeProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := preparePasswordAgePolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		PasswordAgeColID.identifier(): q.iamID,

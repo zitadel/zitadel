@@ -38,7 +38,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 }`),
 				), org.LoginPolicyAddedEventMapper),
 			},
-			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -84,7 +84,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 }`),
 				), org.LoginPolicyAddedEventMapper),
 			},
-			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -115,7 +115,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceLoginPolicyChanged",
-			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyChanged,
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyChangedEventType),
@@ -159,7 +159,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceMFAAdded",
-			reduce: (&LoginPolicyProjection{}).reduceMFAAdded,
+			reduce: (&loginPolicyProjection{}).reduceMFAAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyMultiFactorAddedEventType),
@@ -191,7 +191,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceMFARemoved",
-			reduce: (&LoginPolicyProjection{}).reduceMFARemoved,
+			reduce: (&loginPolicyProjection{}).reduceMFARemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyMultiFactorRemovedEventType),
@@ -223,7 +223,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceLoginPolicyRemoved",
-			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyRemoved,
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyRemovedEventType),
@@ -250,7 +250,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduce2FAAdded",
-			reduce: (&LoginPolicyProjection{}).reduce2FAAdded,
+			reduce: (&loginPolicyProjection{}).reduce2FAAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicySecondFactorAddedEventType),
@@ -282,7 +282,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduce2FARemoved",
-			reduce: (&LoginPolicyProjection{}).reduce2FARemoved,
+			reduce: (&loginPolicyProjection{}).reduce2FARemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicySecondFactorRemovedEventType),
@@ -314,7 +314,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceLoginPolicyAdded",
-			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LoginPolicyAddedEventType),
@@ -359,7 +359,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceLoginPolicyAdded ignoreUnknownUsernames",
-			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LoginPolicyAddedEventType),
@@ -405,7 +405,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceLoginPolicyChanged",
-			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyChanged,
+			reduce: (&loginPolicyProjection{}).reduceLoginPolicyChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LoginPolicyChangedEventType),
@@ -447,7 +447,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceMFAAdded",
-			reduce: (&LoginPolicyProjection{}).reduceMFAAdded,
+			reduce: (&loginPolicyProjection{}).reduceMFAAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LoginPolicyMultiFactorAddedEventType),
@@ -479,7 +479,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceMFARemoved",
-			reduce: (&LoginPolicyProjection{}).reduceMFARemoved,
+			reduce: (&loginPolicyProjection{}).reduceMFARemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LoginPolicyMultiFactorRemovedEventType),
@@ -511,7 +511,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduce2FAAdded",
-			reduce: (&LoginPolicyProjection{}).reduce2FAAdded,
+			reduce: (&loginPolicyProjection{}).reduce2FAAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LoginPolicySecondFactorAddedEventType),
@@ -543,7 +543,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduce2FARemoved",
-			reduce: (&LoginPolicyProjection{}).reduce2FARemoved,
+			reduce: (&loginPolicyProjection{}).reduce2FARemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LoginPolicySecondFactorRemovedEventType),

@@ -33,7 +33,7 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *domain.Aut
 }
 
 func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, authReq *domain.AuthRequest, userID string) (*iam_model.PasswordComplexityPolicyView, string, error) {
-	user, err := l.query.GetUserByID(r.Context(), userID)
+	user, err := l.query.GetUserByID(r.Context(), userID, false)
 	if err != nil {
 		return nil, "", nil
 	}

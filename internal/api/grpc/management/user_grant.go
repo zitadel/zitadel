@@ -19,7 +19,7 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.query.UserGrant(ctx, idQuery, ownerQuery)
+	grant, err := s.query.UserGrant(ctx, true, idQuery, ownerQuery)
 	if err != nil {
 		return nil, err
 	}

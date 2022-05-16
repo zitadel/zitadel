@@ -16,7 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
-type UserGrantProjection struct {
+type userGrantProjection struct {
 	crdb.StatementHandler
 }
 
@@ -24,15 +24,15 @@ const (
 	UserGrantProjectionTable = "zitadel.projections.user_grants"
 )
 
-func NewUserGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserGrantProjection {
-	p := &UserGrantProjection{}
+func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userGrantProjection {
+	p := &userGrantProjection{}
 	config.ProjectionName = UserGrantProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
+func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: usergrant.AggregateType,
@@ -119,7 +119,7 @@ const (
 	UserGrantState         = "state"
 )
 
-func (p *UserGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*usergrant.UserGrantAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-WYOHD", "seq", event.Sequence(), "expectedType", usergrant.UserGrantAddedType).Error("wrong event type")
@@ -142,7 +142,7 @@ func (p *UserGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	), nil
 }
 
-func (p *UserGrantProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var roles pq.StringArray
 
 	switch e := event.(type) {
@@ -168,7 +168,7 @@ func (p *UserGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 	), nil
 }
 
-func (p *UserGrantProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *usergrant.UserGrantRemovedEvent, *usergrant.UserGrantCascadeRemovedEvent:
 		// ok
@@ -185,7 +185,7 @@ func (p *UserGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 	), nil
 }
 
-func (p *UserGrantProjection) reduceDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
 		logging.LogWithFields("PROJE-V3txf", "seq", event.Sequence(), "expectedType", usergrant.UserGrantDeactivatedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-oP7Gm", "reduce.wrong.event.type")
@@ -204,7 +204,7 @@ func (p *UserGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *UserGrantProjection) reduceReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
 		logging.LogWithFields("PROJE-ly6oe", "seq", event.Sequence(), "expectedType", usergrant.UserGrantReactivatedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-DGsKh", "reduce.wrong.event.type")
@@ -223,7 +223,7 @@ func (p *UserGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *UserGrantProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*user.UserRemovedEvent); !ok {
 		logging.LogWithFields("PROJE-Vfeg3", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bner2a", "reduce.wrong.event.type")
@@ -237,7 +237,7 @@ func (p *UserGrantProjection) reduceUserRemoved(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *UserGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*project.ProjectRemovedEvent); !ok {
 		logging.LogWithFields("PROJE-Vfeg3", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bne2a", "reduce.wrong.event.type")
@@ -251,7 +251,7 @@ func (p *UserGrantProjection) reduceProjectRemoved(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *UserGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-DGfe2", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
@@ -266,7 +266,7 @@ func (p *UserGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) 
 	), nil
 }
 
-func (p *UserGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-Edg22", "seq", event.Sequence(), "expectedType", project.RoleRemovedType).Error("wrong event type")
@@ -284,7 +284,7 @@ func (p *UserGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *UserGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
 	var grantID string
 	var keys []string
 	switch e := event.(type) {

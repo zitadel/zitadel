@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
 
-type KeyProjection struct {
+type keyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
 	keyChan             chan<- interface{}
@@ -27,8 +27,8 @@ const (
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 )
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
-	p := &KeyProjection{}
+func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig, keyChan chan<- interface{}) (_ *keyProjection, err error) {
+	p := &keyProjection{}
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -40,7 +40,7 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 	return p, nil
 }
 
-func (p *KeyProjection) reducers() []handler.AggregateReducer {
+func (p *keyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: keypair.AggregateType,
@@ -74,7 +74,7 @@ const (
 	KeyPublicColumnKey    = "key"
 )
 
-func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-GEdg3", "seq", event.Sequence(), "expectedType", keypair.AddedEventType).Error("wrong event type")

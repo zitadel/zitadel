@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetLockoutPolicy(ctx context.Context, req *mgmt_pb.GetLockoutPolicyRequest) (*mgmt_pb.GetLockoutPolicyResponse, error) {
-	policy, err := s.query.LockoutPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.LockoutPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

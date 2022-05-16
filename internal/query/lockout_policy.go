@@ -68,7 +68,10 @@ var (
 	}
 )
 
-func (q *Queries) LockoutPolicyByOrg(ctx context.Context, orgID string) (*LockoutPolicy, error) {
+func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldRealTime bool, orgID string) (*LockoutPolicy, error) {
+	if shouldRealTime {
+		projection.LockoutPolicyProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{

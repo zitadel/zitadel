@@ -34,7 +34,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 }`),
 				), org.PasswordAgePolicyAddedEventMapper),
 			},
-			reduce: (&PasswordAgeProjection{}).reduceAdded,
+			reduce: (&passwordAgeProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -62,7 +62,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceChanged",
-			reduce: (&PasswordAgeProjection{}).reduceChanged,
+			reduce: (&passwordAgeProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PasswordAgePolicyChangedEventType),
@@ -96,7 +96,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&PasswordAgeProjection{}).reduceRemoved,
+			reduce: (&passwordAgeProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PasswordAgePolicyRemovedEventType),
@@ -123,7 +123,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceAdded",
-			reduce: (&PasswordAgeProjection{}).reduceAdded,
+			reduce: (&passwordAgeProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.PasswordAgePolicyAddedEventType),
@@ -161,7 +161,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceChanged",
-			reduce: (&PasswordAgeProjection{}).reduceChanged,
+			reduce: (&passwordAgeProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.PasswordAgePolicyChangedEventType),

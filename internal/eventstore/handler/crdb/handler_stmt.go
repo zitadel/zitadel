@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -61,7 +62,6 @@ func NewStatementHandler(
 	}
 
 	h := StatementHandler{
-		ProjectionHandler:       handler.NewProjectionHandler(config.ProjectionHandlerConfig),
 		client:                  config.Client,
 		sequenceTable:           config.SequenceTable,
 		maxFailureCount:         config.MaxFailureCount,
@@ -72,21 +72,31 @@ func NewStatementHandler(
 		aggregates:              aggregateTypes,
 		reduces:                 reduces,
 		bulkLimit:               config.BulkLimit,
-		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
+		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
 	}
 
-	go h.ProjectionHandler.Process(
+	h.ProjectionHandler = handler.NewProjectionHandler(config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery)
+
+	go h.Process(
 		ctx,
 		h.reduce,
 		h.Update,
 		h.Lock,
 		h.Unlock,
-		h.SearchQuery,
 	)
 
-	h.ProjectionHandler.Handler.Subscribe(h.aggregates...)
+	h.Subscribe(h.aggregates...)
 
 	return h
+}
+
+func (h *StatementHandler) TriggerBulk(ctx context.Context) {
+	ctx, span := tracing.NewSpan(ctx)
+	var err error
+	defer span.EndWithError(err)
+
+	err = h.ProjectionHandler.TriggerBulk(ctx, h.Lock, h.Unlock)
+	logging.OnError(err).WithField("projection", h.ProjectionName).Warn("unable to trigger bulk")
 }
 
 func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64, error) {

@@ -13,7 +13,7 @@ import (
 )
 
 func (s *Server) GetProjectGrantByID(ctx context.Context, req *mgmt_pb.GetProjectGrantByIDRequest) (*mgmt_pb.GetProjectGrantByIDResponse, error) {
-	grant, err := s.query.ProjectGrantByID(ctx, req.GrantId)
+	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId)
 	if err != nil {
 		return nil, err
 	}

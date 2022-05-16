@@ -32,7 +32,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanPasswordlessAddedEventMapper),
 			},
-			reduce: (&UserAuthMethodProjection{}).reduceInitAuthMethod,
+			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -69,7 +69,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanU2FAddedEventMapper),
 			},
-			reduce: (&UserAuthMethodProjection{}).reduceInitAuthMethod,
+			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -105,7 +105,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanOTPAddedEventMapper),
 			},
-			reduce: (&UserAuthMethodProjection{}).reduceInitAuthMethod,
+			reduce: (&userAuthMethodProjection{}).reduceInitAuthMethod,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -143,7 +143,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanPasswordlessVerifiedEventMapper),
 			},
-			reduce: (&UserAuthMethodProjection{}).reduceActivateEvent,
+			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -180,7 +180,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanU2FVerifiedEventMapper),
 			},
-			reduce: (&UserAuthMethodProjection{}).reduceActivateEvent,
+			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -215,7 +215,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanOTPVerifiedEventMapper),
 			},
-			reduce: (&UserAuthMethodProjection{}).reduceActivateEvent,
+			reduce: (&userAuthMethodProjection{}).reduceActivateEvent,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,

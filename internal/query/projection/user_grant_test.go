@@ -38,7 +38,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					}`),
 				), usergrant.UserGrantAddedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceAdded,
+			reduce: (&userGrantProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -76,7 +76,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					}`),
 				), usergrant.UserGrantChangedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceChanged,
+			reduce: (&userGrantProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -108,7 +108,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					}`),
 				), usergrant.UserGrantCascadeChangedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceChanged,
+			reduce: (&userGrantProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -138,7 +138,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					nil,
 				), usergrant.UserGrantRemovedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceRemoved,
+			reduce: (&userGrantProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -165,7 +165,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					nil,
 				), usergrant.UserGrantCascadeRemovedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceRemoved,
+			reduce: (&userGrantProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -192,7 +192,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					nil,
 				), usergrant.UserGrantDeactivatedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceDeactivated,
+			reduce: (&userGrantProjection{}).reduceDeactivated,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -222,7 +222,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					nil,
 				), usergrant.UserGrantDeactivatedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceReactivated,
+			reduce: (&userGrantProjection{}).reduceReactivated,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -252,7 +252,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					nil,
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceUserRemoved,
+			reduce: (&userGrantProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -279,7 +279,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					nil,
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceProjectRemoved,
+			reduce: (&userGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -306,7 +306,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grantID"}`),
 				), project.GrantRemovedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceProjectGrantRemoved,
+			reduce: (&userGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -333,7 +333,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"key": "key"}`),
 				), project.RoleRemovedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceRoleRemoved,
+			reduce: (&userGrantProjection{}).reduceRoleRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -361,7 +361,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grantID", "roleKeys": ["key"]}`),
 				), project.GrantChangedEventMapper),
 			},
-			reduce: (&UserGrantProjection{}).reduceProjectGrantChanged,
+			reduce: (&userGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,

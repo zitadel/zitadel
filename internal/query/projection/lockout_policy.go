@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type LockoutPolicyProjection struct {
+type lockoutPolicyProjection struct {
 	crdb.StatementHandler
 }
 
@@ -32,15 +32,15 @@ const (
 	LockoutPolicyResourceOwnerCol       = "resource_owner"
 )
 
-func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LockoutPolicyProjection {
-	p := &LockoutPolicyProjection{}
+func newLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *lockoutPolicyProjection {
+	p := &lockoutPolicyProjection{}
 	config.ProjectionName = LockoutPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *LockoutPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *lockoutPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -75,7 +75,7 @@ func (p *LockoutPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *lockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LockoutPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -104,7 +104,7 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		}), nil
 }
 
-func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *lockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LockoutPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.LockoutPolicyChangedEvent:
@@ -133,7 +133,7 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 		}), nil
 }
 
-func (p *LockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *lockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LockoutPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-U5cys", "seq", event.Sequence(), "expectedType", org.LockoutPolicyRemovedEventType).Error("wrong event type")

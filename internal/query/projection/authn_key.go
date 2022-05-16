@@ -30,19 +30,19 @@ const (
 	AuthNKeyEnabledCol       = "enabled"
 )
 
-type AuthNKeyProjection struct {
+type authNKeyProjection struct {
 	crdb.StatementHandler
 }
 
-func NewAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *AuthNKeyProjection {
-	p := &AuthNKeyProjection{}
+func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *authNKeyProjection {
+	p := &authNKeyProjection{}
 	config.ProjectionName = AuthNKeyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *AuthNKeyProjection) reducers() []handler.AggregateReducer {
+func (p *authNKeyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -93,7 +93,7 @@ func (p *AuthNKeyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var authNKeyEvent struct {
 		eventstore.BaseEvent
 		keyID      string
@@ -143,7 +143,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event) (*handler.Statement, error) {
 	var appID string
 	var enabled bool
 	switch e := event.(type) {
@@ -170,7 +170,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 	), nil
 }
 
-func (p *AuthNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var condition handler.Condition
 	switch e := event.(type) {
 	case *project.ApplicationKeyRemovedEvent:

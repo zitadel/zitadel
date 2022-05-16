@@ -32,7 +32,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 					[]byte(`{"tokenId": "tokenID", "expiration": "9999-12-31T23:59:59Z", "scopes": ["openid"]}`),
 				), user.PersonalAccessTokenAddedEventMapper),
 			},
-			reduce: (&PersonalAccessTokenProjection{}).reducePersonalAccessTokenAdded,
+			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenAdded,
 			want: wantReduce{
 				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
@@ -66,7 +66,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 					[]byte(`{"tokenId": "tokenID"}`),
 				), user.PersonalAccessTokenRemovedEventMapper),
 			},
-			reduce: (&PersonalAccessTokenProjection{}).reducePersonalAccessTokenRemoved,
+			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenRemoved,
 			want: wantReduce{
 				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
@@ -93,7 +93,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 					nil,
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&PersonalAccessTokenProjection{}).reduceUserRemoved,
+			reduce: (&personalAccessTokenProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),

@@ -186,7 +186,10 @@ var (
 	}
 )
 
-func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserGrant, error) {
+func (q *Queries) UserGrant(ctx context.Context, shouldRealTime bool, queries ...SearchQuery) (*UserGrant, error) {
+	if shouldRealTime {
+		projection.UserGrantProjection.TriggerBulk(ctx)
+	}
 	query, scan := prepareUserGrantQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)

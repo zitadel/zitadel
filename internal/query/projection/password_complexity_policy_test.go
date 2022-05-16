@@ -37,7 +37,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 }`),
 				), org.PasswordComplexityPolicyAddedEventMapper),
 			},
-			reduce: (&PasswordComplexityProjection{}).reduceAdded,
+			reduce: (&passwordComplexityProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -68,7 +68,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceChanged",
-			reduce: (&PasswordComplexityProjection{}).reduceChanged,
+			reduce: (&passwordComplexityProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PasswordComplexityPolicyChangedEventType),
@@ -108,7 +108,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&PasswordComplexityProjection{}).reduceRemoved,
+			reduce: (&passwordComplexityProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PasswordComplexityPolicyRemovedEventType),
@@ -135,7 +135,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceAdded",
-			reduce: (&PasswordComplexityProjection{}).reduceAdded,
+			reduce: (&passwordComplexityProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.PasswordComplexityPolicyAddedEventType),
@@ -179,7 +179,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceChanged",
-			reduce: (&PasswordComplexityProjection{}).reduceChanged,
+			reduce: (&passwordComplexityProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.PasswordComplexityPolicyChangedEventType),
