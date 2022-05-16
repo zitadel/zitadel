@@ -13,6 +13,7 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="orgID" value="{{ .OrgID }}" />
 
     <div class="lgn-actions lgn-reverse-order">
         <button class="lgn-raised-button lgn-primary" type="submit">{{t "InitUserDone.NextButtonText"}}</button>
