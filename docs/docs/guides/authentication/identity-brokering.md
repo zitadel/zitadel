@@ -66,11 +66,13 @@ Google Example:
 
 ![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
 
-### 2. Add custom login policy on your organization
+### 2. Add custom login policy
+
+The login policy can be configured on two levels. Once as default on the instance and this can be overwritten for each organization.
+This case describes how to change it on the organization.
 
 1. Go to your organization settings by clicking on "Organization" in the menu or using the following link: <https://console.zitadel.ch/org>
-2. Modify your login policy
-3. As long as you have the default policy, you can't change the policy. Click create custom policy to set your on settings.
+2. Modify your login policy in the menu "Login Behaviour and Security"
 
 ![Add custom login policy](/img/console_org_custom_login_policy.gif)
 

@@ -2,8 +2,10 @@
 title: Brand Customization
 ---
 
-ZITADEL offers various customization options for your projects brand design. 
-Head over to the Private Labeling Policy on your Organization Page.
+ZITADEL offers various customization options for your projects brand design. The branding can be configured on two different levels.
+The configuration on the instance level will set the default settings, which are triggered for all users if not overwritten on an organization specifically.
+The second possibility is to configure it on each organization. This guide will describe the second possibility.
+For this head over to the Branding Setting on your Organization Page.
 
 ## How it works
 You are able to customize the light and a dark mode separately.
