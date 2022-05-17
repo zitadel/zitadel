@@ -91,5 +91,5 @@ brews:
 
 announce:
   discord:
-    enabled: false #enable when we release v2
+    enabled: true
     message_template: 'ZITADEL {{ .Tag }} is ready! Check the notes: https://github.com/zitadel/zitadel/releases/tag/{{ .Tag }}'
