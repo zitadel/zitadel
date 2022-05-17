@@ -10,8 +10,6 @@ services:
     environment:
       - ZITADEL_MASTERKEY=${ZITADEL_MASTERKEY}
       - ZITADEL_DATABASE_HOST=db
-      # TODO: Use the following variables as defaults
-      - ZITADEL_EXTERNALDOMAIN=localhost
       - ZITADEL_EXTERNALSECURE=false
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/debug"]
