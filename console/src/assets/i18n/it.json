@@ -1086,6 +1086,7 @@
       "MAXAGEDAYS": "Lunghezza massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Loginname dell'utente deve contenere il dominio",
       "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
       "ALLOWEXTERNALIDP": "IDP esterno consentito",
       "ALLOWREGISTER": "Registrazione consentita",

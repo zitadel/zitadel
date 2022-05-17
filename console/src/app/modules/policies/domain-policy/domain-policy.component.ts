@@ -90,6 +90,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
           req.setOrgId(this.org.id);
           req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
           req.setValidateOrgDomains(this.domainData.validateOrgDomains);
+          req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
 
           this.adminService
             .addCustomDomainPolicy(req)
@@ -105,6 +106,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
           req.setOrgId(this.org.id);
           req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
           req.setValidateOrgDomains(this.domainData.validateOrgDomains);
+          req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
 
           this.adminService
             .updateCustomDomainPolicy(req)
@@ -120,6 +122,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
         const req = new UpdateDomainPolicyRequest();
         req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
         req.setValidateOrgDomains(this.domainData.validateOrgDomains);
+        req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
 
         this.adminService
           .updateDomainPolicy(req)

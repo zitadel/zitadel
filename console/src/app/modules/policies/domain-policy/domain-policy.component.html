@@ -31,6 +31,17 @@
       {{ 'POLICY.DATA.VALIDATEORGDOMAINS' | translate }}
     </mat-checkbox>
   </div>
+
+  <div class="row">
+    <mat-checkbox
+      color="primary"
+      name="hasNumber"
+      ngDefaultControl
+      [(ngModel)]="domainData.smtpSenderAddressMatchesInstanceDomain"
+    >
+      {{ 'POLICY.DATA.SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN' | translate }}
+    </mat-checkbox>
+  </div>
 </div>
 
 <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
