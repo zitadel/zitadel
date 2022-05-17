@@ -4,7 +4,7 @@ release:
   github:
     owner: zitadel
     name: zitadel
-  draft: true
+  draft: false
   prerelease: auto
 
 before:
