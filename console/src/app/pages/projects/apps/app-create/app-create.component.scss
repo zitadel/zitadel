@@ -12,109 +12,122 @@ p.desc {
   display: block;
 }
 
-.app-create-container {
-  padding-top: 2rem;
+.abort-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
 
-  .progress-bar {
-    margin-bottom: 1rem;
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
   }
 
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
   }
 }
 
-.margin-right {
-  margin-right: 0.5rem;
-}
+.app-create-content {
+  padding-left: 4.5rem;
 
-.full-width {
-  width: 100%;
-}
-
-.stepper {
-  background: inherit !important;
-  margin: 0 -1.5rem;
-
-  .formfield {
+  .name-formfield {
     max-width: 400px;
+    display: block;
   }
 
-  .step-title {
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  .app-create-container {
+    padding-top: 2rem;
+
+    .progress-bar {
+      margin-bottom: 1rem;
+    }
   }
 
-  .step-description {
-    font-size: 0.9rem;
+  .margin-right {
+    margin-right: 0.5rem;
   }
-}
 
-.checkbox-container {
-  display: flex;
-  flex-direction: column;
-
-  .checkbox {
-    margin: 0.5rem 0;
+  .full-width {
+    width: 100%;
   }
-}
 
-.row {
-  display: flex;
-  justify-content: space-between;
-
-  .left,
-  .right {
-    margin-bottom: 0.5rem;
-    font-size: 14px;
-  }
-}
-
-.app-create-actions {
-  margin-top: 1rem;
-  display: flex;
-
-  .fill-space {
-    flex: 1;
-  }
-}
-
-.dev {
-  .content {
-    display: flex;
-    margin: 0 -0.5rem;
-    flex-wrap: wrap;
-    flex-direction: row;
+  .stepper {
+    background: inherit !important;
+    margin: 0 -1.5rem;
 
     .formfield {
-      flex: 1;
-      box-sizing: border-box;
-      margin: 0 0.5rem;
+      max-width: 400px;
+    }
 
-      &.full-width {
-        flex-basis: 80%;
-      }
+    .step-title {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .step-description {
+      font-size: 0.9rem;
     }
   }
 
-  .continue-button {
-    margin-top: 3rem;
-    display: block;
-    padding: 0.5rem 4rem;
-    float: right;
+  .checkbox-container {
+    display: flex;
+    flex-direction: column;
+
+    .checkbox {
+      margin: 0.5rem 0;
+    }
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+
+    .left,
+    .right {
+      margin-bottom: 0.5rem;
+      font-size: 14px;
+    }
+  }
+
+  .app-create-actions {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+
+    .bck-button {
+      margin-right: 1rem;
+    }
+
+    .create-button {
+      padding: 0.5rem 4rem;
+    }
+  }
+
+  .dev {
+    .content {
+      display: flex;
+      margin: 0 -0.5rem;
+      flex-wrap: wrap;
+      flex-direction: row;
+
+      .formfield {
+        flex: 1;
+        box-sizing: border-box;
+        margin: 0 0.5rem;
+
+        &.full-width {
+          flex-basis: 80%;
+        }
+      }
+    }
+
+    .continue-button {
+      margin-top: 3rem;
+      display: block;
+      padding: 0.5rem 4rem;
+    }
   }
 }

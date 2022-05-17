@@ -1,4 +1,6 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
     UpdateLoginPolicyRequest,
@@ -37,16 +39,54 @@ export class LoginPolicyComponent implements OnInit {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
-
-  constructor(private toast: ToastService, private injector: Injector) {}
+  public lifetimeForm!: FormGroup;
+  constructor(private toast: ToastService, private injector: Injector, private fb: FormBuilder) {
+    this.lifetimeForm = this.fb.group({
+      passwordCheckLifetime: [240, [Validators.required]],
+      externalLoginCheckLifetime: [12, [Validators.required]],
+      mfaInitSkipLifetime: [720, [Validators.required]],
+      secondFactorCheckLifetime: [12, [Validators.required]],
+      multiFactorCheckLifetime: [12, [Validators.required]],
+    });
+  }
 
   private fetchData(): void {
-    this.getData().then((resp) => {
-      if (resp.policy) {
-        this.loginData = resp.policy;
-        this.loading = false;
-      }
-    });
+    this.getData()
+      .then((resp) => {
+        console.log(resp);
+
+        if (resp.policy) {
+          this.loginData = resp.policy;
+          this.loading = false;
+
+          this.passwordCheckLifetime?.setValue(
+            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 240,
+          );
+
+          this.externalLoginCheckLifetime?.setValue(
+            this.loginData.externalLoginCheckLifetime?.seconds
+              ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+
+          this.mfaInitSkipLifetime?.setValue(
+            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 720,
+          );
+
+          this.secondFactorCheckLifetime?.setValue(
+            this.loginData.secondFactorCheckLifetime?.seconds
+              ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+
+          this.multiFactorCheckLifetime?.setValue(
+            this.loginData.multiFactorCheckLifetime?.seconds
+              ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+        }
+      })
+      .catch(this.toast.showError);
   }
 
   public ngOnInit(): void {
@@ -88,6 +128,22 @@ export class LoginPolicyComponent implements OnInit {
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+
+        const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+        mgmtreq.setPasswordCheckLifetime(pcl);
+
+        const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+        mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+        const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+        mgmtreq.setMfaInitSkipLifetime(misl);
+
+        const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+        const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        mgmtreq.setMultiFactorCheckLifetime(mficl);
+
         mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
         mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
@@ -107,6 +163,21 @@ export class LoginPolicyComponent implements OnInit {
         adminreq.setForceMfa(this.loginData.forceMfa);
         adminreq.setPasswordlessType(this.loginData.passwordlessType);
         adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+
+        const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+        adminreq.setPasswordCheckLifetime(admin_pcl);
+
+        const admin_elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+        adminreq.setExternalLoginCheckLifetime(admin_elcl);
+
+        const admin_misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+        adminreq.setMfaInitSkipLifetime(admin_misl);
+
+        const admin_sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        adminreq.setSecondFactorCheckLifetime(admin_sfcl);
+
+        const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+        adminreq.setMultiFactorCheckLifetime(admin_mficl);
         adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
         adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
         // adminreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
@@ -152,5 +223,25 @@ export class LoginPolicyComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  public get passwordCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('passwordCheckLifetime');
+  }
+
+  public get externalLoginCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('externalLoginCheckLifetime');
+  }
+
+  public get mfaInitSkipLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('mfaInitSkipLifetime');
+  }
+
+  public get secondFactorCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('secondFactorCheckLifetime');
+  }
+
+  public get multiFactorCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('multiFactorCheckLifetime');
   }
 }

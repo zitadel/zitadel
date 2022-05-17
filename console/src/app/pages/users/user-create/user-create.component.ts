@@ -75,7 +75,7 @@ export class UserCreateComponent implements OnDestroy {
     this.loading = true;
     this.loadOrg();
     this.mgmtService
-      .getOrgIAMPolicy()
+      .getDomainPolicy()
       .then((resp) => {
         if (resp.policy?.userLoginMustBeDomain) {
           this.userLoginMustBeDomain = resp.policy.userLoginMustBeDomain;
