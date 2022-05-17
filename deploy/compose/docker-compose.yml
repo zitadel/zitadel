@@ -11,6 +11,7 @@ services:
       - ZITADEL_MASTERKEY=${ZITADEL_MASTERKEY}
       - ZITADEL_DATABASE_HOST=db
       - ZITADEL_EXTERNALSECURE=false
+      - ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/debug"]
       interval: 10s
