@@ -52,33 +52,6 @@ func (v *TokenVerifier) RegisterServer(appName, methodPrefix string, mappings Me
 	}
 }
 
-func prefixFromMethod(method string) (string, bool) {
-	parts := strings.Split(method, "/")
-	if len(parts) < 2 {
-		return "", false
-	}
-	return parts[1], true
-}
-
-func (v *TokenVerifier) clientIDAndProjectIDFromMethod(ctx context.Context, method string) (clientID, projectID string, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	prefix, ok := prefixFromMethod(method)
-	if !ok {
-		return "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-GRD2Q", "Errors.Internal")
-	}
-	app, ok := v.clients.Load(prefix)
-	if !ok {
-		return "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-G2qrh", "Errors.Internal")
-	}
-	c := app.(*client)
-	c.id, c.projectID, err = v.authZRepo.VerifierClientID(ctx, c.name)
-	if err != nil {
-		return "", "", caos_errs.ThrowPermissionDenied(err, "AUTHZ-ptTIF2", "Errors.Internal")
-	}
-	return c.id, c.projectID, nil
-}
 func (v *TokenVerifier) SearchMyMemberships(ctx context.Context) (_ []*Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
