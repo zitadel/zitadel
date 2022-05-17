@@ -23,7 +23,7 @@ sudo chmod +x /usr/local/bin/zitadel
 sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
 
 # Run the database and application containers
-zitadel start-from-init --masterkeyFromEnv
+zitadel admin start-from-init --masterkeyFromEnv
 ```
 
 Open your favorite internet browser and navigate to http://localhost:8080/ui/console
