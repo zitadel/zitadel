@@ -1084,7 +1084,7 @@
       "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
-      "USERLOGINMUSTBEDOMAIN": "User Login must be Domain",
+      "USERLOGINMUSTBEDOMAIN": "User Loginname must contain orgdomain",
       "VALIDATEORGDOMAINS": "Validate Org domains",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",

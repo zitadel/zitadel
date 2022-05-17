@@ -1084,7 +1084,7 @@
       "MAXATTEMPTS": "Massimo numero di tentativi di password",
       "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
       "MAXAGEDAYS": "Lunghezza massima in giorni",
-      "USERLOGINMUSTBEDOMAIN": "Loginname dell'utente deve contenere il dominio",
+      "USERLOGINMUSTBEDOMAIN": "Loginname dell'utente deve contenere il dominio dell' organizzazione",
       "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
