@@ -1,19 +1,31 @@
 <div [attr.data-e2e]="'color'">
-  <p class="name cnsl-secondary-text">{{name}}</p>
+  <p class="name cnsl-secondary-text">{{ name }}</p>
 
   <div class="wrapper">
-    <button [disabled]="disabled" class="color-shadow" [style.background-color]="previewColor"
-      (click)="isOpen = !isOpen" cdkOverlayOrigin #trigger="cdkOverlayOrigin"
-      matTooltip="{{'ACTIONS.SET' | translate}}"> </button>
+    <button
+      [disabled]="disabled"
+      class="color-shadow"
+      [style.background-color]="previewColor"
+      (click)="isOpen = !isOpen"
+      cdkOverlayOrigin
+      #trigger="cdkOverlayOrigin"
+      matTooltip="{{ 'ACTIONS.SET' | translate }}"
+    ></button>
 
-    <div class="hex-wrapper" [ngClass]="{'pointer': !disabled}" (click)="disabled ? null : (isOpen = !isOpen)">
+    <div class="hex-wrapper" [ngClass]="{ pointer: !disabled }" (click)="disabled ? null : (isOpen = !isOpen)">
       <i class="las la-hashtag"></i>
-      <span class="hex">{{previewColorCropped}}</span>
+      <span class="hex">{{ previewColorCropped }}</span>
     </div>
   </div>
 </div>
 
-<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="isOpen"
-  (overlayOutsideClick)="isOpen = false">
-  <color-chrome class="picker" [color]="previewColor" (onChangeComplete)="changeComplete($event)"></color-chrome>
+<ng-template
+  cdkConnectedOverlay
+  (detach)="submitColor()"
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen"
+  (overlayOutsideClick)="isOpen = false"
+>
+  <color-chrome class="picker" [color]="previewColor" (onChangeComplete)="changeComplete($event)"> </color-chrome>
+  <button class="close-icon" mat-mini-fab color="primary" (click)="submitColor()"><mat-icon>check</mat-icon></button>
 </ng-template>
