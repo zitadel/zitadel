@@ -5,6 +5,7 @@
 
 @mixin preview-theme($show-dark) {
   $theme: if($show-dark, $caos-dark-app-theme, $caos-light-app-theme);
+
   @include input-theme($theme);
   @include cnsl-label-theme($theme);
   @include mat.all-component-themes($theme);
