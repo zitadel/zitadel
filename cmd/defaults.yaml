@@ -6,7 +6,7 @@ Log:
 Port: 8080
 ExternalPort: 8080
 ExternalDomain:  localhost
-ExternalSecure: false
+ExternalSecure: true
 HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"
 
@@ -159,9 +159,6 @@ SystemDefaults:
     Size: 2048
     PrivateKeyLifetime: 6h
     PublicKeyLifetime: 30h
-
-S3DefaultInstance:
-  CustomDomain: localhost
 
 DefaultInstance:
   CustomDomain: localhost
