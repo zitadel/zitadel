@@ -71,8 +71,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GORELEASER_TOKEN_TAP: ${{ steps.generate-token.outputs.token }}
           RELEASE_VERSION: ${{ steps.semantic.outputs.release-version }} # I think this line is not needed. Nevertheless, it's explicit
-          DISCORD_WEBHOOK_ID: 976058224484687932
-          DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          DISCORD_WEBHOOK_ID: "976058224484687932"
+          DISCORD_WEBHOOK_TOKEN: "${{ secrets.DISCORD_WEBHOOK_TOKEN }}"
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:
