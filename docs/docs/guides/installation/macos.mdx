@@ -14,7 +14,7 @@ cockroach start-single-node --insecure --background --http-addr :9090
 export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 export ZITADEL_EXTERNALSECURE=false
 export ZITADEL_EXTERNALDOMAIN=localhost
-export ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
+export ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
 export MY_ARCHITECTURE="arm64"
 
 # Download the zitadel binary
