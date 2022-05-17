@@ -5,7 +5,7 @@ services:
     restart: always
     networks:
       - zitadel
-    image: ghcr.io/zitadel/zitadel:v1.80.0-v2.20-amd64
+    image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.1-amd64
     command: admin start-from-init --masterkeyFromEnv
     environment:
       - ZITADEL_MASTERKEY=${ZITADEL_MASTERKEY}
