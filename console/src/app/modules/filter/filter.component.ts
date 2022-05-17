@@ -83,6 +83,7 @@ export class FilterComponent implements OnDestroy {
           queryParams: {
             ['filter']: JSON.stringify(filters),
           },
+          replaceUrl: true,
           queryParamsHandling: 'merge',
           skipLocationChange: false,
         });

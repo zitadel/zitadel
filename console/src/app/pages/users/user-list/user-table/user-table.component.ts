@@ -110,6 +110,7 @@ export class UserTableComponent implements OnInit {
       queryParams: {
         type: type === Type.TYPE_HUMAN ? 'human' : type === Type.TYPE_MACHINE ? 'machine' : 'human',
       },
+      replaceUrl: true,
       queryParamsHandling: 'merge',
       skipLocationChange: false,
     });
