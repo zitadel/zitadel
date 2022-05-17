@@ -51,36 +51,42 @@ export class LoginPolicyComponent implements OnInit {
   }
 
   private fetchData(): void {
-    this.getData().then((resp) => {
-      if (resp.policy) {
-        this.loginData = resp.policy;
-        this.loading = false;
+    this.getData()
+      .then((resp) => {
+        console.log(resp);
 
-        this.passwordCheckLifetime?.setValue(
-          this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 240,
-        );
+        if (resp.policy) {
+          this.loginData = resp.policy;
+          this.loading = false;
 
-        this.externalLoginCheckLifetime?.setValue(
-          this.loginData.externalLoginCheckLifetime?.seconds
-            ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
-            : 12,
-        );
+          this.passwordCheckLifetime?.setValue(
+            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 240,
+          );
 
-        this.mfaInitSkipLifetime?.setValue(
-          this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 720,
-        );
+          this.externalLoginCheckLifetime?.setValue(
+            this.loginData.externalLoginCheckLifetime?.seconds
+              ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
 
-        this.secondFactorCheckLifetime?.setValue(
-          this.loginData.secondFactorCheckLifetime?.seconds
-            ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
-            : 12,
-        );
+          this.mfaInitSkipLifetime?.setValue(
+            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 720,
+          );
 
-        this.multiFactorCheckLifetime?.setValue(
-          this.loginData.multiFactorCheckLifetime?.seconds ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60 : 12,
-        );
-      }
-    });
+          this.secondFactorCheckLifetime?.setValue(
+            this.loginData.secondFactorCheckLifetime?.seconds
+              ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+
+          this.multiFactorCheckLifetime?.setValue(
+            this.loginData.multiFactorCheckLifetime?.seconds
+              ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+        }
+      })
+      .catch(this.toast.showError);
   }
 
   public ngOnInit(): void {

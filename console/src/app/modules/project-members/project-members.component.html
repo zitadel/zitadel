@@ -1,34 +1,88 @@
-<cnsl-detail-layout *ngIf="project" [hasBackButton]="true"
-  title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}">
+<cnsl-detail-layout
+  *ngIf="project"
+  [hasBackButton]="true"
+  title="{{ projectName }} {{ 'PROJECT.MEMBER.TITLE' | translate }}"
+>
   <p class="subinfo" sub>
     <span class="cnsl-secondary-text">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</span>
     <a mat-icon-button href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">
       <i class="las la-info-circle"></i>
     </a>
   </p>
-  <cnsl-members-table *ngIf="project" [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
-    (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
-    (changedSelection)="selection = $event" [refreshTrigger]="changePage"
-    [canWrite]="['project.member.write$', 'project.member.write:'+ (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: ''] | hasRole | async"
-    [canDelete]="['project.member.delete$', 'project.member.delete:'+(projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: ''] | hasRole | async"
-    (deleteMember)="removeProjectMember($event)">
-    <ng-template cnslHasRole selectactions
-      [hasRole]="['project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '', 'project.member.delete']">
-      <button (click)="removeProjectMemberSelection()" color="warn"
-        matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" mat-raised-button>
+  <cnsl-members-table
+    *ngIf="project"
+    [dataSource]="dataSource"
+    [memberRoleOptions]="memberRoleOptions"
+    (updateRoles)="updateRoles($event.member, $event.change)"
+    [factoryLoadFunc]="changePageFactory"
+    (changedSelection)="selection = $event"
+    [refreshTrigger]="changePage"
+    [canWrite]="
+      [
+        'project.member.write$',
+        'project.member.write:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
+          ? $any(project)?.id
+          : projectType === ProjectType.PROJECTTYPE_GRANTED
+          ? $any(project)?.projectId
+          : ''
+      ]
+        | hasRole
+        | async
+    "
+    [canDelete]="
+      [
+        'project.member.delete$',
+        'project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
+          ? $any(project)?.id
+          : projectType === ProjectType.PROJECTTYPE_GRANTED
+          ? $any(project)?.projectId
+          : ''
+      ]
+        | hasRole
+        | async
+    "
+    (deleteMember)="removeProjectMember($event)"
+  >
+    <ng-template
+      cnslHasRole
+      selectactions
+      [hasRole]="[
+        'project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
+          ? $any(project)?.id
+          : projectType === ProjectType.PROJECTTYPE_GRANTED
+          ? $any(project)?.projectId
+          : '',
+        'project.member.delete'
+      ]"
+    >
+      <button
+        (click)="($event.stopPropagation); removeProjectMemberSelection()"
+        color="warn"
+        matTooltip="{{ 'ORG_DETAIL.TABLE.DELETE' | translate }}"
+        mat-raised-button
+      >
         <i class="las la-trash"></i>
-        <span>{{'ACTIONS.SELECTIONDELETE' | translate}}</span>
+        <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
         <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
         </cnsl-action-keys>
       </button>
     </ng-template>
-    <ng-template cnslHasRole writeactions
-      [hasRole]="['project.member.write:'+(projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '','project.member.write']">
+    <ng-template
+      cnslHasRole
+      writeactions
+      [hasRole]="[
+        'project.member.write:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
+          ? $any(project)?.id
+          : projectType === ProjectType.PROJECTTYPE_GRANTED
+          ? $any(project)?.projectId
+          : '',
+        'project.member.write'
+      ]"
+    >
       <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
         <mat-icon class="icon">add</mat-icon>
         <span>{{ 'ACTIONS.NEW' | translate }}</span>
-        <cnsl-action-keys (actionTriggered)="openAddMember()">
-        </cnsl-action-keys>
+        <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
       </button>
     </ng-template>
   </cnsl-members-table>
