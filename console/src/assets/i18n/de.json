@@ -1084,7 +1084,7 @@
       "MAXATTEMPTS": "Maximale Anzahl an Versuchen",
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
-      "USERLOGINMUSTBEDOMAIN": "Benutzer-Login muss die Domain der Organisation beinhalten",
+      "USERLOGINMUSTBEDOMAIN": "Benutzer Loginname muss die Domain der Organisation beinhalten",
       "VALIDATEORGDOMAINS": "Org Domains validieren",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Addresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
