@@ -5,15 +5,13 @@ services:
     restart: always
     networks:
       - zitadel
-    image: ghcr.io/zitadel/zitadel:v1.80.0-v2.20-amd64
+    image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.3-amd64
     command: admin start-from-init --masterkeyFromEnv
     environment:
       - ZITADEL_MASTERKEY=${ZITADEL_MASTERKEY}
       - ZITADEL_DATABASE_HOST=db
       - ZITADEL_EXTERNALSECURE=false
-      # TODO: Use the following variables as defaults
-      - ZITADEL_EXTERNALDOMAIN=localhost
-      - ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
+      - ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/debug"]
       interval: 10s
@@ -30,7 +28,7 @@ services:
     restart: always
     networks:
       - zitadel
-    image: cockroachdb/cockroach:v21.2.8
+    image: cockroachdb/cockroach:v21.2.5
     command: start-single-node --insecure --listen-addr=0.0.0.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
