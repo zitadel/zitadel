@@ -179,16 +179,16 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 					return nil, err
 				}
 				cmds = append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
-			}
-
-			if human.Email.Verified {
-				cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
 			} else {
-				value, expiry, err := newEmailCode(ctx, filter, codeAlg)
-				if err != nil {
-					return nil, err
+				if human.Email.Verified {
+					cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
+				} else {
+					value, expiry, err := newEmailCode(ctx, filter, codeAlg)
+					if err != nil {
+						return nil, err
+					}
+					cmds = append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
 				}
-				cmds = append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
 			}
 
 			if human.Phone.Verified {

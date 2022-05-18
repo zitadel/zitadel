@@ -164,9 +164,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.http.get('./assets/environment.json').subscribe((env: any) => {
       this.environmentMap = {
         issuer: env.issuer,
-        adminServiceUrl: env.adminServiceUrl,
-        mgmtServiceUrl: env.mgmtServiceUrl,
-        authServiceUrl: env.adminServiceUrl,
+        adminServiceUrl: env.api,
+        mgmtServiceUrl: env.api,
+        authServiceUrl: env.api,
       };
     });
   }
