@@ -5,7 +5,7 @@ Log:
 
 Port: 8080
 ExternalPort: 8080
-ExternalDomain:  #must be provided
+ExternalDomain: localhost
 ExternalSecure: true
 HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"

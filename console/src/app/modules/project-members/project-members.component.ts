@@ -103,6 +103,19 @@ export class ProjectMembersComponent {
                   this.grantId,
                 );
               };
+
+              const breadcrumbs = [
+                new Breadcrumb({
+                  type: BreadcrumbType.ORG,
+                  routerLink: ['/org'],
+                }),
+                new Breadcrumb({
+                  type: BreadcrumbType.GRANTEDPROJECT,
+                  param: { key: 'projectid', value: (this.project as GrantedProject.AsObject).projectId },
+                  routerLink: ['/projects', (this.project as GrantedProject.AsObject).projectId],
+                }),
+              ];
+              breadcrumbService.setBreadcrumb(breadcrumbs);
             }
           });
         }

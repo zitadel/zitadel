@@ -1,12 +1,16 @@
 <div class="spinner-wr">
-  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+  <mat-spinner diameter="30" *ngIf="smtpLoading || smsProvidersLoading" color="primary"></mat-spinner>
 </div>
 
 <h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
 
-<cnsl-info-section *ngIf="!form.valid" class="info-section-warn" [fitWidth]="true" [type]="InfoSectionType.ALERT">{{
-  'SETTING.SMTP.REQUIREDWARN' | translate
-}}</cnsl-info-section>
+<cnsl-info-section
+  *ngIf="!smtpLoading && !form.valid"
+  class="info-section-warn"
+  [fitWidth]="true"
+  [type]="InfoSectionType.ALERT"
+  >{{ 'SETTING.SMTP.REQUIREDWARN' | translate }}</cnsl-info-section
+>
 
 <form (ngSubmit)="savePolicy()" [formGroup]="form" autocomplete="off">
   <cnsl-form-field class="smtp-form-field" label="Sender Address" required="true">
@@ -33,17 +37,9 @@
     <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" />
   </cnsl-form-field>
 
-  <cnsl-form-field class="smtp-form-field" label="Password" required="true">
-    <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
-    <input
-      id="smtp-password"
-      cnslInput
-      name="smtp-password"
-      autocomplete="smtp-password"
-      type="password"
-      formControlName="password"
-    />
-  </cnsl-form-field>
+  <button class="set-password-btn" (click)="setSMTPPassword()" mat-stroked-button>
+    {{ 'SETTING.SMTP.SETPASSWORD' | translate }}
+  </button>
 
   <div class="general-btn-container">
     <button class="save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>

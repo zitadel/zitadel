@@ -425,10 +425,6 @@ $custom-typography: mat.define-typography-config(
   --success: #10b981;
   $border-color: map-get($foreground, divider);
 
-  .main-container {
-    color: map-get($foreground, base);
-  }
-
   .mat-menu-panel {
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);

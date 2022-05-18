@@ -38,3 +38,7 @@ func (err *InvalidArgumentError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *InvalidArgumentError) Unwrap() error {
+	return err.CaosError
+}

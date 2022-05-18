@@ -32,11 +32,7 @@ func Start(authZRepo authZRepo) (v *TokenVerifier) {
 }
 
 func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang, resourceOwner string, err error) {
-	verifierClientID, projectID, err := v.clientIDAndProjectIDFromMethod(ctx, method)
-	if err != nil {
-		return "", "", "", "", "", err
-	}
-	userID, agentID, clientID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, verifierClientID, projectID)
+	userID, agentID, clientID, prefLang, resourceOwner, err = v.authZRepo.VerifyAccessToken(ctx, token, "", GetInstance(ctx).ProjectID())
 	return userID, clientID, agentID, prefLang, resourceOwner, err
 }
 
@@ -56,33 +52,6 @@ func (v *TokenVerifier) RegisterServer(appName, methodPrefix string, mappings Me
 	}
 }
 
-func prefixFromMethod(method string) (string, bool) {
-	parts := strings.Split(method, "/")
-	if len(parts) < 2 {
-		return "", false
-	}
-	return parts[1], true
-}
-
-func (v *TokenVerifier) clientIDAndProjectIDFromMethod(ctx context.Context, method string) (clientID, projectID string, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	prefix, ok := prefixFromMethod(method)
-	if !ok {
-		return "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-GRD2Q", "Errors.Internal")
-	}
-	app, ok := v.clients.Load(prefix)
-	if !ok {
-		return "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-G2qrh", "Errors.Internal")
-	}
-	c := app.(*client)
-	c.id, c.projectID, err = v.authZRepo.VerifierClientID(ctx, c.name)
-	if err != nil {
-		return "", "", caos_errs.ThrowPermissionDenied(err, "AUTHZ-ptTIF2", "Errors.Internal")
-	}
-	return c.id, c.projectID, nil
-}
 func (v *TokenVerifier) SearchMyMemberships(ctx context.Context) (_ []*Membership, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
