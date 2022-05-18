@@ -1,6 +1,11 @@
-<cnsl-refresh-table *ngIf="dataSource" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
-  [timestamp]="dataSource.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
-
+<cnsl-refresh-table
+  *ngIf="dataSource"
+  (refreshed)="changePage()"
+  [dataSize]="dataSource.totalResult"
+  [timestamp]="dataSource.viewTimestamp"
+  [selection]="selection"
+  [loading]="dataSource?.loading$ | async"
+>
   <ng-container actions *ngIf="selection.hasValue()">
     <ng-content select="[selectactions]"></ng-content>
   </ng-container>
@@ -13,17 +18,32 @@
     <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
       <ng-container matColumnDef="select">
         <th class="selection" mat-header-cell *matHeaderCellDef>
-          <mat-checkbox [disabled]="!canWrite" color="primary" (change)="$event ? masterToggle() : null"
+          <mat-checkbox
+            [disabled]="!canWrite"
+            color="primary"
+            (change)="$event ? masterToggle() : null"
             [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()">
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+          >
           </mat-checkbox>
         </th>
         <td class="selection" mat-cell *matCellDef="let row">
-          <mat-checkbox [disabled]="!canWrite" color="primary" (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-            <cnsl-avatar *ngIf="row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
-              [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''" [avatarUrl]="row.avatarUrl|| ''"
-              [forColor]="row?.preferredLoginName" [size]="32">
+          <mat-checkbox
+            [disabled]="!canWrite"
+            color="primary"
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)"
+          >
+            <cnsl-avatar
+              *ngIf="row?.displayName && row.firstName && row.lastName; else cog"
+              class="avatar"
+              [name]="row.displayName"
+              [avatarUrl]="row.avatarUrl || ''"
+              [avatarUrl]="row.avatarUrl || ''"
+              [forColor]="row?.preferredLoginName"
+              [size]="32"
+            >
             </cnsl-avatar>
             <ng-template #cog>
               <cnsl-avatar [forColor]="row.preferredLoginName" [isMachine]="true">
@@ -35,27 +55,30 @@
       </ng-container>
 
       <ng-container matColumnDef="userId">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERID' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.USERID' | translate }}</th>
         <td mat-cell *matCellDef="let member">
-          {{member.userId}} </td>
+          {{ member.userId }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="displayName">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.DISPLAYNAME' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.DISPLAYNAME' | translate }}</th>
         <td mat-cell *matCellDef="let member">
-          {{member.displayName}} </td>
+          {{ member.displayName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="loginname">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LOGINNAME' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.LOGINNAME' | translate }}</th>
         <td mat-cell *matCellDef="let member">
-          {{member.preferredLoginName}} </td>
+          {{ member.preferredLoginName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.EMAIL' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.MEMBER.EMAIL' | translate }}</th>
         <td mat-cell *matCellDef="let member">
-          {{member.email}}
+          {{ member.email }}
         </td>
       </ng-container>
 
@@ -63,24 +86,36 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let member" class="member-action-tr">
           <cnsl-table-actions [hasActions]="true">
-            <button actions matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn"
-              (click)="triggerDeleteMember(member)" mat-icon-button><i class="las la-trash"></i></button>
+            <button
+              actions
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              color="warn"
+              (click)="$event.stopPropagation(); triggerDeleteMember(member)"
+              mat-icon-button
+            >
+              <i class="las la-trash"></i>
+            </button>
 
             <button menuActions mat-menu-item [routerLink]="['/users', member.userId]">
-              {{'ACTIONS.TABLE.SHOWUSER' | translate : ({value: member.displayName})}}
+              {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: member.displayName } }}
             </button>
           </cnsl-table-actions>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="roles">
-        <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'ROLESLABEL' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef class="role-row">{{ 'ROLESLABEL' | translate }}</th>
         <td mat-cell *matCellDef="let member" class="role-row">
           <mat-chip-list class="cnsl-chip-list" aria-label="role selection">
-            <mat-chip class="cnsl-chip" *ngFor="let role of member.rolesList" [removable]="true" [selectable]="false"
-              (removed)="removeRole(member, role)">
+            <mat-chip
+              class="cnsl-chip"
+              *ngFor="let role of member.rolesList"
+              [removable]="true"
+              [selectable]="false"
+              (removed)="removeRole(member, role)"
+            >
               <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
-              <span>{{role | roletransform}}</span>
+              <span>{{ role | roletransform }}</span>
               <button matChipRemove>
                 <mat-icon>cancel</mat-icon>
               </button>
@@ -90,13 +125,23 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr class="highlight pointer" (click)="addRole(member)" mat-row
-        *matRowDef="let member; columns: displayedColumns;">
-      </tr>
+      <tr
+        class="highlight pointer"
+        (click)="addRole(member)"
+        mat-row
+        *matRowDef="let member; columns: displayedColumns"
+      ></tr>
     </table>
   </div>
-  <cnsl-paginator *ngIf="dataSource" class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp"
-    [pageSize]="INITIALPAGESIZE" [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]"
-    (page)="changePage($event)">
+  <cnsl-paginator
+    *ngIf="dataSource"
+    class="paginator"
+    #paginator
+    [timestamp]="dataSource?.viewTimestamp"
+    [pageSize]="INITIALPAGESIZE"
+    [length]="dataSource.totalResult"
+    [pageSizeOptions]="[25, 50, 100, 250]"
+    (page)="changePage($event)"
+  >
   </cnsl-paginator>
 </cnsl-refresh-table>

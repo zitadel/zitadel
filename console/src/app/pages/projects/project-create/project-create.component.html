@@ -4,25 +4,29 @@
       <button (click)="close()" mat-icon-button>
         <mat-icon>close</mat-icon>
       </button>
-      <span class="abort">{{ 'PROJECT.PAGES.CREATE' | translate }}</span><span class="abort-2">Step
-        {{ currentCreateStep }} of
-        {{ createSteps }}</span>
+      <span class="abort">{{ 'PROJECT.PAGES.CREATE' | translate }}</span>
     </div>
 
     <div class="project-create-content">
-      <h1>{{'PROJECT.PAGES.CREATE_DESC' | translate}}</h1>
+      <h1>{{ 'PROJECT.PAGES.CREATE_DESC' | translate }}</h1>
       <form cdkFocusRegionStart (ngSubmit)="saveProject()">
         <div class="column">
           <cnsl-form-field class="formfield" hintLabel="The name is required!">
-            <cnsl-label>{{'PROJECT.NAME' | translate}}</cnsl-label>
-            <input cnslInput cdkFocusInitial autofocus [(ngModel)]="project.name"
-              [ngModelOptions]="{ standalone: true }" />
+            <cnsl-label>{{ 'PROJECT.NAME' | translate }}</cnsl-label>
+            <input cnslInput cdkFocusInitial autofocus [(ngModel)]="project.name" [ngModelOptions]="{ standalone: true }" />
           </cnsl-form-field>
         </div>
 
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="!project.name" cdkFocusInitial
-          type="submit" [attr.data-e2e]="'continue-button'">
-          {{'ACTIONS.CONTINUE' | translate}}
+        <button
+          color="primary"
+          mat-raised-button
+          class="continue-button"
+          [disabled]="!project.name"
+          cdkFocusInitial
+          type="submit"
+          [attr.data-e2e]="'continue-button'"
+        >
+          {{ 'ACTIONS.CONTINUE' | translate }}
         </button>
       </form>
     </div>

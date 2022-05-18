@@ -4,7 +4,7 @@ release:
   github:
     owner: zitadel
     name: zitadel
-  draft: true
+  draft: false
   prerelease: auto
 
 before:
@@ -91,5 +91,5 @@ brews:
 
 announce:
   discord:
-    enabled: false #enable when we release v2
+    enabled: true
     message_template: 'ZITADEL {{ .Tag }} is ready! Check the notes: https://github.com/zitadel/zitadel/releases/tag/{{ .Tag }}'

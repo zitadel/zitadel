@@ -1,17 +1,26 @@
 @use '@angular/material' as mat;
 
-@mixin preview-theme($theme) {
+@import '../../../../../styles/input.scss';
+@import '../../../label/label.component.scss';
+
+@mixin preview-theme($show-dark) {
+  $theme: if($show-dark, $caos-dark-app-theme, $caos-light-app-theme);
+
+  @include input-theme($theme);
+  @include cnsl-label-theme($theme);
+  @include mat.all-component-themes($theme);
+
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
-  $p-border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   .preview {
     pointer-events: none;
     border-radius: 0.5rem;
     transform: scale(0.9);
+    color: map-get($foreground, base);
 
     * {
       pointer-events: none;
@@ -75,18 +84,6 @@
             font-size: 14px;
             margin: 1rem 0;
           }
-        }
-      }
-
-      &.light {
-        .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
-          color: #000;
-        }
-      }
-
-      &.dark {
-        .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
-          color: #fff;
         }
       }
     }

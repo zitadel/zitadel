@@ -55,6 +55,7 @@ export class SidenavComponent implements ControlValueAccessor, OnInit {
         queryParams: {
           [this.queryParam]: setting,
         },
+        replaceUrl: true,
         queryParamsHandling: 'merge',
         skipLocationChange: false,
       });

@@ -1,0 +1,52 @@
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+</div>
+
+<h2>{{ 'POLICY.DOMAIN_POLICY.TITLE' | translate }}</h2>
+<cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
+
+<!-- <ng-template cnslHasRole [hasRole]="['domain.policy.delete']"> -->
+<button
+  *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+  matTooltip="{{ 'POLICY.RESET' | translate }}"
+  color="warn"
+  (click)="removePolicy()"
+  mat-stroked-button
+>
+  {{ 'POLICY.RESET' | translate }}
+</button>
+<!-- </ng-template> -->
+
+<!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
+<div class="content" *ngIf="domainData">
+  <div class="row">
+    <mat-checkbox color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.userLoginMustBeDomain">
+      {{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate }}
+    </mat-checkbox>
+  </div>
+
+  <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
+  <div class="row">
+    <mat-checkbox color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.validateOrgDomains">
+      {{ 'POLICY.DATA.VALIDATEORGDOMAINS' | translate }}
+    </mat-checkbox>
+  </div>
+
+  <div class="row">
+    <mat-checkbox
+      color="primary"
+      name="hasNumber"
+      ngDefaultControl
+      [(ngModel)]="domainData.smtpSenderAddressMatchesInstanceDomain"
+    >
+      {{ 'POLICY.DATA.SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN' | translate }}
+    </mat-checkbox>
+  </div>
+</div>
+
+<!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
+<div class="btn-container">
+  <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
+</div>

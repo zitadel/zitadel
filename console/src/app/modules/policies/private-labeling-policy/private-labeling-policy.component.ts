@@ -473,6 +473,46 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     }
   }
 
+  public setDarkBackgroundColorAndSave($event: string): void {
+    this.previewData.backgroundColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setDarkPrimaryColorAndSave($event: string): void {
+    this.previewData.primaryColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setDarkWarnColorAndSave($event: string): void {
+    this.previewData.warnColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setDarkFontColorAndSave($event: string): void {
+    this.previewData.fontColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setBackgroundColorAndSave($event: string): void {
+    this.previewData.backgroundColor = $event;
+    this.savePolicy();
+  }
+
+  public setPrimaryColorAndSave($event: string): void {
+    this.previewData.primaryColor = $event;
+    this.savePolicy();
+  }
+
+  public setWarnColorAndSave($event: string): void {
+    this.previewData.warnColor = $event;
+    this.savePolicy();
+  }
+
+  public setFontColorAndSave($event: string): void {
+    this.previewData.fontColor = $event;
+    this.savePolicy();
+  }
+
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
     req.setBackgroundColorDark(this.previewData.backgroundColorDark);
     req.setBackgroundColor(this.previewData.backgroundColor);
