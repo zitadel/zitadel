@@ -818,6 +818,7 @@
       "NOTIFICATIONS": "Notification providers and SMTP",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
+      "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
@@ -827,6 +828,7 @@
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Login and Access",
+      "DOMAIN": "Domain",
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
       "OTHER": "Other"
@@ -846,6 +848,8 @@
       "HOST": "Host",
       "USER": "User",
       "PASSWORD": "Password",
+      "SETPASSWORD": "Set SMTP Password",
+      "PASSWORDSET": "SMTP Password was set successfully.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Saved successfully!",
       "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
@@ -949,9 +953,8 @@
       "TITLE": "Lockout Policy",
       "DESCRIPTION": "Set a maximum number of passwordretries, after which accounts will be blocked."
     },
-    "IAM_POLICY": {
-      "TITLE": "IAM Access Preferences",
-      "DESCRIPTION": "Define access properties of your users."
+    "DOMAIN_POLICY": {
+      "TITLE": "Domain Settings"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
@@ -965,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "ADVANCED": "Advanced",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -1080,7 +1084,9 @@
       "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
-      "USERLOGINMUSTBEDOMAIN": "User Login must be Domain",
+      "USERLOGINMUSTBEDOMAIN": "User Loginname must contain orgdomain",
+      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
       "ALLOWREGISTER": "Register allowed",
@@ -1097,7 +1103,13 @@
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
-      "DISABLEWATERMARK": "Hide Watermark"
+      "DISABLEWATERMARK": "Hide Watermark",
+      "PASSWORDCHECKLIFETIME": "Password Check Lifetime",
+      "EXTERNALLOGINCHECKLIFETIME": "External Login Check Lifetime",
+      "MFAINITSKIPLIFETIME": "Multifactor Init Lifetime",
+      "SECONDFACTORCHECKLIFETIME": "Second Factor Check Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Multifactor Check Lifetime",
+      "INHOURS": "hours"
     },
     "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
@@ -1438,6 +1450,7 @@
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "DELETE_SELECTION_TITLE": "Delete Idp",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "EMPTY": "No IPD available",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."

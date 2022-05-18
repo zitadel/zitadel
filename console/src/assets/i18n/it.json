@@ -818,6 +818,7 @@
       "NOTIFICATIONS": "Notifiche",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
+      "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
@@ -827,6 +828,7 @@
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
       "LOGIN": "Accesso e login",
+      "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aussehen",
       "OTHER": "Altro"
@@ -846,6 +848,8 @@
       "HOST": "Host",
       "USER": "Utente",
       "PASSWORD": "Password",
+      "SETPASSWORD": "Imposta SMTP Password",
+      "PASSWORDSET": "SMTP Password impostata con successo.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Salvato con successo!",
       "REQUIREDWARN": "Per inviare notifiche dal tuo dominio, devi inserire i tuoi dati SMTP."
@@ -949,9 +953,8 @@
       "TITLE": "Impostazioni di blocco",
       "DESCRIPTION": "Imposta un numero massimo di tentativi di password, dopo i quali gli account saranno bloccati."
     },
-    "IAM_POLICY": {
-      "TITLE": "Impostazioni di accesso IAM",
-      "DESCRIPTION": "Definisci le propriet\u00e0 di accesso dei tuoi utenti."
+    "DOMAIN_POLICY": {
+      "TITLE": "Impostazioni dominio"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
@@ -965,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "ADVANCED": "Impostazioni avanzate",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Salvato con successo!"
     },
     "PRIVACY_POLICY": {
@@ -1080,7 +1084,9 @@
       "MAXATTEMPTS": "Massimo numero di tentativi di password",
       "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
       "MAXAGEDAYS": "Lunghezza massima in giorni",
-      "USERLOGINMUSTBEDOMAIN": "Loginname dell'utente deve contenere il dominio",
+      "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
+      "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
       "ALLOWEXTERNALIDP": "IDP esterno consentito",
       "ALLOWREGISTER": "Registrazione consentita",
@@ -1097,7 +1103,13 @@
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
-      "DISABLEWATERMARK": "Nascondi la filigrana"
+      "DISABLEWATERMARK": "Nascondi la filigrana",
+      "PASSWORDCHECKLIFETIME": "Lifetime verificazione password",
+      "EXTERNALLOGINCHECKLIFETIME": "Lifetime verificazione login esterno",
+      "MFAINITSKIPLIFETIME": "Lifetime Initalizzazione Multifattore",
+      "SECONDFACTORCHECKLIFETIME": "Lifetime Second Factor Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Lifetime Multi Factor",
+      "INHOURS": "ore"
     },
     "RESET": "Ripristina l'impostazione dell'istanza",
     "CREATECUSTOM": "Crea un'impostazione personalizzata",
@@ -1438,6 +1450,7 @@
     "DELETE_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
+    "EMPTY": "Nessun IDP disponible",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."

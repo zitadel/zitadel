@@ -818,6 +818,7 @@
       "NOTIFICATIONS": "Benachrichtigungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identity Provider",
+      "DOMAIN": "Domain Einstellungen",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
@@ -827,6 +828,7 @@
     "GROUPS": {
       "NOTIFICATIONS": "Benachrichtigungen",
       "LOGIN": "Login und Zugriff",
+      "DOMAIN": "Domain",
       "TEXTS": "Texte und Sprachen",
       "APPEARANCE": "Erscheinungsbild",
       "OTHER": "Anderes"
@@ -846,6 +848,8 @@
       "HOST": "Host",
       "USER": "Benutzer",
       "PASSWORD": "Passwort",
+      "SETPASSWORD": "SMTP Passwort setzen",
+      "PASSWORDSET": "SMTP Passwort erfolgrech gesetzt.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Erfolgreich gespeichert.",
       "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
@@ -949,9 +953,8 @@
       "TITLE": "Passwortsperre",
       "DESCRIPTION": "Lege eine maximale Anzahl an Passwordwiederholungen fest, nachdem Accounts gesperrt werden sollen."
     },
-    "IAM_POLICY": {
-      "TITLE": "Zugangseinstellungen IAM",
-      "DESCRIPTION": "Definiere die Zugangseistellungen für Benutzer."
+    "DOMAIN_POLICY": {
+      "TITLE": "Domain Einstellungen"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
@@ -965,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "ADVANCED": "Erweitert",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
@@ -1080,7 +1084,9 @@
       "MAXATTEMPTS": "Maximale Anzahl an Versuchen",
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
-      "USERLOGINMUSTBEDOMAIN": "Benutzer-Login muss eine Domain sein",
+      "USERLOGINMUSTBEDOMAIN": "Benutzer Loginname muss die Domain der Organisation beinhalten",
+      "VALIDATEORGDOMAINS": "Org Domains validieren",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Addresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
       "ALLOWREGISTER": "Registrieren erlaubt",
@@ -1097,7 +1103,13 @@
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
-      "DISABLEWATERMARK": "Wasserzeichen ausblenden"
+      "DISABLEWATERMARK": "Wasserzeichen ausblenden",
+      "PASSWORDCHECKLIFETIME": "Passwort Check Lifetime",
+      "EXTERNALLOGINCHECKLIFETIME": "Externer Login Check Lifetime",
+      "MFAINITSKIPLIFETIME": "Multifaktor Init Lifetime",
+      "SECONDFACTORCHECKLIFETIME": "Zweitfaktor Check Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Multifaktor Check Lifetime",
+      "INHOURS": "Stunden"
     },
     "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
@@ -1438,6 +1450,7 @@
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+    "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."

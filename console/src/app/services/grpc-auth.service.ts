@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
@@ -83,7 +84,7 @@ import {
 } from '../proto/generated/zitadel/auth_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
-import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
@@ -262,6 +263,8 @@ export class GrpcAuthService {
     limit?: number,
     offset?: number,
     queryList?: OrgQuery[],
+    sortingColumn?: OrgFieldName,
+    sortingDirection?: SortDirection,
   ): Promise<ListMyProjectOrgsResponse.AsObject> {
     const req = new ListMyProjectOrgsRequest();
     const query = new ListQuery();
@@ -274,6 +277,9 @@ export class GrpcAuthService {
     if (queryList) {
       req.setQueriesList(queryList);
     }
+    // if (sortingColumn) {
+    //     req.setSortingColumn(sortingColumn);
+    // }
 
     req.setQuery(query);
 

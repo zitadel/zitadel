@@ -1,7 +1,7 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { SearchQuery as MemberSearchQuery } from 'src/app/proto/generated/zitadel/member_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
@@ -24,15 +24,16 @@ type FilterSearchQueryAsObject =
   styleUrls: ['./filter.component.scss'],
 })
 export class FilterComponent implements OnDestroy {
-  @Output() public filterChanged: EventEmitter<FilterSearchQuery[] | undefined> = new EventEmitter();
+  @Output() public filterChanged: EventEmitter<FilterSearchQuery[]> = new EventEmitter();
   @Output() public filterOpen: EventEmitter<boolean> = new EventEmitter<boolean>(false);
 
   @Output() public resetted: EventEmitter<void> = new EventEmitter();
   @Output() public trigger: EventEmitter<void> = new EventEmitter();
 
-  private destroy$: Subject<void> = new Subject();
+  @Input() public queryCount: number = 0;
 
-  public filterCount$: BehaviorSubject<number> = new BehaviorSubject(0);
+  private destroy$: Subject<void> = new Subject();
+  public filterChanged$: Observable<FilterSearchQuery[]> = this.filterChanged.asObservable();
 
   public showFilter: boolean = false;
   public methods: TextQueryMethod[] = [
@@ -59,7 +60,6 @@ export class FilterComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.filterCount$.complete();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -83,6 +83,7 @@ export class FilterComponent implements OnDestroy {
           queryParams: {
             ['filter']: JSON.stringify(filters),
           },
+          replaceUrl: true,
           queryParamsHandling: 'merge',
           skipLocationChange: false,
         });

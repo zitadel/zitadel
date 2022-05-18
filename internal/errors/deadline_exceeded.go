@@ -40,3 +40,7 @@ func (err *DeadlineExceededError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *DeadlineExceededError) Unwrap() error {
+	return err.CaosError
+}

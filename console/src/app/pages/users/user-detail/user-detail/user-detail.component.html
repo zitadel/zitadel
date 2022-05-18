@@ -40,7 +40,9 @@
   <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
 </div>
 
-<p class="no-user-error" *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</p>
+<div *ngIf="!loading && !user" class="max-width-container">
+  <p class="no-user-error">{{ 'USER.PAGES.NOUSER' | translate }}</p>
+</div>
 
 <div class="max-width-container" *ngIf="user && (['user.write$', 'user.write:' + user.id] | hasRole) as canWrite$">
   <cnsl-meta-layout>
