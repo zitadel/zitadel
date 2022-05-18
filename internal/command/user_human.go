@@ -251,7 +251,7 @@ func (h *AddHuman) ensureDisplayName() {
 
 //shouldAddInitCode returns true for all added Humans which:
 // - were not added from an external IDP
-// - either:
+// - and either:
 //    - have no verified email
 // 			and / or
 //    -  have no authentication method (password / passwordless)
