@@ -1,0 +1,36 @@
+## Overwrite ZITADEL Defaults
+
+See a description of all possible configuration options with their defaults [in the source code](https://github.com/zitadel/zitadel/blob/v2/cmd/defaults.yaml).
+You can overwrite these values using environment variables or configuration files.
+
+### Configure by environment variables
+
+Prefix the key with *ZITADEL\_*, uppercase the propery and join sections by an underscore _.
+For example, if you want to configure the cockroach admin user name and password, export these two variables.
+
+```bash
+export ZITADEL_ADMINUSER_USERNAME="my_root_users_name"
+export ZITADEL_ADMINUSER_PASSWORD="my_root_users_password"
+```
+
+### Configure by configuration files
+
+Probably, you want to keep some configuration secret.
+Fortunately, you can pass multiple configuration files to the zitadel command.
+
+```bash
+# Create a configuration file containing normal configuration
+cat << EOF > ./zitadel-config.yaml
+AdminUser:
+  Username: my_root_users_name
+EOF
+
+# Create a configuration file containing secrets
+cat << EOF > ./zitadel-secrets.yaml
+AdminUser:
+  Password: "my_root_users_password"
+EOF
+
+# Pass multiple config files using the --config argument
+zitadel admin start-from-init --masterkeyFromEnv --config ./zitadel-config.yaml --config ./zitadel-secrets.yaml
+```
