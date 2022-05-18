@@ -1,6 +1,7 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { take } from 'rxjs';
 import {
     GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
     UpdateLoginPolicyRequest,
@@ -12,6 +13,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -40,21 +42,24 @@ export class LoginPolicyComponent implements OnInit {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
   public lifetimeForm!: FormGroup;
-  constructor(private toast: ToastService, private injector: Injector, private fb: FormBuilder) {
+  constructor(
+    private toast: ToastService,
+    private injector: Injector,
+    private fb: FormBuilder,
+    private authService: GrpcAuthService,
+  ) {
     this.lifetimeForm = this.fb.group({
-      passwordCheckLifetime: [240, [Validators.required]],
-      externalLoginCheckLifetime: [12, [Validators.required]],
-      mfaInitSkipLifetime: [720, [Validators.required]],
-      secondFactorCheckLifetime: [12, [Validators.required]],
-      multiFactorCheckLifetime: [12, [Validators.required]],
+      passwordCheckLifetime: [{ disabled: true, value: 240 }, [Validators.required]],
+      externalLoginCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+      mfaInitSkipLifetime: [{ disabled: true, value: 720 }, [Validators.required]],
+      secondFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+      multiFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
     });
   }
 
   private fetchData(): void {
     this.getData()
       .then((resp) => {
-        console.log(resp);
-
         if (resp.policy) {
           this.loginData = resp.policy;
           this.loading = false;
@@ -107,6 +112,21 @@ export class LoginPolicyComponent implements OnInit {
         break;
     }
     this.fetchData();
+    this.authService
+      .isAllowed(
+        this.serviceType === PolicyComponentServiceType.ADMIN
+          ? ['iam.policy.write']
+          : this.serviceType === PolicyComponentServiceType.MGMT
+          ? ['policy.write']
+          : [],
+      )
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        console.log(allowed);
+        if (allowed) {
+          this.lifetimeForm.enable();
+        }
+      });
   }
 
   private async getData(): Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {

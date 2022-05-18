@@ -37,7 +37,6 @@ import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -400,7 +399,6 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private dialog: MatDialog,
-    private storageService: StorageService,
   ) {}
 
   ngOnInit(): void {

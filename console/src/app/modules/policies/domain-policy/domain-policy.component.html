@@ -12,6 +12,17 @@
   color="warn"
   (click)="removePolicy()"
   mat-stroked-button
+  [disabled]="
+    ([
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? 'iam.policy.write'
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? 'policy.write'
+        : ''
+    ]
+      | hasRole
+      | async) === false
+  "
 >
   {{ 'POLICY.RESET' | translate }}
 </button>
@@ -20,14 +31,46 @@
 <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
 <div class="content" *ngIf="domainData">
   <div class="row">
-    <mat-checkbox color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.userLoginMustBeDomain">
+    <mat-checkbox
+      color="primary"
+      name="hasNumber"
+      ngDefaultControl
+      [(ngModel)]="domainData.userLoginMustBeDomain"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
       {{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate }}
     </mat-checkbox>
   </div>
 
   <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
   <div class="row">
-    <mat-checkbox color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="domainData.validateOrgDomains">
+    <mat-checkbox
+      color="primary"
+      name="hasNumber"
+      ngDefaultControl
+      [(ngModel)]="domainData.validateOrgDomains"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
       {{ 'POLICY.DATA.VALIDATEORGDOMAINS' | translate }}
     </mat-checkbox>
   </div>
@@ -38,6 +81,17 @@
       name="hasNumber"
       ngDefaultControl
       [(ngModel)]="domainData.smtpSenderAddressMatchesInstanceDomain"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
     >
       {{ 'POLICY.DATA.SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN' | translate }}
     </mat-checkbox>
@@ -46,7 +100,23 @@
 
 <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
 <div class="btn-container">
-  <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+  <button
+    (click)="savePolicy()"
+    color="primary"
+    type="submit"
+    mat-raised-button
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>
