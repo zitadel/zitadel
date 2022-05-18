@@ -179,16 +179,16 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 					return nil, err
 				}
 				cmds = append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
-			}
-
-			if human.Email.Verified {
-				cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
 			} else {
-				value, expiry, err := newEmailCode(ctx, filter, codeAlg)
-				if err != nil {
-					return nil, err
+				if human.Email.Verified {
+					cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
+				} else {
+					value, expiry, err := newEmailCode(ctx, filter, codeAlg)
+					if err != nil {
+						return nil, err
+					}
+					cmds = append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
 				}
-				cmds = append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
 			}
 
 			if human.Phone.Verified {
@@ -249,13 +249,17 @@ func (h *AddHuman) ensureDisplayName() {
 	h.DisplayName = h.FirstName + " " + h.LastName
 }
 
+//shouldAddInitCode returns true for all added Humans which:
+// - were not added from an external IDP
+// - and either:
+//    - have no verified email
+// 			and / or
+//    -  have no authentication method (password / passwordless)
 func (h *AddHuman) shouldAddInitCode() bool {
-	//user without idp
-	return !h.Email.Verified ||
-		//user with idp
-		!h.ExternalIDP &&
-			!h.Passwordless &&
-			h.Password != ""
+	return !h.ExternalIDP &&
+		!h.Email.Verified ||
+		!h.Passwordless &&
+			h.Password == ""
 }
 
 func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
