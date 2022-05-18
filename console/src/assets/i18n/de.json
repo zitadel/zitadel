@@ -1450,6 +1450,7 @@
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+    "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."

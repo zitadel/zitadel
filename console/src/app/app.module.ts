@@ -50,6 +50,7 @@ import {
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler/statehandler.service';
 import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
+import { ToastService } from './services/toast.service';
 
 registerLocaleData(localeDe);
 
@@ -175,6 +176,7 @@ const authConfig: AuthConfig = {
     AdminService,
     KeyboardShortcutsService,
     AssetService,
+    ToastService,
     NavigationService,
     { provide: 'windowObject', useValue: window },
   ],

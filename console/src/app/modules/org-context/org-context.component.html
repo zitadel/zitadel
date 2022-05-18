@@ -49,9 +49,11 @@
     </ng-container>
   </div>
 
-  <button mat-button class="show-all" [routerLink]="['/orgs']" (click)="closedCard.emit()">
-    {{ 'MENU.SHOWORGS' | translate }}
-  </button>
+  <ng-template cnslHasRole [hasRole]="['iam.read']">
+    <button mat-button class="show-all" [routerLink]="['/orgs']" (click)="closedCard.emit()">
+      {{ 'MENU.SHOWORGS' | translate }}
+    </button>
+  </ng-template>
 
   <ng-template cnslHasRole [hasRole]="['org.create', 'iam.write']">
     <button mat-button [routerLink]="['/org/create']" (click)="closedCard.emit()">

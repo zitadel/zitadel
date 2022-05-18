@@ -1450,6 +1450,7 @@
     "DELETE_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
+    "EMPTY": "Nessun IDP disponible",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."
