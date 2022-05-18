@@ -166,7 +166,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/org-settings/org-settings.module').then((m) => m.OrgSettingsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
-      roles: ['iam.read', 'iam.write'],
+      roles: ['org.read', 'org.write'],
     },
   },
   {

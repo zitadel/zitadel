@@ -4,7 +4,26 @@
   <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
 </div>
 
-<h2>{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h2>
+<h2>{{ 'SETTINGS.LIST.LOGIN' | translate }}</h2>
+
+<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault">
+  <ng-template cnslHasRole [hasRole]="['policy.delete']">
+    <button
+      color="primary"
+      class="loginpolicy-reset-button"
+      matTooltip="{{ 'POLICY.RESET' | translate }}"
+      color="warn"
+      (click)="removePolicy()"
+      mat-stroked-button
+    >
+      {{ 'POLICY.RESET' | translate }}
+    </button>
+  </ng-template>
+</ng-container>
+
+<br />
+
+<h3>{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}</h3>
 <p class="cnsl-secondary-text">{{ 'MFA.LIST.MULTIFACTORDESCRIPTION' | translate }}</p>
 
 <div class="login-policy-row" *ngIf="loginData">
@@ -41,7 +60,7 @@
 
 <br />
 
-<h2>{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h2>
+<h3>{{ 'MFA.LIST.SECONDFACTORTITLE' | translate }}</h3>
 <p class="cnsl-secondary-text">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
 
 <div *ngIf="loginData" class="login-policy-row">
@@ -71,7 +90,7 @@
 
 <br />
 
-<h2>{{ 'POLICY.LOGIN_POLICY.LIFETIMEDURATIONS' | translate }}</h2>
+<h3>{{ 'POLICY.LOGIN_POLICY.LIFETIMEDURATIONS' | translate }}</h3>
 
 <form class="lifetime-form" (ngSubmit)="savePolicy()" [formGroup]="lifetimeForm" autocomplete="off">
   <cnsl-form-field class="lifetime-form-field" label="Password Check Lifetime" required="true">
@@ -120,7 +139,7 @@
 
 <br />
 
-<h2>{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}</h2>
+<h3>{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}</h3>
 
 <div class="max-card-width login-policy-content" *ngIf="loginData">
   <div class="login-policy-row">
@@ -191,21 +210,6 @@
     </cnsl-form-field>
   </div>
 </div>
-
-<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault">
-  <ng-template cnslHasRole [hasRole]="['policy.delete']">
-    <button
-      color="primary"
-      class="loginpolicy-reset-button"
-      matTooltip="{{ 'POLICY.RESET' | translate }}"
-      color="warn"
-      (click)="removePolicy()"
-      mat-stroked-button
-    >
-      {{ 'POLICY.RESET' | translate }}
-    </button>
-  </ng-template>
-</ng-container>
 
 <br />
 
