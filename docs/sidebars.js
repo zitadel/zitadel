@@ -36,6 +36,7 @@ module.exports = {
   ],
   guides: [
     "guides/overview",
+    "guides/installation/installation",
     {
       type: "category",
       label: "Get to know ZITADEL",
@@ -92,43 +93,6 @@ module.exports = {
       label: "Customization",
       collapsed: false,
       items: ["guides/customization/branding", "guides/customization/texts"],
-    },
-
-    {
-      type: "category",
-      label: "Installation",
-      collapsed: true,
-      items: [
-        {
-          type: "category",
-          label: "CAOS Managed",
-          collapsed: true,
-          items: [
-            "guides/installation/shared-cloud",
-            "guides/installation/managed-dedicated-instance",
-          ],
-        },
-        {
-          type: "category",
-          label: "CAOS Service Packages",
-          collapsed: true,
-          items: [
-            "guides/installation/setup",
-            "guides/installation/setup-orbos",
-            "guides/installation/checkup",
-          ],
-        },
-        {
-          type: "category",
-          label: "Self Managed",
-          collapsed: true,
-          items: [
-            "guides/installation/crd",
-            "guides/installation/gitops",
-            "guides/installation/orbos",
-          ],
-        },
-      ],
     },
     {
       type: "category",

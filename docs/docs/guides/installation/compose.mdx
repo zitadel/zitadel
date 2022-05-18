@@ -1,0 +1,10 @@
+```bash
+# Generate a master encryption key
+export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
+
+# Download the docker compose example configuration
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/compose/docker-compose.yml
+
+# Run the database and application containers
+docker compose up
+```
