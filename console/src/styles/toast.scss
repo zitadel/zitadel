@@ -12,7 +12,7 @@
   //   }
 
   .data-e2e-failure {
-    background-color: $warn-color !important;
-    color: mat.get-color-from-palette($warn, default-contrast) !important;
+    color: $warn-color !important;
+    background-color: mat.get-color-from-palette($background, cards) !important;
   }
 }
