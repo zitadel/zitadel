@@ -1,20 +1,32 @@
-<h1 mat-dialog-title class="title"><span>{{data.title | translate}}</span></h1>
+<h1 mat-dialog-title class="title">
+  <span>{{ data.title | translate }}</span>
+</h1>
 <div mat-dialog-content>
-  <p class="desc cnsl-secondary-text">{{data.desc | translate}}</p>
+  <p class="desc cnsl-secondary-text">{{ data.desc | translate }}</p>
 
   <cnsl-form-field class="form-field" label="Access Code" required="true">
-    <cnsl-label>{{'MFA.TYPE' | translate}}</cnsl-label>
+    <cnsl-label>{{ 'MFA.TYPE' | translate }}</cnsl-label>
     <mat-select [(ngModel)]="newMfaType">
       <mat-option *ngFor="let mfa of availableMfaTypes" [value]="mfa">
-        {{(data.componentType === LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.':
-        LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}
+        {{
+          (data.componentType === LoginMethodComponentType.SecondFactor
+            ? 'MFA.SECONDFACTORTYPES.'
+            : LoginMethodComponentType.MultiFactor
+            ? 'MFA.MULTIFACTORTYPES.'
+            : '') + mfa | translate
+        }}
+
+        <mat-icon>fingerprint</mat-icon>
+        <mat-icon svgIcon="usb"></mat-icon>
       </mat-option>
     </mat-select>
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
-  <button mat-stroked-button (click)="closeDialog()"><span>{{'ACTIONS.CLOSE' | translate}}</span></button>
-  <button [disabled]="false" mat-raised-button class="ok-button" color="primary"
-    (click)="closeDialogWithCode()"><span>{{'ACTIONS.OK' | translate}}</span>
+  <button mat-stroked-button (click)="closeDialog()">
+    <span>{{ 'ACTIONS.CLOSE' | translate }}</span>
+  </button>
+  <button [disabled]="false" mat-raised-button class="ok-button" color="primary" (click)="closeDialogWithCode()">
+    <span>{{ 'ACTIONS.OK' | translate }}</span>
   </button>
 </div>

@@ -28,7 +28,6 @@
 </button>
 <!-- </ng-template> -->
 
-<!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
 <div class="content" *ngIf="domainData">
   <div class="row">
     <mat-checkbox
@@ -52,7 +51,6 @@
     </mat-checkbox>
   </div>
 
-  <!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
   <div class="row">
     <mat-checkbox
       color="primary"
@@ -98,7 +96,6 @@
   </div>
 </div>
 
-<!-- [disabled]="(['domain.policy.write'] | hasRole | async) === false" -->
 <div class="btn-container">
   <button
     (click)="savePolicy()"
