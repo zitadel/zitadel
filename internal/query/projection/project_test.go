@@ -178,7 +178,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.projects (id, creation_date, change_date, resource_owner, instance_id, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting, state, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.projects (id, creation_date, change_date, resource_owner, instance_id, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -192,7 +192,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 								true,
 								domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
 								domain.ProjectStateActive,
-								"editor-user",
 							},
 						},
 					},

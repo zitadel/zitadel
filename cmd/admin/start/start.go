@@ -157,7 +157,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	adminRepo, err := admin_es.Start(config.Admin, store, dbClient, login.HandlerPrefix)
+	adminRepo, err := admin_es.Start(config.Admin, store, dbClient)
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}

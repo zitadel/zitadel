@@ -16,16 +16,17 @@ import (
 const (
 	DomainPolicyTable = "projections.domain_policies"
 
-	DomainPolicyIDCol                    = "id"
-	DomainPolicyCreationDateCol          = "creation_date"
-	DomainPolicyChangeDateCol            = "change_date"
-	DomainPolicySequenceCol              = "sequence"
-	DomainPolicyStateCol                 = "state"
-	DomainPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
-	DomainPolicyValidateOrgDomainsCol    = "validate_org_domains"
-	DomainPolicyIsDefaultCol             = "is_default"
-	DomainPolicyResourceOwnerCol         = "resource_owner"
-	DomainPolicyInstanceIDCol            = "instance_id"
+	DomainPolicyIDCol                                     = "id"
+	DomainPolicyCreationDateCol                           = "creation_date"
+	DomainPolicyChangeDateCol                             = "change_date"
+	DomainPolicySequenceCol                               = "sequence"
+	DomainPolicyStateCol                                  = "state"
+	DomainPolicyUserLoginMustBeDomainCol                  = "user_login_must_be_domain"
+	DomainPolicyValidateOrgDomainsCol                     = "validate_org_domains"
+	DomainPolicySMTPSenderAddressMatchesInstanceDomainCol = "smtp_sender_address_matches_instance_domain"
+	DomainPolicyIsDefaultCol                              = "is_default"
+	DomainPolicyResourceOwnerCol                          = "resource_owner"
+	DomainPolicyInstanceIDCol                             = "instance_id"
 )
 
 type DomainPolicyProjection struct {
@@ -45,6 +46,7 @@ func NewDomainPolicyProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(DomainPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DomainPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(DomainPolicyValidateOrgDomainsCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(DomainPolicySMTPSenderAddressMatchesInstanceDomainCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(DomainPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(DomainPolicyResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DomainPolicyInstanceIDCol, crdb.ColumnTypeText),
@@ -114,6 +116,7 @@ func (p *DomainPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(DomainPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(DomainPolicyUserLoginMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
 			handler.NewCol(DomainPolicyValidateOrgDomainsCol, policyEvent.ValidateOrgDomains),
+			handler.NewCol(DomainPolicySMTPSenderAddressMatchesInstanceDomainCol, policyEvent.SMTPSenderAddressMatchesInstanceDomain),
 			handler.NewCol(DomainPolicyIsDefaultCol, isDefault),
 			handler.NewCol(DomainPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(DomainPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
@@ -139,6 +142,9 @@ func (p *DomainPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 	}
 	if policyEvent.ValidateOrgDomains != nil {
 		cols = append(cols, handler.NewCol(DomainPolicyValidateOrgDomainsCol, *policyEvent.ValidateOrgDomains))
+	}
+	if policyEvent.SMTPSenderAddressMatchesInstanceDomain != nil {
+		cols = append(cols, handler.NewCol(DomainPolicySMTPSenderAddressMatchesInstanceDomainCol, *policyEvent.SMTPSenderAddressMatchesInstanceDomain))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,

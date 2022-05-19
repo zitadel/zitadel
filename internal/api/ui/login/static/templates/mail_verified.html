@@ -12,6 +12,7 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="orgID" value="{{ .OrgID }}" />
 
     <div class="lgn-actions">
         <a class="lgn-stroked-button lgn-primary" href="{{ loginUrl }}">

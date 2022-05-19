@@ -84,8 +84,8 @@ export class AssetService {
       .get('./assets/environment.json')
       .toPromise()
       .then((data: any) => {
-        if (data && data.assetServiceUrl) {
-          return data.assetServiceUrl;
+        if (data && data.api) {
+          return data.api;
         }
       })
       .catch((error) => {

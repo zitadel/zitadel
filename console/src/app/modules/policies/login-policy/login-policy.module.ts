@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -30,6 +31,7 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     InfoSectionModule,
     FormsModule,
     CardModule,
+    ReactiveFormsModule,
     InputModule,
     MatIconModule,
     MatButtonModule,
@@ -37,6 +39,7 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     HasRoleModule,
     MatDialogModule,
     HasRolePipeModule,
+    MatCheckboxModule,
     MatTooltipModule,
     DetailLayoutModule,
     MatProgressSpinnerModule,

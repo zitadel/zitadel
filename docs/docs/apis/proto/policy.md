@@ -19,6 +19,7 @@ title: zitadel/policy.proto
 | user_login_must_be_domain |  bool | - |  |
 | is_default |  bool | - |  |
 | validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
 
 
 
@@ -77,6 +78,8 @@ title: zitadel/policy.proto
 | passwordless_type |  PasswordlessType | - |  |
 | is_default |  bool | - |  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
 | password_check_lifetime |  google.protobuf.Duration | - |  |
 | external_login_check_lifetime |  google.protobuf.Duration | - |  |
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |

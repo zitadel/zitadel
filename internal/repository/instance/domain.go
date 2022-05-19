@@ -18,17 +18,17 @@ const (
 	InstanceDomainRemovedEventType    = domainEventPrefix + "removed"
 )
 
-func NewAddInstanceDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+func NewAddInstanceDomainUniqueConstraint(domain string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddGlobalEventUniqueConstraint(
 		UniqueInstanceDomain,
-		orgDomain,
+		domain,
 		"Errors.Instance.Domain.AlreadyExists")
 }
 
-func NewRemoveInstanceDomainUniqueConstraint(orgDomain string) *eventstore.EventUniqueConstraint {
+func NewRemoveInstanceDomainUniqueConstraint(domain string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveGlobalEventUniqueConstraint(
 		UniqueInstanceDomain,
-		orgDomain)
+		domain)
 }
 
 type DomainAddedEvent struct {
@@ -59,15 +59,15 @@ func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, d
 }
 
 func DomainAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	orgDomainAdded := &DomainAddedEvent{
+	domainAdded := &DomainAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainAdded)
+	err := json.Unmarshal(event.Data, domainAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "INSTANCE-3noij", "unable to unmarshal instance domain added")
 	}
 
-	return orgDomainAdded, nil
+	return domainAdded, nil
 }
 
 type DomainPrimarySetEvent struct {
@@ -96,15 +96,15 @@ func NewDomainPrimarySetEvent(ctx context.Context, aggregate *eventstore.Aggrega
 }
 
 func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.Event, error) {
-	orgDomainAdded := &DomainPrimarySetEvent{
+	domainAdded := &DomainPrimarySetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainAdded)
+	err := json.Unmarshal(event.Data, domainAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "INSTANCE-29jöF", "unable to unmarshal instance domain added")
 	}
 
-	return orgDomainAdded, nil
+	return domainAdded, nil
 }
 
 type DomainRemovedEvent struct {
@@ -133,13 +133,13 @@ func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate,
 }
 
 func DomainRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	orgDomainRemoved := &DomainRemovedEvent{
+	domainRemoved := &DomainRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, orgDomainRemoved)
+	err := json.Unmarshal(event.Data, domainRemoved)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "INSTANCE-BngB2", "unable to unmarshal instance domain removed")
 	}
 
-	return orgDomainRemoved, nil
+	return domainRemoved, nil
 }

@@ -2,10 +2,8 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
-	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
@@ -33,62 +31,6 @@ func MembershipQueryToQuery(req *user_pb.MembershipQuery) (query.SearchQuery, er
 		return query.NewMembershipIsIAMQuery()
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "USER-dsg3z", "Errors.List.Query.Invalid")
-	}
-}
-
-func MembershipIAMQueryToModel(q *user_pb.MembershipIAMQuery) []*user_model.UserMembershipSearchQuery {
-	return []*user_model.UserMembershipSearchQuery{
-		{
-			Key:    user_model.UserMembershipSearchKeyMemberType,
-			Method: domain.SearchMethodEquals,
-			Value:  user_model.MemberTypeIam,
-		},
-		//TODO: q.IAM?
-	}
-}
-
-func MembershipOrgQueryToModel(q *user_pb.MembershipOrgQuery) []*user_model.UserMembershipSearchQuery {
-	return []*user_model.UserMembershipSearchQuery{
-		{
-			Key:    user_model.UserMembershipSearchKeyMemberType,
-			Method: domain.SearchMethodEquals,
-			Value:  user_model.MemberTypeOrganisation,
-		},
-		{
-			Key:    user_model.UserMembershipSearchKeyObjectID,
-			Method: domain.SearchMethodEquals,
-			Value:  q.OrgId,
-		},
-	}
-}
-
-func MembershipProjectQueryToModel(q *user_pb.MembershipProjectQuery) []*user_model.UserMembershipSearchQuery {
-	return []*user_model.UserMembershipSearchQuery{
-		{
-			Key:    user_model.UserMembershipSearchKeyMemberType,
-			Method: domain.SearchMethodEquals,
-			Value:  user_model.MemberTypeProject,
-		},
-		{
-			Key:    user_model.UserMembershipSearchKeyObjectID,
-			Method: domain.SearchMethodEquals,
-			Value:  q.ProjectId,
-		},
-	}
-}
-
-func MembershipProjectGrantQueryToModel(q *user_pb.MembershipProjectGrantQuery) []*user_model.UserMembershipSearchQuery {
-	return []*user_model.UserMembershipSearchQuery{
-		{
-			Key:    user_model.UserMembershipSearchKeyMemberType,
-			Method: domain.SearchMethodEquals,
-			Value:  user_model.MemberTypeProjectGrant,
-		},
-		{
-			Key:    user_model.UserMembershipSearchKeyObjectID,
-			Method: domain.SearchMethodEquals,
-			Value:  q.ProjectGrantId,
-		},
 	}
 }
 

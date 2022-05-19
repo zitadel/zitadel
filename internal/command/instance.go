@@ -59,8 +59,9 @@ type InstanceSetup struct {
 		MaxAgeDays     uint64
 	}
 	DomainPolicy struct {
-		UserLoginMustBeDomain bool
-		ValidateOrgDomains    bool
+		UserLoginMustBeDomain                  bool
+		ValidateOrgDomains                     bool
+		SMTPSenderAddressMatchesInstanceDomain bool
 	}
 	LoginPolicy struct {
 		AllowUsernamePassword      bool
@@ -68,7 +69,9 @@ type InstanceSetup struct {
 		AllowExternalIDP           bool
 		ForceMFA                   bool
 		HidePasswordReset          bool
+		IgnoreUnknownUsername      bool
 		PasswordlessType           domain.PasswordlessType
+		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
 		ExternalLoginCheckLifetime time.Duration
 		MfaInitSkipLifetime        time.Duration
@@ -197,6 +200,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
 			setup.DomainPolicy.ValidateOrgDomains,
+			setup.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
 		),
 		AddDefaultLoginPolicy(
 			instanceAgg,
@@ -205,7 +209,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.AllowExternalIDP,
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
+			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.PasswordlessType,
+			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,
 			setup.LoginPolicy.ExternalLoginCheckLifetime,
 			setup.LoginPolicy.MfaInitSkipLifetime,

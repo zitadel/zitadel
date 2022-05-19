@@ -14,6 +14,9 @@ export function ApiCard({ title, type, label, children}) {
     case 'ADMIN':
       style = styles.apiadmin;
       break;
+    case 'SYSTEM':
+      style = styles.apisystem;
+      break;
     case 'ASSET':
       style = styles.apiasset;
       break;      

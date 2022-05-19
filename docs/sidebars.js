@@ -36,12 +36,14 @@ module.exports = {
   ],
   guides: [
     "guides/overview",
+    "guides/installation/installation",
     {
       type: "category",
       label: "Get to know ZITADEL",
       collapsed: false,
       items: [
         "guides/basics/get-started",
+        "guides/basics/instance",
         "guides/basics/organizations",
         "guides/basics/projects",
       ],
@@ -92,43 +94,6 @@ module.exports = {
       collapsed: false,
       items: ["guides/customization/branding", "guides/customization/texts"],
     },
-
-    {
-      type: "category",
-      label: "Installation",
-      collapsed: true,
-      items: [
-        {
-          type: "category",
-          label: "CAOS Managed",
-          collapsed: true,
-          items: [
-            "guides/installation/shared-cloud",
-            "guides/installation/managed-dedicated-instance",
-          ],
-        },
-        {
-          type: "category",
-          label: "CAOS Service Packages",
-          collapsed: true,
-          items: [
-            "guides/installation/setup",
-            "guides/installation/setup-orbos",
-            "guides/installation/checkup",
-          ],
-        },
-        {
-          type: "category",
-          label: "Self Managed",
-          collapsed: true,
-          items: [
-            "guides/installation/crd",
-            "guides/installation/gitops",
-            "guides/installation/orbos",
-          ],
-        },
-      ],
-    },
     {
       type: "category",
       label: "Trainings",
@@ -164,6 +129,8 @@ module.exports = {
             "apis/proto/auth",
             "apis/proto/management",
             "apis/proto/admin",
+            "apis/proto/system",
+            "apis/proto/instance",
             "apis/proto/org",
             "apis/proto/user",
             "apis/proto/app",
@@ -175,6 +142,7 @@ module.exports = {
             "apis/proto/metadata",
             "apis/proto/message",
             "apis/proto/text",
+            "apis/proto/action",
             "apis/proto/object",
             "apis/proto/options",
           ],
@@ -221,6 +189,7 @@ module.exports = {
       collapsed: true,
       items: [
         "concepts/structure/overview",
+        "concepts/structure/instance",
         "concepts/structure/organizations",
         "concepts/structure/policies",
         "concepts/structure/projects",

@@ -118,6 +118,7 @@
   --apiauthbackground: linear-gradient(40deg, #a9d9ca 30%, #b4d5cb);
   --apimgmtbackground: linear-gradient(40deg, #c6d7f3 30%, #c7c6e3);
   --apiadminbackground: linear-gradient(40deg, #c192c790, #c192c790);
+  --apisystembackground: linear-gradient(40deg, #C7A6928E, #C7A6928E);
   --apiassetbackground: linear-gradient(40deg, #e4eaf1, #eef2f9);
   --overlaycolor: #6c90b420;
   --ifm-hero-text-color: #ffffff;
@@ -281,6 +282,7 @@ h2 {
   --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);
   --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
   --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
+  --apisystembackground: linear-gradient(40deg, #6E695090, #6E695090);
   --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
   --overlaycolor: #ffffff15;
   --ifm-hero-text-color: #023c2a;

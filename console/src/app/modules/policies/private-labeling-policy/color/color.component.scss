@@ -42,12 +42,20 @@
 }
 
 .picker {
-  margin: 1rem 0;
+  position: relative;
+}
+
+.close-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(50%) translateY(-50%);
 }
 
 // stylelint-disable
 ::ng-deep .chrome-picker {
   border-radius: 0.5rem !important;
+  box-shadow: 0 0 1px #00000020, 0 1px 3px #00000020 !important;
 }
 
 ::ng-deep .saturation {

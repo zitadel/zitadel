@@ -112,6 +112,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								&userAgg.Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -169,6 +170,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								&userAgg.Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -178,21 +180,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								context.Background(),
 								&instanceAgg.Aggregate,
 								domain.SecretGeneratorTypeInitCode,
-								0,
-								1*time.Hour,
-								true,
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
 								0,
 								1*time.Hour,
 								true,
@@ -220,18 +207,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte(""),
-									},
-									time.Hour*1,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(context.Background(),
 									&userAgg.Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -285,6 +260,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -297,20 +273,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								false,
 								false,
 								false,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanInitialCodeAddedEvent(context.Background(),
-								&userAgg.Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte(""),
-								},
-								time.Hour*1,
 							),
 						),
 					),
@@ -343,20 +305,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										KeyID:      "id",
 										Crypted:    []byte(""),
 									},
-									0,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte(""),
-									},
-									0,
+									1*time.Hour,
 								),
 							),
 						},
@@ -402,6 +351,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								&userAgg.Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -417,38 +367,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								0,
-								1*time.Hour,
-								true,
-								true,
-								true,
-								true,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
 								newAddHumanEvent("password", true, ""),
-							),
-							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte(""),
-									},
-									1*time.Hour,
-								),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -499,6 +421,19 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								&userAgg.Aggregate,
 								true,
 								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
 							),
 						),
 					),
@@ -520,7 +455,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("", false, "+41711234567"),
+								newAddHumanEvent("password", false, "+41711234567"),
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(
@@ -542,8 +477,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -552,6 +488,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					Username:  "username",
 					FirstName: "firstname",
 					LastName:  "lastname",
+					Password:  "password",
 					Email: Email{
 						Address:  "email@test.ch",
 						Verified: true,
@@ -583,6 +520,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								&userAgg.Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -601,21 +539,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&instanceAgg.Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								0,
-								1*time.Hour,
-								true,
-								true,
-								true,
-								true,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -623,19 +546,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(
-									context.Background(),
-									&userAgg.Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte(""),
-									},
-									1*time.Hour,
-								),
-							),
-							eventFromEventPusher(
-								user.NewHumanEmailCodeAddedEvent(
 									context.Background(),
 									&userAgg.Aggregate,
 									&crypto.CryptoValue{
@@ -800,6 +710,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -834,6 +745,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -876,6 +788,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -968,6 +881,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -1050,6 +964,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -1156,6 +1071,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -1268,6 +1184,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -1372,6 +1289,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -1577,6 +1495,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -1614,6 +1533,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -1663,6 +1583,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -1687,7 +1608,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -1726,6 +1649,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -1750,7 +1674,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -1789,6 +1715,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								false,
 								true,
+								true,
 							),
 						),
 					),
@@ -1813,7 +1740,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -1869,6 +1798,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								false,
 								true,
+								true,
 							),
 						),
 					),
@@ -1893,7 +1823,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -2007,6 +1939,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -2031,7 +1964,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -2113,6 +2048,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&user.NewAggregate("org1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -2137,7 +2073,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -2213,6 +2151,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -2237,7 +2176,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -2335,6 +2276,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -2359,7 +2301,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
+								"",
 								time.Hour*1,
 								time.Hour*2,
 								time.Hour*3,
@@ -2907,6 +2851,7 @@ func TestAddHumanCommand(t *testing.T) {
 								&org.NewAggregate("id").Aggregate,
 								true,
 								true,
+								true,
 							),
 						}, nil
 					}).
@@ -2939,16 +2884,18 @@ func TestAddHumanCommand(t *testing.T) {
 					PreferredLanguage: language.English,
 					FirstName:         "gigi",
 					LastName:          "giraffe",
-					Password:          "",
+					Password:          "password",
 					Username:          "username",
 				},
 				passwordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				filter: NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
 							org.NewDomainPolicyAddedEvent(
 								context.Background(),
 								&org.NewAggregate("id").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -2972,19 +2919,28 @@ func TestAddHumanCommand(t *testing.T) {
 			},
 			want: Want{
 				Commands: []eventstore.Command{
-					user.NewHumanAddedEvent(
-						context.Background(),
-						&agg.Aggregate,
-						"username",
-						"gigi",
-						"giraffe",
-						"",
-						"gigi giraffe",
-						language.English,
-						0,
-						"support@zitadel.ch",
-						true,
-					),
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"gigi",
+							"giraffe",
+							"",
+							"gigi giraffe",
+							language.English,
+							0,
+							"support@zitadel.ch",
+							true,
+						)
+						event.AddPasswordData(&crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							KeyID:      "",
+							Crypted:    []byte("password"),
+						}, false)
+						return event
+					}(),
 					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
 				},
 			},

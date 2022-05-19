@@ -15,9 +15,10 @@ func orgWriteModelToOrg(wm *OrgWriteModel) *domain.Org {
 
 func orgWriteModelToDomainPolicy(wm *OrgDomainPolicyWriteModel) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
-		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
-		ValidateOrgDomains:    wm.ValidateOrgDomains,
+		ObjectRoot:                             writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
+		UserLoginMustBeDomain:                  wm.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     wm.ValidateOrgDomains,
+		SMTPSenderAddressMatchesInstanceDomain: wm.SMTPSenderAddressMatchesInstanceDomain,
 	}
 }
 
