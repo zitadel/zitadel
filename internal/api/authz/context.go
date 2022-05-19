@@ -125,7 +125,10 @@ func GetAllPermissionsFromCtx(ctx context.Context) []string {
 func checkOrigin(ctx context.Context, origins []string) error {
 	origin := grpc.GetGatewayHeader(ctx, http_util.Origin)
 	if origin == "" {
-		return nil
+		origin = http_util.OriginFromCtx(ctx)
+		if origin == "" {
+			return nil
+		}
 	}
 	if http_util.IsOriginAllowed(origins, origin) {
 		return nil

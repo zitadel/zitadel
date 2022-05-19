@@ -861,7 +861,7 @@ func testReduceErr(err error) Reduce {
 }
 
 func testQuery(query *eventstore.SearchQueryBuilder, limit uint64, err error) SearchQuery {
-	return func() (*eventstore.SearchQueryBuilder, uint64, error) {
+	return func(ctx context.Context) (*eventstore.SearchQueryBuilder, uint64, error) {
 		return query, limit, err
 	}
 }
