@@ -66,7 +66,7 @@
     "@types/jsonwebtoken": "^8.5.5",
     "@types/node": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "5.10.0",
-    "@typescript-eslint/parser": "5.10.0",
+    "@typescript-eslint/parser": "5.25.0",
     "codelyzer": "^6.0.0",
     "cypress": "^9.5.1",
     "cypress-terminal-report": "^3.4.1",
