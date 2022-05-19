@@ -22,18 +22,23 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
+		logging.New().Error("no user agent id")
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
 	req.Scopes, err = o.assertProjectRoleScopes(ctx, req.ClientID, req.Scopes)
 	if err != nil {
+		logging.New().WithError(err).Error("project role scope assertion failed")
 		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
+		logging.New().WithError(err).Error("auth request save failed")
 		return nil, err
 	}
-	return AuthRequestFromBusiness(resp)
+	authResp, err := AuthRequestFromBusiness(resp)
+	logging.OnError(err).Error("auth request convert failed")
+	return authResp, err
 }
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
