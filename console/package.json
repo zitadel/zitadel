@@ -60,7 +60,7 @@
     "@angular-eslint/template-parser": "^13.1.0",
     "@angular/cli": "~13.2.5",
     "@angular/compiler-cli": "~13.2.5",
-    "@angular/language-service": "~13.2.5",
+    "@angular/language-service": "~13.3.9",
     "@types/jasmine": "~3.10.3",
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^8.5.5",
