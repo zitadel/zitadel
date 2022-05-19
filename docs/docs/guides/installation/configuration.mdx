@@ -22,15 +22,17 @@ Fortunately, you can pass multiple configuration files to the zitadel command.
 # Create a configuration file containing normal configuration
 cat << EOF > ./zitadel-config.yaml
 DefaultInstance:
-  Human:
-    Username: root
+  Org:
+    Human:
+      Username: root
 EOF
 
 # Create a configuration file containing secrets
 cat << EOF > ./zitadel-secrets.yaml
 DefaultInstance:
-  Human:
-    Password: RootPassword1!
+  Org:
+    Human:
+      Password: RootPassword1!
 EOF
 
 # Pass multiple config files using the --config argument
