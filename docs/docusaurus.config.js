@@ -129,8 +129,6 @@ module.exports = {
     algolia: {
       appId: "1FD5EU44EF",
       apiKey: "2ddc6c35930ec608baf832bf07b5e150",
-      siteId: '13929a6d-0c07-4205-af9b-42121333ec5d',
-      branch: 'v2-alpha-readme',
       indexName: "netlify_13929a6d-0c07-4205-af9b-42121333ec5d_v2-alpha-readme_all",
     },
     prism: {
