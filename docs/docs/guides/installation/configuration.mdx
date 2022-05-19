@@ -9,8 +9,8 @@ Prefix the key with *ZITADEL\_*, uppercase the propery and join sections by an u
 For example, if you want to configure the default ZITADEL IAM admin username and password, export these two variables.
 
 ```bash
-export ZITADEL_DEFAULTINSTANCE_HUMAN_USERNAME="root"
-export ZITADEL_DEFAULTINSTANCE_HUMAN_PASSWORD="RootPassword1!"
+export ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_USERNAME="root"
+export ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 ```
 
 ### Configure by configuration files
@@ -22,15 +22,17 @@ Fortunately, you can pass multiple configuration files to the zitadel command.
 # Create a configuration file containing normal configuration
 cat << EOF > ./zitadel-config.yaml
 DefaultInstance:
-  Human:
-    Username: root
+  Org:
+    Human:
+      Username: root
 EOF
 
 # Create a configuration file containing secrets
 cat << EOF > ./zitadel-secrets.yaml
 DefaultInstance:
-  Human:
-    Password: RootPassword1!
+  Org:
+    Human:
+      Password: RootPassword1!
 EOF
 
 # Pass multiple config files using the --config argument
