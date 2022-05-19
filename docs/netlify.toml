@@ -5,9 +5,8 @@
 package = "@algolia/netlify-plugin-crawler"
   [plugins.inputs]
   branches = ['v2-alpha', 'v2', 'v2-alpha-readme']
-  renderJavaScript = true
+  renderJavaScript = false
   template = "hierarchical"
-  customDomain = "docs.zitadel.com"
 
 [[redirects]]
   from = "/proxy/js/script.js"
