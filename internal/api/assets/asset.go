@@ -83,10 +83,10 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 
 	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
-	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle, http_mw.CORSInterceptor, instanceInterceptor)
+	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle, instanceInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
-	return router
+	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))
 }
 
 func (h *Handler) GetFile() Downloader {
