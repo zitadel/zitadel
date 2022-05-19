@@ -1,6 +1,12 @@
 [build]
   command = "npm run build"
 
+[[plugins]]
+package = "@algolia/netlify-plugin-crawler"
+  [plugins.inputs]
+  branches = ['v2-alpha', 'v2', 'v2-alpha-readme']
+  renderJavaScript = true
+
 [[redirects]]
   from = "/proxy/js/script.js"
   to = "https://plausible.io/js/plausible.js"
