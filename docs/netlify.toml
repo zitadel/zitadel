@@ -6,6 +6,7 @@ package = "@algolia/netlify-plugin-crawler"
   [plugins.inputs]
   branches = ['v2-alpha', 'v2', 'v2-alpha-readme']
   renderJavaScript = true
+  template = "hierarchical"
 
 [[redirects]]
   from = "/proxy/js/script.js"
