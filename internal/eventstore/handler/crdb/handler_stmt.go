@@ -149,7 +149,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
 	if stmts[0].PreviousSequence == 0 {
-		previousStmts, err := h.fetchPreviousStmts(ctx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
+		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
 			return stmts, err
@@ -186,9 +186,8 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	return unexecutedStmts, nil
 }
 
-func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, stmtSeq uint64, instanceID string, sequences currentSequences, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
-
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtSeq uint64, instanceID string, sequences currentSequences, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).SetTx(tx)
 	queriesAdded := false
 	for _, aggregateType := range h.aggregates {
 		for _, sequence := range sequences[aggregateType] {

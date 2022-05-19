@@ -701,7 +701,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				}),
 				aggregates: tt.fields.aggregates,
 			}
-			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, "", tt.args.sequences, tt.args.reduce)
+			stmts, err := h.fetchPreviousStmts(tt.args.ctx, nil, tt.args.stmtSeq, "", tt.args.sequences, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
