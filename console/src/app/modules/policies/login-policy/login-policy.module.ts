@@ -18,13 +18,13 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
+import { DialogAddTypeComponent } from './factor-table/dialog-add-type/dialog-add-type.component';
+import { FactorTableComponent } from './factor-table/factor-table.component';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
-import { DialogAddTypeComponent } from './mfa-table/dialog-add-type/dialog-add-type.component';
-import { MfaTableComponent } from './mfa-table/mfa-table.component';
 
 @NgModule({
-  declarations: [LoginPolicyComponent, MfaTableComponent, DialogAddTypeComponent],
+  declarations: [LoginPolicyComponent, FactorTableComponent, DialogAddTypeComponent],
   imports: [
     LoginPolicyRoutingModule,
     CommonModule,

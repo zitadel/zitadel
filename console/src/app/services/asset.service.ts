@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 
 import { PolicyComponentServiceType } from '../modules/policies/policy-component-types.enum';
 import { Theme } from '../modules/policies/private-labeling-policy/private-labeling-policy.component';
@@ -80,9 +81,7 @@ export class AssetService {
   }
 
   private async getServiceUrl(): Promise<string> {
-    const url = await this.http
-      .get('./assets/environment.json')
-      .toPromise()
+    const url = await lastValueFrom(this.http.get('./assets/environment.json'))
       .then((data: any) => {
         if (data && data.api) {
           return data.api;

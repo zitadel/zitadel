@@ -51,7 +51,7 @@
 </div>
 
 <cnsl-card class="max-card-width">
-  <cnsl-mfa-table
+  <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.MultiFactor"
@@ -68,7 +68,7 @@
         | async) === false
     "
   >
-  </cnsl-mfa-table>
+  </cnsl-factor-table>
 </cnsl-card>
 
 <br />
@@ -99,7 +99,7 @@
   </mat-checkbox>
 </div>
 <cnsl-card class="max-card-width">
-  <cnsl-mfa-table
+  <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.SecondFactor"
@@ -115,7 +115,7 @@
         | async) === false
     "
   >
-  </cnsl-mfa-table>
+  </cnsl-factor-table>
 </cnsl-card>
 
 <br />

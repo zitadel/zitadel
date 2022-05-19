@@ -19,7 +19,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { LoginMethodComponentType } from './mfa-table/mfa-table.component';
+import { LoginMethodComponentType } from './factor-table/factor-table.component';
 
 @Component({
   selector: 'cnsl-login-policy',

@@ -912,7 +912,7 @@
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
-      "DESCRIPTION": "Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
+      "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
       "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN": "Datei auswählen",
       "ACTIVATEPREVIEW": "Konfiguration übernehmen",
