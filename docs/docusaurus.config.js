@@ -20,6 +20,14 @@ module.exports = {
   ],
   themeConfig: {
     zoomSelector: ".markdown :not(em) > img",
+    announcementBar: {
+      id: 'documentation',
+      content:
+        'This page contains the documentation for ZITADEL version 2, if you are looking for version 1 please visit <a target="_blank" rel="noopener noreferrer" href="https://docs.zitadel.ch">https://docs.zitadel.ch</a>',
+      backgroundColor: '#fafbfc',
+      textColor: '#091E42',
+      isCloseable: false,
+    },
     navbar: {
       // title: 'ZITADEL',
       logo: {
