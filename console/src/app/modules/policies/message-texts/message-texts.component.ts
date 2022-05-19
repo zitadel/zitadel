@@ -274,6 +274,7 @@ const REQUESTMAP = {
   styleUrls: ['./message-texts.component.scss'],
 })
 export class MessageTextsComponent implements OnInit, OnDestroy {
+  public loading: boolean = false;
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
   public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({}); // boolean because of isDefault
 
@@ -491,11 +492,14 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     }
 
     const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.locale);
+    this.loading = true;
     return this.getCurrentValues(type, reqCustomInit)
       ?.then((data) => {
+        this.loading = false;
         this.getCustomInitMessageTextMap$.next(data);
       })
       .catch((error) => {
+        this.loading = false;
         this.toast.showError(error);
       });
   }
