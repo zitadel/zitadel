@@ -28,20 +28,20 @@ For example, **ZITADEL** is event sourced but it does not rely on a pub/sub syst
 
 You can run an automatically operated **ZITADEL** instance on a CNCF compliant Kubernetes cluster of your choice:
 
-* [CRD Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/crd)
-* [GitOps Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/gitops)
-* [GitOps Mode on VM/bare-metal](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
+* [CRD Mode on an existing k8s cluster](https://docs.zitadel.com/docs/guides/installation/crd)
+* [GitOps Mode on an existing k8s cluster](https://docs.zitadel.com/docs/guides/installation/gitops)
+* [GitOps Mode on VM/bare-metal](https://docs.zitadel.com/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.com/docs/guides/installation/orbos)
 
 ### Software-as-a-Service
 
-* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
-* **ZITADEL Dedicated:** We operate and support a dedicated instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
+* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.com) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.com/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
+* **ZITADEL Dedicated:** We operate and support a dedicated instance of **ZITADEL** for you. [Get in touch!](https://zitadel.com/contact/)
 
 ## Start using ZITADEL
 
 ### Quickstarts
 
-See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/zitadel/zitadel/discussions/1717).
+See our [Documentation](https://docs.zitadel.com/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/zitadel/zitadel/discussions/1717).
 
 ### Client libraries
 
@@ -52,8 +52,8 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 
 ## Help and Documentation
 
-* [Documentation](https://docs.zitadel.ch)
-* [Say hello](https://zitadel.ch/contact/)
+* [Documentation](https://docs.zitadel.com)
+* [Say hello](https://zitadel.com/contact/)
 * [Join our Discord channel](https://discord.gg/erh5Brh7jE)
 
 ## How To Contribute
@@ -100,13 +100,13 @@ Use our login widget to allow easy and sucure access to your applications and en
 * works on all modern platforms, devices, and browsers
 * phishing resistant alternative
 * requires only one gesture by the user
-* easy [enrollment](https://docs.zitadel.ch/docs/manuals/user-factors) of the device during registration
+* easy [enrollment](https://docs.zitadel.com/docs/manuals/user-factors) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 
 ### Admin Console
 
-Use [Console](https://docs.zitadel.ch/docs/manuals/introduction) or our [APIs](https://docs.zitadel.ch/docs/apis/introduction) to setup organizations, projects and applications.
+Use [Console](https://docs.zitadel.com/docs/manuals/introduction) or our [APIs](https://docs.zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 
 Register new applications
 ![OIDC-Client-Register](https://user-images.githubusercontent.com/1366906/118765446-62064b80-b87b-11eb-8b24-4f4c365b8c58.gif)
