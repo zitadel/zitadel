@@ -92,7 +92,11 @@ module.exports = {
       type: "category",
       label: "Customization",
       collapsed: false,
-      items: ["guides/customization/branding", "guides/customization/texts"],
+      items: [
+          "guides/customization/branding",
+          "guides/customization/texts",
+          "guides/customization/behavior"
+      ],
     },
     {
       type: "category",
@@ -153,6 +157,7 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
+          "apis/actions"
       ],
     },
     {
@@ -186,7 +191,7 @@ module.exports = {
     {
       type: "category",
       label: "Structure",
-      collapsed: true,
+      collapsed: false,
       items: [
         "concepts/structure/overview",
         "concepts/structure/instance",
@@ -204,6 +209,12 @@ module.exports = {
       label: "Use Cases",
       collapsed: false,
       items: ["concepts/usecases/saas"],
+    },
+    {
+      type: "category",
+      label: "Features",
+      collapsed: false,
+      items: ["concepts/features/actions"],
     },
   ],
   manuals: [

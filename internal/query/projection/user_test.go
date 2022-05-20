@@ -36,7 +36,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanAddedEventMapper),
@@ -73,7 +73,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -95,7 +95,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanAddedEventMapper),
@@ -132,7 +132,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -150,7 +150,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanAddedEventMapper),
 			},
@@ -186,7 +186,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{},
 								&sql.NullString{String: "und", Valid: false},
 								&sql.NullInt16{},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{},
 							},
 						},
@@ -208,7 +208,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanRegisteredEventMapper),
@@ -245,7 +245,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -267,7 +267,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanRegisteredEventMapper),
@@ -304,7 +304,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -322,7 +322,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanRegisteredEventMapper),
 			},
@@ -358,7 +358,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullString{},
 								&sql.NullString{String: "und", Valid: false},
 								&sql.NullInt16{},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{},
 							},
 						},
@@ -984,7 +984,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					repository.EventType(user.HumanEmailChangedType),
 					user.AggregateType,
 					[]byte(`{
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanEmailChangedEventMapper),
 			},
@@ -1007,7 +1007,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								false,
 								"agg-id",
 							},
@@ -1023,7 +1023,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					repository.EventType(user.UserV1EmailChangedType),
 					user.AggregateType,
 					[]byte(`{
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanEmailChangedEventMapper),
 			},
@@ -1046,7 +1046,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								false,
 								"agg-id",
 							},

@@ -257,8 +257,8 @@ DefaultInstance:
     SecondFactorCheckLifetime: 18h
     MultiFactorCheckLifetime: 12h
   PrivacyPolicy:
-    TOSLink: https://docs.zitadel.ch/docs/legal/terms-of-service
-    PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
+    TOSLink: https://docs.zitadel.com/docs/legal/terms-of-service
+    PrivacyLink: https://docs.zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
   LabelPolicy:
     PrimaryColor: "#5469d4"

@@ -29,7 +29,7 @@ You can find out how to register OTP [here](./user-factors).
 
 ### Can't remember your otp
 
-If you have a problem with your OTP, please contact your organization support. If you have a user in the Global Organization feel free to contact support@zitadel.ch
+If you have a problem with your OTP, please contact your organization support. If you have a user in the Global Organization feel free to contact support@zitadel.com
 
 ## Login with Universal Second Factor (U2F) (FaceID, FingerPrint, etc.)
 
