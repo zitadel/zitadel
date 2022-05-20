@@ -656,15 +656,18 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &StatementHandler{
-				ProjectionHandler: handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
-					HandlerConfig: handler.HandlerConfig{
-						Eventstore: tt.fields.eventstore,
-					},
-					ProjectionName: "my_projection",
-					RequeueEvery:   0,
-				}),
 				aggregates: tt.fields.aggregates,
 			}
+			h.ProjectionHandler = handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
+				HandlerConfig: handler.HandlerConfig{
+					Eventstore: tt.fields.eventstore,
+				},
+				ProjectionName: "my_projection",
+				RequeueEvery:   0,
+			},
+				h.reduce,
+				h.Update,
+				h.SearchQuery)
 			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, tt.args.sequences, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)

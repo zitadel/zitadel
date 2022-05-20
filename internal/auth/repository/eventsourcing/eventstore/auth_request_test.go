@@ -144,7 +144,7 @@ type mockLoginPolicy struct {
 	policy *query.LoginPolicy
 }
 
-func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, bool, id string) (*query.LoginPolicy, error) {
+func (m *mockLoginPolicy) LoginPolicyByID(context.Context, bool, string) (*query.LoginPolicy, error) {
 	return m.policy, nil
 }
 

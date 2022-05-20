@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
@@ -126,7 +128,10 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 				},
 				ProjectionName: "",
 				RequeueEvery:   -1,
-			})
+			},
+				nil,
+				nil,
+				nil)
 			h.stmts = tt.fields.stmts
 			h.pushSet = tt.fields.pushSet
 			h.shouldPush = tt.fields.shouldPush
@@ -408,7 +413,7 @@ func TestProjectionHandler_push(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			h := NewProjectionHandler(ProjectionHandlerConfig{
 				HandlerConfig: HandlerConfig{},
-			})
+			}, nil, nil, nil)
 			h.stmts = tt.fields.stmts
 			h.pushSet = tt.fields.pushSet
 			if tt.args.previousLock > 0 {
@@ -655,8 +660,9 @@ func TestProjectionHandler_bulk(t *testing.T) {
 				HandlerConfig:  HandlerConfig{},
 				ProjectionName: "",
 				RequeueEvery:   -1,
-			})
-			err := h.bulk(tt.args.ctx, tt.args.lock.lock(), tt.args.executeBulk.executeBulk(), tt.args.unlock.unlock())
+			}, tt.args.executeBulk.Reduce, tt.args.executeBulk.Update, tt.args.executeBulk.Query)
+			h.Eventstore = tt.args.executeBulk.es(t)
+			err := h.bulk(tt.args.ctx, tt.args.lock.lock(), tt.args.unlock.unlock())
 			if !tt.res.isErr(err) {
 				t.Errorf("unexpected error %v", err)
 			}
@@ -871,6 +877,26 @@ type executeBulkMock struct {
 	err           error
 	waitForCancel bool
 	canceled      chan bool
+}
+
+func (m *executeBulkMock) Query() (*eventstore.SearchQueryBuilder, uint64, error) {
+	m.callCount++
+	if m.err != nil {
+		return nil, 0, m.err
+	}
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).AddQuery().SequenceGreater(0).Builder(), 0, nil
+}
+func (m *executeBulkMock) Reduce(eventstore.Event) (*Statement, error) {
+	return nil, nil
+}
+func (m *executeBulkMock) Update(ctx context.Context, stmts []*Statement, reduce Reduce) (unexecutedStmts []*Statement, err error) {
+	return nil, nil
+}
+
+func (m *executeBulkMock) es(t *testing.T) *eventstore.Eventstore {
+	mock := es_repo_mock.NewRepo(t)
+	mock.EXPECT().Filter(gomock.Any(), gomock.Any()).AnyTimes().Return(nil, nil)
+	return eventstore.NewEventstore(mock)
 }
 
 func (m *executeBulkMock) executeBulk() executeBulk {
