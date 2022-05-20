@@ -27,7 +27,8 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
-ZITADEL is the modern open* alternative for Auth0, Firebase Auth, AWS Cognito as well as Keycloak built for the container and serverless era.
+You want auth that's quickly set up like Auth0 but open source like Keycloak? Look no further— ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
+
 
 We provide a wide range of out of the box features like secure login, self-service, OpenID Connect, OAuth2.x, SAML2, branding, Passwordless with FIDO2, OTP, U2F, and an unlimited audit trail to improve the life of developers. Especially noteworthy is that ZITADEL supports not only B2C and B2E scenarios but also B2B. This is super useful for people who build B2B Solutions, as ZITADEL can handle all the delegated user and access management.
 
@@ -51,7 +52,7 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 
 - [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/installation)
 
-### Quickstarts - Integrate you app
+### Quickstarts - Integrate your app
 
 - [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/quickstarts/introduction)
 - [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
