@@ -50,6 +50,12 @@ func (h *Handler) Storage() static.Storage {
 	return h.storage
 }
 
+func AssetAPI(externalSecure bool) func(context.Context) string {
+	return func(ctx context.Context) string {
+		return http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix
+	}
+}
+
 type Uploader interface {
 	UploadAsset(ctx context.Context, info string, asset *command.AssetUpload, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
