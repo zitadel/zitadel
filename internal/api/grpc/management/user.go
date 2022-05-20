@@ -35,7 +35,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDReques
 		return nil, err
 	}
 	return &mgmt_pb.GetUserByIDResponse{
-		User: user_grpc.UserToPb(user, s.assetAPIPrefix),
+		User: user_grpc.UserToPb(user, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
@@ -49,7 +49,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 		return nil, err
 	}
 	return &mgmt_pb.GetUserByLoginNameGlobalResponse{
-		User: user_grpc.UserToPb(user, s.assetAPIPrefix),
+		User: user_grpc.UserToPb(user, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
@@ -68,7 +68,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 		return nil, err
 	}
 	return &mgmt_pb.ListUsersResponse{
-		Result: user_grpc.UsersToPb(res.Users, s.assetAPIPrefix),
+		Result: user_grpc.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
 		Details: obj_grpc.ToListDetails(
 			res.Count,
 			res.Sequence,
@@ -84,7 +84,7 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 		return nil, err
 	}
 	return &mgmt_pb.ListUserChangesResponse{
-		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
@@ -383,7 +383,7 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 		return nil, err
 	}
 	return &mgmt_pb.GetHumanProfileResponse{
-		Profile: user_grpc.ProfileToPb(profile, s.assetAPIPrefix),
+		Profile: user_grpc.ProfileToPb(profile, s.assetAPIPrefix(ctx)),
 		Details: obj_grpc.ToViewDetailsPb(
 			profile.Sequence,
 			profile.CreationDate,

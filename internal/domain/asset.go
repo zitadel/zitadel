@@ -42,5 +42,5 @@ func AssetURL(prefix, resourceOwner, key string) string {
 	if prefix == "" || resourceOwner == "" || key == "" {
 		return ""
 	}
-	return prefix + resourceOwner + "/" + key
+	return prefix + "/" + resourceOwner + "/" + key
 }

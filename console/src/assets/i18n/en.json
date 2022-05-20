@@ -275,12 +275,12 @@
       "U2F_DIALOG_TITLE": "Verify authenticator",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
       "U2F_SUCCESS": "Passwordless Auth created successfully!",
-      "U2F_ERROR": "An error during U2F setup occurred!",
+      "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerprint, Security Keys, Face ID and other"
       },
       "STATE": {
         "0": "No State",
@@ -326,16 +326,16 @@
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
-      "U2F": "U2F (Universal 2nd Factor)",
-      "U2F_DIALOG_TITLE": "Verify U2F",
+      "U2F": "Fingerprint, Security Keys, Face ID and other",
+      "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
-      "U2F_SUCCESS": "U2F created successfully!",
-      "U2F_ERROR": "An error during U2F setup occurred!",
-      "U2F_NAME": "U2F Name",
+      "U2F_SUCCESS": "Factor added successfully!",
+      "U2F_ERROR": "An error during setup occurred!",
+      "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerprint, Security Keys, Face ID and other"
       },
       "STATE": {
         "0": "No State",
@@ -560,7 +560,7 @@
       "PHONEVERIFICATIONSENT": "Phone verification code sent.",
       "EMAILVERIFICATIONSENT": "E-mail verification code sent.",
       "OTPREMOVED": "OTP removed.",
-      "U2FREMOVED": "U2F removed.",
+      "U2FREMOVED": "Factor removed.",
       "PASSWORDLESSREMOVED": "Passwordless removed.",
       "INITIALPASSWORDSET": "Initial password set.",
       "PASSWORDNOTIFICATIONSENT": "Password change notification sent.",
@@ -1497,12 +1497,12 @@
     "TYPE": "Type",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "U2F with Pin"
+      "1": "Fingerprint, Security Keys, Face ID and other"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "OTP",
-      "2": "U2F"
+      "1": "One Time Password (OTP)",
+      "2": "Fingerprint, Security Keys, Face ID and other"
     }
   },
   "LOGINPOLICY": {

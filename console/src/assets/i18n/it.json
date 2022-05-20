@@ -275,12 +275,12 @@
       "U2F_DIALOG_TITLE": "Verifica autenticatore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo authenticatore o dispositivo usato.",
       "U2F_SUCCESS": "Autorizzazione passwordless creata con successo!",
-      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione di U2F!",
+      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
       "TYPE": {
         "0": "Nessun MFA definito",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
       },
       "STATE": {
         "0": "Nessuno Stato",
@@ -326,16 +326,16 @@
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Aggiungi OTP",
       "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
-      "U2F": "U2F (Universal 2nd Factor)",
-      "U2F_DIALOG_TITLE": "Verifica U2F",
+      "U2F": "Impronta digitale, chiave di sicurezza, Face ID e altri",
+      "U2F_DIALOG_TITLE": "Verifica Fattore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo methodo o dispositivo.",
-      "U2F_SUCCESS": "U2F creato con successo!",
-      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione di U2F!",
-      "U2F_NAME": "Nome U2F",
+      "U2F_SUCCESS": "Fattore aggiunto con successo!",
+      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
+      "U2F_NAME": "Nome dell'autenticatore",
       "TYPE": {
         "0": "Nessun altro fattore definito",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
       },
       "STATE": {
         "0": "Nessuno Stato",
@@ -559,8 +559,8 @@
       "PHONEVERIFIED": "Telefono verificato con successo.",
       "PHONEVERIFICATIONSENT": "Codice di verifica telefonica inviato.",
       "EMAILVERIFICATIONSENT": "Codice di verifica e-mail inviato.",
-      "OTPREMOVED": "OTP rimosso.",
-      "U2FREMOVED": "U2F rimosso.",
+      "OTPREMOVED": "One Time Password (OTP) rimosso.",
+      "U2FREMOVED": "Fattore rimosso.",
       "PASSWORDLESSREMOVED": "Rimosso senza password.",
       "INITIALPASSWORDSET": "Password iniziale impostata.",
       "PASSWORDNOTIFICATIONSENT": "Notifica di cambio password inviata.",
@@ -1497,12 +1497,12 @@
     "TYPE": "Tipo",
     "MULTIFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "U2F con Pin"
+      "1": "Impronta digitale, chiave di sicurezza, Face ID e altri"
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "OTP",
-      "2": "U2F"
+      "1": "One Time Password (OTP)",
+      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
     }
   },
   "LOGINPOLICY": {

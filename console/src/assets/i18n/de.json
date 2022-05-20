@@ -279,8 +279,8 @@
       "U2F_NAME": "Authentifikator Name",
       "TYPE": {
         "0": "Keine MFA definiert",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerabdruck, Security Keys, Face ID und andere"
       },
       "STATE": {
         "0": "Kein Status",
@@ -326,16 +326,16 @@
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
       "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
-      "U2F": "U2F (Universal 2nd Factor)",
-      "U2F_DIALOG_TITLE": "U2F hinzufügen",
-      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
-      "U2F_SUCCESS": "U2F erfolgreich erstellt!",
+      "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
+      "U2F_DIALOG_TITLE": "Faktor hinzufügen",
+      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Authentikator an.",
+      "U2F_SUCCESS": "Faktor erfolgreich hinzugefügt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
-      "U2F_NAME": "U2F Name",
+      "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "OTP",
-        "2": "U2F"
+        "2": "Fingerabdruck, Security Key, Face ID oder andere"
       },
       "STATE": {
         "0": "Kein Status",
@@ -560,7 +560,7 @@
       "PHONEVERIFICATIONSENT": "Bestätigungscode per Telefonnummer gesendet.",
       "EMAILVERIFICATIONSENT": "Bestätigungscode per E-Mail gesendet.",
       "OTPREMOVED": "OTP entfernt.",
-      "U2FREMOVED": "U2F entfernt.",
+      "U2FREMOVED": "Faktor entfernt.",
       "PASSWORDLESSREMOVED": "Passwortlos entfernt.",
       "INITIALPASSWORDSET": "Initiales Passwort gesetzt.",
       "PASSWORDNOTIFICATIONSENT": "Passwortänderung mittgeteilt.",
@@ -914,7 +914,7 @@
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
-      "DESCRIPTION": "Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
+      "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
       "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN": "Datei auswählen",
       "ACTIVATEPREVIEW": "Konfiguration übernehmen",
@@ -1497,12 +1497,12 @@
     "TYPE": "Typ",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "U2F with Pin"
+      "1": "Fingerabdruck, Security Keys, Face ID und andere"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "OTP",
-      "2": "U2F"
+      "1": "One Time Password (OTP)",
+      "2": "Fingerabdruck, Security Keys, Face ID und andere"
     }
   },
   "LOGINPOLICY": {

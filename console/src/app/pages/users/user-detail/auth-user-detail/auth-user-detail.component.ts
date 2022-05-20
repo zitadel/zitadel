@@ -38,13 +38,13 @@ export class AuthUserDetailComponent implements OnDestroy {
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
   public settingsList: SidenavSetting[] = [
-    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL'},
-    { id: 'idp', i18nKey: 'USER.SETTINGS.IDP'},
-    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS'},
-    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA'},
-    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS'},
-    { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS'},
-    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA'},
+    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
+    { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
+    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS' },
+    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA' },
+    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' },
+    { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' },
+    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' },
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
