@@ -29,7 +29,7 @@ export class UserGrantCreateComponent implements OnDestroy {
 
   public rolesList: string[] = [];
 
-  public STEPS: number = 2; // project, roles
+  public createSteps: number = 2;
   public currentCreateStep: number = 1;
 
   public UserGrantContext: any = UserGrantContext;

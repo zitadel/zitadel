@@ -21,7 +21,7 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
   public grantId: string = '';
   public rolesKeyList: string[] = [];
 
-  public STEPS: number = 2;
+  public createSteps: number = 2;
   public currentCreateStep: number = 1;
 
   private destroy$: Subject<void> = new Subject();

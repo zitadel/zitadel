@@ -1,0 +1,24 @@
+.create-layout-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+  }
+
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 0.25rem 1rem;
+    border: 1px solid rgba(#8795a1, 0.2);
+    border-radius: 50vw;
+  }
+}
+
+.create-layout-content {
+  padding-left: 4.5rem;
+}

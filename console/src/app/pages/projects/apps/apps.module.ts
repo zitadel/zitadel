@@ -23,6 +23,7 @@ import { AppRadioModule } from 'src/app/modules/app-radio/app-radio.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ClientKeysModule } from 'src/app/modules/client-keys/client-keys.module';
+import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.module';
 import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -66,6 +67,7 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     HasRoleModule,
     SidenavModule,
     MatChipsModule,
+    CreateLayoutModule,
     ClientKeysModule,
     HasRolePipeModule,
     MatIconModule,

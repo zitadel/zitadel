@@ -119,6 +119,7 @@
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
     "MORE": "mehr",
+    "STEP": "Schritt",
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
