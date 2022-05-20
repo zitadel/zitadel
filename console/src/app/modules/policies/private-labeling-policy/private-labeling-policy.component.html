@@ -70,6 +70,17 @@
       mat-raised-button
       color="primary"
       (click)="activatePolicy()"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
     >
       {{ 'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate }}
     </button>
@@ -391,7 +402,18 @@
             class="toggle"
             color="primary"
             ngDefaultControl
-            [disabled]="view === View.CURRENT"
+            [disabled]="
+              view === View.CURRENT ||
+              ([
+                serviceType === PolicyComponentServiceType.ADMIN
+                  ? 'iam.policy.write'
+                  : serviceType === PolicyComponentServiceType.MGMT
+                  ? 'policy.write'
+                  : ''
+              ]
+                | hasRole
+                | async) === false
+            "
             [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
             (change)="savePolicy()"
           >
@@ -402,9 +424,20 @@
             class="toggle"
             color="primary"
             ngDefaultControl
-            [disabled]="view === View.CURRENT"
             [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
             (change)="savePolicy()"
+            [disabled]="
+              view === View.CURRENT ||
+              ([
+                serviceType === PolicyComponentServiceType.ADMIN
+                  ? 'iam.policy.write'
+                  : serviceType === PolicyComponentServiceType.MGMT
+                  ? 'policy.write'
+                  : ''
+              ]
+                | hasRole
+                | async) === false
+            "
           >
             {{ 'POLICY.DATA.DISABLEWATERMARK' | translate }}
           </mat-slide-toggle>

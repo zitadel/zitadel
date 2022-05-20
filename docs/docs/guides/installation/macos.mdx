@@ -11,7 +11,6 @@ cockroach start-single-node --insecure --background --http-addr :9090
 
 # Configure your environment
 # Generate a master encryption key
-export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 export ZITADEL_EXTERNALSECURE=false
 export ZITADEL_EXTERNALDOMAIN=localhost
 export ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
@@ -19,9 +18,7 @@ export MY_ARCHITECTURE="arm64"
 
 # Download the zitadel binary
 curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.3 | grep "browser_download_url.*zitadel_.*_darwin_${MY_ARCHITECTURE}" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadel && sudo chmod +x /usr/local/bin/zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
-sudo chmod +x /usr/local/bin/zitadel
-sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
 
 # Run the database and application containers
-zitadel admin start-from-init --masterkeyFromEnv
+zitadel admin start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
 ```
