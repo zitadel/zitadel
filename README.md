@@ -35,7 +35,7 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 ### Quickstarts - Integrate you app
 
 - [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/quickstarts/introduction)
-- [And even more examples are located under](https://github.com/zitadel/zitadel-examples)
+- [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
 
 > If you miss something please feel free to engage with us [here](https://github.com/zitadel/zitadel/discussions/1717)
 
@@ -44,8 +44,8 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 - [API-first](https://docs.zitadel.com/docs/apis/introduction)
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore)
 - [Actions](https://docs.zitadel.ch/docs/concepts/features/actions) to react on events with custom code
-- [Private labeling](https://docs.zitadel.com/docs/guides/customization/branding) for a uniform user experience
-- [cockroach database](https://www.cockroachlabs.com/) is the only dependency
+- [Branding](https://docs.zitadel.com/docs/guides/customization/branding) for a uniform user experience
+- [Cockroach database](https://www.cockroachlabs.com/) is the only dependency
 
 ## Features
 
@@ -55,9 +55,9 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 - Multifactor authentication with OTP, U2F
 - [Identity Brokering](https://docs.zitadel.com/docs/guides/authentication/identity-brokering)
 - [Machine-to-machine (JWT profile)](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
-- [Personal Access Tokens (PAT)]()
+- Personal Access Tokens (PAT)
 - Role Based Access Control (RBAC)
-- Delegate role management to third-parties
+- [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/basics/projects#what-is-a-granted-project)
 - Self-registration including verification
 - User self service
 - [Service Accounts](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
@@ -73,8 +73,8 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 | Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
 | Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
 | Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | ❌ | [buehler 👑](https://github.com/buehler) |
-| JVM      | ❓ | ❓ | ❓ | | Maybe you? |
-| Python   | ❓ | ❓ | ❓ | | Maybe you? |
+| JVM      | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓ | ❓ | | TBD |
+| Python   | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675) | ❓ | ❓ | | TBD |
 | Javascript | ❓ | ❓ | ❓ | | Maybe you? |
 
 (\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.com/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
@@ -94,7 +94,7 @@ See the policy [here](./SECURITY.md)
 
 ### Passwordless Login
 
-Use our login widget to allow easy and sucure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
+Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
 
 * works on all modern platforms, devices, and browsers
 * phishing resistant alternative
