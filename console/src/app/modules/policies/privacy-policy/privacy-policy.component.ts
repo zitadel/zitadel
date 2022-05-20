@@ -19,7 +19,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { CnslLinks } from '../../links/links.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -33,7 +32,6 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-  public nextLinks: CnslLinks[] = [];
   private sub: Subscription = new Subscription();
 
   public privacyPolicy: PrivacyPolicy.AsObject | undefined = undefined;

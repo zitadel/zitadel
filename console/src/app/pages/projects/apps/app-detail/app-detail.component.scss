@@ -112,6 +112,32 @@
   .app-main-content {
     border-top: 1px solid $divider-color;
     margin-top: 1.5rem;
+
+    .current-auth-method {
+      display: flex;
+      align-items: center;
+      border: 1px solid if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+
+      h3 {
+        margin: 0 1rem 0 0;
+      }
+
+      p {
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      button {
+        margin-left: 1rem;
+      }
+    }
   }
 }
 

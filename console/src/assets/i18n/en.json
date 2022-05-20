@@ -95,6 +95,7 @@
     "CANCEL": "Cancel",
     "INFO": "Info",
     "OK": "OK",
+    "SELECT": "Select",
     "VIEW": "Show",
     "SELECTIONDELETE": "Delete selection",
     "DELETE": "Delete",
@@ -1525,6 +1526,7 @@
     "COMPLIANCE": "OIDC Compliance",
     "URLS": "Urls",
     "CONFIGURATION": "Configuration",
+    "TOKEN": "Token Settings",
     "PAGES": {
       "TITLE": "Application",
       "ID": "ID",

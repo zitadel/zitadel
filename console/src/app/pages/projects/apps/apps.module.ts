@@ -26,7 +26,6 @@ import { ClientKeysModule } from 'src/app/modules/client-keys/client-keys.module
 import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { LinksModule } from 'src/app/modules/links/links.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { NameDialogModule } from 'src/app/modules/name-dialog/name-dialog.module';
 import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
@@ -38,6 +37,7 @@ import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.mo
 import { AdditionalOriginsComponent } from './additional-origins/additional-origins.component';
 import { AppCreateComponent } from './app-create/app-create.component';
 import { AppDetailComponent } from './app-detail/app-detail.component';
+import { AuthMethodDialogComponent } from './app-detail/auth-method-dialog/auth-method-dialog.component';
 import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
@@ -49,12 +49,12 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     AppSecretDialogComponent,
     RedirectUrisComponent,
     AdditionalOriginsComponent,
+    AuthMethodDialogComponent,
   ],
   imports: [
     CommonModule,
     A11yModule,
     RedirectPipeModule,
-    LinksModule,
     NameDialogModule,
     AppRadioModule,
     AppsRoutingModule,
