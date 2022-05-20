@@ -1,6 +1,10 @@
 <h2>{{ 'POLICY.MESSAGE_TEXTS.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate }}</p>
 
+<div *ngIf="loading" class="spinner-wr">
+  <mat-spinner diameter="30" color="primary"></mat-spinner>
+</div>
+
 <div class="message-texts-top-actions">
   <cnsl-form-field class="type">
     <cnsl-label>{{ 'POLICY.MESSAGE_TEXTS.TYPE' | translate }}</cnsl-label>
