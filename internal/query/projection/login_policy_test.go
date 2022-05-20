@@ -47,7 +47,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, default_redirect_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -61,6 +61,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								false,
 								true,
 								false,
+								"",
 							},
 						},
 					},
@@ -80,7 +81,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 	"forceMFA": false,
 	"hidePasswordReset": true,
 	"passwordlessType": 1,
-	"ignoreUnknownUsernames": true
+	"ignoreUnknownUsernames": true,
+	"defaultRedirectURI": "https://example.com/redirect"
 }`),
 				), org.LoginPolicyAddedEventMapper),
 			},
@@ -93,7 +95,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, default_redirect_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -107,6 +109,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								false,
 								true,
 								true,
+								"https://example.com/redirect",
 							},
 						},
 					},
@@ -127,7 +130,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 	"forceMFA": true,
 	"hidePasswordReset": true,
 	"passwordlessType": 1,
-	"ignoreUnknownUsernames": true
+	"ignoreUnknownUsernames": true,
+	"defaultRedirectURI": "https://example.com/redirect"
 }`),
 				), org.LoginPolicyChangedEventMapper),
 			},
@@ -139,7 +143,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (aggregate_id = $10)",
+							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames, default_redirect_uri) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) WHERE (aggregate_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -150,6 +154,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 								true,
 								true,
+								"https://example.com/redirect",
 								"agg-id",
 							},
 						},
@@ -337,7 +342,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, default_redirect_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -351,6 +356,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								false,
+								"",
 							},
 						},
 					},
@@ -371,7 +377,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			"forceMFA": false,
 			"hidePasswordReset": true,
 			"passwordlessType": 1,
-			"ignoreUnknownUsernames": true
+			"ignoreUnknownUsernames": true,
+			"defaultRedirectURI": "https://example.com/redirect"
 			}`),
 				), iam.LoginPolicyAddedEventMapper),
 			},
@@ -383,7 +390,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, ignore_unknown_usernames, default_redirect_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -397,6 +404,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								true,
+								"https://example.com/redirect",
 							},
 						},
 					},
@@ -416,7 +424,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			"allowExternalIdp": true,
 			"forceMFA": true,
 			"hidePasswordReset": true,
-			"passwordlessType": 1
+			"passwordlessType": 1,
+			"defaultRedirectURI": "https://example.com/redirect"
 			}`),
 				), iam.LoginPolicyChangedEventMapper),
 			},
@@ -428,7 +437,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9)",
+							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, default_redirect_uri) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (aggregate_id = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -438,6 +447,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								true,
 								domain.PasswordlessTypeAllowed,
 								true,
+								"https://example.com/redirect",
 								"agg-id",
 							},
 						},

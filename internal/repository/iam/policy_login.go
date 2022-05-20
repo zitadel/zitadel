@@ -29,6 +29,7 @@ func NewLoginPolicyAddedEvent(
 	hidePasswordReset,
 	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		LoginPolicyAddedEvent: *policy.NewLoginPolicyAddedEvent(
@@ -42,7 +43,8 @@ func NewLoginPolicyAddedEvent(
 			forceMFA,
 			hidePasswordReset,
 			ignoreUnknownUsernames,
-			passwordlessType),
+			passwordlessType,
+			defaultRedirectURI),
 	}
 }
 

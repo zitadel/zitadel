@@ -17,6 +17,7 @@ func addLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.Logi
 		PasswordlessType:       policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
 		HidePasswordReset:      p.HidePasswordReset,
 		IgnoreUnknownUsernames: p.IgnoreUnknownUsernames,
+		DefaultRedirectURI:     p.DefaultRedirectUri,
 	}
 }
 
@@ -29,6 +30,7 @@ func updateLoginPolicyToDomain(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *domai
 		PasswordlessType:       policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
 		HidePasswordReset:      p.HidePasswordReset,
 		IgnoreUnknownUsernames: p.IgnoreUnknownUsernames,
+		DefaultRedirectURI:     p.DefaultRedirectUri,
 	}
 }
 

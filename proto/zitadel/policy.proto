@@ -133,6 +133,11 @@ message LoginPolicy {
             description: "defines if unknown username on login screen directly return an error or always display the password screen"
         }
     ];
+    string default_redirect_uri = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
 }
 
 enum SecondFactorType {

@@ -110,7 +110,7 @@ See the policy [here](./SECURITY.md)
 
 ### Passwordless Login
 
-Use our login widget to allow easy and sucure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
+Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
 
 * works on all modern platforms, devices, and browsers
 * phishing resistant alternative

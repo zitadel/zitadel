@@ -1379,7 +1379,9 @@
     "PASSWORDLESSTYPE": {
       "0": "Not allowed",
       "1": "Allowed"
-    }
+    },
+    "DEFAULTREDIRECTURI": "Default Redirect URI",
+    "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)"
   },
   "APP": {
     "LIST": "Applications",

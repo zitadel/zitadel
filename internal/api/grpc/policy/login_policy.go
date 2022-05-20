@@ -19,6 +19,7 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		PasswordlessType:       ModelPasswordlessTypeToPb(policy.PasswordlessType),
 		HidePasswordReset:      policy.HidePasswordReset,
 		IgnoreUnknownUsernames: policy.IgnoreUnknownUsernames,
+		DefaultRedirectUri:     policy.DefaultRedirectURI,
 		Details: &object.ObjectDetails{
 			Sequence:      policy.Sequence,
 			CreationDate:  timestamp_pb.New(policy.CreationDate),

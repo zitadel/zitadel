@@ -3,13 +3,16 @@ package handler
 import (
 	"net/http"
 
+	"github.com/zitadel/logging"
+
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
 const (
-	tmplLogin = "login"
+	tmplLogin  = "login"
+	queryOrgID = "orgID"
 )
 
 type loginData struct {
@@ -24,10 +27,21 @@ func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authReq == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		l.defaultRedirect(w, r)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
+}
+
+func (l *Login) defaultRedirect(w http.ResponseWriter, r *http.Request) {
+	orgID := r.FormValue(queryOrgID)
+	policy, err := l.getLoginPolicy(r, orgID)
+	logging.OnError(err).WithField("orgID", orgID).Error("error loading login policy")
+	redirect := l.zitadelURL
+	if policy != nil && policy.DefaultRedirectURI != "" {
+		redirect = policy.DefaultRedirectURI
+	}
+	http.Redirect(w, r, redirect, http.StatusFound)
 }
 
 func (l *Login) handleLoginName(w http.ResponseWriter, r *http.Request) {

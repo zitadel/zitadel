@@ -2,6 +2,12 @@
   command = "npm run build"
 
 [[redirects]]
+  from = "https://docs.zitadel.ch/docs/legal/*"
+  to = "https://docs.zitadel.com/docs/legal/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/proxy/js/script.js"
   to = "https://plausible.io/js/plausible.js"
   status = 200

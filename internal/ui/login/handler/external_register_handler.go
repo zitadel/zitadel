@@ -58,7 +58,7 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authReq == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		l.defaultRedirect(w, r)
 		return
 	}
 	idpConfig, err := l.getIDPConfigByID(r, data.IDPConfigID)
