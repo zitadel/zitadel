@@ -8,7 +8,7 @@
 
   @include input-theme($theme);
   @include cnsl-label-theme($theme);
-  @include mat.all-component-themes($theme);
+  //   @include mat.all-component-themes($theme);
 
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);

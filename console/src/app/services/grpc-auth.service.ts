@@ -251,6 +251,19 @@ export class GrpcAuthService {
       .then((resp) => resp.toObject());
   }
 
+  public loadMyUser(): void {
+    from(this.getMyUser())
+      .pipe(
+        map((resp) => resp.user),
+        catchError((_) => {
+          return of(undefined);
+        }),
+      )
+      .subscribe((user) => {
+        this.userSubject.next(user);
+      });
+  }
+
   public getMyUser(): Promise<GetMyUserResponse.AsObject> {
     return this.grpcService.auth.getMyUser(new GetMyUserRequest(), null).then((resp) => resp.toObject());
   }

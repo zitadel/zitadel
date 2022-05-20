@@ -29,7 +29,20 @@
 <div class="login-policy-row" *ngIf="loginData">
   <cnsl-form-field class="passwordless-allowed" label="Access Code" required="true">
     <cnsl-label>{{ 'LOGINPOLICY.PASSWORDLESS' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="loginData.passwordlessType">
+    <mat-select
+      [(ngModel)]="loginData.passwordlessType"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
       <mat-option *ngFor="let pt of passwordlessTypes" [value]="pt">
         {{ 'LOGINPOLICY.PASSWORDLESSTYPE.' + pt | translate }}
       </mat-option>
@@ -38,7 +51,7 @@
 </div>
 
 <cnsl-card class="max-card-width">
-  <cnsl-mfa-table
+  <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.MultiFactor"
@@ -55,7 +68,7 @@
         | async) === false
     "
   >
-  </cnsl-mfa-table>
+  </cnsl-factor-table>
 </cnsl-card>
 
 <br />
@@ -64,12 +77,29 @@
 <p class="cnsl-secondary-text">{{ 'MFA.LIST.SECONDFACTORDESCRIPTION' | translate }}</p>
 
 <div *ngIf="loginData" class="login-policy-row">
-  <mat-checkbox card-actions class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.forceMfa">
+  <mat-checkbox
+    card-actions
+    class="login-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    [(ngModel)]="loginData.forceMfa"
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
     {{ 'POLICY.DATA.FORCEMFA' | translate }}
   </mat-checkbox>
 </div>
 <cnsl-card class="max-card-width">
-  <cnsl-mfa-table
+  <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.SecondFactor"
@@ -85,7 +115,7 @@
         | async) === false
     "
   >
-  </cnsl-mfa-table>
+  </cnsl-factor-table>
 </cnsl-card>
 
 <br />
@@ -149,6 +179,17 @@
       matTooltip="{{ 'POLICY.DATA.FORCEMFA_DESC' | translate }}"
       ngDefaultControl
       [(ngModel)]="loginData.allowUsernamePassword"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
     >
       {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate }}
     </mat-checkbox>
@@ -158,7 +199,23 @@
     </cnsl-info-section> -->
   </div>
   <div class="login-policy-row">
-    <mat-checkbox class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.allowRegister">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.allowRegister"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
       {{ 'POLICY.DATA.ALLOWREGISTER' | translate }}
     </mat-checkbox>
 
@@ -169,7 +226,23 @@
     </ng-template> -->
   </div>
   <div class="login-policy-row">
-    <mat-checkbox class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.allowExternalIdp">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.allowExternalIdp"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
       {{ 'POLICY.DATA.ALLOWEXTERNALIDP' | translate }}
     </mat-checkbox>
 
@@ -181,7 +254,23 @@
   </div>
 
   <div class="login-policy-row">
-    <mat-checkbox class="login-policy-toggle" color="primary" ngDefaultControl [(ngModel)]="loginData.hidePasswordReset">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.hidePasswordReset"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
       {{ 'POLICY.DATA.HIDEPASSWORDRESET' | translate }}
     </mat-checkbox>
 
@@ -198,6 +287,17 @@
       color="primary"
       ngDefaultControl
       [(ngModel)]="loginData.ignoreUnknownUsernames"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
     >
       {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate }}
     </mat-checkbox>
@@ -206,7 +306,22 @@
   <div class="login-policy-row">
     <cnsl-form-field class="form-field" label="Access Code" required="true">
       <cnsl-label>{{ 'POLICY.DATA.DEFAULTREDIRECTURI' | translate }}</cnsl-label>
-      <input cnslInput placeholder="https://" [(ngModel)]="loginData.defaultRedirectUri" />
+      <input
+        cnslInput
+        placeholder="https://"
+        [(ngModel)]="loginData.defaultRedirectUri"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+              ? 'policy.write'
+              : ''
+          ]
+            | hasRole
+            | async) === false
+        "
+      />
     </cnsl-form-field>
   </div>
 </div>
@@ -214,7 +329,24 @@
 <br />
 
 <div class="login-policy-btn-container">
-  <button class="login-policy-save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+  <button
+    class="login-policy-save-button"
+    (click)="savePolicy()"
+    color="primary"
+    type="submit"
+    mat-raised-button
+    [disabled]="
+      ([
+        serviceType === PolicyComponentServiceType.ADMIN
+          ? 'iam.policy.write'
+          : serviceType === PolicyComponentServiceType.MGMT
+          ? 'policy.write'
+          : ''
+      ]
+        | hasRole
+        | async) === false
+    "
+  >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>
