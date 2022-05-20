@@ -26,5 +26,5 @@ func (l *Login) getLoginPolicy(r *http.Request, orgID string) (*query.LoginPolic
 	if orgID == "" {
 		return l.query.DefaultLoginPolicy(r.Context())
 	}
-	return l.query.LoginPolicyByID(r.Context(), orgID)
+	return l.query.LoginPolicyByID(r.Context(), false, orgID)
 }
