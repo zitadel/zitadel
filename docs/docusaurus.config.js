@@ -132,13 +132,17 @@ module.exports = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} ZITADEL - Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     algolia: {
-      appId: "8H6ZKXENLO",
-      apiKey: "c3899716db098111f5e89c8987b9c427",
-      indexName: "zitadel",
-    },
+      appId: "1FD5EU44EF",
+      apiKey: "2ddc6c35930ec608baf832bf07b5e150",
+      siteId: '13929a6d-0c07-4205-af9b-42121333ec5d',
+      branch: 'v2-alpha-readme',
+      indexName: 'netlify_13929a6d-0c07-4205-af9b-42121333ec5d_v2-alpha-readme_all',
+      contextualSearch: false,
+      selector: 'div#'
+  },
     prism: {
       additionalLanguages: ["csharp", "dart", "groovy"],
     },
@@ -149,7 +153,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
+          editUrl: "https://github.com/zitadel/zitadel/edit/v2-alpha/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {
