@@ -41,6 +41,7 @@ type ProjectionHandler struct {
 	requeueAfter time.Duration
 	shouldBulk   *time.Timer
 	blukMu       sync.Mutex
+	bulkLocked   bool
 	execBulk     executeBulk
 
 	retryFailedAfter time.Duration
@@ -135,7 +136,11 @@ func (h *ProjectionHandler) Process(
 			h.triggerShouldPush(0)
 		case <-h.shouldBulk.C:
 			h.blukMu.Lock()
-			defer h.blukMu.Unlock()
+			h.bulkLocked = true
+			defer func() {
+				h.bulkLocked = false
+				h.blukMu.Unlock()
+			}()
 			h.bulk(ctx, lock, unlock)
 			h.ResetShouldBulk()
 		default:
@@ -155,7 +160,11 @@ func (h *ProjectionHandler) Process(
 				h.triggerShouldPush(0)
 			case <-h.shouldBulk.C:
 				h.blukMu.Lock()
-				defer h.blukMu.Unlock()
+				h.bulkLocked = true
+				defer func() {
+					h.bulkLocked = false
+					h.blukMu.Unlock()
+				}()
 				h.bulk(ctx, lock, unlock)
 				h.ResetShouldBulk()
 			case <-h.shouldPush.C:
@@ -199,13 +208,16 @@ func (h *ProjectionHandler) TriggerBulk(
 	}
 	defer h.ResetShouldBulk()
 
-	if !h.blukMu.TryLock() {
+	if h.bulkLocked {
 		h.blukMu.Lock()
 		logging.WithFields("projection", h.ProjectionName).Debugf("waiting for existing bulk to finish")
 		h.blukMu.Unlock()
 		return nil
 	}
-	defer h.blukMu.Unlock()
+	defer func() {
+		h.bulkLocked = false
+		h.blukMu.Unlock()
+	}()
 
 	return h.bulk(ctx, lock, unlock)
 }
