@@ -116,7 +116,7 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectChangesResponse{
-		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
@@ -302,7 +302,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
-		Result: member_grpc.MembersToPb(s.assetAPIPrefix, members.Members),
+		Result: member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
 		Details: object_grpc.ToListDetails(
 			members.Count,
 			members.Sequence,
