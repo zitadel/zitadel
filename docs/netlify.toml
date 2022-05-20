@@ -2,8 +2,8 @@
   command = "npm run build"
 
 [[redirects]]
-  from = "https://zitadel.ch/docs/legal/"
-  to = "https://zitadel.com/docs/legal/:splat"
+  from = "https://docs.zitadel.ch/docs/legal/*"
+  to = "https://docs.zitadel.com/docs/legal/:splat"
   status = 301
   force = true
 
