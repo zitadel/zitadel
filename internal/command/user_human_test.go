@@ -2808,7 +2808,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Username:          "username",
 					PreferredLanguage: language.English,
 					Email: Email{
-						Address: "support@zitadel.ch",
+						Address: "support@zitadel.com",
 					},
 				},
 			},
@@ -2824,7 +2824,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Username:          "username",
 					PreferredLanguage: language.English,
 					FirstName:         "hurst",
-					Email:             Email{Address: "support@zitadel.ch"},
+					Email:             Email{Address: "support@zitadel.com"},
 				},
 			},
 			want: Want{
@@ -2836,7 +2836,7 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email:             Email{Address: "support@zitadel.ch"},
+					Email:             Email{Address: "support@zitadel.com"},
 					PreferredLanguage: language.English,
 					FirstName:         "gigi",
 					LastName:          "giraffe",
@@ -2880,7 +2880,7 @@ func TestAddHumanCommand(t *testing.T) {
 			args: args{
 				a: agg,
 				human: &AddHuman{
-					Email:             Email{Address: "support@zitadel.ch", Verified: true},
+					Email:             Email{Address: "support@zitadel.com", Verified: true},
 					PreferredLanguage: language.English,
 					FirstName:         "gigi",
 					LastName:          "giraffe",
@@ -2930,7 +2930,7 @@ func TestAddHumanCommand(t *testing.T) {
 							"gigi giraffe",
 							language.English,
 							0,
-							"support@zitadel.ch",
+							"support@zitadel.com",
 							true,
 						)
 						event.AddPasswordData(&crypto.CryptoValue{

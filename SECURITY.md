@@ -12,7 +12,7 @@ At ZITADEL we are extremely grateful for security aware people who disclose vuln
 
 ## Reporting a vulnerability
 
-To file an incident, please disclose it by e-mail to security@zitadel.ch including the  details of the vulnerability.
+To file an incident, please disclose it by e-mail to security@zitadel.com including the  details of the vulnerability.
 
 At the moment GPG encryption is no yet supported, however you may sign your message at will.
 
