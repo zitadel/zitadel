@@ -51,7 +51,19 @@ dockers:
   - "--platform=linux/arm64"
 
 archives:
-- format: binary
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+    - goos: windows
+      format: zip
+    files:
+      - README.md
+      - LICENSE
 
 gomod:
   proxy: false
@@ -84,10 +96,6 @@ brews:
     - name: git
     install: |-
       bin.install "zitadel"
-      bash_completion.install "completions/zitadel.bash" => "zitadel"
-      zsh_completion.install "completions/zitadel.zsh" => "zitadel"
-      fish_completion.install "completions/gorezitadelleaser.fish"
-      man1.install "manpages/zitadel.1.gz"
 
 announce:
   discord:

@@ -16,8 +16,19 @@ export ZITADEL_EXTERNALDOMAIN=localhost
 export ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
 export MY_ARCHITECTURE="arm64"
 
-# Download the zitadel binary
+# Download and Install ZITADEL
+
+Either use `Homebrew`  ...
+
+```bash
+brew install zitadel/tap/zitadel
+```
+
+... or download the binary from GitHub
+
+```bash
 curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.3 | grep "browser_download_url.*zitadel_.*_darwin_${MY_ARCHITECTURE}" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadel && sudo chmod +x /usr/local/bin/zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+```
 
 # Run the database and application containers
 zitadel admin start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
