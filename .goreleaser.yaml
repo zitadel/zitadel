@@ -85,7 +85,7 @@ brews:
       token: "{{ .Env.GORELEASER_TOKEN_TAP }}"
     folder: Formula
     goarm: "7"
-    homepage:  https://zitadel.ch
+    homepage:  https://zitadel.com
     description: Open source identity solution built for the container and cloud era
     license: Apache 2.0
     test: |
