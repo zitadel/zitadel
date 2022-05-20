@@ -482,116 +482,52 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.requestRedirectValuesSubject$.next();
     if (this.oidcForm.valid) {
       if (this.app.oidcConfig) {
+        //   configuration
         this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
         this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
         this.app.oidcConfig.appType = this.appType?.value;
         this.app.oidcConfig.authMethodType = this.authMethodType?.value;
+
+        // token
+        this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
+        this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
+        this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
+        this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
+
+        // redirects
         this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
         this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
         this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
         this.app.oidcConfig.devMode = this.devMode?.value;
-        this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
-        this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
 
         const req = new UpdateOIDCAppConfigRequest();
         req.setProjectId(this.projectId);
         req.setAppId(this.app.id);
-        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
+
+        // configuration
         req.setResponseTypesList(this.app.oidcConfig.responseTypesList);
-        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
         req.setAuthMethodType(this.app.oidcConfig.authMethodType);
-        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
         req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
         req.setAppType(this.app.oidcConfig.appType);
-        req.setDevMode(this.app.oidcConfig.devMode);
 
-        this.mgmtService
-          .updateOIDCAppConfig(req)
-          .then(() => {
-            if (this.app.oidcConfig) {
-              const config = { oidc: this.app.oidcConfig };
-              this.currentAuthMethod = this.authMethodFromPartialConfig(config);
-            }
-            this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    }
-  }
-
-  public saveOIDCTokenSettings(): void {
-    if (this.oidcTokenForm.valid) {
-      if (this.app.oidcConfig) {
-        this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
-        this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
-
-        const req = new UpdateOIDCAppConfigRequest();
-        req.setProjectId(this.projectId);
-        req.setAppId(this.app.id);
-        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
-        req.setResponseTypesList(this.app.oidcConfig.responseTypesList);
-        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
-        req.setAuthMethodType(this.app.oidcConfig.authMethodType);
-        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
-        req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
-        req.setAppType(this.app.oidcConfig.appType);
-        req.setDevMode(this.app.oidcConfig.devMode);
+        // token
         req.setAccessTokenType(this.app.oidcConfig.accessTokenType);
         req.setAccessTokenRoleAssertion(this.app.oidcConfig.accessTokenRoleAssertion);
         req.setIdTokenRoleAssertion(this.app.oidcConfig.idTokenRoleAssertion);
         req.setIdTokenUserinfoAssertion(this.app.oidcConfig.idTokenUserinfoAssertion);
+
+        // redirects
+        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
+        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
+        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
+        req.setDevMode(this.app.oidcConfig.devMode);
+
         if (this.clockSkewSeconds?.value) {
           const dur = new Duration();
           dur.setSeconds(Math.floor(this.clockSkewSeconds?.value));
           dur.setNanos(Math.floor(this.clockSkewSeconds?.value % 1) * 10000);
           req.setClockSkew(dur);
         }
-        this.mgmtService
-          .updateOIDCAppConfig(req)
-          .then(() => {
-            if (this.app.oidcConfig) {
-              const config = { oidc: this.app.oidcConfig };
-              this.currentAuthMethod = this.authMethodFromPartialConfig(config);
-            }
-            this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    }
-  }
-
-  public saveOIDCRedirects(): void {
-    this.requestRedirectValuesSubject$.next();
-    if (this.oidcForm.valid) {
-      if (this.app.oidcConfig) {
-        this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
-        this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
-        this.app.oidcConfig.appType = this.appType?.value;
-        this.app.oidcConfig.authMethodType = this.authMethodType?.value;
-        this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
-        this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
-        this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
-        this.app.oidcConfig.devMode = this.devMode?.value;
-        this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
-        this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
-        this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
-
-        const req = new UpdateOIDCAppConfigRequest();
-        req.setProjectId(this.projectId);
-        req.setAppId(this.app.id);
-        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
-        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
-        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
-        req.setDevMode(this.app.oidcConfig.devMode);
 
         this.mgmtService
           .updateOIDCAppConfig(req)

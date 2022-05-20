@@ -1719,8 +1719,8 @@
     "TOAST": {
       "REACTIVATED": "Applicazione riattivata.",
       "DEACTIVATED": "Applicazione disattivata.",
-      "OIDCUPDATED": "Configurazione OIDC aggiornata.",
-      "APIUPDATED": "Configurazione API aggiornata",
+      "OIDCUPDATED": "Applicazione aggiornata",
+      "APIUPDATED": "Applicazione aggiornata",
       "UPDATED": "App aggiornata.",
       "CREATED": "App creata.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",

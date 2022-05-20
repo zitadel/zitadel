@@ -157,7 +157,7 @@
 
         <ng-container *ngIf="currentSetting === 'token'">
           <cnsl-card *ngIf="oidcTokenForm && app?.oidcConfig" title=" {{ 'APP.OIDC.TOKENSECTIONTITLE' | translate }}">
-            <form [formGroup]="oidcTokenForm" (ngSubmit)="saveOIDCTokenSettings()">
+            <form [formGroup]="oidcTokenForm" (ngSubmit)="saveOIDCApp()">
               <cnsl-form-field appearance="outline" class="app-formfield">
                 <cnsl-label>{{ 'APP.OIDC.TOKENTYPE' | translate }}</cnsl-label>
                 <mat-select formControlName="accessTokenType">
@@ -301,13 +301,7 @@
             </cnsl-redirect-uris>
 
             <div class="btn-container">
-              <button
-                class="submit-button"
-                color="primary"
-                (click)="saveOIDCRedirects()"
-                [disabled]="!canWrite"
-                mat-raised-button
-              >
+              <button class="submit-button" color="primary" (click)="saveOIDCApp()" [disabled]="!canWrite" mat-raised-button>
                 {{ 'ACTIONS.SAVE' | translate }}
               </button>
             </div>
@@ -329,13 +323,7 @@
             </cnsl-additional-origins>
 
             <div class="btn-container">
-              <button
-                class="submit-button"
-                (click)="saveOIDCRedirects()"
-                color="primary"
-                [disabled]="!canWrite"
-                mat-raised-button
-              >
+              <button class="submit-button" (click)="saveOIDCApp()" color="primary" [disabled]="!canWrite" mat-raised-button>
                 {{ 'ACTIONS.SAVE' | translate }}
               </button>
             </div>

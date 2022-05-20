@@ -44,11 +44,6 @@
     flex-direction: column;
     margin: 0 -0.5rem;
 
-    @media only screen and (min-width: 500px) {
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
-
     .app-info-wrapper {
       display: flex;
       flex-direction: column;
@@ -77,6 +72,7 @@
         flex-direction: column;
         width: 100%;
         align-items: stretch;
+        margin-bottom: 0.5rem;
 
         button {
           transition: opacity 0.15s ease-in-out;
@@ -109,9 +105,27 @@
     }
   }
 
+  .compliance {
+    padding-bottom: 1rem;
+    padding-top: 0.5rem;
+    border-bottom: 1px solid $divider-color;
+
+    .compliance-title {
+      margin: 1rem 0 1rem 0;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .problem {
+      font-size: 14px;
+      margin: 0 0 0.5rem 0;
+      display: block;
+    }
+  }
+
   .app-main-content {
-    border-top: 1px solid $divider-color;
-    margin-top: 1.5rem;
+    margin-top: 0.5rem;
 
     .current-auth-method {
       display: flex;
@@ -138,19 +152,6 @@
         margin-left: 1rem;
       }
     }
-  }
-}
-
-.compliance {
-  .compliance-title {
-    margin: 1rem 0 1rem 0;
-    font-size: 16px;
-  }
-
-  .problem {
-    font-size: 14px;
-    margin: 0 0 0.5rem 0;
-    display: block;
   }
 }
 
