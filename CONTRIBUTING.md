@@ -1,18 +1,4 @@
-# How to contribute to ZITADEL
-
-## Did you find a bug?
-
-Please file an issue [here](https://github.com/zitadel/zitadel/issues/new?assignees=&labels=bug&template=bug_report.md&title=).
-
-Bugs are evaluated every day as soon as possible.
-
-## Enhancement
-
-Do you miss a feature? Please file an issue [here](https://github.com/zitadel/zitadel/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
-
-Enhancements are discussed and evaluated every Wednesday by the ZITADEL core team.
-
-## Grab an Issuesa# Contributing to ZITADEL
+# Contributing to ZITADEL
 
 ## Introduction
 
@@ -20,7 +6,7 @@ Thank you for your interest about how to contribute! As you might know there is 
 
 Please give us and our community the chance to get rid of security vularbilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
 
-The strongest part of a community is the possibility to share thoughts. That's why we give try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
+The strongest part of a community is the possibility to share thoughts. That's why we try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
 If you want to give an answer or be part of discussion please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
 
@@ -39,7 +25,7 @@ Help shaping the future of ZITADEL by
 [Contribute](#how-to-contribute)
 
 - [Code](#contribute-code)
-- If you found a mistake on our [docs page](https://docs.zitadel.ch) or something is missing please read [the docs section](#contribute-docs)
+- If you found a mistake on our [docs page](https://docs.zitadel.com) or something is missing please read [the docs section](#contribute-docs)
 
 Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
