@@ -1,16 +1,31 @@
-<img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
-<img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
+<p align="center">
+    <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" height="200px" width="auto" />
+    <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" height="200px" width="auto" />
+</p>
 
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Release](https://github.com/zitadel/zitadel/actions/workflows/zitadel.yml/badge.svg)](https://github.com/zitadel/zitadel/actions)
-[![license](https://badgen.net/github/license/zitadel/zitadel/)](https://github.com/zitadel/zitadel/blob/main/LICENSE)
-[![release](https://badgen.net/github/release/zitadel/zitadel/stable)](https://github.com/zitadel/zitadel/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/zitadel/zitadel)](https://goreportcard.com/report/github.com/zitadel/zitadel)
-[![codecov](https://codecov.io/gh/zitadel/zitadel/branch/main/graph/badge.svg)](https://codecov.io/gh/zitadel/zitadel)
-[![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)  
-[![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
+<p align="center">
+    <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
+        <img src="https://badgen.net/github/contributors/zitadel/zitadel" /></a>
+    <a href="https://github.com/semantic-release/semantic-release" alt="semantic-release">
+        <img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" /></a>
+    <a href="https://github.com/zitadel/zitadel/actions" alt="ZITADEL Release">
+        <img src="https://github.com/zitadel/zitadel/actions/workflows/zitadel.yml/badge.svg" /></a>
+    <a href="https://github.com/zitadel/zitadel/blob/main/LICENSE" alt="License">
+        <img src="https://badgen.net/github/license/zitadel/zitadel/" /></a>
+    <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
+        <img src="https://badgen.net/github/release/zitadel/zitadel/stable" /></a>
+    <a href="https://goreportcard.com/report/github.com/zitadel/zitadel" alt="Go Report Card">
+        <img src="https://goreportcard.com/badge/github.com/zitadel/zitadel" /></a>
+    <a href="https://codecov.io/gh/zitadel/zitadel" alt="Code Coverage">
+        <img src="https://codecov.io/gh/zitadel/zitadel/branch/main/graph/badge.svg" /></a>
+    <a href="https://discord.gg/erh5Brh7jE" alt="Discord Chat">
+        <img src="https://badgen.net/discord/online-members/erh5Brh7jE" /></a>
+</p>
 
----
+<p align="center">
+    <a href="https://openid.net/certification/#OPs" alt="OpenID Connect Certified">
+        <img src="./docs/static/logos/oidc-cert.png" /></a>
+</p>
 
 ZITADEL is the modern open* alternative for Auth0, Firebase Auth, AWS Cognito as well as Keycloak built for the container and serverless era.
 
@@ -19,6 +34,10 @@ We provide a wide range of out of the box features like secure login, self-servi
 With ZITADEL you rely on a battle tested, hardened and extensible turnkey solution to solve all of your authentication and authorization needs. With the unique way of how ZITADEL stores data it gives you an unlimited audit trail which provides a peace of mind for even the harshest audit and analytics requirements.
 
 <!-- TODO: Insert Video here-->
+
+---
+
+**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://docs.zitadel.ch/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
 
 ## Get started
 
@@ -84,10 +103,6 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 
 Details about how to contribute you can find in the [Contribution Guide](./CONTRIBUTING.md)
 
-## Security
-
-See the policy [here](./SECURITY.md)
-
 ## Showcase
 
 <!-- TODO: Replace Images-->
@@ -125,6 +140,10 @@ We try to distinguishing the environments from which events come from. As enviro
 Besides from errors that don't clearly come from misconfiguration or cli misuage, we send an inital event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
 
 We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
+
+## Security
+
+See the policy [here](./SECURITY.md)
 
 ## License
 
