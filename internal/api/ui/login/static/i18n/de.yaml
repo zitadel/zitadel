@@ -64,7 +64,7 @@ InitPasswordDone:
 
 InitUser:
   Title: User aktivieren
-  Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine EMail zu verifizieren und ein neues Passwort zu setzen.
+  Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine E-Mail zu verifizieren und ein neues Passwort zu setzen.
   CodeLabel: Code
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort bestätigen
@@ -73,7 +73,7 @@ InitUser:
 
 InitUserDone:
   Title: User aktiviert
-  Description: EMail verifiziert und Passwort erfolgreich gesetzt
+  Description: E-Mail verifiziert und Passwort erfolgreich gesetzt
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
