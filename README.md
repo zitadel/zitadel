@@ -64,7 +64,7 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore)
 - [Actions](https://docs.zitadel.ch/docs/concepts/features/actions) to react on events with custom code
 - [Branding](https://docs.zitadel.com/docs/guides/customization/branding) for a uniform user experience
-- [Cockroach database](https://www.cockroachlabs.com/) is the only dependency
+- [CockroachDB](https://www.cockroachlabs.com/) is the only dependency
 
 ## Features
 
@@ -80,8 +80,10 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 - Self-registration including verification
 - User self service
 - [Service Accounts](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
+- [OpenID Connect certified](https://openid.net/certification/#OPs)
+- 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
 
-### Client libraries
+## Client libraries
 
 <!-- TODO: check other libraries -->
 
@@ -102,6 +104,14 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 ## How To Contribute
 
 Details about how to contribute you can find in the [Contribution Guide](./CONTRIBUTING.md)
+
+## Contributors
+
+<a href="https://github.com/zitadel/zitadel/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=zitadel/zitadel" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## Showcase
 
