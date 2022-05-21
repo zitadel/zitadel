@@ -1,5 +1,5 @@
 Errors:
-  Internal: An internal error occured
+  Internal: An internal error occurred
   NoChangesFound: No changes
   OriginNotAllowed: This "Origin" is not allowed
   IDMissing: ID missing
@@ -29,7 +29,7 @@ Errors:
   Limit:
     ExceedsDefault: Limit exceeds default limit
   Language:
-    NotParsed: Could not parse languge
+    NotParsed: Could not parse language
   OIDCSettings:
     NotFound: OIDC Configuration not found
     AlreadyExists: OIDC configuration already exists
@@ -40,18 +40,18 @@ Errors:
   SMSConfig:
     NotFound: SMS configuration not found
     AlreadyActive: SMS configuration already active
-    AlreadyDeactivated: SMS configuration already deactived
+    AlreadyDeactivated: SMS configuration already deactivated
   SMTPConfig:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
-    SenderAdressNotCustomDomain: The sender adress must be configured as custom domain on the instance.
+    SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
   Notification:
     NoDomain: No Domain found for message
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists
-    NotFoundOnOrg: User could not be found on chosen organisation
-    NotAllowedOrg: User is no member of the required organisation
+    NotFoundOnOrg: User could not be found on chosen organization
+    NotAllowedOrg: User is no member of the required organization
     UserIDMissing: User ID missing
     DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
@@ -60,9 +60,9 @@ Errors:
     AlreadyInactive: User already inactive
     NotInactive: User is not inactive
     CantDeactivateInitial: User with state initial can only be deleted not deactivated
-    ShouldBeActiveOrInitial: User is not active or inital
-    AlreadyInitialised: User is already initialised
-    NotInitialised: User is not yet initialised
+    ShouldBeActiveOrInitial: User is not active or initial
+    AlreadyInitialised: User is already initialized
+    NotInitialised: User is not yet initialized
     NotLocked: User is not locked
     NoChanges: No changes found
     InitCodeNotFound: Initialization Code not found
@@ -74,7 +74,7 @@ Errors:
     Email:
       NotFound: Email not found
       Invalid: Email is invalid
-      AlreadyVerified: Email is alredy verified
+      AlreadyVerified: Email is already verified
       NotChanged: Email not changed
     Phone:
       NotFound: Phone not found
@@ -115,8 +115,8 @@ Errors:
       HasSymbol: Password must contain symbol
     ExternalIDP:
       Invalid: Externer IDP invalid
-      IDPConfigNotExisting: IDP provider invalid for this organisation
-      NotAllowed: External IDP not allowed on this organisation
+      IDPConfigNotExisting: IDP provider invalid for this organization
+      NotAllowed: External IDP not allowed on this organization
       MinimumExternalIDPNeeded: At least one IDP must be added
       AlreadyExists: External IDP already taken
       NotFound: External IDP not found
@@ -143,16 +143,16 @@ Errors:
       Invalid: Refresh Token is invalid
       NotFound: Refresh Token not found
   Org:
-    AlreadyExists: Organisationname already taken
+    AlreadyExists: Organisation's name already taken
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
-    AlreadyActive: Organisation is already ative
+    AlreadyActive: Organisation is already active
     Empty: Organisation is empty
     NotFound: Organisation not found
     NotChanged: Organisation not changed
     InvalidDomain: Invalid domain
     DomainMissing: Domain missing
-    DomainNotOnOrg: Domain doesn't exist on organisation
+    DomainNotOnOrg: Domain doesn't exist on organization
     DomainNotVerified: Domain is not verified
     DomainAlreadyVerified: Domain is already verified
     DomainVerificationTypeInvalid: Domain verification type is invalid
@@ -161,10 +161,10 @@ Errors:
     PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
     MemberIDMissing: Member ID missing
-    MemberNotFound: Organisations member not found
+    MemberNotFound: Organisation member not found
     InvalidMember: Organisation member is invalid
     UserIDMissing: User ID missing
-    PolicyAlreadyExists: Policy alredy exists
+    PolicyAlreadyExists: Policy already exists
     PolicyNotExisting: Policy doesn't exist
     IdpInvalid: IDP configuration is invalid
     IdpNotExisting: IDP configuration does not exist
@@ -219,7 +219,7 @@ Errors:
       AlreadyExists: Org IAM Policy already exists
   Project:
     ProjectIDMissing: Project Id missing
-    AlreadyExists: Project already exists on organisation
+    AlreadyExists: Project already exists on organization
     OrgNotExisting: Organisation doesn't exist
     UserNotExisting: User doesn't exist
     CouldNotGenerateClientSecret: Could not generate client secret
@@ -271,8 +271,8 @@ Errors:
     MemberAlreadyExisting: Member already exists
     MemberNotExisting: Member does not exist
     IDMissing: Id missing
-    GlobalOrgMissing: Global organisation missing
-    GlobalOrgAlreadySet: Global organisation has already been set
+    GlobalOrgMissing: Global organization missing
+    GlobalOrgAlreadySet: Global organization has already been set
     IAMProjectIDMissing: IAM project id missing
     IamProjectAlreadySet: IAM project id has already been set
     IdpInvalid: IDP configuration is invalid
@@ -285,7 +285,7 @@ Errors:
     LoginPolicy:
       NotFound: Default Login Policy not found
       NotChanged: Default Login Policy has not been changed
-      NotExisting: Default Login Policy not existig
+      NotExisting: Default Login Policy not existing
       AlreadyExists: Default Login Policy already exists
       RedirectURIInvalid: Default Redirect URI is invalid
       MFA:
@@ -409,7 +409,7 @@ Errors:
     ActionIDsNotExist: ActionIDs do not exist
   Query:
     CloseRows: SQL Statement could not be finished
-    SQLStatement: SQL Statement coud not be created
+    SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
 EventTypes:
   user:
@@ -417,11 +417,11 @@ EventTypes:
     selfregistered: User registered himself
     initialization:
       code:
-        added: Initialisation code generated
-        sent: Initialisation code sent
+        added: Initialization code generated
+        sent: Initialization code sent
       check:
-        succeeded: Initialisation check succeded
-        failed: Initialisation check failed
+        succeeded: Initialization check succeeded
+        failed: Initialization check failed
     token:
       added: Access Token created
     username:
@@ -451,11 +451,11 @@ EventTypes:
         removed: Avatar removed
       initialization:
         code:
-          added: Initialisation code generated
-          sent: Initialisation code sent
+          added: Initialization code generated
+          sent: Initialization code sent
         check:
-          succeeded: Initialisation check succeded
-          failed: Initialisation check failed
+          succeeded: Initialization check succeeded
+          failed: Initialization check failed
       username:
         reserved: Username reserved
         released: Username released
@@ -517,7 +517,7 @@ EventTypes:
             signcount:
               changed: Checksum of the Multifactor U2F Token has been changed
         init:
-          skipped: Multifactor initialisation skipped
+          skipped: Multifactor initialization skipped
       passwordless:
         token:
           added: Token for Passwordless Login added
@@ -532,12 +532,12 @@ EventTypes:
             changed: Checksum of the Passwordless Login Token has been changed
         initialization:
           code:
-            added: Passwordless initialisation code added
-            sent: Passwordless initialisation code sent
-            requested: Passwordless initialisation code requested
+            added: Passwordless initialization code added
+            sent: Passwordless initialization code sent
+            requested: Passwordless initialization code requested
             check:
-              succeeded: Passwordless initialisation code successfuly checked
-              failed: Passwordless initialisation code check failed
+              succeeded: Passwordless initialization code successfully checked
+              failed: Passwordless initialization code check failed
       signed:
         out: User signed out
       refresh:
@@ -579,7 +579,7 @@ EventTypes:
           succeeded: Multifactor OTP check succeeded
           failed: Multifactor OTP check failed
       init:
-        skipped: Multifactor initialisation skipped
+        skipped: Multifactor initialization skipped
     signed:
       out: User signed out
     grant:
@@ -880,7 +880,7 @@ Application:
       Code:
         RedirectUris:
           HttpOnlyForWeb: Grant type code only allowed http redirect uris for apptype web.
-          CustomOnlyForNative: Grant type code only allowes custom redirect uris for apptype native  (e.g appname:// )
+          CustomOnlyForNative: Grant type code only allows custom redirect uris for apptype native  (e.g appname:// )
       Implicit:
         RedirectUris:
           CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
