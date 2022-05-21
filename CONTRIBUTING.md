@@ -86,8 +86,8 @@ docker build -f build/grpc/Dockerfile -t zitadel-base:local . \
 
 We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
 
-* [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-* [All issues](https://github.com/zitadel/zitadel/issues)
+- [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- [All issues](https://github.com/zitadel/zitadel/issues)
 
 ### Make a PR
 
@@ -95,9 +95,9 @@ If you like to contribute fork the ZITADEL repository. After you implemented the
 
 Make sure you use semantic release:
 
-* feat: New Feature
-* fix: Bug Fix
-* docs: Documentation
+- feat: New Feature
+- fix: Bug Fix
+- docs: Documentation
 
 ## Want to start ZITADEL?
 
@@ -106,4 +106,4 @@ You can find an installation guide for all the different environments here:
 
 ## **Did you find a security flaw?**
 
-* Please read [Security Policy](./SECURITY.md).
+- Please read [Security Policy](./SECURITY.md).
