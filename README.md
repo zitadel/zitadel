@@ -138,7 +138,7 @@ ZITADEL components send errors and usage data to CAOS Ltd., so that we are able 
 
 We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
 
-Besides from errors that don't clearly come from misconfiguration or cli misuage, we send an inital event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
+Besides from errors that don't clearly come from misconfiguration or cli misusage, we send an initial event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
 
 We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
 
