@@ -29,7 +29,6 @@
 
 You want auth that's quickly set up like Auth0 but open source like Keycloak? Look no further— ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
 
-
 We provide a wide range of out of the box features like secure login, self-service, OpenID Connect, OAuth2.x, SAML2, branding, Passwordless with FIDO2, OTP, U2F, and an unlimited audit trail to improve the life of developers. Especially noteworthy is that ZITADEL supports not only B2C and B2E scenarios but also B2B. This is super useful for people who build B2B Solutions, as ZITADEL can handle all the delegated user and access management.
 
 With ZITADEL you rely on a battle tested, hardened and extensible turnkey solution to solve all of your authentication and authorization needs. With the unique way of how ZITADEL stores data it gives you an unlimited audit trail which provides a peace of mind for even the harshest audit and analytics requirements.
@@ -122,10 +121,10 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
 
-* works on all modern platforms, devices, and browsers
-* phishing resistant alternative
-* requires only one gesture by the user
-* easy [enrollment](https://docs.zitadel.com/docs/manuals/user-factors) of the device during registration
+- works on all modern platforms, devices, and browsers
+- phishing resistant alternative
+- requires only one gesture by the user
+- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-factors) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 
@@ -148,7 +147,7 @@ ZITADEL components send errors and usage data to CAOS Ltd., so that we are able 
 
 We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
 
-Besides from errors that don't clearly come from misconfiguration or cli misuage, we send an inital event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
+Besides from errors that don't clearly come from misconfiguration or cli misusage, we send an initial event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
 
 We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
 

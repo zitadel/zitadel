@@ -15,8 +15,8 @@ import (
 func New() *cobra.Command {
 	adminCMD := &cobra.Command{
 		Use:   "admin",
-		Short: "The ZITADEL admin CLI let's you interact with your instance",
-		Long:  `The ZITADEL admin CLI let's you interact with your instance`,
+		Short: "The ZITADEL admin CLI lets you interact with your instance",
+		Long:  `The ZITADEL admin CLI lets you interact with your instance`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return errors.New("no additional command provided")
 		},
