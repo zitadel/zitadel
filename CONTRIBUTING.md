@@ -4,7 +4,7 @@
 
 Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
 
-Please give us and our community the chance to get rid of security vularbilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
+Please give us and our community the chance to get rid of security vulnerabilities by responsibly disclose this kind of issues by contacting [security@zitadel.com](mailto:security@zitadel.com).
 
 The strongest part of a community is the possibility to share thoughts. That's why we try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/zitadel/zitadel/issues) and [discussions](https://github.com/zitadel/zitadel/discussions) section here or in our [chat](https://zitadel.com/chat), but we understand your doubts and provide further contact options [here](https://zitadel.com/contact).
 
@@ -31,13 +31,13 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 ## How to contribute
 
-We strongly recomend to talk to us before you start contributing to streamline our and your work.
+We strongly recommend to talk to us before you start contributing to streamline our and your work.
 
 We accept contributions through pull requests. You need a github account for that. If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork). Please draft the pull request as soon as possible. Go through the following checklist before you submit the final pull request:
 
 1. Create a feature branch from the `main`-branch
 1. Make your changes on the new branch
-1. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the lastet commit of the `main`-branch
+1. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `main`-branch
 1. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request correct tagging is required and will be requested by the reviewers.
 1. Request a [review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from one of the authors. The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
 
@@ -48,7 +48,7 @@ The code consists of the following parts:
 | name | description | language | where to find |
 |---|---|---|---|
 | backend | Service that serves the grpc(-web) and RESTful API  | [go](https://go.dev) | [API implementation](./internal/api/grpc) |
-| console | Frontend the user inertacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) |
+| console | Frontend the user interacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) |
 | login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) |
 | API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) |
 | docs | Project documentation made with docusaurus | [Docusaurus](https://docusaurus.io/) | [./docs](./docs) |
@@ -57,7 +57,7 @@ Please validate and test the code before you contribute.
 
 ### Backend / Login
 
-To keep the code clean and understandable we use [golangci-lint](https://golangci-lint.run). We recommend to format the code with this linter while working on ZITADEL to simplify the review process. The configuration is locaed [here](./.golangci.yaml).
+To keep the code clean and understandable we use [golangci-lint](https://golangci-lint.run). We recommend to format the code with this linter while working on ZITADEL to simplify the review process. The configuration is located [here](./.golangci.yaml).
 
 To start the backend with a debugger run the [`main.go`-file](./main.go) located in the root of ZITADEL and provide the arguments and env-variables from below. Ensure that the database is running by running `docker compose -f ./build/local/docker-compose.yml up db`. For additional information please use the documentation of your IDE.
 
@@ -71,7 +71,7 @@ TODO document workflow
 
 ### API Definitions
 
-Ensure the provided code meets the [offical style guide](https://developers.google.com/protocol-buffers/docs/style).
+Ensure the provided code meets the [official style guide](https://developers.google.com/protocol-buffers/docs/style).
 
 The following docker command builds the grpc stub into the correct folders:
 
@@ -91,7 +91,7 @@ We add the label "good first issue" for problems we think are a good starting po
 
 ### Make a PR
 
-If you like to contribute fork the ZITADEL repository. After you implemented the new feature create a PullRequest in the ZITADEL reposiotry.
+If you like to contribute fork the ZITADEL repository. After you implemented the new feature create a PullRequest in the ZITADEL repository.
 
 Make sure you use semantic release:
 
