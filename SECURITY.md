@@ -6,7 +6,7 @@ At ZITADEL we are extremely grateful for security aware people who disclose vuln
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.x.x   | :white_check_mark: as soon as officialy released |
+| 2.x.x   | :white_check_mark: as soon as officially released |
 | 1.x.x   | :white_check_mark: |
 | 0.x.x   | :x:                |
 
@@ -38,4 +38,4 @@ All accepted and mitigated vulnerabilities will be published on [ZITADEL's GitHu
 
 ### Timing
 
-We think it is crucial to publish advisories `ASAP` as mitigations are ready. But due to the unknown nature of the discloures the time frame can range from 7 to 90 days.
+We think it is crucial to publish advisories `ASAP` as mitigations are ready. But due to the unknown nature of the disclosures the time frame can range from 7 to 90 days.

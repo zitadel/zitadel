@@ -1,6 +1,6 @@
 <p align="center">
-    <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" height="200px" width="auto" />
-    <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" height="200px" width="auto" />
+    <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
+    <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
 </p>
 
 <p align="center">
@@ -28,7 +28,6 @@
 </p>
 
 You want auth that's quickly set up like Auth0 but open source like Keycloak? Look no further— ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
-
 
 We provide a wide range of out of the box features like secure login, self-service, OpenID Connect, OAuth2.x, SAML2, branding, Passwordless with FIDO2, OTP, U2F, and an unlimited audit trail to improve the life of developers. Especially noteworthy is that ZITADEL supports not only B2C and B2E scenarios but also B2B. This is super useful for people who build B2B Solutions, as ZITADEL can handle all the delegated user and access management.
 
@@ -65,7 +64,7 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore)
 - [Actions](https://docs.zitadel.ch/docs/concepts/features/actions) to react on events with custom code
 - [Branding](https://docs.zitadel.com/docs/guides/customization/branding) for a uniform user experience
-- [Cockroach database](https://www.cockroachlabs.com/) is the only dependency
+- [CockroachDB](https://www.cockroachlabs.com/) is the only dependency
 
 ## Features
 
@@ -81,8 +80,10 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 - Self-registration including verification
 - User self service
 - [Service Accounts](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
+- [OpenID Connect certified](https://openid.net/certification/#OPs)
+- 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
 
-### Client libraries
+## Client libraries
 
 <!-- TODO: check other libraries -->
 
@@ -104,6 +105,14 @@ You can also discovery our new pay-as-you-go [pricing](https://zitadel.com/prici
 
 Details about how to contribute you can find in the [Contribution Guide](./CONTRIBUTING.md)
 
+## Contributors
+
+<a href="https://github.com/zitadel/zitadel/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=zitadel/zitadel" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
+
 ## Showcase
 
 <!-- TODO: Replace Images-->
@@ -112,10 +121,10 @@ Details about how to contribute you can find in the [Contribution Guide](./CONTR
 
 Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
 
-* works on all modern platforms, devices, and browsers
-* phishing resistant alternative
-* requires only one gesture by the user
-* easy [enrollment](https://docs.zitadel.com/docs/manuals/user-factors) of the device during registration
+- works on all modern platforms, devices, and browsers
+- phishing resistant alternative
+- requires only one gesture by the user
+- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-factors) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 
@@ -138,7 +147,7 @@ ZITADEL components send errors and usage data to CAOS Ltd., so that we are able 
 
 We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
 
-Besides from errors that don't clearly come from misconfiguration or cli misuage, we send an inital event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
+Besides from errors that don't clearly come from misconfiguration or cli misusage, we send an initial event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
 
 We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
 
