@@ -26,7 +26,6 @@ const (
 	ProjectColumnProjectRoleCheck       = "project_role_check"
 	ProjectColumnHasProjectCheck        = "has_project_check"
 	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
-	ProjectColumnCreator                = "creator_id" //TODO: necessary?
 )
 
 type ProjectProjection struct {
@@ -51,7 +50,6 @@ func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(ProjectColumnProjectRoleCheck, crdb.ColumnTypeBool),
 			crdb.NewColumn(ProjectColumnHasProjectCheck, crdb.ColumnTypeBool),
 			crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
-			crdb.NewColumn(ProjectColumnCreator, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(ProjectColumnInstanceID, ProjectColumnID),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ProjectColumnResourceOwner})),
@@ -111,7 +109,6 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler
 			handler.NewCol(ProjectColumnHasProjectCheck, e.HasProjectCheck),
 			handler.NewCol(ProjectColumnPrivateLabelingSetting, e.PrivateLabelingSetting),
 			handler.NewCol(ProjectColumnState, domain.ProjectStateActive),
-			handler.NewCol(ProjectColumnCreator, e.EditorUser()),
 		},
 	), nil
 }

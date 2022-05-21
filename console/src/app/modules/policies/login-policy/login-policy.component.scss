@@ -2,9 +2,9 @@
   margin: 0.5rem 0;
 }
 
-.policy-applied-to {
-  margin: -1rem 0 0 0;
-  font-size: 14px;
+.max-card-width {
+  max-width: 400px;
+  display: block;
 }
 
 .passwordless-allowed {
@@ -12,15 +12,23 @@
   display: block;
 }
 
-.force-mfa-toggle {
-  margin-right: 1rem;
+.lifetime-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 1rem;
+
+  @media only screen and (max-width: 950px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media only screen and (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .login-policy-content {
-  padding-top: 1rem;
-
   .login-policy-row {
-    padding-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
 
     .login-policy-toggle {
       margin: 0.3rem 0;
@@ -32,12 +40,16 @@
   }
 }
 
+.loginpolicy-reset-button {
+  margin: 1rem 0;
+  display: block;
+}
+
 .login-policy-btn-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 
   .login-policy-save-button {
-    margin-bottom: 3rem;
     display: block;
   }
 }

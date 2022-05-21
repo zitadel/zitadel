@@ -1,8 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, Injector, OnDestroy, OnInit, Type } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import {
     GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
     GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
@@ -18,15 +17,12 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
-import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -59,7 +55,7 @@ const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public theme: Theme = Theme.LIGHT;
 
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
   public previewData!: LabelPolicy.AsObject;
@@ -84,66 +80,17 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public org!: Org.AsObject;
-  public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   public InfoSectionType: any = InfoSectionType;
 
   private destroy$: Subject<void> = new Subject();
   public view: View = View.PREVIEW;
   constructor(
-    private authService: GrpcAuthService,
-    private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private assetService: AssetService,
     private storageService: StorageService,
     private themeService: ThemeService,
-    breadcrumbService: BreadcrumbService,
-  ) {
-    this.route.data
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap((data) => {
-          this.serviceType = data.serviceType;
-
-          switch (this.serviceType) {
-            case PolicyComponentServiceType.MGMT:
-              this.service = this.injector.get(ManagementService as Type<ManagementService>);
-
-              const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
-
-              if (org) {
-                this.org = org;
-              }
-              const iambread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
-              });
-              const bread: Breadcrumb = {
-                type: BreadcrumbType.ORG,
-                routerLink: ['/org'],
-              };
-              breadcrumbService.setBreadcrumb([iambread, bread]);
-              break;
-            case PolicyComponentServiceType.ADMIN:
-              this.service = this.injector.get(AdminService as Type<AdminService>);
-
-              const iamBread = new Breadcrumb({
-                type: BreadcrumbType.IAM,
-                name: 'System',
-                routerLink: ['/system'],
-              });
-              breadcrumbService.setBreadcrumb([iamBread]);
-              break;
-          }
-
-          return this.route.params;
-        }),
-      )
-      .subscribe(() => {
-        this.fetchData();
-      });
-  }
+  ) {}
 
   public toggleHoverLogo(theme: Theme, isHovering: boolean): void {
     if (theme === Theme.DARK) {
@@ -194,6 +141,24 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         this.theme = Theme.LIGHT;
       }
     });
+
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+
+        const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
+
+        if (org) {
+          this.org = org;
+        }
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+
+        break;
+    }
+
+    this.fetchData();
   }
 
   public onDropFont(filelist: FileList | null): Promise<any> | void {
@@ -506,6 +471,46 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     } else {
       return false;
     }
+  }
+
+  public setDarkBackgroundColorAndSave($event: string): void {
+    this.previewData.backgroundColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setDarkPrimaryColorAndSave($event: string): void {
+    this.previewData.primaryColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setDarkWarnColorAndSave($event: string): void {
+    this.previewData.warnColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setDarkFontColorAndSave($event: string): void {
+    this.previewData.fontColorDark = $event;
+    this.savePolicy();
+  }
+
+  public setBackgroundColorAndSave($event: string): void {
+    this.previewData.backgroundColor = $event;
+    this.savePolicy();
+  }
+
+  public setPrimaryColorAndSave($event: string): void {
+    this.previewData.primaryColor = $event;
+    this.savePolicy();
+  }
+
+  public setWarnColorAndSave($event: string): void {
+    this.previewData.warnColor = $event;
+    this.savePolicy();
+  }
+
+  public setFontColorAndSave($event: string): void {
+    this.previewData.fontColor = $event;
+    this.savePolicy();
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {

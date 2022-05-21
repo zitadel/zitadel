@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -58,8 +59,9 @@ type InstanceSetup struct {
 		MaxAgeDays     uint64
 	}
 	DomainPolicy struct {
-		UserLoginMustBeDomain bool
-		ValidateOrgDomains    bool
+		UserLoginMustBeDomain                  bool
+		ValidateOrgDomains                     bool
+		SMTPSenderAddressMatchesInstanceDomain bool
 	}
 	LoginPolicy struct {
 		AllowUsernamePassword      bool
@@ -67,7 +69,9 @@ type InstanceSetup struct {
 		AllowExternalIDP           bool
 		ForceMFA                   bool
 		HidePasswordReset          bool
+		IgnoreUnknownUsername      bool
 		PasswordlessType           domain.PasswordlessType
+		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
 		ExternalLoginCheckLifetime time.Duration
 		MfaInitSkipLifetime        time.Duration
@@ -96,8 +100,9 @@ type InstanceSetup struct {
 		MaxAttempts              uint64
 		ShouldShowLockoutFailure bool
 	}
-	EmailTemplate []byte
-	MessageTexts  []*domain.CustomMessageText
+	EmailTemplate     []byte
+	MessageTexts      []*domain.CustomMessageText
+	SMTPConfiguration *smtp.EmailConfig
 }
 
 type ZitadelConfig struct {
@@ -195,6 +200,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
 			setup.DomainPolicy.ValidateOrgDomains,
+			setup.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
 		),
 		AddDefaultLoginPolicy(
 			instanceAgg,
@@ -203,7 +209,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.AllowExternalIDP,
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
+			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.PasswordlessType,
+			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,
 			setup.LoginPolicy.ExternalLoginCheckLifetime,
 			setup.LoginPolicy.MfaInitSkipLifetime,
@@ -261,6 +269,20 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		ClockSkew:                0,
 	}
 
+	if setup.SMTPConfiguration != nil {
+		validations = append(validations,
+			c.prepareAddSMTPConfig(
+				instanceAgg,
+				setup.SMTPConfiguration.From,
+				setup.SMTPConfiguration.FromName,
+				setup.SMTPConfiguration.SMTP.Host,
+				setup.SMTPConfiguration.SMTP.User,
+				[]byte(setup.SMTPConfiguration.SMTP.Password),
+				setup.SMTPConfiguration.Tls,
+			),
+		)
+	}
+
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
@@ -309,9 +331,11 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
-	validations = append(validations,
-		c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)...,
-	)
+	addGenerateddDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
+	if err != nil {
+		return "", nil, err
+	}
+	validations = append(validations, addGenerateddDomain...)
 	if setup.CustomDomain != "" {
 		validations = append(validations,
 			c.addInstanceDomain(instanceAgg, setup.CustomDomain, false),

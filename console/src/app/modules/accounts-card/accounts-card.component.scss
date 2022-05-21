@@ -50,40 +50,6 @@
       margin-top: 0;
     }
 
-    .iamuser {
-      position: absolute;
-      border-radius: 50vw;
-      right: 1rem;
-      top: 1rem;
-      font-size: 12px;
-      line-height: 12px;
-      font-weight: 600;
-      background-color: $primary-color;
-      color: mat.get-color-from-palette($primary, default-contrast);
-      flex-direction: row;
-      align-items: center;
-      text-decoration: none;
-      padding: 0 4px;
-      display: none;
-
-      .label {
-        margin: 0.5rem 1rem;
-      }
-
-      .iambtn {
-        margin: 0 0 0 4px;
-        color: mat.get-color-from-palette($primary, default-contrast);
-      }
-
-      @media only screen and (max-width: 600px) {
-        display: flex;
-
-        .label {
-          margin: 0.5rem 0 0.5rem 0.5rem;
-        }
-      }
-    }
-
     button {
       border-radius: 50vh;
       margin: 0.5rem;

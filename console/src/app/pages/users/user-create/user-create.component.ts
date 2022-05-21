@@ -67,11 +67,6 @@ export class UserCreateComponent implements OnDestroy {
   ) {
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
-        type: BreadcrumbType.IAM,
-        name: 'IAM',
-        routerLink: ['/system'],
-      }),
-      new Breadcrumb({
         type: BreadcrumbType.ORG,
         routerLink: ['/org'],
       }),
@@ -80,7 +75,7 @@ export class UserCreateComponent implements OnDestroy {
     this.loading = true;
     this.loadOrg();
     this.mgmtService
-      .getOrgIAMPolicy()
+      .getDomainPolicy()
       .then((resp) => {
         if (resp.policy?.userLoginMustBeDomain) {
           this.userLoginMustBeDomain = resp.policy.userLoginMustBeDomain;

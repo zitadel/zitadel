@@ -1,0 +1,54 @@
+@use '@angular/material' as mat;
+
+@mixin login-policy-mfas-theme($theme) {
+  $foreground: map-get($theme, foreground);
+
+  .login-policy-mfa-list {
+    display: flex;
+    flex-direction: column;
+
+    .mfa {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      min-height: 40px;
+      max-width: 400px;
+      border-bottom: 1px solid map-get($foreground, dividers);
+
+      &:last-child {
+        border: none;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .rm {
+        display: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      &:hover {
+        .rm {
+          display: block;
+
+          &:not(:hover) {
+            color: var(--grey);
+          }
+        }
+      }
+    }
+
+    .mfa-list-btns {
+      display: flex;
+      justify-content: flex-start;
+      max-width: 400px;
+
+      .new-mfa {
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}

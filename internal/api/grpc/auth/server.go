@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"context"
 	"time"
 
 	"google.golang.org/grpc"
 
+	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/auth/repository"
@@ -28,7 +30,7 @@ type Server struct {
 	query             *query.Queries
 	repo              repository.Repository
 	defaults          systemdefaults.SystemDefaults
-	assetsAPIDomain   string
+	assetsAPIDomain   func(context.Context) string
 	userCodeAlg       crypto.EncryptionAlgorithm
 	externalSecure    bool
 	auditLogRetention time.Duration
@@ -42,7 +44,6 @@ func CreateServer(command *command.Commands,
 	query *query.Queries,
 	authRepo repository.Repository,
 	defaults systemdefaults.SystemDefaults,
-	assetsAPIDomain string,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	externalSecure bool,
 	auditLogRetention time.Duration,
@@ -52,7 +53,7 @@ func CreateServer(command *command.Commands,
 		query:             query,
 		repo:              authRepo,
 		defaults:          defaults,
-		assetsAPIDomain:   assetsAPIDomain,
+		assetsAPIDomain:   assets.AssetAPI(externalSecure),
 		userCodeAlg:       userCodeAlg,
 		externalSecure:    externalSecure,
 		auditLogRetention: auditLogRetention,

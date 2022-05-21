@@ -17,7 +17,7 @@ func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context) (*domain.Privacy
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-559os", "Errors.IAM.PasswordAgePolicy.NotFound")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-559os", "Errors.IAM.PrivacyPolicy.NotFound")
 	}
 	policy := writeModelToPrivacyPolicy(&policyWriteModel.PrivacyPolicyWriteModel)
 	policy.Default = true
@@ -61,13 +61,13 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domai
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PasswordAgePolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PrivacyPolicy.NotFound")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9jJfs", "Errors.IAM.PrivacyPolicy.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {

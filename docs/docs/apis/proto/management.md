@@ -2981,7 +2981,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes |  |
 | warn_color |  string | - | string.max_len: 50<br />  |
 | background_color |  string | - | string.max_len: 50<br />  |
 | font_color |  string | - | string.max_len: 50<br />  |
@@ -3039,6 +3039,8 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
 | password_check_lifetime |  google.protobuf.Duration | - |  |
 | external_login_check_lifetime |  google.protobuf.Duration | - |  |
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
@@ -3153,7 +3155,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| email |  string | - | string.email: true<br />  |
 | is_email_verified |  bool | - |  |
 
 
@@ -5157,7 +5159,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| email |  string | - | string.email: true<br />  |
 | is_email_verified |  bool | - |  |
 
 
@@ -7760,6 +7762,8 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
 | password_check_lifetime |  google.protobuf.Duration | - |  |
 | external_login_check_lifetime |  google.protobuf.Duration | - |  |
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |

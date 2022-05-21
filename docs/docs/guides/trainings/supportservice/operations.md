@@ -22,7 +22,7 @@ In this hands-on training you will gain an understanding about GitOps and ORBOS 
 * Configuration
 * Q&A
 
-**Price**: [Get a quote](https://zitadel.ch/contact)
+**Price**: [Get a quote](https://zitadel.com/contact)
 
 ## ZITADEL and DB Operator 
 
@@ -43,7 +43,7 @@ In this hands-on training you will gain an in-depth understanding of the ZITADEL
 * Common root cause analysis
 * Q&A
 
-**Price**: [Get a quote](https://zitadel.ch/contact)
+**Price**: [Get a quote](https://zitadel.com/contact)
 
 ## ORBOS Tooling
 
@@ -60,4 +60,4 @@ In this training you will learn how to customize tooling or more detailed aspect
 * Alerting
 * Ingress/API-Gateway
 
-**Price**: [Get a quote](https://zitadel.ch/contact)
+**Price**: [Get a quote](https://zitadel.com/contact)

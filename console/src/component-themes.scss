@@ -12,6 +12,7 @@
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/modules/contributors/contributors.component';
 @import 'src/app/modules/nav/nav.component';
+@import './styles/toast.scss';
 @import 'src/app/modules/table-actions/table-actions.component';
 @import 'src/app/modules/org-context/org-context.component.scss';
 @import 'src/app/modules/action-keys/action-keys.component.scss';
@@ -32,7 +33,7 @@
 @import 'src/app/pages/projects/project-grid/project-grid.component';
 @import 'src/app/app.component.scss';
 @import './styles/color.scss';
-@import 'src/app/pages/iam/iam.component.scss';
+@import 'src/app/pages/instance/instance.component.scss';
 @import 'src/app/modules/refresh-table/refresh-table.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
@@ -42,7 +43,6 @@
 @import 'src/app/modules/filter/filter.component.scss';
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
 @import 'src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.scss';
-@import 'src/app/modules/policies/private-labeling-policy/preview/preview.component.scss';
 @import 'src/app/modules/info-row/info-row.component.scss';
 @import 'src/app/modules/sidenav/sidenav.component';
 @import 'src/app/modules/user-grants/user-grants.component.scss';
@@ -51,7 +51,7 @@
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
 @import 'src/app/pages/home/home.component.scss';
-@import 'src/app/modules/policies/login-policy/mfa-table/mfa-table.component.scss';
+@import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import './styles/codemirror.scss';
 
@@ -93,8 +93,9 @@
   @include auth-user-detail-theme($theme);
   @include edit-text-theme($theme);
   @include user-detail-theme($theme);
-  @include iam-detail-theme($theme);
+  @include instance-detail-theme($theme);
   @include meta-theme($theme);
+  @include toast-theme($theme);
   @include keyboard-shortcuts-theme($theme);
   @include project-grant-illustration-theme($theme);
   @include refresh-table-theme($theme);
@@ -102,7 +103,6 @@
   @include sidenav-theme($theme);
   @include info-section-theme($theme);
   @include filter-theme($theme);
-  @include preview-theme($theme);
   @include private-label-theme($theme);
   @include project-grid-theme($theme);
   @include granted-project-detail-theme($theme);

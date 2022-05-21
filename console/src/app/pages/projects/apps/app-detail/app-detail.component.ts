@@ -19,21 +19,21 @@ import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.com
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
-  APIAuthMethodType,
-  APIConfig,
-  App,
-  AppState,
-  OIDCAppType,
-  OIDCAuthMethodType,
-  OIDCConfig,
-  OIDCGrantType,
-  OIDCResponseType,
-  OIDCTokenType,
+    APIAuthMethodType,
+    APIConfig,
+    App,
+    AppState,
+    OIDCAppType,
+    OIDCAuthMethodType,
+    OIDCConfig,
+    OIDCGrantType,
+    OIDCResponseType,
+    OIDCTokenType,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
-  GetOIDCInformationResponse,
-  UpdateAPIAppConfigRequest,
-  UpdateOIDCAppConfigRequest,
+    GetOIDCInformationResponse,
+    UpdateAPIAppConfigRequest,
+    UpdateOIDCAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -42,15 +42,15 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
-  BASIC_AUTH_METHOD,
-  CODE_METHOD,
-  CUSTOM_METHOD,
-  getAuthMethodFromPartialConfig,
-  getPartialConfigFromAuthMethod,
-  IMPLICIT_METHOD,
-  PK_JWT_METHOD,
-  PKCE_METHOD,
-  POST_METHOD,
+    BASIC_AUTH_METHOD,
+    CODE_METHOD,
+    CUSTOM_METHOD,
+    getAuthMethodFromPartialConfig,
+    getPartialConfigFromAuthMethod,
+    IMPLICIT_METHOD,
+    PK_JWT_METHOD,
+    PKCE_METHOD,
+    POST_METHOD,
 } from '../authmethods';
 
 @Component({
@@ -164,9 +164,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.http.get('./assets/environment.json').subscribe((env: any) => {
       this.environmentMap = {
         issuer: env.issuer,
-        adminServiceUrl: env.adminServiceUrl,
-        mgmtServiceUrl: env.mgmtServiceUrl,
-        authServiceUrl: env.adminServiceUrl,
+        adminServiceUrl: env.api,
+        mgmtServiceUrl: env.api,
+        authServiceUrl: env.api,
       };
     });
   }
@@ -229,7 +229,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       {
         i18nTitle: 'APP.PAGES.NEXTSTEPS.2.TITLE',
         i18nDesc: 'APP.PAGES.NEXTSTEPS.2.DESC',
-        href: 'https://docs.zitadel.ch',
+        href: 'https://docs.zitadel.comm',
         iconClasses: 'las la-people-carry',
       },
     ];
@@ -253,11 +253,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.app = app.app;
 
               const breadcrumbs = [
-                new Breadcrumb({
-                  type: BreadcrumbType.IAM,
-                  name: 'IAM',
-                  routerLink: ['/system'],
-                }),
                 new Breadcrumb({
                   type: BreadcrumbType.ORG,
                   routerLink: ['/org'],

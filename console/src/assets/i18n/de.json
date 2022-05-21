@@ -46,7 +46,8 @@
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
-    "INSTANCEOVERVIEW": "Instance Übersicht",
+    "INSTANCEOVERVIEW": "Instanz",
+    "ORGS": "Organisationen",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organisation",
@@ -66,7 +67,8 @@
     "ACTIONS": "Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
-    "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen"
+    "OPENSHORTCUTSTOOLTIP": "Tippe ? um die Tastaturkürzel anzuzeigen",
+    "SETTINGS": "Einstellungen"
   },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
@@ -275,8 +277,8 @@
       "U2F_NAME": "Authentifikator Name",
       "TYPE": {
         "0": "Keine MFA definiert",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerabdruck, Security Keys, Face ID und andere"
       },
       "STATE": {
         "0": "Kein Status",
@@ -322,16 +324,16 @@
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
       "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
-      "U2F": "U2F (Universal 2nd Factor)",
-      "U2F_DIALOG_TITLE": "U2F hinzufügen",
-      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Universellen Multifaktor an.",
-      "U2F_SUCCESS": "U2F erfolgreich erstellt!",
+      "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
+      "U2F_DIALOG_TITLE": "Faktor hinzufügen",
+      "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Authentikator an.",
+      "U2F_SUCCESS": "Faktor erfolgreich hinzugefügt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
-      "U2F_NAME": "U2F Name",
+      "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "Keine MFA definiert",
         "1": "OTP",
-        "2": "U2F"
+        "2": "Fingerabdruck, Security Key, Face ID oder andere"
       },
       "STATE": {
         "0": "Kein Status",
@@ -556,7 +558,7 @@
       "PHONEVERIFICATIONSENT": "Bestätigungscode per Telefonnummer gesendet.",
       "EMAILVERIFICATIONSENT": "Bestätigungscode per E-Mail gesendet.",
       "OTPREMOVED": "OTP entfernt.",
-      "U2FREMOVED": "U2F entfernt.",
+      "U2FREMOVED": "Faktor entfernt.",
       "PASSWORDLESSREMOVED": "Passwortlos entfernt.",
       "INITIALPASSWORDSET": "Initiales Passwort gesetzt.",
       "PASSWORDNOTIFICATIONSENT": "Passwortänderung mittgeteilt.",
@@ -669,6 +671,8 @@
     }
   },
   "IAM": {
+    "TITLE": "Instanz",
+    "DESCRIPTION": "Verwalten Sie Ihre Instanzeinstellungen und Organisationen",
     "POLICIES": {
       "TITLE": "System Administration",
       "DESCRIPTION": "Verwalte die globalen Richtlinen und Zugangseinstellungen."
@@ -679,7 +683,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "Diese Manager können systemweite Einstellungen vornehmen."
+      "DESCRIPTION": "Diese Manager können instanzweite Einstellungen vornehmen."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -759,6 +763,10 @@
       "USEPASSWORD": "Initiales Passwort setzen",
       "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initalisierung nicht setzen."
     },
+    "LIST": {
+      "TITLE": "Organisationen",
+      "DESCRIPTION": "Dies sind die Organisationen in Ihrer Instanz"
+    },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
       "TITLE": "Domains",
@@ -793,6 +801,103 @@
       "SETPRIMARY": "Primäre Domain gesetzt."
     }
   },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Instanz Einstellungen",
+      "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewand sofern die Einstellung nicht überschrieben wurde."
+    },
+    "ORG": {
+      "TITLE": "Organisation Einstellungen",
+      "DESCRIPTION": "Diese Einstellungen erweitern bzw. überschreiben die Einstellungen Ihrer Instanz."
+    },
+    "LIST": {
+      "GENERAL": "Allgemein",
+      "LOGIN": "Loginverhalten und Sicherheit",
+      "LOCKOUT": "Sperrmechanismen",
+      "COMPLEXITY": "Passwordkomplexität",
+      "NOTIFICATIONS": "Benachrichtigungen",
+      "MESSAGETEXTS": "Benachrichtigungstexte",
+      "IDP": "Identity Provider",
+      "DOMAIN": "Domain Einstellungen",
+      "LOGINTEXTS": "Login Interface Texte",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Datenschutzrichtlinie",
+      "OIDC": "OIDC Token Lifetime und Expiration",
+      "SECRETS": "Secret Erscheinungsbild"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Benachrichtigungen",
+      "LOGIN": "Login und Zugriff",
+      "DOMAIN": "Domain",
+      "TEXTS": "Texte und Sprachen",
+      "APPEARANCE": "Erscheinungsbild",
+      "OTHER": "Anderes"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Standardsprache",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "SMTP Einstellungen",
+      "SENDERADDRESS": "Sender Email-Adresse",
+      "SENDERNAME": "Sender Name",
+      "HOST": "Host",
+      "USER": "Benutzer",
+      "PASSWORD": "Passwort",
+      "SETPASSWORD": "SMTP Passwort setzen",
+      "PASSWORDSET": "SMTP Passwort erfolgrech gesetzt.",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Erfolgreich gespeichert.",
+      "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
+    },
+    "SMS": {
+      "TITLE": "SMS Einstellungen",
+      "PROVIDERS": "Anbieter",
+      "PROVIDER": "SMS Anbieter",
+      "ADDPROVIDER": "Anbieter hinzufügen",
+      "ADDPROVIDERDESCRIPTION": "Wählen Sie einen der verfügbaren Anbieter und geben Sie die erforderlichen Daten ein.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio erfolgreich hinzugefügt."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Einstellungen",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "Stunden",
+      "INDAYS": "Tage"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Erscheinungsbild",
+      "TYPES": "Schlüsseltypen",
+      "TYPE": {
+        "1": "Email Initialisierungscode",
+        "2": "Email Verifikationscode",
+        "3": "Telefonnummer Verificationscode",
+        "4": "Passwort Zurücksetzen Code",
+        "5": "Passwordless Initialisierungscode",
+        "6": "Applicationssecret"
+      },
+      "ADDGENERATOR": "Secret Erscheinungsbild definieren",
+      "GENERATORTYPE": "Typ",
+      "EXPIRY": "Ablauf (in Stunden)",
+      "INCLUDEDIGITS": "Enthält Zahlen",
+      "INCLUDESYMBOLS": "Enthält Symbole",
+      "INCLUDELOWERLETTERS": "Enthält Kleinbuchstaben",
+      "INCLUDEUPPERLETTERS": "Enthält Grossbuchstaben",
+      "LENGTH": "Länge",
+      "UPDATED": "Einstellungen geändert"
+    }
+  },
   "POLICY": {
     "TITLE": "Richtlinen entdecken",
     "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
@@ -807,7 +912,7 @@
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
-      "DESCRIPTION": "Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
+      "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
       "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN": "Datei auswählen",
       "ACTIVATEPREVIEW": "Konfiguration übernehmen",
@@ -848,9 +953,8 @@
       "TITLE": "Passwortsperre",
       "DESCRIPTION": "Lege eine maximale Anzahl an Passwordwiederholungen fest, nachdem Accounts gesperrt werden sollen."
     },
-    "IAM_POLICY": {
-      "TITLE": "Zugangseinstellungen IAM",
-      "DESCRIPTION": "Definiere die Zugangseistellungen für Benutzer."
+    "DOMAIN_POLICY": {
+      "TITLE": "Domain Einstellungen"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
@@ -864,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "ADVANCED": "Erweitert",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
@@ -965,7 +1070,7 @@
         "UPDATED": "Benutzerdefinierte Texte gespeichert."
       }
     },
-    "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der Instance-Standard Einstellung.",
+    "DEFAULTLABEL": "Die aktuelle Einstellung entspricht der Einstellung Ihrer Instanz.",
     "BTN_INSTALL": "Installieren",
     "BTN_EDIT": "Modifizieren",
     "DATA": {
@@ -979,7 +1084,9 @@
       "MAXATTEMPTS": "Maximale Anzahl an Versuchen",
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
-      "USERLOGINMUSTBEDOMAIN": "Benutzer-Login muss eine Domain sein",
+      "USERLOGINMUSTBEDOMAIN": "Benutzer Loginname muss die Domain der Organisation beinhalten",
+      "VALIDATEORGDOMAINS": "Org Domains validieren",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Addresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
       "ALLOWREGISTER": "Registrieren erlaubt",
@@ -991,10 +1098,20 @@
       "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
+      "IGNOREUNKNOWNUSERNAMES": "Unbekannte Usernamen ignorieren",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Ist die Option gewählt, wird der Passwort Schritt im Login auch angezeigt wenn der User nicht gefunden wurde. Dem Benutzer wird auf bei der Passwortprüfung nicht angezeigt ob der Username oder das Passwort falsch war.",
+      "DEFAULTREDIRECTURI": "Default Redirect URI",
+      "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
-      "DISABLEWATERMARK": "Wasserzeichen ausblenden"
+      "DISABLEWATERMARK": "Wasserzeichen ausblenden",
+      "PASSWORDCHECKLIFETIME": "Passwort Check Lifetime",
+      "EXTERNALLOGINCHECKLIFETIME": "Externer Login Check Lifetime",
+      "MFAINITSKIPLIFETIME": "Multifaktor Init Lifetime",
+      "SECONDFACTORCHECKLIFETIME": "Zweitfaktor Check Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Multifaktor Check Lifetime",
+      "INHOURS": "Stunden"
     },
-    "RESET": "Richtlinie zurücksetzen",
+    "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
     "TOAST": {
       "SET": "Richtline erfolgreich gesetzt!",
@@ -1333,6 +1450,7 @@
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+    "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."
@@ -1377,12 +1495,12 @@
     "TYPE": "Typ",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "U2F with Pin"
+      "1": "Fingerabdruck, Security Keys, Face ID und andere"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "OTP",
-      "2": "U2F"
+      "1": "One Time Password (OTP)",
+      "2": "Fingerabdruck, Security Keys, Face ID und andere"
     }
   },
   "LOGINPOLICY": {

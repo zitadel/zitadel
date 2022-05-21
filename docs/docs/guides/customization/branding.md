@@ -2,8 +2,10 @@
 title: Brand Customization
 ---
 
-ZITADEL offers various customization options for your projects brand design. 
-Head over to the Private Labeling Policy on your Organization Page.
+ZITADEL offers various customization options for your projects brand design. The branding can be configured on two different levels.
+The configuration on the instance level will set the default settings, which are triggered for all users if not overwritten on an organization specifically.
+The second possibility is to configure it on each organization. This guide will describe the second possibility.
+For this head over to the Branding Setting on your Organization Page.
 
 ## How it works
 You are able to customize the light and a dark mode separately.
@@ -34,7 +36,7 @@ In the advanced behavior you can choose if the loginname suffix (domain e.g road
 If you like to trigger your settings for your applications you have different possibilities.
 
 ### 1. Primary Domain Scope
-Send a [primary domain scope](https://docs.zitadel.ch/docs/apis/openidoauth/scopes#reserved-scopes) with your [authorization request](https://docs.zitadel.ch/docs/guides/authentication/login-users/#auth-request) to trigger your organization.
+Send a [primary domain scope](https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes) with your [authorization request](https://docs.zitadel.com/docs/guides/authentication/login-users/#auth-request) to trigger your organization.
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login.
 
 See the following link as an example. Users will be able to register and login to the organization that verified the @caos.ch domain only.
@@ -50,7 +52,7 @@ Make sure to replace the domain `caos.ch` with your own domain to trigger the co
 
 :::caution
 
-This example uses the ZITADEL Cloud Application for demonstration. You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](https://docs.zitadel.ch/docs/guides/authentication/login-users/#auth-request).
+This example uses the ZITADEL Cloud Application for demonstration. You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](https://docs.zitadel.com/docs/guides/authentication/login-users/#auth-request).
 
 :::
 

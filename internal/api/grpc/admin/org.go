@@ -52,20 +52,20 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	_ = userIDs                                                                        //TODO: handle userIDs
 	human := setUpOrgHumanToCommand(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
-	org := setUpOrgOrgToDomain(req.Org)                                                //TODO: handle domain
-	_ = org
 
-	objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
-		Name:  req.Org.Name,
-		Human: human,
-	})
+	userID, objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
+		Name:         req.Org.Name,
+		CustomDomain: req.Org.Domain,
+		Human:        human,
+	}, userIDs...)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.SetUpOrgResponse{
 		Details: object.DomainToAddDetailsPb(objectDetails),
+		OrgId:   objectDetails.ResourceOwner,
+		UserId:  userID,
 	}, nil
 }
 

@@ -116,6 +116,11 @@ export class AppComponent implements OnInit, OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lightbulb-off-outline.svg'),
     );
 
+    this.matIconRegistry.addSvgIcon(
+      'usb',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/usb-flash-drive-outline.svg'),
+    );
+
     this.matIconRegistry.addSvgIcon('mdi_radar', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/radar.svg'));
 
     this.matIconRegistry.addSvgIcon(
@@ -162,6 +167,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.matIconRegistry.addSvgIcon('mdi_jwt', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/jwt.svg'));
 
     this.matIconRegistry.addSvgIcon('mdi_symbol', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'));
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_shield_alert',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/shield-alert.svg'),
+    );
 
     this.matIconRegistry.addSvgIcon(
       'mdi_numeric',
@@ -349,7 +359,7 @@ export class AppComponent implements OnInit, OnDestroy {
   public changedOrg(org: Org.AsObject): void {
     this.loadPrivateLabelling();
     this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/']);
+      this.router.navigate(['/org'], { fragment: org.id });
     });
   }
 

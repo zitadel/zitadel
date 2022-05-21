@@ -3,7 +3,6 @@ package admin
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/org"
@@ -33,15 +32,4 @@ func fieldNameToOrgColumn(fieldName org.OrgFieldName) query.Column {
 	default:
 		return query.Column{}
 	}
-}
-
-func setUpOrgOrgToDomain(req *admin.SetUpOrgRequest_Org) *domain.Org {
-	org := &domain.Org{
-		Name:    req.Name,
-		Domains: []*domain.OrgDomain{},
-	}
-	if req.Domain != "" {
-		org.Domains = append(org.Domains, &domain.OrgDomain{Domain: req.Domain})
-	}
-	return org
 }

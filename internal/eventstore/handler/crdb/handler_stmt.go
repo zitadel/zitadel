@@ -93,8 +93,8 @@ func NewStatementHandler(
 	return h
 }
 
-func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64, error) {
-	sequences, err := h.currentSequences(h.client.Query)
+func (h *StatementHandler) SearchQuery(ctx context.Context) (*eventstore.SearchQueryBuilder, uint64, error) {
+	sequences, err := h.currentSequences(ctx, h.client.QueryContext)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -131,12 +131,15 @@ func appendToIgnoredInstances(instances []string, id string) []string {
 
 //Update implements handler.Update
 func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (unexecutedStmts []*handler.Statement, err error) {
+	if len(stmts) == 0 {
+		return nil, nil
+	}
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
 		return stmts, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
 	}
 
-	sequences, err := h.currentSequences(tx.Query)
+	sequences, err := h.currentSequences(ctx, tx.QueryContext)
 	if err != nil {
 		tx.Rollback()
 		return stmts, err
@@ -146,7 +149,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
 	if stmts[0].PreviousSequence == 0 {
-		previousStmts, err := h.fetchPreviousStmts(ctx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
+		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
 			return stmts, err
@@ -154,7 +157,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		stmts = append(previousStmts, stmts...)
 	}
 
-	lastSuccessfulIdx := h.executeStmts(tx, stmts, sequences)
+	lastSuccessfulIdx := h.executeStmts(tx, &stmts, sequences)
 
 	if lastSuccessfulIdx >= 0 {
 		err = h.updateCurrentSequences(tx, sequences)
@@ -168,7 +171,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		return stmts, err
 	}
 
-	if lastSuccessfulIdx == -1 {
+	if lastSuccessfulIdx == -1 && len(stmts) > 0 {
 		return stmts, handler.ErrSomeStmtsFailed
 	}
 
@@ -183,9 +186,8 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	return unexecutedStmts, nil
 }
 
-func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, stmtSeq uint64, instanceID string, sequences currentSequences, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
-
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtSeq uint64, instanceID string, sequences currentSequences, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).SetTx(tx)
 	queriesAdded := false
 	for _, aggregateType := range h.aggregates {
 		for _, sequence := range sequences[aggregateType] {
@@ -225,19 +227,27 @@ func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, stmtSeq uint6
 
 func (h *StatementHandler) executeStmts(
 	tx *sql.Tx,
-	stmts []*handler.Statement,
+	stmts *[]*handler.Statement,
 	sequences currentSequences,
 ) int {
 
 	lastSuccessfulIdx := -1
-	for i, stmt := range stmts {
+stmts:
+	for i := 0; i < len(*stmts); i++ {
+		stmt := (*stmts)[i]
 		for _, sequence := range sequences[stmt.AggregateType] {
 			if stmt.Sequence <= sequence.sequence && stmt.InstanceID == sequence.instanceID {
-				continue
+				logging.WithFields("statement", stmt, "currentSequence", sequence).Debug("statement dropped")
+				if i < len(*stmts)-1 {
+					copy((*stmts)[i:], (*stmts)[i+1:])
+				}
+				*stmts = (*stmts)[:len(*stmts)-1]
+				i--
+				continue stmts
 			}
 			if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.sequence && stmt.InstanceID == sequence.instanceID {
-				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "sequence", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequences[stmt.AggregateType]).Warn("sequences do not match")
-				break
+				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "sequence", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequence.sequence).Warn("sequences do not match")
+				break stmts
 			}
 		}
 		err := h.executeStmt(tx, stmt)

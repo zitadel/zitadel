@@ -22,7 +22,7 @@ type EsRepository struct {
 	eventstore.AdministratorRepo
 }
 
-func Start(conf Config, static static.Storage, dbClient *sql.DB, loginPrefix string) (*EsRepository, error) {
+func Start(conf Config, static static.Storage, dbClient *sql.DB) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func Start(conf Config, static static.Storage, dbClient *sql.DB, loginPrefix str
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, static, loginPrefix)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, static)
 
 	return &EsRepository{
 		spooler: spool,

@@ -17,7 +17,7 @@ export class IamViewsComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   @ViewChild(MatPaginator) public paginator!: MatPaginator;
-  public dataSource!: MatTableDataSource<View.AsObject>;
+  public dataSource: MatTableDataSource<View.AsObject> = new MatTableDataSource<View.AsObject>([]);
 
   public displayedColumns: string[] = ['viewName', 'database', 'sequence', 'eventTimestamp', 'lastSuccessfulSpoolerRun'];
 
@@ -28,9 +28,9 @@ export class IamViewsComponent implements AfterViewInit {
 
     const breadcrumbs = [
       new Breadcrumb({
-        type: BreadcrumbType.IAM,
-        name: 'System',
-        routerLink: ['/system'],
+        type: BreadcrumbType.INSTANCE,
+        name: 'Instance',
+        routerLink: ['/instance'],
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
@@ -51,7 +51,7 @@ export class IamViewsComponent implements AfterViewInit {
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe((views) => {
-        this.dataSource = new MatTableDataSource(views);
+        this.dataSource = new MatTableDataSource<View.AsObject>(views);
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       });

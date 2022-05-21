@@ -7,7 +7,7 @@ title: Organizations
 | --- | --- |
 | Description | Learn how ZITADEL is structured around Organizations and how to create your organization and verify a domain to use with that new organization. |
 | Learning Outcomes | In this module you will: <ul><li>Learn about organizations</li><li>Create a new organization</li><li>Verify your domain name </li></ul> |
-|Prerequisites|None|
+|Prerequisites|Existing instance|
 
 ## What is an organization?
 
@@ -44,7 +44,8 @@ When you verify your domain name, then ZITADEL will generate additional logoname
 
 Once you have successfully registered your organization, ZITADEL will automatically generate a domain name for your organization (eg, acme.zitadel.ch). Users that you create within your organization will be suffixed with this domain name.
 
-You can improve the user experience, by suffixing users with a domain name that is in your control. For that you can prove the ownership of your domain, by DNS or HTTP challenge.
+You can improve the user experience, by suffixing users with a domain name that is in your control. If the "validate ord domains" settings in the [Domain Policy](../../concepts/structure/policies) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
+If the settings is set to false, the created domain will automatically be set to verifed.
 
 An organization can have multiple domain names, but only one domain can be primary. The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
 

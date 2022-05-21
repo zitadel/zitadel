@@ -1,0 +1,50 @@
+<h2>{{ 'POLICY.TITLE' | translate }}</h2>
+
+<p class="top-desc cnsl-secondary-text">{{ 'POLICY.DESCRIPTION' | translate }}</p>
+
+<div class="row-lyt" [ngClass]="{ more: type === PolicyComponentServiceType.ADMIN }">
+  <ng-container *ngFor="let setting of SETTINGS">
+    <ng-template
+      cnslHasRole
+      [hasRole]="
+        type === PolicyComponentServiceType.ADMIN
+          ? setting.iamWithRole
+          : type === PolicyComponentServiceType.MGMT
+          ? setting.orgWithRole
+          : []
+      "
+    >
+      <div class="p-item card" @policy [attr.data-e2e]="'policy-card'">
+        <div class="avatar {{ setting.color }}">
+          <mat-icon *ngIf="setting.svgIcon" class="mat-icon" [svgIcon]="setting.svgIcon"></mat-icon>
+          <i *ngIf="setting.icon" class="icon {{ setting.icon }}"></i>
+        </div>
+        <div class="title">
+          <span>{{ setting.i18nTitle | translate }}</span>
+        </div>
+
+        <p class="desc cnsl-secondary-text">
+          {{ setting.i18nDesc ? (setting.i18nDesc | translate) : '' }}
+        </p>
+
+        <span class="fill-space"></span>
+
+        <div class="btn-wrapper">
+          <a
+            [routerLink]="
+              type === PolicyComponentServiceType.ADMIN
+                ? setting.iamRouterLink
+                : type === PolicyComponentServiceType.MGMT
+                ? setting.orgRouterLink
+                : null
+            "
+            [queryParams]="setting.queryParams"
+            mat-stroked-button
+          >
+            {{ 'POLICY.BTN_EDIT' | translate }}
+          </a>
+        </div>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>

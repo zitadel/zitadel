@@ -84,7 +84,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     'actions',
   ];
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.dataSource = new UserGrantsDataSource(this.userService);
 
     switch (this.context) {
@@ -200,7 +200,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  public deleteGrant(grant: UserGrant.AsObject): void {
+  public deleteGrant(event: any, grant: UserGrant.AsObject): void {
+    event.stopPropagation();
+
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',

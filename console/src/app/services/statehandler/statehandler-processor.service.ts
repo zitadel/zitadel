@@ -16,9 +16,7 @@ export class StatehandlerProcessorServiceImpl implements StatehandlerProcessorSe
     const externalUrl = this.location.prepareExternalUrl(url);
     const urlId = uuidv4();
 
-    if (externalUrl.includes('login_hint=')) {
-      sessionStorage.setItem(urlId, externalUrl);
-    }
+    sessionStorage.setItem(urlId, externalUrl);
 
     return of(urlId);
   }

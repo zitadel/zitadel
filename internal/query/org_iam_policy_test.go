@@ -35,6 +35,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						` projections.domain_policies.resource_owner,`+
 						` projections.domain_policies.user_login_must_be_domain,`+
 						` projections.domain_policies.validate_org_domains,`+
+						` projections.domain_policies.smtp_sender_address_matches_instance_domain,`+
 						` projections.domain_policies.is_default,`+
 						` projections.domain_policies.state`+
 						` FROM projections.domain_policies`),
@@ -62,6 +63,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						` projections.domain_policies.resource_owner,`+
 						` projections.domain_policies.user_login_must_be_domain,`+
 						` projections.domain_policies.validate_org_domains,`+
+						` projections.domain_policies.smtp_sender_address_matches_instance_domain,`+
 						` projections.domain_policies.is_default,`+
 						` projections.domain_policies.state`+
 						` FROM projections.domain_policies`),
@@ -73,6 +75,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						"resource_owner",
 						"user_login_must_be_domain",
 						"validate_org_domains",
+						"smtp_sender_address_matches_instance_domain",
 						"is_default",
 						"state",
 					},
@@ -85,20 +88,22 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						true,
 						domain.PolicyStateActive,
 					},
 				),
 			},
 			object: &DomainPolicy{
-				ID:                    "pol-id",
-				CreationDate:          testNow,
-				ChangeDate:            testNow,
-				Sequence:              20211109,
-				ResourceOwner:         "ro",
-				State:                 domain.PolicyStateActive,
-				UserLoginMustBeDomain: true,
-				ValidateOrgDomains:    true,
-				IsDefault:             true,
+				ID:                                     "pol-id",
+				CreationDate:                           testNow,
+				ChangeDate:                             testNow,
+				Sequence:                               20211109,
+				ResourceOwner:                          "ro",
+				State:                                  domain.PolicyStateActive,
+				UserLoginMustBeDomain:                  true,
+				ValidateOrgDomains:                     true,
+				SMTPSenderAddressMatchesInstanceDomain: true,
+				IsDefault:                              true,
 			},
 		},
 		{
@@ -113,6 +118,7 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 						` projections.domain_policies.resource_owner,`+
 						` projections.domain_policies.user_login_must_be_domain,`+
 						` projections.domain_policies.validate_org_domains,`+
+						` projections.domain_policies.smtp_sender_address_matches_instance_domain,`+
 						` projections.domain_policies.is_default,`+
 						` projections.domain_policies.state`+
 						` FROM projections.domain_policies`),

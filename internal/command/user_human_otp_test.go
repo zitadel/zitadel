@@ -180,6 +180,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),

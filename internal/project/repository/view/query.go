@@ -10,17 +10,11 @@ func ProjectByIDQuery(id, instanceID string, latestSequence uint64) (*es_models.
 	if id == "" {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dke74", "Errors.Project.ProjectIDMissing")
 	}
-	return ProjectQuery(latestSequence).
-		AddQuery().
-		AggregateIDFilter(id).
-		InstanceIDFilter(instanceID).
-		SearchQuery(), nil
-}
-
-func ProjectQuery(latestSequence uint64) *es_models.SearchQuery {
 	return es_models.NewSearchQuery().
 		AddQuery().
+		AggregateIDFilter(id).
 		AggregateTypeFilter(project.AggregateType).
 		LatestSequenceFilter(latestSequence).
-		SearchQuery()
+		InstanceIDFilter(instanceID).
+		SearchQuery(), nil
 }

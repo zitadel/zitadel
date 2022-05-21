@@ -1,441 +1,463 @@
-<cnsl-detail-layout [hasBackButton]="true" [title]="'POLICY.PRIVATELABELING.TITLE' | translate">
-  <p class="policy-applied-to" sub>
-    {{ 'POLICY.APPLIEDTO' | translate }}:
-    <strong *ngIf="org; else iam">{{ org.name }}</strong>
-    <ng-template #iam
-      ><strong>{{ 'MENU.INSTANCE' | translate }}</strong>
-    </ng-template>
-  </p>
+<h2>{{ 'POLICY.PRIVATELABELING.TITLE' | translate }}</h2>
+<div class="privatelabeling-policy">
+  <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
-  <div class="privatelabeling-policy">
-    <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
+  <div class="spinner-wr">
+    <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+  </div>
 
-    <div class="spinner-wr">
-      <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
-    </div>
+  <div class="privatelabeling-top-row">
+    <mat-button-toggle-group class="buttongroup" [(ngModel)]="theme" name="theme" aria-label="Theme">
+      <mat-button-toggle [value]="Theme.LIGHT">
+        <div class="toggle-row">
+          <i class="icon las la-sun"></i>
+          <span>{{ 'POLICY.PRIVATELABELING.LIGHT' | translate }}</span>
+          <div *ngIf="theme === Theme.LIGHT" class="current-dot"></div>
+        </div>
+      </mat-button-toggle>
+      <mat-button-toggle [value]="Theme.DARK">
+        <div class="toggle-row">
+          <i class="icon las la-moon"></i>
+          <span> {{ 'POLICY.PRIVATELABELING.DARK' | translate }}</span>
+          <div *ngIf="theme === Theme.DARK" class="current-dot"></div>
+        </div>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
 
-    <div class="privatelabeling-top-row">
-      <mat-button-toggle-group class="buttongroup" [(ngModel)]="theme" name="theme" aria-label="Theme">
-        <mat-button-toggle [value]="Theme.LIGHT">
-          <div class="toggle-row">
-            <i class="icon las la-sun"></i>
-            <span>{{ 'POLICY.PRIVATELABELING.LIGHT' | translate }}</span>
-            <div *ngIf="theme === Theme.LIGHT" class="current-dot"></div>
-          </div>
-        </mat-button-toggle>
-        <mat-button-toggle [value]="Theme.DARK">
-          <div class="toggle-row">
-            <i class="icon las la-moon"></i>
-            <span> {{ 'POLICY.PRIVATELABELING.DARK' | translate }}</span>
-            <div *ngIf="theme === Theme.DARK" class="current-dot"></div>
-          </div>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
+    <mat-button-toggle-group
+      class="theme-toggle"
+      class="buttongroup"
+      [(ngModel)]="view"
+      name="displayview"
+      aria-label="Display View"
+    >
+      <mat-button-toggle [value]="View.PREVIEW">
+        <div class="toggle-row">
+          <span>{{ 'POLICY.PRIVATELABELING.VIEWS.PREVIEW' | translate }}</span>
+          <i
+            class="info-i las la-question-circle"
+            matTooltip="{{ 'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate }}"
+          ></i>
+          <div *ngIf="view === View.PREVIEW" class="current-dot"></div>
+        </div>
+      </mat-button-toggle>
+      <mat-button-toggle [value]="View.CURRENT">
+        <div class="toggle-row">
+          <span> {{ 'POLICY.PRIVATELABELING.VIEWS.CURRENT' | translate }}</span>
+          <div *ngIf="view === View.CURRENT" class="current-dot"></div>
+        </div>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
 
-      <mat-button-toggle-group
-        class="theme-toggle"
-        class="buttongroup"
-        [(ngModel)]="view"
-        name="displayview"
-        aria-label="Display View"
-      >
-        <mat-button-toggle [value]="View.PREVIEW">
-          <div class="toggle-row">
-            <span>{{ 'POLICY.PRIVATELABELING.VIEWS.PREVIEW' | translate }}</span>
-            <div *ngIf="view === View.PREVIEW" class="current-dot"></div>
-          </div>
-        </mat-button-toggle>
-        <mat-button-toggle [value]="View.CURRENT">
-          <div class="toggle-row">
-            <span> {{ 'POLICY.PRIVATELABELING.VIEWS.CURRENT' | translate }}</span>
-            <div *ngIf="view === View.CURRENT" class="current-dot"></div>
-          </div>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
+    <span class="fill-space"></span>
 
-      <span class="fill-space"></span>
-
-      <ng-template cnslHasRole [hasRole]="['policy.delete']">
-        <button
-          class="pl-action-button"
-          *ngIf="view === View.CURRENT && serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-          matTooltip="{{ 'POLICY.RESET' | translate }}"
-          color="warn"
-          (click)="removePolicy()"
-          mat-stroked-button
-        >
-          {{ 'POLICY.RESET' | translate }}
-        </button>
-      </ng-template>
-
+    <ng-template cnslHasRole [hasRole]="['policy.delete']">
       <button
-        *ngIf="view === View.PREVIEW"
         class="pl-action-button"
-        mat-raised-button
-        color="primary"
-        (click)="activatePolicy()"
+        *ngIf="view === View.CURRENT && serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+        matTooltip="{{ 'POLICY.RESET' | translate }}"
+        color="warn"
+        (click)="removePolicy()"
+        mat-stroked-button
       >
-        {{ 'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate }}
+        {{ 'POLICY.RESET' | translate }}
       </button>
-    </div>
+    </ng-template>
 
-    <cnsl-info-section *ngIf="view === View.PREVIEW" class="desc cnsl-secondary-text">
-      {{ 'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate }}
-    </cnsl-info-section>
+    <button
+      *ngIf="view === View.PREVIEW"
+      class="pl-action-button"
+      mat-raised-button
+      color="primary"
+      (click)="activatePolicy()"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
+      {{ 'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate }}
+    </button>
+  </div>
 
-    <div *ngIf="previewData && data" class="lab-policy-content">
-      <mat-accordion class="settings">
-        <mat-expansion-panel class="expansion">
-          <mat-expansion-panel-header [attr.data-e2e]="'policy-category'">
-            <mat-panel-title>
-              <div class="panel-title">
-                <i class="icon las la-image"></i>
-                <span>Logos</span>
-                <span class="space"></span>
-                <small class="cnsl-secondary-text" *ngIf="theme === Theme.DARK"
-                  >({{ 'POLICY.PRIVATELABELING.DARK' | translate }})</small
-                >
-                <small class="cnsl-secondary-text" *ngIf="theme === Theme.LIGHT"
-                  >({{ 'POLICY.PRIVATELABELING.LIGHT' | translate }})</small
-                >
-              </div>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-
-          <div>
-            <p class="cnsl-secondary-button">{{ 'POLICY.PRIVATELABELING.USEOFLOGO' | translate }}</p>
-
-            <cnsl-info-section *ngIf="view !== View.CURRENT" class="max-size-desc">
-              {{ 'POLICY.PRIVATELABELING.MAXSIZE' | translate }}
-            </cnsl-info-section>
-            <cnsl-info-section *ngIf="view !== View.CURRENT" class="max-size-desc">
-              {{ 'POLICY.PRIVATELABELING.EMAILNOSVG' | translate }}
-            </cnsl-info-section>
-
-            <div class="logo-view" [attr.data-e2e]="'image-part-logo'">
-              <span class="label cnsl-secondary-text">Logo</span>
-              <div class="img-wrapper">
-                <ng-container
-                  *ngIf="
-                    view === View.PREVIEW
-                      ? theme === Theme.DARK
-                        ? previewData.logoUrlDark
-                        : previewData.logoUrl
-                      : theme === Theme.DARK
-                      ? data.logoUrlDark
-                      : data.logoUrl as logoSrc;
-                    else addLogoButton
-                  "
-                >
-                  <img [src]="logoSrc" alt="logo" />
-                  <button
-                    class="dl-btn"
-                    mat-icon-button
-                    color="warn"
-                    (click)="deleteAsset(AssetType.LOGO, theme)"
-                    [disabled]="view === View.CURRENT"
-                    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
-                  >
-                    <i class="las la-ban"></i>
-                  </button>
-                </ng-container>
-                <ng-template #addLogoButton>
-                  <input
-                    #selectedFile
-                    style="display: none"
-                    class="file-input"
-                    type="file"
-                    (change)="onDropLogo(theme, $any($event.target).files)"
-                  />
-                  <button
-                    mat-icon-button
-                    matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
-                    *ngIf="view !== View.CURRENT"
-                    (click)="$event.preventDefault(); selectedFile.click()"
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
-                </ng-template>
-              </div>
-            </div>
-
-            <div class="logo-view" [attr.data-e2e]="'image-part-icon'">
-              <span class="label cnsl-secondary-text">Icon</span>
-              <div class="img-wrapper icon">
-                <ng-container
-                  *ngIf="
-                    view === View.PREVIEW
-                      ? theme === Theme.DARK
-                        ? previewData.iconUrlDark
-                        : previewData.iconUrl
-                      : theme === Theme.DARK
-                      ? data.iconUrlDark
-                      : data.iconUrl as iconSrc;
-                    else addIconButton
-                  "
-                >
-                  <img [src]="iconSrc" alt="icon" />
-                  <button
-                    class="dl-btn"
-                    mat-icon-button
-                    color="warn"
-                    (click)="deleteAsset(AssetType.ICON, theme)"
-                    [disabled]="view === View.CURRENT"
-                    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
-                  >
-                    <i class="las la-ban"></i>
-                  </button>
-                </ng-container>
-                <ng-template #addIconButton>
-                  <input
-                    #selectedIconFile
-                    style="display: none"
-                    class="file-input"
-                    type="file"
-                    (change)="onDropIcon(theme, $any($event.target).files)"
-                  />
-                  <button
-                    mat-icon-button
-                    matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
-                    *ngIf="view !== View.CURRENT"
-                    (click)="$event.preventDefault(); selectedIconFile.click()"
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
-                </ng-template>
-              </div>
-            </div>
-          </div>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel class="expansion" [expanded]="true">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <div class="panel-title">
-                <i class="icon las la-palette"></i>
-                <span>{{ 'POLICY.PRIVATELABELING.COLORS' | translate }}</span>
-                <span class="space"></span>
-                <small class="cnsl-secondary-text" *ngIf="theme === Theme.DARK"
-                  >({{ 'POLICY.PRIVATELABELING.DARK' | translate }})</small
-                >
-                <small class="cnsl-secondary-text" *ngIf="theme === Theme.LIGHT"
-                  >({{ 'POLICY.PRIVATELABELING.LIGHT' | translate }})</small
-                >
-              </div>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-
-          <ng-container *ngIf="theme === Theme.DARK">
-            <div class="colors" *ngIf="data && previewData">
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.BACKGROUNDDARK"
-                  (previewChanged)="previewData.backgroundColorDark = $event; savePolicy()"
-                  name="Background Color"
-                  [color]="data.backgroundColorDark"
-                  [previewColor]="previewData.backgroundColorDark"
-                ></cnsl-color>
-              </div>
-
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.PRIMARY"
-                  (previewChanged)="previewData.primaryColorDark = $event; savePolicy()"
-                  name="Primary Color"
-                  [color]="data.primaryColorDark"
-                  [previewColor]="previewData.primaryColorDark"
-                >
-                </cnsl-color>
-              </div>
-
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.WARN"
-                  (previewChanged)="previewData.warnColorDark = $event; savePolicy()"
-                  name="Warn Color"
-                  [color]="data.warnColorDark"
-                  [previewColor]="previewData.warnColorDark"
-                >
-                </cnsl-color>
-              </div>
-
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.FONTDARK"
-                  (previewChanged)="previewData.fontColorDark = $event; savePolicy()"
-                  name="Font Color"
-                  [color]="data.fontColorDark"
-                  [previewColor]="previewData.fontColorDark"
-                >
-                </cnsl-color>
-              </div>
-            </div>
-          </ng-container>
-
-          <ng-container *ngIf="theme === Theme.LIGHT">
-            <div class="colors" *ngIf="data && previewData">
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.BACKGROUNDLIGHT"
-                  (previewChanged)="previewData.backgroundColor = $event; savePolicy()"
-                  name="Background Color"
-                  [color]="data.backgroundColor"
-                  [previewColor]="previewData.backgroundColor"
-                ></cnsl-color>
-              </div>
-
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.PRIMARY"
-                  (previewChanged)="previewData.primaryColor = $event; savePolicy()"
-                  name="Primary Color"
-                  [color]="data.primaryColor"
-                  [previewColor]="previewData.primaryColor"
-                >
-                </cnsl-color>
-              </div>
-
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.WARN"
-                  name="Warn Color"
-                  (previewChanged)="previewData.warnColor = $event; savePolicy()"
-                  [color]="data.warnColor"
-                  [previewColor]="previewData.warnColor"
-                ></cnsl-color>
-              </div>
-
-              <div class="color">
-                <cnsl-color
-                  [disabled]="view === View.CURRENT"
-                  [colorType]="ColorType.FONTLIGHT"
-                  (previewChanged)="previewData.fontColor = $event; savePolicy()"
-                  name="Font Color"
-                  [color]="data.fontColor"
-                  [previewColor]="previewData.fontColor"
-                ></cnsl-color>
-              </div>
-            </div>
-          </ng-container>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel class="expansion">
-          <mat-expansion-panel-header class="header" [attr.data-e2e]="'policy-category'">
-            <mat-panel-title>
-              <div class="panel-title">
-                <i class="icon las la-font"></i>
-                {{ 'POLICY.PRIVATELABELING.FONT' | translate }}
-              </div>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="fonts">
-            <cnsl-info-section class="info-section"
-              >{{ 'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate }}
-            </cnsl-info-section>
-            <div class="font-preview" *ngIf="previewData.fontUrl; else addFontButton">
-              <mat-icon class="icon">text_fields</mat-icon>
-
-              <span class="fill-space"></span>
-
-              <button
-                class="dl-btn"
-                [disabled]="view === View.CURRENT"
-                mat-icon-button
-                color="warn"
-                (click)="deleteFont()"
-                matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+  <div *ngIf="previewData && data" class="lab-policy-content">
+    <mat-accordion class="settings">
+      <mat-expansion-panel class="expansion">
+        <mat-expansion-panel-header [attr.data-e2e]="'policy-category'">
+          <mat-panel-title>
+            <div class="panel-title">
+              <i class="icon las la-image"></i>
+              <span>Logos</span>
+              <span class="space"></span>
+              <small class="cnsl-secondary-text" *ngIf="theme === Theme.DARK"
+                >({{ 'POLICY.PRIVATELABELING.DARK' | translate }})</small
               >
-                <i class="las la-ban"></i>
-              </button>
-            </div>
-
-            <ng-template #addFontButton>
-              <div
-                class="font-add"
-                cnslDropzone
-                (hovered)="toggleHoverFont($event)"
-                (dropped)="onDropFont($event)"
-                [class.hovering]="isHoveringOverFont"
+              <small class="cnsl-secondary-text" *ngIf="theme === Theme.LIGHT"
+                >({{ 'POLICY.PRIVATELABELING.LIGHT' | translate }})</small
               >
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div>
+          <p class="cnsl-secondary-button">{{ 'POLICY.PRIVATELABELING.USEOFLOGO' | translate }}</p>
+
+          <cnsl-info-section *ngIf="view !== View.CURRENT" class="max-size-desc">
+            {{ 'POLICY.PRIVATELABELING.MAXSIZE' | translate }}
+          </cnsl-info-section>
+          <cnsl-info-section *ngIf="view !== View.CURRENT" class="max-size-desc">
+            {{ 'POLICY.PRIVATELABELING.EMAILNOSVG' | translate }}
+          </cnsl-info-section>
+
+          <div class="logo-view" [attr.data-e2e]="'image-part-logo'">
+            <span class="label cnsl-secondary-text">Logo</span>
+            <div class="img-wrapper">
+              <ng-container
+                *ngIf="
+                  view === View.PREVIEW
+                    ? theme === Theme.DARK
+                      ? previewData.logoUrlDark
+                      : previewData.logoUrl
+                    : theme === Theme.DARK
+                    ? data.logoUrlDark
+                    : data.logoUrl as logoSrc;
+                  else addLogoButton
+                "
+              >
+                <img [src]="logoSrc" alt="logo" />
+                <button
+                  class="dl-btn"
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteAsset(AssetType.LOGO, theme)"
+                  [disabled]="view === View.CURRENT"
+                  matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                >
+                  <i class="las la-ban"></i>
+                </button>
+              </ng-container>
+              <ng-template #addLogoButton>
                 <input
-                  #selectedFontFile
+                  #selectedFile
                   style="display: none"
                   class="file-input"
                   type="file"
-                  (change)="onDropFont($any($event.target).files)"
+                  (change)="onDropLogo(theme, $any($event.target).files)"
                 />
-                <a
-                  class="btn"
+                <button
                   mat-icon-button
-                  *ngIf="view !== View.CURRENT"
-                  (click)="selectedFontFile.click()"
                   matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
+                  *ngIf="view !== View.CURRENT"
+                  (click)="$event.preventDefault(); selectedFile.click()"
                 >
                   <mat-icon>add</mat-icon>
-                </a>
-              </div>
-            </ng-template>
+                </button>
+              </ng-template>
+            </div>
           </div>
-        </mat-expansion-panel>
 
-        <mat-expansion-panel class="expansion">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <div class="panel-title">
-                <i class="icon las la-universal-access"></i>
-                {{ 'POLICY.PRIVATELABELING.ADVANCEDBEHAVIOR' | translate }}
-              </div>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="adv-container" *ngIf="previewData">
-            <mat-slide-toggle
-              class="toggle"
-              color="primary"
-              ngDefaultControl
-              [disabled]="view === View.CURRENT"
-              [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
-              (change)="savePolicy()"
-            >
-              {{ 'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate }}
-            </mat-slide-toggle>
-
-            <mat-slide-toggle
-              class="toggle"
-              color="primary"
-              ngDefaultControl
-              [disabled]="view === View.CURRENT"
-              [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
-              (change)="savePolicy()"
-            >
-              {{ 'POLICY.DATA.DISABLEWATERMARK' | translate }}
-            </mat-slide-toggle>
+          <div class="logo-view" [attr.data-e2e]="'image-part-icon'">
+            <span class="label cnsl-secondary-text">Icon</span>
+            <div class="img-wrapper icon">
+              <ng-container
+                *ngIf="
+                  view === View.PREVIEW
+                    ? theme === Theme.DARK
+                      ? previewData.iconUrlDark
+                      : previewData.iconUrl
+                    : theme === Theme.DARK
+                    ? data.iconUrlDark
+                    : data.iconUrl as iconSrc;
+                  else addIconButton
+                "
+              >
+                <img [src]="iconSrc" alt="icon" />
+                <button
+                  class="dl-btn"
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteAsset(AssetType.ICON, theme)"
+                  [disabled]="view === View.CURRENT"
+                  matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                >
+                  <i class="las la-ban"></i>
+                </button>
+              </ng-container>
+              <ng-template #addIconButton>
+                <input
+                  #selectedIconFile
+                  style="display: none"
+                  class="file-input"
+                  type="file"
+                  (change)="onDropIcon(theme, $any($event.target).files)"
+                />
+                <button
+                  mat-icon-button
+                  matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
+                  *ngIf="view !== View.CURRENT"
+                  (click)="$event.preventDefault(); selectedIconFile.click()"
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+              </ng-template>
+            </div>
           </div>
-        </mat-expansion-panel>
-      </mat-accordion>
-
-      <div class="vertical-divider"></div>
-
-      <div class="preview-wrapper">
-        <div class="col">
-          <cnsl-preview
-            [refresh]="refreshPreview"
-            [theme]="theme"
-            class="preview"
-            [policy]="view === View.PREVIEW ? previewData : data"
-          >
-          </cnsl-preview>
         </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="expansion" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="panel-title">
+              <i class="icon las la-palette"></i>
+              <span>{{ 'POLICY.PRIVATELABELING.COLORS' | translate }}</span>
+              <span class="space"></span>
+              <small class="cnsl-secondary-text" *ngIf="theme === Theme.DARK"
+                >({{ 'POLICY.PRIVATELABELING.DARK' | translate }})</small
+              >
+              <small class="cnsl-secondary-text" *ngIf="theme === Theme.LIGHT"
+                >({{ 'POLICY.PRIVATELABELING.LIGHT' | translate }})</small
+              >
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <ng-container *ngIf="theme === Theme.DARK">
+          <div class="colors" *ngIf="data && previewData">
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.BACKGROUNDDARK"
+                (previewChanged)="previewData.backgroundColorDark !== $event ? setDarkBackgroundColorAndSave($event) : null"
+                name="Background Color"
+                [color]="data.backgroundColorDark"
+                [previewColor]="previewData.backgroundColorDark"
+              ></cnsl-color>
+            </div>
+
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.PRIMARY"
+                (previewChanged)="previewData.primaryColorDark !== $event ? setDarkPrimaryColorAndSave($event) : null"
+                name="Primary Color"
+                [color]="data.primaryColorDark"
+                [previewColor]="previewData.primaryColorDark"
+              >
+              </cnsl-color>
+            </div>
+
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.WARN"
+                (previewChanged)="previewData.warnColorDark !== $event ? setDarkWarnColorAndSave($event) : null"
+                name="Warn Color"
+                [color]="data.warnColorDark"
+                [previewColor]="previewData.warnColorDark"
+              >
+              </cnsl-color>
+            </div>
+
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.FONTDARK"
+                (previewChanged)="previewData.fontColorDark !== $event ? setDarkFontColorAndSave($event) : null"
+                name="Font Color"
+                [color]="data.fontColorDark"
+                [previewColor]="previewData.fontColorDark"
+              >
+              </cnsl-color>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="theme === Theme.LIGHT">
+          <div class="colors" *ngIf="data && previewData">
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.BACKGROUNDLIGHT"
+                (previewChanged)="previewData.backgroundColor !== $event ? setBackgroundColorAndSave($event) : null"
+                name="Background Color"
+                [color]="data.backgroundColor"
+                [previewColor]="previewData.backgroundColor"
+              ></cnsl-color>
+            </div>
+
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.PRIMARY"
+                (previewChanged)="previewData.primaryColor !== $event ? setPrimaryColorAndSave($event) : null"
+                name="Primary Color"
+                [color]="data.primaryColor"
+                [previewColor]="previewData.primaryColor"
+              >
+              </cnsl-color>
+            </div>
+
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.WARN"
+                name="Warn Color"
+                (previewChanged)="previewData.warnColor !== $event ? setWarnColorAndSave($event) : null"
+                [color]="data.warnColor"
+                [previewColor]="previewData.warnColor"
+              ></cnsl-color>
+            </div>
+
+            <div class="color">
+              <cnsl-color
+                [disabled]="view === View.CURRENT"
+                [colorType]="ColorType.FONTLIGHT"
+                (previewChanged)="previewData.fontColor !== $event ? setFontColorAndSave($event) : null"
+                name="Font Color"
+                [color]="data.fontColor"
+                [previewColor]="previewData.fontColor"
+              ></cnsl-color>
+            </div>
+          </div>
+        </ng-container>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="expansion">
+        <mat-expansion-panel-header class="header" [attr.data-e2e]="'policy-category'">
+          <mat-panel-title>
+            <div class="panel-title">
+              <i class="icon las la-font"></i>
+              {{ 'POLICY.PRIVATELABELING.FONT' | translate }}
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="fonts">
+          <cnsl-info-section class="info-section"
+            >{{ 'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate }}
+          </cnsl-info-section>
+          <div class="font-preview" *ngIf="previewData.fontUrl; else addFontButton">
+            <mat-icon class="icon">text_fields</mat-icon>
+
+            <span class="fill-space"></span>
+
+            <button
+              class="dl-btn"
+              [disabled]="view === View.CURRENT"
+              mat-icon-button
+              color="warn"
+              (click)="deleteFont()"
+              matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+            >
+              <i class="las la-ban"></i>
+            </button>
+          </div>
+
+          <ng-template #addFontButton>
+            <div
+              class="font-add"
+              cnslDropzone
+              (hovered)="toggleHoverFont($event)"
+              (dropped)="onDropFont($event)"
+              [class.hovering]="isHoveringOverFont"
+            >
+              <input
+                #selectedFontFile
+                style="display: none"
+                class="file-input"
+                type="file"
+                (change)="onDropFont($any($event.target).files)"
+              />
+              <a
+                class="btn"
+                mat-icon-button
+                *ngIf="view !== View.CURRENT"
+                (click)="selectedFontFile.click()"
+                matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
+              >
+                <mat-icon>add</mat-icon>
+              </a>
+            </div>
+          </ng-template>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="expansion">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="panel-title">
+              <i class="icon las la-universal-access"></i>
+              {{ 'POLICY.PRIVATELABELING.ADVANCEDBEHAVIOR' | translate }}
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="adv-container" *ngIf="previewData">
+          <mat-slide-toggle
+            class="toggle"
+            color="primary"
+            ngDefaultControl
+            [disabled]="
+              view === View.CURRENT ||
+              ([
+                serviceType === PolicyComponentServiceType.ADMIN
+                  ? 'iam.policy.write'
+                  : serviceType === PolicyComponentServiceType.MGMT
+                  ? 'policy.write'
+                  : ''
+              ]
+                | hasRole
+                | async) === false
+            "
+            [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
+            (change)="savePolicy()"
+          >
+            {{ 'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate }}
+          </mat-slide-toggle>
+
+          <mat-slide-toggle
+            class="toggle"
+            color="primary"
+            ngDefaultControl
+            [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
+            (change)="savePolicy()"
+            [disabled]="
+              view === View.CURRENT ||
+              ([
+                serviceType === PolicyComponentServiceType.ADMIN
+                  ? 'iam.policy.write'
+                  : serviceType === PolicyComponentServiceType.MGMT
+                  ? 'policy.write'
+                  : ''
+              ]
+                | hasRole
+                | async) === false
+            "
+          >
+            {{ 'POLICY.DATA.DISABLEWATERMARK' | translate }}
+          </mat-slide-toggle>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="vertical-divider"></div>
+
+    <div class="preview-wrapper">
+      <div class="col">
+        <cnsl-preview
+          [refresh]="refreshPreview"
+          [theme]="theme"
+          class="preview"
+          [ngClass]="{ darkmode: theme === Theme.DARK, lightmode: theme === Theme.LIGHT }"
+          [policy]="view === View.PREVIEW ? previewData : data"
+        >
+        </cnsl-preview>
       </div>
     </div>
-
-    <cnsl-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text">
-    </cnsl-policy-grid>
   </div>
-</cnsl-detail-layout>
+</div>

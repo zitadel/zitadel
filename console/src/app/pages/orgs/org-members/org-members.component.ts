@@ -35,16 +35,11 @@ export class OrgMembersComponent {
     private toast: ToastService,
     breadcrumbService: BreadcrumbService,
   ) {
-    const iamBread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
-      name: 'IAM',
-      routerLink: ['/system'],
-    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([iamBread, bread]);
+    breadcrumbService.setBreadcrumb([bread]);
 
     this.mgmtService.getMyOrg().then((resp) => {
       if (resp.org) {

@@ -50,6 +50,12 @@ func (h *Handler) Storage() static.Storage {
 	return h.storage
 }
 
+func AssetAPI(externalSecure bool) func(context.Context) string {
+	return func(ctx context.Context) string {
+		return http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix
+	}
+}
+
 type Uploader interface {
 	UploadAsset(ctx context.Context, info string, asset *command.AssetUpload, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
@@ -81,12 +87,12 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 		query:           queries,
 	}
 
-	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?
+	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
 	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle, instanceInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
-	return router
+	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))
 }
 
 func (h *Handler) GetFile() Downloader {

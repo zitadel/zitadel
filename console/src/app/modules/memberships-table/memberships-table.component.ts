@@ -160,30 +160,9 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
         });
     } else if (membership.iam) {
       // only shown on auth user
-      this.router.navigate(['/system/members']);
+      this.router.navigate(['/instance/members']);
     }
   }
-
-  // public canNavigateToEdit(membership: Membership.AsObject): Observable<boolean> {
-  //   if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
-  //     return this.authService.isAllowed(['org.member.read:' + membership.orgId]);
-  //   } else if (membership.projectGrantId && membership.details?.resourceOwner) {
-  //     return from(this.authService.getActiveOrg(membership.details?.resourceOwner)).pipe(
-  //       switchMap(() => this.authService.isAllowed(['project.grant.member.read:' + membership.projectId])),
-  //       catchError(() => of(false)),
-  //     );
-  //   } else if (membership.projectId && membership.details?.resourceOwner) {
-  //     return from(this.authService.getActiveOrg(membership.details?.resourceOwner)).pipe(
-  //       take(1),
-  //       switchMap(() => this.authService.isAllowed(['project.member.read:' + membership.projectId])),
-  //       catchError(() => of(false)),
-  //     );
-  //   } else if (membership.iam) {
-  //     return this.authService.isAllowed(['iam.member.read']);
-  //   } else {
-  //     return of(false);
-  //   }
-  // }
 
   private startOrgContextWorkflow(membershipOrg: Org.AsObject, currentOrg?: Org.AsObject | null): void {
     if (!currentOrg || (membershipOrg.id && currentOrg.id && currentOrg.id !== membershipOrg.id)) {

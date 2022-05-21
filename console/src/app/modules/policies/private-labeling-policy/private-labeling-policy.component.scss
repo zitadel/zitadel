@@ -1,9 +1,6 @@
 @use '@angular/material' as mat;
 
-.policy-applied-to {
-  margin: -1rem 0 0 0;
-  font-size: 14px;
-}
+@import './preview/preview.component.scss';
 
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);
@@ -73,6 +70,12 @@
             margin-right: 0.5rem;
           }
 
+          .info-i {
+            font-size: 1.2rem;
+            margin-left: 0.5rem;
+            margin-right: 0;
+          }
+
           .current-dot {
             height: 8px;
             width: 8px;
@@ -97,7 +100,6 @@
       padding-top: 2rem;
       display: flex;
       flex-direction: column;
-      margin: 0 -1rem;
 
       @media only screen and (min-width: 950px) {
         flex-direction: row;
@@ -109,12 +111,14 @@
             min-width: 400px;
           }
         }
+
+        .settings {
+          margin-right: 1rem;
+        }
       }
 
       .settings {
         flex: 1;
-        min-width: 350px;
-        margin: 0 1rem;
 
         .expansion {
           box-shadow: none;
@@ -298,12 +302,15 @@
     }
 
     .preview-wrapper {
-      margin: 0 1rem;
       flex: 2;
       position: relative;
       background-color: #00000010;
       border: 1px solid $border-color;
       box-sizing: border-box;
+
+      @media only screen and (min-width: 950px) {
+        margin-left: 1rem;
+      }
 
       .col {
         display: flex;
@@ -315,6 +322,16 @@
         min-height: 600px;
         width: fit-content;
         margin: auto;
+
+        .preview {
+          &.lightmode {
+            @include preview-theme(false);
+          }
+
+          &.darkmode {
+            @include preview-theme(true);
+          }
+        }
       }
     }
   }

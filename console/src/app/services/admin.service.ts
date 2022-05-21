@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import {
     ActivateLabelPolicyRequest,
     ActivateLabelPolicyResponse,
-    AddCustomOrgIAMPolicyRequest,
+    AddCustomDomainPolicyRequest,
     AddCustomOrgIAMPolicyResponse,
     AddIAMMemberRequest,
     AddIAMMemberResponse,
@@ -17,16 +17,18 @@ import {
     AddOIDCIDPResponse,
     AddSecondFactorToLoginPolicyRequest,
     AddSecondFactorToLoginPolicyResponse,
+    AddSMSProviderTwilioRequest,
+    AddSMSProviderTwilioResponse,
     DeactivateIDPRequest,
     DeactivateIDPResponse,
     GetCustomDomainClaimedMessageTextRequest,
     GetCustomDomainClaimedMessageTextResponse,
+    GetCustomDomainPolicyRequest,
+    GetCustomDomainPolicyResponse,
     GetCustomInitMessageTextRequest,
     GetCustomInitMessageTextResponse,
     GetCustomLoginTextsRequest,
     GetCustomLoginTextsResponse,
-    GetCustomOrgIAMPolicyRequest,
-    GetCustomOrgIAMPolicyResponse,
     GetCustomPasswordlessRegistrationMessageTextRequest,
     GetCustomPasswordlessRegistrationMessageTextResponse,
     GetCustomPasswordResetMessageTextRequest,
@@ -39,6 +41,8 @@ import {
     GetDefaultDomainClaimedMessageTextResponse,
     GetDefaultInitMessageTextRequest,
     GetDefaultInitMessageTextResponse,
+    GetDefaultLanguageRequest,
+    GetDefaultLanguageResponse,
     GetDefaultLoginTextsRequest,
     GetDefaultLoginTextsResponse,
     GetDefaultPasswordlessRegistrationMessageTextRequest,
@@ -49,6 +53,10 @@ import {
     GetDefaultVerifyEmailMessageTextResponse,
     GetDefaultVerifyPhoneMessageTextRequest,
     GetDefaultVerifyPhoneMessageTextResponse,
+    GetDomainPolicyRequest,
+    GetDomainPolicyResponse,
+    GetFileSystemNotificationProviderRequest,
+    GetFileSystemNotificationProviderResponse,
     GetIDPByIDRequest,
     GetIDPByIDResponse,
     GetLabelPolicyRequest,
@@ -57,8 +65,10 @@ import {
     GetLockoutPolicyResponse,
     GetLoginPolicyRequest,
     GetLoginPolicyResponse,
-    GetOrgIAMPolicyRequest,
-    GetOrgIAMPolicyResponse,
+    GetLogNotificationProviderRequest,
+    GetLogNotificationProviderResponse,
+    GetOIDCSettingsRequest,
+    GetOIDCSettingsResponse,
     GetPasswordAgePolicyRequest,
     GetPasswordAgePolicyResponse,
     GetPasswordComplexityPolicyRequest,
@@ -67,6 +77,12 @@ import {
     GetPreviewLabelPolicyResponse,
     GetPrivacyPolicyRequest,
     GetPrivacyPolicyResponse,
+    GetSecretGeneratorRequest,
+    GetSecretGeneratorResponse,
+    GetSMSProviderRequest,
+    GetSMSProviderResponse,
+    GetSMTPConfigRequest,
+    GetSMTPConfigResponse,
     GetSupportedLanguagesRequest,
     GetSupportedLanguagesResponse,
     IDPQuery,
@@ -84,6 +100,10 @@ import {
     ListLoginPolicyMultiFactorsResponse,
     ListLoginPolicySecondFactorsRequest,
     ListLoginPolicySecondFactorsResponse,
+    ListSecretGeneratorsRequest,
+    ListSecretGeneratorsResponse,
+    ListSMSProvidersRequest,
+    ListSMSProvidersResponse,
     ListViewsRequest,
     ListViewsResponse,
     ReactivateIDPRequest,
@@ -110,16 +130,18 @@ import {
     RemoveMultiFactorFromLoginPolicyResponse,
     RemoveSecondFactorFromLoginPolicyRequest,
     RemoveSecondFactorFromLoginPolicyResponse,
+    ResetCustomDomainPolicyToDefaultRequest,
+    ResetCustomDomainPolicyToDefaultResponse,
     ResetCustomLoginTextsToDefaultRequest,
     ResetCustomLoginTextsToDefaultResponse,
-    ResetCustomOrgIAMPolicyToDefaultRequest,
-    ResetCustomOrgIAMPolicyToDefaultResponse,
     SetCustomLoginTextsRequest,
     SetCustomLoginTextsResponse,
     SetDefaultDomainClaimedMessageTextRequest,
     SetDefaultDomainClaimedMessageTextResponse,
     SetDefaultInitMessageTextRequest,
     SetDefaultInitMessageTextResponse,
+    SetDefaultLanguageRequest,
+    SetDefaultLanguageResponse,
     SetDefaultPasswordlessRegistrationMessageTextRequest,
     SetDefaultPasswordlessRegistrationMessageTextResponse,
     SetDefaultPasswordResetMessageTextRequest,
@@ -130,8 +152,10 @@ import {
     SetDefaultVerifyPhoneMessageTextResponse,
     SetUpOrgRequest,
     SetUpOrgResponse,
-    UpdateCustomOrgIAMPolicyRequest,
-    UpdateCustomOrgIAMPolicyResponse,
+    UpdateCustomDomainPolicyRequest,
+    UpdateCustomDomainPolicyResponse,
+    UpdateDomainPolicyRequest,
+    UpdateDomainPolicyResponse,
     UpdateIAMMemberRequest,
     UpdateIAMMemberResponse,
     UpdateIDPJWTConfigRequest,
@@ -146,14 +170,20 @@ import {
     UpdateLockoutPolicyResponse,
     UpdateLoginPolicyRequest,
     UpdateLoginPolicyResponse,
-    UpdateOrgIAMPolicyRequest,
-    UpdateOrgIAMPolicyResponse,
+    UpdateOIDCSettingsRequest,
+    UpdateOIDCSettingsResponse,
     UpdatePasswordAgePolicyRequest,
     UpdatePasswordAgePolicyResponse,
     UpdatePasswordComplexityPolicyRequest,
     UpdatePasswordComplexityPolicyResponse,
     UpdatePrivacyPolicyRequest,
     UpdatePrivacyPolicyResponse,
+    UpdateSecretGeneratorRequest,
+    UpdateSecretGeneratorResponse,
+    UpdateSMTPConfigPasswordRequest,
+    UpdateSMTPConfigPasswordResponse,
+    UpdateSMTPConfigRequest,
+    UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -415,6 +445,51 @@ export class AdminService {
     return this.grpcService.admin.updatePasswordAgePolicy(req, null).then((resp) => resp.toObject());
   }
 
+  /* default language */
+
+  public getDefaultLanguage(): Promise<GetDefaultLanguageResponse.AsObject> {
+    const req = new GetDefaultLanguageRequest();
+    return this.grpcService.admin.getDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultLanguage(language: string): Promise<SetDefaultLanguageResponse.AsObject> {
+    const req = new SetDefaultLanguageRequest();
+    req.setLanguage(language);
+
+    return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* notification settings */
+
+  public getSMTPConfig(): Promise<GetSMTPConfigResponse.AsObject> {
+    const req = new GetSMTPConfigRequest();
+    return this.grpcService.admin.getSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMTPConfig(req: UpdateSMTPConfigRequest): Promise<UpdateSMTPConfigResponse.AsObject> {
+    return this.grpcService.admin.updateSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMTPConfigPassword(req: UpdateSMTPConfigPasswordRequest): Promise<UpdateSMTPConfigPasswordResponse.AsObject> {
+    return this.grpcService.admin.updateSMTPConfigPassword(req, null).then((resp) => resp.toObject());
+  }
+
+  /* sms */
+
+  public listSMSProviders(): Promise<ListSMSProvidersResponse.AsObject> {
+    const req = new ListSMSProvidersRequest();
+    return this.grpcService.admin.listSMSProviders(req, null).then((resp) => resp.toObject());
+  }
+
+  public getSMSProvider(): Promise<GetSMSProviderResponse.AsObject> {
+    const req = new GetSMSProviderRequest();
+    return this.grpcService.admin.getSMSProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public addSMSProviderTwilio(req: AddSMSProviderTwilioRequest): Promise<AddSMSProviderTwilioResponse.AsObject> {
+    return this.grpcService.admin.addSMSProviderTwilio(req, null).then((resp) => resp.toObject());
+  }
+
   /* lockout */
 
   public getLockoutPolicy(): Promise<GetLockoutPolicyResponse.AsObject> {
@@ -486,52 +561,73 @@ export class AdminService {
     return this.grpcService.admin.updateLoginPolicy(req, null).then((resp) => resp.toObject());
   }
 
-  /* org iam */
+  /* OIDC Configuration */
 
-  public getCustomOrgIAMPolicy(orgId: string): Promise<GetCustomOrgIAMPolicyResponse.AsObject> {
-    const req = new GetCustomOrgIAMPolicyRequest();
+  public getOIDCSettings(): Promise<GetOIDCSettingsResponse.AsObject> {
+    const req = new GetOIDCSettingsRequest();
+    return this.grpcService.admin.getOIDCSettings(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateOIDCSettings(req: UpdateOIDCSettingsRequest): Promise<UpdateOIDCSettingsResponse.AsObject> {
+    return this.grpcService.admin.updateOIDCSettings(req, null).then((resp) => resp.toObject());
+  }
+
+  /* LOG and FILE Notifications */
+
+  public getLogNotificationProvider(): Promise<GetLogNotificationProviderResponse.AsObject> {
+    const req = new GetLogNotificationProviderRequest();
+    return this.grpcService.admin.getLogNotificationProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public getFileSystemNotificationProvider(): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+    const req = new GetFileSystemNotificationProviderRequest();
+    return this.grpcService.admin.getFileSystemNotificationProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  /* secrets generator */
+
+  public listSecretGenerators(): Promise<ListSecretGeneratorsResponse.AsObject> {
+    const req = new ListSecretGeneratorsRequest();
+    return this.grpcService.admin.listSecretGenerators(req, null).then((resp) => resp.toObject());
+  }
+
+  public getSecretGenerator(req: GetSecretGeneratorRequest): Promise<GetSecretGeneratorResponse.AsObject> {
+    return this.grpcService.admin.getSecretGenerator(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSecretGenerator(req: UpdateSecretGeneratorRequest): Promise<UpdateSecretGeneratorResponse.AsObject> {
+    return this.grpcService.admin.updateSecretGenerator(req, null).then((resp) => resp.toObject());
+  }
+
+  /* org domain policy */
+
+  public getDomainPolicy(): Promise<GetDomainPolicyResponse.AsObject> {
+    const req = new GetDomainPolicyRequest();
+    return this.grpcService.admin.getDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateDomainPolicy(req: UpdateDomainPolicyRequest): Promise<UpdateDomainPolicyResponse.AsObject> {
+    return this.grpcService.admin.updateDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomDomainPolicy(orgId: string): Promise<GetCustomDomainPolicyResponse.AsObject> {
+    const req = new GetCustomDomainPolicyRequest();
     req.setOrgId(orgId);
-    return this.grpcService.admin.getCustomOrgIAMPolicy(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.getCustomDomainPolicy(req, null).then((resp) => resp.toObject());
   }
 
-  public addCustomOrgIAMPolicy(
-    orgId: string,
-    userLoginMustBeDomain: boolean,
-  ): Promise<AddCustomOrgIAMPolicyResponse.AsObject> {
-    const req = new AddCustomOrgIAMPolicyRequest();
+  public addCustomDomainPolicy(req: AddCustomDomainPolicyRequest): Promise<AddCustomOrgIAMPolicyResponse.AsObject> {
+    return this.grpcService.admin.addCustomDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateCustomDomainPolicy(req: UpdateCustomDomainPolicyRequest): Promise<UpdateCustomDomainPolicyResponse.AsObject> {
+    return this.grpcService.admin.updateCustomDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomDomainPolicyToDefault(orgId: string): Promise<ResetCustomDomainPolicyToDefaultResponse.AsObject> {
+    const req = new ResetCustomDomainPolicyToDefaultRequest();
     req.setOrgId(orgId);
-    req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-
-    return this.grpcService.admin.addCustomOrgIAMPolicy(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateCustomOrgIAMPolicy(
-    orgId: string,
-    userLoginMustBeDomain: boolean,
-  ): Promise<UpdateCustomOrgIAMPolicyResponse.AsObject> {
-    const req = new UpdateCustomOrgIAMPolicyRequest();
-    req.setOrgId(orgId);
-    req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-    return this.grpcService.admin.updateCustomOrgIAMPolicy(req, null).then((resp) => resp.toObject());
-  }
-
-  public resetCustomOrgIAMPolicyToDefault(orgId: string): Promise<ResetCustomOrgIAMPolicyToDefaultResponse.AsObject> {
-    const req = new ResetCustomOrgIAMPolicyToDefaultRequest();
-    req.setOrgId(orgId);
-    return this.grpcService.admin.resetCustomOrgIAMPolicyToDefault(req, null).then((resp) => resp.toObject());
-  }
-
-  /* admin iam */
-
-  public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
-    const req = new GetOrgIAMPolicyRequest();
-    return this.grpcService.admin.getOrgIAMPolicy(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateOrgIAMPolicy(userLoginMustBeDomain: boolean): Promise<UpdateOrgIAMPolicyResponse.AsObject> {
-    const req = new UpdateOrgIAMPolicyRequest();
-    req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-    return this.grpcService.admin.updateOrgIAMPolicy(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.resetCustomDomainPolicyToDefault(req, null).then((resp) => resp.toObject());
   }
 
   /* policies end */

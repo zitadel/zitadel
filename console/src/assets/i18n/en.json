@@ -46,7 +46,8 @@
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
-    "INSTANCEOVERVIEW": "Instance Overview",
+    "INSTANCEOVERVIEW": "Instance",
+    "ORGS": "Organizations",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
@@ -66,7 +67,8 @@
     "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
-    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts"
+    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts",
+    "SETTINGS": "Settings"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",
@@ -271,12 +273,12 @@
       "U2F_DIALOG_TITLE": "Verify authenticator",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
       "U2F_SUCCESS": "Passwordless Auth created successfully!",
-      "U2F_ERROR": "An error during U2F setup occurred!",
+      "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerprint, Security Keys, Face ID and other"
       },
       "STATE": {
         "0": "No State",
@@ -322,16 +324,16 @@
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
-      "U2F": "U2F (Universal 2nd Factor)",
-      "U2F_DIALOG_TITLE": "Verify U2F",
+      "U2F": "Fingerprint, Security Keys, Face ID and other",
+      "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
-      "U2F_SUCCESS": "U2F created successfully!",
-      "U2F_ERROR": "An error during U2F setup occurred!",
-      "U2F_NAME": "U2F Name",
+      "U2F_SUCCESS": "Factor added successfully!",
+      "U2F_ERROR": "An error during setup occurred!",
+      "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerprint, Security Keys, Face ID and other"
       },
       "STATE": {
         "0": "No State",
@@ -530,7 +532,7 @@
       "6": "Initial"
     },
     "SEARCH": {
-      "ADDITIONAL": "User Name (selected organization)",
+      "ADDITIONAL": "Loginname (current organization)",
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {
@@ -556,7 +558,7 @@
       "PHONEVERIFICATIONSENT": "Phone verification code sent.",
       "EMAILVERIFICATIONSENT": "E-mail verification code sent.",
       "OTPREMOVED": "OTP removed.",
-      "U2FREMOVED": "U2F removed.",
+      "U2FREMOVED": "Factor removed.",
       "PASSWORDLESSREMOVED": "Passwordless removed.",
       "INITIALPASSWORDSET": "Initial password set.",
       "PASSWORDNOTIFICATIONSENT": "Password change notification sent.",
@@ -669,6 +671,8 @@
     }
   },
   "IAM": {
+    "TITLE": "Instance",
+    "DESCRIPTION": "Manage your instance settings and Organizations",
     "POLICIES": {
       "TITLE": "System Policies and Access Settings",
       "DESCRIPTION": "Manage your global Policies and Management Access Settings."
@@ -679,7 +683,7 @@
     },
     "MEMBER": {
       "TITLE": "Managers",
-      "DESCRIPTION": "These Managers are allowed to make changes in your system."
+      "DESCRIPTION": "These Managers are allowed to make changes in your instance."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -759,6 +763,10 @@
       "USEPASSWORD": "Set Initial Password",
       "USEPASSWORDDESC": "The user does not have to set the password during initialization."
     },
+    "LIST": {
+      "TITLE": "Organizations",
+      "DESCRIPTION": "These are the organizations on your instance"
+    },
     "DOMAINS": {
       "NEW": "Add Domain",
       "TITLE": "Domains",
@@ -791,6 +799,103 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set."
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Instance Settings",
+      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
+    },
+    "ORG": {
+      "TITLE": "Organization Settings",
+      "DESCRIPTION": "These settings extend and overwrite your instance settings."
+    },
+    "LIST": {
+      "GENERAL": "General",
+      "LOGIN": "Login Behaviour and Security",
+      "LOCKOUT": "Lockout",
+      "COMPLEXITY": "Password complexity",
+      "NOTIFICATIONS": "Notification providers and SMTP",
+      "MESSAGETEXTS": "Message Texts",
+      "IDP": "Identity Providers",
+      "DOMAIN": "Domain settings",
+      "LOGINTEXTS": "Login Interface Texts",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Privacy Policy",
+      "OIDC": "OIDC Token lifetime and expiration",
+      "SECRETS": "Secret Appearance"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Notifications",
+      "LOGIN": "Login and Access",
+      "DOMAIN": "Domain",
+      "TEXTS": "Texts and Languages",
+      "APPEARANCE": "Appearance",
+      "OTHER": "Other"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Default Language",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English"
+    },
+    "SMTP": {
+      "TITLE": "SMTP Settings",
+      "SENDERADDRESS": "Sender Email address",
+      "SENDERNAME": "Sender Name",
+      "HOST": "Host",
+      "USER": "User",
+      "PASSWORD": "Password",
+      "SETPASSWORD": "Set SMTP Password",
+      "PASSWORDSET": "SMTP Password was set successfully.",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Saved successfully!",
+      "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
+    },
+    "SMS": {
+      "TITLE": "SMS Settings",
+      "PROVIDERS": "Providers",
+      "PROVIDER": "SMS Provider",
+      "ADDPROVIDER": "Add SMS Provider",
+      "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Sender Number",
+        "ADDED": "Twilio added successfully."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Settings",
+      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
+      "IDTOKENLIFETIME": "Id Token Lifetime",
+      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
+      "INHOURS": "hours",
+      "INDAYS": "Days"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Appearance",
+      "TYPES": "Secret Types",
+      "TYPE": {
+        "1": "Initialization Mail",
+        "2": "Email verification",
+        "3": "Phone verification",
+        "4": "Password Reset",
+        "5": "Passwordless Initialization",
+        "6": "App Secret"
+      },
+      "ADDGENERATOR": "Define Secret Appearance",
+      "GENERATORTYPE": "Type",
+      "EXPIRY": "Expiration (in hours)",
+      "INCLUDEDIGITS": "Include Numbers",
+      "INCLUDESYMBOLS": "Include Symbols",
+      "INCLUDELOWERLETTERS": "Include Lower letters",
+      "INCLUDEUPPERLETTERS": "Include Upper letters",
+      "LENGTH": "Length",
+      "UPDATED": "Settings updated."
     }
   },
   "POLICY": {
@@ -848,9 +953,8 @@
       "TITLE": "Lockout Policy",
       "DESCRIPTION": "Set a maximum number of passwordretries, after which accounts will be blocked."
     },
-    "IAM_POLICY": {
-      "TITLE": "IAM Access Preferences",
-      "DESCRIPTION": "Define access properties of your users."
+    "DOMAIN_POLICY": {
+      "TITLE": "Domain Settings"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
@@ -864,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "ADVANCED": "Advanced",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -965,7 +1070,7 @@
         "UPDATED": "Custom Texts saved."
       }
     },
-    "DEFAULTLABEL": "The currently set guideline corresponds to the standard setting set by the IAM Administrator.",
+    "DEFAULTLABEL": "The current settings corresponds to the standard of your Instance.",
     "BTN_INSTALL": "Setup",
     "BTN_EDIT": "Modify",
     "DATA": {
@@ -979,7 +1084,9 @@
       "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
-      "USERLOGINMUSTBEDOMAIN": "User Login must be Domain",
+      "USERLOGINMUSTBEDOMAIN": "User Loginname must contain orgdomain",
+      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
       "ALLOWREGISTER": "Register allowed",
@@ -991,10 +1098,20 @@
       "HIDEPASSWORDRESET": "Hide Password reset",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
+      "IGNOREUNKNOWNUSERNAMES": "Ignore unknown usernames",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
+      "DEFAULTREDIRECTURI": "Default Redirect URI",
+      "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
-      "DISABLEWATERMARK": "Hide Watermark"
+      "DISABLEWATERMARK": "Hide Watermark",
+      "PASSWORDCHECKLIFETIME": "Password Check Lifetime",
+      "EXTERNALLOGINCHECKLIFETIME": "External Login Check Lifetime",
+      "MFAINITSKIPLIFETIME": "Multifactor Init Lifetime",
+      "SECONDFACTORCHECKLIFETIME": "Second Factor Check Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Multifactor Check Lifetime",
+      "INHOURS": "hours"
     },
-    "RESET": "Reset Policy",
+    "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
     "TOAST": {
       "SET": "Policy set successfully!",
@@ -1333,6 +1450,7 @@
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "DELETE_SELECTION_TITLE": "Delete Idp",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "EMPTY": "No IPD available",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
@@ -1377,12 +1495,12 @@
     "TYPE": "Type",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "U2F with Pin"
+      "1": "Fingerprint, Security Keys, Face ID and other"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "OTP",
-      "2": "U2F"
+      "1": "One Time Password (OTP)",
+      "2": "Fingerprint, Security Keys, Face ID and other"
     }
   },
   "LOGINPOLICY": {

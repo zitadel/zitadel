@@ -59,10 +59,6 @@ var (
 		name:  projection.ProjectColumnInstanceID,
 		table: projectsTable,
 	}
-	ProjectColumnCreator = Column{
-		name:  projection.ProjectColumnCreator,
-		table: projectsTable,
-	}
 	ProjectColumnSequence = Column{
 		name:  projection.ProjectColumnSequence,
 		table: projectsTable,

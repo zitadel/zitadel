@@ -23,8 +23,8 @@ export class KeyboardShortcutsComponent {
 
   public get isNotOnSystem(): boolean {
     return !(
-      ['/system', '/views', '/failed-events'].includes(this.router.url) ||
-      new RegExp('/system/policy/*').test(this.router.url)
+      ['/instance', '/views', '/failed-events'].includes(this.router.url) ||
+      new RegExp('/instance/policy/*').test(this.router.url)
     );
   }
 }

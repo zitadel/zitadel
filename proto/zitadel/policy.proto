@@ -40,6 +40,12 @@ message DomainPolicy {
             description: "defines if organisation domains should be validated org count as validated automatically"
         }
     ];
+    bool smtp_sender_address_matches_instance_domain = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the smtp sender address domain should match an existing domain on the instance"
+        }
+    ];
+
 }
 
 message LabelPolicy {
@@ -56,10 +62,10 @@ message LabelPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
-    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes
     bool hide_login_name_suffix = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     // hex value for secondary color
@@ -149,11 +155,21 @@ message LoginPolicy {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
-    google.protobuf.Duration password_check_lifetime = 9;
-    google.protobuf.Duration external_login_check_lifetime = 10;
-    google.protobuf.Duration mfa_init_skip_lifetime = 11;
-    google.protobuf.Duration second_factor_check_lifetime = 12;
-    google.protobuf.Duration multi_factor_check_lifetime = 13;
+    bool ignore_unknown_usernames = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 11;
+    google.protobuf.Duration external_login_check_lifetime = 12;
+    google.protobuf.Duration mfa_init_skip_lifetime = 13;
+    google.protobuf.Duration second_factor_check_lifetime = 14;
+    google.protobuf.Duration multi_factor_check_lifetime = 15;
 
 }
 

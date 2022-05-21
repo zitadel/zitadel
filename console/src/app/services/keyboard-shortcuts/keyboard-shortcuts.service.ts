@@ -9,11 +9,11 @@ import {
     ACTIONS,
     DOMAINS,
     HOME,
+    INSTANCE,
     KeyboardShortcut,
     ME,
     ORG,
     PROJECTS,
-    SYSTEM,
     USERGRANTS,
     USERS,
 } from './keyboard-shortcuts';
@@ -59,8 +59,8 @@ export class KeyboardShortcutsService implements OnDestroy {
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyS') {
-          if (this.hasPermission(SYSTEM)) {
-            this.router.navigate(SYSTEM.link);
+          if (this.hasPermission(INSTANCE)) {
+            this.router.navigate(INSTANCE.link);
           }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyO') {

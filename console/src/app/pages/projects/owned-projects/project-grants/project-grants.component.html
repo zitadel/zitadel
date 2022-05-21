@@ -1,85 +1,117 @@
 <div class="max-width-container">
   <div class="project-grants-wrapper">
-    <h1>{{'PROJECT.GRANT.TITLE' | translate}}</h1>
-    <p class="desc cnsl-secondary-text">{{'PROJECT.GRANT.DESCRIPTION' | translate}}</p>
-
     <div class="project-grants">
-      <cnsl-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"
-        [dataSize]="dataSource.totalResult" [selection]="selection" [timestamp]="dataSource?.viewTimestamp"
-        (refreshed)="getRoleOptions(projectId)">
-
+      <cnsl-refresh-table
+        [loading]="dataSource?.loading$ | async"
+        *ngIf="projectId"
+        (refreshed)="loadGrantsPage()"
+        [dataSize]="dataSource.totalResult"
+        [selection]="selection"
+        [timestamp]="dataSource?.viewTimestamp"
+        (refreshed)="getRoleOptions(projectId)"
+      >
         <div actions>
-          <a [disabled]="((['project.grant.write$', 'project.grant.write:'+ projectId]| hasRole | async)) === false"
-            color="primary" class="cnsl-action-button" mat-raised-button
-            [routerLink]="[ '/projects', projectId, 'projectgrants', 'create']">
+          <a
+            [disabled]="(['project.grant.write$', 'project.grant.write:' + projectId] | hasRole | async) === false"
+            color="primary"
+            class="cnsl-action-button"
+            mat-raised-button
+            [routerLink]="['/projects', projectId, 'projectgrants', 'create']"
+          >
             <mat-icon class="icon">add</mat-icon>
             <span>{{ 'ACTIONS.NEW' | translate }}</span>
-            <cnsl-action-keys (actionTriggered)="gotoRouterLink([ '/projects', projectId, 'projectgrants', 'create'])">
+            <cnsl-action-keys (actionTriggered)="gotoRouterLink(['/projects', projectId, 'projectgrants', 'create'])">
             </cnsl-action-keys>
           </a>
         </div>
 
         <div class="table-wrapper">
           <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
-
             <ng-container matColumnDef="select">
               <th class="selection" mat-header-cell *matHeaderCellDef>
                 <mat-checkbox
-                  [disabled]="((['project.grant.write$', 'project.grant.write:'+ projectId]| hasRole | async)) === false"
-                  color="primary" (change)="$event ? masterToggle() : null"
+                  [disabled]="(['project.grant.write$', 'project.grant.write:' + projectId] | hasRole | async) === false"
+                  color="primary"
+                  (change)="$event ? masterToggle() : null"
                   [checked]="selection.hasValue() && isAllSelected()"
-                  [indeterminate]="selection.hasValue() && !isAllSelected()">
+                  [indeterminate]="selection.hasValue() && !isAllSelected()"
+                >
                 </mat-checkbox>
               </th>
               <td class="selection" mat-cell *matCellDef="let row">
                 <mat-checkbox
-                  [disabled]="((['project.grant.write$', 'project.grant.write:'+ projectId]| hasRole | async)) === false"
-                  color="primary" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                  [checked]="selection.isSelected(row)">
+                  [disabled]="(['project.grant.write$', 'project.grant.write:' + projectId] | hasRole | async) === false"
+                  color="primary"
+                  (click)="$event.stopPropagation()"
+                  (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)"
+                >
                 </mat-checkbox>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="grantedOrgName">
-              <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORG' | translate }} </th>
-              <td [routerLink]="['/projects',grant.projectId,'projectgrants', grant.grantId]" class="pointer" mat-cell
-                *matCellDef="let grant">
-                {{grant.grantedOrgName}} </td>
+              <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.GRANTEDORG' | translate }}</th>
+              <td
+                [routerLink]="['/projects', grant.projectId, 'projectgrants', grant.grantId]"
+                class="pointer"
+                mat-cell
+                *matCellDef="let grant"
+              >
+                {{ grant.grantedOrgName }}
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="creationDate">
-              <th mat-header-cell *matHeaderCellDef> {{'PROJECT.GRANT.CREATIONDATE' | translate}} </th>
-              <td class="pointer" mat-cell *matCellDef="let grant"
-                [routerLink]="['/projects',grant.projectId,'projectgrants', grant.grantId]">
-                <span>{{grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+              <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}</th>
+              <td
+                class="pointer"
+                mat-cell
+                *matCellDef="let grant"
+                [routerLink]="['/projects', grant.projectId, 'projectgrants', grant.grantId]"
+              >
+                <span>{{ grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="changeDate">
-              <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
-              <td class="pointer" mat-cell *matCellDef="let grant"
-                [routerLink]="['/projects',grant.projectId,'projectgrants', grant.grantId]">
-                <span>{{grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+              <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</th>
+              <td
+                class="pointer"
+                mat-cell
+                *matCellDef="let grant"
+                [routerLink]="['/projects', grant.projectId, 'projectgrants', grant.grantId]"
+              >
+                <span>{{ grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="state">
-              <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.STATE' | translate }} </th>
-              <td class="pointer" mat-cell *matCellDef="let grant"
-                [routerLink]="['/projects',grant.projectId,'projectgrants', grant.grantId]">
-                <span class="state"
-                  [ngClass]="{'active': grant.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': grant.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE}">
-                  {{ 'PROJECT.GRANT.STATES.'+grant.state | translate }}
+              <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.STATE' | translate }}</th>
+              <td
+                class="pointer"
+                mat-cell
+                *matCellDef="let grant"
+                [routerLink]="['/projects', grant.projectId, 'projectgrants', grant.grantId]"
+              >
+                <span
+                  class="state"
+                  [ngClass]="{
+                    active: grant.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE,
+                    inactive: grant.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE
+                  }"
+                >
+                  {{ 'PROJECT.GRANT.STATES.' + grant.state | translate }}
                 </span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="roleNamesList">
-              <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
-              </th>
+              <th mat-header-cell *matHeaderCellDef class="role-row">{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</th>
               <td class="pointer role-row" mat-cell *matCellDef="let grant">
                 <div class="flex-row">
-                  <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.grantedRoleKeysList">{{ role }}
+                  <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.grantedRoleKeysList"
+                    >{{ role }}
                   </cnsl-project-role-chip>
                 </div>
               </td>
@@ -89,10 +121,14 @@
               <th mat-header-cell *matHeaderCellDef class="role-table-actions"></th>
               <td mat-cell *matCellDef="let grant" class="role-table-actions">
                 <cnsl-table-actions>
-                  <button actions
+                  <button
+                    actions
                     [disabled]="(['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) === false"
-                    mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}"
-                    (click)="deleteGrant(grant)">
+                    mat-icon-button
+                    color="warn"
+                    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                    (click)="deleteGrant(grant)"
+                  >
                     <i class="las la-trash"></i>
                   </button>
                 </cnsl-table-actions>
@@ -100,19 +136,24 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let grant; columns: displayedColumns;">
-            </tr>
+            <tr class="highlight" mat-row *matRowDef="let grant; columns: displayedColumns"></tr>
           </table>
         </div>
 
         <div *ngIf="(dataSource.loading$ | async) === false && !dataSource?.totalResult" class="no-content-row">
           <i class="las la-exclamation"></i>
-          <span>{{'PROJECT.GRANT.EMPTY' | translate}}</span>
+          <span>{{ 'PROJECT.GRANT.EMPTY' | translate }}</span>
         </div>
 
-        <cnsl-paginator class="paginator" #paginator [pageSize]="50" [timestamp]="dataSource?.viewTimestamp"
-          [pageSizeOptions]="[25, 50, 100, 250]" [length]="dataSource.totalResult"
-          (page)="loadGrantsPage($event.pageIndex, $event.pageSize)">
+        <cnsl-paginator
+          class="paginator"
+          #paginator
+          [pageSize]="50"
+          [timestamp]="dataSource?.viewTimestamp"
+          [pageSizeOptions]="[25, 50, 100, 250]"
+          [length]="dataSource.totalResult"
+          (page)="loadGrantsPage($event.pageIndex, $event.pageSize)"
+        >
         </cnsl-paginator>
       </cnsl-refresh-table>
     </div>

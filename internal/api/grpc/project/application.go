@@ -65,7 +65,6 @@ func AppAPIConfigToPb(app *query.APIApp) app_pb.AppConfig {
 	return &app_pb.App_ApiConfig{
 		ApiConfig: &app_pb.APIConfig{
 			ClientId:       app.ClientID,
-			ClientSecret:   "", //TODO: remove from proto
 			AuthMethodType: APIAuthMethodeTypeToPb(app.AuthMethodType),
 		},
 	}

@@ -39,7 +39,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-d8kwF", "Errors.IAM.IDPConfig.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

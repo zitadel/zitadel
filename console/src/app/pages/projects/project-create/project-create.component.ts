@@ -21,26 +21,18 @@ export class ProjectCreateComponent {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    const iambread = new Breadcrumb({
-      type: BreadcrumbType.IAM,
-      name: 'IAM',
-      routerLink: ['/system'],
-    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([iambread, bread]);
+    breadcrumbService.setBreadcrumb([bread]);
   }
-
-  public createSteps: number = 1;
-  public currentCreateStep: number = 1;
 
   public saveProject(): void {
     this.mgmtService
       .addProject(this.project)
       .then((resp: AddProjectResponse.AsObject) => {
-        this.toast.showInfo('PROJECT.TOAST.CREATED', true)
+        this.toast.showInfo('PROJECT.TOAST.CREATED', true);
         this.router.navigate(['projects', resp.id]);
       })
       .catch((error) => {

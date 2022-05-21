@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,25 +14,24 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
-import { IdpTableModule } from 'src/app/modules/idp-table/idp-table.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
-import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
+import { DialogAddTypeComponent } from './factor-table/dialog-add-type/dialog-add-type.component';
+import { FactorTableComponent } from './factor-table/factor-table.component';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
-import { DialogAddTypeComponent } from './mfa-table/dialog-add-type/dialog-add-type.component';
-import { MfaTableComponent } from './mfa-table/mfa-table.component';
 
 @NgModule({
-  declarations: [LoginPolicyComponent, MfaTableComponent, DialogAddTypeComponent],
+  declarations: [LoginPolicyComponent, FactorTableComponent, DialogAddTypeComponent],
   imports: [
     LoginPolicyRoutingModule,
     CommonModule,
     InfoSectionModule,
     FormsModule,
     CardModule,
+    ReactiveFormsModule,
     InputModule,
     MatIconModule,
     MatButtonModule,
@@ -39,14 +39,14 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     HasRoleModule,
     MatDialogModule,
     HasRolePipeModule,
+    MatCheckboxModule,
     MatTooltipModule,
     DetailLayoutModule,
-    IdpTableModule,
     MatProgressSpinnerModule,
     MatSelectModule,
     MatRippleModule,
     TranslateModule,
-    PolicyGridModule,
   ],
+  exports: [LoginPolicyComponent],
 })
 export class LoginPolicyModule {}

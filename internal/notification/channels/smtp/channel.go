@@ -29,13 +29,16 @@ func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context
 	}
 	client, err := smtpConfig.SMTP.connectToSMTP(smtpConfig.Tls)
 	if err != nil {
+		logging.New().WithError(err).Error("could not connect to smtp")
 		return nil, err
 	}
 
 	logging.New().Debug("successfully initialized smtp email channel")
 
 	return &Email{
-		smtpClient: client,
+		smtpClient:    client,
+		senderName:    smtpConfig.FromName,
+		senderAddress: smtpConfig.From,
 	}, nil
 }
 

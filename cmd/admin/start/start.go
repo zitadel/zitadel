@@ -157,20 +157,20 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	adminRepo, err := admin_es.Start(config.Admin, store, dbClient, login.HandlerPrefix)
+	adminRepo, err := admin_es.Start(config.Admin, store, dbClient)
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
 	if err := authenticatedAPIs.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.DefaultInstance)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, assets.HandlerPrefix, keys.User)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.ExternalSecure, keys.User)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
+	if err := authenticatedAPIs.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
 

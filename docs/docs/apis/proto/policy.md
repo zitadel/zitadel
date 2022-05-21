@@ -19,6 +19,7 @@ title: zitadel/policy.proto
 | user_login_must_be_domain |  bool | - |  |
 | is_default |  bool | - |  |
 | validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
 
 
 
@@ -32,7 +33,7 @@ title: zitadel/policy.proto
 | details |  zitadel.v1.ObjectDetails | - |  |
 | primary_color |  string | hex value for primary color |  |
 | is_default |  bool | defines if the organisation's admin changed the policy |  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes |  |
 | warn_color |  string | hex value for secondary color |  |
 | background_color |  string | hex value for background color |  |
 | font_color |  string | hex value for font color |  |
@@ -77,6 +78,8 @@ title: zitadel/policy.proto
 | passwordless_type |  PasswordlessType | - |  |
 | is_default |  bool | - |  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
 | password_check_lifetime |  google.protobuf.Duration | - |  |
 | external_login_check_lifetime |  google.protobuf.Duration | - |  |
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |

@@ -1,0 +1,113 @@
+<cnsl-refresh-table
+  [hideRefresh]="true"
+  (refreshed)="refresh()"
+  [dataSize]="dataSource.data.length"
+  [loading]="loading$ | async"
+>
+  <cnsl-filter-org actions (filterChanged)="applySearchQuery($any($event))" (filterOpen)="filterOpen = $event">
+  </cnsl-filter-org>
+
+  <ng-template actions cnslHasRole [hasRole]="['org.create', 'iam.write']">
+    <a [routerLink]="['/org', 'create']" color="primary" mat-raised-button class="cnsl-action-button">
+      <mat-icon class="icon">add</mat-icon>
+      <span>{{ 'ACTIONS.NEW' | translate }}</span>
+      <cnsl-action-keys (actionTriggered)="gotoRouterLink(['/org', 'create'])"> </cnsl-action-keys>
+    </a>
+  </ng-template>
+
+  <table
+    [dataSource]="dataSource"
+    mat-table
+    class="table"
+    aria-label="Organizations"
+    matSort
+    (matSortChange)="sortChange($event)"
+  >
+    <ng-container matColumnDef="select">
+      <th class="selection" mat-header-cell *matHeaderCellDef>
+        {{ 'ORG.PAGES.ACTIVE' | translate }}
+      </th>
+      <td class="selection" mat-cell *matCellDef="let org">
+        <mat-radio-button (change)="selectOrg(org)" color="primary" [checked]="org.id === activeOrg.id"> </mat-radio-button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>{{ 'ORG.PAGES.ID' | translate }}</th>
+      <td mat-cell *matCellDef="let org" (change)="selectOrg(org)">{{ org.id }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="primaryDomain">
+      <th mat-header-cell *matHeaderCellDef>{{ 'ORG.PAGES.PRIMARYDOMAIN' | translate }}</th>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
+        <span>{{ org.primaryDomain }}</span>
+        <button
+          color="primary"
+          class="cpy-button"
+          mat-icon-button
+          [disabled]="copied === org.primaryDomain"
+          [matTooltip]="(copied !== org.primaryDomain ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+          cnslCopyToClipboard
+          [valueToCopy]="org.primaryDomain"
+          (copiedValue)="copied = $event"
+        >
+          <i *ngIf="copied !== org.primaryDomain" class="las la-clipboard"></i>
+          <i *ngIf="copied === org.primaryDomain" class="las la-clipboard-check"></i>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <!-- mat-sort-header -->
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'ORG.PAGES.NAME' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">{{ org.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="state">
+      <th mat-header-cell *matHeaderCellDef>{{ 'ORG.PAGES.STATE' | translate }}</th>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
+        <span
+          class="state"
+          [ngClass]="{
+            active: org.state === OrgState.ORG_STATE_ACTIVE,
+            inactive: org.state === OrgState.ORG_STATE_INACTIVE
+          }"
+          *ngIf="org.state"
+          >{{ 'ORG.STATE.' + org.state | translate }}</span
+        >
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="creationDate">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'ORG.PAGES.CREATIONDATE' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
+        {{ org.details?.creationDate | timestampToDate | localizedDate: 'fromNow' }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="changeDate">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'ORG.PAGES.DATECHANGED' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
+        {{ org.details?.changeDate | timestampToDate | localizedDate: 'fromNow' }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+  <cnsl-paginator
+    #paginator
+    class="paginator"
+    [timestamp]="timestamp"
+    [length]="totalResult || 0"
+    [pageSize]="initialLimit"
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="changePage()"
+  ></cnsl-paginator>
+</cnsl-refresh-table>

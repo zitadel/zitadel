@@ -4,10 +4,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-datasource';
+import { InstanceMembersDataSource } from 'src/app/pages/instance/instance-members/instance-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
 import {
-  ProjectGrantMembersDataSource,
+    ProjectGrantMembersDataSource,
 } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { getMembershipColor } from 'src/app/utils/color';
@@ -21,7 +21,7 @@ type MemberDatasource =
   | OrgMembersDataSource
   | ProjectMembersDataSource
   | ProjectGrantMembersDataSource
-  | IamMembersDataSource;
+  | InstanceMembersDataSource;
 
 @Component({
   selector: 'cnsl-members-table',
@@ -121,7 +121,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   public masterToggle(): void {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.dataSource.membersSubject.value.forEach((row) => this.selection.select(row));
+      : this.dataSource.membersSubject.value.forEach((row: Member.AsObject) => this.selection.select(row));
   }
 
   public changePage(event?: PageEvent): any {

@@ -9,17 +9,17 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import {
-  APIAuthMethodType,
-  OIDCAppType,
-  OIDCAuthMethodType,
-  OIDCGrantType,
-  OIDCResponseType,
+    APIAuthMethodType,
+    OIDCAppType,
+    OIDCAuthMethodType,
+    OIDCGrantType,
+    OIDCResponseType,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
-  AddAPIAppRequest,
-  AddAPIAppResponse,
-  AddOIDCAppRequest,
-  AddOIDCAppResponse,
+    AddAPIAppRequest,
+    AddAPIAppResponse,
+    AddOIDCAppRequest,
+    AddOIDCAppResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -27,13 +27,13 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
-  BASIC_AUTH_METHOD,
-  CODE_METHOD,
-  getPartialConfigFromAuthMethod,
-  IMPLICIT_METHOD,
-  PK_JWT_METHOD,
-  PKCE_METHOD,
-  POST_METHOD,
+    BASIC_AUTH_METHOD,
+    CODE_METHOD,
+    getPartialConfigFromAuthMethod,
+    IMPLICIT_METHOD,
+    PK_JWT_METHOD,
+    PKCE_METHOD,
+    POST_METHOD,
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
 
@@ -48,6 +48,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   public devmode: boolean = false;
   public projectId: string = '';
   public loading: boolean = false;
+
+  public createSteps: number = 4;
+  public currentCreateStep: number = 1;
 
   public oidcAppRequest: AddOIDCAppRequest.AsObject = new AddOIDCAppRequest().toObject();
   public apiAppRequest: AddAPIAppRequest.AsObject = new AddAPIAppRequest().toObject();
@@ -200,11 +203,6 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     if (projectId) {
       const breadcrumbs = [
         new Breadcrumb({
-          type: BreadcrumbType.IAM,
-          name: 'IAM',
-          routerLink: ['/system'],
-        }),
-        new Breadcrumb({
           type: BreadcrumbType.ORG,
           routerLink: ['/org'],
         }),
@@ -275,6 +273,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   }
 
   public changeStep(event: StepperSelectionEvent): void {
+    this.currentCreateStep = event.selectedIndex + 1;
+
     if (event.selectedIndex >= 2) {
       this.requestRedirectValuesSubject$.next();
     }

@@ -33,9 +33,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         version: "1.0";
         description: "The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, users and so on if they have the necessary access rights.";
         contact:{
-            name: "CAOS developers of ZITADEL"
-            url: "https://zitadel.ch"
-            email: "hi@zitadel.ch"
+            name: "ZITADEL"
+            url: "https://zitadel.com"
+            email: "hi@zitadel.com"
         }
         license: {
             name: "Apache License 2.0",
@@ -59,7 +59,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     external_docs: {
         description: "Detailed information about ZITADEL",
-        url: "https://docs.zitadel.ch"
+        url: "https://docs.zitadel.com"
     }
 
     extensions: {
@@ -138,7 +138,6 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
-                //TODO: errors
             };
         };
     }
@@ -2952,7 +2951,7 @@ message AddHumanUserRequest {
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        string email = 1 [(validate.rules).string.email = true];
         bool is_email_verified = 2;
     }
     message Phone {
@@ -2984,7 +2983,7 @@ message ImportHumanUserRequest {
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        string email = 1 [(validate.rules).string.email = true];
         bool is_email_verified = 2;
     }
     message Phone {
@@ -4344,11 +4343,21 @@ message AddCustomLoginPolicyRequest {
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
-    google.protobuf.Duration password_check_lifetime = 7;
-    google.protobuf.Duration external_login_check_lifetime = 8;
-    google.protobuf.Duration mfa_init_skip_lifetime = 9;
-    google.protobuf.Duration second_factor_check_lifetime = 10;
-    google.protobuf.Duration multi_factor_check_lifetime = 11;
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message AddCustomLoginPolicyResponse {
@@ -4362,11 +4371,21 @@ message UpdateCustomLoginPolicyRequest {
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
-    google.protobuf.Duration password_check_lifetime = 7;
-    google.protobuf.Duration external_login_check_lifetime = 8;
-    google.protobuf.Duration mfa_init_skip_lifetime = 9;
-    google.protobuf.Duration second_factor_check_lifetime = 10;
-    google.protobuf.Duration multi_factor_check_lifetime = 11;
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message UpdateCustomLoginPolicyResponse {
@@ -4644,10 +4663,10 @@ message GetDefaultLabelPolicyResponse {
 
 message AddCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {max_len: 50}];
-    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];
@@ -4668,7 +4687,7 @@ message UpdateCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {max_len: 50}];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];
