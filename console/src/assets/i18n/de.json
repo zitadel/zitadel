@@ -236,7 +236,7 @@
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Email Benachrichtigung senden",
-      "DESCRIPTION": "Klicken Sie den untenstehenden Button um ein Verifizierung-Email an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
+      "DESCRIPTION": "Klicken Sie den untenstehenden Button um ein Verifizierung-E-Mail an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
       "NEWEMAIL": "Neue Email"
     },
     "TABLE": {
@@ -291,7 +291,7 @@
         "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
         "ADD_TITLE": "Passwortlose Authentifizierung",
         "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwortlosen Authentifizierungsmethode.",
-        "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre Email Adresse.",
+        "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre E-Mail Adresse.",
         "SEND": "Registrierungslink senden",
         "SENT": "Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup fortzufahren.",
         "QRCODE_DESCRIPTION": "QR-Code zum scannen mit einem anderen Gerät generieren.",
