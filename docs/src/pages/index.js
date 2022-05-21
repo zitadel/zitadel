@@ -67,7 +67,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="docs/guides/installation/shared-cloud"
+              link="docs/guides/installation"
               type={ICONTYPE.STORAGE}
               title="Installation"
               description=""
