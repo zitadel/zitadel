@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -10,49 +12,17 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context) (*domain.PrivacyPolicy, error) {
-	policyWriteModel := NewInstancePrivacyPolicyWriteModel(ctx)
-	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
+func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPrivacyPolicy(instanceAgg, tosLink, privacyLink, helpLink))
 	if err != nil {
 		return nil, err
 	}
-	if !policyWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-559os", "Errors.IAM.PrivacyPolicy.NotFound")
-	}
-	policy := writeModelToPrivacyPolicy(&policyWriteModel.PrivacyPolicyWriteModel)
-	policy.Default = true
-	return policy, nil
-}
-
-func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
-	addedPolicy := NewInstancePrivacyPolicyWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
-	events, err := c.addDefaultPrivacyPolicy(ctx, instanceAgg, addedPolicy, policy)
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, events)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToPrivacyPolicy(&addedPolicy.PrivacyPolicyWriteModel), nil
-}
-
-func (c *Commands) addDefaultPrivacyPolicy(ctx context.Context, instanceAgg *eventstore.Aggregate, addedPolicy *InstancePrivacyPolicyWriteModel, policy *domain.PrivacyPolicy) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
-	if err != nil {
-		return nil, err
-	}
-	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-M00rJ", "Errors.IAM.PrivacyPolicy.AlreadyExists")
-	}
-
-	return instance.NewPrivacyPolicyAddedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink), nil
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
@@ -90,4 +60,45 @@ func (c *Commands) defaultPrivacyPolicyWriteModelByID(ctx context.Context) (poli
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func (c *Commands) getDefaultPrivacyPolicy(ctx context.Context) (*domain.PrivacyPolicy, error) {
+	policyWriteModel := NewInstancePrivacyPolicyWriteModel(ctx)
+	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	if !policyWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-559os", "Errors.IAM.PrivacyPolicy.NotFound")
+	}
+	policy := writeModelToPrivacyPolicy(&policyWriteModel.PrivacyPolicyWriteModel)
+	policy.Default = true
+	return policy, nil
+}
+
+func prepareAddDefaultPrivacyPolicy(
+	a *instance.Aggregate,
+	tosLink,
+	privacyLink,
+	helpLink string,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewInstancePrivacyPolicyWriteModel(ctx)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if writeModel.State == domain.PolicyStateActive {
+				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-M00rJ", "Errors.Instance.PrivacyPolicy.AlreadyExists")
+			}
+			return []eventstore.Command{
+				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink),
+			}, nil
+		}, nil
+	}
 }

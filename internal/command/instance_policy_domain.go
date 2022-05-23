@@ -3,41 +3,26 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
-	addedPolicy := NewInstanceDomainPolicyWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
-	event, err := c.addDefaultDomainPolicy(ctx, instanceAgg, addedPolicy, policy)
+func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultDomainPolicy(instanceAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
 	if err != nil {
 		return nil, err
 	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToDomainPolicy(addedPolicy), nil
-}
-
-func (c *Commands) addDefaultDomainPolicy(ctx context.Context, instanceAgg *eventstore.Aggregate, addedPolicy *InstanceDomainPolicyWriteModel, policy *domain.DomainPolicy) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
-	if err != nil {
-		return nil, err
-	}
-	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.IAM.DomainPolicy.AlreadyExists")
-	}
-	return iam_repo.NewDomainPolicyAddedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain, policy.ValidateOrgDomains, policy.SMTPSenderAddressMatchesInstanceDomain), nil
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
@@ -89,4 +74,35 @@ func (c *Commands) defaultDomainPolicyWriteModelByID(ctx context.Context) (polic
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func prepareAddDefaultDomainPolicy(
+	a *instance.Aggregate,
+	userLoginMustBeDomain,
+	validateOrgDomains,
+	smtpSenderAddressMatchesInstanceDomain bool,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewInstanceDomainPolicyWriteModel(ctx)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if writeModel.State == domain.PolicyStateActive {
+				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.Instance.DomainPolicy.AlreadyExists")
+			}
+			return []eventstore.Command{
+				instance.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
+					userLoginMustBeDomain,
+					validateOrgDomains,
+					smtpSenderAddressMatchesInstanceDomain,
+				),
+			}, nil
+		}, nil
+	}
 }
