@@ -16,14 +16,14 @@ Effort required during depends on the complexity of your infrastructure and the 
 
 With the application support trainings we provide the initial knowledge transfer to manage and support ZITADEL. The trainings are held as block-sessions with relevant staff from your organization. Prices are flat-fee, excl. expenses.
 
-* [ZITADEL DevOps](supportservice/application)
-* [ZITADEL Administrator](supportservice/application)
+* [ZITADEL DevOps](application#zitadel-devops)
+* [ZITADEL Administrator](application#zitadel-administrator)
 
 ## Recurring Trainings
 
 While you can benefit from a technical account manager during your term, these trainings are designed to onboard new staff or update staff about larger changes to the platform. Prices are flat-fee, excl. expenses.
 
-* [ZITADEL Support Refresher](supportservice/application)
-* [ZITADEL Support Onboarding](supportservice/application)
+* [ZITADEL Support Refresher](recurring#zitadel-support-refresher)
+* [ZITADEL Support Onboarding](recurring#zitadel-support-onboarding)
 
 In case you have any questions please [get in touch](https://zitadel.com/contact).
