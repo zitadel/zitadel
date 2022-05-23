@@ -36,6 +36,7 @@ module.exports = {
   ],
   guides: [
     "guides/overview",
+    "guides/installation/installation",
     {
       type: "category",
       label: "Get to know ZITADEL",
@@ -91,43 +92,10 @@ module.exports = {
       type: "category",
       label: "Customization",
       collapsed: false,
-      items: ["guides/customization/branding", "guides/customization/texts"],
-    },
-
-    {
-      type: "category",
-      label: "Installation",
-      collapsed: true,
       items: [
-        {
-          type: "category",
-          label: "CAOS Managed",
-          collapsed: true,
-          items: [
-            "guides/installation/shared-cloud",
-            "guides/installation/managed-dedicated-instance",
-          ],
-        },
-        {
-          type: "category",
-          label: "CAOS Service Packages",
-          collapsed: true,
-          items: [
-            "guides/installation/setup",
-            "guides/installation/setup-orbos",
-            "guides/installation/checkup",
-          ],
-        },
-        {
-          type: "category",
-          label: "Self Managed",
-          collapsed: true,
-          items: [
-            "guides/installation/crd",
-            "guides/installation/gitops",
-            "guides/installation/orbos",
-          ],
-        },
+          "guides/customization/branding",
+          "guides/customization/texts",
+          "guides/customization/behavior"
       ],
     },
     {
@@ -189,6 +157,7 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
+          "apis/actions"
       ],
     },
     {
@@ -222,7 +191,7 @@ module.exports = {
     {
       type: "category",
       label: "Structure",
-      collapsed: true,
+      collapsed: false,
       items: [
         "concepts/structure/overview",
         "concepts/structure/instance",
@@ -240,6 +209,12 @@ module.exports = {
       label: "Use Cases",
       collapsed: false,
       items: ["concepts/usecases/saas"],
+    },
+    {
+      type: "category",
+      label: "Features",
+      collapsed: false,
+      items: ["concepts/features/actions"],
     },
   ],
   manuals: [

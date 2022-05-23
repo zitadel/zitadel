@@ -47,7 +47,15 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 
 	query = criteria.placeholder(query)
 
-	rows, err := criteria.db().QueryContext(ctx, query, values...)
+	var contextQuerier interface {
+		QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+	}
+	contextQuerier = criteria.db()
+	if searchQuery.Tx != nil {
+		contextQuerier = searchQuery.Tx
+	}
+
+	rows, err := contextQuerier.QueryContext(ctx, query, values...)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return z_errors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")

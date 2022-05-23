@@ -16,8 +16,10 @@
     <cnsl-password-lockout-policy [serviceType]="serviceType"></cnsl-password-lockout-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'login'">
-    <!-- <cnsl-org-iam-policy [serviceType]="serviceType"></cnsl-org-iam-policy> -->
     <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'domain'">
+    <cnsl-domain-policy [serviceType]="serviceType"></cnsl-domain-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'idp'">
     <cnsl-idp-settings [serviceType]="serviceType"></cnsl-idp-settings>

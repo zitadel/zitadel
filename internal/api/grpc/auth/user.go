@@ -20,7 +20,7 @@ func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*a
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user, s.assetsAPIDomain)}, nil
+	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user, s.assetsAPIDomain(ctx))}, nil
 }
 
 func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserRequest) (*auth_pb.RemoveMyUserResponse, error) {
@@ -61,7 +61,7 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		return nil, err
 	}
 	return &auth_pb.ListMyUserChangesResponse{
-		Result: change.ChangesToPb(changes.Changes, s.assetsAPIDomain),
+		Result: change.ChangesToPb(changes.Changes, s.assetsAPIDomain(ctx)),
 	}, nil
 }
 

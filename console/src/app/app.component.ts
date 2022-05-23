@@ -116,6 +116,11 @@ export class AppComponent implements OnInit, OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lightbulb-off-outline.svg'),
     );
 
+    this.matIconRegistry.addSvgIcon(
+      'usb',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/usb-flash-drive-outline.svg'),
+    );
+
     this.matIconRegistry.addSvgIcon('mdi_radar', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/radar.svg'));
 
     this.matIconRegistry.addSvgIcon(

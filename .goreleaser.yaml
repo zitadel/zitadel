@@ -4,7 +4,7 @@ release:
   github:
     owner: zitadel
     name: zitadel
-  draft: true
+  draft: false
   prerelease: auto
 
 before:
@@ -51,7 +51,19 @@ dockers:
   - "--platform=linux/arm64"
 
 archives:
-- format: binary
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+    - goos: windows
+      format: zip
+    files:
+      - README.md
+      - LICENSE
 
 gomod:
   proxy: false
@@ -73,7 +85,7 @@ brews:
       token: "{{ .Env.GORELEASER_TOKEN_TAP }}"
     folder: Formula
     goarm: "7"
-    homepage:  https://zitadel.ch
+    homepage:  https://zitadel.com
     description: Open source identity solution built for the container and cloud era
     license: Apache 2.0
     test: |
@@ -84,12 +96,8 @@ brews:
     - name: git
     install: |-
       bin.install "zitadel"
-      bash_completion.install "completions/zitadel.bash" => "zitadel"
-      zsh_completion.install "completions/zitadel.zsh" => "zitadel"
-      fish_completion.install "completions/gorezitadelleaser.fish"
-      man1.install "manpages/zitadel.1.gz"
 
 announce:
   discord:
-    enabled: false #enable when we release v2
+    enabled: true
     message_template: 'ZITADEL {{ .Tag }} is ready! Check the notes: https://github.com/zitadel/zitadel/releases/tag/{{ .Tag }}'

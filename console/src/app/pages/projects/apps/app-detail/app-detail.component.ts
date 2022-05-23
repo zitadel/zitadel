@@ -164,9 +164,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.http.get('./assets/environment.json').subscribe((env: any) => {
       this.environmentMap = {
         issuer: env.issuer,
-        adminServiceUrl: env.adminServiceUrl,
-        mgmtServiceUrl: env.mgmtServiceUrl,
-        authServiceUrl: env.adminServiceUrl,
+        adminServiceUrl: env.api,
+        mgmtServiceUrl: env.api,
+        authServiceUrl: env.api,
       };
     });
   }
@@ -229,7 +229,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       {
         i18nTitle: 'APP.PAGES.NEXTSTEPS.2.TITLE',
         i18nDesc: 'APP.PAGES.NEXTSTEPS.2.DESC',
-        href: 'https://docs.zitadel.ch',
+        href: 'https://docs.zitadel.comm',
         iconClasses: 'las la-people-carry',
       },
     ];

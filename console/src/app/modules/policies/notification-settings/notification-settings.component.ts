@@ -14,6 +14,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
+import { SMTPPasswordDialogComponent } from './smtp-password-dialog/smtp-password-dialog.component';
 
 @Component({
   selector: 'cnsl-notification-settings',
@@ -25,7 +26,12 @@ export class NotificationSettingsComponent implements OnInit {
   public smsProviders: SMSProvider.AsObject[] = [];
   public logNotificationProvider!: DebugNotificationProvider.AsObject;
   public fileNotificationProvider!: DebugNotificationProvider.AsObject;
-  public loading: boolean = false;
+
+  public smtpLoading: boolean = false;
+  public smsProvidersLoading: boolean = false;
+  public logProviderLoading: boolean = false;
+  public fileProviderLoading: boolean = false;
+
   public form!: FormGroup;
 
   public SMSProviderConfigState: any = SMSProviderConfigState;
@@ -45,7 +51,6 @@ export class NotificationSettingsComponent implements OnInit {
       tls: [true, [Validators.required]],
       host: ['', [Validators.required]],
       user: ['', [Validators.required]],
-      password: ['', [Validators.required]],
     });
   }
 
@@ -54,47 +59,61 @@ export class NotificationSettingsComponent implements OnInit {
   }
 
   private fetchData(): void {
+    this.smtpLoading = true;
     this.service
       .getSMTPConfig()
       .then((smtpConfig) => {
+        this.smtpLoading = false;
         if (smtpConfig.smtpConfig) {
           this.form.patchValue(smtpConfig.smtpConfig);
         }
       })
       .catch((error) => {
+        this.smtpLoading = false;
         if (error && error.code === 5) {
           console.log(error);
         }
       });
 
-    this.service.listSMSProviders().then((smsProviders) => {
-      if (smsProviders.resultList) {
-        this.smsProviders = smsProviders.resultList;
-        console.log(this.smsProviders);
-      }
-    });
+    this.smsProvidersLoading = true;
+    this.service
+      .listSMSProviders()
+      .then((smsProviders) => {
+        this.smsProvidersLoading = false;
+        if (smsProviders.resultList) {
+          this.smsProviders = smsProviders.resultList;
+        }
+      })
+      .catch((error) => {
+        this.smsProvidersLoading = false;
+        this.toast.showError(error);
+      });
 
+    this.logProviderLoading = true;
     this.service
       .getLogNotificationProvider()
       .then((logNotificationProvider) => {
+        this.logProviderLoading = false;
         if (logNotificationProvider.provider) {
           this.logNotificationProvider = logNotificationProvider.provider;
         }
       })
       .catch((error) => {
+        this.logProviderLoading = false;
         this.toast.showError(error);
       });
 
+    this.fileProviderLoading = true;
     this.service
       .getFileSystemNotificationProvider()
       .then((fileNotificationProvider) => {
+        this.fileProviderLoading = false;
         if (fileNotificationProvider.provider) {
-          console.log(fileNotificationProvider);
           this.fileNotificationProvider = fileNotificationProvider.provider;
         }
       })
       .catch((error) => {
-        console.log('hehe');
+        this.fileProviderLoading = false;
         this.toast.showError(error);
       });
   }
@@ -107,16 +126,7 @@ export class NotificationSettingsComponent implements OnInit {
     req.setTls(this.tls?.value ?? false);
     req.setUser(this.user?.value ?? '');
 
-    return this.service.updateSMTPConfig(req).then(() => {
-      let passwordReq: UpdateSMTPConfigPasswordRequest;
-      if (this.password) {
-        passwordReq = new UpdateSMTPConfigPasswordRequest();
-        passwordReq.setPassword(this.password.value);
-        return this.service.updateSMTPConfigPassword(passwordReq);
-      } else {
-        return;
-      }
-    });
+    return this.service.updateSMTPConfig(req).catch(this.toast.showError);
   }
 
   public savePolicy(): void {
@@ -125,7 +135,6 @@ export class NotificationSettingsComponent implements OnInit {
       prom
         .then(() => {
           this.toast.showInfo('SETTING.SMTP.SAVED', true);
-          this.loading = true;
           setTimeout(() => {
             this.fetchData();
           }, 2000);
@@ -147,6 +156,28 @@ export class NotificationSettingsComponent implements OnInit {
           .addSMSProviderTwilio(req)
           .then(() => {
             this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
+  public setSMTPPassword(): void {
+    const dialogRef = this.dialog.open(SMTPPasswordDialogComponent, {
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((password: string) => {
+      if (password) {
+        const passwordReq = new UpdateSMTPConfigPasswordRequest();
+        passwordReq.setPassword(password);
+
+        this.service
+          .updateSMTPConfigPassword(passwordReq)
+          .then(() => {
+            this.toast.showInfo('SETTING.SMTP.PASSWORDSET', true);
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -177,9 +208,5 @@ export class NotificationSettingsComponent implements OnInit {
 
   public get host(): AbstractControl | null {
     return this.form.get('host');
-  }
-
-  public get password(): AbstractControl | null {
-    return this.form.get('password');
   }
 }

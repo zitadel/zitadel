@@ -67,7 +67,7 @@
     "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
-    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts",
+    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
     "SETTINGS": "Settings"
   },
   "ACTIONS": {
@@ -205,7 +205,7 @@
       "DESCRIPTIONMACHINE": "Create and manage Service Users of your organization",
       "DETAIL": "Detail",
       "CREATE": "Create",
-      "MY": "My Informations",
+      "MY": "My Information",
       "LOGINNAMES": "Loginnames",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
@@ -273,12 +273,12 @@
       "U2F_DIALOG_TITLE": "Verify authenticator",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
       "U2F_SUCCESS": "Passwordless Auth created successfully!",
-      "U2F_ERROR": "An error during U2F setup occurred!",
+      "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerprint, Security Keys, Face ID and other"
       },
       "STATE": {
         "0": "No State",
@@ -324,16 +324,16 @@
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
-      "U2F": "U2F (Universal 2nd Factor)",
-      "U2F_DIALOG_TITLE": "Verify U2F",
+      "U2F": "Fingerprint, Security Keys, Face ID and other",
+      "U2F_DIALOG_TITLE": "Verify Factor",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used universal Multifactor.",
-      "U2F_SUCCESS": "U2F created successfully!",
-      "U2F_ERROR": "An error during U2F setup occurred!",
-      "U2F_NAME": "U2F Name",
+      "U2F_SUCCESS": "Factor added successfully!",
+      "U2F_ERROR": "An error during setup occurred!",
+      "U2F_NAME": "Authenticator Name",
       "TYPE": {
         "0": "No MFA defined",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Fingerprint, Security Keys, Face ID and other"
       },
       "STATE": {
         "0": "No State",
@@ -363,7 +363,7 @@
     },
     "CREATE": {
       "TITLE": "Create a New User",
-      "DESCRIPTION": "Please provide the necesary information.",
+      "DESCRIPTION": "Please provide the necessary information.",
       "NAMEANDEMAILSECTION": "Name and E-mail",
       "GENDERLANGSECTION": "Gender and Language",
       "PHONESECTION": "Phone numbers",
@@ -373,7 +373,7 @@
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
-      "DESCRIPTION": "Enter the code you recieved by text message to verify your phone number.",
+      "DESCRIPTION": "Enter the code you received by text message to verify your phone number.",
       "CODE": "Code"
     },
     "DATA": {
@@ -544,7 +544,7 @@
     "SIGNEDOUT_BTN": "Sign In",
     "EDITACCOUNT": "Edit Account",
     "ADDACCOUNT": "Log in With Another Account",
-    "RESENDINITIALEMAIL": "Send new initialisation mail",
+    "RESENDINITIALEMAIL": "Send new initialization mail",
     "RESENDEMAILNOTIFICATION": "Resend Email notification",
     "TOAST": {
       "CREATED": "User created successfully.",
@@ -558,7 +558,7 @@
       "PHONEVERIFICATIONSENT": "Phone verification code sent.",
       "EMAILVERIFICATIONSENT": "E-mail verification code sent.",
       "OTPREMOVED": "OTP removed.",
-      "U2FREMOVED": "U2F removed.",
+      "U2FREMOVED": "Factor removed.",
       "PASSWORDLESSREMOVED": "Passwordless removed.",
       "INITIALPASSWORDSET": "Initial password set.",
       "PASSWORDNOTIFICATIONSENT": "Password change notification sent.",
@@ -640,13 +640,13 @@
     },
     "ADDTRIGGER": "Add trigger",
     "TIMEOUT": "Timeout",
-    "TIMEOUTINSEC": "Timout in seconds",
+    "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
     "ACTIONS": "Actions",
-    "ACTIONSMAX": "Based on your Tier, you have available a limited Number of Actions ({{value}}). Make sure to deaktivate those you are not in need or consider upgrading your tier.",
+    "ACTIONSMAX": "Based on your Tier, you have available a limited Number of Actions ({{value}}). Make sure to deactivate those you are not in need or consider upgrading your tier.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Create an Action"
@@ -812,12 +812,13 @@
     },
     "LIST": {
       "GENERAL": "General",
-      "LOGIN": "Login Behaviour and Security",
+      "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notification providers and SMTP",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
+      "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
@@ -827,6 +828,7 @@
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Login and Access",
+      "DOMAIN": "Domain",
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
       "OTHER": "Other"
@@ -846,6 +848,8 @@
       "HOST": "Host",
       "USER": "User",
       "PASSWORD": "Password",
+      "SETPASSWORD": "Set SMTP Password",
+      "PASSWORDSET": "SMTP Password was set successfully.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Saved successfully!",
       "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
@@ -922,7 +926,7 @@
       "ADVANCEDBEHAVIOR": "Advanced Behavior",
       "DROP": "Drop image here or",
       "RELEASE": "Release",
-      "DROPFONT": "Drop fontfile here",
+      "DROPFONT": "Drop font file here",
       "RELEASEFONT": "Release",
       "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in console",
       "MAXSIZE": "The maximum size is limited to 524kB",
@@ -947,11 +951,10 @@
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Policy",
-      "DESCRIPTION": "Set a maximum number of passwordretries, after which accounts will be blocked."
+      "DESCRIPTION": "Set a maximum number of password-retries, after which accounts will be blocked."
     },
-    "IAM_POLICY": {
-      "TITLE": "IAM Access Preferences",
-      "DESCRIPTION": "Define access properties of your users."
+    "DOMAIN_POLICY": {
+      "TITLE": "Domain Settings"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
@@ -965,6 +968,7 @@
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "ADVANCED": "Advanced",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -1035,7 +1039,7 @@
     },
     "MESSAGE_TEXTS": {
       "TITLE": "Message Texts",
-      "DESCRIPTION": "Define your texts for your notication mails.",
+      "DESCRIPTION": "Define your texts for your notification mails.",
       "TYPE": "Notification",
       "TYPES": {
         "INIT": "Initialization",
@@ -1080,7 +1084,9 @@
       "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
-      "USERLOGINMUSTBEDOMAIN": "User Login must be Domain",
+      "USERLOGINMUSTBEDOMAIN": "User Loginname must contain orgdomain",
+      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
       "ALLOWREGISTER": "Register allowed",
@@ -1097,7 +1103,13 @@
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
-      "DISABLEWATERMARK": "Hide Watermark"
+      "DISABLEWATERMARK": "Hide Watermark",
+      "PASSWORDCHECKLIFETIME": "Password Check Lifetime",
+      "EXTERNALLOGINCHECKLIFETIME": "External Login Check Lifetime",
+      "MFAINITSKIPLIFETIME": "Multifactor Init Lifetime",
+      "SECONDFACTORCHECKLIFETIME": "Second Factor Check Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Multifactor Check Lifetime",
+      "INHOURS": "hours"
     },
     "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
@@ -1176,7 +1188,7 @@
         },
         "DIALOG": {
           "TITLE": "Branding Setting",
-          "DESCRIPTION": "Select the behaviour of the login, when using the project."
+          "DESCRIPTION": "Select the behavior of the login, when using the project."
         }
       },
       "PINNED": "Pinned",
@@ -1187,7 +1199,7 @@
       "DIALOG": {
         "REACTIVATE": {
           "TITLE": "Reactivate Project",
-          "DESCRIPTION": "Do you really want to ractivate your project?"
+          "DESCRIPTION": "Do you really want to reactivate your project?"
         },
         "DEACTIVATE": {
           "TITLE": "Deactivate Project",
@@ -1438,6 +1450,7 @@
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "DELETE_SELECTION_TITLE": "Delete Idp",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "EMPTY": "No IPD available",
     "OIDC": {
       "TITLE": "OIDC IDP",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
@@ -1453,9 +1466,9 @@
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",
       "DEACTIVATED": "Idp deactivated.",
-      "SELECTEDREACTIVATED": "Selected idps reactivated.",
-      "SELECTEDDEACTIVATED": "Selected idps deactivated.",
-      "SELECTEDKEYSDELETED": "Selected idps deleted.",
+      "SELECTEDREACTIVATED": "Selected Idps reactivated.",
+      "SELECTEDDEACTIVATED": "Selected Idps deactivated.",
+      "SELECTEDKEYSDELETED": "Selected Idps deleted.",
       "DELETED": "Idp removed successfully!"
     }
   },
@@ -1482,12 +1495,12 @@
     "TYPE": "Type",
     "MULTIFACTORTYPES": {
       "0": "Unknown",
-      "1": "U2F with Pin"
+      "1": "Fingerprint, Security Keys, Face ID and other"
     },
     "SECONDFACTORTYPES": {
       "0": "Unknown",
-      "1": "OTP",
-      "2": "U2F"
+      "1": "One Time Password (OTP)",
+      "2": "Fingerprint, Security Keys, Face ID and other"
     }
   },
   "LOGINPOLICY": {
@@ -1498,7 +1511,7 @@
     "IDPS": "Identity Providers",
     "ADDIDP": {
       "TITLE": "Add Identity Provider",
-      "DESCRIPTION": "You can select predefined or selfcreated providers for authentication.",
+      "DESCRIPTION": "You can select predefined or self-created providers for authentication.",
       "SELECTIDPS": "Identity providers"
     },
     "PASSWORDLESS": "Passwordless Login",
@@ -1585,7 +1598,7 @@
       "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
       "REDIRECTDESCRIPTIONNATIVE": "Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.",
       "REDIRECTNOTVALID": "This redirect URI is not valid.",
-      "COMMAORENTERSEPERATION": "seperate with ↵",
+      "COMMAORENTERSEPERATION": "separate with ↵",
       "TYPEREQUIRED": "The type is required.",
       "TITLE": "OIDC Configuration",
       "CLIENTID": "Client ID",
@@ -1759,7 +1772,7 @@
     },
     "CREATE": {
       "TITLE": "Create authorization",
-      "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
+      "DESCRIPTION": "Search for the organization, the project, and the corresponding roles."
     },
     "EDIT": {
       "TITLE": "Change authorization"
@@ -1776,7 +1789,7 @@
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",
       "DELETE_DESCRIPTION": "You are about to delete an authorization. Do you want to continue?",
-      "BULK_DELETE_TITLE": "Delete autorizations",
+      "BULK_DELETE_TITLE": "Delete authorizations",
       "BULK_DELETE_DESCRIPTION": "You are about to delete multiple authorizations. Do you want to continue?"
     }
   },

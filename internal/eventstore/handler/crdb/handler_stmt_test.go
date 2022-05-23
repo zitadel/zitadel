@@ -138,7 +138,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				expectation(mock)
 			}
 
-			query, limit, err := h.SearchQuery()
+			query, limit, err := h.SearchQuery(context.Background())
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
@@ -183,6 +183,13 @@ func TestStatementHandler_Update(t *testing.T) {
 			name: "begin fails",
 			args: args{
 				ctx: context.Background(),
+				stmts: []*handler.Statement{
+					NewNoOpStatement(&testEvent{
+						aggregateType:    "agg",
+						sequence:         6,
+						previousSequence: 0,
+					}),
+				},
 			},
 			want: want{
 				expectations: []mockExpectation{
@@ -197,6 +204,13 @@ func TestStatementHandler_Update(t *testing.T) {
 			name: "current sequence fails",
 			args: args{
 				ctx: context.Background(),
+				stmts: []*handler.Statement{
+					NewNoOpStatement(&testEvent{
+						aggregateType:    "agg",
+						sequence:         6,
+						previousSequence: 0,
+					}),
+				},
 			},
 			want: want{
 				expectations: []mockExpectation{
@@ -494,7 +508,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			if !tt.want.isErr(err) {
 				t.Errorf("StatementHandler.Update() error = %v", err)
 			}
-			if tt.want.stmtsLen != len(stmts) {
+			if err == nil && tt.want.stmtsLen != len(stmts) {
 				t.Errorf("wrong stmts length: want: %d got %d", tt.want.stmtsLen, len(stmts))
 			}
 
@@ -687,7 +701,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				}),
 				aggregates: tt.fields.aggregates,
 			}
-			stmts, err := h.fetchPreviousStmts(tt.args.ctx, tt.args.stmtSeq, "", tt.args.sequences, tt.args.reduce)
+			stmts, err := h.fetchPreviousStmts(tt.args.ctx, nil, tt.args.stmtSeq, "", tt.args.sequences, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
@@ -1069,7 +1083,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 				t.Fatalf("unexpected err in begin: %v", err)
 			}
 
-			idx := h.executeStmts(tx, tt.args.stmts, tt.args.sequences)
+			idx := h.executeStmts(tx, &tt.args.stmts, tt.args.sequences)
 			if idx != tt.want.idx {
 				t.Errorf("unexpected index want: %d got %d", tt.want.idx, idx)
 			}
@@ -1420,7 +1434,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				t.Fatalf("unexpected err in begin: %v", err)
 			}
 
-			seq, err := h.currentSequences(tx.Query)
+			seq, err := h.currentSequences(context.Background(), tx.QueryContext)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}

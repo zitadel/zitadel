@@ -1,8 +1,12 @@
-<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()">
+<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()" [queryCount]="searchQueries.length">
   <div class="filter-row" id="filtercomp">
     <div class="name-query">
-      <mat-checkbox id="state" class="cb" [checked]="getSubFilter(SubQuery.STATE)"
-        (change)="changeCheckbox(SubQuery.STATE, $event )">{{'FILTER.STATE' | translate}}
+      <mat-checkbox
+        id="state"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.STATE)"
+        (change)="changeCheckbox(SubQuery.STATE, $event)"
+        >{{ 'FILTER.STATE' | translate }}
       </mat-checkbox>
       <div class="subquery" *ngIf="getSubFilter(SubQuery.STATE) as sq">
         <span class="nomethod cnsl-secondary-text">
@@ -10,9 +14,9 @@
         </span>
 
         <cnsl-form-field class="filter-select-value" appearance="outline">
-          <mat-select [value]="sq.getState()" (selectionChange)="setValue(SubQuery.STATE,sq, $event)">
+          <mat-select [value]="sq.getState()" (selectionChange)="setValue(SubQuery.STATE, sq, $event)">
             <mat-option *ngFor="let state of states" [value]="state">
-              {{ 'USER.STATE.'+state | translate }}
+              {{ 'USER.STATE.' + state | translate }}
             </mat-option>
           </mat-select>
         </cnsl-form-field>
@@ -20,61 +24,75 @@
     </div>
 
     <div class="name-query">
-      <mat-checkbox id="displayname" class="cb" [checked]="getSubFilter(SubQuery.DISPLAYNAME)"
-        (change)="changeCheckbox(SubQuery.DISPLAYNAME, $event )">{{'FILTER.DISPLAYNAME' | translate}}
+      <mat-checkbox
+        id="displayname"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.DISPLAYNAME)"
+        (change)="changeCheckbox(SubQuery.DISPLAYNAME, $event)"
+        >{{ 'FILTER.DISPLAYNAME' | translate }}
       </mat-checkbox>
       <div class="subquery" *ngIf="getSubFilter(SubQuery.DISPLAYNAME) as dnq">
         <cnsl-form-field class="filter-select-method" appearance="outline">
           <mat-select [value]="dnq.getMethod()" (selectionChange)="setMethod(dnq, $event)">
             <mat-option *ngFor="let method of methods" [value]="method">
-              {{ 'FILTER.METHODS.'+method | translate }}
+              {{ 'FILTER.METHODS.' + method | translate }}
             </mat-option>
           </mat-select>
         </cnsl-form-field>
 
         <cnsl-form-field class="filter-input-value" appearance="outline">
-          <input cnslInput name="value" [value]="dnq.getDisplayName()"
-            (change)="setValue(SubQuery.DISPLAYNAME, dnq, $event)" />
+          <input
+            cnslInput
+            name="value"
+            [value]="dnq.getDisplayName()"
+            (change)="setValue(SubQuery.DISPLAYNAME, dnq, $event)"
+          />
         </cnsl-form-field>
       </div>
     </div>
 
     <div class="email-query">
-      <mat-checkbox id="email" class="cb" [checked]="getSubFilter(SubQuery.EMAIL)"
-        (change)="changeCheckbox(SubQuery.EMAIL, $event )">{{'FILTER.EMAIL' | translate}}
+      <mat-checkbox
+        id="email"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.EMAIL)"
+        (change)="changeCheckbox(SubQuery.EMAIL, $event)"
+        >{{ 'FILTER.EMAIL' | translate }}
       </mat-checkbox>
       <div class="subquery" *ngIf="getSubFilter(SubQuery.EMAIL) as eq">
         <cnsl-form-field class="filter-select-method" appearance="outline">
           <mat-select [value]="eq.getMethod()" (selectionChange)="setMethod(eq, $event)">
             <mat-option *ngFor="let method of methods" [value]="method">
-              {{ 'FILTER.METHODS.'+method | translate}}
+              {{ 'FILTER.METHODS.' + method | translate }}
             </mat-option>
           </mat-select>
         </cnsl-form-field>
 
         <cnsl-form-field class="filter-input-value" appearance="outline">
-          <input cnslInput name="value" [value]="eq.getEmailAddress()"
-            (change)="setValue(SubQuery.EMAIL, eq, $event)" />
+          <input cnslInput name="value" [value]="eq.getEmailAddress()" (change)="setValue(SubQuery.EMAIL, eq, $event)" />
         </cnsl-form-field>
       </div>
     </div>
 
     <div class="usernane-query">
-      <mat-checkbox id="username" class="cb" [checked]="getSubFilter(SubQuery.USERNAME)"
-        (change)="changeCheckbox(SubQuery.USERNAME, $event )">{{'FILTER.USERNAME' | translate}}
+      <mat-checkbox
+        id="username"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.USERNAME)"
+        (change)="changeCheckbox(SubQuery.USERNAME, $event)"
+        >{{ 'FILTER.USERNAME' | translate }}
       </mat-checkbox>
       <div class="subquery" *ngIf="getSubFilter(SubQuery.USERNAME) as unq">
         <cnsl-form-field class="filter-select-method" appearance="outline">
           <mat-select [value]="unq.getMethod()" (selectionChange)="setMethod(unq, $event)">
             <mat-option *ngFor="let method of methods" [value]="method">
-              {{ 'FILTER.METHODS.'+method | translate}}
+              {{ 'FILTER.METHODS.' + method | translate }}
             </mat-option>
           </mat-select>
         </cnsl-form-field>
 
         <cnsl-form-field class="filter-input-value" appearance="outline">
-          <input cnslInput name="value" [value]="unq.getUserName()"
-            (change)="setValue(SubQuery.USERNAME, unq, $event)" />
+          <input cnslInput name="value" [value]="unq.getUserName()" (change)="setValue(SubQuery.USERNAME, unq, $event)" />
         </cnsl-form-field>
       </div>
     </div>

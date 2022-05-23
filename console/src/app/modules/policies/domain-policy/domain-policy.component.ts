@@ -1,32 +1,43 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { GetCustomOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import {
+    AddCustomDomainPolicyRequest,
+    GetCustomOrgIAMPolicyResponse,
+    UpdateDomainPolicyRequest,
+} from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { DomainPolicy, OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'cnsl-org-iam-policy',
-  templateUrl: './org-iam-policy.component.html',
-  styleUrls: ['./org-iam-policy.component.scss'],
+  selector: 'cnsl-domain-policy',
+  templateUrl: './domain-policy.component.html',
+  styleUrls: ['./domain-policy.component.scss'],
 })
-export class OrgIamPolicyComponent implements OnInit, OnDestroy {
+export class DomainPolicyComponent implements OnInit, OnDestroy {
   private managementService!: ManagementService;
   @Input() public serviceType!: PolicyComponentServiceType;
 
-  public iamData!: OrgIAMPolicy.AsObject;
+  public domainData!: DomainPolicy.AsObject;
 
+  public loading: boolean = false;
   private sub: Subscription = new Subscription();
   private org!: Org.AsObject;
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
-  constructor(private toast: ToastService, private injector: Injector, private adminService: AdminService) {}
+  constructor(
+    private toast: ToastService,
+    private injector: Injector,
+    private adminService: AdminService,
+    private storageService: StorageService,
+  ) {}
 
   ngOnInit(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
@@ -40,22 +51,32 @@ export class OrgIamPolicyComponent implements OnInit, OnDestroy {
   }
 
   public fetchData(): void {
-    this.getData().then((resp) => {
-      if (resp?.policy) {
-        this.iamData = resp.policy;
-      }
-    });
+    this.loading = true;
+    this.getData()
+      .then((resp) => {
+        this.loading = false;
+        if (resp?.policy) {
+          this.domainData = resp.policy;
+        }
+      })
+      .catch((error) => {
+        this.loading = false;
+        this.toast.showError(error);
+      });
   }
 
   private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | any> {
+    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+
+    if (org?.id) {
+      this.org = org;
+    }
+
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return this.managementService.getOrgIAMPolicy();
+        return this.managementService.getDomainPolicy();
       case PolicyComponentServiceType.ADMIN:
-        if (this.org?.id) {
-          return this.adminService.getCustomOrgIAMPolicy(this.org.id);
-        }
-        break;
+        return this.adminService.getCustomDomainPolicy(this.org.id);
       default:
         return Promise.reject();
     }
@@ -64,23 +85,33 @@ export class OrgIamPolicyComponent implements OnInit, OnDestroy {
   public savePolicy(): void {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        if ((this.iamData as OrgIAMPolicy.AsObject).isDefault) {
+        if ((this.domainData as OrgIAMPolicy.AsObject).isDefault) {
+          const req = new AddCustomDomainPolicyRequest();
+          req.setOrgId(this.org.id);
+          req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
+          req.setValidateOrgDomains(this.domainData.validateOrgDomains);
+          req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
+
           this.adminService
-            .addCustomOrgIAMPolicy(this.org.id, this.iamData.userLoginMustBeDomain)
+            .addCustomDomainPolicy(req)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
-              this.fetchData();
             })
             .catch((error) => {
               this.toast.showError(error);
             });
           break;
         } else {
+          const req = new AddCustomDomainPolicyRequest();
+          req.setOrgId(this.org.id);
+          req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
+          req.setValidateOrgDomains(this.domainData.validateOrgDomains);
+          req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
+
           this.adminService
-            .updateCustomOrgIAMPolicy(this.org.id, this.iamData.userLoginMustBeDomain)
+            .updateCustomDomainPolicy(req)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
-              this.fetchData();
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -88,12 +119,15 @@ export class OrgIamPolicyComponent implements OnInit, OnDestroy {
           break;
         }
       case PolicyComponentServiceType.ADMIN:
-        // update Default org iam policy?
+        const req = new UpdateDomainPolicyRequest();
+        req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
+        req.setValidateOrgDomains(this.domainData.validateOrgDomains);
+        req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
+
         this.adminService
-          .updateOrgIAMPolicy(this.iamData.userLoginMustBeDomain)
+          .updateDomainPolicy(req)
           .then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
-            this.fetchData();
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -105,7 +139,7 @@ export class OrgIamPolicyComponent implements OnInit, OnDestroy {
   public removePolicy(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       this.adminService
-        .resetCustomOrgIAMPolicyToDefault(this.org.id)
+        .resetCustomDomainPolicyToDefault(this.org.id)
         .then(() => {
           this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
           setTimeout(() => {
@@ -119,8 +153,8 @@ export class OrgIamPolicyComponent implements OnInit, OnDestroy {
   }
 
   public get isDefault(): boolean {
-    if (this.iamData && this.serviceType === PolicyComponentServiceType.MGMT) {
-      return (this.iamData as OrgIAMPolicy.AsObject).isDefault;
+    if (this.domainData && this.serviceType === PolicyComponentServiceType.MGMT) {
+      return (this.domainData as OrgIAMPolicy.AsObject).isDefault;
     } else {
       return false;
     }

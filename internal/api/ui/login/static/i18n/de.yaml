@@ -64,7 +64,7 @@ InitPasswordDone:
 
 InitUser:
   Title: User aktivieren
-  Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine EMail zu verifizieren und ein neues Passwort zu setzen.
+  Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine E-Mail zu verifizieren und ein neues Passwort zu setzen.
   CodeLabel: Code
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort bestätigen
@@ -73,7 +73,7 @@ InitUser:
 
 InitUserDone:
   Title: User aktiviert
-  Description: EMail verifiziert und Passwort erfolgreich gesetzt
+  Description: E-Mail verifiziert und Passwort erfolgreich gesetzt
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
@@ -305,14 +305,14 @@ Errors:
     UserAgentNotCorresponding: User Agent stimmt nicht überein
     UserAgentNotFound: User Agent ID nicht gefunden
     TokenNotFound: Token nicht gefunden
-    RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
+    RequestTypeNotSupported: Requesttyp wird nicht unterstützt
     MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     Inactive: Benutzer ist inaktiv
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
-    NotMatchingUserID: User stimm nicht mit User in Auth Request überein
+    NotMatchingUserID: User stimmt nicht mit User in Auth Request überein
     UserIDMissing: UserID ist leer
     Invalid: Userdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
@@ -321,7 +321,7 @@ Errors:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
-      InvalidAndLocked: Password ist undgültig und Benutzer wurde gesperrt, melden Sie sich bei ihrem Administrator.
+      InvalidAndLocked: Password ist ungültig und Benutzer wurde gesperrt, melden Sie sich bei ihrem Administrator.
     UsernameOrPassword:
       Invalid: Username oder Passwort ist ungültig
     PasswordComplexityPolicy:
@@ -337,7 +337,7 @@ Errors:
       Empty: Code ist leer
       CryptoCodeNil: Crypto Code ist nil
       NotFound: Code konnte nicht gefunden werden
-      GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
+      GeneratorAlgNotSupported: Generator Algorithmus wird nicht unterstützt
     EmailVerify:
       UserIDEmpty: UserID ist leer
     ExternalData:
@@ -362,7 +362,7 @@ Errors:
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
     ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
-    InvalidConfig: Identitäts Provider Konfiguration ist ungültig
+    InvalidConfig: Identitätsprovider Konfiguration ist ungültig
   IAM:
     LockoutPolicy:
       NotExisting: Lockout Policy existiert nicht

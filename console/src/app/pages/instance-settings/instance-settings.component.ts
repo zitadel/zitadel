@@ -8,6 +8,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import {
     BRANDING,
     COMPLEXITY,
+    DOMAIN,
     GENERAL,
     IDP,
     LOCKOUT,
@@ -31,12 +32,14 @@ export class InstanceSettingsComponent {
   public settingsList: SidenavSetting[] = [
     GENERAL,
     // notifications
-    { showWarn: true, ...NOTIFICATIONS },
+    // { showWarn: true, ...NOTIFICATIONS },
+    NOTIFICATIONS,
     // login
     LOGIN,
     COMPLEXITY,
     LOCKOUT,
     IDP,
+    DOMAIN,
     // appearance
     BRANDING,
     MESSAGETEXTS,

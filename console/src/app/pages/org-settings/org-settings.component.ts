@@ -8,6 +8,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import {
     BRANDING,
     COMPLEXITY,
+    DOMAIN,
     IDP,
     LOCKOUT,
     LOGIN,
@@ -29,6 +30,7 @@ export class OrgSettingsComponent {
     COMPLEXITY,
     LOCKOUT,
     IDP,
+    DOMAIN,
     BRANDING,
     MESSAGETEXTS,
     LOGINTEXTS,

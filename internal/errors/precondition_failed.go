@@ -40,3 +40,7 @@ func (err *PreconditionFailedError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *PreconditionFailedError) Unwrap() error {
+	return err.CaosError
+}
