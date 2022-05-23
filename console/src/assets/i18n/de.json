@@ -95,6 +95,7 @@
     "CANCEL": "Abbrechen",
     "INFO": "Info",
     "OK": "OK",
+    "SELECT": "Auswählen",
     "VIEW": "Öffnen",
     "SELECTIONDELETE": "Ausgewählte löschen",
     "DELETE": "Löschen",
@@ -118,6 +119,7 @@
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
     "MORE": "mehr",
+    "STEP": "Schritt",
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
@@ -1525,6 +1527,7 @@
     "COMPLIANCE": "OIDC Einhaltung",
     "URLS": "Urls",
     "CONFIGURATION": "Konfiguration",
+    "TOKEN": "Token Einstellungen",
     "PAGES": {
       "TITLE": "Anwendung",
       "ID": "ID",
@@ -1717,8 +1720,8 @@
     "TOAST": {
       "REACTIVATED": "Anwendung reaktiviert.",
       "DEACTIVATED": "Anwendung deaktiviert.",
-      "OIDCUPDATED": "OIDC-Konfiguration geändert.",
-      "APIUPDATED": "API Konfiguration geändert.",
+      "OIDCUPDATED": "App gespeichert",
+      "APIUPDATED": "App gespeichert",
       "UPDATED": "App geändert.",
       "CREATED": "App erstellt.",
       "CLIENTSECRETREGENERATED": "Client Secret generiert.",

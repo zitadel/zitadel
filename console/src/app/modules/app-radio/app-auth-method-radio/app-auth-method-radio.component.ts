@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
-  APIAuthMethodType,
-  OIDCAuthMethodType,
-  OIDCGrantType,
-  OIDCResponseType,
+    APIAuthMethodType,
+    OIDCAuthMethodType,
+    OIDCGrantType,
+    OIDCResponseType,
 } from 'src/app/proto/generated/zitadel/app_pb';
 
 export interface RadioItemAuthType {
@@ -16,7 +16,7 @@ export interface RadioItemAuthType {
   responseType?: OIDCResponseType;
   grantType?: OIDCGrantType;
   authMethod?: OIDCAuthMethodType;
-  apiAuthMethod?: | APIAuthMethodType;
+  apiAuthMethod?: APIAuthMethodType;
   recommended?: boolean;
   notRecommended?: boolean;
 }
@@ -31,6 +31,7 @@ export class AppAuthMethodRadioComponent {
   @Input() selected: string = '';
   @Input() authMethods!: RadioItemAuthType[];
   @Input() isOIDC: boolean = false;
+  @Input() compact: boolean = false;
   @Output() selectedMethod: EventEmitter<string> = new EventEmitter();
 
   public emitChange(): void {

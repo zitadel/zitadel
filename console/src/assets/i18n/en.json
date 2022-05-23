@@ -95,6 +95,7 @@
     "CANCEL": "Cancel",
     "INFO": "Info",
     "OK": "OK",
+    "SELECT": "Select",
     "VIEW": "Show",
     "SELECTIONDELETE": "Delete selection",
     "DELETE": "Delete",
@@ -118,6 +119,7 @@
     "PREVIOUS": "Previous",
     "NEXT": "Next",
     "MORE": "more",
+    "STEP": "Step",
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
@@ -1525,6 +1527,7 @@
     "COMPLIANCE": "OIDC Compliance",
     "URLS": "Urls",
     "CONFIGURATION": "Configuration",
+    "TOKEN": "Token Settings",
     "PAGES": {
       "TITLE": "Application",
       "ID": "ID",
@@ -1717,8 +1720,8 @@
     "TOAST": {
       "REACTIVATED": "Application reactivated.",
       "DEACTIVATED": "Application deactivated.",
-      "OIDCUPDATED": "OIDC configuration updated.",
-      "APIUPDATED": "API configuration updated",
+      "OIDCUPDATED": "App updated.",
+      "APIUPDATED": "App updated",
       "UPDATED": "App updated.",
       "CREATED": "App created.",
       "CLIENTSECRETREGENERATED": "client secret generated.",

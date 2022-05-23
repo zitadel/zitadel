@@ -1,34 +1,8 @@
-.container {
-  padding: 4rem 0 2rem 0;
+form {
+  max-width: 35rem;
 
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-    white-space: nowrap;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
-  }
-
-  .create-content {
-    padding-left: 4.5rem;
-
-    form {
-      max-width: 35rem;
-
-      .org-domain {
-        margin-right: 1rem;
-      }
-    }
+  .org-domain {
+    margin-right: 1rem;
   }
 }
 
