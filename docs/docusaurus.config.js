@@ -77,12 +77,16 @@ module.exports = {
           title: "Community",
           items: [
             {
+              label: "Chat",
+              href: "https://zitadel.com/chat",
+            },
+            {
               label: "GitHub Discussions",
               href: "https://github.com/zitadel/zitadel/discussions",
             },
             {
               label: "Twitter",
-              href: "https://twitter.com/zitadel_ch",
+              href: "https://twitter.com/zitadel",
             },
             {
               label: "Linkedin",
@@ -90,20 +94,34 @@ module.exports = {
             },
             {
               label: "Blog",
-              href: "https://zitadel.ch/blog",
+              href: "https://zitadel.com/blog",
             },
           ],
         },
         {
-          title: "Company",
+          title: "Legal",
+          items: [
+
+            {
+              label: "Terms and Conditions",
+              href: "/docs/legal/terms-of-service",
+            },
+            {
+              label: "Privacy Policy",
+              href: "/docs/legal/privacy-policy",
+            },
+          ],
+        },
+        {
+          title: "About",
           items: [
             {
-              label: "About CAOS Ltd.",
-              href: "https://caos.ch/#about",
+              label: "Website",
+              href: "https://zitadel.com",
             },
             {
               label: "Contact",
-              href: "https://zitadel.ch/contact/",
+              href: "https://zitadel.com/contact/",
             },
             {
               label: "GitHub",
@@ -112,17 +130,10 @@ module.exports = {
             {
               label: "Status",
               href: "https://status.zitadel.ch/",
-            },
-            {
-              label: "Terms and Conditions",
-              href: "https://docs.zitadel.ch/docs/legal/terms-of-service",
-            },
-            {
-              label: "Privacy Policy",
-              href: "https://docs.zitadel.ch/docs/legal/privacy-policy",
-            },
+            }
           ],
         },
+        
       ],
       copyright: `Copyright © ${new Date().getFullYear()} CAOS Ltd. Built with Docusaurus.`,
     },
