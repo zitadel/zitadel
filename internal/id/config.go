@@ -40,28 +40,7 @@ type Webhook struct {
 }
 
 func Configure(config *Config) {
-	if config == nil {
-		c := defaultConfig()
-		config = &c
-	}
-
-	GeneratorConfig = config
-}
-
-func defaultConfig() Config {
-	headers := make(map[string]string)
-	headers["Metadata-Flavor"] = "Google"
-
-	return Config{
-		Identification{
-			PrivateIp{true},
-			Hostname{false},
-			Webhook{
-				true,
-				DefaultWebhookPath,
-				nil,
-				&headers,
-			},
-		},
+	if config != nil {
+		GeneratorConfig = config
 	}
 }
