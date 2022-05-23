@@ -6,9 +6,7 @@ The following pages describe the recommended training sessions for managing and 
 
 ## ZITADEL Support Services Trainings
 
-![Support Services Training](/img/training_support_services.png)
-
-When entering into a support services agreement with us, we recommend the following trainings:
+When entering a support services agreement with us, we recommend the following training sessions.
 
 * [Operations training](supportservice/operations)
 * [Application Support training](supportservice/application)
