@@ -19,8 +19,6 @@ In this session your second level support will gain an understanding on how to e
 * Validation of tokens
 * Q&A
 
-**Price**: [Get a quote](https://zitadel.com/contact)
-
 ## ZITADEL Administrator
 
 In this hands-on training your employees will get a complete overview of the system and learn how to configure and use ZITADEL. Your support staff will gain the required knowledge to provide user-support, while your solution owners gain an understanding about integration of clients.
@@ -36,5 +34,3 @@ In this hands-on training your employees will get a complete overview of the sys
 * APIs
 * Client integration best-practices
 * Q&A
-
-**Price**: [Get a quote](https://zitadel.com/contact)

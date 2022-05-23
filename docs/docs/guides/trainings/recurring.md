@@ -16,8 +16,6 @@ In this session you can refresh knowledge about existing and gain experience wit
 * Review of customer feedback
 * Q&A
 
-**Price**: [Get a quote](https://zitadel.com/contact)
-
 ## ZITADEL Support Onboarding
 
 In this hands-on training new support staff will get an overview of the system and learn how to configure and use ZITADEL to provide support for users.
@@ -33,5 +31,3 @@ In this hands-on training new support staff will get an overview of the system a
 * Validation of tokens
 * Walk-through key features
 * Q&A
-
-**Price**: [Get a quote](https://zitadel.com/contact)
