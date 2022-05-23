@@ -51,6 +51,7 @@
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
 @import 'src/app/pages/home/home.component.scss';
+@import 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component.scss';
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import './styles/codemirror.scss';
@@ -67,6 +68,7 @@
   @include top-view-theme($theme);
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
+  @include search-user-autocomplete-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
   @include footer-theme($theme);
