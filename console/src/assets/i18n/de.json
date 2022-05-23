@@ -234,11 +234,11 @@
       "DELETE_SELF_DESCRIPTION": "Sie sind im Begriff Ihren eigenen Benutzer endgültig zu löschen. Dadurch werden Sie ausgeloggt und Ihr Account wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden!",
       "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
       "TYPEUSERNAME": "Wiederholen Sie '{{value}}', um den Benutzer zu löschen.",
-      "DELETE_BTN": "Entgültig löschen"
+      "DELETE_BTN": "Endgültig löschen"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Email Benachrichtigung senden",
-      "DESCRIPTION": "Klicken Sie den untenstehenden Button um ein verifizierungs Email an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
+      "DESCRIPTION": "Klicken Sie den untenstehenden Button um ein Verifizierung-E-Mail an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
       "NEWEMAIL": "Neue Email"
     },
     "TABLE": {
@@ -293,12 +293,12 @@
         "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
         "ADD_TITLE": "Passwortlose Authentifizierung",
         "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwortlosen Authentifizierungsmethode.",
-        "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre email adresse.",
+        "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre E-Mail Adresse.",
         "SEND": "Registrierungslink senden",
-        "SENT": "Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup forzufahren.",
+        "SENT": "Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup fortzufahren.",
         "QRCODE_DESCRIPTION": "QR-Code zum scannen mit einem anderen Gerät generieren.",
         "QRCODE": "QR-Code generieren",
-        "QRCODE_SCAN": "Scannen Sie diesen QR Code um mit dem Setup auf Ihrem Gerät forzufahren.",
+        "QRCODE_SCAN": "Scannen Sie diesen QR Code um mit dem Setup auf Ihrem Gerät fortzufahren.",
         "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um Passwortlos aufzusetzen.",
         "NEW": "Hinzufügen"
       }
@@ -351,7 +351,7 @@
       }
     },
     "EXTERNALIDP": {
-      "TITLE": "Externe Identitäts Provider",
+      "TITLE": "Externe Identitäts-Provider",
       "DESC": "",
       "IDPCONFIGID": "Idp Konfig ID",
       "IDPNAME": "Idp Name",
@@ -509,14 +509,14 @@
       "FILTER": {
         "0": "Nach User Anzeigename filtern",
         "1": "Nach Domain filtern",
-        "2": "Nach Projectnamen filtern",
+        "2": "Nach Projektnamen filtern",
         "3": "Nach Rolle filtern"
       }
     },
     "VALIDATION": {
       "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
       "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
-      "REQUIRED": "Das Eingagefeld ist leer.",
+      "REQUIRED": "Das Eingabefeld ist leer.",
       "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
       "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
       "UPPERCASEMISSING": "Passwort muss einen Grossbuchstaben beinhalten.",
@@ -563,7 +563,7 @@
       "U2FREMOVED": "Faktor entfernt.",
       "PASSWORDLESSREMOVED": "Passwortlos entfernt.",
       "INITIALPASSWORDSET": "Initiales Passwort gesetzt.",
-      "PASSWORDNOTIFICATIONSENT": "Passwortänderung mittgeteilt.",
+      "PASSWORDNOTIFICATIONSENT": "Passwortänderung mitgeteilt.",
       "PASSWORDCHANGED": "Passwort geändert.",
       "REACTIVATED": "Benutzer reaktiviert.",
       "DEACTIVATED": "Benutzer deaktiviert.",
@@ -611,7 +611,7 @@
       },
       "DELETE": {
         "TITLE": "Token löschen",
-        "DESCRIPTION": "Sie sind im Begriff das Token unwiederruflich zu löschen. Wollen Sie dies wirklich tun?"
+        "DESCRIPTION": "Sie sind im Begriff das Token unwiderruflich zu löschen. Wollen Sie dies wirklich tun?"
       },
       "DELETED": "Personal Access Token gelöscht."
     }
@@ -642,7 +642,7 @@
     },
     "ADDTRIGGER": "Trigger hinzufügen",
     "TIMEOUT": "Timeout",
-    "TIMEOUTINSEC": "Timout in Sekunden",
+    "TIMEOUTINSEC": "Timeout in Sekunden",
     "ALLOWEDTOFAIL": "Allowed To Fail",
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Typ",
@@ -677,7 +677,7 @@
     "DESCRIPTION": "Verwalten Sie Ihre Instanzeinstellungen und Organisationen",
     "POLICIES": {
       "TITLE": "System Administration",
-      "DESCRIPTION": "Verwalte die globalen Richtlinen und Zugangseinstellungen."
+      "DESCRIPTION": "Verwalte die globalen Richtlinien und Zugangseinstellungen."
     },
     "EVENTSTORE": {
       "TITLE": "IAM Speicher Administration",
@@ -700,7 +700,7 @@
       "CLEARED": "View wurde erfolgreich zurückgesetzt!",
       "DIALOG": {
         "VIEW_CLEAR_TITLE": "View zurücksetzen?",
-        "VIEW_CLEAR_DESCRIPTION": "Sie sind im Begriff eine View zu löschen. Durch das Löschen einer View wird ein Prozess gestartet, bei dem Daten für Endbenutzer möglicherweise nicht oder verzügert verfügbar sind. Sind Sie sicher?"
+        "VIEW_CLEAR_DESCRIPTION": "Sie sind im Begriff eine View zu löschen. Durch das Löschen einer View wird ein Prozess gestartet, bei dem Daten für Endbenutzer möglicherweise nicht oder verzögert verfügbar sind. Sind Sie sicher?"
       }
     },
     "FAILEDEVENTS": {
@@ -763,7 +763,7 @@
       "PRIMARYDOMAIN": "Primäre Domain",
       "STATE": "Status",
       "USEPASSWORD": "Initiales Passwort setzen",
-      "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initalisierung nicht setzen."
+      "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initialisierung nicht setzen."
     },
     "LIST": {
       "TITLE": "Organisationen",
@@ -806,7 +806,7 @@
   "SETTINGS": {
     "INSTANCE": {
       "TITLE": "Instanz Einstellungen",
-      "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewand sofern die Einstellung nicht überschrieben wurde."
+      "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewandt sofern die Einstellung nicht überschrieben wurde."
     },
     "ORG": {
       "TITLE": "Organisation Einstellungen",
@@ -851,7 +851,7 @@
       "USER": "Benutzer",
       "PASSWORD": "Passwort",
       "SETPASSWORD": "SMTP Passwort setzen",
-      "PASSWORDSET": "SMTP Passwort erfolgrech gesetzt.",
+      "PASSWORDSET": "SMTP Passwort erfolgreich gesetzt.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Erfolgreich gespeichert.",
       "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
@@ -901,7 +901,7 @@
     }
   },
   "POLICY": {
-    "TITLE": "Richtlinen entdecken",
+    "TITLE": "Richtlinien entdecken",
     "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
     "APPLIEDTO": "Angewendet auf",
     "PWD_COMPLEXITY": {
@@ -992,7 +992,7 @@
       "CHANGEDATE": "Neuer Stand vom",
       "KEYNAME": "Login Screen / Interface",
       "RESET_TITLE": "Standardwerte wiederherstellen",
-      "RESET_DESCRIPTION": "Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
+      "RESET_DESCRIPTION": "Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzten Änderungen werden unwiderruflich gelöscht. Wollen Sie fortfahren?",
       "UNSAVED_TITLE": "Ohne speichern fortfahren?",
       "UNSAVED_DESCRIPTION": "Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
       "LOCALE": "Sprachcode",
@@ -1088,7 +1088,7 @@
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
       "USERLOGINMUSTBEDOMAIN": "Benutzer Loginname muss die Domain der Organisation beinhalten",
       "VALIDATEORGDOMAINS": "Org Domains validieren",
-      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Addresse entspricht Instanzdomain",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
       "ALLOWREGISTER": "Registrieren erlaubt",
@@ -1116,8 +1116,8 @@
     "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
     "TOAST": {
-      "SET": "Richtline erfolgreich gesetzt!",
-      "RESETSUCCESS": "Richtline zurückgesetzt!",
+      "SET": "Richtlinie erfolgreich gesetzt!",
+      "RESETSUCCESS": "Richtlinie zurückgesetzt!",
       "UPLOADSUCCESS": "Upload erfolgreich",
       "DELETESUCCESS": "Löschen erfolgreich",
       "UPLOADFAILED": "Upload fehlgeschlagen!"
@@ -1304,11 +1304,11 @@
         "PROJECTGRANTMEMBERADDED": "Berechtigungsmanager hinzugefügt.",
         "PROJECTGRANTMEMBERCHANGED": "Berechtigungsmanager verändert.",
         "PROJECTGRANTMEMBERREMOVED": "Berechtigungsmanager entfernt.",
-        "PROJECTGRANTUPDATED": "Projectberechtigung geändert."
+        "PROJECTGRANTUPDATED": "Projektberechtigung geändert."
       },
       "DIALOG": {
         "DELETE_TITLE": "Projektberechtigung löschen",
-        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Projectberechtigung zu entfernen. Wollen Sie fortfahren?"
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Projektberechtigung zu entfernen. Wollen Sie fortfahren?"
       },
       "ROLES": "Projektrollen"
     },
@@ -1449,9 +1449,9 @@
     "ACTIVATE": "Aktivieren",
     "DELETE": "Löschen",
     "DELETE_TITLE": "IDP löschen",
-    "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+    "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
-    "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+    "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC IDP",
@@ -1487,7 +1487,7 @@
     },
     "DELETE": {
       "TITLE": "Faktor löschen",
-      "DESCRIPTION": "Sie sind im Begriff einen Faktor zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?"
+      "DESCRIPTION": "Sie sind im Begriff einen Faktor zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?"
     },
     "TOAST": {
       "ADDED": "Erfolgreich hinzugefügt.",
@@ -1581,7 +1581,7 @@
     "AUTHMETHODSECTION": "Authentifizierungsmethode",
     "GRANT": "Berechtigungstypen",
     "ADDITIONALORIGINS": "Zusätzliche Origins",
-    "ADDITIONALORIGINSDESC": "Wenn sie zusätzliche Origins definieren wollen, die nicht den Redirect URIs gleichzusätzen sind, können Sie dies hier tun.",
+    "ADDITIONALORIGINSDESC": "Wenn sie zusätzliche Origins definieren wollen, die nicht den Redirect URIs gleichzusetzen sind, können Sie dies hier tun.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "Der Angegebene Wert ist kein Origin.",
     "OIDC": {

@@ -90,13 +90,13 @@ This case describes how to change it on the organization.
 ![Configure identity provider](/img/console_org_identity_provider.gif)
 
 ### 4.Send the primary domain scope on the authorization request
-ZITADEL will show a set of identity providers by default. This configuration can be changed by users with the [manager role] (https://docs.zitadel.ch/docs/concepts/zitadel/objects/managers) `IAM_OWNER`.
+ZITADEL will show a set of identity providers by default. This configuration can be changed by users with the [manager role] (https://docs.zitadel.com/docs/concepts/zitadel/objects/managers) `IAM_OWNER`.
 
 An organization's login settings will be shown 
 
 - as soon as the user has entered the loginname and ZITADEL can identitfy to which organization he belongs; or
 - by sending a primary domain scope.
-To get your own configuration you will have to send the [primary domain scope](https://docs.zitadel.ch/docs/apis/openidoauth/scopes#reserved-scopes) in your [authorization request](https://docs.zitadel.ch/docs/guides/authentication/login-users/#auth-request) .
+To get your own configuration you will have to send the [primary domain scope](https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes) in your [authorization request](https://docs.zitadel.com/docs/guides/authentication/login-users/#auth-request) .
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login, also your branding and policies will trigger.
 
 See the following link as an example. Users will be able to register and login to the organization that verified the @caos.ch domain only.
@@ -112,7 +112,7 @@ Make sure to replace the domain `caos.ch` with your own domain to trigger the co
 
 :::caution
 
-This example uses the ZITADEL Cloud Application for demonstration. You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](https://docs.zitadel.ch/docs/guides/authentication/login-users/#auth-request).
+This example uses the ZITADEL Cloud Application for demonstration. You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](https://docs.zitadel.com/docs/guides/authentication/login-users/#auth-request).
 
 :::
 

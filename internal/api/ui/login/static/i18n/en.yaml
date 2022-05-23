@@ -300,7 +300,7 @@ Footer:
   Help: Help
 
 Errors:
-  Internal: An internal error occured
+  Internal: An internal error occurred
   AuthRequest:
     NotFound: Could not find authrequest
     UserAgentNotCorresponding: User Agent does not correspond

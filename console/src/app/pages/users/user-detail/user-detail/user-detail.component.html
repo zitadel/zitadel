@@ -1,7 +1,7 @@
 <cnsl-top-view
   *ngIf="user"
   title="{{ user?.human ? user.human?.profile?.displayName : user?.machine?.name }}"
-  docLink="https://docs.zitadel.ch/docs/guides/basics/projects"
+  docLink="https://docs.zitadel.com/docs/guides/basics/projects"
   sub="{{ user?.preferredLoginName }}"
   [isActive]="user?.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user?.state === UserState.USER_STATE_INACTIVE"

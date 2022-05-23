@@ -67,7 +67,7 @@
     "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
-    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts",
+    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
     "SETTINGS": "Settings"
   },
   "ACTIONS": {
@@ -207,7 +207,7 @@
       "DESCRIPTIONMACHINE": "Create and manage Service Users of your organization",
       "DETAIL": "Detail",
       "CREATE": "Create",
-      "MY": "My Informations",
+      "MY": "My Information",
       "LOGINNAMES": "Loginnames",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
@@ -365,7 +365,7 @@
     },
     "CREATE": {
       "TITLE": "Create a New User",
-      "DESCRIPTION": "Please provide the necesary information.",
+      "DESCRIPTION": "Please provide the necessary information.",
       "NAMEANDEMAILSECTION": "Name and E-mail",
       "GENDERLANGSECTION": "Gender and Language",
       "PHONESECTION": "Phone numbers",
@@ -375,7 +375,7 @@
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
-      "DESCRIPTION": "Enter the code you recieved by text message to verify your phone number.",
+      "DESCRIPTION": "Enter the code you received by text message to verify your phone number.",
       "CODE": "Code"
     },
     "DATA": {
@@ -546,7 +546,7 @@
     "SIGNEDOUT_BTN": "Sign In",
     "EDITACCOUNT": "Edit Account",
     "ADDACCOUNT": "Log in With Another Account",
-    "RESENDINITIALEMAIL": "Send new initialisation mail",
+    "RESENDINITIALEMAIL": "Send new initialization mail",
     "RESENDEMAILNOTIFICATION": "Resend Email notification",
     "TOAST": {
       "CREATED": "User created successfully.",
@@ -642,13 +642,13 @@
     },
     "ADDTRIGGER": "Add trigger",
     "TIMEOUT": "Timeout",
-    "TIMEOUTINSEC": "Timout in seconds",
+    "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
     "ACTIONS": "Actions",
-    "ACTIONSMAX": "Based on your Tier, you have available a limited Number of Actions ({{value}}). Make sure to deaktivate those you are not in need or consider upgrading your tier.",
+    "ACTIONSMAX": "Based on your Tier, you have available a limited Number of Actions ({{value}}). Make sure to deactivate those you are not in need or consider upgrading your tier.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Create an Action"
@@ -814,7 +814,7 @@
     },
     "LIST": {
       "GENERAL": "General",
-      "LOGIN": "Login Behaviour and Security",
+      "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notification providers and SMTP",
@@ -928,7 +928,7 @@
       "ADVANCEDBEHAVIOR": "Advanced Behavior",
       "DROP": "Drop image here or",
       "RELEASE": "Release",
-      "DROPFONT": "Drop fontfile here",
+      "DROPFONT": "Drop font file here",
       "RELEASEFONT": "Release",
       "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in console",
       "MAXSIZE": "The maximum size is limited to 524kB",
@@ -953,7 +953,7 @@
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Policy",
-      "DESCRIPTION": "Set a maximum number of passwordretries, after which accounts will be blocked."
+      "DESCRIPTION": "Set a maximum number of password-retries, after which accounts will be blocked."
     },
     "DOMAIN_POLICY": {
       "TITLE": "Domain Settings"
@@ -1041,7 +1041,7 @@
     },
     "MESSAGE_TEXTS": {
       "TITLE": "Message Texts",
-      "DESCRIPTION": "Define your texts for your notication mails.",
+      "DESCRIPTION": "Define your texts for your notification mails.",
       "TYPE": "Notification",
       "TYPES": {
         "INIT": "Initialization",
@@ -1190,7 +1190,7 @@
         },
         "DIALOG": {
           "TITLE": "Branding Setting",
-          "DESCRIPTION": "Select the behaviour of the login, when using the project."
+          "DESCRIPTION": "Select the behavior of the login, when using the project."
         }
       },
       "PINNED": "Pinned",
@@ -1201,7 +1201,7 @@
       "DIALOG": {
         "REACTIVATE": {
           "TITLE": "Reactivate Project",
-          "DESCRIPTION": "Do you really want to ractivate your project?"
+          "DESCRIPTION": "Do you really want to reactivate your project?"
         },
         "DEACTIVATE": {
           "TITLE": "Deactivate Project",
@@ -1468,9 +1468,9 @@
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",
       "DEACTIVATED": "Idp deactivated.",
-      "SELECTEDREACTIVATED": "Selected idps reactivated.",
-      "SELECTEDDEACTIVATED": "Selected idps deactivated.",
-      "SELECTEDKEYSDELETED": "Selected idps deleted.",
+      "SELECTEDREACTIVATED": "Selected Idps reactivated.",
+      "SELECTEDDEACTIVATED": "Selected Idps deactivated.",
+      "SELECTEDKEYSDELETED": "Selected Idps deleted.",
       "DELETED": "Idp removed successfully!"
     }
   },
@@ -1513,7 +1513,7 @@
     "IDPS": "Identity Providers",
     "ADDIDP": {
       "TITLE": "Add Identity Provider",
-      "DESCRIPTION": "You can select predefined or selfcreated providers for authentication.",
+      "DESCRIPTION": "You can select predefined or self-created providers for authentication.",
       "SELECTIDPS": "Identity providers"
     },
     "PASSWORDLESS": "Passwordless Login",
@@ -1601,7 +1601,7 @@
       "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
       "REDIRECTDESCRIPTIONNATIVE": "Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.",
       "REDIRECTNOTVALID": "This redirect URI is not valid.",
-      "COMMAORENTERSEPERATION": "seperate with ↵",
+      "COMMAORENTERSEPERATION": "separate with ↵",
       "TYPEREQUIRED": "The type is required.",
       "TITLE": "OIDC Configuration",
       "CLIENTID": "Client ID",
@@ -1775,7 +1775,7 @@
     },
     "CREATE": {
       "TITLE": "Create authorization",
-      "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
+      "DESCRIPTION": "Search for the organization, the project, and the corresponding roles."
     },
     "EDIT": {
       "TITLE": "Change authorization"
@@ -1792,7 +1792,7 @@
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",
       "DELETE_DESCRIPTION": "You are about to delete an authorization. Do you want to continue?",
-      "BULK_DELETE_TITLE": "Delete autorizations",
+      "BULK_DELETE_TITLE": "Delete authorizations",
       "BULK_DELETE_DESCRIPTION": "You are about to delete multiple authorizations. Do you want to continue?"
     }
   },
