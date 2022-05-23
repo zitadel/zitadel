@@ -11,7 +11,7 @@ In this session your second level support will gain an understanding on how to e
 
 **Topics covered**:
 
-* Eventsouring & CQRS 
+* Eventsouring & CQRS
 * Event types
 * Compute models
 * Accessing database
