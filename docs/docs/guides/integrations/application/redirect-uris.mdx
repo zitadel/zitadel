@@ -1,0 +1,34 @@
+import ThemedImage from '@theme/ThemedImage';
+
+export default function RedirectURIs(props) { 
+    return ['web', 'native', 'user-agent'].includes(props.appType) ? (
+        <div>
+            <p>
+                During the login flow the application defines where the users is redirected to after login or logout.
+                <br/>
+                ZITADEL verifies if the URL the user gets redirected to is valid by checking if one of the redirect URIs match.
+            </p>
+            <ul>
+                <li><b>Redirect URIs</b> are verified durring the login process.</li>
+                {
+                    props.redirectURI ?
+                        <ul><li>The default redirect uri of your app is <code>{props.redirectURI}</code></li></ul>
+                        : null
+                }
+                <li><b>Post Logout URIs</b> are verified durring the logout process.</li>
+                {
+                    props.postLogoutURI ?
+                        <ul><li>The default post logout uri of your app is <code>{props.postLogoutURI}</code></li></ul>
+                        : null
+                }
+            </ul>
+            <ThemedImage
+                alt="Redirect URIs configuration"
+                sources={{
+                    light: '/img/guides/application/redirect-uris-light.png',
+                    dark: '/img/guides/application/redirect-uris-dark.png'
+                }}
+            />
+        </div>
+    ) : null;
+}
