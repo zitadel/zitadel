@@ -135,7 +135,7 @@
       "TEXT": "Hier können Sie zwischen Ihren Benutzerkonten wechseln und Ihre Sessions und Ihr Profil verwalten."
     },
     "NAV": {
-      "TEXT": "Diese Navigation ändert sich basierend auf den Breadcrumbs darüber."
+      "TEXT": "Diese Navigation ändert sich basierend auf Ihrer Organisation oder Instanz"
     },
     "CONTEXTCHANGED": {
       "TEXT": "Achtung! Soeben wurde die Organisation gewechselt."
@@ -1549,6 +1549,9 @@
         }
       },
       "DIALOG": {
+        "CONFIG": {
+          "TITLE": "OIDC configuration ändern"
+        },
         "DELETE": {
           "TITLE": "App löschen",
           "DESCRIPTION": "Wollen Sie diese App wirklich löschen?"

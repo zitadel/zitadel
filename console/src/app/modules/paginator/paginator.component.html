@@ -1,25 +1,29 @@
 <div class="paginator-wrapper">
   <div class="col">
-    <p class="length"><span>{{length}} </span>{{'PAGINATOR.COUNT' | translate}}</p>
+    <p class="length">
+      <span>{{ length }} </span>{{ 'PAGINATOR.COUNT' | translate }}
+    </p>
     <p class="ts cnsl-secondary-text" *ngIf="timestamp">
-      {{(timestamp | timestampToDate)| localizedDate: 'EEEE dd. MMM YYYY, HH:mm'}}
+      {{ timestamp | timestampToDate | localizedDate: 'EEEE dd. MMM YYYY, HH:mm' }}
     </p>
   </div>
   <span class="fill-space"></span>
-  <span class="pos cnsl-secondary-text" *ngIf="!hidePagination">{{pageIndex * pageSize}} - {{pageIndex * pageSize +
-    pageSize}} </span>
+  <span class="pos cnsl-secondary-text" *ngIf="!hidePagination"
+    >{{ pageIndex * pageSize }} - {{ pageIndex * pageSize + pageSize }}
+  </span>
   <div class="row" *ngIf="!hidePagination">
     <cnsl-form-field class="size" appearance="outline">
-      <mat-select [(ngModel)]="pageSize" (selectionChange)="emitChange()">
+      <mat-select class="paginator-select" [(ngModel)]="pageSize" (selectionChange)="emitChange()">
         <mat-option *ngFor="let sizeOption of pageSizeOptions" [value]="sizeOption">
-          {{sizeOption}}
+          {{ sizeOption }}
         </mat-option>
       </mat-select>
     </cnsl-form-field>
-    <button *ngIf="previousPossible" (click)="previous()" [disabled]="!previousPossible"
-      mat-stroked-button>{{'PAGINATOR.PREVIOUS' |
-      translate}}</button>
-    <button *ngIf="nextPossible" (click)="next()" [disabled]="!nextPossible" mat-stroked-button>{{'PAGINATOR.NEXT' |
-      translate}}</button>
+    <button *ngIf="previousPossible" (click)="previous()" [disabled]="!previousPossible" mat-stroked-button>
+      {{ 'PAGINATOR.PREVIOUS' | translate }}
+    </button>
+    <button *ngIf="nextPossible" (click)="next()" [disabled]="!nextPossible" mat-stroked-button>
+      {{ 'PAGINATOR.NEXT' | translate }}
+    </button>
   </div>
 </div>

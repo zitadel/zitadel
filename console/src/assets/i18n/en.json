@@ -135,7 +135,7 @@
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
     },
     "NAV": {
-      "TEXT": "This navigation changes based on the breadcrumbs above."
+      "TEXT": "This navigation changes based on your selected oranization above or your instance"
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attention! The organization context has changed."
@@ -1549,6 +1549,9 @@
         }
       },
       "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Change OIDC Configuration"
+        },
         "DELETE": {
           "TITLE": "Delete App",
           "DESCRIPTION": "Do you really want to delete this application?"

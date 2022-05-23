@@ -135,7 +135,7 @@
       "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
     },
     "NAV": {
-      "TEXT": "Questa navigazione cambia in base ai breadcrumb sopra."
+      "TEXT": "Questa navigazione cambia in base all' organizzazione impostata sopra e la tua istanza."
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attenzione! L'organizzazione è appena stata cambiata."
@@ -1549,6 +1549,9 @@
         }
       },
       "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Configurazione OIDC"
+        },
         "DELETE": {
           "TITLE": "Rimuovere App",
           "DESCRIPTION": "Vuoi davvero rimuovere questa applicazione?"
