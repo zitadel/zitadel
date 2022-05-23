@@ -1181,11 +1181,11 @@
           "DESC": "As soon as the user is identified, the branding of the organization of the identified user will be shown, before the system default is shown."
         },
         "1": {
-          "TITLE": "Enforce project resource owner Policy",
+          "TITLE": "Use project setting",
           "DESC": "The branding of the organization which owns the project will be shown"
         },
         "2": {
-          "TITLE": "Allow Login User resource owner policy",
+          "TITLE": "Use User Organization setting",
           "DESC": "The branding of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown."
         },
         "DIALOG": {

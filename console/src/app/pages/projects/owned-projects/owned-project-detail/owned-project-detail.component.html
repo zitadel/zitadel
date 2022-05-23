@@ -111,7 +111,9 @@
               >
                 {{ 'PROJECT.ROLE.ASSERTION' | translate }}</mat-checkbox
               >
-              <p class="desc cnsl-secondary-text">{{ 'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate }}</p>
+              <cnsl-info-section class="desc cnsl-secondary-text">{{
+                'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate
+              }}</cnsl-info-section>
               <mat-checkbox
                 [(ngModel)]="project.projectRoleCheck"
                 [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
@@ -119,7 +121,9 @@
               >
                 {{ 'PROJECT.ROLE.CHECK' | translate }}</mat-checkbox
               >
-              <p class="desc cnsl-secondary-text">{{ 'PROJECT.ROLE.CHECK_DESCRIPTION' | translate }}</p>
+              <cnsl-info-section class="desc cnsl-secondary-text">{{
+                'PROJECT.ROLE.CHECK_DESCRIPTION' | translate
+              }}</cnsl-info-section>
               <mat-checkbox
                 [(ngModel)]="project.hasProjectCheck"
                 [disabled]="(['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
@@ -127,7 +131,9 @@
               >
                 {{ 'PROJECT.HAS_PROJECT' | translate }}</mat-checkbox
               >
-              <p class="desc cnsl-secondary-text">{{ 'PROJECT.HAS_PROJECT_DESCRIPTION' | translate }}</p>
+              <cnsl-info-section class="desc cnsl-secondary-text">{{
+                'PROJECT.HAS_PROJECT_DESCRIPTION' | translate
+              }}</cnsl-info-section>
 
               <div class="project-detail-btn-container">
                 <button mat-raised-button color="primary" (click)="saveProject()">{{ 'ACTIONS.SAVE' | translate }}</button>

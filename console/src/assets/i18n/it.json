@@ -1181,11 +1181,11 @@
           "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Branding dell'organizzazione, prima che venga mostrato il default del sistema."
         },
         "1": {
-          "TITLE": "Applica l'impostazione Branding delle risorse del progetto",
+          "TITLE": "Applica l'impostazione del progetto",
           "DESC": "Branding dell'organizzazione del progetto sar\u00e0 mostrata"
         },
         "2": {
-          "TITLE": "Consentire l'accesso all'impostazione Branding dell'utente",
+          "TITLE": "Applica l'impostazione dell' organizzazione dell' utente",
           "DESC": "Verr\u00e0 mostrata l'impostazione Branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
         },
         "DIALOG": {
