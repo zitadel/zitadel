@@ -34,12 +34,12 @@ gitlab_rails['omniauth_providers'] = [
   {
     name: "openid_connect",
     label: "ZITADEL",
-    icon: "https://console.zitadel.ch/assets/icons/favicon-32x32.png",
+    icon: "https://{your_domain}/ui/console/assets/icons/favicon-32x32.png",
     args: {
       name: "openid_connect",
       scope: ["openid","profile","email"],
       response_type: "code",
-      issuer: "https://issuer.zitadel.ch",
+      issuer: "https://{your_domain}",
       discovery: true,
       client_options: {
         identifier: "<CLIENT ID from ZITADEL>",

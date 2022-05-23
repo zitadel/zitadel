@@ -24,7 +24,7 @@ In Authentication > Enterprise
 1. Press the "+" button right to "OpenID Connect"  
   ![Create new connection](/img/oidc/auth0/auth0-create-app.png)
 2. Set a connection name for example "ZITADEL"
-3. The issuer url is `https://issuer.zitadel.ch/.well-known/openid-configuration`
+3. The issuer url is `https://{your_domain}/.well-known/openid-configuration`
 4. Copy the callback URL (ending with `/login/callback`)
 
 The configuration should look like this:
