@@ -14,7 +14,7 @@ The OpenID Connect Discovery Endpoint is located within the issuer domain.
 
 ## authorization_endpoint
 
-[https://accounts.zitadel.ch/oauth/v2/authorize]({your_domain}/oauth/v2/authorize)
+[https://{your_domain}/oauth/v2/authorize]({your_domain}/oauth/v2/authorize)
 
 :::note
 The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
