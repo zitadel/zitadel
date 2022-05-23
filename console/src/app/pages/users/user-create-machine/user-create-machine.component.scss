@@ -1,22 +1,4 @@
-.abort-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
-
-  .abort {
-    font-size: 1.2rem;
-    margin-left: 2rem;
-  }
-
-  .abort-2 {
-    font-size: 1.2rem;
-    margin-left: 2rem;
-    white-space: nowrap;
-  }
-}
-
 .machine-create-main-content {
-  padding-left: 4.5rem;
   max-width: 35rem;
 
   .machine-create-form {
