@@ -9,31 +9,31 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 
 import { UserCreateMachineRoutingModule } from './user-create-machine-routing.module';
 import { UserCreateMachineComponent } from './user-create-machine.component';
 
-
-
 @NgModule({
-    declarations: [UserCreateMachineComponent],
-    imports: [
-        UserCreateMachineRoutingModule,
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatSelectModule,
-        MatButtonModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatProgressBarModule,
-        MatCheckboxModule,
-        MatTooltipModule,
-        TranslateModule,
-        DetailLayoutModule,
-        InputModule,
-    ],
+  declarations: [UserCreateMachineComponent],
+  imports: [
+    UserCreateMachineRoutingModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    CreateLayoutModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatCheckboxModule,
+    MatTooltipModule,
+    TranslateModule,
+    DetailLayoutModule,
+    InputModule,
+  ],
 })
-export class UserCreateMachineModule { }
+export class UserCreateMachineModule {}

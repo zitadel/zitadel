@@ -1,0 +1,25 @@
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.desc {
+  font-size: 14px;
+}
+
+.formfield {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+
+  button {
+    border-radius: 0.5rem;
+  }
+}
