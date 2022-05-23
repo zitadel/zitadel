@@ -229,6 +229,9 @@ $caos-light-warn: (
 $caos-dark-theme-text: var(--theme-dark-text);
 $caos-light-theme-text: var(--theme-light-text);
 
+$caos-dark-theme-secondary-text: var(--theme-dark-secondary-text);
+$caos-light-theme-secondary-text: var(--theme-light-secondary-text);
+
 $caos-dark-theme-background: (
   status-bar: map_get($caos-dark-background, 300),
   app-bar: map_get($caos-dark-background, 500),
@@ -307,7 +310,7 @@ $caos-dark-theme-foreground: (
   disabled-text: $light-disabled-text,
   elevation: black,
   hint-text: $light-disabled-text,
-  secondary-text: $light-secondary-text,
+  secondary-text: $caos-dark-theme-secondary-text,
   placeholder-text: rgba(white, 0.4),
   icon: rgba(white, 0.54),
   icons: rgba(white, 0.54),
@@ -332,7 +335,7 @@ $caos-light-theme-foreground: (
   disabled-text: $dark-disabled-text,
   elevation: black,
   hint-text: $dark-disabled-text,
-  secondary-text: $dark-secondary-text,
+  secondary-text: $caos-light-theme-secondary-text,
   placeholder-text: rgba(black, 0.3),
   icon: rgba(black, 0.54),
   icons: rgba(black, 0.54),
