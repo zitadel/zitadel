@@ -85,6 +85,10 @@ module.exports = {
           title: "Community",
           items: [
             {
+              label: "Chat",
+              href: "https://zitadel.com/chat",
+            },
+            {
               label: "GitHub Discussions",
               href: "https://github.com/zitadel/zitadel/discussions",
             },
@@ -103,11 +107,25 @@ module.exports = {
           ],
         },
         {
-          title: "Company",
+          title: "Legal",
+          items: [
+
+            {
+              label: "Terms and Conditions",
+              href: "/docs/legal/terms-of-service",
+            },
+            {
+              label: "Privacy Policy",
+              href: "/docs/legal/privacy-policy",
+            },
+          ],
+        },
+        {
+          title: "About",
           items: [
             {
-              label: "Team.",
-              href: "https://zitadel.com/team",
+              label: "Website",
+              href: "https://zitadel.com",
             },
             {
               label: "Contact",
@@ -120,17 +138,10 @@ module.exports = {
             {
               label: "Status",
               href: "https://status.zitadel.ch/",
-            },
-            {
-              label: "Terms and Conditions",
-              href: "https://docs.zitadel.com/docs/legal/terms-of-service",
-            },
-            {
-              label: "Privacy Policy",
-              href: "https://docs.zitadel.com/docs/legal/privacy-policy",
-            },
+            }
           ],
         },
+        
       ],
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
