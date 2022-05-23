@@ -9,6 +9,13 @@
   margin: 0;
   padding-bottom: 0.5rem;
   padding-top: 1rem;
+
+  &.compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+    row-gap: 1rem;
+  }
 }
 
 @mixin app-auth-method-radio-theme($theme) {
@@ -105,6 +112,17 @@
         margin: 2rem;
         font-size: 30px;
         color: if($is-dark-theme, #00000050, #ffffff50);
+      }
+    }
+
+    &.compact {
+      margin: 0;
+      width: 230px;
+
+      .cnsl-radio-header {
+        span {
+          margin: 1rem 0 1.5rem 0;
+        }
       }
     }
 

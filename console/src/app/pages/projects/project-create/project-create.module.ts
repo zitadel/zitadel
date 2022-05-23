@@ -5,22 +5,24 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
+import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 
 import { ProjectCreateRoutingModule } from './project-create-routing.module';
 import { ProjectCreateComponent } from './project-create.component';
 
 @NgModule({
-    declarations: [ProjectCreateComponent],
-    imports: [
-        A11yModule,
-        ProjectCreateRoutingModule,
-        CommonModule,
-        FormsModule,
-        InputModule,
-        MatButtonModule,
-        MatIconModule,
-        TranslateModule,
-    ],
+  declarations: [ProjectCreateComponent],
+  imports: [
+    A11yModule,
+    ProjectCreateRoutingModule,
+    CommonModule,
+    FormsModule,
+    CreateLayoutModule,
+    InputModule,
+    MatButtonModule,
+    MatIconModule,
+    TranslateModule,
+  ],
 })
-export class ProjectCreateModule { }
+export class ProjectCreateModule {}

@@ -22,6 +22,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   @Output() public submitData: EventEmitter<Profile.AsObject> = new EventEmitter<Profile.AsObject>();
   @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
   @Output() public changeUsernameClicked: EventEmitter<void> = new EventEmitter();
+  @Output() public avatarChanged: EventEmitter<void> = new EventEmitter();
 
   public profileForm!: FormGroup;
 
@@ -79,8 +80,9 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
+    dialogRef.afterClosed().subscribe((shouldReload) => {
+      if (shouldReload) {
+        this.avatarChanged.emit();
       }
     });
   }

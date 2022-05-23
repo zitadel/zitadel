@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -26,6 +27,7 @@ import { UserCreateComponent } from './user-create.component';
     FormsModule,
     ReactiveFormsModule,
     MatSelectModule,
+    CreateLayoutModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,

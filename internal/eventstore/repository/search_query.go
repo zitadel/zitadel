@@ -1,6 +1,10 @@
 package repository
 
-import "github.com/zitadel/zitadel/internal/errors"
+import (
+	"database/sql"
+
+	"github.com/zitadel/zitadel/internal/errors"
+)
 
 //SearchQuery defines the which and how data are queried
 type SearchQuery struct {
@@ -8,6 +12,7 @@ type SearchQuery struct {
 	Limit   uint64
 	Desc    bool
 	Filters [][]*Filter
+	Tx      *sql.Tx
 }
 
 //Columns defines which fields of the event are needed for the query

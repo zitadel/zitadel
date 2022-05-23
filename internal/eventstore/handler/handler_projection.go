@@ -35,7 +35,7 @@ type Lock func(context.Context, time.Duration, string) <-chan error
 type Unlock func(string) error
 
 //SearchQuery generates the search query to lookup for events
-type SearchQuery func() (query *eventstore.SearchQueryBuilder, queryLimit uint64, err error)
+type SearchQuery func(ctx context.Context) (query *eventstore.SearchQueryBuilder, queryLimit uint64, err error)
 
 type ProjectionHandler struct {
 	Handler
@@ -259,7 +259,7 @@ func (h *ProjectionHandler) fetchBulkStmts(
 	query SearchQuery,
 	reduce Reduce,
 ) (limitExeeded bool, err error) {
-	eventQuery, eventsLimit, err := query()
+	eventQuery, eventsLimit, err := query(ctx)
 	if err != nil {
 		logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("unable to create event query")
 		return false, err

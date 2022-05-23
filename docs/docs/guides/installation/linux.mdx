@@ -1,0 +1,32 @@
+## Download The CockroachDB binary
+
+Download a `cockroach` binary as described [here](https://www.cockroachlabs.com/docs/v21.2/install-cockroachdb).
+ZITADEL is tested against CockroachDB v21.2.8.
+
+## Run CockroachDB and ZITADEL
+
+Run a CockroachDB instance
+
+```bash
+cockroach start-single-node --insecure --background --http-addr :9090
+```
+
+Configure your environment and generate a master encryption key
+
+```bash
+export ZITADEL_EXTERNALSECURE=false
+export ZITADEL_EXTERNALDOMAIN=localhost
+export ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
+```
+
+Download the zitadel binary
+
+```bash
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.6 | grep "browser_download_url.*zitadel_.*_linux_$(dpkg --print-architecture)" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadel && sudo chmod +x /usr/local/bin/zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+```
+
+Run the database and application containers
+
+```bash
+zitadel admin start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
+```

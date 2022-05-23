@@ -5,7 +5,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
@@ -14,7 +13,6 @@ import { take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
-import { CnslLinks } from 'src/app/modules/links/links.component';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -52,6 +50,7 @@ import {
     PKCE_METHOD,
     POST_METHOD,
 } from '../authmethods';
+import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
 
 @Component({
   selector: 'cnsl-app-detail',
@@ -103,6 +102,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public AppState: any = AppState;
   public oidcForm!: FormGroup;
+  public oidcTokenForm!: FormGroup;
   public apiForm!: FormGroup;
 
   public redirectUrisList: string[] = [];
@@ -122,7 +122,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
   public copiedKey: any = '';
-  public nextLinks: Array<CnslLinks> = [];
   public InfoSectionType: any = InfoSectionType;
   public copied: string = '';
 
@@ -139,7 +138,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private mgmtService: ManagementService,
     private authService: GrpcAuthService,
     private router: Router,
-    private snackbar: MatSnackBar,
     private breadcrumbService: BreadcrumbService,
     private http: HttpClient,
   ) {
@@ -150,6 +148,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       grantTypesList: [{ value: [], disabled: true }],
       appType: [{ value: '', disabled: true }],
       authMethodType: [{ value: '', disabled: true }],
+    });
+
+    this.oidcTokenForm = this.fb.group({
       accessTokenType: [{ value: '', disabled: true }],
       accessTokenRoleAssertion: [{ value: false, disabled: true }],
       idTokenRoleAssertion: [{ value: false, disabled: true }],
@@ -164,9 +165,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.http.get('./assets/environment.json').subscribe((env: any) => {
       this.environmentMap = {
         issuer: env.issuer,
-        adminServiceUrl: env.adminServiceUrl,
-        mgmtServiceUrl: env.mgmtServiceUrl,
-        authServiceUrl: env.adminServiceUrl,
+        adminServiceUrl: env.api,
+        mgmtServiceUrl: env.api,
+        authServiceUrl: env.api,
       };
     });
   }
@@ -212,32 +213,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private initLinks(): void {
-    this.nextLinks = [
-      {
-        i18nTitle: 'APP.PAGES.NEXTSTEPS.0.TITLE',
-        i18nDesc: 'APP.PAGES.NEXTSTEPS.0.DESC',
-        routerLink: ['/projects', this.projectId, 'roles'],
-        iconClasses: 'las la-user-tag',
-      },
-      {
-        i18nTitle: 'APP.PAGES.NEXTSTEPS.1.TITLE',
-        i18nDesc: 'APP.PAGES.NEXTSTEPS.1.DESC',
-        routerLink: ['/users', 'create'],
-        iconClasses: 'las la-user-plus',
-      },
-      {
-        i18nTitle: 'APP.PAGES.NEXTSTEPS.2.TITLE',
-        i18nDesc: 'APP.PAGES.NEXTSTEPS.2.DESC',
-        href: 'https://docs.zitadel.ch',
-        iconClasses: 'las la-people-carry',
-      },
-    ];
-  }
-
   private async getData(projectId: string, appId: string): Promise<void> {
-    this.initLinks();
-
     this.mgmtService.getIAM().then((iam) => {
       this.isZitadel = iam.iamProjectId === this.projectId;
     });
@@ -277,6 +253,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
                 this.settingsList = [
                   { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                  { id: 'token', i18nKey: 'APP.TOKEN' },
                   { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
                   { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
                   { id: 'urls', i18nKey: 'APP.URLS' },
@@ -317,6 +294,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
               if (allowed) {
                 this.oidcForm.enable();
+                this.oidcTokenForm.enable();
                 this.apiForm.enable();
               }
 
@@ -332,10 +310,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
               if (this.app.oidcConfig?.clockSkew) {
                 const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
-                this.oidcForm.controls['clockSkewSeconds'].setValue(inSecs);
+                this.oidcTokenForm.controls['clockSkewSeconds'].setValue(inSecs);
               }
               if (this.app.oidcConfig) {
                 this.oidcForm.patchValue(this.app.oidcConfig);
+                this.oidcTokenForm.patchValue(this.app.oidcConfig);
               }
               if (this.app.apiConfig) {
                 this.apiForm.patchValue(this.app.apiConfig);
@@ -350,8 +329,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 } else {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
-
-                this.showSaveSnack();
               });
 
               this.apiForm.valueChanges.subscribe((apiConfig) => {
@@ -363,8 +340,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 } else {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
-
-                this.showSaveSnack();
               });
             }
           })
@@ -375,20 +350,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           });
       });
     this.docs = await this.mgmtService.getOIDCInformation();
-  }
-
-  private async showSaveSnack(): Promise<void> {
-    const message = await this.translate.get('APP.TOAST.CONFIGCHANGED').toPromise();
-    const action = await this.translate.get('ACTIONS.SAVENOW').toPromise();
-
-    const snackRef = this.snackbar.open(message, action, { duration: 5000, verticalPosition: 'top' });
-    snackRef.onAction().subscribe(() => {
-      if (this.app.oidcConfig) {
-        this.saveOIDCApp();
-      } else if (this.app.apiConfig) {
-        this.saveAPIApp();
-      }
-    });
   }
 
   private getAuthMethodOptions(type: string): void {
@@ -426,6 +387,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         (partialConfig.oidc as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
 
       this.oidcForm.patchValue(this.app.oidcConfig);
+      this.oidcTokenForm.patchValue(this.app.oidcConfig);
     } else if (partialConfig && partialConfig.api && this.app.apiConfig) {
       this.app.apiConfig.authMethodType =
         (partialConfig.api as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
@@ -444,6 +406,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       },
       width: '400px',
     });
+
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp && this.projectId && this.app.id) {
         this.mgmtService
@@ -519,40 +482,53 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this.requestRedirectValuesSubject$.next();
     if (this.oidcForm.valid) {
       if (this.app.oidcConfig) {
+        //   configuration
         this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
         this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
         this.app.oidcConfig.appType = this.appType?.value;
         this.app.oidcConfig.authMethodType = this.authMethodType?.value;
-        this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
-        this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
-        this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
-        this.app.oidcConfig.devMode = this.devMode?.value;
+
+        // token
         this.app.oidcConfig.accessTokenType = this.accessTokenType?.value;
         this.app.oidcConfig.accessTokenRoleAssertion = this.accessTokenRoleAssertion?.value;
         this.app.oidcConfig.idTokenRoleAssertion = this.idTokenRoleAssertion?.value;
         this.app.oidcConfig.idTokenUserinfoAssertion = this.idTokenUserinfoAssertion?.value;
 
+        // redirects
+        this.app.oidcConfig.redirectUrisList = this.redirectUrisList;
+        this.app.oidcConfig.postLogoutRedirectUrisList = this.postLogoutRedirectUrisList;
+        this.app.oidcConfig.additionalOriginsList = this.additionalOriginsList;
+        this.app.oidcConfig.devMode = this.devMode?.value;
+
         const req = new UpdateOIDCAppConfigRequest();
         req.setProjectId(this.projectId);
         req.setAppId(this.app.id);
-        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
+
+        // configuration
         req.setResponseTypesList(this.app.oidcConfig.responseTypesList);
-        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
         req.setAuthMethodType(this.app.oidcConfig.authMethodType);
-        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
         req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
         req.setAppType(this.app.oidcConfig.appType);
-        req.setDevMode(this.app.oidcConfig.devMode);
+
+        // token
         req.setAccessTokenType(this.app.oidcConfig.accessTokenType);
         req.setAccessTokenRoleAssertion(this.app.oidcConfig.accessTokenRoleAssertion);
         req.setIdTokenRoleAssertion(this.app.oidcConfig.idTokenRoleAssertion);
         req.setIdTokenUserinfoAssertion(this.app.oidcConfig.idTokenUserinfoAssertion);
+
+        // redirects
+        req.setRedirectUrisList(this.app.oidcConfig.redirectUrisList);
+        req.setAdditionalOriginsList(this.app.oidcConfig.additionalOriginsList);
+        req.setPostLogoutRedirectUrisList(this.app.oidcConfig.postLogoutRedirectUrisList);
+        req.setDevMode(this.app.oidcConfig.devMode);
+
         if (this.clockSkewSeconds?.value) {
           const dur = new Duration();
           dur.setSeconds(Math.floor(this.clockSkewSeconds?.value));
           dur.setNanos(Math.floor(this.clockSkewSeconds?.value % 1) * 10000);
           req.setClockSkew(dur);
         }
+
         this.mgmtService
           .updateOIDCAppConfig(req)
           .then(() => {
@@ -622,6 +598,24 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  public changeAuthMethod(): void {
+    const ref = this.dialog.open(AuthMethodDialogComponent, {
+      data: {
+        radioItemAuthType: this.currentRadioItemAuthType,
+        initialAuthMethod: this.initialAuthMethod,
+        currentAuthMethod: this.currentAuthMethod,
+        authMethods: this.authMethods,
+        isOIDC: this.app?.oidcConfig !== undefined,
+      },
+    });
+
+    ref.afterClosed().subscribe((authMethod: string) => {
+      if (authMethod) {
+        this.setPartialConfigFromAuthMethod(authMethod);
+      }
+    });
+  }
+
   public regenerateAPIClientSecret(): void {
     this.mgmtService
       .regenerateAPIClientSecret(this.app.id, this.projectId)
@@ -637,6 +631,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public get currentRadioItemAuthType(): RadioItemAuthType | undefined {
+    return this.authMethods.find((i) => i.key === this.initialAuthMethod);
   }
 
   public navigateBack(): void {
@@ -672,22 +670,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public get accessTokenType(): AbstractControl | null {
-    return this.oidcForm.get('accessTokenType');
+    return this.oidcTokenForm.get('accessTokenType');
   }
 
   public get idTokenRoleAssertion(): AbstractControl | null {
-    return this.oidcForm.get('idTokenRoleAssertion');
+    return this.oidcTokenForm.get('idTokenRoleAssertion');
   }
 
   public get accessTokenRoleAssertion(): AbstractControl | null {
-    return this.oidcForm.get('accessTokenRoleAssertion');
+    return this.oidcTokenForm.get('accessTokenRoleAssertion');
   }
 
   public get idTokenUserinfoAssertion(): AbstractControl | null {
-    return this.oidcForm.get('idTokenUserinfoAssertion');
+    return this.oidcTokenForm.get('idTokenUserinfoAssertion');
   }
 
   public get clockSkewSeconds(): AbstractControl | null {
-    return this.oidcForm.get('clockSkewSeconds');
+    return this.oidcTokenForm.get('clockSkewSeconds');
   }
 }

@@ -12,28 +12,16 @@ p.desc {
   display: block;
 }
 
+.name-formfield {
+  max-width: 400px;
+  display: block;
+}
+
 .app-create-container {
   padding-top: 2rem;
 
   .progress-bar {
     margin-bottom: 1rem;
-  }
-
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
   }
 }
 
@@ -87,9 +75,14 @@ p.desc {
 .app-create-actions {
   margin-top: 1rem;
   display: flex;
+  align-items: center;
 
-  .fill-space {
-    flex: 1;
+  .bck-button {
+    margin-right: 1rem;
+  }
+
+  .create-button {
+    padding: 0.5rem 4rem;
   }
 }
 
@@ -115,6 +108,5 @@ p.desc {
     margin-top: 3rem;
     display: block;
     padding: 0.5rem 4rem;
-    float: right;
   }
 }

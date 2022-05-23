@@ -15,7 +15,14 @@
     </a>
   </ng-template>
 
-  <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements">
+  <table
+    [dataSource]="dataSource"
+    mat-table
+    class="table"
+    aria-label="Organizations"
+    matSort
+    (matSortChange)="sortChange($event)"
+  >
     <ng-container matColumnDef="select">
       <th class="selection" mat-header-cell *matHeaderCellDef>
         {{ 'ORG.PAGES.ACTIVE' | translate }}
@@ -51,6 +58,7 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
+      <!-- mat-sort-header -->
       <th mat-header-cell *matHeaderCellDef>
         {{ 'ORG.PAGES.NAME' | translate }}
       </th>
