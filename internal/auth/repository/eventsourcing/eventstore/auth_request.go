@@ -148,6 +148,10 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
+	err = repo.fillPolicies(ctx, request)
+	if err != nil {
+		return nil, err
+	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
