@@ -276,4 +276,8 @@ export class ShortcutsComponent implements OnDestroy {
   public get allProjects(): ShortcutItem[] {
     return this.all.filter((s) => s.type === ShortcutType.PROJECT);
   }
+
+  public get allAvailableShortcuts(): ShortcutItem[] {
+    return [...this.allRoutes, ...this.allPolicies, ...this.allProjects];
+  }
 }

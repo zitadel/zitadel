@@ -207,6 +207,30 @@
     }
   }
 
+  .available-shortcut-wrapper {
+    border: 1px solid $border-color;
+    border-radius: 1rem;
+    padding: 1rem;
+
+    .available-shortcut-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: 1rem;
+
+      @media only screen and (min-width: 800px) {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      @media only screen and (min-width: 1200px) {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .shortcut-box {
+        margin: 0;
+      }
+    }
+  }
+
   .cdk-drag-preview {
     box-sizing: border-box;
     border-radius: 1rem;
