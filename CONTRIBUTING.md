@@ -94,10 +94,10 @@ We add the label "good first issue" for problems we think are a good starting po
 
 ZITADEL loads translations from four files:
 
-- [Console texts](https://github.com/zitadel/zitadel/tree/main/console/src/assets/i18n)
-- [Login interface](https://github.com/zitadel/zitadel/tree/main/internal/ui/login/static/i18n)
-- [Email notification](https://github.com/zitadel/zitadel/tree/main/internal/notification/static/i18n)
-- [Common texts](https://github.com/zitadel/zitadel/tree/main/internal/static/i18n) for success or error toasts
+- [Console texts](./console/src/assets/i18n)
+- [Login interface](./internal/ui/login/static/i18n)
+- [Email notification](./internal/notification/static/i18n)
+- [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
 
