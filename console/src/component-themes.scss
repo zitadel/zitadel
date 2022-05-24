@@ -23,6 +23,7 @@
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
+@import 'src/app/pages/projects/apps/redirect-uris/redirect-uris.component';
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
 @import 'src/app/modules/edit-text/edit-text.component.scss';
@@ -111,6 +112,7 @@
   @include user-grants-theme($theme);
   @include info-row-theme($theme);
   @include action-dialog-theme($theme);
+  @include redirect-uris-theme($theme);
   @include action-keys-theme($theme);
   @include codemirror-theme($theme);
   @include contact-theme($theme);

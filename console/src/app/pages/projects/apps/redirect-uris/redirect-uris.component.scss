@@ -1,4 +1,80 @@
-.form {
+@use '@angular/material' as mat;
+
+@mixin redirect-uris-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
+  $button-text-color: map-get($foreground, text);
+  $button-disabled-text-color: map-get($foreground, disabled-button);
+  $divider-color: map-get($foreground, dividers);
+  $secondary-text: map-get($foreground, secondary-text);
+
+  .redirect-uris-list {
+    width: 100%;
+
+    .uri-line {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0;
+      padding: 0rem 0 0rem 0.75rem;
+      border-radius: 4px;
+      background: map-get($background, infosection);
+
+      .uri {
+        font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        font-size: 14px;
+        overflow-x: auto;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      i.green {
+        font-size: 1rem;
+        line-height: 35px;
+        height: 30px;
+      }
+
+      .icon-button {
+        height: 30px;
+        line-height: 30px;
+
+        .icon {
+          font-size: 1rem;
+          margin-bottom: 3px;
+        }
+
+        &:not(:hover) {
+          color: $secondary-text;
+        }
+      }
+
+      .alerticon {
+        display: none;
+      }
+
+      &.alert {
+        background-color: map-get($background, alertinfosection);
+        color: map-get($foreground, alertinfosection);
+
+        .alerticon {
+          display: inline;
+        }
+      }
+    }
+  }
+
+  .redirect-uris-error {
+    font-size: 13px;
+    color: $warn-color;
+    margin: 0 0.5rem 1.5rem 0.5rem;
+  }
+}
+
+.redirect-uris-form {
   display: flex;
   align-items: flex-end;
   min-width: 320px;
@@ -11,53 +87,4 @@
     margin-bottom: 14px;
     margin-right: -0.5rem;
   }
-}
-
-.uri-list {
-  margin: 0 0.5rem;
-  width: 100%;
-
-  .uri-line {
-    display: flex;
-    align-items: center;
-
-    .uri {
-      font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-      font-size: 14px;
-      overflow-x: auto;
-    }
-
-    .fill-space {
-      flex: 1;
-    }
-
-    i.green {
-      font-size: 1rem;
-      line-height: 35px;
-      height: 30px;
-    }
-
-    i.red {
-      font-size: 1.2rem;
-    }
-
-    .icon-button {
-      height: 30px;
-      line-height: 30px;
-
-      .icon {
-        font-size: 1rem !important;
-      }
-
-      &:not(:hover) {
-        color: var(--grey);
-      }
-    }
-  }
-}
-
-.error {
-  font-size: 13px;
-  color: var(--warn);
-  margin: 0 0.5rem 1.5rem 0.5rem;
 }
