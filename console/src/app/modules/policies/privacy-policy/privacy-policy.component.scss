@@ -61,18 +61,8 @@
   display: flex;
   justify-content: flex-start;
 
-  .save-button,
-  .reset-button {
+  .save-button {
     display: block;
-    margin: 0 1rem 0 0;
-  }
-
-  .reset-button {
-    display: flex;
-    align-items: center;
-
-    i {
-      margin-bottom: 3px;
-    }
+    margin: 0;
   }
 }
