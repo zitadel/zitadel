@@ -11,17 +11,32 @@ Each policy can be overridden and reset to the default.
 ## General
 
 :::info
-
 Only available on the instance settings
-
 :::
 
 At the moment general settings is only one configuration. This defines the default language of the whole instance.
 
-
 ![General Settings](/img/console_instance_policy_general.png)
 
+## Notification
 
+:::info
+Only available on the instance settings
+:::
+
+In the notification settings you can configure your SMTP and an SMS Provider. At the moment only Twilio is available as SMS provider.
+
+### SMTP 
+On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own. You need to add a custom domain on your instance.
+Go to the ZITADEL customer portal to configure a custom domain.
+
+![Notification Providers](/img/console_instance_policy_notification.png)
+
+### SMS
+
+No default provider is configured to send some sms to your users. If you like to validate the phone numbers of your users make sure to add your twilio configuration.
+
+![Notification Providers](/img/console_instance_policy_notification_twilio.png)
 
 ## Password Complexity
 
@@ -50,7 +65,14 @@ The Login Policy defines how the login process should look like and which authen
 
 ![Login Policy](/img/manuals/policies/console_org_login.png)
 
-### Multifactors / Second Factors
+### Passwordless
+
+Passwordless authentication means that the user doesn't need to enter a password to login. In our case the user has to enter his loginname and as the next step proof the identity through a registered device or token.
+There are two different types one is depending on the device (e.g. Fingerprint, Face recognition, WindowsHello) and the other is independent (eg. Yubikey, Solokey). 
+
+
+
+### Multifactor
 
 In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universial Second Factor) with PIN. There is no other option at the moment.
 Multifactors:
@@ -107,5 +129,7 @@ A link to the current policies can be provided. On register each user has to acc
 
 In the domain policy you have two different settings. 
 One is the "user_login_must_be_domain", by setting this all the users within an organisation will be suffixed with the domain of the organisation.
-The second is "validate_org_domains" if this is set to true all created domains on an organisation must be verified per acme challenge. [Verify Domain] (../../guides/basics/organizations#domain-verification-and-primary-domain)
+
+The second is "validate_org_domains" if this is set to true all created domains on an organisation must be verified per acme challenge.
+More about how to verify a domain [here](../../guides/basics/organizations#domain-verification-and-primary-domain).
 If it is set to false, all registered domain will automatically be created as verified and the users will be able to use the domain for login.
