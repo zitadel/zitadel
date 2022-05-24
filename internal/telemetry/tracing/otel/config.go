@@ -19,15 +19,31 @@ type Config struct {
 func NewTracerFromConfig(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
 	c.Endpoint, _ = rawConfig["endpoint"].(string)
-	fraction, ok := rawConfig["fraction"].(string)
-	if ok {
-		c.Fraction, err = strconv.ParseFloat(fraction, 32)
-		if err != nil {
-			return errors.ThrowInternal(err, "OTEL-Dd2s", "could not map fraction")
-		}
+	c.Fraction, err = FractionFromConfig(rawConfig["fraction"])
+	if err != nil {
+		return err
 	}
-
 	return c.NewTracer()
+}
+
+func FractionFromConfig(i interface{}) (float64, error) {
+	if i == nil {
+		return 0, nil
+	}
+	switch fraction := i.(type) {
+	case float64:
+		return fraction, nil
+	case int:
+		return float64(fraction), nil
+	case string:
+		f, err := strconv.ParseFloat(fraction, 64)
+		if err != nil {
+			return 0, errors.ThrowInternal(err, "GOOGLE-Dsag3", "could not map fraction")
+		}
+		return f, nil
+	default:
+		return 0, errors.ThrowInternal(nil, "GOOGLE-Sg31s", "could not map fraction, unknown type")
+	}
 }
 
 func (c *Config) NewTracer() error {

@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
@@ -18,7 +19,9 @@ func (repo *UserMembershipRepo) Health() error {
 	return repo.View.Health()
 }
 
-func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
+func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context) (_ []*authz.Membership, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	memberships, err := repo.searchUserMemberships(ctx)
 	if err != nil {
 		return nil, err
@@ -26,9 +29,12 @@ func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context) ([]*aut
 	return userMembershipsToMemberships(memberships), nil
 }
 
-func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*user_view_model.UserMembershipView, error) {
+func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) (_ []*user_view_model.UserMembershipView, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	ctxData := authz.GetCtxData(ctx)
 	instance := authz.GetInstance(ctx)
+	ctx, orgSpan := tracing.NewSpan(ctx)
 	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
 		Queries: []*user_model.UserMembershipSearchQuery{
 			{
@@ -48,9 +54,11 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 			},
 		},
 	})
+	orgSpan.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
+	ctx, iamSpan := tracing.NewSpan(ctx)
 	iamMemberships, iamCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
 		Queries: []*user_model.UserMembershipSearchQuery{
 			{
@@ -70,6 +78,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 			},
 		},
 	})
+	iamSpan.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
