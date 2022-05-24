@@ -15,7 +15,7 @@ import (
 
 func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
 	agg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, addSecretGeneratorConfig(agg, typ, config))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddSecretGeneratorConfig(agg, typ, config))
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.Secr
 	}, nil
 }
 
-func addSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) preparation.Validation {
+func prepareAddSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if !typ.Valid() {
 			return nil, errors.ThrowInvalidArgument(nil, "V2-FGqVj", "Errors.InvalidArgument")

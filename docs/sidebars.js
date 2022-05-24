@@ -104,16 +104,8 @@ module.exports = {
       collapsed: true,
       items: [
         "guides/trainings/introduction",
-        {
-          type: "category",
-          label: "Support Service",
-          collapsed: true,
-          items: [
-            "guides/trainings/supportservice/operations",
-            "guides/trainings/supportservice/application",
-            "guides/trainings/supportservice/recurring",
-          ],
-        },
+        "guides/trainings/application",
+        "guides/trainings/recurring"
       ],
     },
   ],

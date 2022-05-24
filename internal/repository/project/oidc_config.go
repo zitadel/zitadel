@@ -109,7 +109,7 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.AppID != c.AppID {
 		return false
 	}
-	if e.ClientID != "" && e.ClientID != c.ClientID {
+	if e.ClientID != c.ClientID {
 		return false
 	}
 	if e.ClientSecret != c.ClientSecret {

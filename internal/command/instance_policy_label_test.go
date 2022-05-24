@@ -25,11 +25,21 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.LabelPolicy
+		ctx                 context.Context
+		primaryColor        string
+		backgroundColor     string
+		warnColor           string
+		fontColor           string
+		primaryColorDark    string
+		backgroundColorDark string
+		warnColorDark       string
+		fontColorDark       string
+		hideLoginNameSuffix bool
+		errorMsgPopup       bool
+		disableWatermark    bool
 	}
 	type res struct {
-		want *domain.LabelPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -64,20 +74,18 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.LabelPolicy{
-					PrimaryColor:        "#ffffff",
-					BackgroundColor:     "#ffffff",
-					WarnColor:           "#ffffff",
-					FontColor:           "#ffffff",
-					PrimaryColorDark:    "#ffffff",
-					BackgroundColorDark: "#ffffff",
-					WarnColorDark:       "#ffffff",
-					FontColorDark:       "#ffffff",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-				},
+				ctx:                 context.Background(),
+				primaryColor:        "#ffffff",
+				backgroundColor:     "#ffffff",
+				warnColor:           "#ffffff",
+				fontColor:           "#ffffff",
+				primaryColorDark:    "#ffffff",
+				backgroundColorDark: "#ffffff",
+				warnColorDark:       "#ffffff",
+				fontColorDark:       "#ffffff",
+				hideLoginNameSuffix: true,
+				errorMsgPopup:       true,
+				disableWatermark:    true,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -113,39 +121,22 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				policy: &domain.LabelPolicy{
-					PrimaryColor:        "#ffffff",
-					BackgroundColor:     "#ffffff",
-					WarnColor:           "#ffffff",
-					FontColor:           "#ffffff",
-					PrimaryColorDark:    "#ffffff",
-					BackgroundColorDark: "#ffffff",
-					WarnColorDark:       "#ffffff",
-					FontColorDark:       "#ffffff",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-				},
+				ctx:                 authz.WithInstanceID(context.Background(), "INSTANCE"),
+				primaryColor:        "#ffffff",
+				backgroundColor:     "#ffffff",
+				warnColor:           "#ffffff",
+				fontColor:           "#ffffff",
+				primaryColorDark:    "#ffffff",
+				backgroundColorDark: "#ffffff",
+				warnColorDark:       "#ffffff",
+				fontColorDark:       "#ffffff",
+				hideLoginNameSuffix: true,
+				errorMsgPopup:       true,
+				disableWatermark:    true,
 			},
 			res: res{
-				want: &domain.LabelPolicy{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					PrimaryColor:        "#ffffff",
-					BackgroundColor:     "#ffffff",
-					WarnColor:           "#ffffff",
-					FontColor:           "#ffffff",
-					PrimaryColorDark:    "#ffffff",
-					BackgroundColorDark: "#ffffff",
-					WarnColorDark:       "#ffffff",
-					FontColorDark:       "#ffffff",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -155,7 +146,20 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultLabelPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultLabelPolicy(
+				tt.args.ctx,
+				tt.args.primaryColor,
+				tt.args.backgroundColor,
+				tt.args.warnColor,
+				tt.args.fontColor,
+				tt.args.primaryColorDark,
+				tt.args.backgroundColorDark,
+				tt.args.warnColorDark,
+				tt.args.fontColorDark,
+				tt.args.hideLoginNameSuffix,
+				tt.args.errorMsgPopup,
+				tt.args.disableWatermark,
+			)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -378,7 +382,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -409,7 +413,8 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								instance.NewLabelPolicyActivatedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 								),
@@ -419,7 +424,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 			},
 			res: res{
 				want: &domain.ObjectDetails{

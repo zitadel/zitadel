@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 func New() *cobra.Command {
@@ -20,7 +21,7 @@ func New() *cobra.Command {
 Prereqesits:
 - cockroachdb
 
-The user provided by flags needs priviledge to 
+The user provided by flags needs privileges to
 - create the database if it does not exist
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
@@ -37,6 +38,7 @@ The user provided by flags needs priviledge to
 }
 
 func InitAll(config *Config) {
+	id.Configure(config.Machine)
 	err := initialise(config,
 		VerifyUser(config.Database.Username, config.Database.Password),
 		VerifyDatabase(config.Database.Database),

@@ -33,6 +33,7 @@ const (
 
 type InstanceSetup struct {
 	zitadel          ZitadelConfig
+	idGenerator      id.Generator
 	InstanceName     string
 	CustomDomain     string
 	DefaultLanguage  language.Tag
@@ -113,28 +114,28 @@ type ZitadelConfig struct {
 	consoleAppID string
 }
 
-func (s *InstanceSetup) generateIDs() (err error) {
-	s.zitadel.projectID, err = id.SonyFlakeGenerator.Next()
+func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
+	s.zitadel.projectID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.mgmtAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.mgmtAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.adminAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.adminAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.authAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.authAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.consoleAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.consoleAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -142,7 +143,7 @@ func (s *InstanceSetup) generateIDs() (err error) {
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
-	instanceID, err := id.SonyFlakeGenerator.Next()
+	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -153,17 +154,17 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
-	orgID, err := id.SonyFlakeGenerator.Next()
+	orgID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	userID, err := id.SonyFlakeGenerator.Next()
+	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	if err = setup.generateIDs(); err != nil {
+	if err = setup.generateIDs(c.idGenerator); err != nil {
 		return "", nil, err
 	}
 	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
@@ -174,16 +175,16 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
-		addInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
+		prepareAddInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
 
-		AddPasswordComplexityPolicy(
+		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,
 			setup.PasswordComplexityPolicy.MinLength,
 			setup.PasswordComplexityPolicy.HasLowercase,
@@ -191,18 +192,18 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.PasswordComplexityPolicy.HasNumber,
 			setup.PasswordComplexityPolicy.HasSymbol,
 		),
-		AddPasswordAgePolicy(
+		prepareAddDefaultPasswordAgePolicy(
 			instanceAgg,
 			setup.PasswordAgePolicy.ExpireWarnDays,
 			setup.PasswordAgePolicy.MaxAgeDays,
 		),
-		AddDefaultDomainPolicy(
+		prepareAddDefaultDomainPolicy(
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
 			setup.DomainPolicy.ValidateOrgDomains,
 			setup.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
 		),
-		AddDefaultLoginPolicy(
+		prepareAddDefaultLoginPolicy(
 			instanceAgg,
 			setup.LoginPolicy.AllowUsernamePassword,
 			setup.LoginPolicy.AllowRegister,
@@ -218,14 +219,14 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
 		),
-		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
-		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
-		AddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
+		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
-		AddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
-		AddDefaultLabelPolicy(
+		prepareAddDefaultLabelPolicy(
 			instanceAgg,
 			setup.LabelPolicy.PrimaryColor,
 			setup.LabelPolicy.BackgroundColor,
@@ -239,13 +240,13 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LabelPolicy.ErrorMsgPopup,
 			setup.LabelPolicy.DisableWatermark,
 		),
-		ActivateDefaultLabelPolicy(instanceAgg),
+		prepareActivateDefaultLabelPolicy(instanceAgg),
 
-		AddEmailTemplate(instanceAgg, setup.EmailTemplate),
+		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
 
 	for _, msg := range setup.MessageTexts {
-		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
+		validations = append(validations, prepareSetInstanceCustomMessageTexts(instanceAgg, msg))
 	}
 
 	console := &addOIDCApp{
@@ -292,7 +293,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -304,7 +305,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -316,7 +317,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -328,7 +329,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddOIDCAppCommand(console, nil),
+		c.AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
 	addGenerateddDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
@@ -377,7 +378,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	}, nil
 }
 
-func addInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
+func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{

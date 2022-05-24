@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -20,11 +21,15 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.PasswordComplexityPolicy
+		ctx          context.Context
+		minLength    uint64
+		hasLowercase bool
+		hasUppercase bool
+		hasNumber    bool
+		hasSymbol    bool
 	}
 	type res struct {
-		want *domain.PasswordComplexityPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -41,14 +46,12 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.PasswordComplexityPolicy{
-					MinLength:    0,
-					HasUppercase: true,
-					HasLowercase: true,
-					HasNumber:    true,
-					HasSymbol:    true,
-				},
+				ctx:          context.Background(),
+				minLength:    0,
+				hasUppercase: true,
+				hasLowercase: true,
+				hasNumber:    true,
+				hasSymbol:    true,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -71,14 +74,12 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				policy: &domain.PasswordComplexityPolicy{
-					MinLength:    8,
-					HasUppercase: true,
-					HasLowercase: true,
-					HasNumber:    true,
-					HasSymbol:    true,
-				},
+				ctx:          authz.WithInstanceID(context.Background(), "INSTANCE"),
+				minLength:    8,
+				hasUppercase: true,
+				hasLowercase: true,
+				hasNumber:    true,
+				hasSymbol:    true,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -105,27 +106,16 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				policy: &domain.PasswordComplexityPolicy{
-					MinLength:    8,
-					HasUppercase: true,
-					HasLowercase: true,
-					HasNumber:    true,
-					HasSymbol:    true,
-				},
+				ctx:          authz.WithInstanceID(context.Background(), "INSTANCE"),
+				minLength:    8,
+				hasUppercase: true,
+				hasLowercase: true,
+				hasNumber:    true,
+				hasSymbol:    true,
 			},
 			res: res{
-				want: &domain.PasswordComplexityPolicy{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					MinLength:    8,
-					HasUppercase: true,
-					HasLowercase: true,
-					HasNumber:    true,
-					HasSymbol:    true,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -135,7 +125,7 @@ func TestCommandSide_AddDefaultPasswordComplexityPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultPasswordComplexityPolicy(tt.args.ctx, tt.args.minLength, tt.args.hasLowercase, tt.args.hasUppercase, tt.args.hasNumber, tt.args.hasSymbol)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
