@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -18,6 +19,9 @@ import (
 )
 
 func TestAddAPIConfig(t *testing.T) {
+	type fields struct {
+		idGenerator id.Generator
+	}
 	type args struct {
 		a      *project.Aggregate
 		appID  string
@@ -29,12 +33,14 @@ func TestAddAPIConfig(t *testing.T) {
 	agg := project.NewAggregate("test", "test")
 
 	tests := []struct {
-		name string
-		args args
-		want Want
+		name   string
+		fields fields
+		args   args
+		want   Want
 	}{
 		{
-			name: "invalid appID",
+			name:   "invalid appID",
+			fields: fields{},
 			args: args{
 				a:     agg,
 				appID: "",
@@ -45,7 +51,8 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid name",
+			name:   "invalid name",
+			fields: fields{},
 			args: args{
 				a:     agg,
 				appID: "appID",
@@ -56,7 +63,8 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "project not exists",
+			name:   "project not exists",
+			fields: fields{},
 			args: args{
 				a:     agg,
 				appID: "id",
@@ -73,6 +81,9 @@ func TestAddAPIConfig(t *testing.T) {
 		},
 		{
 			name: "correct without client secret",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID"),
+			},
 			args: args{
 				a:     agg,
 				appID: "appID",
@@ -103,7 +114,7 @@ func TestAddAPIConfig(t *testing.T) {
 					),
 					project.NewAPIConfigAddedEvent(ctx, &agg.Aggregate,
 						"appID",
-						"",
+						"clientID@project",
 						nil,
 						domain.APIAuthMethodTypePrivateKeyJWT,
 					),
@@ -113,8 +124,11 @@ func TestAddAPIConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				idGenerator: tt.fields.idGenerator,
+			}
 			AssertValidation(t,
-				AddAPIAppCommand(
+				c.AddAPIAppCommand(
 					&addAPIApp{
 						AddApp: AddApp{
 							Aggregate: *tt.args.a,

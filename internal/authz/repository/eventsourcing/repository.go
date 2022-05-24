@@ -32,7 +32,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, queries *query.Queries
 		return nil, err
 	}
 
-	idGenerator := id.SonyFlakeGenerator
+	idGenerator := id.SonyFlakeGenerator()
 	view, err := authz_view.StartView(dbClient, idGenerator, queries)
 	if err != nil {
 		return nil, err
