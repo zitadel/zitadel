@@ -38,11 +38,11 @@ func FractionFromConfig(i interface{}) (float64, error) {
 	case string:
 		f, err := strconv.ParseFloat(fraction, 64)
 		if err != nil {
-			return 0, errors.ThrowInternal(err, "GOOGLE-Dsag3", "could not map fraction")
+			return 0, errors.ThrowInternal(err, "OTEL-SAfe1", "could not map fraction")
 		}
 		return f, nil
 	default:
-		return 0, errors.ThrowInternal(nil, "GOOGLE-Sg31s", "could not map fraction, unknown type")
+		return 0, errors.ThrowInternal(nil, "OTEL-Dd2s", "could not map fraction, unknown type")
 	}
 }
 
