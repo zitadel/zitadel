@@ -17,7 +17,8 @@ export interface ShortcutItem {
   i18nTitle?: string;
   i18nDesc?: string;
   routerLink: any;
-  withRole: string[];
+  queryParams?: any;
+  withRole?: string[];
   icon?: string;
   label?: string;
   svgIcon?: string;
@@ -138,8 +139,9 @@ export class ShortcutsComponent implements OnDestroy {
             type: ShortcutType.POLICY,
             i18nTitle: p.i18nTitle,
             i18nDesc: p.i18nDesc,
-            routerLink: p.orgRouterLink,
-            withRole: p.orgWithRole,
+            routerLink: p.orgRouterLink ?? p.iamRouterLink,
+            queryParams: p.queryParams,
+            withRole: p.orgWithRole ?? p.iamWithRole,
             icon: p.icon ?? '',
             svgIcon: p.svgIcon ?? '',
             color: p.color ?? '',
@@ -176,10 +178,10 @@ export class ShortcutsComponent implements OnDestroy {
       } else {
         switch (listName) {
           case 'main':
-            this.main = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT, CREATE_USER];
+            this.main = [PROFILE_SHORTCUT /* CREATE_ORG, CREATE_PROJECT, CREATE_USER */];
             break;
           case 'secondary':
-            this.secondary = [];
+            this.secondary = [CREATE_ORG, CREATE_PROJECT, CREATE_USER];
             // [LOGIN_POLICY, PRIVATELABEL_POLICY].map((p) => {
             //   const policy: string = {
             //     i18nTitle: p.i18nTitle,
@@ -194,7 +196,7 @@ export class ShortcutsComponent implements OnDestroy {
             // });
             break;
           case 'third':
-            this.third = [];
+            this.third = this.ALL_SHORTCUTS.filter((item) => item.i18nTitle === 'SETTINGS.GROUPS.APPEARANCE');
             // [LOGIN_TEXTS_POLICY, MESSAGE_TEXTS_POLICY].map((p) => {
             //   const policy: ShortcutItem = {
             //     i18nTitle: p.i18nTitle,

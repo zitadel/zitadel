@@ -3,13 +3,13 @@
     <div class="shortcut-title-container">
       <h2>{{ 'HOME.SHORTCUTS.SHORTCUTS' | translate }}</h2>
       <button
-        [matTooltip]="(editState ? 'ACTIONS.CLOSE' : 'ACTIONS.EDIT') | translate"
+        [matTooltip]="(editState ? 'ACTIONS.SAVE' : 'ACTIONS.EDIT') | translate"
         class="shortcut-btn"
         (click)="editState = !editState"
         mat-icon-button
       >
         <i *ngIf="!editState" class="las la-pen"></i>
-        <mat-icon *ngIf="editState">close</mat-icon>
+        <i *ngIf="editState" class="las la-check"></i>
       </button>
       <button matTooltip="{{ 'ACTIONS.RESETDEFAULT' | translate }}" (click)="reset()" *ngIf="editState" mat-icon-button>
         <i *ngIf="editState" class="las la-undo-alt"></i>
@@ -23,6 +23,7 @@
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
             <a
               [routerLink]="!editState ? shortcut.routerLink : null"
+              [queryParams]="shortcut.queryParams ? shortcut.queryParams : null"
               class="shortcut-box"
               [ngClass]="{ 'edit-state': editState && !shortcut.disabled, disabled: editState && shortcut.disabled }"
               cdkDrag
@@ -60,6 +61,7 @@
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
             <a
               [routerLink]="!editState ? shortcut.routerLink : null"
+              [queryParams]="shortcut.queryParams ? shortcut.queryParams : null"
               class="shortcut-box"
               [ngClass]="{ 'edit-state': editState && !shortcut.disabled }"
               cdkDrag
@@ -97,6 +99,7 @@
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
             <a
               [routerLink]="!editState ? shortcut.routerLink : null"
+              [queryParams]="shortcut.queryParams ? shortcut.queryParams : null"
               class="shortcut-box"
               [ngClass]="{ 'edit-state': editState && !shortcut.disabled }"
               cdkDrag

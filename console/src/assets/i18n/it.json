@@ -818,6 +818,7 @@
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "complessità della password",
       "NOTIFICATIONS": "Notifiche",
+      "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
       "DOMAIN": "Impostazioni del dominio",
