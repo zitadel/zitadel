@@ -23,11 +23,23 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.LoginPolicy
+		ctx                        context.Context
+		allowUsernamePassword      bool
+		allowRegister              bool
+		allowExternalIDP           bool
+		forceMFA                   bool
+		hidePasswordReset          bool
+		ignoreUnknownUsernames     bool
+		passwordlessType           domain.PasswordlessType
+		defaultRedirectURI         string
+		passwordCheckLifetime      time.Duration
+		externalLoginCheckLifetime time.Duration
+		mfaInitSkipLifetime        time.Duration
+		secondFactorCheckLifetime  time.Duration
+		multiFactorCheckLifetime   time.Duration
 	}
 	type res struct {
-		want *domain.LoginPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -64,12 +76,10 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
-				},
+				ctx:                   context.Background(),
+				allowRegister:         true,
+				allowUsernamePassword: true,
+				passwordlessType:      domain.PasswordlessTypeAllowed,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -107,43 +117,24 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				policy: &domain.LoginPolicy{
-					AllowRegister:              true,
-					AllowUsernamePassword:      true,
-					AllowExternalIDP:           true,
-					ForceMFA:                   true,
-					HidePasswordReset:          true,
-					IgnoreUnknownUsernames:     true,
-					PasswordlessType:           domain.PasswordlessTypeAllowed,
-					DefaultRedirectURI:         "https://example.com/redirect",
-					PasswordCheckLifetime:      time.Hour * 1,
-					ExternalLoginCheckLifetime: time.Hour * 2,
-					MFAInitSkipLifetime:        time.Hour * 3,
-					SecondFactorCheckLifetime:  time.Hour * 4,
-					MultiFactorCheckLifetime:   time.Hour * 5,
-				},
+				ctx:                        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				allowRegister:              true,
+				allowUsernamePassword:      true,
+				allowExternalIDP:           true,
+				forceMFA:                   true,
+				hidePasswordReset:          true,
+				ignoreUnknownUsernames:     true,
+				passwordlessType:           domain.PasswordlessTypeAllowed,
+				defaultRedirectURI:         "https://example.com/redirect",
+				passwordCheckLifetime:      time.Hour * 1,
+				externalLoginCheckLifetime: time.Hour * 2,
+				mfaInitSkipLifetime:        time.Hour * 3,
+				secondFactorCheckLifetime:  time.Hour * 4,
+				multiFactorCheckLifetime:   time.Hour * 5,
 			},
 			res: res{
-				want: &domain.LoginPolicy{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					AllowRegister:              true,
-					AllowUsernamePassword:      true,
-					AllowExternalIDP:           true,
-					ForceMFA:                   true,
-					HidePasswordReset:          true,
-					IgnoreUnknownUsernames:     true,
-					PasswordlessType:           domain.PasswordlessTypeAllowed,
-					DefaultRedirectURI:         "https://example.com/redirect",
-					PasswordCheckLifetime:      time.Hour * 1,
-					ExternalLoginCheckLifetime: time.Hour * 2,
-					MFAInitSkipLifetime:        time.Hour * 3,
-					SecondFactorCheckLifetime:  time.Hour * 4,
-					MultiFactorCheckLifetime:   time.Hour * 5,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -153,7 +144,22 @@ func TestCommandSide_AddDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultLoginPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultLoginPolicy(
+				tt.args.ctx,
+				tt.args.allowUsernamePassword,
+				tt.args.allowRegister,
+				tt.args.allowExternalIDP,
+				tt.args.forceMFA,
+				tt.args.hidePasswordReset,
+				tt.args.ignoreUnknownUsernames,
+				tt.args.passwordlessType,
+				tt.args.defaultRedirectURI,
+				tt.args.passwordCheckLifetime,
+				tt.args.externalLoginCheckLifetime,
+				tt.args.mfaInitSkipLifetime,
+				tt.args.secondFactorCheckLifetime,
+				tt.args.multiFactorCheckLifetime,
+			)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1046,7 +1052,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			_, got, err := r.AddSecondFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
+			got, err := r.AddSecondFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1282,7 +1288,7 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			_, got, err := r.AddMultiFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
+			got, err := r.AddMultiFactorToDefaultLoginPolicy(tt.args.ctx, tt.args.factor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

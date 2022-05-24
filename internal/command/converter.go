@@ -12,3 +12,11 @@ func writeModelToObjectDetails(writeModel *eventstore.WriteModel) *domain.Object
 		EventDate:     writeModel.ChangeDate,
 	}
 }
+
+func pushedEventsToObjectDetails(events []eventstore.Event) *domain.ObjectDetails {
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
+	}
+}
