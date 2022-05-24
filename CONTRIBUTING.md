@@ -16,7 +16,7 @@ For people who are new to ZITADEL: We flag issues which are a good starting poin
 
 Make ZITADEL more popular and give it a ⭐
 
-Help shaping the future of ZITADEL by
+Help shaping the future of ZITADEL:
 
 - Join our [chat](https://zitadel.com/chat) and discuss with us or others.
 - Ask or answer questions in the [issues section](https://github.com/zitadel/zitadel/issues)
@@ -24,8 +24,9 @@ Help shaping the future of ZITADEL by
 
 [Contribute](#how-to-contribute)
 
-- [Code](#contribute-code)
+- [Contribute code](#contribute)
 - If you found a mistake on our [docs page](https://docs.zitadel.com) or something is missing please read [the docs section](#contribute-docs)
+- [Translate](#contribute-internationalization) and improve texts
 
 Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
@@ -88,6 +89,17 @@ We add the label "good first issue" for problems we think are a good starting po
 
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
+
+## Contribute Internationalization
+
+ZITADEL loads translations from four files:
+
+- [Console texts](./console/src/assets/i18n)
+- [Login interface](./internal/ui/login/static/i18n)
+- [Email notification](./internal/notification/static/i18n)
+- [Common texts](./internal/static/i18n) for success or error toasts
+
+You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
 
 ### Make a PR
 
