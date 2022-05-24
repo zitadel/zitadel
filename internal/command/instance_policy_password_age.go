@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -10,36 +12,17 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
-	addedPolicy := NewInstancePasswordAgePolicyWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.WriteModel)
-	event, err := c.addDefaultPasswordAgePolicy(ctx, instanceAgg, addedPolicy, policy)
+func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, expireWarnDays, maxAgeDays uint64) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPasswordAgePolicy(instanceAgg, expireWarnDays, maxAgeDays))
 	if err != nil {
 		return nil, err
 	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToPasswordAgePolicy(&addedPolicy.PasswordAgePolicyWriteModel), nil
-}
-
-func (c *Commands) addDefaultPasswordAgePolicy(ctx context.Context, instanceAgg *eventstore.Aggregate, addedPolicy *InstancePasswordAgePolicyWriteModel, policy *domain.PasswordAgePolicy) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
-	if err != nil {
-		return nil, err
-	}
-	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.IAM.PasswordAgePolicy.AlreadyExists")
-	}
-
-	return instance.NewPasswordAgePolicyAddedEvent(ctx, instanceAgg, policy.ExpireWarnDays, policy.MaxAgeDays), nil
-
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
@@ -79,4 +62,33 @@ func (c *Commands) defaultPasswordAgePolicyWriteModelByID(ctx context.Context) (
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func prepareAddDefaultPasswordAgePolicy(
+	a *instance.Aggregate,
+	expireWarnDays,
+	maxAgeDays uint64,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewInstancePasswordAgePolicyWriteModel(ctx)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if writeModel.State == domain.PolicyStateActive {
+				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.Instance.PasswordAgePolicy.AlreadyExists")
+			}
+			return []eventstore.Command{
+				instance.NewPasswordAgePolicyAddedEvent(ctx, &a.Aggregate,
+					expireWarnDays,
+					maxAgeDays,
+				),
+			}, nil
+		}, nil
+	}
 }

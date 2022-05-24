@@ -174,16 +174,16 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
-		addInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
+		prepareAddInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
 
-		AddPasswordComplexityPolicy(
+		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,
 			setup.PasswordComplexityPolicy.MinLength,
 			setup.PasswordComplexityPolicy.HasLowercase,
@@ -191,18 +191,18 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.PasswordComplexityPolicy.HasNumber,
 			setup.PasswordComplexityPolicy.HasSymbol,
 		),
-		AddPasswordAgePolicy(
+		prepareAddDefaultPasswordAgePolicy(
 			instanceAgg,
 			setup.PasswordAgePolicy.ExpireWarnDays,
 			setup.PasswordAgePolicy.MaxAgeDays,
 		),
-		AddDefaultDomainPolicy(
+		prepareAddDefaultDomainPolicy(
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
 			setup.DomainPolicy.ValidateOrgDomains,
 			setup.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
 		),
-		AddDefaultLoginPolicy(
+		prepareAddDefaultLoginPolicy(
 			instanceAgg,
 			setup.LoginPolicy.AllowUsernamePassword,
 			setup.LoginPolicy.AllowRegister,
@@ -218,14 +218,14 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
 		),
-		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
-		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
-		AddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
+		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
-		AddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
-		AddDefaultLabelPolicy(
+		prepareAddDefaultLabelPolicy(
 			instanceAgg,
 			setup.LabelPolicy.PrimaryColor,
 			setup.LabelPolicy.BackgroundColor,
@@ -239,13 +239,13 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LabelPolicy.ErrorMsgPopup,
 			setup.LabelPolicy.DisableWatermark,
 		),
-		ActivateDefaultLabelPolicy(instanceAgg),
+		prepareActivateDefaultLabelPolicy(instanceAgg),
 
-		AddEmailTemplate(instanceAgg, setup.EmailTemplate),
+		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
 
 	for _, msg := range setup.MessageTexts {
-		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
+		validations = append(validations, prepareSetInstanceCustomMessageTexts(instanceAgg, msg))
 	}
 
 	console := &addOIDCApp{
@@ -377,7 +377,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	}, nil
 }
 
-func addInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
+func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
