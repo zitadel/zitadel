@@ -65,9 +65,17 @@ export class UserDetailComponent implements OnInit {
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
+    activatedRoute: ActivatedRoute,
     private mediaMatcher: MediaMatcher,
     breadcrumbService: BreadcrumbService,
   ) {
+    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
+      const { id } = params;
+      if (id) {
+        this.currentSetting = id;
+      }
+    });
+
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
         type: BreadcrumbType.ORG,

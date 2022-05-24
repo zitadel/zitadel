@@ -37,7 +37,7 @@ export class UserTableComponent implements OnInit {
   public Type: any = Type;
   @Input() public type: Type = Type.TYPE_HUMAN;
   @Input() refreshOnPreviousRoutes: string[] = [];
-  @Input() disabled: boolean = false;
+  @Input() canWrite: boolean = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatSort) public sort!: MatSort;
   public INITIAL_PAGE_SIZE: number = 20;
@@ -77,6 +77,7 @@ export class UserTableComponent implements OnInit {
   public filterOpen: boolean = false;
 
   private searchQueries: SearchQuery[] = [];
+  @Input() public canDelete: boolean = false;
   constructor(
     private router: Router,
     public translate: TranslateService,

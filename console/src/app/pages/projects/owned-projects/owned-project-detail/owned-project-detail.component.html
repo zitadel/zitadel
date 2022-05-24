@@ -6,7 +6,7 @@
   [isInactive]="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
   [hasContributors]="true"
   stateTooltip="{{ 'PROJECT.STATE.' + project?.state | translate }}"
-  [hasActions]="true"
+  [hasActions]="['project.app.write:' + project?.id, 'project.app.write$'] | hasRole | async"
 >
   <ng-template topActions cnslHasRole [hasRole]="['project.write:' + projectId, 'project.write']">
     <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name" *ngIf="isZitadel === false">
@@ -68,8 +68,13 @@
   <cnsl-meta-layout>
     <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" [queryParam]="'id'">
       <ng-container *ngIf="currentSetting === 'general' && project">
-        <ng-template cnslHasRole [hasRole]="['project.app.read:' + project.id, 'project.app.read']">
-          <cnsl-application-grid *ngIf="grid" [disabled]="isZitadel" (changeView)="grid = false" [projectId]="projectId">
+        <ng-template cnslHasRole [hasRole]="['project.app.read:' + project.id, 'project.app.read$']">
+          <cnsl-application-grid
+            *ngIf="grid"
+            [disabled]="isZitadel || (['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false"
+            (changeView)="grid = false"
+            [projectId]="projectId"
+          >
           </cnsl-application-grid>
           <cnsl-card *ngIf="!grid" title="{{ 'PROJECT.APP.TITLE' | translate }}">
             <div class="card-actions" card-actions>
@@ -77,7 +82,12 @@
                 <i matTooltip="show grid view" class="las la-th-large"></i>
               </button>
             </div>
-            <cnsl-applications [disabled]="isZitadel" [projectId]="projectId"></cnsl-applications>
+            <cnsl-applications
+              [disabled]="
+                isZitadel || (['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false
+              "
+              [projectId]="projectId"
+            ></cnsl-applications>
           </cnsl-card>
         </ng-template>
 
@@ -136,7 +146,14 @@
               }}</cnsl-info-section>
 
               <div class="project-detail-btn-container">
-                <button mat-raised-button color="primary" (click)="saveProject()">{{ 'ACTIONS.SAVE' | translate }}</button>
+                <button
+                  mat-raised-button
+                  [disabled]="(['project.app.write:' + project.id, 'project.app.write$'] | hasRole | async) === false"
+                  color="primary"
+                  (click)="saveProject()"
+                >
+                  {{ 'ACTIONS.SAVE' | translate }}
+                </button>
               </div>
             </cnsl-card>
           </ng-template>

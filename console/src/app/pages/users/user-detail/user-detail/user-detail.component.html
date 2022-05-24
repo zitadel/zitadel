@@ -48,7 +48,7 @@
 
 <div class="max-width-container" *ngIf="user && (['user.write$', 'user.write:' + user.id] | hasRole) as canWrite$">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
+    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" queryParam="id">
       <div *ngIf="error" class="max-width-container">
         <p>{{ error }}</p>
       </div>
