@@ -31,15 +31,12 @@ All your settings will be removed and the default settings of the system will tr
 
 ## Internationalization
 
-ZITADELs support for languages will be extended with time. 
-If you need support for a specific language we highly recommend you to write translation files for the missing language.
+ZITADEL is available in the following languages
 
-ZITADEL loads translations from three files:
+- English (en)
+- German (de)
+- Italian (it)
 
- - [Console translations](https://github.com/zitadel/zitadel/tree/main/console/src/assets/i18n)
- - [Login interface texts](https://github.com/zitadel/zitadel/tree/main/internal/ui/login/static/i18n)
- - [Email Notifcation texts](https://github.com/zitadel/zitadel/tree/main/internal/notification/static/i18n)
- - [Common translations](https://github.com/zitadel/zitadel/tree/main/internal/static/i18n) for success or error toasts
+A language is displayed based on your agent's language header. The default language is English.
 
- Make sure you set the locale as the name. Later on, language header will determine which file gets displayed.
-
+If you need support for a specific language we highly encourage you to [contribute translation files](/CONTRIBUTING.md) for the missing language.
