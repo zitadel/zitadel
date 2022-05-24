@@ -21,11 +21,12 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.PasswordAgePolicy
+		ctx            context.Context
+		maxAgeDays     uint64
+		expireWarnDays uint64
 	}
 	type res struct {
-		want *domain.PasswordAgePolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -51,11 +52,9 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.PasswordAgePolicy{
-					MaxAgeDays:     365,
-					ExpireWarnDays: 10,
-				},
+				ctx:            context.Background(),
+				maxAgeDays:     365,
+				expireWarnDays: 10,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -82,21 +81,13 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				policy: &domain.PasswordAgePolicy{
-					ExpireWarnDays: 365,
-					MaxAgeDays:     10,
-				},
+				ctx:            authz.WithInstanceID(context.Background(), "INSTANCE"),
+				expireWarnDays: 365,
+				maxAgeDays:     10,
 			},
 			res: res{
-				want: &domain.PasswordAgePolicy{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					ExpireWarnDays: 365,
-					MaxAgeDays:     10,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -106,7 +97,7 @@ func TestCommandSide_AddDefaultPasswordAgePolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPasswordAgePolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultPasswordAgePolicy(tt.args.ctx, tt.args.expireWarnDays, tt.args.maxAgeDays)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
