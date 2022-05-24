@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -23,12 +22,12 @@ type OrgSetup struct {
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string) (string, *domain.ObjectDetails, error) {
-	orgID, err := id.SonyFlakeGenerator().Next()
+	orgID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	userID, err := id.SonyFlakeGenerator().Next()
+	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}

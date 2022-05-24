@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -42,7 +41,7 @@ type addOIDCApp struct {
 }
 
 //AddOIDCAppCommand prepares the commands to add an oidc app. The ClientID will be set during the CreateCommands
-func AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
+func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if app.ID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument")
@@ -72,7 +71,7 @@ func AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) pr
 				return nil, errors.ThrowNotFound(err, "PROJE-6swVG", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator(), project.Name)
+			app.ClientID, err = domain.NewClientID(c.idGenerator, project.Name)
 			if err != nil {
 				return nil, errors.ThrowInternal(err, "V2-VMSQ1", "Errors.Internal")
 			}
