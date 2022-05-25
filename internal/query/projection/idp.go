@@ -37,6 +37,7 @@ const (
 	IDPTypeCol          = "type"
 
 	OIDCConfigIDPIDCol                 = "idp_id"
+	OIDCConfigInstanceIDCol            = "instance_id"
 	OIDCConfigClientIDCol              = "client_id"
 	OIDCConfigClientSecretCol          = "client_secret"
 	OIDCConfigIssuerCol                = "issuer"
@@ -47,6 +48,7 @@ const (
 	OIDCConfigTokenEndpointCol         = "token_endpoint"
 
 	JWTConfigIDPIDCol        = "idp_id"
+	JWTConfigInstanceIDCol   = "instance_id"
 	JWTConfigIssuerCol       = "issuer"
 	JWTConfigKeysEndpointCol = "keys_endpoint"
 	JWTConfigHeaderNameCol   = "header_name"
@@ -76,12 +78,13 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
+			crdb.NewPrimaryKey(IDPIDCol, IDPInstanceIDCol),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol})),
 			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{IDPIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCConfigInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OIDCConfigClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(OIDCConfigClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(OIDCConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -93,9 +96,11 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(OIDCConfigIDPIDCol),
 			IDPOIDCSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_idp")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+			crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(JWTConfigInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(JWTConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(JWTConfigKeysEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -103,6 +108,7 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(JWTConfigIDPIDCol),
 			IDPJWTSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_jwt_ref_idp")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -263,6 +269,7 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.Event) (*handler.State
 		cols,
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -287,6 +294,7 @@ func (p *IDPProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -311,6 +319,7 @@ func (p *IDPProjection) reduceIDPReactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -330,6 +339,7 @@ func (p *IDPProjection) reduceIDPRemoved(event eventstore.Event) (*handler.State
 		&idpEvent,
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -354,11 +364,13 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(OIDCConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
@@ -423,12 +435,14 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(OIDCConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(IDPOIDCSuffix),
 		),
@@ -455,12 +469,14 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
 
 		crdb.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(JWTConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(JWTConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(JWTConfigEndpointCol, idpEvent.JWTEndpoint),
 				handler.NewCol(JWTConfigIssuerCol, idpEvent.Issuer),
 				handler.NewCol(JWTConfigKeysEndpointCol, idpEvent.KeysEndpoint),
@@ -509,12 +525,14 @@ func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
-				handler.NewCond(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(JWTConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCond(JWTConfigInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(IDPJWTSuffix),
 		),

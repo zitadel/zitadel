@@ -19,6 +19,7 @@ type Table struct {
 	primaryKey  PrimaryKey
 	indices     []*Index
 	constraints []*Constraint
+	foreignKeys []*ForeignKey
 }
 
 func NewTable(columns []*Column, key PrimaryKey, opts ...TableOption) *Table {
@@ -55,6 +56,12 @@ func WithIndex(index *Index) TableOption {
 func WithConstraint(constraint *Constraint) TableOption {
 	return func(table *Table) {
 		table.constraints = append(table.constraints, constraint)
+	}
+}
+
+func WithForeignKey(key *ForeignKey) TableOption {
+	return func(table *Table) {
+		table.foreignKeys = append(table.foreignKeys, key)
 	}
 }
 
@@ -156,6 +163,27 @@ func NewConstraint(name string, columns []string) *Constraint {
 type Constraint struct {
 	Name    string
 	Columns []string
+}
+
+func NewForeignKey(name string, columns []string, refColumns []string) *ForeignKey {
+	i := &ForeignKey{
+		Name:       name,
+		Columns:    columns,
+		RefColumns: refColumns,
+	}
+	return i
+}
+
+func NewForeignKeyOfPublicKeys(name string) *ForeignKey {
+	return &ForeignKey{
+		Name: name,
+	}
+}
+
+type ForeignKey struct {
+	Name       string
+	Columns    []string
+	RefColumns []string
 }
 
 //Init implements handler.Init
@@ -267,6 +295,16 @@ func createTableStatement(table *Table, tableName string, suffix string) string 
 	)
 	for _, index := range table.indices {
 		stmt += fmt.Sprintf(", INDEX %s (%s)", index.Name, strings.Join(index.Columns, ","))
+	}
+	for _, key := range table.foreignKeys {
+		ref := tableName
+		if len(key.RefColumns) > 0 {
+			ref += fmt.Sprintf("(%s)", strings.Join(key.RefColumns, ","))
+		}
+		if len(key.Columns) == 0 {
+			key.Columns = table.primaryKey
+		}
+		stmt += fmt.Sprintf(", CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s ON DELETE CASCADE", key.Name, strings.Join(key.Columns, ","), ref)
 	}
 	for _, constraint := range table.constraints {
 		stmt += fmt.Sprintf(", CONSTRAINT %s UNIQUE (%s)", constraint.Name, strings.Join(constraint.Columns, ","))

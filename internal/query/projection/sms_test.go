@@ -54,10 +54,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.sms_configs (id, aggregate_id, creation_date, change_date, resource_owner, instance_id, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.sms_configs (id, aggregate_id, instance_id, creation_date, change_date, resource_owner, instance_id, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"id",
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
@@ -67,9 +68,10 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.sms_configs_twilio (sms_id, sid, token, sender_number) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.sms_configs_twilio (sms_id, instance_id, sid, token, sender_number) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"id",
+								"instance-id",
 								"sid",
 								anyArg{},
 								"sender-number",
@@ -101,19 +103,21 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								&sid,
 								&senderNumber,
 								"id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"id",
+								"instance-id",
 							},
 						},
 					},
@@ -140,12 +144,13 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateActive,
 								anyArg{},
 								uint64(15),
 								"id",
+								"instance-id",
 							},
 						},
 					},
@@ -172,12 +177,13 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateInactive,
 								anyArg{},
 								uint64(15),
 								"id",
+								"instance-id",
 							},
 						},
 					},
@@ -204,9 +210,10 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.sms_configs WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.sms_configs WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"id",
+								"instance-id",
 							},
 						},
 					},
