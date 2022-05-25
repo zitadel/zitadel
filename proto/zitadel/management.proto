@@ -4335,7 +4335,7 @@ message GetDefaultLoginPolicyRequest {}
 message GetDefaultLoginPolicyResponse {
     zitadel.policy.v1.LoginPolicy policy = 1;
 }
-/
+
 message AddCustomLoginPolicyRequest {
     bool allow_username_password = 1;
     bool allow_register = 2;
