@@ -9,7 +9,7 @@ You can also manage your subscriptions, billing, newsletters and support request
 
 The overview shows all the instances that are registered for a specific customer.
 You can directly see what kind of subscription the instance has and in which data region it is stored.
-With a click on a instance row you get to the detail of the choosen instance.
+With a click on a instance row you get to the detail of the chosen instance.
 
 ## New instance
 
