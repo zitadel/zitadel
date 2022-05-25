@@ -7,15 +7,15 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func UserSessionsToPb(sessions []*user_model.UserSessionView) []*user.Session {
+func UserSessionsToPb(sessions []*user_model.UserSessionView, avatarPrefix string) []*user.Session {
 	s := make([]*user.Session, len(sessions))
 	for i, session := range sessions {
-		s[i] = UserSessionToPb(session)
+		s[i] = UserSessionToPb(session, avatarPrefix)
 	}
 	return s
 }
 
-func UserSessionToPb(session *user_model.UserSessionView) *user.Session {
+func UserSessionToPb(session *user_model.UserSessionView, avatarPrefix string) *user.Session {
 	return &user.Session{
 		// SessionId: session.,//TOOD: not return from be
 		AgentId:     session.UserAgentID,
@@ -24,7 +24,7 @@ func UserSessionToPb(session *user_model.UserSessionView) *user.Session {
 		LoginName:   session.LoginName,
 		DisplayName: session.DisplayName,
 		AuthState:   SessionStateToPb(session.State),
-		AvatarUrl:   session.AvatarURL,
+		AvatarUrl:   domain.AvatarURL(avatarPrefix, session.ResourceOwner, session.AvatarKey),
 		Details: object.ToViewDetailsPb(
 			session.Sequence,
 			session.CreationDate,
