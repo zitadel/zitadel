@@ -35,7 +35,7 @@ func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 	p := new(SMTPConfigProjection)
 	config.ProjectionName = SMTPConfigProjectionTable
 	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
+	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
@@ -132,6 +132,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		columns,
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -151,6 +152,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		},
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
