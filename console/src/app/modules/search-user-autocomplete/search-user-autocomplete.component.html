@@ -1,5 +1,4 @@
-<div class="found" *ngIf="users.length > 0">
-  <!-- <span class="found-label cnsl-secondary-text">{{'USER.SEARCH.FOUND' | translate}}:</span> -->
+<div class="user-autocomplete-found" *ngIf="users.length > 0">
   <div class="found-user-row" *ngFor="let user of users; index as i">
     <div class="circle">
       <cnsl-avatar
@@ -109,9 +108,11 @@
           </mat-option>
         </mat-autocomplete>
 
-        <span class="target-desc">
+        <span class="user-autocomplete-target-desc">
           {{ 'USER.TARGET.SELF' | translate }}
-          <a (click)="changeTarget()">{{ 'USER.TARGET.CLICKHERE' | translate }}</a>
+          <a (click)="changeTarget()"
+            ><strong>{{ 'USER.TARGET.CLICKHERE' | translate }}</strong></a
+          >
         </span>
       </cnsl-form-field>
     </div>
@@ -122,9 +123,11 @@
       <cnsl-form-field class="user-create-form-field more-space">
         <cnsl-label>{{ 'USER.SEARCH.ADDITIONAL-EXTERNAL' | translate }}</cnsl-label>
         <input cnslInput type="text" [formControl]="globalLoginNameControl" placeholder="example@externaldomain.com" />
-        <span class="target-desc">
+        <span class="user-autocomplete-target-desc">
           {{ (target === UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate }}
-          <a (click)="changeTarget()">{{ 'USER.TARGET.CLICKHERE' | translate }}</a>
+          <a (click)="changeTarget()"
+            ><strong>{{ 'USER.TARGET.CLICKHERE' | translate }}</strong></a
+          >
         </span>
       </cnsl-form-field>
 

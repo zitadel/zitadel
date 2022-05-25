@@ -16,7 +16,7 @@
       opacity: 0.6;
       font-size: 15px;
       cursor: pointer;
-      color: map-get($foreground, base);
+      color: map-get($foreground, text);
 
       &:first-child {
         margin-right: 1rem;

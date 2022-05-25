@@ -7,11 +7,16 @@
   font-size: 0.9rem;
 }
 
-.radio-button {
-  margin: 0.5rem 0;
+.project-radio-group {
+  display: flex;
+  flex-direction: column;
 
-  .label {
-    white-space: normal;
+  .radio-button {
+    margin: 0.5rem 0;
+
+    .label {
+      white-space: normal;
+    }
   }
 }
 
@@ -23,10 +28,6 @@
 .action {
   display: flex;
   justify-content: space-between;
-
-  .ok-button {
-    margin-left: 0.5rem;
-  }
 
   button {
     border-radius: 0.5rem;

@@ -13,11 +13,7 @@ h1 {
 
 .action {
   display: flex;
-  justify-content: flex-end;
-
-  .ok-button {
-    margin-left: 0.5rem;
-  }
+  justify-content: space-between;
 
   button {
     border-radius: 0.5rem;

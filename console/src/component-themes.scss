@@ -23,6 +23,7 @@
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
+@import 'src/app/pages/projects/apps/redirect-uris/redirect-uris.component';
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
 @import 'src/app/modules/edit-text/edit-text.component.scss';
@@ -51,6 +52,7 @@
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
 @import 'src/app/pages/home/home.component.scss';
+@import 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component.scss';
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import './styles/codemirror.scss';
@@ -67,6 +69,7 @@
   @include top-view-theme($theme);
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
+  @include search-user-autocomplete-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
   @include footer-theme($theme);
@@ -109,6 +112,7 @@
   @include user-grants-theme($theme);
   @include info-row-theme($theme);
   @include action-dialog-theme($theme);
+  @include redirect-uris-theme($theme);
   @include action-keys-theme($theme);
   @include codemirror-theme($theme);
   @include contact-theme($theme);

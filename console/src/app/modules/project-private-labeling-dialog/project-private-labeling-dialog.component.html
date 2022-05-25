@@ -1,20 +1,25 @@
-<h1 class="title">{{'PROJECT.PAGES.PRIVATELABEL.DIALOG.TITLE' | translate}} {{data?.number}}</h1>
-<p class="desc cnsl-secondary-text">{{'PROJECT.PAGES.PRIVATELABEL.DIALOG.DESCRIPTION' | translate}}</p>
+<h1 class="title">{{ 'PROJECT.PAGES.PRIVATELABEL.DIALOG.TITLE' | translate }} {{ data?.number }}</h1>
+<p class="desc cnsl-secondary-text">{{ 'PROJECT.PAGES.PRIVATELABEL.DIALOG.DESCRIPTION' | translate }}</p>
 <div mat-dialog-content>
-  <mat-radio-group class="example-radio-group" [(ngModel)]="setting">
+  <mat-radio-group class="project-radio-group" [(ngModel)]="setting">
     <mat-radio-button class="radio-button" *ngFor="let selection of settings" [value]="selection">
-      <span class="label">{{'PROJECT.PAGES.PRIVATELABEL.'+selection+'.TITLE' | translate}}</span>
+      <span class="label">{{ 'PROJECT.PAGES.PRIVATELABEL.' + selection + '.TITLE' | translate }}</span>
     </mat-radio-button>
   </mat-radio-group>
-  <cnsl-info-section class="info">{{'PROJECT.PAGES.PRIVATELABEL.'+setting+'.DESC' | translate}}</cnsl-info-section>
+  <cnsl-info-section class="info">{{ 'PROJECT.PAGES.PRIVATELABEL.' + setting + '.DESC' | translate }}</cnsl-info-section>
 </div>
 <div mat-dialog-actions class="action">
-  <button cdkFocusInitial mat-stroked-button class="ok-button" (click)="closeDialog()">
-    {{'ACTIONS.CLOSE' | translate}}
+  <button cdkFocusInitial mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CLOSE' | translate }}
   </button>
 
-  <button [disabled]="setting === undefined" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-    (click)="closeDialog(setting)">
-    {{'ACTIONS.OK' | translate}}
+  <button
+    [disabled]="setting === undefined"
+    cdkFocusInitial
+    color="primary"
+    mat-raised-button
+    (click)="closeDialog(setting)"
+  >
+    {{ 'ACTIONS.OK' | translate }}
   </button>
 </div>

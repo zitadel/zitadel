@@ -1,9 +1,10 @@
 .metadata-details {
   padding-bottom: 1rem;
 
-  .actions {
+  .metadata-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
 
     .edit {
       font-size: 14px;
@@ -53,6 +54,7 @@
 .empty-desc {
   margin: 0;
   font-size: 14px;
+  margin-bottom: 0.5rem;
 }
 
 .refresh-btn {

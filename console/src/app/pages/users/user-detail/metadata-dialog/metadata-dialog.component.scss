@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
 
-  .title {
-    font-size: 1.5rem;
+  .metadata-title {
+    font-size: 1.3rem;
     margin: 0;
   }
 
@@ -23,23 +23,27 @@
   }
 }
 
-.content {
-  display: flex;
-  align-items: center;
-  margin: 0 -0.5rem;
+.metadata-dialog-content {
+  min-width: 400px;
 
-  .formfield {
-    flex: 1;
-    margin: 0 0.5rem;
+  .content {
+    display: flex;
+    align-items: center;
+    margin: 0 -0.5rem;
 
-    @media only screen and (max-width: 450px) {
-      flex-basis: 100%;
+    .formfield {
+      flex: 1;
+      margin: 0 0.5rem;
+
+      @media only screen and (max-width: 450px) {
+        flex-basis: 100%;
+      }
     }
-  }
 
-  .rm-button,
-  .set-button {
-    margin-top: 14px;
+    .rm-button,
+    .set-button {
+      margin-top: 14px;
+    }
   }
 }
 

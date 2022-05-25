@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, HostBinding, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -19,8 +19,7 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard
 import { ManagementService } from './services/mgmt.service';
 import { NavigationService } from './services/navigation.service';
 import { OverlayWorkflowService } from './services/overlay/overlay-workflow.service';
-import { IntroWorkflowOverlays } from './services/overlay/workflows';
-import { StorageLocation, StorageService } from './services/storage.service';
+import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
@@ -30,7 +29,7 @@ import { UpdateService } from './services/update.service';
   styleUrls: ['./app.component.scss'],
   animations: [toolbarAnimation, ...navAnimations, accountCard, routeAnimations, adminLineAnimation],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnDestroy {
   @ViewChild('drawer') public drawer!: MatDrawer;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
@@ -218,7 +217,10 @@ export class AppComponent implements OnInit, OnDestroy {
           .then((org) => {
             this.org = org;
 
-            this.startIntroWorkflow();
+            this.loadPrivateLabelling();
+
+            // TODO add when console storage is implemented
+            // this.startIntroWorkflow();
           })
           .catch((error) => {
             this.router.navigate(['/users/me']);
@@ -235,21 +237,19 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  private startIntroWorkflow(): void {
-    setTimeout(() => {
-      const cb = () => {
-        this.storageService.setItem('intro-dismissed', true, StorageLocation.local);
-      };
-      const dismissed = this.storageService.getItem('intro-dismissed', StorageLocation.local);
-      if (!dismissed) {
-        this.workflowService.startWorkflow(IntroWorkflowOverlays, cb);
-      }
-    }, 1000);
-  }
+  // TODO implement Console storage
 
-  public ngOnInit(): void {
-    this.loadPrivateLabelling();
-  }
+  //   private startIntroWorkflow(): void {
+  //     setTimeout(() => {
+  //       const cb = () => {
+  //         this.storageService.setItem('intro-dismissed', true, StorageLocation.local);
+  //       };
+  //       const dismissed = this.storageService.getItem('intro-dismissed', StorageLocation.local);
+  //       if (!dismissed) {
+  //         this.workflowService.startWorkflow(IntroWorkflowOverlays, cb);
+  //       }
+  //     }, 1000);
+  //   }
 
   public ngOnDestroy(): void {
     this.destroy$.next();
