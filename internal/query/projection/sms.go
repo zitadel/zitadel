@@ -26,6 +26,7 @@ const (
 
 	smsTwilioTableSuffix              = "twilio"
 	SMSTwilioConfigColumnSMSID        = "sms_id"
+	SMSTwilioColumnInstanceID         = "instance_id"
 	SMSTwilioConfigColumnSID          = "sid"
 	SMSTwilioConfigColumnSenderNumber = "sender_number"
 	SMSTwilioConfigColumnToken        = "token"
@@ -50,16 +51,18 @@ func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSColumnInstanceID, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(SMSColumnInstanceID, SMSColumnID),
+			crdb.NewPrimaryKey(SMSColumnID, SMSColumnInstanceID),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText, crdb.Default(SMSColumnID)),
+			crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText),
+			crdb.NewColumn(SMSTwilioColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnSID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnSenderNumber, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnToken, crdb.ColumnTypeJSONB),
 		},
 			crdb.NewPrimaryKey(SMSTwilioConfigColumnSMSID),
 			smsTwilioTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_twilio_ref_sms")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -108,6 +111,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 			[]handler.Column{
 				handler.NewCol(SMSColumnID, e.ID),
 				handler.NewCol(SMSColumnAggregateID, e.Aggregate().ID),
+				handler.NewCol(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSColumnCreationDate, e.CreationDate()),
 				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
 				handler.NewCol(SMSColumnResourceOwner, e.Aggregate().ResourceOwner),
@@ -119,6 +123,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(SMSTwilioConfigColumnSMSID, e.ID),
+				handler.NewCol(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSTwilioConfigColumnSID, e.SID),
 				handler.NewCol(SMSTwilioConfigColumnToken, e.Token),
 				handler.NewCol(SMSTwilioConfigColumnSenderNumber, e.SenderNumber),
@@ -147,6 +152,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 			columns,
 			[]handler.Condition{
 				handler.NewCond(SMSTwilioConfigColumnSMSID, e.ID),
+				handler.NewCond(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(smsTwilioTableSuffix),
 		),
@@ -157,6 +163,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 			},
 			[]handler.Condition{
 				handler.NewCond(SMSColumnID, e.ID),
+				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -176,6 +183,7 @@ func (p *SMSConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (
 		},
 		[]handler.Condition{
 			handler.NewCond(SMSColumnID, e.ID),
+			handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -194,6 +202,7 @@ func (p *SMSConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event)
 		},
 		[]handler.Condition{
 			handler.NewCond(SMSColumnID, e.ID),
+			handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -207,6 +216,7 @@ func (p *SMSConfigProjection) reduceSMSConfigRemoved(event eventstore.Event) (*h
 		e,
 		[]handler.Condition{
 			handler.NewCond(SMSColumnID, e.ID),
+			handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
