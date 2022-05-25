@@ -3048,6 +3048,19 @@ This is an empty request
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | second_factors | repeated zitadel.policy.v1.SecondFactorType | - |  |
 | multi_factors | repeated zitadel.policy.v1.MultiFactorType | - |  |
+| idps | repeated AddCustomLoginPolicyRequest.IDP | - |  |
+
+
+
+
+### AddCustomLoginPolicyRequest.IDP
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| ownerType |  zitadel.idp.v1.IDPOwnerType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 

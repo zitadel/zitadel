@@ -87,6 +87,7 @@ title: zitadel/policy.proto
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | second_factors | repeated SecondFactorType | - |  |
 | multi_factors | repeated MultiFactorType | - |  |
+| idps | repeated zitadel.idp.v1.IDPLoginPolicyLink | - |  |
 
 
 

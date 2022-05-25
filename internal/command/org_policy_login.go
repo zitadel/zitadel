@@ -59,6 +59,17 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 		}
 		cmds = append(cmds, org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, factor))
 	}
+	for _, provider := range policy.IDPProviders {
+		if provider.Type == domain.IdentityProviderTypeOrg {
+			_, err = c.getOrgIDPConfigByID(ctx, provider.IDPConfigID, resourceOwner)
+		} else {
+			_, err = c.getInstanceIDPConfigByID(ctx, provider.IDPConfigID)
+		}
+		if err != nil {
+			return nil, caos_errs.ThrowPreconditionFailed(err, "Org-FEd32", "Errors.IDPConfig.NotExisting")
+		}
+		cmds = append(cmds, org.NewIdentityProviderAddedEvent(ctx, orgAgg, provider.IDPConfigID, provider.Type))
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err

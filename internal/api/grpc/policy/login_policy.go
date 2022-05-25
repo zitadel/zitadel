@@ -4,6 +4,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
@@ -28,6 +29,7 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		MultiFactorCheckLifetime:   durationpb.New(policy.MultiFactorCheckLifetime),
 		SecondFactors:              ModelSecondFactorTypesToPb(policy.SecondFactors),
 		MultiFactors:               ModelMultiFactorTypesToPb(policy.MultiFactors),
+		Idps:                       idp_grpc.IDPLoginPolicyLinksToPb(policy.IDPLinks),
 		Details: &object.ObjectDetails{
 			Sequence:      policy.Sequence,
 			CreationDate:  timestamppb.New(policy.CreationDate),

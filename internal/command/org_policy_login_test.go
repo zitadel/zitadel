@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -276,6 +277,140 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					MultiFactorCheckLifetime:   time.Hour * 5,
 					SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					MultiFactors:               []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				},
+			},
+			res: res{
+				want: &domain.LoginPolicy{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "org1",
+						ResourceOwner: "org1",
+					},
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+				},
+			},
+		},
+		{
+			name: "add policy with unknown idp, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.LoginPolicy{
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+					IDPProviders: []*domain.IDPProvider{
+						{
+							Type:        domain.IdentityProviderTypeSystem,
+							IDPConfigID: "invalid",
+						},
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "add policy idp, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicyAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									true,
+									true,
+									true,
+									true,
+									true,
+									true,
+									domain.PasswordlessTypeAllowed,
+									"https://example.com/redirect",
+									time.Hour*1,
+									time.Hour*2,
+									time.Hour*3,
+									time.Hour*4,
+									time.Hour*5,
+								),
+							),
+							eventFromEventPusher(
+								org.NewIdentityProviderAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									"config1",
+									domain.IdentityProviderTypeSystem,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.LoginPolicy{
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+					IDPProviders: []*domain.IDPProvider{
+						{
+							Type:        domain.IdentityProviderTypeSystem,
+							IDPConfigID: "config1",
+						},
+					},
 				},
 			},
 			res: res{
