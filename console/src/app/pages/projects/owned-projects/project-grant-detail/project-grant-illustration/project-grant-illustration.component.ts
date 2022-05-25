@@ -13,7 +13,6 @@ export class ProjectGrantIllustrationComponent {
   @Output() public editRoleClicked: EventEmitter<void> = new EventEmitter();
 
   ProjectGrantState: any = ProjectGrantState;
-  constructor() {}
 
   public removeRole(roleKey: string): void {
     this.roleRemoved.emit(roleKey);

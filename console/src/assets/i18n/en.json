@@ -35,7 +35,7 @@
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Organization Settings",
+      "SETTINGS": "Available shortcuts",
       "PROJECTS": "Projects",
       "REORDER": "Hold and drag the tile to move it",
       "ADD": "Hold and drag a tile to add"
@@ -135,7 +135,7 @@
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
     },
     "NAV": {
-      "TEXT": "This navigation changes based on the breadcrumbs above."
+      "TEXT": "This navigation changes based on your selected oranization above or your instance"
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attention! The organization context has changed."
@@ -818,6 +818,7 @@
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notification providers and SMTP",
+      "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
       "DOMAIN": "Domain settings",
@@ -1181,11 +1182,11 @@
           "DESC": "As soon as the user is identified, the branding of the organization of the identified user will be shown, before the system default is shown."
         },
         "1": {
-          "TITLE": "Enforce project resource owner Policy",
+          "TITLE": "Use project setting",
           "DESC": "The branding of the organization which owns the project will be shown"
         },
         "2": {
-          "TITLE": "Allow Login User resource owner policy",
+          "TITLE": "Use User Organization setting",
           "DESC": "The branding of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown."
         },
         "DIALOG": {
@@ -1549,6 +1550,9 @@
         }
       },
       "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Change OIDC Configuration"
+        },
         "DELETE": {
           "TITLE": "Delete App",
           "DESCRIPTION": "Do you really want to delete this application?"

@@ -20,7 +20,7 @@
     pointer-events: none;
     border-radius: 0.5rem;
     transform: scale(0.9);
-    color: map-get($foreground, base);
+    color: map-get($foreground, text);
 
     * {
       pointer-events: none;

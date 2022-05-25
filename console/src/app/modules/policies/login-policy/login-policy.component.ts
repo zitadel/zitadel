@@ -122,7 +122,6 @@ export class LoginPolicyComponent implements OnInit {
       )
       .pipe(take(1))
       .subscribe((allowed) => {
-        console.log(allowed);
         if (allowed) {
           this.lifetimeForm.enable();
         }

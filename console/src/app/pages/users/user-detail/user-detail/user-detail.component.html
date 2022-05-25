@@ -37,7 +37,9 @@
 </cnsl-top-view>
 
 <div *ngIf="loading" class="max-width-container">
-  <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
+  <div class="sp-wrapper">
+    <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
+  </div>
 </div>
 
 <div *ngIf="!loading && !user" class="max-width-container">
@@ -46,7 +48,7 @@
 
 <div class="max-width-container" *ngIf="user && (['user.write$', 'user.write:' + user.id] | hasRole) as canWrite$">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
+    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" queryParam="id">
       <div *ngIf="error" class="max-width-container">
         <p>{{ error }}</p>
       </div>

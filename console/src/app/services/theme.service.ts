@@ -57,9 +57,10 @@ export class ThemeService {
   }
 
   public saveTextColor(colorHex: string, isDark: boolean): void {
-    this.primaryColorPalette = this.computeColors(colorHex);
     const theme = isDark ? 'dark' : 'light';
     document.documentElement.style.setProperty(`--theme-${theme}-${'text'}`, colorHex);
+    const secondaryTextHex = tinycolor(colorHex).setAlpha(0.78).toHex8String();
+    document.documentElement.style.setProperty(`--theme-${theme}-${'secondary-text'}`, secondaryTextHex);
   }
 
   private computeColors(hex: string): Color[] {

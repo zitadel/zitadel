@@ -229,6 +229,9 @@ $caos-light-warn: (
 $caos-dark-theme-text: var(--theme-dark-text);
 $caos-light-theme-text: var(--theme-light-text);
 
+$caos-dark-theme-secondary-text: var(--theme-dark-secondary-text);
+$caos-light-theme-secondary-text: var(--theme-light-secondary-text);
+
 $caos-dark-theme-background: (
   status-bar: map_get($caos-dark-background, 300),
   app-bar: map_get($caos-dark-background, 500),
@@ -287,7 +290,7 @@ $caos-light-theme-background: (
   unselected-chip: map_get($caos-light-background, 300),
   disabled-list-option: map_get($caos-light-background, 200),
   tooltip: map_get($mat-gray, 700),
-  infosection: map_get($caos-light-primary, 100),
+  infosection: map_get($caos-light-background, 600),
   warninfosection: #ffc1c1,
   alertinfosection: rgb(251, 191, 36),
   successinfosection: #cbf4c9,
@@ -307,7 +310,7 @@ $caos-dark-theme-foreground: (
   disabled-text: $light-disabled-text,
   elevation: black,
   hint-text: $light-disabled-text,
-  secondary-text: $light-secondary-text,
+  secondary-text: $caos-dark-theme-secondary-text,
   placeholder-text: rgba(white, 0.4),
   icon: rgba(white, 0.54),
   icons: rgba(white, 0.54),
@@ -332,7 +335,7 @@ $caos-light-theme-foreground: (
   disabled-text: $dark-disabled-text,
   elevation: black,
   hint-text: $dark-disabled-text,
-  secondary-text: $dark-secondary-text,
+  secondary-text: $caos-light-theme-secondary-text,
   placeholder-text: rgba(black, 0.3),
   icon: rgba(black, 0.54),
   icons: rgba(black, 0.54),
@@ -340,7 +343,7 @@ $caos-light-theme-foreground: (
   slider-min: rgba(black, 0.87),
   slider-off: rgba(black, 0.26),
   slider-off-active: rgba(black, 0.38),
-  infosection: #4a4a4a,
+  infosection: map-get(map-get($caos-light-background, contrast), 600),
   warninfosection: #620e0e,
   alertinfosection: rgb(146, 64, 14),
   successinfosection: #0e6245,
@@ -514,7 +517,7 @@ $custom-typography: mat.define-typography-config(
 
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     background-color: map-get($background, background);
     border-radius: 8px;
     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;

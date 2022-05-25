@@ -105,27 +105,12 @@ export class FactorTableComponent implements OnInit {
   }
 
   public addMfa(): void {
-    let selection: any[] = [];
-
-    if (this.componentType === LoginMethodComponentType.MultiFactor) {
-      selection = [MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION];
-    } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-      selection = [SecondFactorType.SECOND_FACTOR_TYPE_U2F, SecondFactorType.SECOND_FACTOR_TYPE_OTP];
-    }
-
-    this.mfas.forEach((mfa) => {
-      const index = selection.findIndex((sel) => sel === mfa);
-      if (index > -1) {
-        selection.splice(index, 1);
-      }
-    });
-
     const dialogRef = this.dialog.open(DialogAddTypeComponent, {
       data: {
         title: 'MFA.CREATE.TITLE',
         desc: 'MFA.CREATE.DESCRIPTION',
         componentType: this.componentType,
-        types: selection,
+        types: this.availableSelection,
       },
       width: '400px',
     });
@@ -243,5 +228,18 @@ export class FactorTableComponent implements OnInit {
     setTimeout(() => {
       this.getData();
     }, to);
+  }
+
+  public get availableSelection(): Array<MultiFactorType | SecondFactorType> {
+    const allTypes: MultiFactorType[] | SecondFactorType[] =
+      this.componentType === LoginMethodComponentType.MultiFactor
+        ? [MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION]
+        : this.componentType === LoginMethodComponentType.SecondFactor
+        ? [SecondFactorType.SECOND_FACTOR_TYPE_U2F, SecondFactorType.SECOND_FACTOR_TYPE_OTP]
+        : [];
+
+    const filtered = (allTypes as Array<MultiFactorType | SecondFactorType>).filter((type) => !this.mfas.includes(type));
+
+    return filtered;
   }
 }

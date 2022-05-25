@@ -2,10 +2,10 @@ export interface SettingLinks {
   i18nTitle: string;
   i18nDesc: string;
   iamRouterLink: any;
-  orgRouterLink: any;
+  orgRouterLink?: any;
   queryParams: any;
-  iamWithRole: string[];
-  orgWithRole: string[];
+  iamWithRole?: string[];
+  orgWithRole?: string[];
   icon?: string;
   svgIcon?: string;
   color: string;
@@ -49,12 +49,10 @@ export const PRIVACY_POLICY: SettingLinks = {
 
 export const NOTIFICATION_GROUP: SettingLinks = {
   i18nTitle: 'SETTINGS.GROUPS.NOTIFICATIONS',
-  i18nDesc: '',
+  i18nDesc: 'SETTINGS.LIST.NOTIFICATIONS_DESC',
   iamRouterLink: ['/settings'],
-  orgRouterLink: ['/org-settings'],
   queryParams: { id: 'notifications' },
   iamWithRole: ['iam.policy.read'],
-  orgWithRole: ['policy.read'],
   icon: 'las la-bell',
   color: 'red',
 };

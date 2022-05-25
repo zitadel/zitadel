@@ -23,7 +23,9 @@ export class StatehandlerServiceImpl implements StatehandlerService, OnDestroy {
         map(() => oauthService.state),
         takeUntil(this.unsubscribe$),
       )
-      .subscribe((state) => processor.restoreState(state));
+      .subscribe((state) => {
+        processor.restoreState(state);
+      });
   }
 
   public initStateHandler(): void {
@@ -47,9 +49,11 @@ export class StatehandlerServiceImpl implements StatehandlerService, OnDestroy {
       switchMap((url: string) => {
         if (url.includes('?login_hint=')) {
           const newUrl = this.removeParam('login_hint', url);
-          return of(newUrl);
+          return of(this.processor.createState(newUrl));
+        } else if (url) {
+          return of(this.processor.createState(url));
         } else {
-          return this.processor.createState(url);
+          return of(undefined);
         }
       }),
     );

@@ -35,7 +35,7 @@
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Organisation Einstellungen",
+      "SETTINGS": "Verfügbare Shortcuts",
       "PROJECTS": "Projekte",
       "REORDER": "Zum Verschieben Kachel halten un ziehen",
       "ADD": "Zum Hinzufügen Kachel halten und ziehen"
@@ -135,7 +135,7 @@
       "TEXT": "Hier können Sie zwischen Ihren Benutzerkonten wechseln und Ihre Sessions und Ihr Profil verwalten."
     },
     "NAV": {
-      "TEXT": "Diese Navigation ändert sich basierend auf den Breadcrumbs darüber."
+      "TEXT": "Diese Navigation ändert sich basierend auf Ihrer Organisation oder Instanz"
     },
     "CONTEXTCHANGED": {
       "TEXT": "Achtung! Soeben wurde die Organisation gewechselt."
@@ -818,6 +818,7 @@
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",
       "NOTIFICATIONS": "Benachrichtigungen",
+      "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identity Provider",
       "DOMAIN": "Domain Einstellungen",
@@ -1181,11 +1182,11 @@
           "DESC": "Sobald der Nutzer identifiziert ist, wird das Branding der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
         },
         "1": {
-          "TITLE": "Durchsetzung der Richtlinie des Projekteigentümers",
+          "TITLE": "Einstellung des Projekteigentümers",
           "DESC": "Das Branding der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
         },
         "2": {
-          "TITLE": "Durchsetzung der Richtlinie des Benutzereigentümers",
+          "TITLE": "Einstellung des Benutzereigentümers",
           "DESC": "Das Branding der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
         },
         "DIALOG": {
@@ -1549,6 +1550,9 @@
         }
       },
       "DIALOG": {
+        "CONFIG": {
+          "TITLE": "OIDC configuration ändern"
+        },
         "DELETE": {
           "TITLE": "App löschen",
           "DESCRIPTION": "Wollen Sie diese App wirklich löschen?"
