@@ -2765,7 +2765,7 @@ footer .lgn-logo-watermark {
 }
 
 a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button) {
-  color: var(--zitadel-color-font-500);
+  color: var(--zitadel-color-font);
 }
 a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):hover, a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):active {
   color: var(--zitadel-color-primary-500);
