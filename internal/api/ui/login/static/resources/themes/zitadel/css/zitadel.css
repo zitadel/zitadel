@@ -64,6 +64,7 @@
   --zitadel-color-state-success-background: #cbf4c9;
   --zitadel-color-state-warn-font: #620e0e;
   --zitadel-color-state-warn-background: #ffc1c1;
+  --zitadel-color-footer-background: #00000008;
   --zitadel-color-divider: rgba(0, 0, 0, 0.12);
   --zitadel-color-button-disabled: rgba(0, 0, 0, 0.26);
   --zitadel-color-button-disabled-background: rgba(0, 0, 0, 0.12);
@@ -156,6 +157,7 @@
   --zitadel-color-state-success-background: #68cf8340;
   --zitadel-color-state-warn-font: #ffc1c1;
   --zitadel-color-state-warn-background: #af455359;
+  --zitadel-color-footer-background: #00000020;
   --zitadel-color-divider: rgba(255, 255, 255, 0.12);
   --zitadel-color-button-disabled: rgba(0, 0, 0, 0.26);
   --zitadel-color-button-disabled-background: rgba(255, 255, 255, 0.12);
@@ -2752,7 +2754,7 @@ input[type=checkbox]:checked + label:after {
 }
 
 footer {
-  background-color: var(--zitadel-color-background);
+  background-color: var(--zitadel-color-footer-background);
   border-top: 1px solid var(--zitadel-color-footer-line);
 }
 footer a {
