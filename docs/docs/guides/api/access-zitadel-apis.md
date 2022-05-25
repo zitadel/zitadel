@@ -69,7 +69,7 @@ Use the scope `urn:zitadel:iam:org:project:id:{projectid}:aud` to include the pr
 
 ```bash
 curl --request POST \
-  --url {your_domain}/oauth/v2/token \
+  --url {your_domain}/oauth/v2/oauth/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile email urn:zitadel:iam:org:project:id:69234237810729019:aud' \

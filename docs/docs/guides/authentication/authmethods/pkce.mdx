@@ -78,7 +78,7 @@ Send your `client_id` and the previously generated string as `code_verifier` for
 
 ```curl
 curl --request POST \
---url https://api.zitadel.ch/oauth/v2/token \
+--url https://api.zitadel.ch/oauth/v2/oauth/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
 --data code=${code} \

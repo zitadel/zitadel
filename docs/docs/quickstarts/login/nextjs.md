@@ -50,10 +50,10 @@ export const ZITADEL = {
     scope: "openid profile email",
     params: { response_type: "code", grant_type: "authorization_code" },
     authorizationParams: { grant_type: "authorization_code", response_type: "code" },
-    accessTokenUrl: "https://api.zitadel.dev/oauth/v2/token",
-    requestTokenUrl: "https://api.zitadel.dev/oauth/v2/token",
-    authorizationUrl: "https://accounts.zitadel.dev/oauth/v2/authorize",
-    profileUrl: "https://api.zitadel.dev/oauth/v2/userinfo",
+    accessTokenUrl: "https://api.zitadel.ch/oauth/v2/oauth/token",
+    requestTokenUrl: "https://api.zitadel.ch/oauth/v2/oauth/token",
+    authorizationUrl: "https://accounts.zitadel.ch/oauth/v2/authorize",
+    profileUrl: "https://api.zitadel.ch/oauth/v2/userinfo",
     protection: "pkce",
     async profile(profile, tokens) {
         console.log(profile, tokens);
@@ -76,8 +76,6 @@ export default NextAuth({
     ],
 });
 ```
-
-Replace the endpoints `https://api.zitadel.dev/` with `https://api.zitadel.ch/` if your using a ZITADEL CLOUD tier or your own endpoint if your using a self hosted ENTERPRISE tier respectively.
 
 We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
 To be able to connect to ZITADEL, navigate to your [Console Projects](https://console.zitadel.ch/projects) create or select an existing project and add your app selecting WEB, then PKCE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app. 

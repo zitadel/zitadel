@@ -142,7 +142,7 @@ the error will be display directly to the user on the auth server
 
 ## token_endpoint
 
-[{your_domain}/oauth/v2/token]({your_domain}/oauth/v2/token)
+[{your_domain}/oauth/v2/oauth/token]({your_domain}/oauth/v2/oauth/token)
 
 The token_endpoint will as the name suggests return various tokens (access, id and refresh) depending on the used `grant_type`. 
 When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
@@ -231,7 +231,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 ```BASH
 curl --request POST \
-  --url {your_domain}/oauth/v2/token \
+  --url {your_domain}/oauth/v2/oauth/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data assertion=eyJhbGciOiJSUzI1Ni...

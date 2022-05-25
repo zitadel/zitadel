@@ -119,7 +119,7 @@ With the encoded JWT from the prior step, you will need to craft a POST request 
 
 ```bash
 curl --request POST \
-  --url https://api.zitadel.ch/oauth/v2/token \
+  --url https://api.zitadel.ch/oauth/v2/oauth/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile email' \

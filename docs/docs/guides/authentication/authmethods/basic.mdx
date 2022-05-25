@@ -69,7 +69,7 @@ So check [Client Secret Basic Auth Method](/docs/apis/openidoauth/authn-methods#
 
 ```curl
 curl --request POST \
---url https://api.zitadel.ch/oauth/v2/token \
+--url https://api.zitadel.ch/oauth/v2/oauth/token \
 --header 'Authorization: Basic ${basic}' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
