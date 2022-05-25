@@ -98,7 +98,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(config.AuthZ, config.SystemDefaults, queries, dbClient, keys.OIDC)
+	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}

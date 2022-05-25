@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/zitadel/zitadel/internal/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -38,7 +37,6 @@ type Config struct {
 	Database          database.Config
 	Tracing           tracing.Config
 	Projections       projection.Config
-	AuthZ             authz.Config
 	Auth              auth_es.Config
 	Admin             admin_es.Config
 	UserAgentCookie   *middleware.UserAgentCookieConfig

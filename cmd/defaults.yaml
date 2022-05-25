@@ -81,13 +81,6 @@ Projections:
     projects:
       BulkLimit: 2000
 
-AuthZ:
-  Repository:
-    Spooler:
-      ConcurrentWorkers: 1
-      BulkLimit: 10000
-      FailureCountUntilSkip: 5
-
 Auth:
   SearchLimit: 1000
   Spooler:

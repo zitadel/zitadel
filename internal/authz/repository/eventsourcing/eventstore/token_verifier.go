@@ -29,6 +29,10 @@ type TokenVerifierRepo struct {
 	Query                *query.Queries
 }
 
+func (repo *TokenVerifierRepo) Health() error {
+	return repo.View.Health()
+}
+
 func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (_ *usr_model.TokenView, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
