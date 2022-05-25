@@ -182,6 +182,19 @@ module.exports = {
     "concepts/architecture",
     {
       type: "category",
+      label: "Customer Portal",
+      collapsed: true,
+      items: [
+        "concepts/customerportal/overview",
+        "concepts/customerportal/start",
+        "concepts/customerportal/instances",
+        "concepts/customerportal/billing",
+        "concepts/customerportal/users",
+        "concepts/customerportal/support",
+      ],
+    },
+    {
+      type: "category",
       label: "Structure",
       collapsed: false,
       items: [
