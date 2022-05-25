@@ -25,7 +25,7 @@ func (s *Server) ListViews(ctx context.Context, _ *system_pb.ListViewsRequest) (
 
 func (s *Server) ClearView(ctx context.Context, req *system_pb.ClearViewRequest) (*system_pb.ClearViewResponse, error) {
 	var err error
-	if req.Database != "zitadel" {
+	if req.Database != s.database {
 		err = s.administrator.ClearView(ctx, req.Database, req.ViewName)
 	} else {
 		err = s.query.ClearCurrentSequence(ctx, req.ViewName)

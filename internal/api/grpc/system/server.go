@@ -21,6 +21,7 @@ var _ system.SystemServiceServer = (*Server)(nil)
 
 type Server struct {
 	system.UnimplementedSystemServiceServer
+	database        string
 	command         *command.Commands
 	query           *query.Queries
 	administrator   repository.AdministratorRepository
@@ -34,12 +35,14 @@ type Config struct {
 func CreateServer(command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
+	database string,
 	defaultInstance command.InstanceSetup,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		administrator:   repo,
+		database:        database,
 		DefaultInstance: defaultInstance,
 	}
 }

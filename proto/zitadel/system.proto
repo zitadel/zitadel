@@ -203,9 +203,6 @@ service SystemService {
             post: "/views/{database}/{view_name}";
         };
 
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.write";
-        };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
