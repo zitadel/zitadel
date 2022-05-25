@@ -36,7 +36,7 @@
             <p>{{t "MFAProvider.ChooseOther"}}</p>
             {{ range $provider := .MFAProviders}}
             {{ $providerName := (t (printf "MFAProvider.Provider%v" $provider)) }}
-            <button class="lgn-stroked-button lgn-primary" type="submit" name="provider" value="{{$provider}}"
+            <button class="lgn-stroked-button" type="submit" name="provider" value="{{$provider}}"
                 formnovalidate>{{$providerName}}</button>
             {{ end }}
         </div>
