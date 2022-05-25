@@ -3046,6 +3046,8 @@ This is an empty request
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| second_factors | repeated zitadel.policy.v1.SecondFactorType | - |  |
+| multi_factors | repeated zitadel.policy.v1.MultiFactorType | - |  |
 
 
 

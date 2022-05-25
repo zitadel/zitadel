@@ -85,6 +85,8 @@ title: zitadel/policy.proto
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| second_factors | repeated SecondFactorType | - |  |
+| multi_factors | repeated MultiFactorType | - |  |
 
 
 

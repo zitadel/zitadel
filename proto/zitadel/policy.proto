@@ -170,7 +170,8 @@ message LoginPolicy {
     google.protobuf.Duration mfa_init_skip_lifetime = 13;
     google.protobuf.Duration second_factor_check_lifetime = 14;
     google.protobuf.Duration multi_factor_check_lifetime = 15;
-
+    repeated SecondFactorType second_factors = 16;
+    repeated MultiFactorType multi_factors = 17;
 }
 
 enum SecondFactorType {

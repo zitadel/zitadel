@@ -29,8 +29,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
-		ctx,
+	cmds := []eventstore.Command{
 		org.NewLoginPolicyAddedEvent(
 			ctx,
 			orgAgg,
@@ -46,7 +45,21 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 			policy.ExternalLoginCheckLifetime,
 			policy.MFAInitSkipLifetime,
 			policy.SecondFactorCheckLifetime,
-			policy.MultiFactorCheckLifetime))
+			policy.MultiFactorCheckLifetime),
+	}
+	for _, factor := range policy.SecondFactors {
+		if !factor.Valid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "Org-SFeea", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		}
+		cmds = append(cmds, org.NewLoginPolicySecondFactorAddedEvent(ctx, orgAgg, factor))
+	}
+	for _, factor := range policy.MultiFactors {
+		if !factor.Valid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "Org-WSfrg", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		}
+		cmds = append(cmds, org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, factor))
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

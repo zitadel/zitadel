@@ -26,6 +26,8 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		MfaInitSkipLifetime:        durationpb.New(policy.MFAInitSkipLifetime),
 		SecondFactorCheckLifetime:  durationpb.New(policy.SecondFactorCheckLifetime),
 		MultiFactorCheckLifetime:   durationpb.New(policy.MultiFactorCheckLifetime),
+		SecondFactors:              ModelSecondFactorTypesToPb(policy.SecondFactors),
+		MultiFactors:               ModelMultiFactorTypesToPb(policy.MultiFactors),
 		Details: &object.ObjectDetails{
 			Sequence:      policy.Sequence,
 			CreationDate:  timestamppb.New(policy.CreationDate),

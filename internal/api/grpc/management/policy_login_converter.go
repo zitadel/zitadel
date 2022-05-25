@@ -23,6 +23,8 @@ func addLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.Logi
 		MFAInitSkipLifetime:        p.MfaInitSkipLifetime.AsDuration(),
 		SecondFactorCheckLifetime:  p.SecondFactorCheckLifetime.AsDuration(),
 		MultiFactorCheckLifetime:   p.MultiFactorCheckLifetime.AsDuration(),
+		SecondFactors:              policy_grpc.SecondFactorsTypesToDomain(p.SecondFactors),
+		MultiFactors:               policy_grpc.MultiFactorsTypesToDomain(p.MultiFactors),
 	}
 }
 

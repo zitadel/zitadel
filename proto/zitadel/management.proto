@@ -4335,7 +4335,7 @@ message GetDefaultLoginPolicyRequest {}
 message GetDefaultLoginPolicyResponse {
     zitadel.policy.v1.LoginPolicy policy = 1;
 }
-
+/
 message AddCustomLoginPolicyRequest {
     bool allow_username_password = 1;
     bool allow_register = 2;
@@ -4358,6 +4358,8 @@ message AddCustomLoginPolicyRequest {
     google.protobuf.Duration mfa_init_skip_lifetime = 11;
     google.protobuf.Duration second_factor_check_lifetime = 12;
     google.protobuf.Duration multi_factor_check_lifetime = 13;
+    repeated zitadel.policy.v1.SecondFactorType second_factors = 14;
+    repeated zitadel.policy.v1.MultiFactorType multi_factors = 15;
 }
 
 message AddCustomLoginPolicyResponse {
