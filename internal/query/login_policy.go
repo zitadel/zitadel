@@ -352,9 +352,6 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&idpType,
 				)
 				if err != nil {
-					if errs.Is(err, sql.ErrNoRows) {
-						return nil, errors.ThrowNotFound(err, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
-					}
 					return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
 				}
 				var link IDPLoginPolicyLink
@@ -370,6 +367,9 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					}
 					links = append(links, &link)
 				}
+			}
+			if p.OrgID == "" {
+				return nil, errors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
 			}
 			p.DefaultRedirectURI = defaultRedirectURI.String
 			p.MultiFactors = make([]domain.MultiFactorType, len(multiFactors))
