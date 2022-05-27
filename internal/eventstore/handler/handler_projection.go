@@ -40,7 +40,7 @@ type ProjectionHandler struct {
 
 	requeueAfter time.Duration
 	shouldBulk   *time.Timer
-	blukMu       sync.Mutex
+	bulkMu       sync.Mutex
 	bulkLocked   bool
 	execBulk     executeBulk
 
@@ -135,12 +135,12 @@ func (h *ProjectionHandler) Process(
 			}
 			h.triggerShouldPush(0)
 		case <-h.shouldBulk.C:
-			h.blukMu.Lock()
+			h.bulkMu.Lock()
 			h.bulkLocked = true
 			h.bulk(ctx, lock, unlock)
 			h.ResetShouldBulk()
 			h.bulkLocked = false
-			h.blukMu.Unlock()
+			h.bulkMu.Unlock()
 		default:
 			//lower prio select with push
 			select {
@@ -157,12 +157,12 @@ func (h *ProjectionHandler) Process(
 				}
 				h.triggerShouldPush(0)
 			case <-h.shouldBulk.C:
-				h.blukMu.Lock()
+				h.bulkMu.Lock()
 				h.bulkLocked = true
 				h.bulk(ctx, lock, unlock)
 				h.ResetShouldBulk()
 				h.bulkLocked = false
-				h.blukMu.Unlock()
+				h.bulkMu.Unlock()
 			case <-h.shouldPush.C:
 				h.push(ctx, update, reduce)
 				h.ResetShouldBulk()
@@ -196,7 +196,7 @@ func (h *ProjectionHandler) TriggerBulk(
 	unlock Unlock,
 ) error {
 	if !h.shouldBulk.Stop() {
-		//make sure to empty shouldBulk chan
+		//make sure to flush shouldBulk chan
 		select {
 		case <-h.shouldBulk.C:
 		default:
@@ -204,16 +204,16 @@ func (h *ProjectionHandler) TriggerBulk(
 	}
 	defer h.ResetShouldBulk()
 
-	h.blukMu.Lock()
+	h.bulkMu.Lock()
 	if h.bulkLocked {
 		logging.WithFields("projection", h.ProjectionName).Debugf("waiting for existing bulk to finish")
-		h.blukMu.Unlock()
+		h.bulkMu.Unlock()
 		return nil
 	}
 	h.bulkLocked = true
 	defer func() {
 		h.bulkLocked = false
-		h.blukMu.Unlock()
+		h.bulkMu.Unlock()
 	}()
 
 	return h.bulk(ctx, lock, unlock)
