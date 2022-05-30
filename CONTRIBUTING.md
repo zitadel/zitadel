@@ -32,15 +32,63 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 ## How to contribute
 
-We strongly recommend to talk to us before you start contributing to streamline our and your work.
+We strongly recommend to [talk to us](https://zitadel.com/contact) before you start contributing to streamline our and your work.
 
 We accept contributions through pull requests. You need a github account for that. If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork). Please draft the pull request as soon as possible. Go through the following checklist before you submit the final pull request:
 
-1. Create a feature branch from the `main`-branch
-1. Make your changes on the new branch
-1. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `main`-branch
-1. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request correct tagging is required and will be requested by the reviewers.
-1. Request a [review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from one of the authors. The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
+### Submit a Pull Request (PR)
+
+> :warning: Currently main development is done on branch `v2-alpha`. Make sure you're merging into the correct branch.
+
+1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the zitadel/zitadel repository on Github
+2. On your fork, commit your changes to a new branch
+
+`git checkout -b my-fix-branch v2-alpha`
+
+3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
+
+4. Commit the changes on the new branch
+
+`git commit --all`
+
+5. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `v2-alpha`-branch
+
+6. Push the changes to your branch on Github
+
+`git push origin my-fix-branch`
+
+7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
+
+8.  On Github, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:v2-alpha`. Request review from one of the maintainers.
+
+### Reviewing a Pull Request
+
+The reviewers will provide you feedback and approve your changes as soon as they are satisfied. If we ask you for changes in the code, you can follow the [Github Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
+
+<!-- TODO: how to do this via git -->
+<!-- TODO: change commit message via git -->
+
+### Commit Messages
+
+Make sure you use [semantic release messages format](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type).
+
+`<type>(<scope>): <short summary>`
+
+#### Type
+
+Must be one of the following: 
+
+- **feat**: New Feature
+- **fix**: Bug Fix
+- **docs**: Documentation
+
+#### Scope
+
+This is optional to indicate which component is affected. In doubt, leave blank (`<type>: <short summary>`)
+
+#### Short Summary
+
+Provide a brief description of the change.
 
 ## Contribute
 
@@ -64,7 +112,7 @@ To start the backend with a debugger run the [`main.go`-file](./main.go) located
 
 Make sure to use the following configurations:
 
-TODO document workflow
+<!-- TODO: document workflow -->
 
 ### Console
 
@@ -80,6 +128,11 @@ The following docker command builds the grpc stub into the correct folders:
 docker build -f build/grpc/Dockerfile -t zitadel-base:local . \
     && docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .
 ```
+
+### Testing
+
+<!-- TODO: how to run E2E tests -->
+
 
 ## Contribute Docs
 
@@ -100,16 +153,6 @@ ZITADEL loads translations from four files:
 - [Common texts](./internal/static/i18n) for success or error toasts
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
-
-### Make a PR
-
-If you like to contribute fork the ZITADEL repository. After you implemented the new feature create a PullRequest in the ZITADEL repository.
-
-Make sure you use semantic release:
-
-- feat: New Feature
-- fix: Bug Fix
-- docs: Documentation
 
 ## Want to start ZITADEL?
 
