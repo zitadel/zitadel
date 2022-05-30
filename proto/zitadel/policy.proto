@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "zitadel/idp.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -170,7 +171,9 @@ message LoginPolicy {
     google.protobuf.Duration mfa_init_skip_lifetime = 13;
     google.protobuf.Duration second_factor_check_lifetime = 14;
     google.protobuf.Duration multi_factor_check_lifetime = 15;
-
+    repeated SecondFactorType second_factors = 16;
+    repeated MultiFactorType multi_factors = 17;
+    repeated zitadel.idp.v1.IDPLoginPolicyLink idps = 18;
 }
 
 enum SecondFactorType {
