@@ -65,7 +65,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/no/token/needed"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{})
 					return verifier
 				}(),
@@ -84,7 +84,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
 				}(),
@@ -104,7 +104,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
 				}(),
@@ -124,7 +124,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
 				}(),

@@ -60,7 +60,7 @@ func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(SMSTwilioConfigColumnSenderNumber, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnToken, crdb.ColumnTypeJSONB),
 		},
-			crdb.NewPrimaryKey(SMSTwilioConfigColumnSMSID),
+			crdb.NewPrimaryKey(SMSTwilioConfigColumnSMSID, SMSTwilioColumnInstanceID),
 			smsTwilioTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_twilio_ref_sms")),
 		),

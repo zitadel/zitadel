@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -66,6 +67,9 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return CtxData{}, err
+	}
+	if strings.HasPrefix(method, "/zitadel.system.v1.SystemService") {
+		return CtxData{UserID: userID}, nil
 	}
 	var projectID string
 	var origins []string
