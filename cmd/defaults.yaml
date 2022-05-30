@@ -163,6 +163,13 @@ EncryptionKeys:
   CSRFCookieKeyID: "csrfCookieKey"
   UserAgentCookieKeyID: "userAgentCookieKey"
 
+SystemAPIUsers:
+  # add keys for authentication of the systemAPI here:
+  # - superuser:
+  #     Path: /path/to/superuser/key.pem
+  # - superuser2:
+  #     Path: /path/to/superuser2/key.pem
+
 #TODO: remove as soon as possible
 SystemDefaults:
   SecretGenerators:
