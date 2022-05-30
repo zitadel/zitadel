@@ -19,9 +19,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         version: "1.0";
         description: "This API is intended to configure and manage the different tenants whithin ZITADEL.";
         contact:{
-            name: "CAOS developers of ZITADEL"
-            url: "https://zitadel.ch"
-            email: "hi@zitadel.ch"
+            name: "ZITADEL"
+            url: "https://zitadel.com"
+            email: "hi@zitadel.com"
         }
         license: {
             name: "Apache 2.0",
@@ -46,7 +46,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     external_docs: {
         description: "Detailed information about ZITADEL",
-        url: "https://docs.zitadel.ch"
+        url: "https://docs.zitadel.com"
     }
 
     responses: {
@@ -222,7 +222,7 @@ service SystemService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -250,7 +250,7 @@ service SystemService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -278,7 +278,7 @@ service SystemService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -307,7 +307,7 @@ service SystemService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {

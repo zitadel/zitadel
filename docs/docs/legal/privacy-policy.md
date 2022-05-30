@@ -23,7 +23,7 @@ Teufener Strasse 19
 9000 St. Gallen
 SWITZERLAND
 Phone: 043 215 27 44  
-E-mail: legal@caos.ch  
+E-mail: legal@zitadel.com
 
 ## General notes
 

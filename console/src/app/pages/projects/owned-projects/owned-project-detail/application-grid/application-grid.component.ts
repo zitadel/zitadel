@@ -11,7 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 })
 export class ApplicationGridComponent implements OnInit {
   @Input() public projectId: string = '';
-  @Input() public disabled: boolean = false;
+  @Input() public disabled: boolean = true;
   @Output() public changeView: EventEmitter<void> = new EventEmitter();
   public appsSubject: BehaviorSubject<App.AsObject[]> = new BehaviorSubject<App.AsObject[]>([]);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);

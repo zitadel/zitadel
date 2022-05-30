@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -92,4 +93,34 @@ func (c *Commands) defaultMailTemplateWriteModelByID(ctx context.Context) (polic
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func prepareAddDefaultEmailTemplate(
+	a *instance.Aggregate,
+	template []byte,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if template == nil {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-fm9sd", "Errors.Instance.MailTemplate.Invalid")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewInstanceMailTemplateWriteModel(ctx)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if writeModel.State == domain.PolicyStateActive {
+				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-5n8fs", "Errors.Instance.MailTemplate.AlreadyExists")
+			}
+			return []eventstore.Command{
+				instance.NewMailTemplateAddedEvent(ctx, &a.Aggregate,
+					template,
+				),
+			}, nil
+		}, nil
+	}
 }

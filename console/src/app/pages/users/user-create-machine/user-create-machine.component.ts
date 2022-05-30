@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,6 +25,7 @@ export class UserCreateMachineComponent implements OnDestroy {
     private toast: ToastService,
     public userService: ManagementService,
     private fb: FormBuilder,
+    private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
     breadcrumbService.setBreadcrumb([
@@ -71,6 +73,10 @@ export class UserCreateMachineComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+  }
+
+  public close(): void {
+    this._location.back();
   }
 
   public get name(): AbstractControl | null {

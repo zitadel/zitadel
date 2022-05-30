@@ -36,7 +36,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanAddedEventMapper),
@@ -64,16 +64,17 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"first-name",
 								"last-name",
 								&sql.NullString{String: "nick-name", Valid: true},
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -95,7 +96,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanAddedEventMapper),
@@ -123,16 +124,17 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"first-name",
 								"last-name",
 								&sql.NullString{String: "nick-name", Valid: true},
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -150,7 +152,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanAddedEventMapper),
 			},
@@ -177,16 +179,17 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"first-name",
 								"last-name",
 								&sql.NullString{},
 								&sql.NullString{},
 								&sql.NullString{String: "und", Valid: false},
 								&sql.NullInt16{},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{},
 							},
 						},
@@ -208,7 +211,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanRegisteredEventMapper),
@@ -236,16 +239,17 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"first-name",
 								"last-name",
 								&sql.NullString{String: "nick-name", Valid: true},
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -267,7 +271,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"displayName": "display-name",
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
-						"email": "email@zitadel.ch",
+						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
 				), user.HumanRegisteredEventMapper),
@@ -295,16 +299,17 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"first-name",
 								"last-name",
 								&sql.NullString{String: "nick-name", Valid: true},
 								&sql.NullString{String: "display-name", Valid: true},
 								&sql.NullString{String: "ch-DE", Valid: true},
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 							},
 						},
@@ -322,7 +327,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanRegisteredEventMapper),
 			},
@@ -349,16 +354,17 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"first-name",
 								"last-name",
 								&sql.NullString{},
 								&sql.NullString{},
 								&sql.NullString{String: "und", Valid: false},
 								&sql.NullInt16{},
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								&sql.NullString{},
 							},
 						},
@@ -384,10 +390,11 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateInitial,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -412,10 +419,11 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateInitial,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -440,10 +448,11 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateActive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -468,10 +477,11 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateActive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -496,12 +506,13 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateLocked,
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -526,12 +537,13 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateActive,
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -556,12 +568,13 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateInactive,
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -586,12 +599,13 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateActive,
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -616,9 +630,10 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.users WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.users WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -645,12 +660,13 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"username",
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -682,15 +698,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7)",
+							expectedStmt: "UPDATE projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"first-name",
 								"last-name",
@@ -699,6 +716,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								"ch-DE",
 								domain.GenderDiverse,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -730,15 +748,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7)",
+							expectedStmt: "UPDATE projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"first-name",
 								"last-name",
@@ -747,6 +766,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								"ch-DE",
 								domain.GenderDiverse,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -773,19 +793,21 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"+41 00 000 00 00",
 								false,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -812,19 +834,21 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"+41 00 000 00 00",
 								false,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -849,19 +873,21 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -886,19 +912,21 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -923,18 +951,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -959,18 +989,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -984,7 +1016,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					repository.EventType(user.HumanEmailChangedType),
 					user.AggregateType,
 					[]byte(`{
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanEmailChangedEventMapper),
 			},
@@ -997,19 +1029,21 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								false,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1023,7 +1057,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					repository.EventType(user.UserV1EmailChangedType),
 					user.AggregateType,
 					[]byte(`{
-						"email": "email@zitadel.ch"
+						"email": "email@zitadel.com"
 					}`),
 				), user.HumanEmailChangedEventMapper),
 			},
@@ -1036,19 +1070,21 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								"email@zitadel.ch",
+								"email@zitadel.com",
 								false,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1073,18 +1109,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1109,18 +1147,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1147,18 +1187,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"users/agg-id/avatar",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1183,18 +1225,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								nil,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1236,9 +1280,10 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_machines (user_id, name, description) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.users_machines (user_id, instance_id, name, description) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"machine-name",
 								&sql.NullString{},
 							},
@@ -1283,9 +1328,10 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users_machines (user_id, name, description) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.users_machines (user_id, instance_id, name, description) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								"machine-name",
 								&sql.NullString{String: "description", Valid: true},
 							},
@@ -1315,19 +1361,21 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_machines SET (name, description) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_machines SET (name, description) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"description",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1354,18 +1402,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_machines SET (name) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_machines SET (name) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -1392,18 +1442,20 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users_machines SET (description) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_machines SET (description) = ($1) WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"description",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},

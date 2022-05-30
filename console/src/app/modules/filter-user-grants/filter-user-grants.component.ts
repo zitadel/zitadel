@@ -82,7 +82,7 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
         });
 
         this.searchQueries = userQueries.filter((q) => q !== undefined) as UserGrantQuery[];
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       }
@@ -170,23 +170,21 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
     switch (subquery) {
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(event?.target?.value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.USERNAME:
         (query as UserNameQuery).setUserName(event?.target?.value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.ORGNAME:
         (query as UserGrantOrgNameQuery).setOrgName(event?.target?.value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.PROJECTNAME:
         (query as UserGrantProjectNameQuery).setProjectName(event?.target?.value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
     }
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public getSubFilter(subquery: SubQuery): any {
@@ -225,23 +223,17 @@ export class FilterUserGrantsComponent extends FilterComponent implements OnInit
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
   public emitFilter(): void {
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public resetFilter(): void {
     this.searchQueries = [];
     this.emitFilter();
-  }
-
-  public get filterCount(): number {
-    return this.searchQueries.length;
   }
 }

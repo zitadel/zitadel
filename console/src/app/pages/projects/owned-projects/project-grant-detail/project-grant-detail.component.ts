@@ -3,17 +3,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
+import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { UserGrantRoleDialogComponent } from 'src/app/modules/user-grant-role-dialog/user-grant-role-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import {
-    ProjectGrantMembersCreateDialogComponent,
-    ProjectGrantMembersCreateDialogExportType,
-} from './project-grant-members-create-dialog/project-grant-members-create-dialog.component';
 import { ProjectGrantMembersDataSource } from './project-grant-members-datasource';
 
 @Component({
@@ -69,25 +67,29 @@ export class ProjectGrantDetailComponent {
         );
       };
 
-      this.mgmtService.getProjectGrantByID(this.grantid, this.projectid).then((resp) => {
-        if (resp.projectGrant) {
-          this.grant = resp.projectGrant;
+      this.mgmtService
+        .getProjectGrantByID(this.grantid, this.projectid)
+        .then((resp) => {
+          console.log(resp);
+          if (resp.projectGrant) {
+            this.grant = resp.projectGrant;
 
-          const breadcrumbs = [
-            new Breadcrumb({
-              type: BreadcrumbType.ORG,
-              routerLink: ['/org'],
-            }),
-            new Breadcrumb({
-              type: BreadcrumbType.PROJECT,
-              name: '',
-              param: { key: 'projectid', value: resp.projectGrant.projectId },
-              routerLink: ['/projects', resp.projectGrant.projectId],
-            }),
-          ];
-          this.breadcrumbService.setBreadcrumb(breadcrumbs);
-        }
-      });
+            const breadcrumbs = [
+              new Breadcrumb({
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              }),
+              new Breadcrumb({
+                type: BreadcrumbType.PROJECT,
+                name: '',
+                param: { key: 'projectid', value: resp.projectGrant.projectId },
+                routerLink: ['/projects', resp.projectGrant.projectId],
+              }),
+            ];
+            this.breadcrumbService.setBreadcrumb(breadcrumbs);
+          }
+        })
+        .catch(this.toast.showError);
     });
   }
 
@@ -176,36 +178,35 @@ export class ProjectGrantDetailComponent {
   }
 
   public async openAddMember(): Promise<any> {
-    const keysList = await this.mgmtService.listProjectGrantMemberRoles();
-
-    const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
+    const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
       data: {
-        roleKeysList: keysList.resultList,
+        creationType: CreationType.PROJECT_GRANTED,
       },
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
-      if (dataToAdd) {
-        Promise.all(
-          dataToAdd.userIds.map((userid: string) => {
-            return this.mgmtService.addProjectGrantMember(
-              this.grant.projectId,
-              this.grant.grantId,
-              userid,
-              dataToAdd.rolesKeyList,
-            );
-          }),
-        )
-          .then(() => {
-            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERADDED', true);
-            setTimeout(() => {
-              this.changePage.emit();
-            }, 3000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        const users: User.AsObject[] = resp.users;
+        const roles: string[] = resp.roles;
+
+        if (users && users.length && roles && roles.length) {
+          const userIds = users.map((user) => user.id);
+          Promise.all(
+            userIds.map((userid: string) => {
+              return this.mgmtService.addProjectGrantMember(this.grant.projectId, this.grant.grantId, userid, resp.roles);
+            }),
+          )
+            .then(() => {
+              this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERADDED', true);
+              setTimeout(() => {
+                this.changePage.emit();
+              }, 3000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
       }
     });
   }

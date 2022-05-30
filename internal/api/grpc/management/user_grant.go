@@ -24,7 +24,7 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 		return nil, err
 	}
 	return &mgmt_pb.GetUserGrantByIDResponse{
-		UserGrant: user.UserGrantToPb(s.assetAPIPrefix, grant),
+		UserGrant: user.UserGrantToPb(s.assetAPIPrefix(ctx), grant),
 	}, nil
 }
 
@@ -38,7 +38,7 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 		return nil, err
 	}
 	return &mgmt_pb.ListUserGrantResponse{
-		Result: user.UserGrantsToPb(s.assetAPIPrefix, res.UserGrants),
+		Result: user.UserGrantsToPb(s.assetAPIPrefix(ctx), res.UserGrants),
 		Details: obj_grpc.ToListDetails(
 			res.Count,
 			res.Sequence,

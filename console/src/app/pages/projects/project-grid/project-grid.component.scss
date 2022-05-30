@@ -25,17 +25,12 @@
   }
 }
 
-.spinner {
-  margin: 1rem;
-}
-
 .grid-main-container {
   position: relative;
 
   .loading-sp-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: block;
+    margin: 1rem 0.5rem 0 0.5rem;
   }
 
   .owned-project-grid-container {

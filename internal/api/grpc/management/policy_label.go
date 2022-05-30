@@ -14,7 +14,7 @@ func (s *Server) GetLabelPolicy(ctx context.Context, req *mgmt_pb.GetLabelPolicy
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix), IsDefault: policy.IsDefault}, nil
+	return &mgmt_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix(ctx)), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *mgmt_pb.GetPreviewLabelPolicyRequest) (*mgmt_pb.GetPreviewLabelPolicyResponse, error) {
@@ -22,7 +22,7 @@ func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *mgmt_pb.GetPrev
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetPreviewLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix), IsDefault: policy.IsDefault}, nil
+	return &mgmt_pb.GetPreviewLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix(ctx)), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetDefaultLabelPolicy(ctx context.Context, req *mgmt_pb.GetDefaultLabelPolicyRequest) (*mgmt_pb.GetDefaultLabelPolicyResponse, error) {
@@ -30,7 +30,7 @@ func (s *Server) GetDefaultLabelPolicy(ctx context.Context, req *mgmt_pb.GetDefa
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetDefaultLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix)}, nil
+	return &mgmt_pb.GetDefaultLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix(ctx))}, nil
 }
 
 func (s *Server) AddCustomLabelPolicy(ctx context.Context, req *mgmt_pb.AddCustomLabelPolicyRequest) (*mgmt_pb.AddCustomLabelPolicyResponse, error) {

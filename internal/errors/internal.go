@@ -40,3 +40,7 @@ func (err *InternalError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *InternalError) Unwrap() error {
+	return err.CaosError
+}

@@ -40,3 +40,7 @@ func (err *UnimplementedError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *UnimplementedError) Unwrap() error {
+	return err.CaosError
+}

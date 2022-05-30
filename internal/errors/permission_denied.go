@@ -40,3 +40,7 @@ func (err *PermissionDeniedError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *PermissionDeniedError) Unwrap() error {
+	return err.CaosError
+}

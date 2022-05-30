@@ -68,9 +68,16 @@ export class HeaderComponent implements OnDestroy {
   }
 
   public get isOnInstance(): boolean {
-    return (
-      ['/instance', '/views', '/orgs', '/settings', '/failed-events', '/instance/members'].includes(this.router.url) ||
-      this.router.url.includes('/settings')
-    );
+    const pages: string[] = [
+      '/instance',
+      '/settings',
+      '/views',
+      '/orgs',
+      '/settings',
+      '/failed-events',
+      '/instance/members',
+    ];
+
+    return pages.findIndex((p) => this.router.url.includes(p)) > -1;
   }
 }

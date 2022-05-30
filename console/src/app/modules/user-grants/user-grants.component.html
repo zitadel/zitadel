@@ -1,6 +1,12 @@
-<cnsl-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()" [hideRefresh]="true"
-  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
-  [dataSize]="dataSource?.totalResult ?? 0" [selection]="selection">
+<cnsl-refresh-table
+  [loading]="dataSource?.loading$ | async"
+  (refreshed)="changePage()"
+  [hideRefresh]="true"
+  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
+  [timestamp]="dataSource?.viewTimestamp"
+  [dataSize]="dataSource?.totalResult ?? 0"
+  [selection]="selection"
+>
   <!-- <div leftActions class="user-grants-table-left-actions">
     <button class="user-grant-type-button" [ngClass]="{'active': type === undefined}"
       (click)="setType(undefined)">{{'PROJECT.GRANT.ALL' | translate}}</button>
@@ -10,19 +16,36 @@
       (click)="setType(Type.TYPE_MACHINE)">{{'USER.TABLE.TYPES.MACHINE' | translate}}</button>
   </div> -->
 
-  <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="cnsl-action-button" mat-raised-button actions
-    (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete === false">
+  <button
+    color="warn"
+    matTooltip="{{ 'GRANTS.DELETE' | translate }}"
+    class="cnsl-action-button"
+    mat-raised-button
+    actions
+    (click)="deleteGrantSelection()"
+    *ngIf="selection.hasValue() && disableDelete === false"
+  >
     <i class="las la-trash"></i>
-    <span>{{'ACTIONS.DELETE' | translate}}</span>
+    <span>{{ 'ACTIONS.DELETE' | translate }}</span>
     <cnsl-action-keys (actionTriggered)="deleteGrantSelection()" [type]="ActionKeysType.DELETE"></cnsl-action-keys>
   </button>
 
-  <cnsl-filter-user-grants actions *ngIf="!selection.hasValue()" (filterChanged)="applySearchQuery($any($event))"
-    (filterOpen)="filterOpen = $event"></cnsl-filter-user-grants>
+  <cnsl-filter-user-grants
+    actions
+    *ngIf="!selection.hasValue()"
+    (filterChanged)="applySearchQuery($any($event))"
+    (filterOpen)="filterOpen = $event"
+  ></cnsl-filter-user-grants>
 
-  <a actions *ngIf="disableWrite === false && (selection.hasValue() === false)"
-    matTooltip="{{'GRANTS.ADD' | translate}}" color="primary" class="cnsl-action-button" mat-raised-button
-    [routerLink]="routerLink">
+  <a
+    actions
+    *ngIf="disableWrite === false && selection.hasValue() === false"
+    matTooltip="{{ 'GRANTS.ADD' | translate }}"
+    color="primary"
+    class="cnsl-action-button"
+    mat-raised-button
+    [routerLink]="routerLink"
+  >
     <mat-icon class="icon">add</mat-icon>
     <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
     <cnsl-action-keys (actionTriggered)="gotoCreateLink(routerLink)" [type]="ActionKeysType.ADD"></cnsl-action-keys>
@@ -32,68 +55,91 @@
     <table mat-table multiTemplateDataRows class="table" aria-label="Elements" [dataSource]="dataSource">
       <ng-container matColumnDef="select">
         <th class="selection" mat-header-cell *matHeaderCellDef>
-          <mat-checkbox [disabled]="disableWrite" color="primary" (change)="$event ? masterToggle() : null"
+          <mat-checkbox
+            [disabled]="disableWrite"
+            color="primary"
+            (change)="$event ? masterToggle() : null"
             [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()">
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+          >
           </mat-checkbox>
         </th>
         <td class="selection" mat-cell *matCellDef="let row">
           <mat-checkbox
-            [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + row?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + row?.id] : []) | hasRole | async))"
-            color="primary" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)">
-            <cnsl-avatar *ngIf="row && row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
-              [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''" [forColor]="row?.preferredLoginName"
-              [size]="32">
+            [disabled]="
+              disableWrite ||
+              !(
+                (['user.grant.write$'] | hasRole | async) ||
+                ((context === UserGrantContext.OWNED_PROJECT
+                  ? ['user.grant.write:' + row?.projectId]
+                  : context === UserGrantContext.GRANTED_PROJECT
+                  ? ['user.grant.write:' + row?.id]
+                  : []
+                )
+                  | hasRole
+                  | async)
+              )
+            "
+            color="primary"
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)"
+          >
+            <cnsl-avatar
+              *ngIf="row && row?.displayName && row.firstName && row.lastName; else cog"
+              class="avatar"
+              [name]="row.displayName"
+              [avatarUrl]="row.avatarUrl || ''"
+              [forColor]="row?.preferredLoginName"
+              [size]="32"
+            >
             </cnsl-avatar>
             <ng-template #cog>
-              <cnsl-avatar class="avatar" [isMachine]="true" [forColor]="row.preferredLoginName" [size]="32">
-              </cnsl-avatar>
+              <cnsl-avatar class="avatar" [isMachine]="true" [forColor]="row.preferredLoginName" [size]="32"> </cnsl-avatar>
             </ng-template>
           </mat-checkbox>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="user">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.USER' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          <a class="user">{{grant.displayName ? grant.displayName :
-            grant.userName ? grant.userName : ''}}</a>
+          <a class="user">{{ grant.displayName ? grant.displayName : grant.userName ? grant.userName : '' }}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="org">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ORG' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.ORG' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          {{grant.orgName}} </td>
+          {{ grant.orgName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="projectId">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.PROJECTNAME' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          {{grant.projectName}} </td>
+          {{ grant.projectName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.TYPE' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.TYPE' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          <span class="state">{{getType(grant)}}</span>
+          <span class="state">{{ getType(grant) }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="creationDate">
-        <th mat-header-cell *matHeaderCellDef> {{'PROJECT.GRANT.CREATIONDATE' | translate}} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          <span class="no-break">{{grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
-            }}</span>
+          <span class="no-break">{{ grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.CHANGEDATE' | translate }} </th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          <span class="no-break">{{grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm'
-            }}</span>
+          <span class="no-break">{{ grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
@@ -103,42 +149,56 @@
         </th>
         <td mat-cell *matCellDef="let grant; let i = index" class="role-data">
           <div class="flex-row">
-            <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.roleKeysList">{{ role }}
+            <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.roleKeysList"
+              >{{ role }}
             </cnsl-project-role-chip>
           </div>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions" stickyEnd>
-        <th mat-header-cell *matHeaderCellDef class="user-tr-actions"> </th>
+        <th mat-header-cell *matHeaderCellDef class="user-tr-actions"></th>
         <td mat-cell class="user-tr-actions" *matCellDef="let grant; let i = index">
           <cnsl-table-actions [hasActions]="true">
-            <button actions matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="deleteGrant(grant)"
-              mat-icon-button>
+            <button
+              actions
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              color="warn"
+              (click)="deleteGrant($event, grant)"
+              mat-icon-button
+            >
               <i class="las la-trash"></i>
             </button>
 
             <button menuActions mat-menu-item [routerLink]="['/users', grant.userId]">
-              {{'ACTIONS.TABLE.SHOWUSER' | translate : ({value: grant.displayName})}}
+              {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: grant.displayName } }}
             </button>
           </cnsl-table-actions>
         </td>
       </ng-container>
 
-
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr (click)="openEditDialog(grant)" class="highlight pointer" mat-row
-        *matRowDef="let grant; columns: displayedColumns;">
-      </tr>
+      <tr
+        (click)="openEditDialog(grant)"
+        class="highlight pointer"
+        mat-row
+        *matRowDef="let grant; columns: displayedColumns"
+      ></tr>
     </table>
   </div>
   <div *ngIf="(dataSource.loading$ | async) === false && !dataSource?.totalResult" class="no-content-row">
     <i class="las la-exclamation"></i>
-    <span>{{'GRANTS.EMPTY' | translate}}</span>
+    <span>{{ 'GRANTS.EMPTY' | translate }}</span>
   </div>
-  <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult"
-    [pageSize]="INITIAL_PAGE_SIZE" [length]="dataSource.totalResult" [pageSizeOptions]="[2, 3, 25, 50, 100, 250]"
-    (page)="changePage($event)">
+  <cnsl-paginator
+    class="paginator"
+    #paginator
+    [timestamp]="dataSource?.viewTimestamp"
+    [length]="dataSource.totalResult"
+    [pageSize]="INITIAL_PAGE_SIZE"
+    [length]="dataSource.totalResult"
+    [pageSizeOptions]="[2, 3, 25, 50, 100, 250]"
+    (page)="changePage($event)"
+  >
   </cnsl-paginator>
-
 </cnsl-refresh-table>

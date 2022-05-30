@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -20,11 +21,12 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.LockoutPolicy
+		ctx                 context.Context
+		maxPasswordAttempts uint64
+		showLockOutFailures bool
 	}
 	type res struct {
-		want *domain.LockoutPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -50,11 +52,9 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.LockoutPolicy{
-					MaxPasswordAttempts: 10,
-					ShowLockOutFailures: true,
-				},
+				ctx:                 context.Background(),
+				maxPasswordAttempts: 10,
+				showLockOutFailures: true,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -81,21 +81,13 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				policy: &domain.LockoutPolicy{
-					MaxPasswordAttempts: 10,
-					ShowLockOutFailures: true,
-				},
+				ctx:                 authz.WithInstanceID(context.Background(), "INSTANCE"),
+				maxPasswordAttempts: 10,
+				showLockOutFailures: true,
 			},
 			res: res{
-				want: &domain.LockoutPolicy{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					MaxPasswordAttempts: 10,
-					ShowLockOutFailures: true,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -105,7 +97,7 @@ func TestCommandSide_AddDefaultLockoutPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultLockoutPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultLockoutPolicy(tt.args.ctx, tt.args.maxPasswordAttempts, tt.args.showLockOutFailures)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

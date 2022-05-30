@@ -49,7 +49,7 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 		return nil, err
 	}
 	return &mgmt_pb.ListAppChangesResponse{
-		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 

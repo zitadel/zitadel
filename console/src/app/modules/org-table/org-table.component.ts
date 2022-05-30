@@ -1,9 +1,11 @@
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, Input, ViewChild } from '@angular/core';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
-import { Org, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { Org, OrgFieldName, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -38,6 +40,7 @@ export class OrgTableComponent {
   public filterOpen: boolean = false;
   public OrgState: any = OrgState;
   public copied: string = '';
+  @ViewChild(MatSort) public sort!: MatSort;
 
   private searchQueries: OrgQuery[] = [];
   private destroy$: Subject<void> = new Subject();
@@ -48,7 +51,12 @@ export class OrgTableComponent {
   });
   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
 
-  constructor(private authService: GrpcAuthService, private router: Router, private toast: ToastService) {
+  constructor(
+    private authService: GrpcAuthService,
+    private router: Router,
+    private toast: ToastService,
+    private _liveAnnouncer: LiveAnnouncer,
+  ) {
     this.requestOrgs$.next({ limit: this.initialLimit, offset: 0, queries: this.searchQueries });
     this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
 
@@ -60,7 +68,17 @@ export class OrgTableComponent {
   public loadOrgs(request: Request): Observable<Org.AsObject[]> {
     this.loadingSubject.next(true);
 
-    return from(this.authService.listMyProjectOrgs(request.limit, request.offset, request.queries)).pipe(
+    let sortingField: OrgFieldName | undefined = undefined;
+    if (this.sort?.active && this.sort?.direction)
+      switch (this.sort.active) {
+        case 'name':
+          sortingField = OrgFieldName.ORG_FIELD_NAME_NAME;
+          break;
+      }
+
+    return from(
+      this.authService.listMyProjectOrgs(request.limit, request.offset, request.queries, sortingField, this.sort?.direction),
+    ).pipe(
       map((resp) => {
         this.timestamp = resp.details?.viewTimestamp;
         this.totalResult = resp.details?.totalResult ?? 0;
@@ -84,6 +102,15 @@ export class OrgTableComponent {
       offset: this.paginator.pageSize * this.paginator.pageIndex,
       queries: this.searchQueries,
     });
+  }
+
+  public sortChange(sortState: Sort) {
+    if (sortState.direction && sortState.active) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+      this.refresh();
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
   }
 
   public applySearchQuery(searchQueries: OrgQuery[]): void {

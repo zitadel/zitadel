@@ -40,3 +40,7 @@ func (err *UnauthenticatedError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *UnauthenticatedError) Unwrap() error {
+	return err.CaosError
+}

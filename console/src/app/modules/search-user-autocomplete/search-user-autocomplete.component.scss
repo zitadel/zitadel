@@ -1,15 +1,79 @@
-.target-desc {
-  font-size: 14px;
-  display: block;
-  margin-top: 0.5rem;
+@use '@angular/material' as mat;
 
-  a {
-    color: #4072b4;
+@mixin search-user-autocomplete-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $secondary-text: map-get($foreground, secondary-text);
 
-    &:hover {
-      cursor: pointer;
-      color: #6992c9;
-      text-decoration: underline;
+  .user-autocomplete-found {
+    margin: 0.5rem 0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
+    max-width: 500px;
+    box-sizing: border-box;
+
+    .add-user-row {
+      margin-left: -4px;
+    }
+
+    .found-user-row {
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 0;
+
+      button {
+        visibility: hidden;
+      }
+
+      &:hover {
+        button {
+          visibility: visible;
+        }
+      }
+    }
+
+    .found-label {
+      font-size: 14px;
+    }
+
+    .user-name-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .smaller {
+        font-size: 13px;
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .search-user-dl-btn {
+      transition: color 0.2s ease;
+
+      &:not(:hover) {
+        color: $secondary-text;
+      }
+    }
+  }
+
+  .user-autocomplete-target-desc {
+    font-size: 14px;
+    display: block;
+    margin-top: 0.5rem;
+
+    a {
+      color: $primary-color;
+
+      &:hover {
+        cursor: pointer;
+        color: mat.get-color-from-palette($primary, 400);
+        text-decoration: underline;
+      }
     }
   }
 }
@@ -34,60 +98,6 @@
 .sm-dlt {
   cursor: pointer;
   font-size: 0.8rem;
-}
-
-.found {
-  margin: 0.5rem 0;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0;
-  max-width: 500px;
-  box-sizing: border-box;
-
-  .add-user-row {
-    margin-left: -4px;
-  }
-
-  .found-user-row {
-    display: flex;
-    align-items: center;
-    padding: 0.25rem 0;
-
-    button {
-      visibility: hidden;
-    }
-
-    &:hover {
-      button {
-        visibility: visible;
-      }
-    }
-  }
-
-  .found-label {
-    font-size: 14px;
-  }
-
-  .user-name-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .smaller {
-      font-size: 13px;
-    }
-  }
-
-  .fill-space {
-    flex: 1;
-  }
-
-  .search-user-dl-btn {
-    transition: color 0.2s ease;
-
-    &:not(:hover) {
-      color: var(--grey);
-    }
-  }
 }
 
 .circle {

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -11,52 +12,35 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
-	addedPolicy := NewInstanceLabelPolicyWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.LabelPolicyWriteModel.WriteModel)
-	event, err := c.addDefaultLabelPolicy(ctx, instanceAgg, addedPolicy, policy)
+func (c *Commands) AddDefaultLabelPolicy(
+	ctx context.Context,
+	primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string,
+	hideLoginNameSuffix, errorMsgPopup, disableWatermark bool,
+) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
+		prepareAddDefaultLabelPolicy(
+			instanceAgg,
+			primaryColor,
+			backgroundColor,
+			warnColor,
+			fontColor,
+			primaryColorDark,
+			backgroundColorDark,
+			warnColorDark,
+			fontColorDark,
+			hideLoginNameSuffix,
+			errorMsgPopup,
+			disableWatermark,
+		))
 	if err != nil {
 		return nil, err
 	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(addedPolicy, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToLabelPolicy(&addedPolicy.LabelPolicyWriteModel), nil
-}
-
-func (c *Commands) addDefaultLabelPolicy(ctx context.Context, instanceAgg *eventstore.Aggregate, addedPolicy *InstanceLabelPolicyWriteModel, policy *domain.LabelPolicy) (eventstore.Command, error) {
-	if err := policy.IsValid(); err != nil {
-		return nil, err
-	}
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
-	if err != nil {
-		return nil, err
-	}
-	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-2B0ps", "Errors.IAM.LabelPolicy.AlreadyExists")
-	}
-
-	return instance.NewLabelPolicyAddedEvent(
-		ctx,
-		instanceAgg,
-		policy.PrimaryColor,
-		policy.BackgroundColor,
-		policy.WarnColor,
-		policy.FontColor,
-		policy.PrimaryColorDark,
-		policy.BackgroundColorDark,
-		policy.WarnColorDark,
-		policy.FontColorDark,
-		policy.HideLoginNameSuffix,
-		policy.ErrorMsgPopup,
-		policy.DisableWatermark), nil
-
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
@@ -102,26 +86,16 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 }
 
 func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.ObjectDetails, error) {
-	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareActivateDefaultLabelPolicy(instanceAgg))
 	if err != nil {
 		return nil, err
 	}
-
-	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-6M23e", "Errors.IAM.LabelPolicy.NotFound")
-	}
-
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyActivatedEvent(ctx, instanceAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(existingPolicy, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
@@ -395,4 +369,75 @@ func (c *Commands) getDefaultLabelPolicy(ctx context.Context) (*domain.LabelPoli
 	policy := writeModelToLabelPolicy(&policyWriteModel.LabelPolicyWriteModel)
 	policy.Default = true
 	return policy, nil
+}
+
+func prepareAddDefaultLabelPolicy(
+	a *instance.Aggregate,
+	primaryColor,
+	backgroundColor,
+	warnColor,
+	fontColor,
+	primaryColorDark,
+	backgroundColorDark,
+	warnColorDark,
+	fontColorDark string,
+	hideLoginNameSuffix,
+	errorMsgPopup,
+	disableWatermark bool,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewInstanceLabelPolicyWriteModel(ctx)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if writeModel.State == domain.PolicyStateActive {
+				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-2B0ps", "Errors.Instance.LabelPolicy.AlreadyExists")
+			}
+			return []eventstore.Command{
+				instance.NewLabelPolicyAddedEvent(ctx, &a.Aggregate,
+					primaryColor,
+					backgroundColor,
+					warnColor,
+					fontColor,
+					primaryColorDark,
+					backgroundColorDark,
+					warnColorDark,
+					fontColorDark,
+					hideLoginNameSuffix,
+					errorMsgPopup,
+					disableWatermark,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func prepareActivateDefaultLabelPolicy(
+	a *instance.Aggregate,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewInstanceLabelPolicyWriteModel(ctx)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-6M23e", "Errors.Instance.LabelPolicy.NotFound")
+			}
+			return []eventstore.Command{
+				instance.NewLabelPolicyActivatedEvent(ctx, &a.Aggregate),
+			}, nil
+		}, nil
+	}
 }

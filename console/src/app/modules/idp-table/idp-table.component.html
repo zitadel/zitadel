@@ -248,6 +248,12 @@
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>
+
+  <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
+    <i class="las la-exclamation"></i>
+    <span>{{ 'IDP.EMPTY' | translate }}</span>
+  </div>
+
   <cnsl-paginator
     #paginator
     class="paginator"

@@ -1,79 +1,95 @@
 <div class="grid-main-container" *ngIf="projectType$ | async as type">
-  <div class="loading-sp-wrapper">
-    <mat-progress-spinner diameter="25" *ngIf="(loading$| async) === false" class="spinner" color="primary">
-    </mat-progress-spinner>
+  <div class="loading-sp-wrapper" *ngIf="loading$ | async">
+    <mat-spinner diameter="25" class="spinner" color="primary"> </mat-spinner>
   </div>
 
   <div class="owned-project-grid-container">
-    <div class="item card" matRipple *ngFor="let item of selection.selected; index as i"
+    <div
+      class="item card"
+      matRipple
+      *ngFor="let item of selection.selected; index as i"
       (click)="navigateToProject(type, item, $event)"
-      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
+      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE }"
+    >
       <div class="text-part">
-        <span *ngIf="item.details && item.details.changeDate"
-          class="top cnsl-secondary-text">{{'PROJECT.PAGES.LASTMODIFIED' |
-          translate}}
-          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+        <span *ngIf="item.details && item.details.changeDate" class="top cnsl-secondary-text"
+          >{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}
+          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
+        >
         <div class="name-row">
           <span class="name" *ngIf="$any(item).name">{{ $any(item).name }}</span>
           <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName }}</span>
 
-          <div class="state-dot"
-            [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">
-          </div>
+          <div
+            class="state-dot"
+            [ngClass]="{
+              active: item.state === ProjectState.PROJECT_STATE_ACTIVE,
+              inactive: item.state === ProjectState.PROJECT_STATE_INACTIVE
+            }"
+          ></div>
         </div>
 
-        <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' |
-          translate}}
-          {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+        <span *ngIf="item.details && item.details.creationDate" class="created"
+          >{{ 'PROJECT.PAGES.CREATEDON' | translate }}
+          {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
+        >
         <span class="fill-space"></span>
       </div>
 
-      <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
-      <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
+      <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{ key: item }"></template>
+      <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{ key: item }"></template>
     </div>
   </div>
   <div class="owned-project-grid-container">
-    <div class="item card" matRipple *ngFor="let item of notPinned; index as i"
+    <div
+      class="item card"
+      matRipple
+      *ngFor="let item of notPinned; index as i"
       (click)="navigateToProject(type, $any(item), $event)"
-      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}" [attr.data-e2e]="'grid-card'">
+      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE }"
+      [attr.data-e2e]="'grid-card'"
+    >
       <div class="text-part">
-        <span *ngIf="item.details && item.details.changeDate"
-          class="top cnsl-secondary-text">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
-          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+        <span *ngIf="item.details && item.details.changeDate" class="top cnsl-secondary-text"
+          >{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}
+          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
+        >
         <div class="name-row">
           <span class="name" *ngIf="$any(item).name">{{ $any(item).name }}</span>
           <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName }}</span>
 
-          <div class="state-dot"
-            [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">
-          </div>
+          <div
+            class="state-dot"
+            [ngClass]="{
+              active: item.state === ProjectState.PROJECT_STATE_ACTIVE,
+              inactive: item.state === ProjectState.PROJECT_STATE_INACTIVE
+            }"
+          ></div>
         </div>
 
-        <span class="owning-org" *ngIf="$any(item).projectOwnerName">{{$any(item).projectOwnerName}}</span>
-        <span *ngIf="item.details && item.details.creationDate"
-          class="created cnsl-secondary-text">{{'PROJECT.PAGES.CREATEDON' |
-          translate}}
-          {{
-          item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-          }}</span>
+        <span class="owning-org" *ngIf="$any(item).projectOwnerName">{{ $any(item).projectOwnerName }}</span>
+        <span *ngIf="item.details && item.details.creationDate" class="created cnsl-secondary-text"
+          >{{ 'PROJECT.PAGES.CREATEDON' | translate }}
+          {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
+        >
         <span class="fill-space"></span>
       </div>
 
       <ng-container *ngIf="type === ProjectType.PROJECTTYPE_OWNED">
-        <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
+        <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{ key: item }"></template>
       </ng-container>
-      <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
+      <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{ key: item }"></template>
     </div>
 
     <p class="n-items cnsl-secondary-text" *ngIf="(loading$ | async) === false && projectList.length === 0">
-      {{'PROJECT.PAGES.NOITEMS' |
-      translate}}</p>
+      {{ 'PROJECT.PAGES.NOITEMS' | translate }}
+    </p>
 
     <ng-container *ngIf="type === ProjectType.PROJECTTYPE_OWNED">
       <ng-template cnslHasRole [hasRole]="['project.create']">
         <div class="add-project-button card" matRipple (click)="addItem()">
           <mat-icon class="icon">add</mat-icon>
-          <span>{{'PROJECT.PAGES.ADDNEW' | translate}}</span>
+          <span>{{ 'PROJECT.PAGES.ADDNEW' | translate }}</span>
           <cnsl-action-keys [doNotUseContrast]="true" [withoutMargin]="true" (actionTriggered)="addItem()">
           </cnsl-action-keys>
         </div>
@@ -83,16 +99,27 @@
 </div>
 
 <ng-template #deleteButton let-key="key">
-  <button *ngIf="key.id !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
-    (click)="deleteProject($event, key)" class="delete-button" mat-icon-button
-    [attr.data-e2e]="'delete-project-button'">
+  <button
+    *ngIf="key.id !== zitadelProjectId"
+    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+    color="warn"
+    (click)="deleteProject($event, key)"
+    class="delete-button"
+    mat-icon-button
+    [attr.data-e2e]="'delete-project-button'"
+  >
     <i class="las la-trash"></i>
   </button>
 </ng-template>
 
 <ng-template #toggleButton let-key="key">
-  <button matTooltip="{{'ACTIONS.PIN' | translate}}" [ngClass]="{ selected: selection.isSelected(key)}"
-    (click)="toggle(key,$event)" class="edit-button" mat-icon-button>
+  <button
+    matTooltip="{{ 'ACTIONS.PIN' | translate }}"
+    [ngClass]="{ selected: selection.isSelected(key) }"
+    (click)="toggle(key, $event)"
+    class="edit-button"
+    mat-icon-button
+  >
     <mat-icon *ngIf="selection.isSelected(key)" svgIcon="mdi_pin"></mat-icon>
     <mat-icon svgIcon="mdi_pin_outline" *ngIf="!selection.isSelected(key)"></mat-icon>
   </button>

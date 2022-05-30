@@ -57,7 +57,7 @@
 
         .org-link {
           font-size: 14px;
-          color: map-get($foreground, base);
+          color: map-get($foreground, text);
           text-decoration: none;
           padding: 0.5rem 0.75rem 0.5rem 0.75rem;
           height: 2.5rem;
@@ -90,7 +90,7 @@
           .org-switch-button {
             font-weight: bold;
             border: none;
-            color: map-get($foreground, base);
+            color: map-get($foreground, text);
             border-radius: 6px;
             position: relative;
             font-size: 14px;
@@ -118,7 +118,7 @@
 
               svg {
                 opacity: 0.7;
-                fill: map-get($foreground, base);
+                fill: map-get($foreground, text);
                 height: 1.25rem;
                 width: 1.25rem;
               }
@@ -135,7 +135,7 @@
 
         .breadcrumb-link {
           font-size: 14px;
-          color: map-get($foreground, base);
+          color: map-get($foreground, text);
           text-decoration: none;
           padding: 0.5rem 0.75rem 0.5rem 0.75rem;
           height: 2.5rem;

@@ -91,7 +91,7 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
         });
 
         this.searchQueries = userQueries.filter((q) => q !== undefined) as UserSearchQuery[];
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       }
@@ -181,23 +181,21 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
     switch (subquery) {
       case SubQuery.STATE:
         (query as StateQuery).setState(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.EMAIL:
         (query as EmailQuery).setEmailAddress(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.USERNAME:
         (query as UserNameQuery).setUserName(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
     }
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public getSubFilter(subquery: SubQuery): any {
@@ -235,23 +233,17 @@ export class FilterUserComponent extends FilterComponent implements OnInit {
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
   public emitFilter(): void {
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public resetFilter(): void {
     this.searchQueries = [];
     this.emitFilter();
-  }
-
-  public get filterCount(): number {
-    return this.searchQueries.length;
   }
 }

@@ -49,6 +49,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   public projectId: string = '';
   public loading: boolean = false;
 
+  public createSteps: number = 4;
+  public currentCreateStep: number = 1;
+
   public oidcAppRequest: AddOIDCAppRequest.AsObject = new AddOIDCAppRequest().toObject();
   public apiAppRequest: AddAPIAppRequest.AsObject = new AddAPIAppRequest().toObject();
 
@@ -270,6 +273,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   }
 
   public changeStep(event: StepperSelectionEvent): void {
+    this.currentCreateStep = event.selectedIndex + 1;
+
     if (event.selectedIndex >= 2) {
       this.requestRedirectValuesSubject$.next();
     }

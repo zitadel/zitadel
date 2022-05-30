@@ -1,5 +1,10 @@
 <h2>{{ 'POLICY.LOGIN_TEXTS.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate }}</p>
+
+<div *ngIf="loading" class="spinner-wr">
+  <mat-spinner diameter="30" color="primary"></mat-spinner>
+</div>
+
 <div class="date">
   <div>
     <p class="newer-title" *ngIf="newerVersionExists">{{ 'POLICY.LOGIN_TEXTS.NEWERVERSIONEXISTS' | translate }}</p>

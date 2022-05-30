@@ -200,7 +200,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  public deleteGrant(grant: UserGrant.AsObject): void {
+  public deleteGrant(event: any, grant: UserGrant.AsObject): void {
+    event.stopPropagation();
+
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',

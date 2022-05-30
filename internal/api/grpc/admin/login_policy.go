@@ -88,7 +88,7 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddSecondFactorToLoginPolicyRequest) (*admin_pb.AddSecondFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddMultiFactorToLoginPolicyRequest) (*admin_pb.AddMultiFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}

@@ -57,7 +57,7 @@ With this token you can make subsequent requests, just like a human user.
 
 In this exercise we will authenticate a service user and receive an access_token to use against a API.
 
-> **Information:** Are you stuck? Don't hesitate to reach out to us on [Github Discussions](https://github.com/zitadel/zitadel/discussions) or [contact us](https://zitadel.ch/contact/) privately.
+> **Information:** Are you stuck? Don't hesitate to reach out to us on [Github Discussions](https://github.com/zitadel/zitadel/discussions) or [contact us](https://zitadel.com/contact/) privately.
 
 ### 1. Generate a private-public key pair in ZITADEL
 

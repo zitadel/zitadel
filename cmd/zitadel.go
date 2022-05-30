@@ -24,8 +24,8 @@ var (
 func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "zitadel",
-		Short: "The ZITADEL CLI let's you interact with ZITADEL",
-		Long:  `The ZITADEL CLI let's you interact with ZITADEL`,
+		Short: "The ZITADEL CLI lets you interact with ZITADEL",
+		Long:  `The ZITADEL CLI lets you interact with ZITADEL`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return errors.New("no additional command provided")
 		},

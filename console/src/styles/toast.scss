@@ -1,14 +1,10 @@
 @use '@angular/material' as mat;
 
 @mixin toast-theme($theme) {
-  $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
-  $primary-light-color: mat.get-color-from-palette($primary, 200);
   $warn: map-get($theme, warn);
   $warn-color: mat.get-color-from-palette($warn, 500);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
 
   //   .data-e2e-success {
   //     background-color: map-get($background, cards) !important;
@@ -16,7 +12,7 @@
   //   }
 
   .data-e2e-failure {
-    background-color: $warn-color !important;
-    color: map-get($foreground, text) !important;
+    color: $warn-color !important;
+    background-color: mat.get-color-from-palette($background, cards) !important;
   }
 }

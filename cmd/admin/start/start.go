@@ -98,7 +98,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(config.AuthZ, config.SystemDefaults, queries, dbClient, keys.OIDC)
+	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -161,23 +161,23 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.DefaultInstance)); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database, config.DefaultInstance)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, assets.HandlerPrefix, keys.User)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.ExternalSecure, keys.User)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
 
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries, instanceInterceptor.Handler))
+	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, instanceInterceptor.Handler))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator, config.ExternalSecure, login.EndpointResources)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources)
 	if err != nil {
 		return err
 	}

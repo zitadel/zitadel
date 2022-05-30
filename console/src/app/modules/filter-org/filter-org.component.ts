@@ -50,7 +50,7 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
         });
 
         this.searchQueries = orgQueries.filter((q) => q !== undefined) as OrgQuery[];
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : undefined);
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       }
@@ -88,11 +88,9 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
     switch (subquery) {
       case SubQuery.NAME:
         (query as OrgNameQuery).setName(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
     }
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public getSubFilter(subquery: SubQuery): any {
@@ -109,23 +107,17 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
   public emitFilter(): void {
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public resetFilter(): void {
     this.searchQueries = [];
     this.emitFilter();
-  }
-
-  public get filterCount(): number {
-    return this.searchQueries.length;
   }
 }

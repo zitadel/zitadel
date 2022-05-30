@@ -50,7 +50,7 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
         });
 
         this.searchQueries = projectQueries.filter((q) => q !== undefined) as ProjectQuery[];
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         // this.showFilter = true;
         // this.filterOpen.emit(true);
       }
@@ -60,15 +60,6 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
     if (event.checked) {
       switch (subquery) {
-        // case SubQuery.RESOURCEOWNER:
-        //   const ronq = new ProjectResourceOwnerQuery();
-        //   ronq.setResourceOwner('');
-
-        //   const ro_sq = new ProjectQuery();
-        //   ro_sq.setProjectResourceOwnerQuery(ronq);
-
-        //   this.searchQueries.push(ro_sq);
-        //   break;
         case SubQuery.NAME:
           const nq = new ProjectNameQuery();
           nq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
@@ -82,14 +73,6 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
       }
     } else {
       switch (subquery) {
-        // case SubQuery.RESOURCEOWNER:
-        //   const index_s = this.searchQueries.findIndex(
-        //     (q) => (q as ProjectQuery).toObject().projectResourceOwnerQuery !== undefined,
-        //   );
-        //   if (index_s > -1) {
-        //     this.searchQueries.splice(index_s, 1);
-        //   }
-        //   break;
         case SubQuery.NAME:
           const index_dn = this.searchQueries.findIndex((q) => (q as ProjectQuery).toObject().nameQuery !== undefined);
           if (index_dn > -1) {
@@ -103,28 +86,15 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
   public setValue(subquery: SubQuery, query: any, event: any) {
     const value = event?.target?.value ?? event.value;
     switch (subquery) {
-      // case SubQuery.RESOURCEOWNER:
-      //   (query as ProjectResourceOwnerQuery).setResourceOwner(value);
-      //   this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
-      //   break;
       case SubQuery.NAME:
         (query as ProjectNameQuery).setName(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
     }
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public getSubFilter(subquery: SubQuery): any {
     switch (subquery) {
-      // case SubQuery.RESOURCEOWNER:
-      //   const s = this.searchQueries.find((q) => (q as ProjectQuery).toObject().projectResourceOwnerQuery !== undefined);
-      //   if (s) {
-      //     return (s as ProjectQuery).getProjectResourceOwnerQuery();
-      //   } else {
-      //     return undefined;
-      //   }
       case SubQuery.NAME:
         const dn = this.searchQueries.find((q) => (q as ProjectQuery).toObject().nameQuery !== undefined);
         if (dn) {
@@ -137,15 +107,13 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
   public emitFilter(): void {
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public resetFilter(): void {
@@ -153,7 +121,7 @@ export class FilterProjectComponent extends FilterComponent implements OnInit {
     this.emitFilter();
   }
 
-  public get filterCount(): number {
+  public get filterCounter(): number {
     return this.searchQueries.length;
   }
 }
