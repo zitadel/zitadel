@@ -11,7 +11,7 @@
     <button
       (click)="deactivateSelectedIdps()"
       matTooltip="{{ 'IDP.DEACTIVATE' | translate }}"
-      class="margin-right bg-state inactive"
+      class="idp-margin-right bg-state inactive"
       mat-stroked-button
       *ngIf="selection.hasValue()"
       [disabled]="
@@ -103,7 +103,7 @@
 
       <ng-container matColumnDef="availability">
         <th class="availability" mat-header-cell *matHeaderCellDef>
-          <!-- <span>{{ 'IDP.AVAILABILITY' | translate }}</span> -->
+          <span>{{ 'IDP.AVAILABILITY' | translate }}</span>
         </th>
         <td class="availability" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
           <i
@@ -229,22 +229,7 @@
         </td>
       </ng-container>
 
-      <tr
-        mat-header-row
-        *matHeaderRowDef="
-          ([
-            serviceType === PolicyComponentServiceType.ADMIN
-              ? 'iam.idp.write'
-              : serviceType === PolicyComponentServiceType.MGMT
-              ? 'org.idp.write'
-              : ''
-          ]
-          | hasRole
-          | async)
-            ? displayedColumnsWithActions
-            : displayedColumns
-        "
-      ></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>

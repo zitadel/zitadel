@@ -31,6 +31,7 @@
               "src/app/proto/generated/zitadel/admin_pb",
               "src/app/proto/generated/zitadel/org_pb",
               "src/app/proto/generated/zitadel/management_pb",
+              "src/app/proto/generated/zitadel/user_pb",
               "src/app/proto/generated/**",
               "google-protobuf/google/protobuf/empty_pb",
               "file-saver",
