@@ -27,4 +27,4 @@ Click on the new button above the instance table to create a new instance.
 
 ## Detail
 
-The detail shows you general information about your instance, which options you have and what the state on your usage is.
+The detail shows you general information about your instance, which options you have and your usage.
