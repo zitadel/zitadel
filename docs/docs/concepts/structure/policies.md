@@ -139,6 +139,10 @@ https://demo.com/tos-{{.Lang}}
 
 ## OIDC token lifetime and expiration
 
+:::info
+Only available on the instance settings
+:::
+
 Configure how long the different oidc tokens should life.
 You can set the following times:
 - Access Token Lifetime
@@ -150,6 +154,10 @@ You can set the following times:
 
 
 ## Secret appearance
+
+:::info
+Only available on the instance settings
+:::
 
 ZITADEL has some different codes and secrets, that can be specified.
 You can configure what kind of characters should be included, how long the secret should be and the expiration.
