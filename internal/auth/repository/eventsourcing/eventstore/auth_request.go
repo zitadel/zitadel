@@ -65,11 +65,9 @@ type privacyPolicyProvider interface {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
-	PrefixAvatarURL() string
 }
 type userViewProvider interface {
 	UserByID(string, string) (*user_view_model.UserView, error)
-	PrefixAvatarURL() string
 }
 
 type loginPolicyViewProvider interface {
@@ -1105,7 +1103,7 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID, instan
 	if err != nil {
 		return nil, err
 	}
-	return user_view_model.UserSessionsToModel(session, provider.PrefixAvatarURL()), nil
+	return user_view_model.UserSessionsToModel(session), nil
 }
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
@@ -1119,7 +1117,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
 		logging.Log("EVENT-Hse6s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return user_view_model.UserSessionToModel(session, provider.PrefixAvatarURL()), nil
+		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
 	for _, event := range events {
@@ -1144,7 +1142,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
-				return user_view_model.UserSessionToModel(session, provider.PrefixAvatarURL()), nil
+				return user_view_model.UserSessionToModel(session), nil
 			}
 			if eventData.UserAgentID != agentID {
 				continue
@@ -1155,7 +1153,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		err := sessionCopy.AppendEvent(event)
 		logging.Log("EVENT-qbhj3").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("error appending event")
 	}
-	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
+	return user_view_model.UserSessionToModel(&sessionCopy), nil
 }
 
 func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string, ignoreUnknownUsernames bool) (user *user_model.UserView, err error) {
@@ -1200,24 +1198,24 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-dfg42").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), nil
+		return user_view_model.UserToModel(user), nil
 	}
 	if len(events) == 0 {
 		if viewErr != nil {
 			return nil, viewErr
 		}
-		return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), viewErr
+		return user_view_model.UserToModel(user), viewErr
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), nil
+			return user_view_model.UserToModel(user), nil
 		}
 	}
 	if userCopy.State == int32(user_model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3F9so", "Errors.User.NotFound")
 	}
-	return user_view_model.UserToModel(&userCopy, viewProvider.PrefixAvatarURL()), nil
+	return user_view_model.UserToModel(&userCopy), nil
 }
 
 func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, request *domain.AuthRequest) error {

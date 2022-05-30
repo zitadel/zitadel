@@ -28,6 +28,9 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	for _, service := range ignoredServices {
+		if !strings.HasPrefix(service, "/") {
+			service = "/" + service
+		}
 		if strings.HasPrefix(info.FullMethod, service) {
 			return handler(ctx, req)
 		}

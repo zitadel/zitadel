@@ -17,7 +17,7 @@ type Profile struct {
 	Gender             Gender
 	PreferredLoginName string
 	LoginNames         []string
-	AvatarURL          string
+	AvatarKey          string
 }
 
 func (p *Profile) IsValid() bool {
