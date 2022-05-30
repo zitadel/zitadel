@@ -213,11 +213,11 @@ func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimar
 }
 
 func (s *Server) ListOrgMemberRoles(ctx context.Context, _ *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
-	iam, err := s.query.Instance(ctx)
+	instance, err := s.query.Instance(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID)
+	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == instance.GlobalOrgID)
 	return &mgmt_pb.ListOrgMemberRolesResponse{
 		Result: roles,
 	}, nil

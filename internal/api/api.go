@@ -31,7 +31,7 @@ type API struct {
 
 type health interface {
 	Health(ctx context.Context) error
-	Instance(ctx context.Context) (*query.Instance, error)
+	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
 func New(

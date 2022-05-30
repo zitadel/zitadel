@@ -61,16 +61,16 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	iam, err := l.query.Instance(r.Context())
+	instance, err := l.query.Instance(r.Context(), false)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
 
-	resourceOwner := iam.GlobalOrgID
+	resourceOwner := instance.GlobalOrgID
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
-	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != iam.GlobalOrgID {
+	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != instance.GlobalOrgID {
 		memberRoles = nil
 		resourceOwner = authRequest.RequestedOrgID
 	}
@@ -125,12 +125,12 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	if resourceOwner == "" {
-		iam, err := l.query.Instance(r.Context())
+		instance, err := l.query.Instance(r.Context(), false)
 		if err != nil {
 			l.renderRegister(w, r, authRequest, formData, err)
 			return
 		}
-		resourceOwner = iam.GlobalOrgID
+		resourceOwner = instance.GlobalOrgID
 	}
 
 	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, resourceOwner)

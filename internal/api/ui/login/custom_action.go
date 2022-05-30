@@ -17,11 +17,11 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		resourceOwner = config.AggregateID
 	}
 	if resourceOwner == authz.GetInstance(ctx).InstanceID() {
-		iam, err := l.query.Instance(ctx)
+		instance, err := l.query.Instance(ctx, false)
 		if err != nil {
 			return nil, err
 		}
-		resourceOwner = iam.GlobalOrgID
+		resourceOwner = instance.GlobalOrgID
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
 	if err != nil {

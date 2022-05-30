@@ -206,7 +206,11 @@ var (
 	}
 )
 
-func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID string) (*App, error) {
+func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string) (*App, error) {
+	if shouldTriggerBulk {
+		projection.AppProjection.TriggerBulk(ctx)
+	}
+
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{

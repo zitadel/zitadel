@@ -111,12 +111,12 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	iam, err := l.query.Instance(r.Context())
+	instance, err := l.query.Instance(r.Context(), false)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	resourceOwner := iam.GlobalOrgID
+	resourceOwner := instance.GlobalOrgID
 	if authReq.RequestedOrgID != "" {
 		resourceOwner = authReq.RequestedOrgID
 	}
@@ -134,7 +134,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
 		return
 	}
-	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
+	l.registerExternalUser(w, r, authReq, instance, user, externalIDP)
 }
 
 func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.Instance, user *domain.Human, externalIDP *domain.UserIDPLink) {
@@ -204,15 +204,15 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	iam, err := l.query.Instance(r.Context())
+	instance, err := l.query.Instance(r.Context(), false)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	resourceOwner := iam.GlobalOrgID
+	resourceOwner := instance.GlobalOrgID
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
+	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != instance.GlobalOrgID {
 		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}

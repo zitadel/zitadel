@@ -31,7 +31,7 @@ func (s *Server) ListInstances(ctx context.Context, req *system_pb.ListInstances
 
 func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequest) (*system_pb.GetInstanceResponse, error) {
 	ctx = authz.WithInstanceID(ctx, req.InstanceId)
-	instance, err := s.query.Instance(ctx)
+	instance, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
 	}
@@ -100,12 +100,14 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 }
 
 func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest) (*system_pb.AddDomainResponse, error) {
+	//TODO: should be solved in interceptor
 	ctx = authz.WithInstanceID(ctx, req.InstanceId)
-	instance, err := s.query.Instance(ctx)
+	instance, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
 	}
 	ctx = authz.WithInstance(ctx, instance)
+
 	details, err := s.command.AddInstanceDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err

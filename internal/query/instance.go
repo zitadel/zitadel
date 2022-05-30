@@ -149,8 +149,10 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	return instances, err
 }
 
-func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
-	projection.InstanceProjection.TriggerBulk(ctx)
+func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (*Instance, error) {
+	if shouldTriggerBulk {
+		projection.InstanceProjection.TriggerBulk(ctx)
+	}
 
 	stmt, scan := prepareInstanceDomainQuery(authz.GetInstance(ctx).RequestedDomain())
 	query, args, err := stmt.Where(sq.Eq{
@@ -185,7 +187,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instan
 }
 
 func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
-	instance, err := q.Instance(ctx)
+	instance, err := q.Instance(ctx, false)
 	if err != nil {
 		return language.Und
 	}
