@@ -114,41 +114,42 @@ export class ThemeService {
     }
   }
 
+  public setDefaultColors = () => {
+    const darkPrimary = '#bbbafa';
+    const lightPrimary = '#5469d4';
+
+    const darkWarn = '#ff3b5b';
+    const lightWarn = '#cd3d56';
+
+    const darkBackground = '#111827';
+    const lightBackground = '#fafafa';
+
+    const darkText = '#ffffff';
+    const lightText = '#000000';
+
+    this.savePrimaryColor(darkPrimary, true);
+    this.savePrimaryColor(lightPrimary, false);
+
+    this.saveWarnColor(darkWarn, true);
+    this.saveWarnColor(lightWarn, false);
+
+    this.saveBackgroundColor(darkBackground, true);
+    this.saveBackgroundColor(lightBackground, false);
+
+    this.saveTextColor(darkText, true);
+    this.saveTextColor(lightText, false);
+  };
+
   public loadPrivateLabelling(): void {
-    const setDefaultColors = () => {
-      const darkPrimary = '#bbbafa';
-      const lightPrimary = '#5469d4';
+    this.setDefaultColors();
 
-      const darkWarn = '#ff3b5b';
-      const lightWarn = '#cd3d56';
+    const isDark = (color: string) => this.isDark(color);
+    const isLight = (color: string) => this.isLight(color);
 
-      const darkBackground = '#111827';
-      const lightBackground = '#fafafa';
-
-      const darkText = '#ffffff';
-      const lightText = '#000000';
-
-      this.savePrimaryColor(darkPrimary, true);
-      this.savePrimaryColor(lightPrimary, false);
-
-      this.saveWarnColor(darkWarn, true);
-      this.saveWarnColor(lightWarn, false);
-
-      this.saveBackgroundColor(darkBackground, true);
-      this.saveBackgroundColor(lightBackground, false);
-
-      this.saveTextColor(darkText, true);
-      this.saveTextColor(lightText, false);
-    };
-
-    setDefaultColors();
-
-    this.mgmtService.getLabelPolicy().then((lpresp) => {
-      if (lpresp.policy) {
+    this.mgmtService
+      .getLabelPolicy()
+      .then((lpresp) => {
         const labelpolicy = lpresp.policy;
-
-        const isDark = (color: string) => this.isDark(color);
-        const isLight = (color: string) => this.isLight(color);
 
         const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
         const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
@@ -159,8 +160,8 @@ export class ThemeService {
         let darkBackground = labelpolicy?.backgroundColorDark;
         let lightBackground = labelpolicy?.backgroundColor;
 
-        let darkText = labelpolicy.fontColorDark;
-        let lightText = labelpolicy.fontColor;
+        let darkText = labelpolicy?.fontColorDark ?? '#ffffff';
+        let lightText = labelpolicy?.fontColor ?? '#000000';
 
         this.savePrimaryColor(darkPrimary, true);
         this.savePrimaryColor(lightPrimary, false);
@@ -199,7 +200,10 @@ export class ThemeService {
           lightText = '#000000';
         }
         this.saveTextColor(lightText || '#000000', false);
-      }
-    });
+      })
+      .catch((error) => {
+        console.error('could not load private labelling policy!', error);
+        this.setDefaultColors();
+      });
   }
 }

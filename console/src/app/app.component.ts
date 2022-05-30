@@ -216,13 +216,14 @@ export class AppComponent implements OnDestroy {
           .getActiveOrg()
           .then((org) => {
             this.org = org;
-
             this.themeService.loadPrivateLabelling();
 
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })
           .catch((error) => {
+            console.error(error);
+            this.themeService.setDefaultColors();
             this.router.navigate(['/users/me']);
           });
       }
