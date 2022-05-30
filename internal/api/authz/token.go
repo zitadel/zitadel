@@ -77,7 +77,19 @@ type systemJWTStorage struct {
 }
 
 type SystemAPIUser struct {
-	Path string
+	Path    string //if a path is specified, the key will be read from that path
+	KeyData []byte //else you can also specify the data directly in the KeyData
+}
+
+func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
+	if s.Path != "" {
+		var err error
+		s.KeyData, err = os.ReadFile(s.Path)
+		if err != nil {
+			return nil, caos_errs.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
+		}
+	}
+	return crypto.BytesToPublicKey(s.KeyData)
 }
 
 func (s *systemJWTStorage) GetKeyByIDAndUserID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {
@@ -91,11 +103,7 @@ func (s *systemJWTStorage) GetKeyByIDAndUserID(_ context.Context, _, userID stri
 	}
 	defer s.mutex.Unlock()
 	s.mutex.Lock()
-	keyData, err := os.ReadFile(key.Path)
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
-	}
-	publicKey, err := crypto.BytesToPublicKey(keyData)
+	publicKey, err := key.readKey()
 	if err != nil {
 		return nil, err
 	}
