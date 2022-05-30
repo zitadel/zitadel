@@ -18,7 +18,7 @@ func (repo *UserSessionRepo) GetMyUserSessions(ctx context.Context) ([]*usr_mode
 	if err != nil {
 		return nil, err
 	}
-	return model.UserSessionsToModel(userSessions, repo.View.PrefixAvatarURL()), nil
+	return model.UserSessionsToModel(userSessions), nil
 }
 
 func (repo *UserSessionRepo) ActiveUserSessionCount() int64 {

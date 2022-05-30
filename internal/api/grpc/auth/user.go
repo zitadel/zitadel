@@ -100,7 +100,7 @@ func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUser
 		return nil, err
 	}
 	return &auth_pb.ListMyUserSessionsResponse{
-		Result: user_grpc.UserSessionsToPb(userSessions),
+		Result: user_grpc.UserSessionsToPb(userSessions, s.assetsAPIDomain(ctx)),
 	}, nil
 }
 

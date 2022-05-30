@@ -156,7 +156,7 @@ CREATE TABLE auth.refresh_tokens (
     instance_id STRING NOT NULL,
 
     PRIMARY KEY (id, instance_id),
-    UNIQUE INDEX unique_client_user_index (client_id ASC, user_agent_id ASC, user_id ASC, instance_id)
+    UNIQUE INDEX unique_client_user_index (client_id, user_agent_id, user_id)
 );
 
 CREATE TABLE auth.org_project_mapping (

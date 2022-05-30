@@ -68,7 +68,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 					{
 						Roles: []string{"ORG_OWNER"},
 					},
-				}}),
+				}}, "", nil),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -91,7 +91,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "No Grants",
 			args: args{
 				ctxData:      CtxData{},
-				verifier:     Start(&testVerifier{memberships: []*Membership{}}),
+				verifier:     Start(&testVerifier{memberships: []*Membership{}}, "", nil),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -119,7 +119,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 						MemberType:  MemberTypeIam,
 						Roles:       []string{"IAM_OWNER"},
 					},
-				}}),
+				}}, "", nil),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{

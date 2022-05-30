@@ -50,6 +50,7 @@ type Config struct {
 	EncryptionKeys    *encryptionKeyConfig
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
+	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
