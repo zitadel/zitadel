@@ -365,7 +365,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		if labelPolicy != nil {
 			baseData.LabelPolicy = labelPolicy.ToDomain()
 		}
-		policy, err := l.query.DefaultPrivacyPolicy(r.Context())
+		policy, err := l.query.DefaultPrivacyPolicy(r.Context(), false)
 		if err != nil {
 			return baseData
 		}

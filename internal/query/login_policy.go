@@ -139,7 +139,11 @@ var (
 	}
 )
 
-func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPolicy, error) {
+func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, orgID string) (*LoginPolicy, error) {
+	if shouldTriggerBulk {
+		projection.LoginPolicyProjection.TriggerBulk(ctx)
+	}
+
 	query, scan := prepareLoginPolicyQuery()
 	stmt, args, err := query.Where(
 		sq.And{

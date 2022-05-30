@@ -227,22 +227,6 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return scan(row)
 }
 
-func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
-	stmt, scan := prepareAppQuery()
-	query, args, err := stmt.Where(
-		sq.Eq{
-			AppColumnID.identifier():         appID,
-			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		},
-	).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
-	}
-
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
-}
-
 func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
