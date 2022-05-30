@@ -32,10 +32,6 @@ func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_v
 	return nil, nil
 }
 
-func (m *mockViewNoUserSession) PrefixAvatarURL() string {
-	return ""
-}
-
 type mockViewErrUserSession struct{}
 
 func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
@@ -44,10 +40,6 @@ func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user
 
 func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
-}
-
-func (m *mockViewErrUserSession) PrefixAvatarURL() string {
-	return ""
 }
 
 type mockViewUserSession struct {
@@ -87,18 +79,10 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 	return sessions, nil
 }
 
-func (m *mockViewUserSession) PrefixAvatarURL() string {
-	return "prefix/"
-}
-
 type mockViewNoUser struct{}
 
 func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, error) {
 	return nil, errors.ThrowNotFound(nil, "id", "user not found")
-}
-
-func (m *mockViewNoUser) PrefixAvatarURL() string {
-	return ""
 }
 
 type mockEventUser struct {
@@ -174,10 +158,6 @@ func (m *mockViewUser) UserByID(string, string) (*user_view_model.UserView, erro
 			PasswordlessTokens:       m.PasswordlessTokens,
 		},
 	}, nil
-}
-
-func (m *mockViewUser) PrefixAvatarURL() string {
-	return ""
 }
 
 type mockViewOrg struct {
