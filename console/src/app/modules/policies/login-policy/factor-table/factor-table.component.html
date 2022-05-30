@@ -22,7 +22,7 @@
     <button
       mat-stroked-button
       class="new-mfa cnsl-action-button"
-      [disabled]="disabled"
+      [disabled]="disabled || availableSelection.length === 0"
       (click)="!disabled ? addMfa() : null"
     >
       <mat-icon class="icon">add</mat-icon>

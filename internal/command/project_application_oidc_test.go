@@ -20,6 +20,9 @@ import (
 )
 
 func TestAddOIDCApp(t *testing.T) {
+	type fields struct {
+		idGenerator id.Generator
+	}
 	type args struct {
 		app             *addOIDCApp
 		clientSecretAlg crypto.HashAlgorithm
@@ -30,12 +33,14 @@ func TestAddOIDCApp(t *testing.T) {
 	agg := project.NewAggregate("test", "test")
 
 	tests := []struct {
-		name string
-		args args
-		want Want
+		name   string
+		fields fields
+		args   args
+		want   Want
 	}{
 		{
-			name: "invalid appID",
+			name:   "invalid appID",
+			fields: fields{},
 			args: args{
 				app: &addOIDCApp{
 					AddApp: AddApp{
@@ -56,7 +61,8 @@ func TestAddOIDCApp(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid name",
+			name:   "invalid name",
+			fields: fields{},
 			args: args{
 				app: &addOIDCApp{
 					AddApp: AddApp{
@@ -77,7 +83,8 @@ func TestAddOIDCApp(t *testing.T) {
 			},
 		},
 		{
-			name: "project not exists",
+			name:   "project not exists",
+			fields: fields{},
 			args: args{
 				app: &addOIDCApp{
 					AddApp: AddApp{
@@ -104,6 +111,9 @@ func TestAddOIDCApp(t *testing.T) {
 		},
 		{
 			name: "correct",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID"),
+			},
 			args: args{
 				app: &addOIDCApp{
 					AddApp: AddApp{
@@ -144,7 +154,7 @@ func TestAddOIDCApp(t *testing.T) {
 					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
 						domain.OIDCVersionV1,
 						"id",
-						"",
+						"clientID@project",
 						nil,
 						nil,
 						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
@@ -166,8 +176,11 @@ func TestAddOIDCApp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c := Commands{
+				idGenerator: tt.fields.idGenerator,
+			}
 			AssertValidation(t,
-				AddOIDCAppCommand(
+				c.AddOIDCAppCommand(
 					tt.args.app,
 					tt.args.clientSecretAlg,
 				), tt.args.filter, tt.want)

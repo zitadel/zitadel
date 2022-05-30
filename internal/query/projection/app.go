@@ -30,12 +30,14 @@ const (
 
 	appAPITableSuffix              = "api_configs"
 	AppAPIConfigColumnAppID        = "app_id"
+	AppAPIConfigColumnInstanceID   = "instance_id"
 	AppAPIConfigColumnClientID     = "client_id"
 	AppAPIConfigColumnClientSecret = "client_secret"
 	AppAPIConfigColumnAuthMethod   = "auth_method"
 
 	appOIDCTableSuffix                          = "oidc_configs"
 	AppOIDCConfigColumnAppID                    = "app_id"
+	AppOIDCConfigColumnInstanceID               = "instance_id"
 	AppOIDCConfigColumnVersion                  = "version"
 	AppOIDCConfigColumnClientID                 = "client_id"
 	AppOIDCConfigColumnClientSecret             = "client_secret"
@@ -74,22 +76,25 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(AppColumnInstanceID, ActionIDCol),
+			crdb.NewPrimaryKey(AppColumnID, AppColumnInstanceID),
 			crdb.WithIndex(crdb.NewIndex("project_id_idx", []string{AppColumnProjectID})),
 			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{AppColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppAPIConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppAPIConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(AppAPIConfigColumnAppID),
 			appAPITableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps")),
 			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
@@ -107,8 +112,9 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID),
+			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID, AppOIDCConfigColumnInstanceID),
 			appOIDCTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_apps")),
 			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppOIDCConfigColumnClientID})),
 		),
 	)
@@ -212,6 +218,7 @@ func (p *AppProjection) reduceAppChanged(event eventstore.Event) (*handler.State
 		},
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
+			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -230,6 +237,7 @@ func (p *AppProjection) reduceAppDeactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
+			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -248,6 +256,7 @@ func (p *AppProjection) reduceAppReactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
+			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -261,6 +270,7 @@ func (p *AppProjection) reduceAppRemoved(event eventstore.Event) (*handler.State
 		e,
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
+			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -274,6 +284,7 @@ func (p *AppProjection) reduceProjectRemoved(event eventstore.Event) (*handler.S
 		e,
 		[]handler.Condition{
 			handler.NewCond(AppColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -288,6 +299,7 @@ func (p *AppProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppAPIConfigColumnAppID, e.AppID),
+				handler.NewCol(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppAPIConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
 				handler.NewCol(AppAPIConfigColumnAuthMethod, e.AuthMethodType),
@@ -301,6 +313,7 @@ func (p *AppProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -327,6 +340,7 @@ func (p *AppProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 			cols,
 			[]handler.Condition{
 				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
+				handler.NewCond(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(appAPITableSuffix),
 		),
@@ -337,6 +351,7 @@ func (p *AppProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -355,6 +370,7 @@ func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 			},
 			[]handler.Condition{
 				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
+				handler.NewCond(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(appAPITableSuffix),
 		),
@@ -365,6 +381,7 @@ func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -380,6 +397,7 @@ func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppOIDCConfigColumnAppID, e.AppID),
+				handler.NewCol(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
@@ -406,6 +424,7 @@ func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -471,6 +490,7 @@ func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 			cols,
 			[]handler.Condition{
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
+				handler.NewCond(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -481,6 +501,7 @@ func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -499,6 +520,7 @@ func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 			},
 			[]handler.Condition{
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
+				handler.NewCond(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -509,6 +531,7 @@ func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil

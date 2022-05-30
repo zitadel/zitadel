@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>
-  <span>{{data.titleKey | translate}} {{data?.number}}</span>
+  <span>{{ data.titleKey | translate }} {{ data?.number }}</span>
 </h1>
-<p class="desc cnsl-secondary-text">{{data.descKey | translate}}</p>
+<p class="desc cnsl-secondary-text">{{ data.descKey | translate }}</p>
 <div mat-dialog-content>
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ data.labelKey | translate }}</cnsl-label>
@@ -9,12 +9,11 @@
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
-  <button color="primary" mat-stroked-button class="ok-button" (click)="closeDialog()">
-    {{'ACTIONS.CLOSE' | translate}}
+  <button color="primary" mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CLOSE' | translate }}
   </button>
 
-  <button [disabled]="!name" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
-    (click)="closeDialog(name)">
-    {{'ACTIONS.RENAME' | translate}}
+  <button [disabled]="!name" cdkFocusInitial color="primary" mat-raised-button (click)="closeDialog(name)">
+    {{ 'ACTIONS.RENAME' | translate }}
   </button>
 </div>

@@ -34,8 +34,8 @@
       "DESCRIPTION": "Iniziare rapidamente con ZITADEL."
     },
     "SHORTCUTS": {
-      "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Impostazioni dell' organizazzione",
+      "SHORTCUTS": "Scorciatoie",
+      "SETTINGS": "Scorciatoie disponibili",
       "PROJECTS": "Progetti",
       "REORDER": "Per spostare, tieni premuto e trascina il riquadro",
       "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
@@ -135,7 +135,7 @@
       "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
     },
     "NAV": {
-      "TEXT": "Questa navigazione cambia in base ai breadcrumb sopra."
+      "TEXT": "Questa navigazione cambia in base all' organizzazione impostata sopra e la tua istanza."
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attenzione! L'organizzazione è appena stata cambiata."
@@ -818,6 +818,7 @@
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "complessità della password",
       "NOTIFICATIONS": "Notifiche",
+      "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
       "DOMAIN": "Impostazioni del dominio",
@@ -1181,11 +1182,11 @@
           "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Branding dell'organizzazione, prima che venga mostrato il default del sistema."
         },
         "1": {
-          "TITLE": "Applica l'impostazione Branding delle risorse del progetto",
+          "TITLE": "Applica l'impostazione del progetto",
           "DESC": "Branding dell'organizzazione del progetto sar\u00e0 mostrata"
         },
         "2": {
-          "TITLE": "Consentire l'accesso all'impostazione Branding dell'utente",
+          "TITLE": "Applica l'impostazione dell' organizzazione dell' utente",
           "DESC": "Verr\u00e0 mostrata l'impostazione Branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
         },
         "DIALOG": {
@@ -1549,6 +1550,9 @@
         }
       },
       "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Configurazione OIDC"
+        },
         "DELETE": {
           "TITLE": "Rimuovere App",
           "DESCRIPTION": "Vuoi davvero rimuovere questa applicazione?"

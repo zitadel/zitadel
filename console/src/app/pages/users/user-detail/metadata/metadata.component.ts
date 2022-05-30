@@ -16,8 +16,7 @@ export class MetadataComponent implements OnInit {
   public metadata: Metadata.AsObject[] = [];
   public loading: boolean = false;
 
-  constructor(private dialog: MatDialog, private service: ManagementService, private toast: ToastService,
-  ) { }
+  constructor(private dialog: MatDialog, private service: ManagementService, private toast: ToastService) {}
 
   ngOnInit(): void {
     this.loadMetadata();
@@ -37,17 +36,20 @@ export class MetadataComponent implements OnInit {
 
   public loadMetadata(): Promise<any> {
     this.loading = true;
-    return (this.service as ManagementService).listUserMetadata(this.userId).then(resp => {
-      this.loading = false;
-      this.metadata = resp.resultList.map(md => {
-        return {
-          key: md.key,
-          value: atob(md.value as string),
-        };
+    return (this.service as ManagementService)
+      .listUserMetadata(this.userId)
+      .then((resp) => {
+        this.loading = false;
+        this.metadata = resp.resultList.map((md) => {
+          return {
+            key: md.key,
+            value: atob(md.value as string),
+          };
+        });
+      })
+      .catch((error) => {
+        this.loading = false;
+        this.toast.showError(error);
       });
-    }).catch((error) => {
-      this.loading = false;
-      this.toast.showError(error);
-    });
   }
 }

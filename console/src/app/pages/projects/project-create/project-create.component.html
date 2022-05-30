@@ -1,4 +1,9 @@
-<cnsl-create-layout title="{{ 'PROJECT.PAGES.CREATE' | translate }}" [createSteps]="1" [currentCreateStep]="1">
+<cnsl-create-layout
+  title="{{ 'PROJECT.PAGES.CREATE' | translate }}"
+  [createSteps]="1"
+  [currentCreateStep]="1"
+  (closed)="close()"
+>
   <h1>{{ 'PROJECT.PAGES.CREATE_DESC' | translate }}</h1>
   <form cdkFocusRegionStart (ngSubmit)="saveProject()">
     <div class="column">

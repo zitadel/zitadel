@@ -45,7 +45,7 @@ func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(OrgDomainIsPrimaryCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(OrgDomainValidationTypeCol, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(OrgDomainInstanceIDCol, OrgDomainOrgIDCol),
+			crdb.NewPrimaryKey(OrgDomainOrgIDCol, OrgDomainDomainCol, OrgDomainInstanceIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -118,6 +118,7 @@ func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Eve
 		[]handler.Condition{
 			handler.NewCond(OrgDomainDomainCol, e.Domain),
 			handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
+			handler.NewCond(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -137,6 +138,7 @@ func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.Event) (*han
 		[]handler.Condition{
 			handler.NewCond(OrgDomainDomainCol, e.Domain),
 			handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
+			handler.NewCond(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -157,6 +159,7 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
 				handler.NewCond(OrgDomainIsPrimaryCol, true),
+				handler.NewCond(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -168,6 +171,7 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(OrgDomainDomainCol, e.Domain),
 				handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
+				handler.NewCond(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -183,6 +187,7 @@ func (p *OrgDomainProjection) reduceDomainRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(OrgDomainDomainCol, e.Domain),
 			handler.NewCond(OrgDomainOrgIDCol, e.Aggregate().ID),
+			handler.NewCond(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
