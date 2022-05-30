@@ -20,6 +20,9 @@
         <img src="https://codecov.io/gh/zitadel/zitadel/branch/main/graph/badge.svg" /></a>
     <a href="https://discord.gg/erh5Brh7jE" alt="Discord Chat">
         <img src="https://badgen.net/discord/online-members/erh5Brh7jE" /></a>
+    <a href="https://artifacthub.io/packages/search?repo=zitadel" alt="Discord Chat">
+        <img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/zitadel" /></a>
+
 </p>
 
 <p align="center">
