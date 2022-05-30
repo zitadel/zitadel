@@ -104,12 +104,20 @@ service SystemService {
             post: "/instances/_search"
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
     }
 
     // Returns the detail of an instance
     rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
         option (google.api.http) = {
             get: "/instances/{instance_id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
         };
     }
 
@@ -120,6 +128,10 @@ service SystemService {
             post: "/instances"
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
     }
 
     // Removes a instances
@@ -127,6 +139,10 @@ service SystemService {
     rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
         option (google.api.http) = {
             delete: "/instances/{instance_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
         };
     }
 
@@ -136,6 +152,10 @@ service SystemService {
             post: "/domains/{domain}/_exists";
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
     }
 
     // Returns the custom domains of an instance
@@ -143,6 +163,10 @@ service SystemService {
         option (google.api.http) = {
             post: "/instances/{instance_id}/domains/_search";
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
         };
     }
 
@@ -152,12 +176,20 @@ service SystemService {
             post: "/instances/{instance_id}/domains";
             body: "*"
         };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
     }
 
     // Returns the domain of an instance
     rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
         option (google.api.http) = {
             delete: "/instances/{instance_id}/domains/{domain}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
         };
     }
 
@@ -166,6 +198,10 @@ service SystemService {
         option (google.api.http) = {
             post: "/instances/{instance_id}/domains/_set_primary";
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
         };
     }
 
@@ -177,6 +213,10 @@ service SystemService {
         option (google.api.http) = {
             post: "/views/_search";
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -204,7 +244,7 @@ service SystemService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.write";
+            permission: "authenticated";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -231,6 +271,10 @@ service SystemService {
             body: "*"
         };
 
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
@@ -254,6 +298,10 @@ service SystemService {
     rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
         option (google.api.http) = {
             delete: "/failedevents/{database}/{view_name}/{failed_sequence}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

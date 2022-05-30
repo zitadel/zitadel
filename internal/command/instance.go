@@ -33,6 +33,7 @@ const (
 
 type InstanceSetup struct {
 	zitadel          ZitadelConfig
+	idGenerator      id.Generator
 	InstanceName     string
 	CustomDomain     string
 	DefaultLanguage  language.Tag
@@ -113,28 +114,28 @@ type ZitadelConfig struct {
 	consoleAppID string
 }
 
-func (s *InstanceSetup) generateIDs() (err error) {
-	s.zitadel.projectID, err = id.SonyFlakeGenerator.Next()
+func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
+	s.zitadel.projectID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.mgmtAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.mgmtAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.adminAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.adminAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.authAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.authAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.consoleAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.consoleAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -142,7 +143,7 @@ func (s *InstanceSetup) generateIDs() (err error) {
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
-	instanceID, err := id.SonyFlakeGenerator.Next()
+	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -153,17 +154,17 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
-	orgID, err := id.SonyFlakeGenerator.Next()
+	orgID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	userID, err := id.SonyFlakeGenerator.Next()
+	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	if err = setup.generateIDs(); err != nil {
+	if err = setup.generateIDs(c.idGenerator); err != nil {
 		return "", nil, err
 	}
 	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
@@ -292,7 +293,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -304,7 +305,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -316,7 +317,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -328,7 +329,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddOIDCAppCommand(console, nil),
+		c.AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
 	addGenerateddDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)

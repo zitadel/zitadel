@@ -14,12 +14,11 @@ import (
 )
 
 type UserRepo struct {
-	SearchLimit     uint64
-	Eventstore      v1.Eventstore
-	View            *view.View
-	Query           *query.Queries
-	SystemDefaults  systemdefaults.SystemDefaults
-	PrefixAvatarURL string
+	SearchLimit    uint64
+	Eventstore     v1.Eventstore
+	View           *view.View
+	Query          *query.Queries
+	SystemDefaults systemdefaults.SystemDefaults
 }
 
 func (repo *UserRepo) Health(ctx context.Context) error {

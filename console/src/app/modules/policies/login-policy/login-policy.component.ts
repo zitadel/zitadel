@@ -57,7 +57,7 @@ export class LoginPolicyComponent implements OnInit {
     });
   }
 
-  private fetchData(): void {
+  public fetchData(): void {
     this.getData()
       .then((resp) => {
         if (resp.policy) {
@@ -122,7 +122,6 @@ export class LoginPolicyComponent implements OnInit {
       )
       .pipe(take(1))
       .subscribe((allowed) => {
-        console.log(allowed);
         if (allowed) {
           this.lifetimeForm.enable();
         }
@@ -148,6 +147,8 @@ export class LoginPolicyComponent implements OnInit {
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
+        mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
 
         const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
         mgmtreq.setPasswordCheckLifetime(pcl);

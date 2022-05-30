@@ -139,7 +139,7 @@ func (m *MachineView) IsZero() bool {
 	return m == nil || m.Name == ""
 }
 
-func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
+func UserToModel(user *UserView) *model.UserView {
 	userView := &model.UserView{
 		ID:                 user.ID,
 		UserName:           user.UserName,
@@ -165,7 +165,6 @@ func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 			NickName:                 user.NickName,
 			DisplayName:              user.DisplayName,
 			AvatarKey:                user.AvatarKey,
-			AvatarURL:                domain.AvatarURL(prefixAvatarURL, user.ResourceOwner, user.AvatarKey),
 			PreferredLanguage:        user.PreferredLanguage,
 			Gender:                   model.Gender(user.Gender),
 			Email:                    user.Email,
@@ -192,14 +191,6 @@ func UserToModel(user *UserView, prefixAvatarURL string) *model.UserView {
 		}
 	}
 	return userView
-}
-
-func UsersToModel(users []*UserView, prefixAvatarURL string) []*model.UserView {
-	result := make([]*model.UserView, len(users))
-	for i, p := range users {
-		result[i] = UserToModel(p, prefixAvatarURL)
-	}
-	return result
 }
 
 func WebauthnTokensToModel(tokens []*WebAuthNView) []*model.WebAuthNView {

@@ -1,22 +1,17 @@
 <cnsl-card class="metadata-details" title="{{ 'USER.METADATA.TITLE' | translate }}">
-  <div card-actions class="actions">
+  <div class="metadata-actions">
     <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
-    <button mat-raised-button color="primary" class="edit" (click)="editMetadata()">{{'ACTIONS.EDIT' |
-      translate}}</button>
-    <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-btn" (click)="loadMetadata()" mat-icon-button
-      aria-label="refresh contributors">
-      <mat-icon class="icon">refresh</mat-icon>
-    </button>
+    <button mat-raised-button color="primary" class="edit" (click)="editMetadata()">{{ 'ACTIONS.EDIT' | translate }}</button>
   </div>
 
   <ng-container *ngIf="metadata?.length; else emptyList">
     <div class="metadata-set" *ngFor="let md of metadata">
-      <span class="first cnsl-secondary-text">{{md.key}}</span>
+      <span class="first cnsl-secondary-text">{{ md.key }}</span>
       <span class="second">{{ md.value }}</span>
     </div>
   </ng-container>
 
   <ng-template #emptyList>
-    <p class="empty-desc cnsl-secondary-text">{{'USER.METADATA.EMPTY' | translate}}</p>
+    <p class="empty-desc cnsl-secondary-text">{{ 'USER.METADATA.EMPTY' | translate }}</p>
   </ng-template>
 </cnsl-card>

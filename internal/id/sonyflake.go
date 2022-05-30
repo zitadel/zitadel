@@ -1,6 +1,7 @@
 package id
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"hash/fnv"
@@ -8,10 +9,12 @@ import (
 	"net"
 	"net/http"
 	"os"
-
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/drone/envsubst"
+	"github.com/jarcoal/jpath"
 	"github.com/sony/sonyflake"
 )
 
@@ -28,13 +31,24 @@ func (s *sonyflakeGenerator) Next() (string, error) {
 }
 
 var (
-	SonyFlakeGenerator = Generator(&sonyflakeGenerator{
-		sonyflake.NewSonyflake(sonyflake.Settings{
-			MachineID: machineID,
-			StartTime: time.Date(2019, 4, 29, 0, 0, 0, 0, time.UTC),
-		}),
-	})
+	GeneratorConfig    *Config    = nil
+	sonyFlakeGenerator *Generator = nil
 )
+
+func SonyFlakeGenerator() Generator {
+	if sonyFlakeGenerator == nil {
+		sfg := Generator(&sonyflakeGenerator{
+			sonyflake.NewSonyflake(sonyflake.Settings{
+				MachineID: machineID,
+				StartTime: time.Date(2019, 4, 29, 0, 0, 0, 0, time.UTC),
+			}),
+		})
+
+		sonyFlakeGenerator = &sfg
+	}
+
+	return *sonyFlakeGenerator
+}
 
 // the following is a copy of sonyflake (https://github.com/sony/sonyflake/blob/master/sonyflake.go)
 //with the change of using the "POD-IP" if no private ip is found
@@ -73,16 +87,41 @@ func isPrivateIPv4(ip net.IP) bool {
 }
 
 func machineID() (uint16, error) {
-	ip, ipErr := lower16BitPrivateIP()
-	if ipErr == nil {
-		return ip, nil
+	if GeneratorConfig == nil {
+		return 0, errors.New("Cannot create a unique ID for the machine, generator has not been configured.")
 	}
 
-	cid, cidErr := cloudRunContainerID()
-	if cidErr != nil {
-		return 0, fmt.Errorf("neighter found a private ip nor a cloud run container instance id: private ip err: %w, cloud run ip err: %s", ipErr, cidErr.Error())
+	errors := []string{}
+	if GeneratorConfig.Identification.PrivateIp.Enabled {
+		ip, ipErr := lower16BitPrivateIP()
+		if ipErr == nil {
+			return ip, nil
+		}
+		errors = append(errors, fmt.Sprintf("failed to get Private IP address %s", ipErr))
 	}
-	return cid, nil
+
+	if GeneratorConfig.Identification.Hostname.Enabled {
+		hn, hostErr := hostname()
+		if hostErr == nil {
+			return hn, nil
+		}
+		errors = append(errors, fmt.Sprintf("failed to get Hostname %s", hostErr))
+	}
+
+	if GeneratorConfig.Identification.Webhook.Enabled {
+		cid, cidErr := metadataWebhookID()
+		if cidErr == nil {
+			return cid, nil
+		}
+
+		errors = append(errors, fmt.Sprintf("failed to query metadata webhook %s", cidErr))
+	}
+
+	if len(errors) == 0 {
+		errors = append(errors, "No machine identification method enabled.")
+	}
+
+	return 0, fmt.Errorf("none of the enabled methods for identifying the machine succeeded: %s", strings.Join(errors, ". "))
 }
 
 func lower16BitPrivateIP() (uint16, error) {
@@ -94,16 +133,42 @@ func lower16BitPrivateIP() (uint16, error) {
 	return uint16(ip[2])<<8 + uint16(ip[3]), nil
 }
 
-func cloudRunContainerID() (uint16, error) {
+func hostname() (uint16, error) {
+	host, err := os.Hostname()
+	if err != nil {
+		return 0, err
+	}
+
+	h := fnv.New32()
+	_, hashErr := h.Write([]byte(host))
+	if hashErr != nil {
+		return 0, hashErr
+	}
+
+	return uint16(h.Sum32()), nil
+}
+
+func metadataWebhookID() (uint16, error) {
+	webhook := GeneratorConfig.Identification.Webhook
+	url, err := envsubst.EvalEnv(webhook.Url)
+	if err != nil {
+		url = webhook.Url
+	}
+
 	req, err := http.NewRequest(
 		http.MethodGet,
-		"http://metadata.google.internal/computeMetadata/v1/instance/id",
+		url,
 		nil,
 	)
 	if err != nil {
 		return 0, err
 	}
-	req.Header.Set("Metadata-Flavor", "Google")
+
+	if webhook.Headers != nil {
+		for key, value := range *webhook.Headers {
+			req.Header.Set(key, value)
+		}
+	}
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
@@ -113,16 +178,39 @@ func cloudRunContainerID() (uint16, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 && resp.StatusCode < 600 {
-		return 0, fmt.Errorf("cloud metadata returned an unsuccessful status code %d", resp.StatusCode)
+		return 0, fmt.Errorf("metadata endpoint returned an unsuccessful status code %d", resp.StatusCode)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return 0, err
 	}
 
+	data, err := extractMetadataResponse(webhook.JPath, body)
+	if err != nil {
+		return 0, err
+	}
+
 	h := fnv.New32()
-	if _, err = h.Write(body); err != nil {
+	if _, err = h.Write(data); err != nil {
 		return 0, err
 	}
 	return uint16(h.Sum32()), nil
+}
+
+func extractMetadataResponse(path *string, data []byte) ([]byte, error) {
+	if path != nil {
+		jp, err := jpath.NewFromBytes(data)
+		if err != nil {
+			return nil, err
+		}
+
+		results := jp.Query(*path)
+		if len(results) == 0 {
+			return nil, fmt.Errorf("metadata endpoint response was successful, but JSONPath provided didn't match anything in the response: %s", string(data[:]))
+		}
+
+		return json.Marshal(results)
+	}
+
+	return data, nil
 }

@@ -11,31 +11,25 @@ import (
 )
 
 type View struct {
-	Db              *gorm.DB
-	keyAlgorithm    crypto.EncryptionAlgorithm
-	idGenerator     id.Generator
-	prefixAvatarURL string
-	query           *query.Queries
+	Db           *gorm.DB
+	keyAlgorithm crypto.EncryptionAlgorithm
+	idGenerator  id.Generator
+	query        *query.Queries
 }
 
-func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, idGenerator id.Generator, prefixAvatarURL string) (*View, error) {
+func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, idGenerator id.Generator) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient)
 	if err != nil {
 		return nil, err
 	}
 	return &View{
-		Db:              gorm,
-		keyAlgorithm:    keyAlgorithm,
-		idGenerator:     idGenerator,
-		prefixAvatarURL: prefixAvatarURL,
-		query:           queries,
+		Db:           gorm,
+		keyAlgorithm: keyAlgorithm,
+		idGenerator:  idGenerator,
+		query:        queries,
 	}, nil
 }
 
 func (v *View) Health() (err error) {
 	return v.Db.DB().Ping()
-}
-
-func (v *View) PrefixAvatarURL() string {
-	return v.prefixAvatarURL
 }

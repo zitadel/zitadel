@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/id"
 )
 
 var (
@@ -123,6 +124,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 			}
 			defer client.Close()
 
+			id.Configure(&id.Config{Identification: id.Identification{PrivateIp: id.PrivateIp{Enabled: true}}})
 			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
 				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 					ProjectionName: tt.fields.projectionName,

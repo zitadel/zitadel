@@ -54,7 +54,7 @@
     <ng-template cnslHasRole [hasRole]="['policy.delete']">
       <button
         class="pl-action-button"
-        *ngIf="view === View.CURRENT && serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+        *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
         matTooltip="{{ 'POLICY.RESET' | translate }}"
         color="warn"
         (click)="removePolicy()"

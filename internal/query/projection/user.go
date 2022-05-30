@@ -31,8 +31,9 @@ const (
 	UserUsernameCol      = "username"
 	UserTypeCol          = "type"
 
-	UserHumanSuffix = "humans"
-	HumanUserIDCol  = "user_id"
+	UserHumanSuffix        = "humans"
+	HumanUserIDCol         = "user_id"
+	HumanUserInstanceIDCol = "instance_id"
 
 	// profile
 	HumanFirstNameCol         = "first_name"
@@ -52,10 +53,11 @@ const (
 	HumanIsPhoneVerifiedCol = "is_phone_verified"
 
 	// machine
-	UserMachineSuffix     = "machines"
-	MachineUserIDCol      = "user_id"
-	MachineNameCol        = "name"
-	MachineDescriptionCol = "description"
+	UserMachineSuffix        = "machines"
+	MachineUserIDCol         = "user_id"
+	MachineUserInstanceIDCol = "instance_id"
+	MachineNameCol           = "name"
+	MachineDescriptionCol    = "description"
 )
 
 func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserProjection {
@@ -74,13 +76,14 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserUsernameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
+			crdb.NewPrimaryKey(UserIDCol, UserInstanceIDCol),
 			crdb.WithIndex(crdb.NewIndex("username_idx", []string{UserUsernameCol})),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserResourceOwnerCol})),
 			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{UserIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
+			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(HumanUserInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(HumanFirstNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(HumanLastNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(HumanNickNameCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -93,16 +96,19 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(HumanPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(HumanIsPhoneVerifiedCol, crdb.ColumnTypeBool, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(HumanUserIDCol),
+			crdb.NewPrimaryKey(HumanUserIDCol, HumanUserInstanceIDCol),
 			UserHumanSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_human_ref_user")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
+			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MachineUserInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineDescriptionCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(MachineUserIDCol),
+			crdb.NewPrimaryKey(MachineUserIDCol, MachineUserInstanceIDCol),
 			UserMachineSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -262,6 +268,7 @@ func (p *UserProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCol(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(HumanFirstNameCol, e.FirstName),
 				handler.NewCol(HumanLastNameCol, e.LastName),
 				handler.NewCol(HumanNickNameCol, &sql.NullString{String: e.NickName, Valid: e.NickName != ""}),
@@ -299,6 +306,7 @@ func (p *UserProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCol(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(HumanFirstNameCol, e.FirstName),
 				handler.NewCol(HumanLastNameCol, e.LastName),
 				handler.NewCol(HumanNickNameCol, &sql.NullString{String: e.NickName, Valid: e.NickName != ""}),
@@ -325,6 +333,7 @@ func (p *UserProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*hand
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -341,6 +350,7 @@ func (p *UserProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -360,6 +370,7 @@ func (p *UserProjection) reduceUserLocked(event eventstore.Event) (*handler.Stat
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -379,6 +390,7 @@ func (p *UserProjection) reduceUserUnlocked(event eventstore.Event) (*handler.St
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -398,6 +410,7 @@ func (p *UserProjection) reduceUserDeactivated(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -417,6 +430,7 @@ func (p *UserProjection) reduceUserReactivated(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -431,6 +445,7 @@ func (p *UserProjection) reduceUserRemoved(event eventstore.Event) (*handler.Sta
 		e,
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -450,6 +465,7 @@ func (p *UserProjection) reduceUserNameChanged(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -493,12 +509,14 @@ func (p *UserProjection) reduceHumanProfileChanged(event eventstore.Event) (*han
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -520,6 +538,7 @@ func (p *UserProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handl
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -529,6 +548,7 @@ func (p *UserProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handl
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -550,6 +570,7 @@ func (p *UserProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -559,6 +580,7 @@ func (p *UserProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -580,6 +602,7 @@ func (p *UserProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -588,6 +611,7 @@ func (p *UserProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -609,6 +633,7 @@ func (p *UserProjection) reduceHumanEmailChanged(event eventstore.Event) (*handl
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -618,6 +643,7 @@ func (p *UserProjection) reduceHumanEmailChanged(event eventstore.Event) (*handl
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -639,6 +665,7 @@ func (p *UserProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -647,6 +674,7 @@ func (p *UserProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -668,6 +696,7 @@ func (p *UserProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handle
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -676,6 +705,7 @@ func (p *UserProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handle
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -697,6 +727,7 @@ func (p *UserProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*hand
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
@@ -705,6 +736,7 @@ func (p *UserProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*hand
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
@@ -735,6 +767,7 @@ func (p *UserProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(MachineUserIDCol, e.Aggregate().ID),
+				handler.NewCol(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(MachineNameCol, e.Name),
 				handler.NewCol(MachineDescriptionCol, &sql.NullString{String: e.Description, Valid: e.Description != ""}),
 			},
@@ -769,12 +802,14 @@ func (p *UserProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		),
 		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserMachineSuffix),
 		),

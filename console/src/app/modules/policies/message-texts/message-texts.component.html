@@ -32,7 +32,7 @@
   </cnsl-form-field>
 </div>
 
-<div class="content">
+<div class="message-text-content">
   <cnsl-edit-text
     [chips]="chips[currentType]"
     [disabled]="(canWrite$ | async) === false"
@@ -43,7 +43,7 @@
   ></cnsl-edit-text>
 </div>
 
-<div class="actions">
+<div class="message-text-actions">
   <button
     class="reset-button"
     *ngIf="(getCustomInitMessageTextMap$ | async) && (getCustomInitMessageTextMap$ | async)?.isDefault === false"
