@@ -28,12 +28,12 @@ const (
 	SecretGeneratorColumnIncludeSymbols      = "include_symbols"
 )
 
-type SecretGeneratorProjection struct {
+type secretGeneratorProjection struct {
 	crdb.StatementHandler
 }
 
-func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SecretGeneratorProjection {
-	p := new(SecretGeneratorProjection)
+func newSecretGeneratorProjection(ctx context.Context, config crdb.StatementHandlerConfig) *secretGeneratorProjection {
+	p := new(secretGeneratorProjection)
 	config.ProjectionName = SecretGeneratorProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -59,7 +59,7 @@ func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 	return p
 }
 
-func (p *SecretGeneratorProjection) reducers() []handler.AggregateReducer {
+func (p *secretGeneratorProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -81,7 +81,7 @@ func (p *SecretGeneratorProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *secretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
@@ -106,7 +106,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 	), nil
 }
 
-func (p *SecretGeneratorProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *secretGeneratorProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", instance.SecretGeneratorChangedEventType)
@@ -143,7 +143,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 	), nil
 }
 
-func (p *SecretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *secretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", instance.SecretGeneratorRemovedEventType)

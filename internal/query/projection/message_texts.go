@@ -33,12 +33,12 @@ const (
 	MessageTextFooterCol       = "footer_text"
 )
 
-type MessageTextProjection struct {
+type messageTextProjection struct {
 	crdb.StatementHandler
 }
 
-func NewMessageTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *MessageTextProjection {
-	p := new(MessageTextProjection)
+func newMessageTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *messageTextProjection {
+	p := new(messageTextProjection)
 	config.ProjectionName = MessageTextTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -66,7 +66,7 @@ func NewMessageTextProjection(ctx context.Context, config crdb.StatementHandlerC
 	return p
 }
 
-func (p *MessageTextProjection) reducers() []handler.AggregateReducer {
+func (p *messageTextProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -105,7 +105,7 @@ func (p *MessageTextProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextSetEvent
 	switch e := event.(type) {
 	case *org.CustomTextSetEvent:
@@ -155,7 +155,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 		cols), nil
 }
 
-func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextRemovedEvent
 	switch e := event.(type) {
 	case *org.CustomTextRemovedEvent:
@@ -204,7 +204,7 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	), nil
 }
 
-func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *messageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextTemplateRemovedEvent
 	switch e := event.(type) {
 	case *org.CustomTextTemplateRemovedEvent:

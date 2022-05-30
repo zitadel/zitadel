@@ -28,12 +28,12 @@ const (
 	LockoutPolicyShowLockOutFailuresCol = "show_failure"
 )
 
-type LockoutPolicyProjection struct {
+type lockoutPolicyProjection struct {
 	crdb.StatementHandler
 }
 
-func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LockoutPolicyProjection {
-	p := new(LockoutPolicyProjection)
+func newLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *lockoutPolicyProjection {
+	p := new(lockoutPolicyProjection)
 	config.ProjectionName = LockoutPolicyTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -56,7 +56,7 @@ func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandle
 	return p
 }
 
-func (p *LockoutPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *lockoutPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -91,7 +91,7 @@ func (p *LockoutPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *lockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LockoutPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -120,7 +120,7 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		}), nil
 }
 
-func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *lockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LockoutPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.LockoutPolicyChangedEvent:
@@ -148,7 +148,7 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 		}), nil
 }
 
-func (p *LockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *lockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LockoutPolicyRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Bqut9", "reduce.wrong.event.type %s", org.LockoutPolicyRemovedEventType)

@@ -25,12 +25,12 @@ const (
 	InstanceColumnDefaultLanguage = "default_language"
 )
 
-type InstanceProjection struct {
+type instanceProjection struct {
 	crdb.StatementHandler
 }
 
-func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConfig) *InstanceProjection {
-	p := new(InstanceProjection)
+func newInstanceProjection(ctx context.Context, config crdb.StatementHandlerConfig) *instanceProjection {
+	p := new(instanceProjection)
 	config.ProjectionName = InstanceProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -53,7 +53,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 	return p
 }
 
-func (p *InstanceProjection) reducers() []handler.AggregateReducer {
+func (p *instanceProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -83,7 +83,7 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *InstanceProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-29nlS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
@@ -100,7 +100,7 @@ func (p *InstanceProjection) reduceInstanceAdded(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.GlobalOrgSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.GlobalOrgSetEventType)
@@ -118,7 +118,7 @@ func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ProjectSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
@@ -136,7 +136,7 @@ func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ConsoleSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
@@ -155,7 +155,7 @@ func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 	), nil
 }
 
-func (p *InstanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DefaultLanguageSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)

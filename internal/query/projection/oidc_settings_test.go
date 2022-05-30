@@ -30,7 +30,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 					[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
 				), instance.OIDCSettingsChangedEventMapper),
 			},
-			reduce: (&OIDCSettingsProjection{}).reduceOIDCSettingsChanged,
+			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsChanged,
 			want: wantReduce{
 				projection:       OIDCSettingsProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -63,7 +63,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 					[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
 				), instance.OIDCSettingsAddedEventMapper),
 			},
-			reduce: (&OIDCSettingsProjection{}).reduceOIDCSettingsAdded,
+			reduce: (&oidcSettingsProjection{}).reduceOIDCSettingsAdded,
 			want: wantReduce{
 				projection:       OIDCSettingsProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),

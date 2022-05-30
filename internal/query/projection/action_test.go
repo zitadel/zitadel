@@ -31,7 +31,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
 				), action.AddedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionAdded,
+			reduce: (&actionProjection{}).reduceActionAdded,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -68,7 +68,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "name2", "script":"name2(){}"}`),
 				), action.ChangedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionChanged,
+			reduce: (&actionProjection{}).reduceActionChanged,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -99,7 +99,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), action.DeactivatedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionDeactivated,
+			reduce: (&actionProjection{}).reduceActionDeactivated,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -129,7 +129,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), action.ReactivatedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionReactivated,
+			reduce: (&actionProjection{}).reduceActionReactivated,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -159,7 +159,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), action.RemovedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionRemoved,
+			reduce: (&actionProjection{}).reduceActionRemoved,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),

@@ -17,12 +17,12 @@ const (
 	InstanceMemberIAMIDCol = "id"
 )
 
-type InstanceMemberProjection struct {
+type instanceMemberProjection struct {
 	crdb.StatementHandler
 }
 
-func NewInstanceMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *InstanceMemberProjection {
-	p := new(InstanceMemberProjection)
+func newInstanceMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *instanceMemberProjection {
+	p := new(instanceMemberProjection)
 	config.ProjectionName = InstanceMemberProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -37,7 +37,7 @@ func NewInstanceMemberProjection(ctx context.Context, config crdb.StatementHandl
 	return p
 }
 
-func (p *InstanceMemberProjection) reducers() []handler.AggregateReducer {
+func (p *instanceMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -72,7 +72,7 @@ func (p *InstanceMemberProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *InstanceMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", instance.MemberAddedEventType)
@@ -80,7 +80,7 @@ func (p *InstanceMemberProjection) reduceAdded(event eventstore.Event) (*handler
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(InstanceMemberIAMIDCol, e.Aggregate().ID))
 }
 
-func (p *InstanceMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-5WQcZ", "reduce.wrong.event.type %s", instance.MemberChangedEventType)
@@ -88,7 +88,7 @@ func (p *InstanceMemberProjection) reduceChanged(event eventstore.Event) (*handl
 	return reduceMemberChanged(e.MemberChangedEvent)
 }
 
-func (p *InstanceMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberCascadeRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dmdf2", "reduce.wrong.event.type %s", instance.MemberCascadeRemovedEventType)
@@ -96,7 +96,7 @@ func (p *InstanceMemberProjection) reduceCascadeRemoved(event eventstore.Event) 
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent)
 }
 
-func (p *InstanceMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-exVqy", "reduce.wrong.event.type %s", instance.MemberRemovedEventType)
@@ -104,7 +104,7 @@ func (p *InstanceMemberProjection) reduceRemoved(event eventstore.Event) (*handl
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.UserID))
 }
 
-func (p *InstanceMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-mkDHF", "reduce.wrong.event.type %s", user.UserRemovedType)

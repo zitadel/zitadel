@@ -150,6 +150,8 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 }
 
 func (q *Queries) Instance(ctx context.Context) (*Instance, error) {
+	projection.InstanceProjection.TriggerBulk(ctx)
+
 	stmt, scan := prepareInstanceDomainQuery(authz.GetInstance(ctx).RequestedDomain())
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),

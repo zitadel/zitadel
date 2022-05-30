@@ -45,7 +45,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMSConfigTwilioAddedEventMapper),
 			},
-			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioAdded,
+			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -94,7 +94,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMSConfigTwilioChangedEventMapper),
 			},
-			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioChanged,
+			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -135,7 +135,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMSConfigActivatedEventMapper),
 			},
-			reduce: (&SMSConfigProjection{}).reduceSMSConfigActivated,
+			reduce: (&smsConfigProjection{}).reduceSMSConfigActivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -168,7 +168,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMSConfigDeactivatedEventMapper),
 			},
-			reduce: (&SMSConfigProjection{}).reduceSMSConfigDeactivated,
+			reduce: (&smsConfigProjection{}).reduceSMSConfigDeactivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -201,7 +201,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMSConfigRemovedEventMapper),
 			},
-			reduce: (&SMSConfigProjection{}).reduceSMSConfigRemoved,
+			reduce: (&smsConfigProjection{}).reduceSMSConfigRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
