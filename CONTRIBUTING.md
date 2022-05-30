@@ -101,7 +101,7 @@ ZITADEL loads translations from four files:
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
 
-### Make a PR
+## Make a PR
 
 If you like to contribute fork the ZITADEL repository. After you implemented the new feature create a PullRequest in the ZITADEL repository.
 
