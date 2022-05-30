@@ -59,7 +59,7 @@
     "@angular-eslint/schematics": "^13.1.0",
     "@angular-eslint/template-parser": "^13.1.0",
     "@angular/cli": "~13.3.6",
-    "@angular/compiler-cli": "~13.3.9",
+    "@angular/compiler-cli": "~13.3.10",
     "@angular/language-service": "~13.3.9",
     "@types/jasmine": "~3.10.3",
     "@types/jasminewd2": "~2.0.10",
