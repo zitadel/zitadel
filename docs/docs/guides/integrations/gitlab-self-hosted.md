@@ -2,18 +2,18 @@
 title: Gitlab OmniAuth Provider
 ---
 
-This guide shows how to enable login with ZITADEL on self hosted gitlab instances.
+This guide shows how to enable login with ZITADEL on self-hosted Gitlab instances.
 
 It covers how to:
 
 - create and configure the application in your ZITADEL project
-- create and configure the connection in gitlab self hosted
+- create and configure the connection in a self-hosted Gitlab instance
 
-Prerequisits:
+Prerequisites:
 
-- existing ZITADEL organisation, if not present follow [this guide](../../guides/basics/get-started#trying-out-zitadel-on-zitadelch)
+- existing ZITADEL organization, if not present follow [this guide](../../guides/basics/get-started#trying-out-zitadel-on-zitadelch)
 - existing project, if not present follow the first 3 steps [here](../../guides/basics/projects#exercise---create-a-simple-project)
-- running gitlab instance see [installation guide](https://docs.gitlab.com/ee/install/)
+- running Gitlab instance see [installation guide](https://docs.gitlab.com/ee/install/)
 
 import CreateApp from "./application/application.mdx";
 
@@ -34,17 +34,17 @@ gitlab_rails['omniauth_providers'] = [
   {
     name: "openid_connect",
     label: "ZITADEL",
-    icon: "https://{your_domain}/ui/console/assets/icons/favicon-32x32.png",
+    icon: "https://<YOUR_DOMAIN>/ui/console/assets/icons/favicon-32x32.png",
     args: {
       name: "openid_connect",
       scope: ["openid","profile","email"],
       response_type: "code",
-      issuer: "https://{your_domain}",
+      issuer: "https://<YOUR_DOMAIN>",
       discovery: true,
       client_options: {
         identifier: "<CLIENT ID from ZITADEL>",
         secret: "<CLIENT SECRET from ZITADEL>",
-        redirect_uri: "https://<your_gitlab_url>/users/auth/openid_connect/callback"
+        redirect_uri: "https://<YOUR_GITLAB_URL>/users/auth/openid_connect/callback"
       }
     }
   }

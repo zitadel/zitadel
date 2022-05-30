@@ -4,7 +4,7 @@ export default function RedirectURIs(props) {
     return ['web', 'native', 'user-agent'].includes(props.appType) ? (
         <div>
             <p>
-                During the login flow the application defines where the users is redirected to after login or logout.
+                During the login flow the application defines where a user is redirected to after login or logout.
                 <br/>
                 ZITADEL verifies if the URL the user gets redirected to is valid by checking if one of the redirect URIs match.
             </p>
@@ -23,6 +23,9 @@ export default function RedirectURIs(props) {
                 }
             </ul>
             <ThemedImage
+            <Admonition type="note">
+                <p>The default redirect uri of your app is <code>{props.redirectURI}</code></p>
+            </Admonition>
                 alt="Redirect URIs configuration"
                 sources={{
                     light: '/img/guides/application/redirect-uris-light.png',

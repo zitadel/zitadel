@@ -2,29 +2,29 @@
 title: Connect with Auth0
 ---
 
-This guide shows how to enable login with ZITADEL on auth0.
+This guide shows how to enable login with ZITADEL on Auth0.
 
 It covers how to:
 
 - create and configure the application in your project
-- create and configure the connection in your auth0 tenant
+- create and configure the connection in your Auth0 tenant
 
-Prerequisits:
+Prerequisites:
 
-- existing ZITADEL organisation, if not present follow [this guide](../../guides/basics/get-started#trying-out-zitadel-on-zitadelch)
+- existing ZITADEL organization, if not present follow [this guide](../../guides/basics/get-started#trying-out-zitadel-on-zitadelch)
 - existing project, if not present follow the first 3 steps [here](../../guides/basics/projects#exercise---create-a-simple-project)
-- existing auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
+- existing Auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
 
-We have to switch between ZITADEL and auth0. If the headings begin with "ZITADEL" switch to the ZITADEL console and if the headings start with auth0 please switch to the auth0 gui.
+> We have to switch between ZITADEL and a Auth0. If the headings begin with "ZITADEL" switch to the ZITADEL Console and if the headings start with Auth0 please switch to the Auth0 GUI.
 
-## **auth0**: Create a new connection
+## **Auth0**: Create a new connection
 
 In Authentication > Enterprise
 
 1. Press the "+" button right to "OpenID Connect"  
   ![Create new connection](/img/oidc/auth0/auth0-create-app.png)
 2. Set a connection name for example "ZITADEL"
-3. The issuer url is `https://{your_domain}/.well-known/openid-configuration`
+3. The issuer url is `https://<YOUR_DOMAIN>/.well-known/openid-configuration`
 4. Copy the callback URL (ending with `/login/callback`)
 
 The configuration should look like this:
@@ -41,10 +41,10 @@ import CreateApp from "./application/application.mdx";
 
 <CreateApp appType="web" authType="code" appName="Auth0" redirectURI="https://<TENANT>.<REGION>.auth0.com/login/callback"/>
 
-## **auth0**: Connect ZITADEL
+## **Auth0**: Connect ZITADEL
 
-1. Copy the client id from ZITADEL and past it into the "Client ID" field
-2. Copy the client secret from ZITADEL and past it into the "Client Secret" field
+1. Copy the client id from ZITADEL and past it into the **Client ID** field
+2. Copy the client secret from ZITADEL and past it into the **Client Secret** field
    ![full configuration](/img/oidc/auth0/auth0-full.png)
 3. click Create
 4. To verify the connection go to the "Applications" tab and enable the Default App
