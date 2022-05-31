@@ -13,30 +13,31 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
-func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
-	events, addedProject, err := c.addProject(ctx, project, resourceOwner, ownerUserID)
+func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID, projectID string) (_ *domain.Project, err error) {
+	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
-	if err != nil {
-		return nil, err
+	if existingProject != nil {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
 	}
-	err = AppendAndReduce(addedProject, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return projectWriteModelToProject(addedProject), nil
+	return c.addProjectWithID(ctx, project, resourceOwner, ownerUserID, projectID)
 }
 
-func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ []eventstore.Command, _ *ProjectWriteModel, err error) {
-	if !projectAdd.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
-	}
-	projectAdd.AggregateID, err = c.idGenerator.Next()
+func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
+	projectID, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+
+	return c.addProjectWithID(ctx, project, resourceOwner, ownerUserID, projectID)
+}
+
+func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID, projectID string) (_ *domain.Project, err error) {
+	if !projectAdd.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
+	}
+	projectAdd.AggregateID = projectID
 	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
@@ -52,7 +53,16 @@ func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, r
 			projectAdd.PrivateLabelingSetting),
 		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
 	}
-	return events, addedProject, nil
+
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(addedProject, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return projectWriteModelToProject(addedProject), nil
 }
 
 func AddProjectCommand(

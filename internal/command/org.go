@@ -21,17 +21,19 @@ type OrgSetup struct {
 	Human        AddHuman
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string) (string, *domain.ObjectDetails, error) {
-	orgID, err := c.idGenerator.Next()
+func (c *Commands) SetUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, *domain.ObjectDetails, error) {
+	existingOrg, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
 		return "", nil, err
 	}
-
-	userID, err := c.idGenerator.Next()
-	if err != nil {
-		return "", nil, err
+	if existingOrg != nil {
+		return "", nil, errors.ThrowPreconditionFailed(nil, "COMMAND-poaj2", "Errors.Org.AlreadyExisting")
 	}
 
+	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+}
+
+func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
@@ -61,6 +63,20 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string)
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
 	}, nil
+}
+
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string) (string, *domain.ObjectDetails, error) {
+	orgID, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+
+	userID, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
 }
 
 //AddOrgCommand defines the commands to create a new org,

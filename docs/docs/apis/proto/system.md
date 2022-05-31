@@ -130,6 +130,18 @@ Returns the domain of an instance
     POST: /instances/{instance_id}/domains/_set_primary
 
 
+### ImportInstanceData
+
+> **rpc** ImportInstanceData([ImportInstanceDataRequest](#importinstancedatarequest))
+[ImportInstanceDataResponse](#importinstancedataresponse)
+
+Imports data into instance and creates different objects
+
+
+
+    POST: /instances/{instance_id}/import
+
+
 ### ListViews
 
 > **rpc** ListViews([ListViewsRequest](#listviewsrequest))
@@ -150,8 +162,8 @@ they represent the delta of the event happend on the objects
 [ClearViewResponse](#clearviewresponse)
 
 Truncates the delta of the change stream
-be carefull with this function because ZITADEL has to 
-recompute the deltas after they got cleared. 
+be carefull with this function because ZITADEL has to
+recompute the deltas after they got cleared.
 Search requests will return wrong results until all deltas are recomputed
 
 
@@ -165,7 +177,7 @@ Search requests will return wrong results until all deltas are recomputed
 [ListFailedEventsResponse](#listfailedeventsresponse)
 
 Returns event descriptions which cannot be processed.
-It's possible that some events need some retries. 
+It's possible that some events need some retries.
 For example if the SMTP-API wasn't able to send an email at the first time
 
 
@@ -180,7 +192,7 @@ For example if the SMTP-API wasn't able to send an email at the first time
 
 Deletes the event from failed events view.
 the event is not removed from the change stream
-This call is usefull if the system was able to process the event later. 
+This call is usefull if the system was able to process the event later.
 e.g. if the second try of sending an email was successful. the first try produced a
 failed event. You can find out if it worked on the `failure_count`
 
@@ -421,6 +433,145 @@ This is an empty request
 
 ### HealthzResponse
 This is an empty response
+
+
+
+
+### ImportInstanceDataAPIApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddAPIAppRequest | - |  |
+
+
+
+
+### ImportInstanceDataAction
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| action_id |  string | - |  |
+| action |  zitadel.management.v1.CreateActionRequest | - |  |
+
+
+
+
+### ImportInstanceDataError
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  string | - |  |
+| id |  string | - |  |
+| message |  string | - |  |
+
+
+
+
+### ImportInstanceDataHumanUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  zitadel.management.v1.AddHumanUserRequest | - |  |
+
+
+
+
+### ImportInstanceDataMachineUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  zitadel.management.v1.AddMachineUserRequest | - |  |
+
+
+
+
+### ImportInstanceDataOIDCApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddOIDCAppRequest | - |  |
+
+
+
+
+### ImportInstanceDataOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| owner_id |  string | - |  |
+| org |  zitadel.management.v1.AddOrgRequest | - |  |
+| domain_policy |  zitadel.admin.v1.AddCustomDomainPolicyRequest | - |  |
+| label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
+| lockout_policy |  zitadel.management.v1.AddCustomLockoutPolicyRequest | - |  |
+| login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
+| password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
+| privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
+| projects | repeated ImportInstanceDataProject | - |  |
+| api_apps | repeated ImportInstanceDataAPIApplication | - |  |
+| oidc_apps | repeated ImportInstanceDataOIDCApplication | - |  |
+| human_users | repeated ImportInstanceDataHumanUser | - |  |
+| machine_users | repeated ImportInstanceDataMachineUser | - |  |
+| actions | repeated ImportInstanceDataAction | - |  |
+| project_grants | repeated zitadel.management.v1.AddProjectGrantRequest | - |  |
+| user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
+| org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
+| project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
+| project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+
+
+
+
+### ImportInstanceDataProject
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| owner_id |  string | - |  |
+| project |  zitadel.management.v1.AddProjectRequest | - |  |
+
+
+
+
+### ImportInstanceDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - |  |
+| orgs | repeated ImportInstanceDataOrg | - |  |
+
+
+
+
+### ImportInstanceDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| errors | repeated ImportInstanceDataError | - |  |
 
 
 

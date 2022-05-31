@@ -184,6 +184,21 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
+	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToAddHuman(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddHumanUserResponse{
+		UserId: details.ID,
+		Details: obj_grpc.AddToDetailsPb(
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner,
+		),
+	}, nil
+}
+
+func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.AddHuman {
 	lang, err := language.Parse(req.Profile.PreferredLanguage)
 	logging.OnError(err).Debug("unable to parse language")
 
@@ -211,18 +226,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 			Verified: req.Phone.IsPhoneVerified,
 		}
 	}
-	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human)
-	if err != nil {
-		return nil, err
-	}
-	return &mgmt_pb.AddHumanUserResponse{
-		UserId: details.ID,
-		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
-	}, nil
+	return human
 }
 
 func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {

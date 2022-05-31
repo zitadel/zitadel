@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -10,6 +9,26 @@ import (
 )
 
 func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
+	userID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	return c.addMachineWithID(ctx, orgID, userID, machine)
+}
+
+func (c *Commands) AddMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
+	existingMachine, err := c.machineWriteModelByID(ctx, machine.AggregateID, machine.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if isUserStateExists(existingMachine.UserState) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-k2una", "Errors.User.AlreadyExisting")
+	}
+
+	return c.addMachineWithID(ctx, orgID, userID, machine)
+}
+
+func (c *Commands) addMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
 	if !machine.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 	}
@@ -19,10 +38,6 @@ func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain
 	}
 	if !domainPolicy.UserLoginMustBeDomain {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.Invalid")
-	}
-	userID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
 	}
 	machine.AggregateID = userID
 	addedMachine := NewMachineWriteModel(machine.AggregateID, orgID)

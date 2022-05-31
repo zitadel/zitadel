@@ -1,6 +1,8 @@
 package system
 
 import (
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/admin/repository"
@@ -26,6 +28,7 @@ type Server struct {
 	query           *query.Queries
 	administrator   repository.AdministratorRepository
 	DefaultInstance command.InstanceSetup
+	passwordHashAlg crypto.HashAlgorithm
 }
 
 type Config struct {
@@ -34,6 +37,7 @@ type Config struct {
 
 func CreateServer(command *command.Commands,
 	query *query.Queries,
+	sd systemdefaults.SystemDefaults,
 	repo repository.Repository,
 	database string,
 	defaultInstance command.InstanceSetup,
@@ -44,6 +48,7 @@ func CreateServer(command *command.Commands,
 		administrator:   repo,
 		database:        database,
 		DefaultInstance: defaultInstance,
+		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 	}
 }
 

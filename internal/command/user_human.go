@@ -54,13 +54,21 @@ type AddHuman struct {
 	Register               bool
 }
 
-func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
-	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
-	}
-	userID, err := c.idGenerator.Next()
+func (c *Commands) AddHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman) (*domain.HumanDetails, error) {
+	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if isUserStateExists(existingHuman.UserState) {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
+	}
+
+	return c.addHumanWithID(ctx, resourceOwner, userID, human)
+}
+
+func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman) (*domain.HumanDetails, error) {
+	if resourceOwner == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 	agg := user.NewAggregate(userID, resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddHumanCommand(agg, human, c.userPasswordAlg, c.userEncryption))
@@ -81,6 +89,15 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 			ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 		},
 	}, nil
+}
+
+func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
+	userID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.addHumanWithID(ctx, resourceOwner, userID, human)
 }
 
 type humanCreationCommand interface {
