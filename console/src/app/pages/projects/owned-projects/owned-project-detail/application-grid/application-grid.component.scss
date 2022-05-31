@@ -54,12 +54,18 @@
     .name {
       font-size: 14px;
       text-align: center;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
     }
 
     .type {
       font-size: 12px;
       color: #8a868a;
       text-align: center;
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 }
