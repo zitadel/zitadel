@@ -26,6 +26,7 @@ In the profile data you can change the following data:
 
 In the contact information you can change your password, email and phone number. The Email and Phone number need to be verified.
 
+![Profile](/img/manuals/console_profile.png)
 ### Change Password
 
 Change your password by entering your old, new and new confirmation password.
@@ -54,3 +55,45 @@ The phone number is not mandatory withing ZITADEL. If you like to add it, you ha
 5. Enter the code a click "OK"
 
 Your phone number should now be verified.
+
+## Identity Providers
+
+The identity provider section shows you, if you have linked an account from another system. (e.g. Google Account, Github, Azure AD, etc)
+If you have some linked accounts, in this section you can remove them, if you don't need them anymore.
+
+## Passwordless
+
+ZITADEL provides some different authentication methods, passwordless is one of them.
+Passwordless has two different types, system based or system independent.
+
+If you use system based methods make sure to register all the different devices you need to login. (e.g. Notebook, Mobile Phone, etc)
+ 
+Examples for passwordless authentication methods are: Fingerprint, Windows Hello, Face Recognition, etc.
+For device independent authentication you can use some hardware tokens. e.g. Yubikey, Solokey, etc.
+
+## Multifactor Authentication
+
+Multifactor authentication means that after entering the password, you need some kind of second authentication.
+At the moment ZITADEL provides Webauthn and OTP.
+Webauthn uses your device to authenticate e.g Fingerprint, Face Recognition, Windows Hello.
+OTP means One time password, to use this method you need to install some kind of Authenticator App like Google Authenticator, Authy, Microsoft Authenticator.
+
+
+## Authorization
+
+In the authorization section you can see all the permissions and roles you have to some different applications.
+
+## Memberships
+
+Membership is the role model ZITADEL provides for itself. If you have any permissions to manage something within ZITADEL you will have a membership.
+This memeberships are hierarchical and have the following layers:
+- System
+- Organization
+- Project
+- Granted Project
+
+To read more about the different roles withing ZITADEL click [here](../concepts/structure/managers.md).
+
+## Metadata
+
+Sometimes it is needed to store some more data on a user. This data can be stored in the metadata.
