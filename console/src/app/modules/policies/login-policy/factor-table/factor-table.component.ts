@@ -68,33 +68,53 @@ export class FactorTableComponent {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new MgmtRemoveMultiFactorFromLoginPolicyRequest();
             req.setType(type as MultiFactorType);
-            (this.service as ManagementService).removeMultiFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            (this.service as ManagementService)
+              .removeMultiFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new MgmtRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
-            (this.service as ManagementService).removeSecondFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            (this.service as ManagementService)
+              .removeSecondFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           }
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new AdminRemoveMultiFactorFromLoginPolicyRequest();
             req.setType(type as MultiFactorType);
-            (this.service as AdminService).removeMultiFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            (this.service as AdminService)
+              .removeMultiFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new AdminRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
-            (this.service as AdminService).removeSecondFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            (this.service as AdminService)
+              .removeSecondFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           }
         }
       }

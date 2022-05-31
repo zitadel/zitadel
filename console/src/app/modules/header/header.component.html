@@ -10,20 +10,20 @@
         alt="home logo"
         *ngIf="isDarkTheme; else customlighttheme"
         [src]="labelpolicy?.iconUrlDark ? labelpolicy.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
-        onerror="this.src='./assets/images/zitadel-logo-solo-light.svg';this.onerror='';"
+        (error)="errorHandler($event, './assets/images/zitadel-logo-solo-light.svg')"
       />
       <ng-template #customlighttheme>
         <img
           alt="home logo"
           class="logo"
           [src]="labelpolicy?.iconUrl ? labelpolicy.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
-          onerror="this.src='./assets/images/zitadel-logo-solo-dark.svg';this.onerror='';"
+          (error)="errorHandler($event, './assets/images/zitadel-logo-solo-dark.svg')"
         />
       </ng-template>
     </a>
 
     <ng-template #defaultHome>
-      <a *ngIf="org" class="title" [routerLink]="['/']">
+      <a class="title" [routerLink]="['/']">
         <img
           class="logo"
           alt="zitadel logo"
@@ -31,7 +31,7 @@
           src="./assets/images/zitadel-logo-solo-light.svg"
         />
         <ng-template #lighttheme>
-          <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
+          <img alt="zitadel logo" class="logo" src="./assets/images/zitadel-logo-solo-dark.svg" />
         </ng-template>
       </a>
     </ng-template>

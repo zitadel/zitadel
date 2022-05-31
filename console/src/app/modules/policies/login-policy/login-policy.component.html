@@ -50,7 +50,7 @@
   </cnsl-form-field>
 </div>
 
-<cnsl-card class="max-card-width">
+<cnsl-card class="max-card-width" *ngIf="loginData">
   <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
@@ -100,7 +100,7 @@
     {{ 'POLICY.DATA.FORCEMFA' | translate }}
   </mat-checkbox>
 </div>
-<cnsl-card class="max-card-width">
+<cnsl-card class="max-card-width" *ngIf="loginData">
   <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
