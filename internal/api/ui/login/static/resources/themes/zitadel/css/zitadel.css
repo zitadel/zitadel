@@ -38,7 +38,7 @@
   --zitadel-color-background-800: rgb(168, 168, 168);
   --zitadel-color-background-900: rgb(142, 142, 142);
   --zitadel-color-background-contrast: rgb(0, 0, 0);
-  --zitadel-color-footer-line: #e3e8ee;
+  --zitadel-color-footer-line: rgba(0, 0, 0, 0.12);
   --zitadel-color-input-background: #00000003;
   --zitadel-color-input-border: #00000040;
   --zitadel-color-input-border-hover: #1a1b1b;
@@ -64,7 +64,10 @@
   --zitadel-color-state-success-background: #cbf4c9;
   --zitadel-color-state-warn-font: #620e0e;
   --zitadel-color-state-warn-background: #ffc1c1;
-  --zitadel-color-footer-background: #00000008;
+  --zitadel-color-footer-background: #00000002;
+  --zitadel-color-footer-background-mozilla: var(
+    --zitadel-color-background-600
+  );
   --zitadel-color-divider: rgba(0, 0, 0, 0.12);
   --zitadel-color-button-disabled: rgba(0, 0, 0, 0.26);
   --zitadel-color-button-disabled-background: rgba(0, 0, 0, 0.12);
@@ -131,7 +134,7 @@
   --zitadel-color-background-800: rgb(25, 25, 25);
   --zitadel-color-background-900: rgb(23, 23, 23);
   --zitadel-color-background-contrast: rgb(255, 255, 255);
-  --zitadel-color-footer-line: #303131;
+  --zitadel-color-footer-line: rgba(255, 255, 255, 0.12);
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
   --zitadel-color-input-border: #403e3e;
   --zitadel-color-input-border-hover: #aeafb1;
@@ -158,6 +161,9 @@
   --zitadel-color-state-warn-font: #ffc1c1;
   --zitadel-color-state-warn-background: #af455359;
   --zitadel-color-footer-background: #00000020;
+  --zitadel-color-footer-background-mozilla: var(
+    --zitadel-color-background-600
+  );
   --zitadel-color-divider: rgba(255, 255, 255, 0.12);
   --zitadel-color-button-disabled: rgba(0, 0, 0, 0.26);
   --zitadel-color-button-disabled-background: rgba(255, 255, 255, 0.12);
@@ -405,6 +411,9 @@ select::placeholder, .lgn-select::placeholder {
   margin: 0 0 2px 0;
   font-weight: 400;
 }
+.lgn-label * {
+  font-size: 12px;
+}
 
 @keyframes ripple {
   0% {
@@ -558,7 +567,7 @@ a.block {
 }
 
 .lgn-max-width-wrapper {
-  max-width: 400px;
+  max-width: 440px;
   margin: auto;
   margin-top: 50px;
   margin-bottom: 50px;
@@ -708,6 +717,10 @@ i {
 .lgn-account-selection .lgn-account i {
   font-size: 1.2rem;
 }
+.lgn-account-selection .lgn-account i.account-add {
+  font-size: 1.4rem;
+  margin-left: 3px;
+}
 
 .lgn-avatar {
   height: 32px;
@@ -737,7 +750,7 @@ i {
   margin: 0 0 10px;
   font-size: 14px;
   line-height: 24px;
-  box-sizing: inherit;
+  box-sizing: border-box;
 }
 .lgn-checkbox input[type=checkbox] {
   position: absolute;
@@ -748,6 +761,7 @@ i {
   opacity: 0;
   z-index: 0;
   box-sizing: inherit;
+  margin: 2px;
 }
 .lgn-checkbox label {
   display: block;
@@ -757,13 +771,17 @@ i {
   font-size: 14px;
   line-height: 28px;
 }
+.lgn-checkbox label a {
+  text-decoration: underline;
+}
 .lgn-checkbox label:before {
   content: "";
   position: absolute;
-  top: 4px;
+  top: 6px;
   left: 0;
   width: 16px;
   height: 16px;
+  box-sizing: border-box;
   border-radius: 2px;
   transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   transition-property: background-color, border-color;
@@ -771,10 +789,10 @@ i {
 .lgn-checkbox label:after {
   content: "";
   position: absolute;
-  top: 5px;
+  top: 7px;
   left: 5px;
-  width: 6px;
-  height: 12px;
+  width: 4px;
+  height: 10px;
   transform: rotate(45deg);
   transition: border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -787,6 +805,9 @@ i {
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
+}
+.lgn-select:not([disabled]), select:not([disabled]) {
+  cursor: pointer;
 }
 .lgn-select::-ms-expand, select::-ms-expand {
   display: none;
@@ -1092,8 +1113,6 @@ i {
   font-weight: 400;
 }
 .lgn-success-label {
-  color: #0e6245;
-  background: #cbf4c9;
   border-radius: 0.5rem;
   padding: 0.5rem;
 }
@@ -1304,6 +1323,9 @@ select::placeholder, .lgn-select::placeholder {
   margin: 0 0 2px 0;
   font-weight: 400;
 }
+.lgn-label * {
+  font-size: 12px;
+}
 
 @keyframes ripple {
   0% {
@@ -1457,7 +1479,7 @@ a.block {
 }
 
 .lgn-max-width-wrapper {
-  max-width: 400px;
+  max-width: 440px;
   margin: auto;
   margin-top: 50px;
   margin-bottom: 50px;
@@ -1607,6 +1629,10 @@ i {
 .lgn-account-selection .lgn-account i {
   font-size: 1.2rem;
 }
+.lgn-account-selection .lgn-account i.account-add {
+  font-size: 1.4rem;
+  margin-left: 3px;
+}
 
 .lgn-avatar {
   height: 32px;
@@ -1636,7 +1662,7 @@ i {
   margin: 0 0 10px;
   font-size: 14px;
   line-height: 24px;
-  box-sizing: inherit;
+  box-sizing: border-box;
 }
 .lgn-checkbox input[type=checkbox] {
   position: absolute;
@@ -1647,6 +1673,7 @@ i {
   opacity: 0;
   z-index: 0;
   box-sizing: inherit;
+  margin: 2px;
 }
 .lgn-checkbox label {
   display: block;
@@ -1656,13 +1683,17 @@ i {
   font-size: 14px;
   line-height: 28px;
 }
+.lgn-checkbox label a {
+  text-decoration: underline;
+}
 .lgn-checkbox label:before {
   content: "";
   position: absolute;
-  top: 4px;
+  top: 6px;
   left: 0;
   width: 16px;
   height: 16px;
+  box-sizing: border-box;
   border-radius: 2px;
   transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   transition-property: background-color, border-color;
@@ -1670,10 +1701,10 @@ i {
 .lgn-checkbox label:after {
   content: "";
   position: absolute;
-  top: 5px;
+  top: 7px;
   left: 5px;
-  width: 6px;
-  height: 12px;
+  width: 4px;
+  height: 10px;
   transform: rotate(45deg);
   transition: border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1686,6 +1717,9 @@ i {
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
+}
+.lgn-select:not([disabled]), select:not([disabled]) {
+  cursor: pointer;
 }
 .lgn-select::-ms-expand, select::-ms-expand {
   display: none;
@@ -1991,8 +2025,6 @@ i {
   font-weight: 400;
 }
 .lgn-success-label {
-  color: #0e6245;
-  background: #cbf4c9;
   border-radius: 0.5rem;
   padding: 0.5rem;
 }
@@ -2266,7 +2298,7 @@ i {
   font-weight: 400;
 }
 .lgn-max-width-wrapper {
-  max-width: 400px;
+  max-width: 440px;
   margin: auto;
   margin-top: 50px;
   margin-bottom: 50px;
@@ -2756,6 +2788,13 @@ input[type=checkbox]:checked + label:after {
 footer {
   background-color: var(--zitadel-color-footer-background);
   border-top: 1px solid var(--zitadel-color-footer-line);
+  backdrop-filter: blur(10px);
+}
+@-moz-document url-prefix() {
+  footer {
+    background-color: var(--zitadel-color-footer-background-mozilla);
+    backdrop-filter: none;
+  }
 }
 footer a {
   color: var(--zitadel-color-font-500);
@@ -2847,14 +2886,17 @@ a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):hover, a:not
   background-image: var(--zitadel-icon-select);
 }
 
-.lgn-list li::before, ul li::before {
+.lgn-list li::before,
+ul li::before {
   color: var(--zitadel-color-primary);
 }
-.lgn-list li i.lgn-warn, ul li i.lgn-warn {
+.lgn-list li i.lgn-warn,
+ul li i.lgn-warn {
   color: var(--zitadel-color-warn);
 }
-.lgn-list li i.lgn-valid, ul li i.lgn-valid {
-  color: #85d996;
+.lgn-list li i.lgn-valid,
+ul li i.lgn-valid {
+  color: var(--zitadel-color-success);
 }
 
 .lgn-idp {
