@@ -56,7 +56,8 @@
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.MultiFactor"
     [list]="loginData.multiFactorsList"
-    (listChanged)="fetchData()"
+    (typeRemoved)="removeFactor($event)"
+    (typeAdded)="addFactor($event)"
     [disabled]="
       loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
       ([

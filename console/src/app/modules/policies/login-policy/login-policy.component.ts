@@ -254,44 +254,46 @@ export class LoginPolicyComponent implements OnInit {
     }
   }
 
-  public async removeFactor(request: Promise<any>): Promise<any> {
+  public removeFactor(request: Promise<unknown>): void {
     // create policy before types can be removed
-    const task: Promise<any> = this.isDefault
-      ? this.updateData()
-          .then(() => {
-            return request;
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          })
-      : request;
-
-    return task
-      .then(() => {
-        this.toast.showInfo('MFA.TOAST.DELETED', true);
-        setTimeout(() => {
-          this.fetchData();
-        }, 2000);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    if (this.isDefault) {
+      console.log('create policy');
+      this.updateData()
+        .then(() => {
+          return request;
+        })
+        .then(() => {
+          this.toast.showInfo('MFA.TOAST.DELETED', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    } else {
+      request
+        .then(() => {
+          this.toast.showInfo('MFA.TOAST.DELETED', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
   }
 
-  public async addFactor(request: Promise<any>): Promise<any> {
+  public addFactor(request: Promise<unknown>): void {
     // create policy before types can be added
-    const task: Promise<any> = this.isDefault
-      ? this.updateData()
-          .then(() => {
-            console.log('created');
-            return request;
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          })
+    const task: Promise<unknown> = this.isDefault
+      ? this.updateData().then(() => {
+          return request;
+        })
       : request;
 
-    return task
+    task
       .then(() => {
         this.toast.showInfo('MFA.TOAST.ADDED', true);
         setTimeout(() => {
