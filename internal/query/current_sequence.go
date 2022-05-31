@@ -196,7 +196,7 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 			CurrentSequenceColTimestamp.identifier()).
 			From(currentSequencesTable.identifier() + " AS OF SYSTEM TIME '-1ms'").PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestSequence, error) {
-			seq := &LatestSequence{Timestamp: time.Now()}
+			seq := new(LatestSequence)
 			err := row.Scan(
 				&seq.Sequence,
 				&seq.Timestamp,

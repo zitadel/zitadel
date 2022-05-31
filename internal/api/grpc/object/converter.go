@@ -69,11 +69,15 @@ func ToListDetails(
 	processedSequence uint64,
 	viewTimestamp time.Time,
 ) *object_pb.ListDetails {
-	return &object_pb.ListDetails{
+	details := &object_pb.ListDetails{
 		TotalResult:       totalResult,
 		ProcessedSequence: processedSequence,
-		ViewTimestamp:     timestamppb.New(viewTimestamp),
 	}
+	if !viewTimestamp.IsZero() {
+		details.ViewTimestamp = timestamppb.New(viewTimestamp)
+	}
+
+	return details
 }
 
 func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
