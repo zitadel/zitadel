@@ -71,12 +71,46 @@ If you use system based methods make sure to register all the different devices 
 Examples for passwordless authentication methods are: Fingerprint, Windows Hello, Face Recognition, etc.
 For device independent authentication you can use some hardware tokens. e.g. Yubikey, Solokey, etc.
 
+There are different options how to add a passwordless autehntication.
+1. Add directly on the current device
+2. Send a registration link to your email. You can open this email and use the link on any device you like to register
+3. Generate a qr code with a registration link and scann the QR Code with the device where you like to register 
+
+Make sure to add at least to different devices or a device independent method
+
+![Add Passwordless fingerprint](/img/manuals/console_profile_passwordless.gif)
+
 ## Multifactor Authentication
 
 Multifactor authentication means that after entering the password, you need some kind of second authentication.
 At the moment ZITADEL provides Webauthn and OTP.
 Webauthn uses your device to authenticate e.g Fingerprint, Face Recognition, Windows Hello.
 OTP means One time password, to use this method you need to install some kind of Authenticator App like Google Authenticator, Authy, Microsoft Authenticator.
+
+## Fingerprint, Security Keys, Face ID, etc.
+
+Use a method that is provided by your device to authenticate yourself.
+
+1. Click the button "Add Factor" in the multifactor authentication section of your profile
+2. Choose Fingerprint, Security Keys, Face ID and others
+3. Enter a name which identifies your authentication (e.g iPhone Road.Runner, Mac Book 1, Yubikey), The name is used for nothing just for yourself to recognize what you have registered.
+4. Your device will show you a popup to choose what method you like to register
+5. Choose the method ond follow the instructions (e.g. Scan your finger, Enter Pin, etc.)
+
+![Add MFA Fingerprint](/img/manuals/console_profile_mfa_webauthn.gif)
+
+### One time Password (OTP)
+
+For One time password (OTP) you will need an Authenticator app of your choice that provides an authentication code.
+
+1. Download an Authenticator App of your choice (e.g. Authy, Google Authenticator, Microsoft Authenticator, etc.)
+2. Click the button "Add Factor" in the multifactor authentication section of your profile
+3. Choose OTP (One-Time-Password)
+4. Scan the QR Code with your app
+5. Enter the code you get in the app in the Code input field
+
+You will now be able to use otp as a second factor during the login process
+
 
 
 ## Authorization

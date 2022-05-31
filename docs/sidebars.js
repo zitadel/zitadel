@@ -225,21 +225,7 @@ module.exports = {
   manuals: [
     "manuals/introduction",
     "manuals/user-profile",
-    {
-      type: "category",
-      label: "User",
-      items: [
-        "manuals/user-register",
-        "manuals/user-login",
-        "manuals/user-passwordless",
-        "manuals/user-password",
-        "manuals/user-factors",
-        "manuals/user-email",
-        "manuals/user-phone",
-        "manuals/user-social-login",
-      ],
-      collapsed: false,
-    },
+    "manuals/user-login",
     "manuals/troubleshooting",
   ],
   legal: [
