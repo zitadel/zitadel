@@ -50,11 +50,13 @@
   </cnsl-form-field>
 </div>
 
-<cnsl-card class="max-card-width">
+<cnsl-card class="max-card-width" *ngIf="loginData">
   <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.MultiFactor"
+    [list]="loginData.multiFactorsList"
+    (listChanged)="fetchData()"
     [disabled]="
       loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
       ([
@@ -98,11 +100,13 @@
     {{ 'POLICY.DATA.FORCEMFA' | translate }}
   </mat-checkbox>
 </div>
-<cnsl-card class="max-card-width">
+<cnsl-card class="max-card-width" *ngIf="loginData">
   <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.SecondFactor"
+    [list]="loginData.secondFactorsList"
+    (listChanged)="fetchData()"
     [disabled]="
       ([
         serviceType === PolicyComponentServiceType.ADMIN

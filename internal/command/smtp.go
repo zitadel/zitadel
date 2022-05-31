@@ -158,6 +158,9 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 				host,
 				user,
 			)
+			if err != nil {
+				return nil, err
+			}
 			if !hasChanged {
 				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 			}

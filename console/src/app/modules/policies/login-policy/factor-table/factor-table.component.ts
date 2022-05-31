@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
@@ -34,14 +34,15 @@ export enum LoginMethodComponentType {
   templateUrl: './factor-table.component.html',
   styleUrls: ['./factor-table.component.scss'],
 })
-export class FactorTableComponent implements OnInit {
+export class FactorTableComponent {
   public LoginMethodComponentType: any = LoginMethodComponentType;
   @Input() componentType!: LoginMethodComponentType;
   @Input() public serviceType!: PolicyComponentServiceType;
   @Input() service!: AdminService | ManagementService;
   @Input() disabled: boolean = false;
+  @Input() list: Array<MultiFactorType | SecondFactorType> = [];
+  @Output() listChanged: EventEmitter<void> = new EventEmitter();
   @ViewChild(MatPaginator) public paginator!: MatPaginator;
-  public mfas: Array<MultiFactorType | SecondFactorType> = [];
 
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -49,10 +50,6 @@ export class FactorTableComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {}
-
-  public ngOnInit(): void {
-    this.getData();
-  }
 
   public removeMfa(type: MultiFactorType | SecondFactorType): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -71,33 +68,53 @@ export class FactorTableComponent implements OnInit {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new MgmtRemoveMultiFactorFromLoginPolicyRequest();
             req.setType(type as MultiFactorType);
-            (this.service as ManagementService).removeMultiFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.refreshPageAfterTimout(2000);
-            });
+            (this.service as ManagementService)
+              .removeMultiFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new MgmtRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
-            (this.service as ManagementService).removeSecondFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.refreshPageAfterTimout(2000);
-            });
+            (this.service as ManagementService)
+              .removeSecondFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           }
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new AdminRemoveMultiFactorFromLoginPolicyRequest();
             req.setType(type as MultiFactorType);
-            (this.service as AdminService).removeMultiFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.refreshPageAfterTimout(2000);
-            });
+            (this.service as AdminService)
+              .removeMultiFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new AdminRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
-            (this.service as AdminService).removeSecondFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.refreshPageAfterTimout(2000);
-            });
+            (this.service as AdminService)
+              .removeSecondFactorFromLoginPolicy(req)
+              .then(() => {
+                this.toast.showInfo('MFA.TOAST.DELETED', true);
+                this.listChanged.emit();
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           }
         }
       }
@@ -124,7 +141,8 @@ export class FactorTableComponent implements OnInit {
             (this.service as ManagementService)
               .addMultiFactorToLoginPolicy(req)
               .then(() => {
-                this.refreshPageAfterTimout(2000);
+                this.toast.showInfo('MFA.TOAST.ADDED', true);
+                this.listChanged.emit();
               })
               .catch((error) => {
                 this.toast.showError(error);
@@ -135,7 +153,8 @@ export class FactorTableComponent implements OnInit {
             (this.service as ManagementService)
               .addSecondFactorToLoginPolicy(req)
               .then(() => {
-                this.refreshPageAfterTimout(2000);
+                this.toast.showInfo('MFA.TOAST.ADDED', true);
+                this.listChanged.emit();
               })
               .catch((error) => {
                 this.toast.showError(error);
@@ -148,7 +167,8 @@ export class FactorTableComponent implements OnInit {
             (this.service as AdminService)
               .addMultiFactorToLoginPolicy(req)
               .then(() => {
-                this.refreshPageAfterTimout(2000);
+                this.toast.showInfo('MFA.TOAST.ADDED', true);
+                this.listChanged.emit();
               })
               .catch((error) => {
                 this.toast.showError(error);
@@ -159,7 +179,8 @@ export class FactorTableComponent implements OnInit {
             (this.service as AdminService)
               .addSecondFactorToLoginPolicy(req)
               .then(() => {
-                this.refreshPageAfterTimout(2000);
+                this.toast.showInfo('MFA.TOAST.ADDED', true);
+                this.listChanged.emit();
               })
               .catch((error) => {
                 this.toast.showError(error);
@@ -170,66 +191,6 @@ export class FactorTableComponent implements OnInit {
     });
   }
 
-  private async getData(): Promise<void> {
-    this.loadingSubject.next(true);
-
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      if (this.componentType === LoginMethodComponentType.MultiFactor) {
-        (this.service as ManagementService)
-          .listLoginPolicyMultiFactors()
-          .then((resp) => {
-            this.mfas = resp.resultList;
-            this.loadingSubject.next(false);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loadingSubject.next(false);
-          });
-      } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-        (this.service as ManagementService)
-          .listLoginPolicySecondFactors()
-          .then((resp) => {
-            this.mfas = resp.resultList;
-            this.loadingSubject.next(false);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loadingSubject.next(false);
-          });
-      }
-    } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      if (this.componentType === LoginMethodComponentType.MultiFactor) {
-        (this.service as AdminService)
-          .listLoginPolicyMultiFactors()
-          .then((resp) => {
-            this.mfas = resp.resultList;
-            this.loadingSubject.next(false);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loadingSubject.next(false);
-          });
-      } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
-        (this.service as AdminService)
-          .listLoginPolicySecondFactors()
-          .then((resp) => {
-            this.mfas = resp.resultList;
-            this.loadingSubject.next(false);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-            this.loadingSubject.next(false);
-          });
-      }
-    }
-  }
-
-  public refreshPageAfterTimout(to: number): void {
-    setTimeout(() => {
-      this.getData();
-    }, to);
-  }
-
   public get availableSelection(): Array<MultiFactorType | SecondFactorType> {
     const allTypes: MultiFactorType[] | SecondFactorType[] =
       this.componentType === LoginMethodComponentType.MultiFactor
@@ -238,7 +199,7 @@ export class FactorTableComponent implements OnInit {
         ? [SecondFactorType.SECOND_FACTOR_TYPE_U2F, SecondFactorType.SECOND_FACTOR_TYPE_OTP]
         : [];
 
-    const filtered = (allTypes as Array<MultiFactorType | SecondFactorType>).filter((type) => !this.mfas.includes(type));
+    const filtered = (allTypes as Array<MultiFactorType | SecondFactorType>).filter((type) => !this.list.includes(type));
 
     return filtered;
   }

@@ -1,5 +1,6 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { GetLockoutPolicyResponse as AdminGetPasswordLockoutPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
     GetLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse,
@@ -7,10 +8,10 @@ import {
 import { LockoutPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
+import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -27,7 +28,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(private toast: ToastService, private injector: Injector, private storageService: StorageService) {}
+  constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {
@@ -62,15 +63,29 @@ export class PasswordLockoutPolicyComponent implements OnInit {
 
   public resetPolicy(): void {
     if (this.service instanceof ManagementService) {
-      this.service
-        .resetLockoutPolicyToDefault()
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-          this.fetchData();
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.RESET',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'SETTING.DIALOG.RESET.DEFAULTTITLE',
+          descriptionKey: 'SETTING.DIALOG.RESET.DEFAULTDESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          (this.service as ManagementService)
+            .resetLockoutPolicyToDefault()
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+              this.fetchData();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
     }
   }
 

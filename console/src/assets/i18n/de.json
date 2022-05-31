@@ -899,6 +899,13 @@
       "INCLUDEUPPERLETTERS": "Enthält Grossbuchstaben",
       "LENGTH": "Länge",
       "UPDATED": "Einstellungen geändert"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Einstellungen zurücksetzen",
+        "DEFAULTDESCRIPTION": "Sie sind im Begriff, Einstellungen auf die der Instanz zurückzusetzen? Wollen Sie fortfahren?",
+        "LOGINPOLICY_DESCRIPTION": "Achtung: Wenn Sie fortfahren werden auch Identity Provider auf die Instanzeinstellungen zurückgesetzt."
+      }
     }
   },
   "POLICY": {
