@@ -18,9 +18,8 @@ func (s *Server) ListFailedEvents(ctx context.Context, req *system_pb.ListFailed
 	if err != nil {
 		return nil, err
 	}
-	convertedNew := FailedEventsToPb(failedEvents)
-	convertedOld = append(convertedOld, convertedNew...)
-	return &system_pb.ListFailedEventsResponse{Result: convertedOld}, nil
+	convertedNew := FailedEventsToPb(s.database, failedEvents)
+	return &system_pb.ListFailedEventsResponse{Result: append(convertedOld, convertedNew...)}, nil
 }
 
 func (s *Server) RemoveFailedEvent(ctx context.Context, req *system_pb.RemoveFailedEventRequest) (*system_pb.RemoveFailedEventResponse, error) {

@@ -18,7 +18,7 @@ func (s *Server) ListFailedEvents(ctx context.Context, req *admin_pb.ListFailedE
 	if err != nil {
 		return nil, err
 	}
-	convertedNew := FailedEventsToPb(failedEvents)
+	convertedNew := FailedEventsToPb(s.database, failedEvents)
 	return &admin_pb.ListFailedEventsResponse{Result: append(convertedOld, convertedNew...)}, nil
 }
 

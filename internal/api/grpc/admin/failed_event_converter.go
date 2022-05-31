@@ -24,17 +24,17 @@ func FailedEventViewToPb(failedEvent *model.FailedEvent) *admin_pb.FailedEvent {
 	}
 }
 
-func FailedEventsToPb(failedEvents *query.FailedEvents) []*admin_pb.FailedEvent {
+func FailedEventsToPb(database string, failedEvents *query.FailedEvents) []*admin_pb.FailedEvent {
 	events := make([]*admin_pb.FailedEvent, len(failedEvents.FailedEvents))
 	for i, failedEvent := range failedEvents.FailedEvents {
-		events[i] = FailedEventToPb(failedEvent)
+		events[i] = FailedEventToPb(database, failedEvent)
 	}
 	return events
 }
 
-func FailedEventToPb(failedEvent *query.FailedEvent) *admin_pb.FailedEvent {
+func FailedEventToPb(database string, failedEvent *query.FailedEvent) *admin_pb.FailedEvent {
 	return &admin_pb.FailedEvent{
-		Database:       "zitadel",
+		Database:       database,
 		ViewName:       failedEvent.ProjectionName,
 		FailedSequence: failedEvent.FailedSequence,
 		FailureCount:   failedEvent.FailureCount,
