@@ -18,12 +18,8 @@ func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinked
 		return nil, err
 	}
 	return &auth_pb.ListMyLinkedIDPsResponse{
-		Result: idp_grpc.IDPUserLinksToPb(links.Links),
-		Details: object.ToListDetails(
-			links.Count,
-			links.Sequence,
-			links.Timestamp,
-		),
+		Result:  idp_grpc.IDPUserLinksToPb(links.Links),
+		Details: object.ToListDetails(links.Count, links.Sequence, links.Timestamp),
 	}, nil
 }
 

@@ -68,12 +68,8 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 		return nil, err
 	}
 	return &mgmt_pb.ListUsersResponse{
-		Result: user_grpc.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  user_grpc.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
@@ -120,12 +116,8 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMetadataResponse{
-		Result: metadata.MetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  metadata.MetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
@@ -731,12 +723,8 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 		return nil, err
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
-		Result: authn.KeysToPb(result.AuthNKeys),
-		Details: obj_grpc.ToListDetails(
-			result.Count,
-			result.Sequence,
-			result.Timestamp,
-		),
+		Result:  authn.KeysToPb(result.AuthNKeys),
+		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
 	}, nil
 }
 
@@ -798,12 +786,8 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 		return nil, err
 	}
 	return &mgmt_pb.ListPersonalAccessTokensResponse{
-		Result: user_grpc.PersonalAccessTokensToPb(result.PersonalAccessTokens),
-		Details: obj_grpc.ToListDetails(
-			result.Count,
-			result.Sequence,
-			result.Timestamp,
-		),
+		Result:  user_grpc.PersonalAccessTokensToPb(result.PersonalAccessTokens),
+		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
 	}, nil
 }
 
@@ -848,12 +832,8 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
-		Result: idp_grpc.IDPUserLinksToPb(res.Links),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  idp_grpc.IDPUserLinksToPb(res.Links),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
@@ -876,11 +856,7 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
-		Result: user_grpc.MembershipsToMembershipsPb(response.Memberships),
-		Details: obj_grpc.ToListDetails(
-			response.Count,
-			response.Sequence,
-			response.Timestamp,
-		),
+		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
+		Details: obj_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
 	}, nil
 }
