@@ -4,10 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ListIDPsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { IDP, IDPLoginPolicyLink, IDPOwnerType, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
-import { ListOrgIDPsResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+    AddCustomLoginPolicyRequest,
+    AddCustomLoginPolicyResponse,
+    ListOrgIDPsResponse,
+} from 'src/app/proto/generated/zitadel/management_pb';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -38,6 +44,7 @@ export class IdpTableComponent implements OnInit {
 
   public idps: IDPLoginPolicyLink.AsObject[] = [];
   public IDPStylingType: any = IDPStylingType;
+  public loginPolicy!: LoginPolicy.AsObject;
 
   constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
     this.selection.changed.subscribe(() => {
@@ -212,29 +219,104 @@ export class IdpTableComponent implements OnInit {
   private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).listLoginPolicyIDPs().then((resp) => {
-          return resp.resultList;
+        return (this.service as ManagementService).getLoginPolicy().then((policyResp) => {
+          if (policyResp.policy) {
+            this.loginPolicy = policyResp.policy;
+          }
+          return policyResp.policy?.idpsList ?? [];
         });
       case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).listLoginPolicyIDPs().then((providers) => {
-          return providers.resultList;
+        return (this.service as AdminService).getLoginPolicy().then((policyResp) => {
+          if (policyResp.policy) {
+            this.loginPolicy = policyResp.policy;
+          }
+          return policyResp.policy?.idpsList ?? [];
         });
     }
+  }
+
+  private addLoginPolicy(): Promise<AddCustomLoginPolicyResponse.AsObject> {
+    const mgmtreq = new AddCustomLoginPolicyRequest();
+    mgmtreq.setAllowExternalIdp(this.loginPolicy.allowExternalIdp);
+    mgmtreq.setAllowRegister(this.loginPolicy.allowRegister);
+    mgmtreq.setAllowUsernamePassword(this.loginPolicy.allowUsernamePassword);
+    mgmtreq.setForceMfa(this.loginPolicy.forceMfa);
+    mgmtreq.setPasswordlessType(this.loginPolicy.passwordlessType);
+    mgmtreq.setHidePasswordReset(this.loginPolicy.hidePasswordReset);
+    mgmtreq.setMultiFactorsList(this.loginPolicy.multiFactorsList);
+    mgmtreq.setSecondFactorsList(this.loginPolicy.secondFactorsList);
+
+    const pcl = new Duration()
+      .setSeconds(this.loginPolicy.passwordCheckLifetime?.seconds ?? 0)
+      .setNanos(this.loginPolicy.passwordCheckLifetime?.nanos ?? 0);
+    mgmtreq.setPasswordCheckLifetime(pcl);
+
+    const elcl = new Duration()
+      .setSeconds(this.loginPolicy.externalLoginCheckLifetime?.seconds ?? 0)
+      .setNanos(this.loginPolicy.externalLoginCheckLifetime?.nanos ?? 0);
+    mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+    const misl = new Duration()
+      .setSeconds(this.loginPolicy.mfaInitSkipLifetime?.seconds ?? 0)
+      .setNanos(this.loginPolicy.mfaInitSkipLifetime?.nanos ?? 0);
+    mgmtreq.setMfaInitSkipLifetime(misl);
+
+    const sfcl = new Duration()
+      .setSeconds(this.loginPolicy.secondFactorCheckLifetime?.seconds ?? 0)
+      .setNanos(this.loginPolicy.secondFactorCheckLifetime?.nanos ?? 0);
+    mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+    const mficl = new Duration()
+      .setSeconds(this.loginPolicy.multiFactorCheckLifetime?.seconds ?? 0)
+      .setNanos(this.loginPolicy.multiFactorCheckLifetime?.nanos ?? 0);
+    mgmtreq.setMultiFactorCheckLifetime(mficl);
+
+    mgmtreq.setIgnoreUnknownUsernames(this.loginPolicy.ignoreUnknownUsernames);
+    mgmtreq.setDefaultRedirectUri(this.loginPolicy.defaultRedirectUri);
+
+    return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
   }
 
   public addIdp(idp: IDP.AsObject | IDP.AsObject): Promise<any> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
-          this.toast.showInfo('IDP.TOAST.ADDED', true);
-          this.getIdps()
-            .then((resp) => {
-              this.idps = resp;
+        if (this.isDefault) {
+          return this.addLoginPolicy()
+            .then(() => {
+              return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
+                this.toast.showInfo('IDP.TOAST.ADDED', true);
+
+                setTimeout(() => {
+                  this.getIdps()
+                    .then((resp) => {
+                      this.idps = resp;
+                    })
+                    .catch((error) => {
+                      this.toast.showError(error);
+                    });
+                }, 2000);
+              });
             })
             .catch((error) => {
               this.toast.showError(error);
             });
-        });
+        } else {
+          return (this.service as ManagementService)
+            .addIDPToLoginPolicy(idp.id, idp.owner)
+            .then(() => {
+              this.toast.showInfo('IDP.TOAST.ADDED', true);
+              this.getIdps()
+                .then((resp) => {
+                  this.idps = resp;
+                })
+                .catch((error) => {
+                  this.toast.showError(error);
+                });
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
       case PolicyComponentServiceType.ADMIN:
         return (this.service as AdminService)
           .addIDPToLoginPolicy(idp.id)
@@ -250,23 +332,48 @@ export class IdpTableComponent implements OnInit {
     }
   }
 
-  public removeIdp(idp: IDP.AsObject): void {
+  public removeIdp(idp: IDP.AsObject): Promise<any> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        (this.service as ManagementService)
-          .removeIDPFromLoginPolicy(idp.id)
-          .then(() => {
-            this.toast.showInfo('IDP.TOAST.REMOVED', true);
-            this.getIdps().then((resp) => {
-              this.idps = resp;
+        if (this.isDefault) {
+          return this.addLoginPolicy()
+            .then(() => {
+              return (this.service as ManagementService)
+                .removeIDPFromLoginPolicy(idp.id)
+                .then(() => {
+                  this.toast.showInfo('IDP.TOAST.REMOVED', true);
+                  setTimeout(() => {
+                    this.getIdps()
+                      .then((resp) => {
+                        this.idps = resp;
+                      })
+                      .catch((error) => {
+                        this.toast.showError(error);
+                      });
+                  }, 2000);
+                })
+                .catch((error) => {
+                  this.toast.showError(error);
+                });
+            })
+            .catch((error) => {
+              this.toast.showError(error);
             });
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-        break;
+        } else {
+          return (this.service as ManagementService)
+            .removeIDPFromLoginPolicy(idp.id)
+            .then(() => {
+              this.toast.showInfo('IDP.TOAST.REMOVED', true);
+              this.getIdps().then((resp) => {
+                this.idps = resp;
+              });
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
       case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService)
+        return (this.service as AdminService)
           .removeIDPFromLoginPolicy(idp.id)
           .then(() => {
             this.toast.showInfo('IDP.TOAST.REMOVED', true);
@@ -277,7 +384,6 @@ export class IdpTableComponent implements OnInit {
           .catch((error) => {
             this.toast.showError(error);
           });
-        break;
     }
   }
 
@@ -287,5 +393,13 @@ export class IdpTableComponent implements OnInit {
 
   public get displayedColumnsWithActions(): string[] {
     return ['actions', ...this.displayedColumns];
+  }
+
+  public get isDefault(): boolean {
+    if (this.loginPolicy && this.serviceType === PolicyComponentServiceType.MGMT) {
+      return this.loginPolicy.isDefault;
+    } else {
+      return false;
+    }
   }
 }

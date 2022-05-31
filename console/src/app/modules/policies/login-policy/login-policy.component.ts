@@ -257,7 +257,6 @@ export class LoginPolicyComponent implements OnInit {
   public removeFactor(request: Promise<unknown>): void {
     // create policy before types can be removed
     if (this.isDefault) {
-      console.log('create policy');
       this.updateData()
         .then(() => {
           return request;
