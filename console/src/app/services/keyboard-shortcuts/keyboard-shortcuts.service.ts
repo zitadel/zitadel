@@ -98,12 +98,6 @@ export class KeyboardShortcutsService implements OnDestroy {
             this.router.navigate(DOMAINS.link);
           }
         }
-
-        // if (secondKey.shiftKey && (secondKey.code === 'Digit7' || secondKey.key==='/')) {
-
-        // }
-
-        // SIDEWIDESHORTCUTS.f
       } else if (secondKey && exclude.indexOf(secondTagname?.toLowerCase()) === -1) {
         if (secondKey.key === '?') {
           this.openOverviewDialog();

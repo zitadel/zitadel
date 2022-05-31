@@ -126,7 +126,9 @@ export class NotificationSettingsComponent implements OnInit {
     req.setTls(this.tls?.value ?? false);
     req.setUser(this.user?.value ?? '');
 
-    return this.service.updateSMTPConfig(req).catch(this.toast.showError);
+    return this.service.updateSMTPConfig(req).catch((error) => {
+      this.toast.showError(error);
+    });
   }
 
   public savePolicy(): void {

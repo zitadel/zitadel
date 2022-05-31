@@ -84,7 +84,7 @@
   }
 
   .no-content-row {
-    background-color: if($is-dark-theme, #00000030, #f4f4f470);
+    background-color: if($is-dark-theme, #ffffff10, #f4f4f470);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     display: flex;
@@ -92,6 +92,7 @@
     padding: 0.5rem;
     font-size: 14px;
     justify-content: center;
+    font-style: italic;
   }
 
   .selection {

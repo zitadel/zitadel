@@ -3,12 +3,12 @@ import { Observable } from 'rxjs';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Pipe({
-    name: 'hasRole',
+  name: 'hasRole',
 })
 export class HasRolePipe implements PipeTransform {
-    constructor(private authService: GrpcAuthService) { }
+  constructor(private authService: GrpcAuthService) {}
 
-    public transform(values: string[]): Observable<boolean> {
-        return this.authService.isAllowed(values);
-    }
+  public transform(values: string[], requresAll: boolean = false): Observable<boolean> {
+    return this.authService.isAllowed(values, requresAll);
+  }
 }
