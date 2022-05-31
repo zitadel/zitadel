@@ -33,14 +33,14 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
 	}
-	idGenerator := id.SonyFlakeGenerator
+	idGenerator := id.SonyFlakeGenerator()
 
-	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, idGenerator, assetsPrefix)
+	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, idGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -50,12 +50,11 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, systemDefaults, queries)
 
 	userRepo := eventstore.UserRepo{
-		SearchLimit:     conf.SearchLimit,
-		Eventstore:      es,
-		View:            view,
-		Query:           queries,
-		SystemDefaults:  systemDefaults,
-		PrefixAvatarURL: assetsPrefix,
+		SearchLimit:    conf.SearchLimit,
+		Eventstore:     es,
+		View:           view,
+		Query:          queries,
+		SystemDefaults: systemDefaults,
 	}
 	//TODO: remove as soon as possible
 	queryView := queryViewWrapper{

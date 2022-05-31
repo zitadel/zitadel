@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 

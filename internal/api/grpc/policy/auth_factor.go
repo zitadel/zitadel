@@ -5,6 +5,14 @@ import (
 	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 )
 
+func SecondFactorsTypesToDomain(secondFactorTypes []policy_pb.SecondFactorType) []domain.SecondFactorType {
+	types := make([]domain.SecondFactorType, len(secondFactorTypes))
+	for i, factorType := range secondFactorTypes {
+		types[i] = SecondFactorTypeToDomain(factorType)
+	}
+	return types
+}
+
 func SecondFactorTypeToDomain(secondFactorType policy_pb.SecondFactorType) domain.SecondFactorType {
 	switch secondFactorType {
 	case policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_OTP:
@@ -32,6 +40,23 @@ func ModelSecondFactorTypeToPb(secondFactorType domain.SecondFactorType) policy_
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_U2F
 	default:
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
+	}
+}
+
+func MultiFactorsTypesToDomain(multiFactorTypes []policy_pb.MultiFactorType) []domain.MultiFactorType {
+	types := make([]domain.MultiFactorType, len(multiFactorTypes))
+	for i, factorType := range multiFactorTypes {
+		types[i] = MultiFactorTypeToDomain(factorType)
+	}
+	return types
+}
+
+func MultiFactorTypeToDomain(multiFactorType policy_pb.MultiFactorType) domain.MultiFactorType {
+	switch multiFactorType {
+	case policy_pb.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION:
+		return domain.MultiFactorTypeU2FWithPIN
+	default:
+		return domain.MultiFactorTypeUnspecified
 	}
 }
 

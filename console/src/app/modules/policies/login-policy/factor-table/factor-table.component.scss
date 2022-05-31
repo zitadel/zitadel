@@ -35,7 +35,7 @@
           display: block;
 
           &:not(:hover) {
-            color: var(--grey);
+            color: map-get($foreground, secondary-text);
           }
         }
       }

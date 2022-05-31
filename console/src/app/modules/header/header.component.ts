@@ -67,6 +67,10 @@ export class HeaderComponent implements OnDestroy {
     return this.router.url === '/users/me';
   }
 
+  public errorHandler(event: any, fallbackSrc: string) {
+    (event.target as HTMLImageElement).src = fallbackSrc;
+  }
+
   public get isOnInstance(): boolean {
     const pages: string[] = [
       '/instance',

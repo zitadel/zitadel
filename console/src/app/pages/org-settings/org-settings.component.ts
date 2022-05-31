@@ -27,9 +27,9 @@ export class OrgSettingsComponent {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public settingsList: SidenavSetting[] = [
     LOGIN,
+    IDP,
     COMPLEXITY,
     LOCKOUT,
-    IDP,
     DOMAIN,
     BRANDING,
     MESSAGETEXTS,

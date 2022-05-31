@@ -37,7 +37,6 @@ type HumanView struct {
 	NickName                 string
 	DisplayName              string
 	AvatarKey                string
-	AvatarURL                string
 	PreferredLanguage        string
 	Gender                   Gender
 	Email                    string
@@ -249,7 +248,7 @@ func (u *UserView) GetProfile() (*Profile, error) {
 		Gender:             u.Gender,
 		PreferredLoginName: u.PreferredLoginName,
 		LoginNames:         u.LoginNames,
-		AvatarURL:          u.AvatarURL,
+		AvatarKey:          u.AvatarKey,
 	}, nil
 }
 

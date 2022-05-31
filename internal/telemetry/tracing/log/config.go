@@ -1,12 +1,9 @@
 package log
 
 import (
-	"strconv"
-
 	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing/otel"
 )
@@ -17,14 +14,10 @@ type Config struct {
 
 func NewTracer(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
-	fraction, ok := rawConfig["fraction"].(string)
-	if ok {
-		c.Fraction, err = strconv.ParseFloat(fraction, 32)
-		if err != nil {
-			return errors.ThrowInternal(err, "LOG-Dsag3", "could not map fraction")
-		}
+	c.Fraction, err = otel.FractionFromConfig(rawConfig["fraction"])
+	if err != nil {
+		return err
 	}
-
 	return c.NewTracer()
 }
 

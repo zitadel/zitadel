@@ -1,65 +1,104 @@
 <cnsl-detail-layout [hasBackButton]="true" title="{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}">
   <p class="subinfo" sub>
     <span class="cnsl-secondary-text">{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}</span>
-    <a mat-icon-button href="https://docs.zitadel.com/docs/concepts/structure/projects#granted-organizations"
-      target="_blank">
+    <a
+      mat-icon-button
+      href="https://docs.zitadel.com/docs/concepts/structure/projects#granted-organizations"
+      target="_blank"
+    >
       <i class="las la-info-circle"></i>
     </a>
   </p>
 
   <div actions>
     <button class="actions-trigger-desk" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
-      <span>{{'ACTIONS.ACTIONS' | translate}}</span>
+      <span>{{ 'ACTIONS.ACTIONS' | translate }}</span>
       <mat-icon class="icon">keyboard_arrow_down</mat-icon>
     </button>
-    <button class="actions-trigger-mob" matTooltip="{{'ACTIONS.ACTIONS' | translate}}" mat-icon-button
-      [matMenuTriggerFor]="actions">
+    <button
+      class="actions-trigger-mob"
+      matTooltip="{{ 'ACTIONS.ACTIONS' | translate }}"
+      mat-icon-button
+      [matMenuTriggerFor]="actions"
+    >
       <i class="las la-ellipsis-v"></i>
     </button>
   </div>
 
   <mat-menu #actions="matMenu" xPosition="before">
-    <button mat-menu-item *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
-      (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
-      translate}}</button>
-    <button mat-menu-item *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
-      (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' |
-      translate}}</button>
+    <button
+      mat-menu-item
+      *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
+      (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE)"
+    >
+      {{ 'USER.PAGES.DEACTIVATE' | translate }}
+    </button>
+    <button
+      mat-menu-item
+      *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
+      (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE)"
+    >
+      {{ 'USER.PAGES.REACTIVATE' | translate }}
+    </button>
   </mat-menu>
 
   <div class="master-row">
-    <div>
-
-    </div>
+    <div></div>
   </div>
 
-  <cnsl-project-grant-illustration *ngIf="grant" [grantedProject]="grant" [projectRoleOptions]="projectRoleOptions"
-    (roleRemoved)="removeRole($event)" (editRoleClicked)="editRoles()">
+  <cnsl-project-grant-illustration
+    *ngIf="grant && projectRoleOptions"
+    [grantedProject]="grant"
+    [projectRoleOptions]="projectRoleOptions"
+    (roleRemoved)="removeRole($event)"
+    (editRoleClicked)="editRoles()"
+  >
   </cnsl-project-grant-illustration>
 
   <h2 class="project-grant-h2">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h2>
-  <p class="desc max-width-description">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
+  <p class="desc cnsl-secondary-text max-width-description">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
 
-  <cnsl-members-table *ngIf="grant" [dataSource]="dataSource"
-    [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async"
-    [canDelete]="['project.grant.member.delete','project.grant.member.delete:' + grant.grantId] | hasRole | async"
-    [memberRoleOptions]="memberRoleOptions" (updateRoles)="updateMemberRoles($event.member, $event.change)"
-    (deleteMember)="removeProjectMember($event)" [factoryLoadFunc]="changePageFactory"
-    (changedSelection)="selection = $event" [refreshTrigger]="changePage">
-    <button class="cnsl-action-button" selectactions (click)="removeProjectMemberSelection()"
-      [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grant.grantId] | hasRole | async) === false"
-      matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" color="warn" mat-raised-button>
+  <cnsl-members-table
+    *ngIf="grant"
+    [dataSource]="dataSource"
+    [canWrite]="['project.grant.member.write', 'project.grant.member.write:' + grant.grantId] | hasRole | async"
+    [canDelete]="['project.grant.member.delete', 'project.grant.member.delete:' + grant.grantId] | hasRole | async"
+    [memberRoleOptions]="memberRoleOptions"
+    (updateRoles)="updateMemberRoles($event.member, $event.change)"
+    (deleteMember)="removeProjectMember($event)"
+    [factoryLoadFunc]="changePageFactory"
+    (changedSelection)="selection = $event"
+    [refreshTrigger]="changePage"
+  >
+    <button
+      class="cnsl-action-button"
+      selectactions
+      (click)="removeProjectMemberSelection()"
+      [disabled]="
+        (['project.grant.member.delete', 'project.grant.member.delete:' + grant.grantId] | hasRole | async) === false
+      "
+      matTooltip="{{ 'ORG_DETAIL.TABLE.DELETE' | translate }}"
+      color="warn"
+      mat-raised-button
+    >
       <i class="las la-trash"></i>
-      <span>{{'ACTIONS.SELECTIONDELETE' | translate}}</span>
+      <span>{{ 'ACTIONS.SELECTIONDELETE' | translate }}</span>
       <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
       </cnsl-action-keys>
     </button>
-    <button class="cnsl-action-button" writeactions color="primary"
-      [disabled]="(['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async) === false"
-      (click)="openAddMember()" color="primary" mat-raised-button>
+    <button
+      class="cnsl-action-button"
+      writeactions
+      color="primary"
+      [disabled]="
+        (['project.grant.member.write', 'project.grant.member.write:' + grant.grantId] | hasRole | async) === false
+      "
+      (click)="openAddMember()"
+      color="primary"
+      mat-raised-button
+    >
       <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-      <cnsl-action-keys (actionTriggered)="openAddMember()">
-      </cnsl-action-keys>
+      <cnsl-action-keys (actionTriggered)="openAddMember()"> </cnsl-action-keys>
     </button>
   </cnsl-members-table>
 </cnsl-detail-layout>

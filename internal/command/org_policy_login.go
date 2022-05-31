@@ -29,8 +29,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(
-		ctx,
+	cmds := []eventstore.Command{
 		org.NewLoginPolicyAddedEvent(
 			ctx,
 			orgAgg,
@@ -46,7 +45,32 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 			policy.ExternalLoginCheckLifetime,
 			policy.MFAInitSkipLifetime,
 			policy.SecondFactorCheckLifetime,
-			policy.MultiFactorCheckLifetime))
+			policy.MultiFactorCheckLifetime),
+	}
+	for _, factor := range policy.SecondFactors {
+		if !factor.Valid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "Org-SFeea", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		}
+		cmds = append(cmds, org.NewLoginPolicySecondFactorAddedEvent(ctx, orgAgg, factor))
+	}
+	for _, factor := range policy.MultiFactors {
+		if !factor.Valid() {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "Org-WSfrg", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		}
+		cmds = append(cmds, org.NewLoginPolicyMultiFactorAddedEvent(ctx, orgAgg, factor))
+	}
+	for _, provider := range policy.IDPProviders {
+		if provider.Type == domain.IdentityProviderTypeOrg {
+			_, err = c.getOrgIDPConfigByID(ctx, provider.IDPConfigID, resourceOwner)
+		} else {
+			_, err = c.getInstanceIDPConfigByID(ctx, provider.IDPConfigID)
+		}
+		if err != nil {
+			return nil, caos_errs.ThrowPreconditionFailed(err, "Org-FEd32", "Errors.IDPConfig.NotExisting")
+		}
+		cmds = append(cmds, org.NewIdentityProviderAddedEvent(ctx, orgAgg, provider.IDPConfigID, provider.Type))
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, HostBinding, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -19,8 +19,7 @@ import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard
 import { ManagementService } from './services/mgmt.service';
 import { NavigationService } from './services/navigation.service';
 import { OverlayWorkflowService } from './services/overlay/overlay-workflow.service';
-import { IntroWorkflowOverlays } from './services/overlay/workflows';
-import { StorageLocation, StorageService } from './services/storage.service';
+import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
@@ -30,7 +29,7 @@ import { UpdateService } from './services/update.service';
   styleUrls: ['./app.component.scss'],
   animations: [toolbarAnimation, ...navAnimations, accountCard, routeAnimations, adminLineAnimation],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnDestroy {
   @ViewChild('drawer') public drawer!: MatDrawer;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
@@ -217,10 +216,14 @@ export class AppComponent implements OnInit, OnDestroy {
           .getActiveOrg()
           .then((org) => {
             this.org = org;
+            this.themeService.loadPrivateLabelling();
 
-            this.startIntroWorkflow();
+            // TODO add when console storage is implemented
+            // this.startIntroWorkflow();
           })
           .catch((error) => {
+            console.error(error);
+            this.themeService.setDefaultColors();
             this.router.navigate(['/users/me']);
           });
       }
@@ -235,114 +238,23 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  private startIntroWorkflow(): void {
-    setTimeout(() => {
-      const cb = () => {
-        this.storageService.setItem('intro-dismissed', true, StorageLocation.local);
-      };
-      const dismissed = this.storageService.getItem('intro-dismissed', StorageLocation.local);
-      if (!dismissed) {
-        this.workflowService.startWorkflow(IntroWorkflowOverlays, cb);
-      }
-    }, 1000);
-  }
+  // TODO implement Console storage
 
-  public ngOnInit(): void {
-    this.loadPrivateLabelling();
-  }
+  //   private startIntroWorkflow(): void {
+  //     setTimeout(() => {
+  //       const cb = () => {
+  //         this.storageService.setItem('intro-dismissed', true, StorageLocation.local);
+  //       };
+  //       const dismissed = this.storageService.getItem('intro-dismissed', StorageLocation.local);
+  //       if (!dismissed) {
+  //         this.workflowService.startWorkflow(IntroWorkflowOverlays, cb);
+  //       }
+  //     }, 1000);
+  //   }
 
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  public loadPrivateLabelling(): void {
-    const setDefaultColors = () => {
-      const darkPrimary = '#bbbafa';
-      const lightPrimary = '#5469d4';
-
-      const darkWarn = '#ff3b5b';
-      const lightWarn = '#cd3d56';
-
-      const darkBackground = '#111827';
-      const lightBackground = '#fafafa';
-
-      const darkText = '#ffffff';
-      const lightText = '#000000';
-
-      this.themeService.savePrimaryColor(darkPrimary, true);
-      this.themeService.savePrimaryColor(lightPrimary, false);
-
-      this.themeService.saveWarnColor(darkWarn, true);
-      this.themeService.saveWarnColor(lightWarn, false);
-
-      this.themeService.saveBackgroundColor(darkBackground, true);
-      this.themeService.saveBackgroundColor(lightBackground, false);
-
-      this.themeService.saveTextColor(darkText, true);
-      this.themeService.saveTextColor(lightText, false);
-    };
-
-    setDefaultColors();
-
-    this.mgmtService.getLabelPolicy().then((labelpolicy) => {
-      if (labelpolicy.policy) {
-        this.labelpolicy = labelpolicy.policy;
-
-        const isDark = (color: string) => this.themeService.isDark(color);
-        const isLight = (color: string) => this.themeService.isLight(color);
-
-        const darkPrimary = this.labelpolicy?.primaryColorDark || '#bbbafa';
-        const lightPrimary = this.labelpolicy?.primaryColor || '#5469d4';
-
-        const darkWarn = this.labelpolicy?.warnColorDark || '#ff3b5b';
-        const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
-
-        let darkBackground = this.labelpolicy?.backgroundColorDark;
-        let lightBackground = this.labelpolicy?.backgroundColor;
-
-        let darkText = this.labelpolicy.fontColorDark;
-        let lightText = this.labelpolicy.fontColor;
-
-        this.themeService.savePrimaryColor(darkPrimary, true);
-        this.themeService.savePrimaryColor(lightPrimary, false);
-
-        this.themeService.saveWarnColor(darkWarn, true);
-        this.themeService.saveWarnColor(lightWarn, false);
-
-        if (darkBackground && !isDark(darkBackground)) {
-          console.info(
-            `Background (${darkBackground}) is not dark enough for a dark theme. Falling back to zitadel background`,
-          );
-          darkBackground = '#111827';
-        }
-        this.themeService.saveBackgroundColor(darkBackground || '#111827', true);
-
-        if (lightBackground && !isLight(lightBackground)) {
-          console.info(
-            `Background (${lightBackground}) is not light enough for a light theme. Falling back to zitadel background`,
-          );
-          lightBackground = '#fafafa';
-        }
-        this.themeService.saveBackgroundColor(lightBackground || '#fafafa', false);
-
-        if (darkText && !isLight(darkText)) {
-          console.info(
-            `Text color (${darkText}) is not light enough for a dark theme. Falling back to zitadel's text color`,
-          );
-          darkText = '#ffffff';
-        }
-        this.themeService.saveTextColor(darkText || '#ffffff', true);
-
-        if (lightText && !isDark(lightText)) {
-          console.info(
-            `Text color (${lightText}) is not dark enough for a light theme. Falling back to zitadel's text color`,
-          );
-          lightText = '#000000';
-        }
-        this.themeService.saveTextColor(lightText || '#000000', false);
-      }
-    });
   }
 
   public prepareRoute(outlet: RouterOutlet): boolean {
@@ -357,7 +269,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public changedOrg(org: Org.AsObject): void {
-    this.loadPrivateLabelling();
+    this.themeService.loadPrivateLabelling();
     this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
       this.router.navigate(['/org'], { fragment: org.id });
     });

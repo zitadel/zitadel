@@ -46,8 +46,8 @@ var (
 func newZitadel() *cobra.Command {
 	return &cobra.Command{
 		Use:   "zitadel",
-		Short: "initialize ZITADEL internas",
-		Long: `initialize ZITADEL internas.
+		Short: "initialize ZITADEL internals",
+		Long: `initialize ZITADEL internals.
 
 Prereqesits:
 - cockroachdb with user and database

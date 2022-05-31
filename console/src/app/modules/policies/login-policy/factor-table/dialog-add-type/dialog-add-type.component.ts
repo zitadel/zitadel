@@ -19,6 +19,7 @@ export class DialogAddTypeComponent {
 
   constructor(public dialogRef: MatDialogRef<DialogAddTypeComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.availableMfaTypes = data.types;
+    this.newMfaType = data.types && data.types[0] ? data.types[0] : undefined;
   }
 
   public closeDialog(): void {

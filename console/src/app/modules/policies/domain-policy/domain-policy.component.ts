@@ -1,4 +1,5 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import {
     AddCustomDomainPolicyRequest,
@@ -13,6 +14,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
@@ -33,6 +35,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   constructor(
+    private dialog: MatDialog,
     private toast: ToastService,
     private injector: Injector,
     private adminService: AdminService,
@@ -138,17 +141,31 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
 
   public removePolicy(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      this.adminService
-        .resetCustomDomainPolicyToDefault(this.org.id)
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-          setTimeout(() => {
-            this.fetchData();
-          }, 1000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.RESET',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'SETTING.DIALOG.RESET.DEFAULTTITLE',
+          descriptionKey: 'SETTING.DIALOG.RESET.DEFAULTDESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          this.adminService
+            .resetCustomDomainPolicyToDefault(this.org.id)
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+              setTimeout(() => {
+                this.fetchData();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
     }
   }
 
