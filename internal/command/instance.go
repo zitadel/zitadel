@@ -270,20 +270,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		ClockSkew:                0,
 	}
 
-	if setup.SMTPConfiguration != nil {
-		validations = append(validations,
-			c.prepareAddSMTPConfig(
-				instanceAgg,
-				setup.SMTPConfiguration.From,
-				setup.SMTPConfiguration.FromName,
-				setup.SMTPConfiguration.SMTP.Host,
-				setup.SMTPConfiguration.SMTP.User,
-				[]byte(setup.SMTPConfiguration.SMTP.Password),
-				setup.SMTPConfiguration.Tls,
-			),
-		)
-	}
-
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
@@ -332,15 +318,30 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		c.AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
-	addGenerateddDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
+
+	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
 	if err != nil {
 		return "", nil, err
 	}
-	validations = append(validations, addGenerateddDomain...)
+	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
 		validations = append(validations,
 			c.addInstanceDomain(instanceAgg, setup.CustomDomain, false),
 			setPrimaryInstanceDomain(instanceAgg, setup.CustomDomain),
+		)
+	}
+
+	if setup.SMTPConfiguration != nil {
+		validations = append(validations,
+			c.prepareAddSMTPConfig(
+				instanceAgg,
+				setup.SMTPConfiguration.From,
+				setup.SMTPConfiguration.FromName,
+				setup.SMTPConfiguration.SMTP.Host,
+				setup.SMTPConfiguration.SMTP.User,
+				[]byte(setup.SMTPConfiguration.SMTP.Password),
+				setup.SMTPConfiguration.Tls,
+			),
 		)
 	}
 
