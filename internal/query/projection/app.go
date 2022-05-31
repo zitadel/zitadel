@@ -87,7 +87,7 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(AppAPIConfigColumnAppID),
+			crdb.NewPrimaryKey(AppAPIConfigColumnAppID, AppAPIConfigColumnInstanceID),
 			appAPITableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps")),
 			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID})),

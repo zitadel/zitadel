@@ -1,5 +1,6 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
 import {
@@ -18,6 +19,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
+import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
 
@@ -47,6 +49,7 @@ export class LoginPolicyComponent implements OnInit {
     private injector: Injector,
     private fb: FormBuilder,
     private authService: GrpcAuthService,
+    private dialog: MatDialog,
   ) {
     this.lifetimeForm = this.fb.group({
       passwordCheckLifetime: [{ disabled: true, value: 240 }, [Validators.required]],
@@ -57,7 +60,7 @@ export class LoginPolicyComponent implements OnInit {
     });
   }
 
-  private fetchData(): void {
+  public fetchData(): void {
     this.getData()
       .then((resp) => {
         if (resp.policy) {
@@ -147,6 +150,8 @@ export class LoginPolicyComponent implements OnInit {
         mgmtreq.setForceMfa(this.loginData.forceMfa);
         mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
         mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+        mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
+        mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
 
         const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
         mgmtreq.setPasswordCheckLifetime(pcl);
@@ -221,18 +226,33 @@ export class LoginPolicyComponent implements OnInit {
 
   public removePolicy(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService)
-        .resetLoginPolicyToDefault()
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-          this.loading = true;
-          setTimeout(() => {
-            this.fetchData();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.RESET',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'SETTING.DIALOG.RESET.DEFAULTTITLE',
+          descriptionKey: 'SETTING.DIALOG.RESET.DEFAULTDESCRIPTION',
+          warnSectionKey: 'SETTING.DIALOG.RESET.LOGINPOLICY_DESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          (this.service as ManagementService)
+            .resetLoginPolicyToDefault()
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+              this.loading = true;
+              setTimeout(() => {
+                this.fetchData();
+              }, 2000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
     }
   }
 
