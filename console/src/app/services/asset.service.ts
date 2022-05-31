@@ -18,23 +18,23 @@ export enum AssetType {
 }
 
 export enum AssetEndpoint {
-  IAMFONT = 'iam/policy/label/font',
+  IAMFONT = 'instance/policy/label/font',
   MGMTFONT = 'org/policy/label/font',
 
-  IAMDARKLOGO = 'iam/policy/label/logo/dark',
-  IAMLOGO = 'iam/policy/label/logo',
-  IAMDARKICON = 'iam/policy/label/icon/dark',
-  IAMICON = 'iam/policy/label/icon',
+  IAMDARKLOGO = 'instance/policy/label/logo/dark',
+  IAMLOGO = 'instance/policy/label/logo',
+  IAMDARKICON = 'instance/policy/label/icon/dark',
+  IAMICON = 'instance/policy/label/icon',
 
   MGMTDARKLOGO = 'org/policy/label/logo/dark',
   MGMTLOGO = 'org/policy/label/logo',
   MGMTDARKICON = 'org/policy/label/icon/dark',
   MGMTICON = 'org/policy/label/icon',
 
-  IAMDARKLOGOPREVIEW = 'iam/policy/label/logo/dark/_preview',
-  IAMLOGOPREVIEW = 'iam/policy/label/logo/_preview',
-  IAMDARKICONPREVIEW = 'iam/policy/label/icon/dark/_preview',
-  IAMICONPREVIEW = 'iam/policy/label/icon/_preview',
+  IAMDARKLOGOPREVIEW = 'instance/policy/label/logo/dark/_preview',
+  IAMLOGOPREVIEW = 'instance/policy/label/logo/_preview',
+  IAMDARKICONPREVIEW = 'instance/policy/label/icon/dark/_preview',
+  IAMICONPREVIEW = 'instance/policy/label/icon/_preview',
 
   MGMTDARKLOGOPREVIEW = 'org/policy/label/logo/dark/_preview',
   MGMTLOGOPREVIEW = 'org/policy/label/logo/_preview',

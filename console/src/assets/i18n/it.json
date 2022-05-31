@@ -1479,7 +1479,9 @@
       "SELECTEDREACTIVATED": "IDP selezionati riattivati.",
       "SELECTEDDEACTIVATED": "IDP selezionati disattivati.",
       "SELECTEDKEYSDELETED": "IDP selezionati cancellati.",
-      "DELETED": "IDP rimosso con successo!"
+      "DELETED": "IDP rimosso con successo!",
+      "ADDED": "Aggiunto con successo.",
+      "REMOVED": "Rimosso con successo."
     }
   },
   "MFA": {

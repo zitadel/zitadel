@@ -106,7 +106,8 @@
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.SecondFactor"
     [list]="loginData.secondFactorsList"
-    (listChanged)="fetchData()"
+    (typeRemoved)="removeFactor($event)"
+    (typeAdded)="addFactor($event)"
     [disabled]="
       ([
         serviceType === PolicyComponentServiceType.ADMIN

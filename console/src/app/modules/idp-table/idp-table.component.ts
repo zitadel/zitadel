@@ -226,6 +226,7 @@ export class IdpTableComponent implements OnInit {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
+          this.toast.showInfo('IDP.TOAST.ADDED', true);
           this.getIdps()
             .then((resp) => {
               this.idps = resp;
@@ -238,6 +239,7 @@ export class IdpTableComponent implements OnInit {
         return (this.service as AdminService)
           .addIDPToLoginPolicy(idp.id)
           .then(() => {
+            this.toast.showInfo('IDP.TOAST.ADDED', true);
             this.getIdps().then((resp) => {
               this.idps = resp;
             });
@@ -251,28 +253,30 @@ export class IdpTableComponent implements OnInit {
   public removeIdp(idp: IDP.AsObject): void {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        (this.service as ManagementService).removeIDPFromLoginPolicy(idp.id).then(
-          () => {
+        (this.service as ManagementService)
+          .removeIDPFromLoginPolicy(idp.id)
+          .then(() => {
+            this.toast.showInfo('IDP.TOAST.REMOVED', true);
             this.getIdps().then((resp) => {
               this.idps = resp;
             });
-          },
-          (error) => {
+          })
+          .catch((error) => {
             this.toast.showError(error);
-          },
-        );
+          });
         break;
       case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService).removeIDPFromLoginPolicy(idp.id).then(
-          () => {
+        (this.service as AdminService)
+          .removeIDPFromLoginPolicy(idp.id)
+          .then(() => {
+            this.toast.showInfo('IDP.TOAST.REMOVED', true);
             this.getIdps().then((resp) => {
               this.idps = resp;
             });
-          },
-          (error) => {
+          })
+          .catch((error) => {
             this.toast.showError(error);
-          },
-        );
+          });
         break;
     }
   }
