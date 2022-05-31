@@ -224,6 +224,7 @@ module.exports = {
   ],
   manuals: [
     "manuals/introduction",
+    "manuals/user-profile",
     {
       type: "category",
       label: "User",

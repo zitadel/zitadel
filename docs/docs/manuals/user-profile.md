@@ -1,0 +1,56 @@
+---
+title: User Profile
+---
+
+To get to your user profile you have to login to your ZITADEL Console {your-domain}-{randomstring}.zitadel.cloud or {your-custom-domain}.
+If you have no special permissions in the ZITADEL Console, you will get directly to your profile page. 
+Otherwise click on your user avatar in the top right of the console. A menu will open, with the "Edit Account" button you will be redirected to your profile page.
+
+## Loginname
+
+You are able to login with some different login names. The login name consists of the username and the organization suffix. The organization suffix are the registered domains on your organization.
+![Loginname](/img/manuals/console_profile_loginname.png)
+
+## General
+
+In the general section you can find your profile data and contact information.
+In the profile data you can change the following data:
+- Avatar
+- Username
+- Firstname
+- Lastname
+- Nickname
+- Display Name
+- Gender
+- Language
+
+In the contact information you can change your password, email and phone number. The Email and Phone number need to be verified.
+
+### Change Password
+
+Change your password by entering your old, new and new confirmation password.
+
+![Change Password](/img/change_password.gif)
+
+### Change Email
+
+Click on the edit button next to the email to change your email address.
+You will now get an email to verify that this is your account. This can take a moment. 
+Click on the button in the mail to verify the address. If you now reload your profile page the email address should be shown as verified.
+
+If you wait to long to verify the email, your code will probably be expired. 
+The get a new verification mail click on "resend code" next to the "not verified" label.
+
+The email doesn't need to be unique within the whole system.
+
+### Change Phone number
+
+The phone number is not mandatory withing ZITADEL. If you like to add it, you have to verify it. 
+
+1. Click "edit button" and add your number
+2. Get an SMS with a verification code to the added number
+3. Click "Verify" below the added number
+4. A popup with an Input field for your code will be shown
+5. Enter the code a click "OK"
+
+Your phone number should now be verified.
