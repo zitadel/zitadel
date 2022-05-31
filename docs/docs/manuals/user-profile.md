@@ -87,7 +87,7 @@ At the moment ZITADEL provides Webauthn and OTP.
 Webauthn uses your device to authenticate e.g Fingerprint, Face Recognition, Windows Hello.
 OTP means One time password, to use this method you need to install some kind of Authenticator App like Google Authenticator, Authy, Microsoft Authenticator.
 
-## Fingerprint, Security Keys, Face ID, etc.
+### Fingerprint, Security Keys, Face ID, etc.
 
 Use a method that is provided by your device to authenticate yourself.
 
