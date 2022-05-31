@@ -1479,7 +1479,9 @@
       "SELECTEDREACTIVATED": "Selected Idps reactivated.",
       "SELECTEDDEACTIVATED": "Selected Idps deactivated.",
       "SELECTEDKEYSDELETED": "Selected Idps deleted.",
-      "DELETED": "Idp removed successfully!"
+      "DELETED": "Idp removed successfully!",
+      "ADDED": "Added successfully.",
+      "REMOVED": "Removed successfully."
     }
   },
   "MFA": {

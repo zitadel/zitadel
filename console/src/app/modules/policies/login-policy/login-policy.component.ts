@@ -94,7 +94,9 @@ export class LoginPolicyComponent implements OnInit {
           );
         }
       })
-      .catch(this.toast.showError);
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public ngOnInit(): void {
@@ -171,10 +173,7 @@ export class LoginPolicyComponent implements OnInit {
         mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
         mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-        // if(this.loginData.passwordCheckLifetime) {
-        // mgmtreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
-        // }
-        if ((this.loginData as LoginPolicy.AsObject).isDefault) {
+        if (this.isDefault) {
           return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
         } else {
           return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
@@ -204,7 +203,6 @@ export class LoginPolicyComponent implements OnInit {
         adminreq.setMultiFactorCheckLifetime(admin_mficl);
         adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
         adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
-        // adminreq.setPasswordCheckLifetime(this.loginData.passwordCheckLifetime);
 
         return (this.service as AdminService).updateLoginPolicy(adminreq);
     }
@@ -254,6 +252,57 @@ export class LoginPolicyComponent implements OnInit {
         }
       });
     }
+  }
+
+  public removeFactor(request: Promise<unknown>): void {
+    // create policy before types can be removed
+    if (this.isDefault) {
+      console.log('create policy');
+      this.updateData()
+        .then(() => {
+          return request;
+        })
+        .then(() => {
+          this.toast.showInfo('MFA.TOAST.DELETED', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    } else {
+      request
+        .then(() => {
+          this.toast.showInfo('MFA.TOAST.DELETED', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
+  }
+
+  public addFactor(request: Promise<unknown>): void {
+    // create policy before types can be added
+    const task: Promise<unknown> = this.isDefault
+      ? this.updateData().then(() => {
+          return request;
+        })
+      : request;
+
+    task
+      .then(() => {
+        this.toast.showInfo('MFA.TOAST.ADDED', true);
+        setTimeout(() => {
+          this.fetchData();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public get isDefault(): boolean {
