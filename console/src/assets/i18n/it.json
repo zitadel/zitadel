@@ -899,6 +899,13 @@
       "INCLUDEUPPERLETTERS": "Contiene lettere maiuscole",
       "LENGTH": "Lunghezza",
       "UPDATED": "Impostazioni aggiornati"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Ripristina impostazioni",
+        "DEFAULTDESCRIPTION": "Stai per ripristinare le impostazioni sulla configurazione predefinita della tua istanza. Sei sicuro di voler continuare?",
+        "LOGINPOLICY_DESCRIPTION": "Avviso: Se continui, anche le impostazioni del provider di identità verranno ripristinate sull'impostazione dell'istanza."
+      }
     }
   },
   "POLICY": {

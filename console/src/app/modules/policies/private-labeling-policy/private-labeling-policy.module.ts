@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -19,6 +20,7 @@ import { CardModule } from '../../card/card.module';
 import { DetailLayoutModule } from '../../detail-layout/detail-layout.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
+import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { ColorComponent } from './color/color.component';
 import { PreviewComponent } from './preview/preview.component';
 import { PrivateLabelingPolicyRoutingModule } from './private-labeling-policy-routing.module';
@@ -43,6 +45,8 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     TranslateModule,
     DetailLayoutModule,
     DropzoneModule,
+    MatDialogModule,
+    WarnDialogModule,
     HasRolePipeModule,
     MatProgressSpinnerModule,
     MatExpansionModule,

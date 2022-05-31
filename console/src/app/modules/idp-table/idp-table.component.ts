@@ -33,7 +33,7 @@ export class IdpTableComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public IDPOwnerType: any = IDPOwnerType;
   public IDPState: any = IDPState;
-  public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'state'];
+  public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'state', 'actions'];
   @Output() public changedSelection: EventEmitter<Array<IDP.AsObject>> = new EventEmitter();
 
   public idps: IDPLoginPolicyLink.AsObject[] = [];
@@ -52,7 +52,7 @@ export class IdpTableComponent implements OnInit {
     });
 
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      this.displayedColumns = ['availability', 'name', 'type', 'owner', 'creationDate', 'changeDate', 'state'];
+      this.displayedColumns = ['availability', 'name', 'type', 'owner', 'creationDate', 'changeDate', 'state', 'actions'];
     }
   }
 
@@ -154,10 +154,6 @@ export class IdpTableComponent implements OnInit {
     this.loadingSubject.next(true);
 
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      // const query: IDPQuery = new IDPQuery();
-      // const otQuery: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
-      // otQuery.setOwnerType(IDPOwnerType.IDP_OWNER_TYPE_ORG);
-      // query.setOwnerTypeQuery(otQuery);
       (this.service as ManagementService)
         .listOrgIDPs(limit, offset)
         .then((resp) => {
