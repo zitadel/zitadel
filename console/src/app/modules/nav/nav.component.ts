@@ -9,6 +9,7 @@ import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 @Component({
@@ -93,6 +94,7 @@ export class NavComponent implements OnDestroy {
     public mgmtService: ManagementService,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
+    private shortcutService: KeyboardShortcutsService,
   ) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
   }
@@ -110,5 +112,9 @@ export class NavComponent implements OnDestroy {
   public get isUserLinkActive(): boolean {
     const url = this.router.url;
     return url.substring(0, 6) === '/users';
+  }
+
+  public openHelp() {
+    this.shortcutService.openOverviewDialog();
   }
 }

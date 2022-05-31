@@ -70,8 +70,8 @@ export const IDP: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.IDP',
   groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
   requiredRoles: {
-    [PolicyComponentServiceType.MGMT]: ['policy.read'],
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.MGMT]: ['policy.read', 'org.idp.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read', 'org.idp.read'],
   },
 };
 

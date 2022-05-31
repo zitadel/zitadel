@@ -1,8 +1,6 @@
-@import 'success_label_base';
+@import "success_label_base";
 
 .lgn-success-label {
-    color: #0e6245;
-    background: #cbf4c9;
-    border-radius: .5rem;
-    padding: .5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
 }
