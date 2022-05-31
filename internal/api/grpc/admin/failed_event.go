@@ -19,13 +19,12 @@ func (s *Server) ListFailedEvents(ctx context.Context, req *admin_pb.ListFailedE
 		return nil, err
 	}
 	convertedNew := FailedEventsToPb(failedEvents)
-	convertedOld = append(convertedOld, convertedNew...)
-	return &admin_pb.ListFailedEventsResponse{Result: convertedOld}, nil
+	return &admin_pb.ListFailedEventsResponse{Result: append(convertedOld, convertedNew...)}, nil
 }
 
 func (s *Server) RemoveFailedEvent(ctx context.Context, req *admin_pb.RemoveFailedEventRequest) (*admin_pb.RemoveFailedEventResponse, error) {
 	var err error
-	if req.Database != "zitadel" {
+	if req.Database != s.database {
 		err = s.administrator.RemoveFailedEvent(ctx, RemoveFailedEventRequestToModel(req))
 	} else {
 		err = s.query.RemoveFailedEvent(ctx, req.ViewName, req.FailedSequence)
