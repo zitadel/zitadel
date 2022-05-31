@@ -35,7 +35,7 @@ type authZRepo interface {
 	ExistsOrg(ctx context.Context, orgID string) error
 }
 
-func Start(authZRepo authZRepo, systemAPI string, keys map[string]*SystemAPIUser) (v *TokenVerifier) {
+func Start(authZRepo authZRepo, issuer string, keys map[string]*SystemAPIUser) (v *TokenVerifier) {
 	return &TokenVerifier{
 		authZRepo: authZRepo,
 		systemJWTProfile: op.NewJWTProfileVerifier(
@@ -43,7 +43,7 @@ func Start(authZRepo authZRepo, systemAPI string, keys map[string]*SystemAPIUser
 				keys:       keys,
 				cachedKeys: make(map[string]*rsa.PublicKey),
 			},
-			systemAPI,
+			issuer,
 			1*time.Hour,
 			time.Second,
 		),
