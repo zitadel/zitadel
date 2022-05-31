@@ -29,6 +29,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
@@ -150,7 +151,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		authZRepo,
 		queries,
 	}
-	verifier := internal_authz.Start(repo, config.ExternalDomain, systemAPIKeys)
+	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)+oidc.HandlerPrefix, systemAPIKeys)
 
 	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, keys.OIDC, keys.User)

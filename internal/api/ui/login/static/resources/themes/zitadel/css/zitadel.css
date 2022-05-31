@@ -2778,7 +2778,7 @@ input[type=checkbox]:checked + label:before {
   border-color: var(--zitadel-color-primary);
 }
 input[type=checkbox]:checked + label:after {
-  border-color: #fff;
+  border-color: var(--zitadel-color-primary-contrast);
 }
 
 .lgn-label {
