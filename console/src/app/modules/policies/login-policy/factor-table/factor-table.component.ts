@@ -74,7 +74,9 @@ export class FactorTableComponent {
                 this.toast.showInfo('MFA.TOAST.DELETED', true);
                 this.listChanged.emit();
               })
-              .catch(this.toast.showError);
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new MgmtRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
@@ -84,7 +86,9 @@ export class FactorTableComponent {
                 this.toast.showInfo('MFA.TOAST.DELETED', true);
                 this.listChanged.emit();
               })
-              .catch(this.toast.showError);
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           }
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
@@ -96,7 +100,9 @@ export class FactorTableComponent {
                 this.toast.showInfo('MFA.TOAST.DELETED', true);
                 this.listChanged.emit();
               })
-              .catch(this.toast.showError);
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new AdminRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
@@ -106,7 +112,9 @@ export class FactorTableComponent {
                 this.toast.showInfo('MFA.TOAST.DELETED', true);
                 this.listChanged.emit();
               })
-              .catch(this.toast.showError);
+              .catch((error) => {
+                this.toast.showError(error);
+              });
           }
         }
       }
