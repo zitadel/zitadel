@@ -89,7 +89,9 @@ export class ProjectGrantDetailComponent {
             this.breadcrumbService.setBreadcrumb(breadcrumbs);
           }
         })
-        .catch(this.toast.showError);
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     });
   }
 

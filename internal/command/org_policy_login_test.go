@@ -1047,7 +1047,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			got, err := r.AddIDPToLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1442,7 +1442,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveIDPProviderFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider, tt.args.cascadeExternalIDPs...)
+			got, err := r.RemoveIDPFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider, tt.args.cascadeExternalIDPs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

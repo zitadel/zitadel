@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"testing"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -23,8 +25,10 @@ func Test_FlowPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareFlowQuery no result",
-			prepare: prepareFlowQuery,
+			name: "prepareFlowQuery no result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT projections.actions.id,`+
@@ -47,11 +51,16 @@ func Test_FlowPrepares(t *testing.T) {
 					nil,
 				),
 			},
-			object: &Flow{TriggerActions: map[domain.TriggerType][]*Action{}},
+			object: &Flow{
+				TriggerActions: map[domain.TriggerType][]*Action{},
+				Type:           domain.FlowTypeExternalAuthentication,
+			},
 		},
 		{
-			name:    "prepareFlowQuery one action",
-			prepare: prepareFlowQuery,
+			name: "prepareFlowQuery one action",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT projections.actions.id,`+
@@ -129,8 +138,10 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareFlowQuery multiple actions",
-			prepare: prepareFlowQuery,
+			name: "prepareFlowQuery multiple actions",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT projections.actions.id,`+
@@ -236,8 +247,10 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareFlowQuery no action",
-			prepare: prepareFlowQuery,
+			name: "prepareFlowQuery no action",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(`SELECT projections.actions.id,`+
@@ -302,8 +315,10 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareFlowQuery sql err",
-			prepare: prepareFlowQuery,
+			name: "prepareFlowQuery sql err",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(`SELECT projections.actions.id,`+

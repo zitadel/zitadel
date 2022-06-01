@@ -3,8 +3,6 @@ package admin
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
@@ -12,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	obj_pb "github.com/zitadel/zitadel/pkg/grpc/object"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
@@ -38,12 +35,8 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 		return nil, err
 	}
 	return &admin_pb.ListOrgsResponse{
-		Result: org_grpc.OrgViewsToPb(orgs.Orgs),
-		Details: &obj_pb.ListDetails{
-			TotalResult:       orgs.Count,
-			ProcessedSequence: orgs.Sequence,
-			ViewTimestamp:     timestamppb.New(orgs.Timestamp),
-		},
+		Result:  org_grpc.OrgViewsToPb(orgs.Orgs),
+		Details: object.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
 	}, nil
 }
 

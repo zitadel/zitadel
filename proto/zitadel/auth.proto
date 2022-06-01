@@ -585,6 +585,28 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    // Returns the label policy of the current organisation
+    rpc GetMyLabelPolicy(GetMyLabelPolicyRequest) returns (GetMyLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the privacy policy of the current organisation
+    rpc GetMyPrivacyPolicy(GetMyPrivacyPolicyRequest) returns (GetMyPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/privacy"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //This is an empty request
@@ -1016,4 +1038,18 @@ message ListMyMembershipsRequest {
 message ListMyMembershipsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.user.v1.Membership result = 2;
+}
+
+//This is an empty request
+message GetMyLabelPolicyRequest {}
+
+message GetMyLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+}
+
+//This is an empty request
+message GetMyPrivacyPolicyRequest {}
+
+message GetMyPrivacyPolicyResponse {
+    zitadel.policy.v1.PrivacyPolicy policy = 1;
 }

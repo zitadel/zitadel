@@ -36,12 +36,8 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantsResponse{
-		Result: proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
-		Details: object_grpc.ToListDetails(
-			grants.Count,
-			grants.Sequence,
-			grants.Timestamp,
-		),
+		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
 	}, nil
 }
 
@@ -63,12 +59,8 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 		return nil, err
 	}
 	return &mgmt_pb.ListAllProjectGrantsResponse{
-		Result: proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
-		Details: object_grpc.ToListDetails(
-			grants.Count,
-			grants.Sequence,
-			grants.Timestamp,
-		),
+		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
 	}, nil
 }
 
@@ -177,12 +169,8 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantMembersResponse{
-		Result: member_grpc.MembersToPb(s.assetAPIPrefix(ctx), response.Members),
-		Details: object_grpc.ToListDetails(
-			response.Count,
-			response.Sequence,
-			response.Timestamp,
-		),
+		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), response.Members),
+		Details: object_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
 	}, nil
 }
 
