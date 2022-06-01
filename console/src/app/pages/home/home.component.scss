@@ -39,6 +39,7 @@
       grid-template-columns: 1fr;
       gap: 1rem;
       justify-content: space-evenly;
+      padding-bottom: 1rem;
 
       @media only screen and (min-width: 599px) {
         grid-template-columns: 1fr 1fr;

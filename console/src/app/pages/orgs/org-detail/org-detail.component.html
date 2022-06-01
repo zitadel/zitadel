@@ -16,7 +16,7 @@
     (addClicked)="openAddMember()"
     (showDetailClicked)="showDetail()"
     (refreshClicked)="loadMembers()"
-    [disabled]="false"
+    [disabled]="(['org.member.write'] | hasRole | async) === false"
   >
   </cnsl-contributors>
 
