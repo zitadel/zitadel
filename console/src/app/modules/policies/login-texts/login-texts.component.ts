@@ -93,6 +93,7 @@ const REQUESTMAP = {
   styleUrls: ['./login-texts.component.scss'],
 })
 export class LoginTextsComponent implements OnInit, OnDestroy {
+  public loading: boolean = false;
   public currentPolicyChangeDate!: Timestamp.AsObject | undefined;
   public newerPolicyChangeDate!: Timestamp.AsObject | undefined;
 
@@ -208,6 +209,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   }
 
   public async loadData(): Promise<any> {
+    this.loading = true;
     const reqDefaultInit = REQUESTMAP[this.serviceType].getDefault;
     reqDefaultInit.setLanguage(this.locale);
     this.getDefaultInitMessageTextMap$ = from(this.getDefaultValues(reqDefaultInit)).pipe(map((m) => m[this.currentSubMap]));
@@ -215,12 +217,14 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
     return this.getCurrentValues(reqCustomInit)
       .then((policy) => {
+        this.loading = false;
         if (policy) {
           this.totalCustomPolicy = policy;
           this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
         }
       })
       .catch((error) => {
+        this.loading = false;
         this.toast.showError(error);
       });
   }

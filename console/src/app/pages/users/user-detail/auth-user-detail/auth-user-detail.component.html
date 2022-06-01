@@ -17,7 +17,7 @@
 
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">
+    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" queryParam="id">
       <ng-container *ngIf="currentSetting === 'general'">
         <cnsl-card
           *ngIf="user && user.human && user.human.profile"
@@ -35,6 +35,7 @@
             (changedLanguage)="changedLanguage($event)"
             (changeUsernameClicked)="changeUsername()"
             (submitData)="saveProfile($event)"
+            (avatarChanged)="refreshUser()"
           >
           </cnsl-detail-form>
         </cnsl-card>

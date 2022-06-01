@@ -1,6 +1,7 @@
 package crdb
 
 import (
+	"context"
 	"database/sql"
 	"strconv"
 	"strings"
@@ -21,8 +22,8 @@ type instanceSequence struct {
 	sequence   uint64
 }
 
-func (h *StatementHandler) currentSequences(query func(string, ...interface{}) (*sql.Rows, error)) (currentSequences, error) {
-	rows, err := query(h.currentSequenceStmt, h.ProjectionName)
+func (h *StatementHandler) currentSequences(ctx context.Context, query func(context.Context, string, ...interface{}) (*sql.Rows, error)) (currentSequences, error) {
+	rows, err := query(ctx, h.currentSequenceStmt, h.ProjectionName)
 	if err != nil {
 		return nil, err
 	}

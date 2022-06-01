@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "zitadel/idp.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -62,10 +63,10 @@ message LabelPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
-    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes
     bool hide_login_name_suffix = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     // hex value for secondary color
@@ -170,7 +171,9 @@ message LoginPolicy {
     google.protobuf.Duration mfa_init_skip_lifetime = 13;
     google.protobuf.Duration second_factor_check_lifetime = 14;
     google.protobuf.Duration multi_factor_check_lifetime = 15;
-
+    repeated SecondFactorType second_factors = 16;
+    repeated MultiFactorType multi_factors = 17;
+    repeated zitadel.idp.v1.IDPLoginPolicyLink idps = 18;
 }
 
 enum SecondFactorType {

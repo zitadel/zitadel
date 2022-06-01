@@ -15,7 +15,7 @@ func (s *Server) GetMyProfile(ctx context.Context, req *auth_pb.GetMyProfileRequ
 		return nil, err
 	}
 	return &auth_pb.GetMyProfileResponse{
-		Profile: user_grpc.ProfileToPb(profile, s.assetsAPIDomain),
+		Profile: user_grpc.ProfileToPb(profile, s.assetsAPIDomain(ctx)),
 		Details: object_grpc.ToViewDetailsPb(
 			profile.Sequence,
 			profile.CreationDate,

@@ -36,9 +36,10 @@ export class InstanceSettingsComponent {
     NOTIFICATIONS,
     // login
     LOGIN,
+    IDP,
     COMPLEXITY,
     LOCKOUT,
-    IDP,
+
     DOMAIN,
     // appearance
     BRANDING,

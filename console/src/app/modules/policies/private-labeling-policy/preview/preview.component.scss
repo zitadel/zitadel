@@ -8,7 +8,7 @@
 
   @include input-theme($theme);
   @include cnsl-label-theme($theme);
-  @include mat.all-component-themes($theme);
+  //   @include mat.all-component-themes($theme);
 
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
@@ -20,7 +20,7 @@
     pointer-events: none;
     border-radius: 0.5rem;
     transform: scale(0.9);
-    color: map-get($foreground, base);
+    color: map-get($foreground, text);
 
     * {
       pointer-events: none;

@@ -1,7 +1,6 @@
 :root {
   --zitadel-color-primary: var(--zitadel-color-primary-500);
   --zitadel-color-background: var(--zitadel-color-background-500);
-  --zitadel-color-secondary: var(--zitadel-color-secondary-500);
   --zitadel-color-warn: var(--zitadel-color-warn-500);
   --zitadel-color-text: var(--zitadel-color-text-500);
 
@@ -18,30 +17,18 @@
   --zitadel-color-primary-rgb: rgb(84, 105, 212);
   --zitadel-color-primary-contrast: var(--zitadel-color-white);
 
-  --zitadel-color-secondary-50: #eaedfa;
-  --zitadel-color-secondary-100: #ccd2f2;
-  --zitadel-color-secondary-200: #aab4ea;
-  --zitadel-color-secondary-300: #8796e1;
-  --zitadel-color-secondary-400: #6e80da;
-  --zitadel-color-secondary-500: #5469d4;
-  --zitadel-color-secondary-600: #4d61cf;
-  --zitadel-color-secondary-700: #4356c9;
-  --zitadel-color-secondary-800: #3a4cc3;
-  --zitadel-color-secondary-900: #293bb9;
-  --zitadel-color-secondary-contrast: var(--zitadel-color-white);
+  --zitadel-color-warn-50: #f9e7eb;
+  --zitadel-color-warn-100: #f0c4cc;
+  --zitadel-color-warn-200: #e69dab;
+  --zitadel-color-warn-300: #dc7689;
+  --zitadel-color-warn-400: #d5586f;
+  --zitadel-color-warn-500: #cd3b56;
+  --zitadel-color-warn-600: #c8354f;
+  --zitadel-color-warn-700: #c12d45;
+  --zitadel-color-warn-800: #ba263c;
+  --zitadel-color-warn-900: #ae192b;
 
-  --zitadel-color-warn-50: #F9E7EB;
-  --zitadel-color-warn-100: #F0C4CC;
-  --zitadel-color-warn-200: #E69DAB;
-  --zitadel-color-warn-300: #DC7689;
-  --zitadel-color-warn-400: #D5586F;
-  --zitadel-color-warn-500: #CD3B56;
-  --zitadel-color-warn-600: #C8354F;
-  --zitadel-color-warn-700: #C12D45;
-  --zitadel-color-warn-800: #BA263C;
-  --zitadel-color-warn-900: #AE192B;
-
-  --zitadel-font-family: 'Lato';
+  --zitadel-font-family: "Lato";
 
   --zitadel-color-background-50: rgb(255, 255, 255);
   --zitadel-color-background-100: rgb(255, 255, 255);
@@ -55,11 +42,12 @@
   --zitadel-color-background-900: rgb(142, 142, 142);
   --zitadel-color-background-contrast: rgb(0, 0, 0);
 
-  --zitadel-color-footer-line: #e3e8ee;
+  --zitadel-color-footer-line: rgba(0, 0, 0, 0.12);
 
-  --zitadel-color-input-background: #fafafa50;
+  --zitadel-color-input-background: #00000003;
   --zitadel-color-input-border: #00000040;
   --zitadel-color-input-border-hover: #1a1b1b;
+  --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
 
   --zitadel-color-font-50: rgb(0, 0, 0);
@@ -73,23 +61,37 @@
   --zitadel-color-font-800: rgb(0, 0, 0);
   --zitadel-color-font-900: rgb(0, 0, 0);
   --zitadel-color-font-contrast: rgb(255, 255, 255);
-  --zitadel-color-label: var(--zitadel-color-grey-600);
-
+  --zitadel-color-label: #0000008a;
 
   --zitadel-color-account-selector-hover: rgba(0, 0, 0, 0.02);
   --zitadel-color-account-selector-active: rgba(0, 0, 0, 0.05);
 
   --zitadel-color-success: #0e6245;
   --zitadel-color-success-background: #cbf4c9;
+  --zitadel-color-state-success-font: #0e6245;
+  --zitadel-color-state-success-background: #cbf4c9;
+  --zitadel-color-state-warn-font: #620e0e;
+  --zitadel-color-state-warn-background: #ffc1c1;
+
+  --zitadel-color-footer-background: #00000002;
+  --zitadel-color-footer-background-mozilla: var(
+    --zitadel-color-background-600
+  );
 
   --zitadel-color-divider: rgba(0, 0, 0, 0.12);
 
   --zitadel-color-button-disabled: rgba(0, 0, 0, 0.26);
   --zitadel-color-button-disabled-background: rgba(0, 0, 0, 0.12);
   --zitadel-color-button-selected-background: var(--zitadel-color-grey-900);
-  --zitadel-color-button-disabled-selected-background: var(--zitadel-color-grey-800);
+  --zitadel-color-button-disabled-selected-background: var(
+    --zitadel-color-grey-800
+  );
   --zitadel-color-raised-button-background: var(--zitadel-color-white);
-
+  --zitadel-color-stroked-button-hover-background: #00000010;
+  --zitadel-color-stroked-button-active-background: #00000020;
+  --zitadel-color-raised-button-active-background: var(
+    --zitadel-color-primary-700
+  );
 
   --zitadel-color-white: #ffffff;
   --zitadel-color-black: #000000;
@@ -104,8 +106,8 @@
   --zitadel-color-grey-800: #424242;
   --zitadel-color-grey-900: #212121;
 
-  --zitadel-icon-select: url('../select_arrow_light.svg');
-  --zitadel-logo-powered-by: url('../logo-dark.svg');
+  --zitadel-icon-select: url("../select_arrow_light.svg");
+  --zitadel-logo-powered-by: url("../logo-dark.svg");
 
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;
@@ -126,29 +128,18 @@
   --zitadel-color-primary-800: #305687;
   --zitadel-color-primary-900: #284770;
 
-  --zitadel-color-secondary-50: #ffffff;
-  --zitadel-color-secondary-100: #dde6f3;
-  --zitadel-color-secondary-200: #b4c9e4;
-  --zitadel-color-secondary-300: #7fa3d1;
-  --zitadel-color-secondary-400: #6992c9;
-  --zitadel-color-secondary-500: #5282c1;
-  --zitadel-color-secondary-600: #4072b4;
-  --zitadel-color-secondary-700: #38649d;
-  --zitadel-color-secondary-800: #305687;
-  --zitadel-color-secondary-900: #284770;
-
-  --zitadel-color-warn-50: #FFE7EB;
-  --zitadel-color-warn-100: #FFC4CE;
-  --zitadel-color-warn-200: #FF9DAD;
-  --zitadel-color-warn-300: #FF768C;
-  --zitadel-color-warn-400: #FF5874;
+  --zitadel-color-warn-50: #ffe7eb;
+  --zitadel-color-warn-100: #ffc4ce;
+  --zitadel-color-warn-200: #ff9dad;
+  --zitadel-color-warn-300: #ff768c;
+  --zitadel-color-warn-400: #ff5874;
   --zitadel-color-warn-500: #ff3b5b;
-  --zitadel-color-warn-600: #FF3553;
-  --zitadel-color-warn-700: #FF2D49;
-  --zitadel-color-warn-800: #FF2640;
-  --zitadel-color-warn-900: #FF192F;
+  --zitadel-color-warn-600: #ff3553;
+  --zitadel-color-warn-700: #ff2d49;
+  --zitadel-color-warn-800: #ff2640;
+  --zitadel-color-warn-900: #ff192f;
 
-  --zitadel-font-family: 'Lato';
+  --zitadel-font-family: "Lato";
 
   --zitadel-color-background-50: rgb(60, 60, 60);
   --zitadel-color-background-100: rgb(55, 55, 55);
@@ -162,11 +153,12 @@
   --zitadel-color-background-900: rgb(23, 23, 23);
   --zitadel-color-background-contrast: rgb(255, 255, 255);
 
-  --zitadel-color-footer-line: #303131;
+  --zitadel-color-footer-line: rgba(255, 255, 255, 0.12);
 
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
   --zitadel-color-input-border: #403e3e;
   --zitadel-color-input-border-hover: #aeafb1;
+  --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
 
   --zitadel-color-text-50: rgb(255, 255, 255);
@@ -180,28 +172,41 @@
   --zitadel-color-text-800: rgb(167, 168, 169);
   --zitadel-color-text-900: rgb(141, 142, 143);
   --zitadel-color-text-contrast: rgb(0, 0, 0);
-  --zitadel-color-label: var(--zitadel-color-grey-600);
+  --zitadel-color-label: #ffffffb3;
 
   --zitadel-color-account-selector-hover: rgba(255, 255, 255, 0.02);
   --zitadel-color-account-selector-active: rgba(255, 255, 255, 0.05);
 
-
   --zitadel-color-success: #cbf4c9;
   --zitadel-color-success-background: #4f566b;
+  --zitadel-color-state-success-font: #cbf4c9;
+  --zitadel-color-state-success-background: #68cf8340;
+  --zitadel-color-state-warn-font: #ffc1c1;
+  --zitadel-color-state-warn-background: #af455359;
+
+  --zitadel-color-footer-background: #00000020;
+  --zitadel-color-footer-background-mozilla: var(
+    --zitadel-color-background-600
+  );
 
   --zitadel-color-divider: rgba(255, 255, 255, 0.12);
 
   --zitadel-color-button-disabled: rgba(0, 0, 0, 0.26);
   --zitadel-color-button-disabled-background: rgba(255, 255, 255, 0.12);
   --zitadel-color-button-selected-background: var(--zitadel-color-grey-900);
-  --zitadel-color-button-disabled-selected-background: var(--zitadel-color-grey-800);
+  --zitadel-color-button-disabled-selected-background: var(
+    --zitadel-color-grey-800
+  );
   --zitadel-color-raised-button-background: var(--zitadel-color-grey-800);
-
+  --zitadel-color-stroked-button-hover-background: #ffffff10;
+  --zitadel-color-stroked-button-active-background: #ffffff20;
+  --zitadel-color-raised-button-active-background: var(
+    --zitadel-color-primary-300
+  );
 
   /*--zitadel-color-label: var(--zitadel-color-grey-600); same */
-  --zitadel-icon-select: url('../select_arrow_dark.svg');
-  --zitadel-logo-powered-by: url('../logo-light.svg');
-
+  --zitadel-icon-select: url("../select_arrow_dark.svg");
+  --zitadel-logo-powered-by: url("../logo-light.svg");
 
   --zitadel-color-google-text: #8b8d8d;
   --zitadel-color-google-background: #ffffff;

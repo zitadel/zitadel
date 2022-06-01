@@ -39,7 +39,7 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgChangesResponse{
-		Result: change_grpc.ChangesToPb(response.Changes, s.assetAPIPrefix),
+		Result: change_grpc.ChangesToPb(response.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
@@ -134,12 +134,8 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
-		Result: org_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(
-			domains.Count,
-			domains.Sequence,
-			domains.Timestamp,
-		),
+		Result:  org_grpc.DomainsToPb(domains.Domains),
+		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
 	}, nil
 }
 
@@ -233,12 +229,8 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
-		Result: member_grpc.MembersToPb(s.assetAPIPrefix, members.Members),
-		Details: object.ToListDetails(
-			members.Count,
-			members.Sequence,
-			members.Timestamp,
-		),
+		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
+		Details: object.ToListDetails(members.Count, members.Sequence, members.Timestamp),
 	}, nil
 }
 

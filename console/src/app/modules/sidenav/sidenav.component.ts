@@ -8,7 +8,10 @@ export interface SidenavSetting {
   id: string;
   i18nKey: string;
   groupI18nKey?: string;
-  requiredRoles?: { [serviceType in PolicyComponentServiceType]: string[] };
+  requiredRoles?: {
+    [PolicyComponentServiceType.MGMT]?: string[];
+    [PolicyComponentServiceType.ADMIN]?: string[];
+  };
   showWarn?: boolean;
 }
 
@@ -26,6 +29,7 @@ export class SidenavComponent implements ControlValueAccessor, OnInit {
   @Input() public settingsList: SidenavSetting[] = [];
   @Input() public queryParam: string = '';
 
+  public PolicyComponentServiceType: any = PolicyComponentServiceType;
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {

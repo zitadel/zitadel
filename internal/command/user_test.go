@@ -1630,7 +1630,7 @@ func TestExistsUser(t *testing.T) {
 							"displayName",
 							language.German,
 							domain.GenderFemale,
-							"support@zitadel.ch",
+							"support@zitadel.com",
 							true,
 						),
 					}, nil
@@ -1656,7 +1656,7 @@ func TestExistsUser(t *testing.T) {
 							"displayName",
 							language.German,
 							domain.GenderFemale,
-							"support@zitadel.ch",
+							"support@zitadel.com",
 							true,
 						),
 					}, nil

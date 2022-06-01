@@ -56,9 +56,10 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys_private (id, expiry, key) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.keys_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -69,9 +70,10 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys_public (id, expiry, key) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.keys_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								[]byte("publicKey"),
 							},

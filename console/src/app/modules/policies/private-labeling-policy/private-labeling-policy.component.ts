@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -23,6 +24,7 @@ import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
+import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 export enum Theme {
@@ -90,6 +92,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     private assetService: AssetService,
     private storageService: StorageService,
     private themeService: ThemeService,
+    private dialog: MatDialog,
   ) {}
 
   public toggleHoverLogo(theme: Theme, isHovering: boolean): void {
@@ -118,7 +121,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             case PolicyComponentServiceType.MGMT:
               return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKLOGO, formData, this.org.id));
             case PolicyComponentServiceType.ADMIN:
-              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData, this.org.id));
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKLOGO, formData));
           }
         }
         if (theme === Theme.LIGHT) {
@@ -126,7 +129,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             case PolicyComponentServiceType.MGMT:
               return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTLOGO, formData, this.org.id));
             case PolicyComponentServiceType.ADMIN:
-              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData, this.org.id));
+              return this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMLOGO, formData));
           }
         }
       }
@@ -273,7 +276,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTDARKICON, formData, this.org.id));
               break;
             case PolicyComponentServiceType.ADMIN:
-              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData, this.org.id));
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMDARKICON, formData));
               break;
           }
         }
@@ -283,7 +286,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.handleUploadPromise(this.assetService.upload(AssetEndpoint.MGMTICON, formData, this.org.id));
               break;
             case PolicyComponentServiceType.ADMIN:
-              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData, this.org.id));
+              this.handleUploadPromise(this.assetService.upload(AssetEndpoint.IAMICON, formData));
               break;
           }
         }
@@ -395,17 +398,31 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
   public removePolicy(): void {
     if (this.service instanceof ManagementService) {
-      this.service
-        .resetLabelPolicyToDefault()
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-          setTimeout(() => {
-            this.fetchData();
-          }, 1000);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.RESET',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'SETTING.DIALOG.RESET.DEFAULTTITLE',
+          descriptionKey: 'SETTING.DIALOG.RESET.DEFAULTDESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          (this.service as ManagementService)
+            .resetLabelPolicyToDefault()
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+              setTimeout(() => {
+                this.fetchData();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
     }
   }
 

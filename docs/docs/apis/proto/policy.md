@@ -33,7 +33,7 @@ title: zitadel/policy.proto
 | details |  zitadel.v1.ObjectDetails | - |  |
 | primary_color |  string | hex value for primary color |  |
 | is_default |  bool | defines if the organisation's admin changed the policy |  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes |  |
 | warn_color |  string | hex value for secondary color |  |
 | background_color |  string | hex value for background color |  |
 | font_color |  string | hex value for font color |  |
@@ -85,6 +85,9 @@ title: zitadel/policy.proto
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| second_factors | repeated SecondFactorType | - |  |
+| multi_factors | repeated MultiFactorType | - |  |
+| idps | repeated zitadel.idp.v1.IDPLoginPolicyLink | - |  |
 
 
 

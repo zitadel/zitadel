@@ -20,7 +20,7 @@ func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*a
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user, s.assetsAPIDomain)}, nil
+	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user, s.assetsAPIDomain(ctx))}, nil
 }
 
 func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserRequest) (*auth_pb.RemoveMyUserResponse, error) {
@@ -61,7 +61,7 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		return nil, err
 	}
 	return &auth_pb.ListMyUserChangesResponse{
-		Result: change.ChangesToPb(changes.Changes, s.assetsAPIDomain),
+		Result: change.ChangesToPb(changes.Changes, s.assetsAPIDomain(ctx)),
 	}, nil
 }
 
@@ -75,12 +75,8 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 		return nil, err
 	}
 	return &auth_pb.ListMyMetadataResponse{
-		Result: metadata.MetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  metadata.MetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
@@ -100,7 +96,7 @@ func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUser
 		return nil, err
 	}
 	return &auth_pb.ListMyUserSessionsResponse{
-		Result: user_grpc.UserSessionsToPb(userSessions),
+		Result: user_grpc.UserSessionsToPb(userSessions, s.assetsAPIDomain(ctx)),
 	}, nil
 }
 
@@ -133,12 +129,8 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 		return nil, err
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
-		Result: UserGrantsToPb(res.UserGrants),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  UserGrantsToPb(res.UserGrants),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 

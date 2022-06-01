@@ -30,8 +30,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         description: "This API is intended to configure and manage the IAM instance itself.";
         contact:{
             name: "CAOS developers of ZITADEL"
-            url: "https://zitadel.ch"
-            email: "hi@zitadel.ch"
+            url: "https://zitadel.com"
+            email: "hi@zitadel.com"
         }
         license: {
             name: "Apache 2.0",
@@ -56,7 +56,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     external_docs: {
         description: "Detailed information about ZITADEL",
-        url: "https://docs.zitadel.ch"
+        url: "https://docs.zitadel.com"
     }
 
     security_definitions: {
@@ -379,7 +379,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -405,7 +405,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -439,7 +439,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -478,7 +478,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -514,7 +514,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -551,7 +551,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -590,7 +590,7 @@ service AdminService {
             tags: "oidc";
 
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.com/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -663,7 +663,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -700,7 +700,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -737,7 +737,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -773,7 +773,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -812,7 +812,7 @@ service AdminService {
             tags: "identity provider";
             tags: "oidc";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.com/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -907,7 +907,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -936,7 +936,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -963,7 +963,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -991,7 +991,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -1019,7 +1019,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -1047,7 +1047,7 @@ service AdminService {
             tags: "orgiam";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the orgiam";
             };
             responses: {
@@ -1073,7 +1073,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -1101,7 +1101,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -1127,7 +1127,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -1154,7 +1154,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -1181,7 +1181,7 @@ service AdminService {
             tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domain policy";
             };
             responses: {
@@ -1208,7 +1208,7 @@ service AdminService {
             tags: "domainpolicy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
                 description: "detailed information about the domainpolicy";
             };
             responses: {
@@ -1369,7 +1369,7 @@ service AdminService {
             tags: "login policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Login_Options";
+                url: "https://docs.zitadel.com/administrate#Login_Options";
                 description: "detailed information about the login policy";
             };
             responses: {
@@ -1397,7 +1397,7 @@ service AdminService {
             tags: "login policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Login_Options";
+                url: "https://docs.zitadel.com/administrate#Login_Options";
                 description: "detailed information about the login policy";
             };
             responses: {
@@ -1426,7 +1426,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1455,7 +1455,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1483,7 +1483,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1510,7 +1510,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1539,7 +1539,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1578,7 +1578,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1616,7 +1616,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1645,7 +1645,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1684,7 +1684,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1722,7 +1722,7 @@ service AdminService {
             tags: "password policy";
             tags: "password complexity";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Password_complexity";
+                url: "https://docs.zitadel.com/administrate#Password_complexity";
                 description: "detailed information about the password complexity policy";
             };
             responses: {
@@ -1751,7 +1751,7 @@ service AdminService {
             tags: "password policy";
             tags: "password complexity";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Password_complexity";
+                url: "https://docs.zitadel.com/administrate#Password_complexity";
                 description: "detailed information about the password complexity policy";
             };
             responses: {
@@ -2286,7 +2286,7 @@ service AdminService {
             tags: "member";
             tags: "roles";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -2315,7 +2315,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -2344,7 +2344,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -2384,7 +2384,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -2422,7 +2422,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -2460,7 +2460,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -2487,7 +2487,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -2516,7 +2516,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -3591,7 +3591,7 @@ message UpdateLabelPolicyRequest {
     ];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];

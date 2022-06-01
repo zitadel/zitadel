@@ -53,6 +53,6 @@ export class ProfilePictureComponent {
   }
 
   public closeDialog(): void {
-    this.dialogRef.close(false);
+    this.dialogRef.close(true);
   }
 }

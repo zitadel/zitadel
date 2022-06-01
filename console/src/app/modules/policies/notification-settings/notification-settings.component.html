@@ -1,8 +1,8 @@
+<h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
+
 <div class="spinner-wr">
   <mat-spinner diameter="30" *ngIf="smtpLoading || smsProvidersLoading" color="primary"></mat-spinner>
 </div>
-
-<h2>{{ 'SETTING.SMTP.TITLE' | translate }}</h2>
 
 <cnsl-info-section
   *ngIf="!smtpLoading && !form.valid"

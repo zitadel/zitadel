@@ -34,7 +34,7 @@ Errors:
     NotFound: OIDC Konfiguration konnte nicht gefunden werden
     AlreadyExists: OIDC Konfiguration existiert bereits
   SecretGenerator:
-    AlreadyExists: Passwort Generator exisiter bereits
+    AlreadyExists: Passwort Generator existiert bereits
     TypeMissing: Passwort Generator Typ fehlt
     NotFound: Passwort Generator nicht gefunden
   SMSConfig:
@@ -49,11 +49,11 @@ Errors:
     NoDomain: Keine Domäne für Nachricht gefunden
   User:
     NotFound: Benutzer konnte nicht gefunden werden
-    AlreadyExists: Benutzer existierts bereits
+    AlreadyExists: Benutzer existiert bereits
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
-    DomainPolicyNil: Organisations Policy ist leer
+    DomainPolicyNil: Organisation Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
     Invalid: Benutzerdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
@@ -65,7 +65,7 @@ Errors:
     NotInitialised: Benutzer ist noch nicht initialisiert
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
-    InitCodeNotFound: Kein Initialisierungs Code gefunden
+    InitCodeNotFound: Kein Initialisierungs-Code gefunden
     UsernameNotChanged: Benutzername wurde nicht verändert
     Profile:
       NotFound: Profil nicht gefunden
@@ -77,12 +77,12 @@ Errors:
       AlreadyVerified: Email ist bereits verifiziert
       NotChanged: Email wurde nicht geändert
     Phone:
-      NotFound: Telfonnummer nicht gefunden
+      NotFound: Telefonnummer nicht gefunden
       Invalid: Telefonnummer ist ungültig
       AlreadyVerified: Telefonnummer bereits verifiziert
     Address:
-      NotFound: Addresse nicht gefunden
-      NotChanged: Addresse wurde nicht geändert
+      NotFound: Adresse nicht gefunden
+      NotChanged: Adresse wurde nicht geändert
     Machine:
       Key:
         NotFound: Maschinen Key nicht gefunden
@@ -99,7 +99,7 @@ Errors:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden
       Expired: Code ist abgelaufen
-      GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
+      GeneratorAlgNotSupported: Generator Algorithmus wird nicht unterstützt
     Password:
       NotFound: Password nicht gefunden
       Empty: Passwort ist leer
@@ -108,7 +108,7 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
-      MinLengthNotAllowed: Angegebene Mindestläng ist nicht erlaubt
+      MinLengthNotAllowed: Angegebene Mindestlänge ist nicht erlaubt
       HasLower: Passwort beinhaltet keinen Kleinbuchstaben
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
@@ -199,10 +199,10 @@ Errors:
       AlreadyExists: Default Message Text existiert bereits
       Invalid: Default Message Text ist ungültig
     PasswordComplexityPolicy:
-      NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
-      Empty: Passwort Komplexitäts Policy ist leer
-      NotExisting: Passwort Komplexitäts Policy existiert nicht
-      AlreadyExists: Passwort Komplexitäts Policy existiert bereits
+      NotFound: Passwortkomplexität Policy konnte nicht gefunden werden
+      Empty: Passwortkomplexität Policy ist leer
+      NotExisting: Passwortkomplexität Policy existiert nicht
+      AlreadyExists: Passwortkomplexität Policy existiert bereits
     PasswordLockoutPolicy:
       NotFound: Password Lockout Policy konnte nicht gefunden werden
       Empty: Passwort Lockout Policy ist leer
@@ -233,7 +233,7 @@ Errors:
       AlreadyExists: Member existiert bereits
       NotExisting: Member existiert nicht
       NotFound: Member konnte nicht gefunden werden
-    MinimumOneRoleNeeded: Es muss mindestend eine Rolle hinzugefügt werden
+    MinimumOneRoleNeeded: Es muss mindestens eine Rolle hinzugefügt werden
     Role:
       AlreadyExists: Rolle existiert bereits
       Invalid: Rolle ist ungültig
@@ -243,7 +243,7 @@ Errors:
       AlreadyExists: Applikation existiert bereits
       NotFound: Applikation nicht gefunden
       Invalid: Applikation ist ungültig
-      NotExisting: Applikation exisitert nicht
+      NotExisting: Applikation existiert nicht
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
       IsNotAPI: Applikation ist nicht vom Typ API
       NotActive: Applikation ist nicht aktiv
@@ -293,13 +293,13 @@ Errors:
         NotExisting: Multifaktor existiert nicht
         Unspecified: Multifaktor ungültig
       IDP:
-        AlreadyExists: Identitäts Provider existiert bereits
-        NotExisting: Identitäts Provider existiert nicht
+        AlreadyExists: Identitätsprovider existiert bereits
+        NotExisting: Identitätsprovider existiert nicht
         Invalid: IDP ist ungültig
       IDPConfig:
-        AlreadyExists: Identitäts Provider Konfiguration existiert bereits
-        NotInactive: Identitäts Provider Konfiguration nicht inaktive
-        NotActive: Identitäts Provider Konfiguration nicht aktive
+        AlreadyExists: Identitätsprovider Konfiguration existiert bereits
+        NotInactive: Identitätsprovider Konfiguration nicht inaktive
+        NotActive: Identitätsprovider Konfiguration nicht aktive
     LabelPolicy:
       NotFound: Default Private Label Policy konnte nicht gefunden
       NotChanged: Default Private Label Policy wurde nicht verändert
@@ -363,7 +363,7 @@ Errors:
     AlreadyExists: Member existiert bereits
   IDPConfig:
     AlreadyExists: IDP Konfiguration mit diesem Name existiert bereits
-    NotExisting: Identitäts Provider Konfiguration existiert nicht
+    NotExisting: Identitätsprovider Konfiguration existiert nicht
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
     AuditRetention: Änderungsverlauf ist ausserhalb der Audit Log Retention
@@ -400,7 +400,7 @@ Errors:
     NotFound: Action wurde nicht gefunden
     NotActive: Action ist nicht aktiv
     NotInactive: Action ist nicht inaktiv
-    MaxAllowed: Keine weitern aktiven Actions mehr erlaubt
+    MaxAllowed: Keine weitere aktiven Actions mehr erlaubt
   Flow:
     FlowTypeMissing: FlowType fehlt
     Empty: Flow ist bereits leer
@@ -410,7 +410,7 @@ Errors:
   Query:
     CloseRows: SQL Statement konnte nicht abgeschlossen werden
     SQLStatement: SQL Statement konnte nicht erstellt werden
-    InvalidRequest: Anfage ist ungültig
+    InvalidRequest: Anfrage ist ungültig
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -418,7 +418,7 @@ EventTypes:
     initialization: 
       code:
         added: Initialisierungscode generiert
-        sent: Initialiseriungscode versendet
+        sent: Initialisierungscode versendet
       check:
         succeeded: Benutzerinitialisierung erfolgreich
         failed: Benutzerinitialisierung fehlgeschlagen
@@ -452,7 +452,7 @@ EventTypes:
       initialization: 
         code:
           added: Initialisierungscode generiert
-          sent: Initialiseriungscode versendet
+          sent: Initialisierungscode versendet
         check:
           succeeded: Benutzerinitialisierung erfolgreich
           failed: Benutzerinitialisierung fehlgeschlagen
@@ -532,12 +532,12 @@ EventTypes:
             changed: Prüfsumme des Tokens für Passwortlos Login wurde verändert
         initialization:
           code:
-            added: Passwortlos Initialisierungcode wurde hinzugefügt
-            sent: Passwortlos Initialisierungcode wurde versendet
-            requested: Passwortlos Initialisierungcode wurde angefordert
+            added: Passwortlos Initialisierungsode wurde hinzugefügt
+            sent: Passwortlos Initialisierungsode wurde versendet
+            requested: Passwortlos Initialisierungsode wurde angefordert
             check:
-              succeeded: Passwortlos Initialisierungcode wurde erfolgreich geprüft
-              failed: Passwortlos Initialisierungcode Überprüfung ist fehlgeschlagen
+              succeeded: Passwortlos Initialisierungsode wurde erfolgreich geprüft
+              failed: Passwortlos Initialisierungsode Überprüfung ist fehlgeschlagen
       signed:
         out: Benutzer erfolgreich abgemeldet
       refresh:
@@ -652,7 +652,7 @@ EventTypes:
       login:
         added: Login Richtlinie hinzugefügt
         changed: Login Richtlinie geändert
-        removed: Login Richtline gelöscht
+        removed: Login Richtlinie gelöscht
         idpprovider:
           added: Idp Provider zu Login Richtlinie hinzugefügt
           removed: Idp Provider aus Login Richtlinie gelöscht
@@ -664,15 +664,15 @@ EventTypes:
           removed: Multifaktor aus Login Richtlinie gelöscht
       password:
         complexity:
-          added: Passwort Komplexitäts Richtlinie hinzugefügt
-          changed: Passwort Komplexitäts Richtlinie geändert
-          removed: Passwort Komplexitäts Richtlinie gelöscht
+          added: Passwortkomplexität Richtlinie hinzugefügt
+          changed: Passwortkomplexität Richtlinie geändert
+          removed: Passwortkomplexität Richtlinie gelöscht
         age:
           added: Passwort Alter Richtlinie hinzugefügt
           changed: Passwort Alter Richtlinie geändert
           removed: Passwort Alter Richtlinie gelöscht
         lockout:
-          added: Passwort Sperrungs Richtlinie hinzugefügt
+          added: Passwort sperrungs Richtlinie hinzugefügt
           changed: Passwort Sperrungs Richtlinie geändert
           removed: Passwort Sperrungs Richtlinie gelöscht
       label:
@@ -765,8 +765,8 @@ EventTypes:
   policy:
     password:
       complexity:
-        added: Passwortkomplexitätsrichtline hinzugefügt
-        changed: Passwortkomplexitätsrichtline geändert
+        added: Passwortkomplexität Richtlinie hinzugefügt
+        changed: Passwortkomplexität Richtline geändert
       age:
         added: Passwortaltersrichtlinie hinzugefügt
         changed: Passwortaltersrichtlinie geändert
@@ -815,8 +815,8 @@ EventTypes:
           added: Idp Provider zu Default Login Policy hinzugefügt
           removed: Idp Provider aus Default Login Policy gelöscht
       label:
-        added: Label Richtline hinzugefügt
-        changed: Label Richtline geändert
+        added: Label Richtlinie hinzugefügt
+        changed: Label Richtlinie geändert
         activated: Label Richtline aktiviert
         logo:
           added: Logo zu Label Richtlinie hinzugefügt

@@ -1,12 +1,9 @@
 package google
 
 import (
-	"strconv"
-
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing/otel"
 )
@@ -19,14 +16,10 @@ type Config struct {
 func NewTracer(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
 	c.ProjectID, _ = rawConfig["projectid"].(string)
-	fraction, ok := rawConfig["fraction"].(string)
-	if ok {
-		c.Fraction, err = strconv.ParseFloat(fraction, 32)
-		if err != nil {
-			return errors.ThrowInternal(err, "GOOGLE-Dsag3", "could not map fraction")
-		}
+	c.Fraction, err = otel.FractionFromConfig(rawConfig["fraction"])
+	if err != nil {
+		return err
 	}
-
 	return c.NewTracer()
 }
 

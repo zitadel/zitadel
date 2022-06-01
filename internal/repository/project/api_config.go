@@ -67,6 +67,9 @@ func (e *APIConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.AppID != c.AppID {
 		return false
 	}
+	if e.ClientID != c.ClientID {
+		return false
+	}
 	if e.AuthMethodType != c.AuthMethodType {
 		return false
 	}

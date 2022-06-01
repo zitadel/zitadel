@@ -1,10 +1,13 @@
 package admin
 
 import (
+	"context"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/admin/repository"
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
@@ -21,10 +24,11 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	admin.UnimplementedAdminServiceServer
+	database        string
 	command         *command.Commands
 	query           *query.Queries
 	administrator   repository.AdministratorRepository
-	assetsAPIDomain string
+	assetsAPIDomain func(context.Context) string
 	userCodeAlg     crypto.EncryptionAlgorithm
 }
 
@@ -32,17 +36,20 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands,
+func CreateServer(
+	database string,
+	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
-	assetsAPIDomain string,
+	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
 	return &Server{
+		database:        database,
 		command:         command,
 		query:           query,
 		administrator:   repo,
-		assetsAPIDomain: assetsAPIDomain,
+		assetsAPIDomain: assets.AssetAPI(externalSecure),
 		userCodeAlg:     userCodeAlg,
 	}
 }

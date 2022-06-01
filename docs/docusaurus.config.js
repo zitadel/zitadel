@@ -20,6 +20,14 @@ module.exports = {
   ],
   themeConfig: {
     zoomSelector: ".markdown :not(em) > img",
+    announcementBar: {
+      id: 'documentation',
+      content:
+        'This page contains the documentation for ZITADEL version 2, if you are looking for version 1 please visit <a target="_blank" rel="noopener noreferrer" href="https://docs-v1.zitadel.com">https://docs-v1.zitadel.com</a>',
+      backgroundColor: '#fafbfc',
+      textColor: '#091E42',
+      isCloseable: false,
+    },
     navbar: {
       // title: 'ZITADEL',
       logo: {
@@ -77,6 +85,10 @@ module.exports = {
           title: "Community",
           items: [
             {
+              label: "Chat",
+              href: "https://zitadel.com/chat",
+            },
+            {
               label: "GitHub Discussions",
               href: "https://github.com/zitadel/zitadel/discussions",
             },
@@ -95,11 +107,25 @@ module.exports = {
           ],
         },
         {
-          title: "Company",
+          title: "Legal",
+          items: [
+
+            {
+              label: "Terms and Conditions",
+              href: "/docs/legal/terms-of-service",
+            },
+            {
+              label: "Privacy Policy",
+              href: "/docs/legal/privacy-policy",
+            },
+          ],
+        },
+        {
+          title: "About",
           items: [
             {
-              label: "Team.",
-              href: "https://zitadel.com/team",
+              label: "Website",
+              href: "https://zitadel.com",
             },
             {
               label: "Contact",
@@ -112,25 +138,19 @@ module.exports = {
             {
               label: "Status",
               href: "https://status.zitadel.ch/",
-            },
-            {
-              label: "Terms and Conditions",
-              href: "https://docs.zitadel.com/docs/legal/terms-of-service",
-            },
-            {
-              label: "Privacy Policy",
-              href: "https://docs.zitadel.com/docs/legal/privacy-policy",
-            },
+            }
           ],
         },
+        
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} ZITADEL - Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     algolia: {
       appId: "8H6ZKXENLO",
-      apiKey: "c3899716db098111f5e89c8987b9c427",
-      indexName: "zitadel",
-    },
+      apiKey: "124fe1c102a184bc6fc70c75dc84f96f",
+      indexName: 'zitadel',
+      selector: 'div#'
+  },
     prism: {
       additionalLanguages: ["csharp", "dart", "groovy"],
     },
@@ -141,7 +161,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
+          editUrl: "https://github.com/zitadel/zitadel/edit/v2-alpha/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {

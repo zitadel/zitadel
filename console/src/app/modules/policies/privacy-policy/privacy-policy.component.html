@@ -1,7 +1,21 @@
 <h2>{{ 'POLICY.PRIVACY_POLICY.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.PRIVACY_POLICY.DESCRIPTION' | translate }}</p>
 
-<cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
+<ng-container *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault">
+  <ng-template cnslHasRole [hasRole]="['policy.delete']">
+    <button
+      color="primary"
+      matTooltip="{{ 'POLICY.RESET' | translate }}"
+      color="warn"
+      (click)="resetDefault()"
+      mat-stroked-button
+    >
+      {{ 'POLICY.RESET' | translate }}
+    </button>
+  </ng-template>
+</ng-container>
+
+<!-- <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section> -->
 
 <div>
   <form *ngIf="form" [formGroup]="form" class="policy-content">
@@ -26,17 +40,6 @@
 </div>
 
 <div class="policy-actions">
-  <button
-    *ngIf="privacyPolicy && privacyPolicy.isDefault === false"
-    class="reset-button"
-    [disabled]="(canWrite$ | async) === false"
-    (click)="resetDefault()"
-    color="warn"
-    type="submit"
-    mat-stroked-button
-  >
-    <i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}
-  </button>
   <button
     class="save-button"
     [disabled]="(canWrite$ | async) === false"

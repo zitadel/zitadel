@@ -2,8 +2,9 @@ import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
@@ -38,13 +39,13 @@ export class AuthUserDetailComponent implements OnDestroy {
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
   public settingsList: SidenavSetting[] = [
-    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL'},
-    { id: 'idp', i18nKey: 'USER.SETTINGS.IDP'},
-    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS'},
-    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA'},
-    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS'},
-    { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS'},
-    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA'},
+    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
+    { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
+    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS' },
+    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA' },
+    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' },
+    { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' },
+    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' },
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
@@ -57,7 +58,15 @@ export class AuthUserDetailComponent implements OnDestroy {
     private breadcrumbService: BreadcrumbService,
     private mediaMatcher: MediaMatcher,
     private _location: Location,
+    activatedRoute: ActivatedRoute,
   ) {
+    activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
+      const { id } = params;
+      if (id) {
+        this.currentSetting = id;
+      }
+    });
+
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;
     if (small) {

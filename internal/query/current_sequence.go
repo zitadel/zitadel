@@ -15,10 +15,9 @@ import (
 )
 
 const (
-	lockStmtFormat = "INSERT INTO %[1]s" +
-		" (locker_id, locked_until, projection_name) VALUES ($1, now()+$2::INTERVAL, $3)" +
-		" ON CONFLICT (projection_name)" +
-		" DO UPDATE SET locker_id = $1, locked_until = now()+$2::INTERVAL"
+	lockStmtFormat = "UPDATE %[1]s" +
+		" set locker_id = $1, locked_until = now()+$2::INTERVAL" +
+		" WHERE projection_name = $3"
 	lockerIDReset = "reset"
 )
 
@@ -136,7 +135,7 @@ func (q *Queries) checkAndLock(ctx context.Context, projectionName string) error
 	if err != nil || rows == 0 {
 		return errors.ThrowInternal(err, "QUERY-Bh3ws", "Errors.RemoveFailed")
 	}
-	time.Sleep(7 * time.Second) //more than twice the default lock duration (10s)
+	time.Sleep(7 * time.Second) //more than half the default lock duration (10s)
 	return nil
 }
 
@@ -195,17 +194,14 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 	return sq.Select(
 			CurrentSequenceColCurrentSequence.identifier(),
 			CurrentSequenceColTimestamp.identifier()).
-			From(currentSequencesTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(currentSequencesTable.identifier() + " AS OF SYSTEM TIME '-1ms'").PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestSequence, error) {
 			seq := new(LatestSequence)
 			err := row.Scan(
 				&seq.Sequence,
 				&seq.Timestamp,
 			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-gmd9o", "Errors.CurrentSequence.NotFound")
-				}
+			if err != nil && !errs.Is(err, sql.ErrNoRows) {
 				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "Errors.Internal")
 			}
 			return seq, nil

@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -63,6 +64,7 @@ export class UserCreateComponent implements OnDestroy {
     private fb: FormBuilder,
     private mgmtService: ManagementService,
     private changeDetRef: ChangeDetectorRef,
+    private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
     breadcrumbService.setBreadcrumb([
@@ -92,6 +94,10 @@ export class UserCreateComponent implements OnDestroy {
         this.envSuffixLabel = this.envSuffix();
         this.changeDetRef.detectChanges();
       });
+  }
+
+  public close(): void {
+    this._location.back();
   }
 
   private async loadOrg(): Promise<void> {
