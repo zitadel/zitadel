@@ -1,82 +1,85 @@
-.idp-form {
-  padding-top: 1rem;
-}
-
-.idp-desc {
-  font-size: 14px;
-}
-
-.idp-content {
-  display: flex;
-  flex-direction: row;
-  margin: 0 -0.5rem;
-  flex-wrap: wrap;
+.idp-wrapper {
+  margin-top: 2rem;
 
   .idp-desc {
-    flex-basis: 100%;
-    margin: 0 0.5rem;
-    margin-bottom: 1rem;
+    font-size: 14px;
   }
 
-  .formfield {
-    flex: 1 1 auto;
-    margin: 0 0.5rem;
-    min-width: 150px;
-
-    .chip {
-      border-radius: 0.5rem;
-      height: 40px;
+  .idp-content {
+    .idp-desc {
+      margin-bottom: 1rem;
     }
 
-    &.fullwidth {
-      flex-basis: 100%;
-    }
+    .idp-formfield {
+      display: block;
+      max-width: 400px;
 
-    @media only screen and (max-width: 450px) {
-      flex-basis: 100%;
-    }
-  }
+      .chip {
+        border-radius: 0.5rem;
+        height: 40px;
+      }
 
-  .auto-reg-info {
-    margin: 0 0.5rem 1rem 0.5rem;
-    display: block;
-    width: 100%;
-
-    .auto-reg-desc {
-      margin: 0 0 1rem 0;
-    }
-  }
-
-  .line {
-    display: flex;
-    align-items: flex-end;
-    width: 100%;
-
-    .formfield {
-      flex: 1;
-
-      input {
+      .mat-chip-input {
+        width: 100%;
         margin: 0;
+      }
+
+      @media only screen and (max-width: 450px) {
+        max-width: none;
       }
     }
 
-    button {
-      margin-bottom: 12px;
+    .auto-reg-info {
+      margin: 0 0 1rem 0;
+      display: block;
+      width: 100%;
+      max-width: 400px;
+
+      .auto-reg-desc {
+        margin: 0 0 1rem 0;
+      }
+    }
+
+    .scope-card {
+      max-width: 400px;
+      display: block;
+
+      .scope-card-content {
+        display: block;
+
+        .flex-line {
+          display: flex;
+          align-items: flex-end;
+          width: 100%;
+
+          .idp-formfield {
+            flex: 1;
+
+            input {
+              margin: 0;
+            }
+          }
+
+          button {
+            margin-bottom: 12px;
+          }
+        }
+      }
     }
   }
-}
 
-.btn-wrapper {
-  display: flex;
-  justify-content: flex-end;
+  .btn-wrapper {
+    display: flex;
+    margin-top: 1rem;
 
-  .continue-button {
-    margin-bottom: 4rem;
-    display: block;
-
-    @media only screen and (max-width: 450px) {
-      margin-top: 1rem;
+    .continue-button {
       margin-bottom: 2rem;
+      display: block;
+
+      @media only screen and (max-width: 450px) {
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+      }
     }
   }
 }
