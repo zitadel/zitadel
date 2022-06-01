@@ -2,7 +2,8 @@
 title: Users
 ---
 
-Manage all your users who are allowed to access the customer portal.
+Manage all your users who are allowed to access the Customer Portal.
+For the moment all users with access to the Customer Portal will have the role "Admin".
 
 ![Create user](/img/manuals/portal/customer_portal_user_list.png)
 

@@ -10,3 +10,5 @@ Create a new support request with the following information:
 - Message
 
 At the bottom of the page you can see all your support requests. 
+
+![Customer Portal Support](/img/manuals/portal/customer_portal_support.png)
