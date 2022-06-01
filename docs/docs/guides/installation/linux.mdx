@@ -22,7 +22,7 @@ export ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
 Download the zitadel binary
 
 ```bash
-curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.6 | grep "browser_download_url.*zitadel_.*_linux_$(dpkg --print-architecture)" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadel && sudo chmod +x /usr/local/bin/zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.16 | grep "browser_download_url.*zitadel_.*_linux_$(dpkg --print-architecture)" | cut -d '"' -f 4 | sudo wget -i - -O /usr/local/bin/zitadel && sudo chmod +x /usr/local/bin/zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
 ```
 
 Run the database and application containers
