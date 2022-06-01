@@ -234,9 +234,9 @@ module.exports = {
     "legal/data-processing-agreement",
     {
       type: "category",
-      label: "Service Descriptions",
+      label: "Service Description",
       collapsed: false,
-      items: ["legal/service-level-description", "legal/support-services"],
+      items: ["legal/cloud-service-description", "legal/service-level-description", "legal/support-services"],
     },
     {
       type: "category",
