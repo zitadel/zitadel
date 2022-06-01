@@ -182,19 +182,6 @@ module.exports = {
     "concepts/architecture",
     {
       type: "category",
-      label: "Customer Portal",
-      collapsed: true,
-      items: [
-        "concepts/customerportal/overview",
-        "concepts/customerportal/start",
-        "concepts/customerportal/instances",
-        "concepts/customerportal/billing",
-        "concepts/customerportal/users",
-        "concepts/customerportal/support",
-      ],
-    },
-    {
-      type: "category",
       label: "Structure",
       collapsed: false,
       items: [
@@ -226,6 +213,19 @@ module.exports = {
     "manuals/introduction",
     "manuals/user-profile",
     "manuals/user-login",
+    {
+      type: "category",
+      label: "Customer Portal",
+      collapsed: true,
+      items: [
+        "manuals/customerportal/overview",
+        "manuals/customerportal/start",
+        "manuals/customerportal/instances",
+        "manuals/customerportal/billing",
+        "manuals/customerportal/users",
+        "manuals/customerportal/support",
+      ],
+    },
     "manuals/troubleshooting",
   ],
   legal: [

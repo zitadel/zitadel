@@ -16,7 +16,7 @@ To get started, enter the following data:
 - Organization Name
 - Instance Name
 
-![Customer Portal Landing Page](/img/concepts/portal/customer_portal_landing_page.png)
+![Customer Portal Landing Page](/img/manuals/portal/customer_portal_landing_page.png)
 
 The instance you have created will automatically be in the free subscription, which already allows you to use all the features.
 Sign in to [ZITADEL Customer Portal](https://zitadel.cloud), to manage all you instances.
