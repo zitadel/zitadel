@@ -284,7 +284,7 @@ func isErrAlreadyExists(err error) bool {
 	if !ok {
 		return false
 	}
-	return sqlErr.Routine == "NewRelationAlreadyExistsError"
+	return sqlErr.Code == "42P07"
 }
 
 func createTableStatement(table *Table, tableName string, suffix string) string {
