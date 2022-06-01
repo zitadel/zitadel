@@ -63,7 +63,7 @@ type Flow struct {
 }
 
 func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string) (*Flow, error) {
-	query, scan := prepareFlowQuery()
+	query, scan := prepareFlowQuery(flowType)
 	stmt, args, err := query.Where(
 		sq.Eq{
 			FlowsTriggersColumnFlowType.identifier():      flowType,
@@ -188,7 +188,7 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 		}
 }
 
-func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -211,6 +211,7 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 		func(rows *sql.Rows) (*Flow, error) {
 			flow := &Flow{
 				TriggerActions: make(map[domain.TriggerType][]*Action),
+				Type:           flowType,
 			}
 			for rows.Next() {
 				var (
