@@ -15,6 +15,7 @@ The terms of service (**"TOS"**) outlined in this document establish the most im
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
+* [**Service Description**](service-description) - What service we offer under this agreement
 * [**Service Level Description**](service-level-description) - What service levels do we guarantee you
 * [**Support Service Descriptions**](support-services) - How we provide support services to you
 
@@ -61,9 +62,7 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 
 We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](support-services) to this document.
 
-Customers without a Subscription or a Subscription plan that does not include Support Services should post inquiries and issues regarding ZITADEL from customers to our [GitHub Discussions](https://github.com/zitadel/zitadel/discussions), whenever feasible.
-
-If you need support integrating or setting up ZITADEL, please contact our consulting team.
+Customers without a subscription can contact us via the official [communication channels](https://zitadel.com/contact).
 
 ### Limited influence
 
@@ -195,9 +194,9 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 ### Entry into force
 
-These TOS shall enter into force as of 16.06.2021.
+These TOS shall enter into force as of 01.07.2022.
 
-Last revised: July 20, 2021
+Last revised: June 3, 2022
 
 ### Amendments
 
