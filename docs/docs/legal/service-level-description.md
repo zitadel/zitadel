@@ -6,6 +6,8 @@ custom_edit_url: null
 
 This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
 
+Last revised: June 3, 2022
+
 ## Definitions
 
 **Monthly Uptime Percentage** means total number of minutes in a month, minus the number of minutes of Downtime suffered from all Downtime Periods in a month, divided by the total number of minutes in a month.
@@ -40,6 +42,7 @@ This excludes specifically:
 
 - **Authentication API** Endpoints
 - **OpenID Connect 1.0 / OAuth 2.0 API** Endpoints
+- **SAML 2.0** Endpoints
 - **Login Service** means the graphical user interface of ZITADEL Cloud for users to Login, Self-Register, and conduct a Password Reset.
 - **Identity Brokering Service** means the component of ZITADEL Cloud that handles federated authentication of users with third-party identity provider, excluding any failure or misconfiguration by the third-party
 
