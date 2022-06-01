@@ -162,7 +162,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
 	}
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
@@ -171,10 +171,10 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&existingPolicy.LoginPolicyWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&existingPolicy.WriteModel), nil
 }
 
-func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
@@ -218,7 +218,7 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
@@ -243,7 +243,7 @@ func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourc
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
-	events := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
+	events := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -256,7 +256,7 @@ func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourc
 	return writeModelToObjectDetails(&idpModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.Command {
+func (c *Commands) removeIDPFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.Command {
 	var events []eventstore.Command
 	if cascade {
 		events = append(events, org.NewIdentityProviderCascadeRemovedEvent(ctx, orgAgg, idpConfigID))
@@ -371,7 +371,7 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
-	return multiFactorModel.MultiFactorWriteModel.MFAType, writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
+	return multiFactorModel.MFAType, writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
 }
 
 func (c *Commands) addMultiFactorToLoginPolicy(ctx context.Context, multiFactorModel *OrgMultiFactorWriteModel, multiFactor domain.MultiFactorType) (*org.LoginPolicyMultiFactorAddedEvent, error) {
