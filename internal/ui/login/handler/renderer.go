@@ -332,12 +332,13 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 }
 
 func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
+	lang, _ := l.renderer.ReqLang(l.getTranslator(authReq), r).Base()
 	baseData := baseData{
 		errorData: errorData{
 			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
-		Lang:                   l.renderer.ReqLang(l.getTranslator(authReq), r).String(),
+		Lang:                   lang.String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
