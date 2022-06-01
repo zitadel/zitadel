@@ -2711,9 +2711,9 @@ select:focus,
 .lgn-select:focus {
   border-color: var(--zitadel-color-input-border-active);
 }
-.lgn-input[color=warn],
-select[color=warn],
-.lgn-select[color=warn] {
+.lgn-input.lgn-touched[color=warn],
+select.lgn-touched[color=warn],
+.lgn-select.lgn-touched[color=warn] {
   border-color: var(--zitadel-color-warn);
 }
 
