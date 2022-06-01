@@ -12,7 +12,7 @@ This annex of the [Framework Agreement](terms-of-service) describes the service 
 
 **Authenticated request** means <!-- TODO: Elio -->
 
-**Action minutes** means <!-- TODO: mpa -->
+**Action minutes** means execution time, rounded up to 1 second, of custom code execution via a customer defined Action.
 
 **Adequate Country** means a country or territory recognized as providing an adequate level of protection for Personal Data under an adequacy decision made, from time to time, by (as applicable) (i) the Information Commissioner's Office and/or under applicable UK law (including the UK GDPR), or (ii) the [European Commission under the GDPR](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en).
 
