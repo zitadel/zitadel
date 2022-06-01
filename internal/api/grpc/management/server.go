@@ -31,7 +31,6 @@ type Server struct {
 	passwordHashAlg   crypto.HashAlgorithm
 	userCodeAlg       crypto.EncryptionAlgorithm
 	externalSecure    bool
-	issuerPath        string
 	auditLogRetention time.Duration
 }
 
@@ -41,7 +40,6 @@ func CreateServer(
 	sd systemdefaults.SystemDefaults,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	externalSecure bool,
-	issuerPath string,
 	auditLogRetention time.Duration,
 ) *Server {
 	return &Server{
@@ -52,7 +50,6 @@ func CreateServer(
 		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		userCodeAlg:       userCodeAlg,
 		externalSecure:    externalSecure,
-		issuerPath:        issuerPath,
 		auditLogRetention: auditLogRetention,
 	}
 }

@@ -151,7 +151,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		authZRepo,
 		queries,
 	}
-	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)+oidc.HandlerPrefix, systemAPIKeys)
+	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), systemAPIKeys)
 
 	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, keys.OIDC, keys.User)
@@ -168,7 +168,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.Database, commands, queries, adminRepo, config.ExternalSecure, keys.User)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, oidc.HandlerPrefix, config.AuditLogRetention)); err != nil {
+	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
@@ -183,17 +183,16 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return err
 	}
 
-	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler)
-	if err != nil {
-		return fmt.Errorf("unable to start oidc provider: %w", err)
-	}
-	apis.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
-
 	openAPIHandler, err := openapi.Start()
 	if err != nil {
 		return fmt.Errorf("unable to start openapi handler: %w", err)
 	}
 	apis.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
+
+	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler)
+	if err != nil {
+		return fmt.Errorf("unable to start oidc provider: %w", err)
+	}
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler)
 	if err != nil {
@@ -207,6 +206,12 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(login.HandlerPrefix, l.Handler())
 
+	//handle oidc at last, to be able to handle the root
+	//we might want to change that in the future
+	//esp. if we want to have multiple well-known endpoints
+	//it might make sense to handle the discovery endpoint and oauth and oidc prefixes individually
+	//but this will require a change in the oidc lib
+	apis.RegisterHandler("", oidcProvider.HttpHandler())
 	return nil
 }
 
