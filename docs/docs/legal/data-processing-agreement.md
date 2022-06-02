@@ -29,7 +29,6 @@ In particular, the following Personal Data are part of the processing:
         <li>Surname and first name</li>
         <li>Email addresses</li>
         <li>User name</li>
-        <li>Language</li>
       </ul>
     </td>
     <td>All users</td>
@@ -59,9 +58,9 @@ In particular, the following Personal Data are part of the processing:
       <ul>
         <li>Profile pictures</li>
         <li>Gender</li>
-        <li>Birthday</li>
         <li>Language</li>
-        <li>Address(es)</li>
+        <li>Nickname</li>
+        <li>Display name</li>
         <li>Phone number(s)</li>
       </ul>
     </td>
@@ -83,6 +82,7 @@ In particular, the following Personal Data are part of the processing:
     <td>
       <ul>
         <li>Billing address</li>
+        <li>Payment information</li>
         <li>Customer number</li>
         <li>Customer history</li>
         <li>Credit rating information</li>
