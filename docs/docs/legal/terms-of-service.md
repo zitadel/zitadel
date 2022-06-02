@@ -112,7 +112,7 @@ You will ensure that your vicarious agents, customers and third parties fulfill 
 
 ### Credit and payment
 
-Signup to our Services does not require you to open a payment account. However, a payment account is required for the purchase of our Subscriptions. The costs for the services you have purchased will be debited periodically and in advance from your payment account.
+Signup to our Services does not require you to open a payment account. However, a payment account is required for the purchase of our Subscriptions. The costs for the services you have purchased will be debited periodically from your payment account.
 
 ### Payment procedure
 
