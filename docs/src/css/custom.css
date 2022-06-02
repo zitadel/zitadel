@@ -360,7 +360,8 @@ main .container img {
 
 .rounded-system,
 .rounded-apis,
-.rounded-policy {
+.rounded-policy,
+.rounded-instance {
   background: linear-gradient(40deg, #1f2937, #111827);
 }
 
