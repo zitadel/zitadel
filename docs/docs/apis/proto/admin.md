@@ -290,7 +290,7 @@ all queries need to match (AND)
 > **rpc** SetUpOrg([SetUpOrgRequest](#setuporgrequest))
 [SetUpOrgResponse](#setuporgresponse)
 
-Creates a new org and user 
+Creates a new org and user
 and adds the user to the orgs members as ORG_OWNER
 
 
@@ -1373,7 +1373,7 @@ they represent the delta of the event happend on the objects
 [ListFailedEventsResponse](#listfailedeventsresponse)
 
 Returns event descriptions which cannot be processed.
-It's possible that some events need some retries. 
+It's possible that some events need some retries.
 For example if the SMTP-API wasn't able to send an email at the first time
 
 
@@ -1395,6 +1395,18 @@ failed event. You can find out if it worked on the `failure_count`
 
 
     DELETE: /failedevents/{database}/{view_name}/{failed_sequence}
+
+
+### ImportData
+
+> **rpc** ImportData([ImportDataRequest](#importdatarequest))
+[ImportDataResponse](#importdataresponse)
+
+Imports data into instance and creates different objects
+
+
+
+    POST: /import
 
 
 
@@ -2398,6 +2410,227 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_id_query |  zitadel.idp.v1.IDPIDQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_name_query |  zitadel.idp.v1.IDPNameQuery | - |  |
+
+
+
+
+### ImportDataAPIApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddAPIAppRequest | - |  |
+
+
+
+
+### ImportDataAction
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| action_id |  string | - |  |
+| action |  zitadel.management.v1.CreateActionRequest | - |  |
+
+
+
+
+### ImportDataError
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  string | - |  |
+| id |  string | - |  |
+| message |  string | - |  |
+
+
+
+
+### ImportDataHumanUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  zitadel.management.v1.AddHumanUserRequest | - |  |
+
+
+
+
+### ImportDataMachineUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  zitadel.management.v1.AddMachineUserRequest | - |  |
+
+
+
+
+### ImportDataOIDCApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddOIDCAppRequest | - |  |
+
+
+
+
+### ImportDataOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| owner_id |  string | - |  |
+| org |  zitadel.management.v1.AddOrgRequest | - |  |
+| domain_policy |  AddCustomDomainPolicyRequest | - |  |
+| label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
+| lockout_policy |  zitadel.management.v1.AddCustomLockoutPolicyRequest | - |  |
+| login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
+| password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
+| privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
+| projects | repeated ImportDataProject | - |  |
+| api_apps | repeated ImportDataAPIApplication | - |  |
+| oidc_apps | repeated ImportDataOIDCApplication | - |  |
+| human_users | repeated ImportDataHumanUser | - |  |
+| machine_users | repeated ImportDataMachineUser | - |  |
+| actions | repeated ImportDataAction | - |  |
+| project_grants | repeated zitadel.management.v1.AddProjectGrantRequest | - |  |
+| user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
+| org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
+| project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
+| project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+
+
+
+
+### ImportDataProject
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| owner_id |  string | - |  |
+| project |  zitadel.management.v1.AddProjectRequest | - |  |
+
+
+
+
+### ImportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated ImportDataOrg | - |  |
+
+
+
+
+### ImportDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| errors | repeated ImportDataError | - |  |
+| success |  ImportDataSuccess | - |  |
+
+
+
+
+### ImportDataSuccess
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated ImportDataSuccessOrg | - |  |
+
+
+
+
+### ImportDataSuccessOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| project_ids | repeated string | - |  |
+| oidc_app_ids | repeated string | - |  |
+| api_app_ids | repeated string | - |  |
+| human_user_ids | repeated string | - |  |
+| machin_user_ids | repeated string | - |  |
+| action_ids | repeated string | - |  |
+| project_grants | repeated ImportDataSuccessProjectGrant | - |  |
+| user_grants | repeated ImportDataSuccessUserGrant | - |  |
+| org_members | repeated string | - |  |
+| project_members | repeated ImportDataSuccessProjectMember | - |  |
+| project_grant_members | repeated ImportDataSuccessProjectGrantMember | - |  |
+
+
+
+
+### ImportDataSuccessProjectGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| org_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessProjectGrantMember
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| grant_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessProjectMember
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| user_id |  string | - |  |
 
 
 

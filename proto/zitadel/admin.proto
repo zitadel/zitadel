@@ -10,6 +10,7 @@ import "zitadel/policy.proto";
 import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
+import "zitadel/management.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -391,7 +392,7 @@ service AdminService {
         };
     }
 
-    //Checks whether an organisation exists by the given parameters 
+    //Checks whether an organisation exists by the given parameters
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
             get: "/orgs/_is_unique";
@@ -462,7 +463,7 @@ service AdminService {
         };
     }
 
-    //Creates a new org and user 
+    //Creates a new org and user
     // and adds the user to the orgs members as ORG_OWNER
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
@@ -1380,7 +1381,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default login policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLoginPolicy(UpdateLoginPolicyRequest) returns (UpdateLoginPolicyResponse) {
@@ -1445,7 +1446,7 @@ service AdminService {
             post: "/policies/login/idps";
             body: "*";
         };
-        
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
@@ -1796,7 +1797,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default password age policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdatePasswordAgePolicy(UpdatePasswordAgePolicyRequest) returns (UpdatePasswordAgePolicyResponse) {
@@ -1854,7 +1855,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default lockout policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLockoutPolicy(UpdateLockoutPolicyRequest) returns (UpdateLockoutPolicyResponse) {
@@ -2271,7 +2272,7 @@ service AdminService {
         };
     }
 
-    //Returns the IAM roles visible for the requested user 
+    //Returns the IAM roles visible for the requested user
     rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
         option (google.api.http) = {
             post: "/members/roles/_search";
@@ -2473,7 +2474,7 @@ service AdminService {
     }
 
     //Returns event descriptions which cannot be processed.
-    // It's possible that some events need some retries. 
+    // It's possible that some events need some retries.
     // For example if the SMTP-API wasn't able to send an email at the first time
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
@@ -2536,6 +2537,18 @@ service AdminService {
                     };
                 };
             };
+        };
+    }
+
+    // Imports data into instance and creates different objects
+    rpc ImportData(ImportDataRequest) returns (ImportDataResponse) {
+        option (google.api.http) = {
+            post: "/import";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
         };
     }
 }
@@ -2913,7 +2926,7 @@ message SetUpOrgRequest {
             ];
             bool is_phone_verified = 2;
         }
-    
+
         string user_name = 1 [
             (validate.rules).string = {min_len: 1, max_len: 200},
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2922,7 +2935,7 @@ message SetUpOrgRequest {
                 example: "\"mr_long_neck\"";
             }
         ];
-        
+
         Profile profile = 2 [(validate.rules).message.required = true];
         Email email = 3 [(validate.rules).message.required = true];
         Phone phone = 4;
@@ -3746,7 +3759,7 @@ message RemoveIDPFromLoginPolicyRequest {
 			required: ["idp_id"]
 		};
 	};
-    
+
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3775,7 +3788,7 @@ message AddSecondFactorToLoginPolicyRequest {
 			required: ["type"]
 		};
 	};
-    
+
     zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -3825,7 +3838,7 @@ message RemoveMultiFactorFromLoginPolicyRequest {
 			required: ["type"]
 		};
 	};
-    
+
     zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -4461,4 +4474,106 @@ message FailedEvent {
             example: "\"ID=EXAMP-ID3ER Message=Example message\"";
         }
     ];
+}
+
+
+message ImportDataRequest {
+    repeated ImportDataOrg orgs = 2;
+}
+message ImportDataOrg {
+    string org_id = 1;
+    string owner_id = 2;
+    zitadel.management.v1.AddOrgRequest org = 3;
+    AddCustomDomainPolicyRequest domain_policy = 4;
+    zitadel.management.v1.AddCustomLabelPolicyRequest label_policy = 5;
+    zitadel.management.v1.AddCustomLockoutPolicyRequest lockout_policy = 6;
+    zitadel.management.v1.AddCustomLoginPolicyRequest login_policy = 7;
+    zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest password_complexity_policy = 8;
+    zitadel.management.v1.AddCustomPrivacyPolicyRequest privacy_policy = 9;
+
+    repeated ImportDataProject projects = 10;
+    repeated ImportDataAPIApplication api_apps = 11;
+    repeated ImportDataOIDCApplication oidc_apps = 12;
+    repeated ImportDataHumanUser human_users = 13;
+    repeated ImportDataMachineUser machine_users = 14;
+    repeated ImportDataAction actions = 15;
+
+    repeated zitadel.management.v1.AddProjectGrantRequest project_grants = 16;
+    repeated zitadel.management.v1.AddUserGrantRequest user_grants = 17;
+
+    repeated zitadel.management.v1.AddOrgMemberRequest org_members = 18;
+    repeated zitadel.management.v1.AddProjectMemberRequest project_members = 19;
+    repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 20;
+}
+message ImportDataProject {
+    string project_id = 1;
+    string owner_id = 2;
+    zitadel.management.v1.AddProjectRequest project = 3;
+}
+message ImportDataAPIApplication {
+    string app_id = 1;
+    zitadel.management.v1.AddAPIAppRequest app = 2;
+}
+message ImportDataOIDCApplication {
+    string app_id = 1;
+    zitadel.management.v1.AddOIDCAppRequest app = 2;
+}
+message ImportDataHumanUser {
+    string user_id = 1;
+    zitadel.management.v1.ImportHumanUserRequest user = 2;
+}
+message ImportDataMachineUser {
+    string user_id = 1;
+    zitadel.management.v1.AddMachineUserRequest user = 2;
+}
+message ImportDataAction {
+    string action_id = 1;
+    zitadel.management.v1.CreateActionRequest action = 2;
+}
+
+message ImportDataResponse{
+    repeated ImportDataError errors = 1;
+    ImportDataSuccess success = 2;
+}
+message ImportDataError{
+    string type = 1;
+    string id = 2;
+    string message = 3;
+}
+
+message ImportDataSuccess {
+    repeated ImportDataSuccessOrg orgs = 1;
+}
+
+message ImportDataSuccessOrg{
+    string org_id = 1;
+    repeated string project_ids = 2;
+    repeated string oidc_app_ids = 3;
+    repeated string api_app_ids = 4;
+    repeated string human_user_ids = 5;
+    repeated string machin_user_ids = 6;
+    repeated string action_ids = 7;
+    repeated ImportDataSuccessProjectGrant project_grants = 8;
+    repeated ImportDataSuccessUserGrant user_grants = 9;
+    repeated string org_members = 10;
+    repeated ImportDataSuccessProjectMember project_members = 11;
+    repeated ImportDataSuccessProjectGrantMember project_grant_members = 12;
+}
+
+message ImportDataSuccessProjectGrant{
+    string project_id = 1;
+    string org_id = 2;
+}
+message ImportDataSuccessUserGrant{
+    string project_id = 1;
+    string user_id = 2;
+}
+message ImportDataSuccessProjectMember{
+    string project_id = 1;
+    string user_id = 2;
+}
+message ImportDataSuccessProjectGrantMember{
+    string project_id = 1;
+    string grant_id = 2;
+    string user_id = 3;
 }

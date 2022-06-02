@@ -16,7 +16,7 @@ func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action
 	if err != nil {
 		return "", nil, err
 	}
-	if existingAction != nil {
+	if existingAction.State != domain.ActionStateUnspecified {
 		return "", nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-nau2k", "Errors.Action.AlreadyExisting")
 	}
 

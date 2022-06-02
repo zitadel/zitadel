@@ -121,7 +121,7 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err != nil {
 		return nil, err
 	}
-	if existingApp != nil {
+	if existingApp.State != domain.AppStateUnspecified {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Application.AlreadyExisting")
 	}
 

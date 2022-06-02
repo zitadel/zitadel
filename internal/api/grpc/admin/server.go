@@ -2,7 +2,7 @@ package admin
 
 import (
 	"context"
-
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/admin/repository"
@@ -30,6 +30,7 @@ type Server struct {
 	administrator   repository.AdministratorRepository
 	assetsAPIDomain func(context.Context) string
 	userCodeAlg     crypto.EncryptionAlgorithm
+	passwordHashAlg crypto.HashAlgorithm
 }
 
 type Config struct {
@@ -40,6 +41,7 @@ func CreateServer(
 	database string,
 	command *command.Commands,
 	query *query.Queries,
+	sd systemdefaults.SystemDefaults,
 	repo repository.Repository,
 	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
@@ -51,6 +53,7 @@ func CreateServer(
 		administrator:   repo,
 		assetsAPIDomain: assets.AssetAPI(externalSecure),
 		userCodeAlg:     userCodeAlg,
+		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 	}
 }
 

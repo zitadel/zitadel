@@ -18,7 +18,7 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 	if err != nil {
 		return nil, err
 	}
-	if existingProject != nil {
+	if existingProject.State != domain.ProjectStateUnspecified {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
 	}
 	return c.addProjectWithID(ctx, project, resourceOwner, ownerUserID, projectID)

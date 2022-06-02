@@ -75,7 +75,7 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	if err != nil {
 		return nil, err
 	}
-	if existingAPI != nil {
+	if existingAPI.State != domain.AppStateUnspecified {
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Application.AlreadyExisting")
 	}
 

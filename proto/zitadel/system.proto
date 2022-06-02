@@ -3,8 +3,6 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/instance.proto";
-import "zitadel/management.proto";
-import "zitadel/admin.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -206,19 +204,6 @@ service SystemService {
       permission: "authenticated";
     };
   }
-
-  // Imports data into instance and creates different objects
-  rpc ImportInstanceData(ImportInstanceDataRequest) returns (ImportInstanceDataResponse) {
-    option (google.api.http) = {
-      post: "/instances/{instance_id}/import";
-      body: "*"
-    };
-
-    option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
-    };
-  }
-
 
   //Returns all stored read models of ZITADEL
   // views are used for search optimisation and optimise request latencies
@@ -628,68 +613,4 @@ message FailedEvent {
       example: "\"ID=EXAMP-ID3ER Message=Example message\"";
     }
   ];
-}
-
-message ImportInstanceDataRequest {
-  string instance_id = 1;
-  repeated ImportInstanceDataOrg orgs = 2;
-}
-message ImportInstanceDataOrg {
-  string org_id = 1;
-  string owner_id = 2;
-  zitadel.management.v1.AddOrgRequest org = 3;
-  zitadel.admin.v1.AddCustomDomainPolicyRequest domain_policy = 4;
-  zitadel.management.v1.AddCustomLabelPolicyRequest label_policy = 5;
-  zitadel.management.v1.AddCustomLockoutPolicyRequest lockout_policy = 6;
-  zitadel.management.v1.AddCustomLoginPolicyRequest login_policy = 7;
-  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest password_complexity_policy = 8;
-  zitadel.management.v1.AddCustomPrivacyPolicyRequest privacy_policy = 9;
-
-  repeated ImportInstanceDataProject projects = 10;
-  repeated ImportInstanceDataAPIApplication api_apps = 11;
-  repeated ImportInstanceDataOIDCApplication oidc_apps = 12;
-  repeated ImportInstanceDataHumanUser human_users = 13;
-  repeated ImportInstanceDataMachineUser machine_users = 14;
-  repeated ImportInstanceDataAction actions = 15;
-
-  repeated zitadel.management.v1.AddProjectGrantRequest project_grants = 16;
-  repeated zitadel.management.v1.AddUserGrantRequest user_grants = 17;
-  repeated zitadel.management.v1.AddOrgMemberRequest org_members = 18;
-
-  repeated zitadel.management.v1.AddProjectMemberRequest project_members = 19;
-  repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 20;
-}
-message ImportInstanceDataProject {
-  string project_id = 1;
-  string owner_id = 2;
-  zitadel.management.v1.AddProjectRequest project = 3;
-}
-message ImportInstanceDataAPIApplication {
-  string app_id = 1;
-  zitadel.management.v1.AddAPIAppRequest app = 2;
-}
-message ImportInstanceDataOIDCApplication {
-  string app_id = 1;
-  zitadel.management.v1.AddOIDCAppRequest app = 2;
-}
-message ImportInstanceDataHumanUser {
-  string user_id = 1;
-  zitadel.management.v1.AddHumanUserRequest user = 2;
-}
-message ImportInstanceDataMachineUser {
-  string user_id = 1;
-  zitadel.management.v1.AddMachineUserRequest user = 2;
-}
-message ImportInstanceDataAction {
-  string action_id = 1;
-  zitadel.management.v1.CreateActionRequest action = 2;
-}
-
-message ImportInstanceDataResponse{
-  repeated ImportInstanceDataError errors = 1;
-}
-message ImportInstanceDataError{
-  string type = 1;
-  string id = 2;
-  string message = 3;
 }
