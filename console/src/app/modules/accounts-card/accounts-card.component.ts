@@ -50,10 +50,6 @@ export class AccountsCardComponent implements OnInit {
     }
   }
 
-  public close(): void {
-    this.closedCard.emit();
-  }
-
   public selectAccount(loginHint?: string): void {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {

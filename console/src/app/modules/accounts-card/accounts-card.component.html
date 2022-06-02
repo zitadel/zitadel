@@ -1,4 +1,4 @@
-<div class="accounts-card" cnslOutsideClick (clickOutside)="closeCard($event)">
+<div class="accounts-card">
   <cnsl-avatar
     (click)="editUserProfile()"
     *ngIf="user.human?.profile && user.human?.profile?.displayName"

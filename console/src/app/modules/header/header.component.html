@@ -196,10 +196,11 @@
       </a>
     </div>
 
-    <div
-      cnslOutsideClick
-      (clickOutside)="closeAccountCard()"
+    <button
+      cdkOverlayOrigin
+      #accounttrigger="cdkOverlayOrigin"
       class="icon-container"
+      (click)="showAccount = !showAccount"
       [ngClass]="{ 'iam-user': (['iam.write$'] | hasRole | async) }"
     >
       <cnsl-avatar
@@ -220,15 +221,30 @@
         [size]="38"
       >
       </cnsl-avatar>
-      <cnsl-accounts-card
-        @accounts
-        class="a_card"
-        *ngIf="showAccount"
-        (closedCard)="showAccount = false"
-        [user]="user"
-        [iamuser]="['iam.write$'] | hasRole | async"
+
+      <ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="accounttrigger"
+        [flexibleDimensions]="true"
+        [lockPosition]="true"
+        [cdkConnectedOverlayOffsetY]="10"
+        [cdkConnectedOverlayHasBackdrop]="true"
+        [cdkConnectedOverlayPositions]="positions"
+        cdkConnectedOverlayBackdropClass="transparent-backdrop"
+        [cdkConnectedOverlayOpen]="showAccount"
+        (backdropClick)="showAccount = false"
+        (detach)="showAccount = false"
       >
-      </cnsl-accounts-card>
-    </div>
+        <cnsl-accounts-card
+          @accounts
+          class="a_card"
+          *ngIf="showAccount"
+          (closedCard)="showAccount = false"
+          [user]="user"
+          [iamuser]="['iam.write$'] | hasRole | async"
+        >
+        </cnsl-accounts-card>
+      </ng-template>
+    </button>
   </div>
 </mat-toolbar>
