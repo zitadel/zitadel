@@ -2,7 +2,7 @@
 title: Getting Started
 ---
 
-If you are new to ZITADEL your first action is to create your first ZITADEL instance and an account to access the ZITADEL customer portal.
+If you are new to ZITADEL your first action is to create your first ZITADEL instance and an account to access the ZITADEL Customer Portal.
 
 Got to [ZITADEL Customer Portal](https://zitadel.cloud) and enter all the detail information.
 As soon as you click "Let's go" you will get two initialization mails to finish your registration.

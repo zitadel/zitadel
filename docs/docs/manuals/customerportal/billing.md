@@ -20,4 +20,4 @@ Once a payment method is configured, it can be selected directly in the instance
 
 ## Invoices
 
-We show all you invoices, and you are able to download them directly in the customer portal.
+We show all you invoices, and you are able to download them directly in the Customer Portal.
