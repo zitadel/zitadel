@@ -124,6 +124,24 @@
       "SHOWUSER": "Zeige Benutzer {{value}}"
     }
   },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Hat die Kontrolle über die gesamte Instanz, einschließlich aller Organisationen",
+    "IAM_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Instanz einschließlich aller Organisationen zu überprüfen",
+    "IAM_ORG_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Organisationen",
+    "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
+    "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
+    "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
+    "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
+    "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von User grants",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Hat die Berechtigung, Projektberechtigungen für externe Organisationen zu verwalten",
+    "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und zugrunde liegenden Einstellungen zu erstellen",
+    "PROJECT_OWNER": "Hat die Berechtigung für das gesamte Projekt",
+    "PROJECT_OWNER_VIEWER": "Hat die Leseberechtigung, das gesamte Projekt zu überprüfen",
+    "PROJECT_OWNER_GLOBAL": "Hat die Berechtigung für das gesamte Projekt",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Hat die Leseberechtigung, das gesamte Projekt zu überprüfen",
+    "PROJECT_GRANT_OWNER": "Hat die Berechtigung, die Projektberechtigungen für externe Organisationen zu verwalten",
+    "PROJECT_GRANT_OWNER_VIEWER": "Hat die Leseberechtigung, die Projektberechtigungen für externe Organisationen zu überprüfen"
+  },
   "OVERLAYS": {
     "ORGSWITCHER": {
       "TEXT": "Alle Organisationseinstellungen und Tabellen basieren auf dieser ausgewählten Organisation. Klicken Sie auf diese Schaltfläche, um die Organisation zu wechseln oder eine neue zu erstellen."

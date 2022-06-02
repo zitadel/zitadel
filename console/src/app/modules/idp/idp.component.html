@@ -41,7 +41,7 @@
           <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="name" />
         </cnsl-form-field>
-        <cnsl-form-field class="formfield" appearance="outline">
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.STYLE' | translate }}</cnsl-label>
           <mat-select formControlName="stylingType">
             <mat-option *ngFor="let field of styleFields" [value]="field">
@@ -132,7 +132,7 @@
             </mat-chip-list>
           </cnsl-form-field>
 
-          <cnsl-form-field class="formfield" appearance="outline">
+          <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
             <mat-select formControlName="displayNameMapping">
               <mat-option *ngFor="let field of mappingFields" [value]="field">
@@ -140,7 +140,7 @@
               </mat-option>
             </mat-select>
           </cnsl-form-field>
-          <cnsl-form-field class="formfield" appearance="outline">
+          <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</cnsl-label>
             <mat-select formControlName="usernameMapping">
               <mat-option *ngFor="let field of mappingFields" [value]="field">

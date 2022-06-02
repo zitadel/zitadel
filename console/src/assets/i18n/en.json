@@ -124,6 +124,24 @@
       "SHOWUSER": "Show user {{value}}"
     }
   },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Has control over the whole instance, including all organizations",
+    "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
+    "IAM_ORG_MANAGER": "Has permission to create and manage organizations",
+    "IAM_USER_MANAGER": "Has permission to create and manage users",
+    "ORG_OWNER": "Has permission over the whole organization",
+    "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
+    "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
+    "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
+    "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
+    "PROJECT_OWNER": "Has permission over the whole project",
+    "PROJECT_OWNER_VIEWER": "Has permission to review the whole project",
+    "PROJECT_OWNER_GLOBAL": "Has permission over the whole project",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Has permission to review the whole project",
+    "PROJECT_GRANT_OWNER": "Has permission to manage the project grant",
+    "PROJECT_GRANT_OWNER_VIEWER": "Has permission to review the project grant"
+  },
   "OVERLAYS": {
     "ORGSWITCHER": {
       "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."

@@ -114,11 +114,21 @@
             line-height: 1rem;
           }
 
-          .email,
+          .state,
           .loginname {
-            color: $secondary-text;
             font-size: 0.8rem;
             line-height: 1rem;
+            width: fit-content;
+          }
+
+          .loginname {
+            color: $secondary-text;
+          }
+
+          .state {
+            margin-top: 3px;
+            font-size: 11px;
+            padding: 1px 0.5rem;
           }
         }
 

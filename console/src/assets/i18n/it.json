@@ -124,6 +124,24 @@
       "SHOWUSER": "Mostra utente {{value}}"
     }
   },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
+    "IAM_OWNER_VIEWER": "Ha l'autorizzazione per esaminare l'intera istanza, comprese tutte le organizzazioni",
+    "IAM_ORG_MANAGER": "Ha il permesso di creare e gestire organizzazioni",
+    "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
+    "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
+    "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
+    "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
+    "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
+    "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
+    "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
+    "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
+    "PROJECT_OWNER_GLOBAL": "Ha il permesso per l'intero progetto",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Ha il permesso di esaminare l'intero progetto",
+    "PROJECT_GRANT_OWNER": "Ha l'autorizzazione per gestire le sovvenzioni di progetto (Project Grant)",
+    "PROJECT_GRANT_OWNER_VIEWER": "Ha il permesso di esaminare le sovvenzioni di progetto (Project Grant)"
+  },
   "OVERLAYS": {
     "ORGSWITCHER": {
       "TEXT": "Tutte le impostazioni e le tabelle dell'organizzazione si basano su un'organizzazione selezionata. Fai clic sul pulsante per cambiare organizzazione o crearne una nuova."

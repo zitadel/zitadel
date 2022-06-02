@@ -1,27 +1,47 @@
 <form>
-    <cnsl-form-field appearance="outline" class="full-width">
-        <cnsl-label>Role Name</cnsl-label>
-        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the role name" #nameInput
-            [formControl]="myControl" [matAutocomplete]="auto" />
+  <cnsl-form-field class="full-width">
+    <cnsl-label>Role Name</cnsl-label>
+    <input
+      cnslInput
+      *ngIf="singleOutput"
+      type="text"
+      placeholder="Search for the role name"
+      #nameInput
+      [formControl]="myControl"
+      [matAutocomplete]="auto"
+    />
 
-        <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
-            <mat-chip class="chip" *ngFor="let selectedRole of roles" [selectable]="selectable" [removable]="removable"
-                (removed)="remove(selectedRole)">
-                {{selectedRole.displayName}}
-                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-            </mat-chip>
-            <input cnslInput placeholder="Role Name" #nameInput [formControl]="myControl" [matAutocomplete]="auto"
-                [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                [matChipInputAddOnBlur]="addOnBlur" (matChipInputTokenEnd)="add($event)" />
-        </mat-chip-list>
+    <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
+      <mat-chip
+        class="chip"
+        *ngFor="let selectedRole of roles"
+        [selectable]="selectable"
+        [removable]="removable"
+        (removed)="remove(selectedRole)"
+      >
+        {{ selectedRole.displayName }}
+        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+      </mat-chip>
+      <input
+        cnslInput
+        placeholder="Role Name"
+        #nameInput
+        [formControl]="myControl"
+        [matAutocomplete]="auto"
+        [matChipInputFor]="chipList"
+        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        [matChipInputAddOnBlur]="addOnBlur"
+        (matChipInputTokenEnd)="add($event)"
+      />
+    </mat-chip-list>
 
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
-            <mat-option *ngIf="isLoading" class="is-loading">
-                <mat-spinner diameter="30"></mat-spinner>
-            </mat-option>
-            <mat-option *ngFor="let role of filteredRoles" [value]="role.key">
-                {{role.displayName}}
-            </mat-option>
-        </mat-autocomplete>
-    </cnsl-form-field>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+      <mat-option *ngIf="isLoading" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let role of filteredRoles" [value]="role.key">
+        {{ role.displayName }}
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
 </form>
