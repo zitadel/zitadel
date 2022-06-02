@@ -38,7 +38,7 @@
     }
 
     &:after {
-      border-color: #fff; // TODO replace with contrast to background color
+      border-color: var(--zitadel-color-primary-contrast);
     }
   }
 }

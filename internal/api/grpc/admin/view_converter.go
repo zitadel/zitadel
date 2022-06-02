@@ -25,17 +25,17 @@ func ViewToPb(view *model.View) *admin_pb.View {
 	}
 }
 
-func CurrentSequencesToPb(currentSequences *query.CurrentSequences) []*admin_pb.View {
+func CurrentSequencesToPb(database string, currentSequences *query.CurrentSequences) []*admin_pb.View {
 	v := make([]*admin_pb.View, len(currentSequences.CurrentSequences))
 	for i, currentSequence := range currentSequences.CurrentSequences {
-		v[i] = CurrentSequenceToPb(currentSequence)
+		v[i] = CurrentSequenceToPb(database, currentSequence)
 	}
 	return v
 }
 
-func CurrentSequenceToPb(currentSequence *query.CurrentSequence) *admin_pb.View {
+func CurrentSequenceToPb(database string, currentSequence *query.CurrentSequence) *admin_pb.View {
 	return &admin_pb.View{
-		Database:          "zitadel",
+		Database:          database,
 		ViewName:          currentSequence.ProjectionName,
 		ProcessedSequence: currentSequence.CurrentSequence,
 		EventTimestamp:    timestamppb.New(currentSequence.Timestamp),

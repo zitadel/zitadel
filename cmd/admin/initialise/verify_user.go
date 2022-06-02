@@ -3,6 +3,7 @@ package initialise
 import (
 	"database/sql"
 	_ "embed"
+	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -43,7 +44,7 @@ func VerifyUser(username, password string) func(*sql.DB) error {
 		logging.WithFields("username", username).Info("verify user")
 		return verify(db,
 			exists(searchUser, username),
-			exec(createUserStmt, username, &sql.NullString{String: password, Valid: password != ""}),
+			exec(fmt.Sprintf(createUserStmt, username), &sql.NullString{String: password, Valid: password != ""}),
 		)
 	}
 }
