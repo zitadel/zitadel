@@ -196,55 +196,55 @@
       </a>
     </div>
 
-    <button
-      cdkOverlayOrigin
-      #accounttrigger="cdkOverlayOrigin"
-      class="icon-container"
-      (click)="showAccount = !showAccount"
-      [ngClass]="{ 'iam-user': (['iam.write$'] | hasRole | async) }"
-    >
-      <cnsl-avatar
-        id="avatartoggle"
-        *ngIf="
-          user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))
-        "
-        class="avatar-toggle dontcloseonclick"
+    <div class="account-card-wrapper">
+      <button
+        cdkOverlayOrigin
+        #accounttrigger="cdkOverlayOrigin"
+        class="icon-container"
         (click)="showAccount = !showAccount"
-        [active]="showAccount"
-        [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-        [forColor]="user?.preferredLoginName || ''"
-        [name]="
-          user.human?.profile?.displayName
-            ? user.human?.profile?.displayName ?? ''
-            : user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
-        "
-        [size]="38"
+        [ngClass]="{ 'iam-user': (['iam.write$'] | hasRole | async) }"
       >
-      </cnsl-avatar>
-
-      <ng-template
-        cdkConnectedOverlay
-        [cdkConnectedOverlayOrigin]="accounttrigger"
-        [flexibleDimensions]="true"
-        [lockPosition]="true"
-        [cdkConnectedOverlayOffsetY]="10"
-        [cdkConnectedOverlayHasBackdrop]="true"
-        [cdkConnectedOverlayPositions]="positions"
-        cdkConnectedOverlayBackdropClass="transparent-backdrop"
-        [cdkConnectedOverlayOpen]="showAccount"
-        (backdropClick)="showAccount = false"
-        (detach)="showAccount = false"
-      >
-        <cnsl-accounts-card
-          @accounts
-          class="a_card"
-          *ngIf="showAccount"
-          (closedCard)="showAccount = false"
-          [user]="user"
-          [iamuser]="['iam.write$'] | hasRole | async"
+        <cnsl-avatar
+          id="avatartoggle"
+          *ngIf="
+            user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))
+          "
+          class="avatar-toggle dontcloseonclick"
+          [active]="showAccount"
+          [avatarUrl]="user.human?.profile?.avatarUrl || ''"
+          [forColor]="user?.preferredLoginName || ''"
+          [name]="
+            user.human?.profile?.displayName
+              ? user.human?.profile?.displayName ?? ''
+              : user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
+          "
+          [size]="38"
         >
-        </cnsl-accounts-card>
-      </ng-template>
-    </button>
+        </cnsl-avatar>
+      </button>
+    </div>
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="accounttrigger"
+      [flexibleDimensions]="true"
+      [lockPosition]="true"
+      [cdkConnectedOverlayOffsetY]="10"
+      [cdkConnectedOverlayHasBackdrop]="true"
+      [cdkConnectedOverlayPositions]="accountCardPositions"
+      cdkConnectedOverlayBackdropClass="transparent-backdrop"
+      [cdkConnectedOverlayOpen]="showAccount"
+      (backdropClick)="showAccount = false"
+      (detach)="showAccount = false"
+    >
+      <cnsl-accounts-card
+        @accounts
+        class="a_card"
+        *ngIf="showAccount"
+        (closedCard)="showAccount = false"
+        [user]="user"
+        [iamuser]="['iam.write$'] | hasRole | async"
+      >
+      </cnsl-accounts-card>
+    </ng-template>
   </div>
 </mat-toolbar>

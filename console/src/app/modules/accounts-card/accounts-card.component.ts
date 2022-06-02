@@ -35,7 +35,7 @@ export class AccountsCardComponent implements OnInit {
       });
   }
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.loadingUsers = true;
   }
 

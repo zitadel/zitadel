@@ -28,6 +28,7 @@
     align-items: center;
     padding: 1rem 0;
     position: relative;
+    color: map-get($foreground, text);
 
     .avatar {
       font-size: 80px;
@@ -47,7 +48,7 @@
 
     .u-email {
       font-size: 0.8rem;
-      margin-top: 0;
+      margin: 0.5rem 0;
     }
 
     button {
@@ -96,6 +97,7 @@
           border-radius: 50%;
           margin: 0 1rem;
           text-align: center;
+          display: flex;
 
           i {
             margin: auto;
@@ -112,6 +114,9 @@
             font-weight: 500;
             font-size: 0.9rem;
             line-height: 1rem;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
           }
 
           .state,
