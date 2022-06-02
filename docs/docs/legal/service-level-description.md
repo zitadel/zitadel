@@ -70,7 +70,7 @@ Achieved vs.  Guaranteed| 99.50% | 99.90% | 99.95%
 
 Option | Monthly Uptime Percentage
 --- | ---
-None (Base) | 99.50%
+Default | 99.50%
 Extended SLA | 99.95%
 
 1. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document. Financial Credit shall be the sole and exclusive remedy for breach of this SLA.
