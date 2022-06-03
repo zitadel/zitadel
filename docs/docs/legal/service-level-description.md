@@ -2,6 +2,13 @@
 title: Service Level
 custom_edit_url: null
 --- 
+
+:::note
+
+This document describes the current version of our offering. For terms regarding to our previous offering, which is being shut down on 31.12.2022, please refer to the [agreements under docs-v1.zitadel.com](https://docs-v1.zitadel.com/).
+
+:::
+
 ## Introduction
 
 This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
@@ -63,7 +70,7 @@ Achieved vs.  Guaranteed| 99.50% | 99.90% | 99.95%
 
 Option | Monthly Uptime Percentage
 --- | ---
-None (Base) | 99.50%
+Default | 99.50%
 Extended SLA | 99.95%
 
 1. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document. Financial Credit shall be the sole and exclusive remedy for breach of this SLA.

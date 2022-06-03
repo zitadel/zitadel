@@ -10,7 +10,7 @@ This annex of the [Framework Agreement](terms-of-service) describes the service 
 
 **Monthly quota** means the available usage per measure for one billing period. The quota is reset to zero with the start of a new billing period.
 
-**Authenticated request** means <!-- TODO: Elio -->
+**Authenticated request** means any request to our API endpoints requiring a valid authorization header. We exclude requests with a server error, discovery endpoints, and endpoints to load UI assets.
 
 **Action minutes** means execution time, rounded up to 1 second, of custom code execution via a customer defined Action.
 

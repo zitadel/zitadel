@@ -28,7 +28,6 @@ The following policies complement the TOS. When accepting the TOS, you accept th
 This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
 
 * [**Dedicated Instance Terms**](terms-of-service-dedicated) - How we provide our services for a dedicated instance
-* [**Annex to the Dedicated Instance Terms**](dedicated-instance-annex) - Describe differences of services and guarantees with different providers
 
 ### Alterations
 
@@ -112,7 +111,7 @@ You will ensure that your vicarious agents, customers and third parties fulfill 
 
 ### Credit and payment
 
-Signup to our Services does not require you to open a payment account. However, a payment account is required for the purchase of our Subscriptions. The costs for the services you have purchased will be debited periodically and in advance from your payment account.
+Signup to our Services does not require you to open a payment account. However, a payment account is required for the purchase of our Subscriptions. The costs for the services you have purchased will be debited periodically from your payment account.
 
 ### Payment procedure
 
