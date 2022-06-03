@@ -280,6 +280,7 @@ footer .watermark .lgn-logo-watermark {
   padding: 0 16px;
   border-radius: 6px;
   overflow: visible;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 .lgn-button[disabled], .lgn-stroked-button[disabled], .lgn-icon-button[disabled] {
   cursor: default;
@@ -306,6 +307,7 @@ footer .watermark .lgn-logo-watermark {
   padding: 0 16px;
   border-radius: 6px;
   overflow: visible;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   transform: translate3d(0, 0, 0);
 }
 .lgn-raised-button[disabled] {
@@ -506,6 +508,9 @@ a {
 }
 a.block {
   display: block;
+}
+a.sub-formfield-link {
+  margin: 10px 0;
 }
 
 .lgn-idp {
@@ -1192,6 +1197,7 @@ footer .watermark .lgn-logo-watermark {
   padding: 0 16px;
   border-radius: 6px;
   overflow: visible;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 .lgn-button[disabled], .lgn-stroked-button[disabled], .lgn-icon-button[disabled] {
   cursor: default;
@@ -1218,6 +1224,7 @@ footer .watermark .lgn-logo-watermark {
   padding: 0 16px;
   border-radius: 6px;
   overflow: visible;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   transform: translate3d(0, 0, 0);
 }
 .lgn-raised-button[disabled] {
@@ -1418,6 +1425,9 @@ a {
 }
 a.block {
   display: block;
+}
+a.sub-formfield-link {
+  margin: 10px 0;
 }
 
 .lgn-idp {

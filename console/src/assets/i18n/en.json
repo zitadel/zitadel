@@ -1409,7 +1409,7 @@
     },
     "OWNERTYPES": {
       "0": "unknown",
-      "1": "System",
+      "1": "Instance",
       "2": "Organization"
     },
     "TYPES": {
@@ -1462,11 +1462,12 @@
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "EMPTY": "No IPD available",
     "OIDC": {
-      "TITLE": "OIDC IDP",
+      "GENERAL": "General Information",
+      "TITLE": "OIDC Configuration",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT IDP",
+      "TITLE": "JWT Configuration",
       "DESCRIPTION": "Enter the data for JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
