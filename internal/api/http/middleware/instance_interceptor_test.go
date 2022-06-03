@@ -266,6 +266,10 @@ func (m *mockInstance) DefaultLanguage() language.Tag {
 	return language.English
 }
 
+func (m *mockInstance) DefaultOrganisationID() string {
+	return "orgID"
+}
+
 func (m *mockInstance) RequestedDomain() string {
 	return "zitadel.cloud"
 }

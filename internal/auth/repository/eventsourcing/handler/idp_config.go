@@ -114,7 +114,7 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		idp, err = i.view.IDPConfigByID(idp.IDPConfigID, idp.InstanceID)
+		idp, err = i.view.IDPConfigByID(idp.IDPConfigID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -125,7 +125,7 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		if err != nil {
 			return err
 		}
-		idp, err = i.view.IDPConfigByID(idp.IDPConfigID, idp.InstanceID)
+		idp, err = i.view.IDPConfigByID(idp.IDPConfigID, event.InstanceID)
 		if err != nil {
 			return err
 		}
