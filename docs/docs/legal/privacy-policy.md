@@ -20,8 +20,8 @@ Contact for questions and issues regarding data protection is:
 CAOS AG  
 Data Protection Officer  
 Teufener Strasse 19  
-9000 St. Gallen
-SWITZERLAND
+9000 St. Gallen  
+SWITZERLAND  
 Phone: 043 215 27 44  
 E-mail: legal@zitadel.com
 
