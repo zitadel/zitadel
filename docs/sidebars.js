@@ -240,17 +240,12 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Dedicated Instance",
-      collapsed: false,
+      label: "Additional terms",
+      collapsed: true,
       items: [
+        "legal/terms-support-service",
         "legal/terms-of-service-dedicated",
       ],
-    },
-    {
-      type: "category",
-      label: "Support Program",
-      collapsed: false,
-      items: ["legal/terms-support-service"],
     },
     {
       type: "category",
