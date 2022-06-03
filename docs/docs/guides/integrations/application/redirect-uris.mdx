@@ -1,4 +1,5 @@
 import ThemedImage from '@theme/ThemedImage';
+import Admonition from '@theme/Admonition'
 
 export default function RedirectURIs(props) { 
     return ['web', 'native', 'user-agent'].includes(props.appType) ? (
@@ -22,10 +23,10 @@ export default function RedirectURIs(props) {
                         : null
                 }
             </ul>
-            <ThemedImage
             <Admonition type="note">
                 <p>The default redirect uri of your app is <code>{props.redirectURI}</code></p>
             </Admonition>
+            <ThemedImage
                 alt="Redirect URIs configuration"
                 sources={{
                     light: '/img/guides/application/redirect-uris-light.png',
