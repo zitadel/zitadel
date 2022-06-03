@@ -63,13 +63,13 @@ func Test_hostNameFromContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := hostNameFromContext(tt.args.ctx, tt.args.headerName)
+			got, err := hostFromContext(tt.args.ctx, tt.args.headerName)
 			if (err != nil) != tt.res.err {
-				t.Errorf("hostNameFromContext() error = %v, wantErr %v", err, tt.res.err)
+				t.Errorf("hostFromContext() error = %v, wantErr %v", err, tt.res.err)
 				return
 			}
 			if got != tt.res.want {
-				t.Errorf("hostNameFromContext() got = %v, want %v", got, tt.res.want)
+				t.Errorf("hostFromContext() got = %v, want %v", got, tt.res.want)
 			}
 		})
 	}
