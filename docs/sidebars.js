@@ -244,7 +244,6 @@ module.exports = {
       collapsed: false,
       items: [
         "legal/terms-of-service-dedicated",
-        "legal/dedicated-instance-annex",
       ],
     },
     {
