@@ -11,45 +11,45 @@ import (
 )
 
 const (
-	GlobalOrgSetEventType eventstore.EventType = "iam.global.org.set"
+	DefaultOrgSetEventType eventstore.EventType = "instance.default.org.set"
 )
 
-type GlobalOrgSetEvent struct {
+type DefaultOrgSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	OrgID string `json:"globalOrgId"`
+	OrgID string `json:"orgId"`
 }
 
-func (e *GlobalOrgSetEvent) Data() interface{} {
+func (e *DefaultOrgSetEvent) Data() interface{} {
 	return e
 }
 
-func (e *GlobalOrgSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DefaultOrgSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewGlobalOrgSetEventEvent(
+func NewDefaultOrgSetEventEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	orgID string,
-) *GlobalOrgSetEvent {
-	return &GlobalOrgSetEvent{
+) *DefaultOrgSetEvent {
+	return &DefaultOrgSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			GlobalOrgSetEventType,
+			DefaultOrgSetEventType,
 		),
 		OrgID: orgID,
 	}
 }
 
-func GlobalOrgSetMapper(event *repository.Event) (eventstore.Event, error) {
-	e := &GlobalOrgSetEvent{
+func DefaultOrgSetMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &DefaultOrgSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal global org set")
+		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal default org set")
 	}
 
 	return e, nil
