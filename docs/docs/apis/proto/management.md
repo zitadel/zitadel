@@ -4701,8 +4701,9 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| global_org_id |  string | - |  |
+| global_org_id |  string | deprecated: use default_org_id instead |  |
 | iam_project_id |  string | - |  |
+| default_org_id |  string | - |  |
 
 
 

@@ -271,8 +271,6 @@ Errors:
     MemberAlreadyExisting: Member existiert bereits
     MemberNotExisting: Member existiert nicht
     IDMissing: ID fehlt
-    GlobalOrgMissing: Globale Organisation fehlt
-    GlobalOrgAlreadySet: Globale Organisation wurde bereits gesetzt
     IAMProjectIDMissing: IAM Project ID fehlt
     IamProjectAlreadySet: IAM Project ID wurde bereits gesetzt
     IdpInvalid: IDP Konfiguration ist ungültig

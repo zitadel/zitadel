@@ -17,6 +17,21 @@ func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueReque
 	return &admin_pb.IsOrgUniqueResponse{IsUnique: isUnique}, err
 }
 
+func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgRequest) (*admin_pb.SetDefaultOrgResponse, error) {
+	details, err := s.command.SetDefaultOrg(ctx, req.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetDefaultOrgResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
+	org, err := s.query.OrgByID(ctx, authz.GetInstance(ctx).DefaultOrganisationID())
+	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
+}
+
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
 	org, err := s.query.OrgByID(ctx, req.Id)
 	if err != nil {

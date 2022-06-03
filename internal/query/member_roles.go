@@ -37,7 +37,7 @@ func (q *Queries) GetProjectMemberRoles(ctx context.Context) ([]string, error) {
 		return nil, err
 	}
 	roles := make([]string, 0)
-	global := authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID
+	global := authz.GetCtxData(ctx).OrgID == iam.DefaultOrgID
 	for _, roleMap := range q.zitadelRoles {
 		if strings.HasPrefix(roleMap.Role, "PROJECT") && !strings.HasPrefix(roleMap.Role, "PROJECT_GRANT") {
 			if global && !strings.HasSuffix(roleMap.Role, "GLOBAL") {
