@@ -2551,6 +2551,17 @@ service AdminService {
             permission: "iam.write";
         };
     }
+    // Imports data into instance and creates different objects
+    rpc ExportData(ExportDataRequest) returns (ExportDataResponse) {
+        option (google.api.http) = {
+            post: "/export";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
 }
 
 
@@ -4478,11 +4489,10 @@ message FailedEvent {
 
 
 message ImportDataRequest {
-    repeated ImportDataOrg orgs = 2;
+    repeated DataOrg orgs = 2;
 }
-message ImportDataOrg {
+message DataOrg {
     string org_id = 1;
-    string owner_id = 2;
     zitadel.management.v1.AddOrgRequest org = 3;
     AddCustomDomainPolicyRequest domain_policy = 4;
     zitadel.management.v1.AddCustomLabelPolicyRequest label_policy = 5;
@@ -4491,12 +4501,12 @@ message ImportDataOrg {
     zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest password_complexity_policy = 8;
     zitadel.management.v1.AddCustomPrivacyPolicyRequest privacy_policy = 9;
 
-    repeated ImportDataProject projects = 10;
-    repeated ImportDataAPIApplication api_apps = 11;
-    repeated ImportDataOIDCApplication oidc_apps = 12;
-    repeated ImportDataHumanUser human_users = 13;
-    repeated ImportDataMachineUser machine_users = 14;
-    repeated ImportDataAction actions = 15;
+    repeated DataProject projects = 10;
+    repeated DataAPIApplication api_apps = 11;
+    repeated DataOIDCApplication oidc_apps = 12;
+    repeated DataHumanUser human_users = 13;
+    repeated DataMachineUser machine_users = 14;
+    repeated DataAction actions = 15;
 
     repeated zitadel.management.v1.AddProjectGrantRequest project_grants = 16;
     repeated zitadel.management.v1.AddUserGrantRequest user_grants = 17;
@@ -4505,28 +4515,27 @@ message ImportDataOrg {
     repeated zitadel.management.v1.AddProjectMemberRequest project_members = 19;
     repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 20;
 }
-message ImportDataProject {
+message DataProject {
     string project_id = 1;
-    string owner_id = 2;
-    zitadel.management.v1.AddProjectRequest project = 3;
+    zitadel.management.v1.AddProjectRequest project = 2;
 }
-message ImportDataAPIApplication {
+message DataAPIApplication {
     string app_id = 1;
     zitadel.management.v1.AddAPIAppRequest app = 2;
 }
-message ImportDataOIDCApplication {
+message DataOIDCApplication {
     string app_id = 1;
     zitadel.management.v1.AddOIDCAppRequest app = 2;
 }
-message ImportDataHumanUser {
+message DataHumanUser {
     string user_id = 1;
-    zitadel.management.v1.ImportHumanUserRequest user = 2;
+    zitadel.management.v1.AddHumanUserRequest user = 2;
 }
-message ImportDataMachineUser {
+message DataMachineUser {
     string user_id = 1;
     zitadel.management.v1.AddMachineUserRequest user = 2;
 }
-message ImportDataAction {
+message DataAction {
     string action_id = 1;
     zitadel.management.v1.CreateActionRequest action = 2;
 }
@@ -4576,4 +4585,11 @@ message ImportDataSuccessProjectGrantMember{
     string project_id = 1;
     string grant_id = 2;
     string user_id = 3;
+}
+
+message ExportDataRequest {
+    repeated string org_ids = 1;
+}
+message ExportDataResponse {
+    repeated DataOrg orgs = 1;
 }

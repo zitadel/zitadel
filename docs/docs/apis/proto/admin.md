@@ -1409,6 +1409,18 @@ Imports data into instance and creates different objects
     POST: /import
 
 
+### ExportData
+
+> **rpc** ExportData([ExportDataRequest](#exportdatarequest))
+[ExportDataResponse](#exportdataresponse)
+
+Imports data into instance and creates different objects
+
+
+
+    POST: /export
+
+
 
 
 
@@ -1656,6 +1668,109 @@ This is an empty request
 
 
 
+### DataAPIApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddAPIAppRequest | - |  |
+
+
+
+
+### DataAction
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| action_id |  string | - |  |
+| action |  zitadel.management.v1.CreateActionRequest | - |  |
+
+
+
+
+### DataHumanUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  zitadel.management.v1.AddHumanUserRequest | - |  |
+
+
+
+
+### DataMachineUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  zitadel.management.v1.AddMachineUserRequest | - |  |
+
+
+
+
+### DataOIDCApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddOIDCAppRequest | - |  |
+
+
+
+
+### DataOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| owner_id |  string | - |  |
+| org |  zitadel.management.v1.AddOrgRequest | - |  |
+| domain_policy |  AddCustomDomainPolicyRequest | - |  |
+| label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
+| lockout_policy |  zitadel.management.v1.AddCustomLockoutPolicyRequest | - |  |
+| login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
+| password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
+| privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
+| projects | repeated DataProject | - |  |
+| api_apps | repeated DataAPIApplication | - |  |
+| oidc_apps | repeated DataOIDCApplication | - |  |
+| human_users | repeated DataHumanUser | - |  |
+| machine_users | repeated DataMachineUser | - |  |
+| actions | repeated DataAction | - |  |
+| project_grants | repeated zitadel.management.v1.AddProjectGrantRequest | - |  |
+| user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
+| org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
+| project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
+| project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+
+
+
+
+### DataProject
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| owner_id |  string | - |  |
+| project |  zitadel.management.v1.AddProjectRequest | - |  |
+
+
+
+
 ### DeactivateIDPRequest
 
 
@@ -1674,6 +1789,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ExportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_ids | repeated string | - |  |
+
+
+
+
+### ExportDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated DataOrg | - |  |
 
 
 
@@ -2414,30 +2551,6 @@ This is an empty response
 
 
 
-### ImportDataAPIApplication
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| app_id |  string | - |  |
-| app |  zitadel.management.v1.AddAPIAppRequest | - |  |
-
-
-
-
-### ImportDataAction
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| action_id |  string | - |  |
-| action |  zitadel.management.v1.CreateActionRequest | - |  |
-
-
-
-
 ### ImportDataError
 
 
@@ -2451,92 +2564,13 @@ This is an empty response
 
 
 
-### ImportDataHumanUser
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - |  |
-| user |  zitadel.management.v1.AddHumanUserRequest | - |  |
-
-
-
-
-### ImportDataMachineUser
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - |  |
-| user |  zitadel.management.v1.AddMachineUserRequest | - |  |
-
-
-
-
-### ImportDataOIDCApplication
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| app_id |  string | - |  |
-| app |  zitadel.management.v1.AddOIDCAppRequest | - |  |
-
-
-
-
-### ImportDataOrg
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| org_id |  string | - |  |
-| owner_id |  string | - |  |
-| org |  zitadel.management.v1.AddOrgRequest | - |  |
-| domain_policy |  AddCustomDomainPolicyRequest | - |  |
-| label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
-| lockout_policy |  zitadel.management.v1.AddCustomLockoutPolicyRequest | - |  |
-| login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
-| password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
-| privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
-| projects | repeated ImportDataProject | - |  |
-| api_apps | repeated ImportDataAPIApplication | - |  |
-| oidc_apps | repeated ImportDataOIDCApplication | - |  |
-| human_users | repeated ImportDataHumanUser | - |  |
-| machine_users | repeated ImportDataMachineUser | - |  |
-| actions | repeated ImportDataAction | - |  |
-| project_grants | repeated zitadel.management.v1.AddProjectGrantRequest | - |  |
-| user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
-| org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
-| project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
-| project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
-
-
-
-
-### ImportDataProject
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| project_id |  string | - |  |
-| owner_id |  string | - |  |
-| project |  zitadel.management.v1.AddProjectRequest | - |  |
-
-
-
-
 ### ImportDataRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| orgs | repeated ImportDataOrg | - |  |
+| orgs | repeated DataOrg | - |  |
 
 
 

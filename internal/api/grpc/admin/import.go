@@ -86,7 +86,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 		}
 		if org.Projects != nil {
 			for _, project := range org.GetProjects() {
-				_, err := s.command.AddProjectWithID(ctx, management.ProjectCreateToDomain(project.GetProject()), org.GetOrgId(), project.GetOwnerId(), project.GetProjectId())
+				_, err := s.command.AddProjectWithID(ctx, management.ProjectCreateToDomain(project.GetProject()), org.GetOrgId(), project.GetProjectId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "project", Id: project.GetProjectId(), Message: err.Error()})
 					continue
