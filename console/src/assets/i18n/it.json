@@ -1409,7 +1409,7 @@
     },
     "OWNERTYPES": {
       "0": "sconosciuto",
-      "1": "Sistema",
+      "1": "Istanza",
       "2": "Organizzazione"
     },
     "TYPES": {
@@ -1462,11 +1462,12 @@
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "EMPTY": "Nessun IDP disponible",
     "OIDC": {
-      "TITLE": "OIDC IDP",
+      "GENERAL": "Informazioni generali",
+      "TITLE": "Configurazione OIDC",
       "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT IDP",
+      "TITLE": "Configurazione JWT",
       "DESCRIPTION": "Inserisci i dati per il JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
