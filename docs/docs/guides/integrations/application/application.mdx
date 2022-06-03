@@ -25,7 +25,7 @@ export default function CreateApp(props) {
                 }}
             />
             <h3>Select the authentication method</h3>
-            <p>The authentication method defines the communication flow durring a login</p>
+            <p>The authentication method defines the communication flow during a login</p>
             <AuthType appType={props.appType} authType={props.authType}/>
             <h3>Redirect URIs</h3>
             <RedirectURIs appType={props.appType} redirectURI={props.redirectURI} postLogoutURI={props.postLogoutURI}/>

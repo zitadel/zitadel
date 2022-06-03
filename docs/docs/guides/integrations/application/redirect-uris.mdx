@@ -10,13 +10,13 @@ export default function RedirectURIs(props) {
                 ZITADEL verifies if the URL the user gets redirected to is valid by checking if one of the redirect URIs match.
             </p>
             <ul>
-                <li><b>Redirect URIs</b> are verified durring the login process.</li>
+                <li><b>Redirect URIs</b> are verified during the login process.</li>
                 {
                     props.redirectURI ?
                         <ul><li>The default redirect uri of your app is <code>{props.redirectURI}</code></li></ul>
                         : null
                 }
-                <li><b>Post Logout URIs</b> are verified durring the logout process.</li>
+                <li><b>Post Logout URIs</b> are verified during the logout process.</li>
                 {
                     props.postLogoutURI ?
                         <ul><li>The default post logout uri of your app is <code>{props.postLogoutURI}</code></li></ul>
