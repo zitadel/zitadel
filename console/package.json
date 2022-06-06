@@ -68,7 +68,7 @@
     "@typescript-eslint/parser": "5.26.0",
     "codelyzer": "^6.0.0",
     "cypress": "^9.5.1",
-    "cypress-terminal-report": "^3.4.1",
+    "cypress-terminal-report": "^4.0.1",
     "eslint": "^8.16.0",
     "@typescript-eslint/eslint-plugin": "5.25.0",
     "jasmine-core": "~4.1.1",
