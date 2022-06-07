@@ -6,7 +6,7 @@ Login:
   LoginNameLabel: Loginname
   UsernamePlaceHolder: username
   LoginnamePlaceHolder: username@domain
-  ExternalUserDescription: Melde dich mit einem externen Benutzer an
+  ExternalUserDescription: oder melde dich mit einem externen Benutzer an
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
   RegisterButtonText: registrieren
   NextButtonText: weiter
@@ -159,7 +159,7 @@ PasswordlessRegistrationDone:
 
 PasswordChange:
   Title: Passwort ändern
-  Description: Ändere dein Password in dem du dein altes und dann dein neuen Passwort eingibst.
+  Description: Ändere dein Passwort in dem du dein altes und dann dein neues Passwort eingibst.
   OldPasswordLabel: Altes Passwort
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort Bestätigung

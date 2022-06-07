@@ -39,7 +39,14 @@
   </cnsl-form-field>
 </form>
 <div class="oidc-btn-container">
-  <button class="save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+  <button
+    [disabled]="form.disabled"
+    class="save-button"
+    (click)="savePolicy()"
+    color="primary"
+    type="submit"
+    mat-raised-button
+  >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
 </div>

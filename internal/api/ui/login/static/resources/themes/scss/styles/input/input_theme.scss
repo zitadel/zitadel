@@ -31,7 +31,7 @@
     }
 
     // overwrite if state is warn
-    &[color="warn"] {
+    &.lgn-touched[color="warn"] {
       border-color: var(--zitadel-color-warn);
     }
   }
