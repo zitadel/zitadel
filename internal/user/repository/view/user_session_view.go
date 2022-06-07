@@ -73,6 +73,25 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID, instanceID string) ([]*m
 	return userSessions, err
 }
 
+func UserSessionsByOrgID(db *gorm.DB, table, orgID, instanceID string) ([]*model.UserSessionView, error) {
+	userSessions := make([]*model.UserSessionView, 0)
+	userAgentQuery := &usr_model.UserSessionSearchQuery{
+		Key:    usr_model.UserSessionSearchKeyResourceOwner,
+		Method: domain.SearchMethodEquals,
+		Value:  orgID,
+	}
+	instanceIDQuery := &usr_model.UserSessionSearchQuery{
+		Key:    usr_model.UserSessionSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
+	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
+		Queries: []*usr_model.UserSessionSearchQuery{userAgentQuery, instanceIDQuery},
+	})
+	_, err := query(db, &userSessions)
+	return userSessions, err
+}
+
 func ActiveUserSessions(db *gorm.DB, table string) (uint64, error) {
 	activeQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyState,

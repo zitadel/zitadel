@@ -213,7 +213,7 @@ func (s *Server) ListOrgMemberRoles(ctx context.Context, _ *mgmt_pb.ListOrgMembe
 	if err != nil {
 		return nil, err
 	}
-	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID)
+	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == iam.DefaultOrgID)
 	return &mgmt_pb.ListOrgMemberRolesResponse{
 		Result: roles,
 	}, nil
