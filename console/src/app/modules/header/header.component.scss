@@ -271,7 +271,7 @@
 
           &:hover,
           &:focus {
-            border: 2px solid if($is-dark-theme, #ffffff, map-get($primary, 200));
+            border: 2px solid if($is-dark-theme, #fff, map-get($primary, 200));
           }
 
           .docs {
