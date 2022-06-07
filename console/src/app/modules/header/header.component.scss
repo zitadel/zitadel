@@ -261,14 +261,17 @@
           border-radius: 50%;
           transition: border ease 0.15s;
           padding: 0;
-          border: 2px solid #ffffff80 !important;
+          border: 2px solid if($is-dark-theme, #ffffff80, #00000010);
+          outline: none;
+          background: none;
 
           &.iam-user {
             border: 2px solid $primary-color;
           }
 
-          &:hover {
-            border-color: if($is-dark-theme, #ffffff, #00000050);
+          &:hover,
+          &:focus {
+            border: 2px solid if($is-dark-theme, #ffffff, map-get($primary, 200));
           }
 
           .docs {
@@ -280,6 +283,7 @@
             display: block;
             margin: auto;
             cursor: pointer;
+            border: none;
           }
 
           .name {

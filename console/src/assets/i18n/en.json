@@ -756,6 +756,7 @@
       "LISTDESCRIPTION": "Choose an organization.",
       "ACTIVE": "Active",
       "CREATE": "Create Organization",
+      "NOPERMISSION": "You don't have the permission to access organization settings.",
       "USERSELFACCOUNT": "Use your personal account as organization owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",

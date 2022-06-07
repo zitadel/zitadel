@@ -756,6 +756,7 @@
       "LISTDESCRIPTION": "Wähle eine Organisation aus.",
       "ACTIVE": "Aktiv",
       "CREATE": "Organisation erstellen",
+      "NOPERMISSION": "Sie haben keine Berechtigung, auf Einstellungen der Organisation zuzugreifen.",
       "USERSELFACCOUNT": "Verwenden Sie Ihr persönliches Konto als Organisationsinhaber",
       "ORGDETAIL_TITLE": "Gebe den Namen und die Domain für die neue Organisation ein.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
