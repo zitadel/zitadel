@@ -35,7 +35,7 @@
     <div class="lgn-actions lgn-reverse-order">
         <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Login.NextButtonText"}}</button>
         <span class="fill-space"></span>
-        {{if .LoginPolicy.AllowRegister}}
+        {{if hasRegistration}}
         <button class="lgn-stroked-button" name="register" value="true" formnovalidate>{{t "Login.RegisterButtonText"}}</button>
         {{end}}
     </div>

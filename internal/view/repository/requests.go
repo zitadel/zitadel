@@ -39,7 +39,7 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 			}
 		}
 
-		err := query.Take(res).Error
+		err := query.Debug().Take(res).Error
 		if err == nil {
 			return nil
 		}

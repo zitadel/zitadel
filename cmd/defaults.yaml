@@ -114,6 +114,20 @@ OIDC:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
   CustomEndpoints:
+    Auth:
+      Path: /oauth/v2/authorize
+    Token:
+      Path: /oauth/v2/token
+    Introspection:
+      Path: /oauth/v2/introspect
+    Userinfo:
+      Path: /oidc/v1/userinfo
+    Revocation:
+      Path: /oauth/v2/revoke
+    EndSession:
+      Path: /oidc/v1/end_session
+    Keys:
+      Path: /oauth/v2/keys
 
 Login:
   LanguageCookieName: zitadel.login.lang

@@ -8,13 +8,13 @@ import TabItem from '@theme/TabItem';
 ## OpenID Connect 1.0 Discovery
 
 The OpenID Connect Discovery Endpoint is located within the issuer domain.
- This would give us [{your_domain}/.well-known/openid-configuration]({your_domain}/.well-known/openid-configuration).
+ This would give us {your_domain}/.well-known/openid-configuration.
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
 ## authorization_endpoint
 
-[https://accounts.zitadel.ch/oauth/v2/authorize]({your_domain}/oauth/v2/authorize)
+{your_domain}/oauth/v2/authorize
 
 :::note
 The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
@@ -142,7 +142,7 @@ the error will be display directly to the user on the auth server
 
 ## token_endpoint
 
-[{your_domain}/oauth/v2/token]({your_domain}/oauth/v2/token)
+{your_domain}/oauth/v2/token
 
 The token_endpoint will as the name suggests return various tokens (access, id and refresh) depending on the used `grant_type`. 
 When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
@@ -321,7 +321,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 ## introspection_endpoint
 
-[{your_domain}/oauth/v2/introspect]({your_domain}/oauth/v2/introspect)
+{your_domain}/oauth/v2/introspect
 
 This endpoint enables client to validate an `acccess_token`, either opaque or JWT. Unlike client side JWT validation,
 this endpoint will check if the token is not revoked (by client or logout).
@@ -387,14 +387,14 @@ If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
 
 ## userinfo_endpoint
 
-[{your_domain}/oauth/v2/userinfo]({your_domain}/oauth/v2/userinfo)
+{your_domain}/oidc/v1/userinfo
 
 This endpoint will return information about the authorized user.
 
 Send the `access_token` of the **user** (not the client) as Bearer Token in the `authorization` header:
 ```BASH
 curl --request GET \
-  --url {your_domain}/oauth/v2/userinfo
+  --url {your_domain}/oidc/v1/userinfo
   --header 'Authorization: Bearer dsfdsjk29fm2as...'
 ```
 
@@ -409,7 +409,7 @@ If the token is invalid or expired, an HTTP 401 will be returned.
 
 ## revocation_endpoint
 
-[{your_domain}/oauth/v2/revoke]({your_domain}/oauth/v2/revoke)
+{your_domain}/oauth/v2/revoke
 
 This endpoint enables clients to revoke an `access_token` or `refresh_token` they have been granted.
 
@@ -482,13 +482,13 @@ curl --request POST \
 
 ## end_session_endpoint
 
-[{your_domain}/oauth/v2/endsession]({your_domain}/oauth/v2/endsession)
+{your_domain}/oidc/v1/endsession
 
 > The end_session_endpoint is located with the login page, due to the need of accessing the same cookie domain
 
 ## jwks_uri
 
-[{your_domain}/oauth/v2/keys]({your_domain}/oauth/v2/keys)
+{your_domain}/oauth/v2/keys
 
 > Be aware that these keys can be rotated without any prior notice. We will however make sure that a proper `kid` is set with each key!
 

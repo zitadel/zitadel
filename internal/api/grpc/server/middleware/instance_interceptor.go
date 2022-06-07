@@ -14,6 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
+const (
+	HTTP1Host = "x-zitadel-http1-host"
+)
+
 type InstanceVerifier interface {
 	GetInstance(ctx context.Context)
 }
@@ -36,7 +40,7 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 		}
 	}
 
-	host, err := hostNameFromContext(interceptorCtx, headerName)
+	host, err := hostFromContext(interceptorCtx, headerName)
 	if err != nil {
 		return nil, status.Error(codes.PermissionDenied, err.Error())
 	}
@@ -48,12 +52,19 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	return handler(authz.WithInstance(ctx, instance), req)
 }
 
-func hostNameFromContext(ctx context.Context, headerName string) (string, error) {
+func hostFromContext(ctx context.Context, headerName string) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return "", fmt.Errorf("cannot read metadata")
 	}
-	host, ok := md[headerName]
+	host, ok := md[HTTP1Host]
+	if ok && len(host) == 1 {
+		if !isAllowedToSendHTTP1Header(md) {
+			return "", fmt.Errorf("no valid host header")
+		}
+		return host[0], nil
+	}
+	host, ok = md[headerName]
 	if !ok {
 		return "", fmt.Errorf("cannot find header: %v", headerName)
 	}
@@ -61,4 +72,12 @@ func hostNameFromContext(ctx context.Context, headerName string) (string, error)
 		return "", fmt.Errorf("invalid host header: %v", host)
 	}
 	return host[0], nil
+}
+
+//isAllowedToSendHTTP1Header check if the gRPC call was sent to `localhost`
+//this is only possible when calling the server directly running on localhost
+//or through the gRPC gateway
+func isAllowedToSendHTTP1Header(md metadata.MD) bool {
+	authority, ok := md[":authority"]
+	return ok && len(authority) == 1 && strings.Split(authority[0], ":")[0] == "localhost"
 }

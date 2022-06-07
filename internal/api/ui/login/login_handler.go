@@ -98,10 +98,13 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 	data := l.getUserData(r, authReq, "Login", errID, errMessage)
 	funcs := map[string]interface{}{
 		"hasUsernamePasswordLogin": func() bool {
-			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
+			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
 		},
 		"hasExternalLogin": func() bool {
-			return authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
+			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
+		},
+		"hasRegistration": func() bool {
+			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowRegister
 		},
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplLogin], data, funcs)

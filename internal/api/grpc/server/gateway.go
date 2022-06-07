@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 
@@ -56,7 +57,7 @@ type Gateway interface {
 
 type GatewayFunc func(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error
 
-func CreateGateway(ctx context.Context, g Gateway, port uint16) (http.Handler, string, error) {
+func CreateGateway(ctx context.Context, g Gateway, port uint16, http1HostName string) (http.Handler, string, error) {
 	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -66,11 +67,24 @@ func CreateGateway(ctx context.Context, g Gateway, port uint16) (http.Handler, s
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to register grpc gateway: %w", err)
 	}
-	return addInterceptors(runtimeMux), g.GatewayPathPrefix(), nil
+	return addInterceptors(runtimeMux, http1HostName), g.GatewayPathPrefix(), nil
 }
 
-func addInterceptors(handler http.Handler) http.Handler {
-	handler = http_mw.DefaultMetricsHandler(handler)
+func addInterceptors(handler http.Handler, http1HostName string) http.Handler {
+	handler = http1Host(handler, http1HostName)
+	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)
-	return http_mw.CORSInterceptor(handler)
+	return http_mw.DefaultMetricsHandler(handler)
+}
+
+func http1Host(next http.Handler, http1HostName string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		host, err := http_mw.HostFromRequest(r, http1HostName)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		r.Header.Set(middleware.HTTP1Host, host)
+		next.ServeHTTP(w, r)
+	})
 }

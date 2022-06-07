@@ -171,6 +171,14 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
+	case user.HumanAvatarAddedType:
+		key, err := avatarKeyFromEvent(event)
+		if err != nil {
+			return err
+		}
+		v.AvatarKey = key
+	case user.HumanAvatarRemovedType:
+		v.AvatarKey = ""
 	}
 	return nil
 }
@@ -179,4 +187,13 @@ func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time
 	v.SecondFactorVerification = verificationTime
 	v.SecondFactorVerificationType = int32(mfaType)
 	v.State = int32(domain.UserSessionStateActive)
+}
+
+func avatarKeyFromEvent(event *models.Event) (string, error) {
+	data := make(map[string]string)
+	if err := json.Unmarshal(event.Data, &data); err != nil {
+		logging.Log("EVEN-Sfew2").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
+	}
+	return data["storeKey"], nil
 }
