@@ -5,7 +5,7 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(GlobalOrgSetEventType, GlobalOrgSetMapper).
+	es.RegisterFilterEventMapper(DefaultOrgSetEventType, DefaultOrgSetMapper).
 		RegisterFilterEventMapper(ProjectSetEventType, ProjectSetMapper).
 		RegisterFilterEventMapper(ConsoleSetEventType, ConsoleSetMapper).
 		RegisterFilterEventMapper(DefaultLanguageSetEventType, DefaultLanguageSetMapper).

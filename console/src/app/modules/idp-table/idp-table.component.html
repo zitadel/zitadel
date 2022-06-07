@@ -129,8 +129,8 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.TYPE' | translate }}</th>
         <td class="pointer" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
-          <span class="state" *ngIf="idp?.oidcConfig">{{ 'IDP.OIDC.TITLE' | translate }}</span>
-          <span class="state" *ngIf="idp?.jwtConfig">{{ 'IDP.JWT.TITLE' | translate }}</span>
+          <span class="state" *ngIf="idp?.oidcConfig">{{ 'IDP.TYPES.1' | translate }}</span>
+          <span class="state" *ngIf="idp?.jwtConfig">{{ 'IDP.TYPES.3' | translate }}</span>
         </td>
       </ng-container>
 
@@ -216,7 +216,16 @@
             <button
               actions
               [disabled]="
-                serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG
+                (serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG) ||
+                ([
+                  serviceType === PolicyComponentServiceType.ADMIN
+                    ? 'iam.idp.write'
+                    : serviceType === PolicyComponentServiceType.MGMT
+                    ? 'org.idp.write'
+                    : ''
+                ]
+                  | hasRole
+                  | async) === false
               "
               mat-icon-button
               color="warn"

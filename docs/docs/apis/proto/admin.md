@@ -272,6 +272,30 @@ Checks whether an organisation exists by the given parameters
     GET: /orgs/_is_unique
 
 
+### SetDefaultOrg
+
+> **rpc** SetDefaultOrg([SetDefaultOrgRequest](#setdefaultorgrequest))
+[SetDefaultOrgResponse](#setdefaultorgresponse)
+
+Set the default org
+
+
+
+    PUT: /orgs/default/{org_id}
+
+
+### GetDefaultOrg
+
+> **rpc** GetDefaultOrg([GetDefaultOrgRequest](#getdefaultorgrequest))
+[GetDefaultOrgResponse](#getdefaultorgresponse)
+
+Set the default org
+
+
+
+    GET: /orgs/default
+
+
 ### ListOrgs
 
 > **rpc** ListOrgs([ListOrgsRequest](#listorgsrequest))
@@ -2113,6 +2137,23 @@ This is an empty request
 
 
 
+### GetDefaultOrgRequest
+This is an empty request
+
+
+
+
+### GetDefaultOrgResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org |  zitadel.org.v1.Org | - |  |
+
+
+
+
 ### GetDefaultPasswordResetMessageTextRequest
 
 
@@ -3513,6 +3554,28 @@ This is an empty request
 
 
 ### SetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultOrgRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### SetDefaultOrgResponse
 
 
 

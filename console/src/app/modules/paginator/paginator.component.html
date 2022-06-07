@@ -12,7 +12,7 @@
     >{{ pageIndex * pageSize }} - {{ pageIndex * pageSize + pageSize }}
   </span>
   <div class="row" *ngIf="!hidePagination">
-    <cnsl-form-field class="size" appearance="outline">
+    <cnsl-form-field class="size">
       <mat-select class="paginator-select" [(ngModel)]="pageSize" (selectionChange)="emitChange()">
         <mat-option *ngFor="let sizeOption of pageSizeOptions" [value]="sizeOption">
           {{ sizeOption }}

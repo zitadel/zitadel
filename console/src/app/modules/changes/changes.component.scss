@@ -30,6 +30,10 @@
     margin-bottom: 0.5rem;
     box-sizing: border-box;
 
+    @media only screen and (max-width: 500px) {
+      border-bottom: none;
+    }
+
     .date {
       font-weight: 500;
       font-size: 0.8rem;

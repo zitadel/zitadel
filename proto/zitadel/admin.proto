@@ -424,6 +424,28 @@ service AdminService {
         };
     }
 
+    // Set the default org
+    rpc SetDefaultOrg(SetDefaultOrgRequest) returns (SetDefaultOrgResponse) {
+        option (google.api.http) = {
+            put: "/orgs/default/{org_id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Set the default org
+    rpc GetDefaultOrg(GetDefaultOrgRequest) returns (GetDefaultOrgResponse) {
+        option (google.api.http) = {
+            get: "/orgs/default";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
     //Returns all organisations matching the request
     // all queries need to match (AND)
     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
@@ -2591,6 +2613,21 @@ message GetDefaultLanguageRequest {}
 
 message GetDefaultLanguageResponse {
     string language = 1;
+}
+
+message SetDefaultOrgRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message SetDefaultOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetDefaultOrgRequest {}
+
+message GetDefaultOrgResponse {
+    zitadel.org.v1.Org org = 1;
 }
 
 message ListInstanceDomainsRequest {

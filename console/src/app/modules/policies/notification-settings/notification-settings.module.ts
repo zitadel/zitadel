@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
@@ -24,6 +25,7 @@ import { SMTPPasswordDialogComponent } from './smtp-password-dialog/smtp-passwor
     InfoSectionModule,
     FormsModule,
     ReactiveFormsModule,
+    HasRolePipeModule,
     MatButtonModule,
     MatCheckboxModule,
     InputModule,

@@ -66,7 +66,7 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	host, err := getHost(r, headerName)
+	host, err := HostFromRequest(r, headerName)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 	return authz.WithInstance(ctx, instance), nil
 }
 
-func getHost(r *http.Request, headerName string) (string, error) {
+func HostFromRequest(r *http.Request, headerName string) (string, error) {
 	host := r.Host
 	if headerName != "host" {
 		host = r.Header.Get(headerName)

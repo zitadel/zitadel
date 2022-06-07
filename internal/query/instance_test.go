@@ -36,7 +36,7 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.creation_date,`+
 						` projections.instances.change_date,`+
 						` projections.instances.sequence,`+
-						` projections.instances.global_org_id,`+
+						` projections.instances.default_org_id,`+
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
 						` projections.instances.console_app_id,`+
@@ -65,7 +65,7 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.creation_date,`+
 						` projections.instances.change_date,`+
 						` projections.instances.sequence,`+
-						` projections.instances.global_org_id,`+
+						` projections.instances.default_org_id,`+
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
 						` projections.instances.console_app_id,`+
@@ -76,7 +76,7 @@ func Test_InstancePrepares(t *testing.T) {
 						"creation_date",
 						"change_date",
 						"sequence",
-						"global_org_id",
+						"default_org_id",
 						"iam_project_id",
 						"console_client_id",
 						"console_app_id",
@@ -100,7 +100,7 @@ func Test_InstancePrepares(t *testing.T) {
 				CreationDate: testNow,
 				ChangeDate:   testNow,
 				Sequence:     20211108,
-				GlobalOrgID:  "global-org-id",
+				DefaultOrgID: "global-org-id",
 				IAMProjectID: "project-id",
 				ConsoleID:    "client-id",
 				ConsoleAppID: "app-id",
@@ -118,7 +118,7 @@ func Test_InstancePrepares(t *testing.T) {
 						` projections.instances.creation_date,`+
 						` projections.instances.change_date,`+
 						` projections.instances.sequence,`+
-						` projections.instances.global_org_id,`+
+						` projections.instances.default_org_id,`+
 						` projections.instances.iam_project_id,`+
 						` projections.instances.console_client_id,`+
 						` projections.instances.console_app_id,`+

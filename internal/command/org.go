@@ -244,6 +244,35 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
+func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(id).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(id).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgDeactivatedEventType,
+			org.OrgReactivatedEventType,
+			org.OrgRemovedEventType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		switch event.(type) {
+		case *org.OrgAddedEvent, *org.OrgReactivatedEvent:
+			exists = true
+		case *org.OrgDeactivatedEvent, *org.OrgRemovedEvent:
+			exists = false
+		}
+	}
+
+	return exists, nil
+}
+
 func (c *Commands) setUpOrg(
 	ctx context.Context,
 	organisation *domain.Org,
