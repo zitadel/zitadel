@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type OrgIAMPolicyProjection struct {
+type orgIAMPolicyProjection struct {
 	crdb.StatementHandler
 }
 
@@ -31,15 +31,15 @@ const (
 	OrgIAMPolicyResourceOwnerCol         = "resource_owner"
 )
 
-func NewOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgIAMPolicyProjection {
-	p := &OrgIAMPolicyProjection{}
+func newOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgIAMPolicyProjection {
+	p := &orgIAMPolicyProjection{}
 	config.ProjectionName = OrgIAMPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *OrgIAMPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *orgIAMPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -74,7 +74,7 @@ func (p *OrgIAMPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.OrgIAMPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -102,7 +102,7 @@ func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 		}), nil
 }
 
-func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.OrgIAMPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.OrgIAMPolicyChangedEvent:
@@ -128,7 +128,7 @@ func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 		}), nil
 }
 
-func (p *OrgIAMPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgIAMPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.OrgIAMPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-ovQya", "seq", event.Sequence(), "expectedType", org.OrgIAMPolicyRemovedEventType).Error("wrong event type")

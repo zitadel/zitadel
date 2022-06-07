@@ -44,7 +44,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
 	}
-	projectRoles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.query.GetUserByID(ctx, subject)
+	user, err := o.query.GetUserByID(ctx, subject, true)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.query.GetUserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, userID, true)
 	if err != nil {
 		return err
 	}
@@ -329,7 +329,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.query.SearchUserMetadata(ctx, userID, &query.UserMetadataSearchQueries{})
+	metaData, err := o.query.SearchUserMetadata(ctx, userID, true, &query.UserMetadataSearchQueries{})
 	if err != nil {
 		return nil, err
 	}
@@ -342,11 +342,11 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.query.GetUserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, userID, true)
 	if err != nil {
 		return nil, err
 	}
-	resourceOwner, err := o.query.OrgByID(ctx, user.ResourceOwner)
+	resourceOwner, err := o.query.OrgByID(ctx, true, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

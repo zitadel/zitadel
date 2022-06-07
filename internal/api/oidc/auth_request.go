@@ -212,7 +212,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}
-	project, err := o.query.ProjectByID(ctx, projectID)
+	project, err := o.query.ProjectByID(ctx, true, projectID)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
 	}
@@ -223,7 +223,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 	if err != nil {
 		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return err
 	}

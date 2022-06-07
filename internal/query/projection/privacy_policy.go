@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type PrivacyPolicyProjection struct {
+type privacyPolicyProjection struct {
 	crdb.StatementHandler
 }
 
@@ -33,15 +33,15 @@ const (
 	PrivacyPolicyResourceOwnerCol = "resource_owner"
 )
 
-func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PrivacyPolicyProjection {
-	p := &PrivacyPolicyProjection{}
+func newPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *privacyPolicyProjection {
+	p := &privacyPolicyProjection{}
 	config.ProjectionName = PrivacyPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *PrivacyPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *privacyPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -76,7 +76,7 @@ func (p *PrivacyPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *privacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PrivacyPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -106,7 +106,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		}), nil
 }
 
-func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *privacyPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PrivacyPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PrivacyPolicyChangedEvent:
@@ -138,7 +138,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 		}), nil
 }
 
-func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *privacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PrivacyPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-hN5Ip", "seq", event.Sequence(), "expectedType", org.PrivacyPolicyRemovedEventType).Error("wrong event type")

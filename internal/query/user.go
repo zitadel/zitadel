@@ -229,7 +229,11 @@ var (
 	}
 )
 
-func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUserByID(ctx context.Context, userID string, shouldRealTime bool, queries ...SearchQuery) (*User, error) {
+	if shouldRealTime {
+		projection.LoginNameProjection.TriggerBulk(ctx)
+		projection.UserProjection.TriggerBulk(ctx)
+	}
 	query, scan := prepareUserQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)

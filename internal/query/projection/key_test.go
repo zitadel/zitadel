@@ -34,7 +34,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 					keypairAddedEventData(time.Now().Add(time.Hour)),
 				), keypair.AddedEventMapper),
 			},
-			reduce: (&KeyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
+			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
 			want: wantReduce{
 				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),
@@ -88,7 +88,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 					keypairAddedEventData(time.Now().Add(-time.Hour)),
 				), keypair.AddedEventMapper),
 			},
-			reduce: (&KeyProjection{}).reduceKeyPairAdded,
+			reduce: (&keyProjection{}).reduceKeyPairAdded,
 			want: wantReduce{
 				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),

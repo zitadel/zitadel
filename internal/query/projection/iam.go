@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/iam"
 )
 
-type IAMProjection struct {
+type iamProjection struct {
 	crdb.StatementHandler
 }
 
@@ -19,15 +19,15 @@ const (
 	IAMProjectionTable = "zitadel.projections.iam"
 )
 
-func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IAMProjection {
-	p := &IAMProjection{}
+func newIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *iamProjection {
+	p := &iamProjection{}
 	config.ProjectionName = IAMProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *IAMProjection) reducers() []handler.AggregateReducer {
+func (p *iamProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: iam.AggregateType,
@@ -65,7 +65,7 @@ const (
 	IAMColumnSetUpDone    = "setup_done"
 )
 
-func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.GlobalOrgSetEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-3n89fs", "seq", event.Sequence(), "expectedType", iam.GlobalOrgSetEventType).Error("wrong event type")
@@ -82,7 +82,7 @@ func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Sta
 	), nil
 }
 
-func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.ProjectSetEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-2j9fw", "seq", event.Sequence(), "expectedType", iam.ProjectSetEventType).Error("wrong event type")
@@ -99,7 +99,7 @@ func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.St
 	), nil
 }
 
-func (p *IAMProjection) reduceSetupEvent(event eventstore.Event) (*handler.Statement, error) {
+func (p *iamProjection) reduceSetupEvent(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SetupStepEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-39fjw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.SetupDoneEventType, iam.SetupStartedEventType}).Error("wrong event type")

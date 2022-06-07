@@ -34,7 +34,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), iam.MemberAddedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceAdded,
+			reduce: (&iamMemberProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    iam.AggregateType,
 				sequence:         15,
@@ -70,7 +70,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), iam.MemberChangedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceChanged,
+			reduce: (&iamMemberProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    iam.AggregateType,
 				sequence:         15,
@@ -102,7 +102,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), iam.MemberCascadeRemovedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceCascadeRemoved,
+			reduce: (&iamMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    iam.AggregateType,
 				sequence:         15,
@@ -131,7 +131,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), iam.MemberRemovedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceRemoved,
+			reduce: (&iamMemberProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    iam.AggregateType,
 				sequence:         15,
@@ -158,7 +158,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceUserRemoved,
+			reduce: (&iamMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,

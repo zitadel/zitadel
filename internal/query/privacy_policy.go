@@ -73,7 +73,10 @@ var (
 	}
 )
 
-func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
+func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldRealTime bool, orgID string) (*PrivacyPolicy, error) {
+	if shouldRealTime {
+		projection.PrivacyPolicyProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{

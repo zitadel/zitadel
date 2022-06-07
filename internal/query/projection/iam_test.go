@@ -30,7 +30,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 					[]byte(`{"globalOrgId": "orgid"}`),
 				), iam.GlobalOrgSetMapper),
 			},
-			reduce: (&IAMProjection{}).reduceGlobalOrgSet,
+			reduce: (&iamProjection{}).reduceGlobalOrgSet,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -60,7 +60,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 					[]byte(`{"iamProjectId": "project-id"}`),
 				), iam.ProjectSetMapper),
 			},
-			reduce: (&IAMProjection{}).reduceIAMProjectSet,
+			reduce: (&iamProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -90,7 +90,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 					[]byte(`{"Step": 1}`),
 				), iam.SetupStepMapper),
 			},
-			reduce: (&IAMProjection{}).reduceSetupEvent,
+			reduce: (&iamProjection{}).reduceSetupEvent,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -120,7 +120,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 					[]byte(`{"Step": 1}`),
 				), iam.SetupStepMapper),
 			},
-			reduce: (&IAMProjection{}).reduceSetupEvent,
+			reduce: (&iamProjection{}).reduceSetupEvent,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
 				aggregateType:    eventstore.AggregateType("iam"),

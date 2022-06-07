@@ -19,7 +19,7 @@ func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *admin_pb.GetOrgIAMPolic
 }
 
 func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCustomOrgIAMPolicyRequest) (*admin_pb.GetCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.query.OrgIAMPolicyByOrg(ctx, req.OrgId)
+	policy, err := s.query.OrgIAMPolicyByOrg(ctx, true, req.OrgId)
 	if err != nil {
 		return nil, err
 	}

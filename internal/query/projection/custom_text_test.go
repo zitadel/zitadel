@@ -35,7 +35,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&CustomTextProjection{}).reduceSet,
+			reduce: (&customTextProjection{}).reduceSet,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -63,7 +63,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&CustomTextProjection{}).reduceRemoved,
+			reduce: (&customTextProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextRemovedEventType),
@@ -97,7 +97,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceTemplateRemoved",
-			reduce: (&CustomTextProjection{}).reduceTemplateRemoved,
+			reduce: (&customTextProjection{}).reduceTemplateRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextTemplateRemovedEventType),
@@ -130,7 +130,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceAdded",
-			reduce: (&CustomTextProjection{}).reduceSet,
+			reduce: (&customTextProjection{}).reduceSet,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.CustomTextSetEventType),
@@ -170,7 +170,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceRemoved",
-			reduce: (&CustomTextProjection{}).reduceRemoved,
+			reduce: (&customTextProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.CustomTextTemplateRemovedEventType),
@@ -204,7 +204,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceTemplateRemoved",
-			reduce: (&CustomTextProjection{}).reduceTemplateRemoved,
+			reduce: (&customTextProjection{}).reduceTemplateRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.CustomTextTemplateRemovedEventType),

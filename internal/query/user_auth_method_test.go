@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_UserAuthMethodPrepares(t *testing.T) {
@@ -206,110 +205,6 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 						` zitadel.projections.user_auth_methods.state,`+
 						` zitadel.projections.user_auth_methods.method_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.user_auth_methods`),
-					sql.ErrConnDone,
-				),
-				err: func(err error) (error, bool) {
-					if !errors.Is(err, sql.ErrConnDone) {
-						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: nil,
-		},
-		{
-			name:    "prepareUserAuthMethodQuery no result",
-			prepare: prepareUserAuthMethodQuery,
-			want: want{
-				sqlExpectations: mockQueries(
-					`SELECT zitadel.projections.user_auth_methods.token_id,`+
-						` zitadel.projections.user_auth_methods.creation_date,`+
-						` zitadel.projections.user_auth_methods.change_date,`+
-						` zitadel.projections.user_auth_methods.resource_owner,`+
-						` zitadel.projections.user_auth_methods.user_id,`+
-						` zitadel.projections.user_auth_methods.sequence,`+
-						` zitadel.projections.user_auth_methods.name,`+
-						` zitadel.projections.user_auth_methods.state,`+
-						` zitadel.projections.user_auth_methods.method_type`+
-						` FROM zitadel.projections.user_auth_methods`,
-					nil,
-					nil,
-				),
-				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
-						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: (*AuthMethod)(nil),
-		},
-		{
-			name:    "prepareUserAuthMethodQuery found",
-			prepare: prepareUserAuthMethodQuery,
-			want: want{
-				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.user_auth_methods.token_id,`+
-						` zitadel.projections.user_auth_methods.creation_date,`+
-						` zitadel.projections.user_auth_methods.change_date,`+
-						` zitadel.projections.user_auth_methods.resource_owner,`+
-						` zitadel.projections.user_auth_methods.user_id,`+
-						` zitadel.projections.user_auth_methods.sequence,`+
-						` zitadel.projections.user_auth_methods.name,`+
-						` zitadel.projections.user_auth_methods.state,`+
-						` zitadel.projections.user_auth_methods.method_type`+
-						` FROM zitadel.projections.user_auth_methods`),
-					[]string{
-						"token_id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"user_id",
-						"sequence",
-						"name",
-						"state",
-						"method_type",
-					},
-					[]driver.Value{
-						"token_id",
-						testNow,
-						testNow,
-						"ro",
-						"user_id",
-						uint64(20211108),
-						"name",
-						domain.MFAStateReady,
-						domain.UserAuthMethodTypeU2F,
-					},
-				),
-			},
-			object: &AuthMethod{
-				TokenID:       "token_id",
-				CreationDate:  testNow,
-				ChangeDate:    testNow,
-				ResourceOwner: "ro",
-				UserID:        "user_id",
-				Sequence:      20211108,
-				Name:          "name",
-				State:         domain.MFAStateReady,
-				Type:          domain.UserAuthMethodTypeU2F,
-			},
-		},
-		{
-			name:    "prepareUserAuthMethodQuery sql err",
-			prepare: prepareUserAuthMethodQuery,
-			want: want{
-				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.user_auth_methods.token_id,`+
-						` zitadel.projections.user_auth_methods.creation_date,`+
-						` zitadel.projections.user_auth_methods.change_date,`+
-						` zitadel.projections.user_auth_methods.resource_owner,`+
-						` zitadel.projections.user_auth_methods.user_id,`+
-						` zitadel.projections.user_auth_methods.sequence,`+
-						` zitadel.projections.user_auth_methods.name,`+
-						` zitadel.projections.user_auth_methods.state,`+
-						` zitadel.projections.user_auth_methods.method_type`+
 						` FROM zitadel.projections.user_auth_methods`),
 					sql.ErrConnDone,
 				),

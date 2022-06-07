@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.Id, domain.IAMID)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, true, req.Id, domain.IAMID)
 	if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -75,27 +74,10 @@ type ProjectRoleSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectRoleByID(ctx context.Context, projectID, key string) (*ProjectRole, error) {
-	stmt, scan := prepareProjectRoleQuery()
-	query, args, err := stmt.
-		Where(sq.Eq{
-			ProjectRoleColumnProjectID.identifier(): projectID,
-			ProjectRoleColumnKey.identifier():       key,
-		}).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2N0fs", "Errors.Query.SQLStatment")
+func (q *Queries) SearchProjectRoles(ctx context.Context, shouldRealTime bool, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
+	if shouldRealTime {
+		projection.ProjectRoleProjection.TriggerBulk(ctx)
 	}
-
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
-}
-
-func (q *Queries) ExistsProjectRole(ctx context.Context, projectID, key string) (err error) {
-	_, err = q.ProjectRoleByID(ctx, projectID, key)
-	return err
-}
-
-func (q *Queries) SearchProjectRoles(ctx context.Context, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
 	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
@@ -202,39 +184,6 @@ func (q *ProjectRoleSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 		query = q.toQuery(query)
 	}
 	return query
-}
-
-func prepareProjectRoleQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectRole, error)) {
-	return sq.Select(
-			ProjectRoleColumnProjectID.identifier(),
-			ProjectRoleColumnCreationDate.identifier(),
-			ProjectRoleColumnChangeDate.identifier(),
-			ProjectRoleColumnResourceOwner.identifier(),
-			ProjectRoleColumnSequence.identifier(),
-			ProjectRoleColumnKey.identifier(),
-			ProjectRoleColumnDisplayName.identifier(),
-			ProjectRoleColumnGroupName.identifier()).
-			From(projectRolesTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*ProjectRole, error) {
-			p := new(ProjectRole)
-			err := row.Scan(
-				&p.ProjectID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.Sequence,
-				&p.Key,
-				&p.DisplayName,
-				&p.Group,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Mf0wf", "Errors.ProjectRole.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-M00sf", "Errors.Internal")
-			}
-			return p, nil
-		}
 }
 
 func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {

@@ -115,7 +115,10 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	return authNKeys, err
 }
 
-func (q *Queries) GetAuthNKeyByID(ctx context.Context, id string, queries ...SearchQuery) (*AuthNKey, error) {
+func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldRealTime bool, id string, queries ...SearchQuery) (*AuthNKey, error) {
+	if shouldRealTime {
+		projection.AuthNKeyProjection.TriggerBulk(ctx)
+	}
 	query, scan := prepareAuthNKeyQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)

@@ -34,7 +34,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 }`),
 				), org.LockoutPolicyAddedEventMapper),
 			},
-			reduce: (&LockoutPolicyProjection{}).reduceAdded,
+			reduce: (&lockoutPolicyProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -62,7 +62,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceChanged",
-			reduce: (&LockoutPolicyProjection{}).reduceChanged,
+			reduce: (&lockoutPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LockoutPolicyChangedEventType),
@@ -96,7 +96,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&LockoutPolicyProjection{}).reduceRemoved,
+			reduce: (&lockoutPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LockoutPolicyRemovedEventType),
@@ -123,7 +123,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceAdded",
-			reduce: (&LockoutPolicyProjection{}).reduceAdded,
+			reduce: (&lockoutPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LockoutPolicyAddedEventType),
@@ -161,7 +161,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceChanged",
-			reduce: (&LockoutPolicyProjection{}).reduceChanged,
+			reduce: (&lockoutPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.LockoutPolicyChangedEventType),

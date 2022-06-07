@@ -36,7 +36,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -75,7 +75,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -114,7 +114,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -153,7 +153,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -192,7 +192,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -231,7 +231,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -270,7 +270,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextSetEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -308,7 +308,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -344,7 +344,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -380,7 +380,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -416,7 +416,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -452,7 +452,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -488,7 +488,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -524,7 +524,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), org.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -549,7 +549,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&MessageTextProjection{}).reduceTemplateRemoved,
+			reduce: (&messageTextProjection{}).reduceTemplateRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextTemplateRemovedEventType),
@@ -582,7 +582,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceAdded",
-			reduce: (&MessageTextProjection{}).reduceAdded,
+			reduce: (&messageTextProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.CustomTextSetEventType),
@@ -632,7 +632,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					}`),
 				), iam.CustomTextRemovedEventMapper),
 			},
-			reduce: (&MessageTextProjection{}).reduceRemoved,
+			reduce: (&messageTextProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,

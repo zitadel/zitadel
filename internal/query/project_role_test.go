@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-
-	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_ProjectRolePrepares(t *testing.T) {
@@ -193,104 +191,6 @@ func Test_ProjectRolePrepares(t *testing.T) {
 						` zitadel.projections.project_roles.display_name,`+
 						` zitadel.projections.project_roles.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.project_roles`),
-					sql.ErrConnDone,
-				),
-				err: func(err error) (error, bool) {
-					if !errors.Is(err, sql.ErrConnDone) {
-						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: nil,
-		},
-		{
-			name:    "prepareProjectRoleQuery no result",
-			prepare: prepareProjectRoleQuery,
-			want: want{
-				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name`+
-						` FROM zitadel.projections.project_roles`),
-					nil,
-					nil,
-				),
-				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
-						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: (*ProjectRole)(nil),
-		},
-		{
-			name:    "prepareProjectRoleQuery found",
-			prepare: prepareProjectRoleQuery,
-			want: want{
-				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name`+
-						` FROM zitadel.projections.project_roles`),
-					[]string{
-						"project_id",
-						"creation_date",
-						"change_date",
-						"resource_owner",
-						"sequence",
-						"role_key",
-						"display_name",
-						"group_name",
-					},
-					[]driver.Value{
-						"project-id",
-						testNow,
-						testNow,
-						"ro",
-						uint64(20211111),
-						"role-key",
-						"role-display-name",
-						"role-group",
-					},
-				),
-			},
-			object: &ProjectRole{
-				ProjectID:     "project-id",
-				CreationDate:  testNow,
-				ChangeDate:    testNow,
-				ResourceOwner: "ro",
-				Sequence:      20211111,
-				Key:           "role-key",
-				DisplayName:   "role-display-name",
-				Group:         "role-group",
-			},
-		},
-		{
-			name:    "prepareProjectRoleQuery sql err",
-			prepare: prepareProjectRoleQuery,
-			want: want{
-				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.project_roles.project_id,`+
-						` zitadel.projections.project_roles.creation_date,`+
-						` zitadel.projections.project_roles.change_date,`+
-						` zitadel.projections.project_roles.resource_owner,`+
-						` zitadel.projections.project_roles.sequence,`+
-						` zitadel.projections.project_roles.role_key,`+
-						` zitadel.projections.project_roles.display_name,`+
-						` zitadel.projections.project_roles.group_name`+
 						` FROM zitadel.projections.project_roles`),
 					sql.ErrConnDone,
 				),

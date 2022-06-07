@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type UserAuthMethodProjection struct {
+type userAuthMethodProjection struct {
 	crdb.StatementHandler
 }
 
@@ -20,8 +20,8 @@ const (
 	UserAuthMethodTable = "zitadel.projections.user_auth_methods"
 )
 
-func NewUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserAuthMethodProjection {
-	p := &UserAuthMethodProjection{}
+func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userAuthMethodProjection {
+	p := &userAuthMethodProjection{}
 	config.ProjectionName = UserAuthMethodTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -40,7 +40,7 @@ const (
 	UserAuthMethodTypeCol          = "method_type"
 )
 
-func (p *UserAuthMethodProjection) reducers() []handler.AggregateReducer {
+func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -86,7 +86,7 @@ func (p *UserAuthMethodProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *UserAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) (*handler.Statement, error) {
+func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) (*handler.Statement, error) {
 	tokenID := ""
 	var methodType domain.UserAuthMethodType
 	switch e := event.(type) {
@@ -119,7 +119,7 @@ func (p *UserAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 	), nil
 }
 
-func (p *UserAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (*handler.Statement, error) {
+func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (*handler.Statement, error) {
 	tokenID := ""
 	name := ""
 	var methodType domain.UserAuthMethodType
@@ -158,7 +158,7 @@ func (p *UserAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 	), nil
 }
 
-func (p *UserAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event) (*handler.Statement, error) {
+func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event) (*handler.Statement, error) {
 	var tokenID string
 	var methodType domain.UserAuthMethodType
 	switch e := event.(type) {

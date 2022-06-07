@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type OrgMemberProjection struct {
+type orgMemberProjection struct {
 	crdb.StatementHandler
 }
 
@@ -21,15 +21,15 @@ const (
 	OrgMemberProjectionTable = "zitadel.projections.org_members"
 )
 
-func NewOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgMemberProjection {
-	p := &OrgMemberProjection{}
+func newOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgMemberProjection {
+	p := &orgMemberProjection{}
 	config.ProjectionName = OrgMemberProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *OrgMemberProjection) reducers() []handler.AggregateReducer {
+func (p *orgMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -74,7 +74,7 @@ const (
 	OrgMemberOrgIDCol = "org_id"
 )
 
-func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-BoKBr", "seq", event.Sequence(), "expectedType", org.MemberAddedEventType).Error("wrong event type")
@@ -83,7 +83,7 @@ func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-bfqNl", "seq", event.Sequence(), "expected", org.MemberChangedEventType).Error("wrong event type")
@@ -92,7 +92,7 @@ func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.St
 	return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberCascadeRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zgb6w", "seq", event.Sequence(), "expected", org.MemberCascadeRemovedEventType).Error("wrong event type")
@@ -101,7 +101,7 @@ func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*han
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-KPyxE", "seq", event.Sequence(), "expected", org.MemberRemovedEventType).Error("wrong event type")
@@ -113,7 +113,7 @@ func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.St
 	)
 }
 
-func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-f5pgn", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
@@ -122,7 +122,7 @@ func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handle
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	//TODO: as soon as org deletion is implemented:
 	// Case: The user has resource owner A and an org has resource owner B
 	// if org B deleted it works

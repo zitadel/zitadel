@@ -93,7 +93,10 @@ type ProjectSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectByID(ctx context.Context, id string) (*Project, error) {
+func (q *Queries) ProjectByID(ctx context.Context, shouldRealTime bool, id string) (*Project, error) {
+	if shouldRealTime {
+		projection.ProjectProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := prepareProjectQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectColumnID.identifier(): id,
@@ -104,11 +107,6 @@ func (q *Queries) ProjectByID(ctx context.Context, id string) (*Project, error) 
 
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
-}
-
-func (q *Queries) ExistsProject(ctx context.Context, id string) (err error) {
-	_, err = q.ProjectByID(ctx, id)
-	return err
 }
 
 func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries) (projects *Projects, err error) {

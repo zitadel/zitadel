@@ -11,21 +11,21 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
-type ProjectRoleProjection struct {
+type projectRoleProjection struct {
 	crdb.StatementHandler
 }
 
 const ProjectRoleProjectionTable = "zitadel.projections.project_roles"
 
-func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectRoleProjection {
-	p := &ProjectRoleProjection{}
+func newProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectRoleProjection {
+	p := &projectRoleProjection{}
 	config.ProjectionName = ProjectRoleProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
+func (p *projectRoleProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -63,7 +63,7 @@ const (
 	ProjectRoleColumnCreator       = "creator_id"
 )
 
-func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Fmre5", "seq", event.Sequence(), "expectedType", project.RoleAddedType).Error("wrong event type")
@@ -85,7 +85,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("wrong event type")
@@ -113,7 +113,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-MlokF", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
@@ -128,7 +128,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event)
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-hm90R", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")

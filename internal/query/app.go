@@ -200,7 +200,10 @@ var (
 	}
 )
 
-func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID string) (*App, error) {
+func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldRealTime bool, projectID, appID string) (*App, error) {
+	if shouldRealTime {
+		projection.AppProjection.TriggerBulk(ctx)
+	}
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -210,19 +213,6 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID str
 	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AFDgg", "Errors.Query.SQLStatement")
-	}
-
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
-}
-
-func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
-	stmt, scan := prepareAppQuery()
-	query, args, err := stmt.Where(
-		sq.Eq{AppColumnID.identifier(): appID},
-	).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)

@@ -111,27 +111,6 @@ var (
 	}
 )
 
-func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageText, error) {
-	stmt, scan := prepareMessageTextQuery()
-	query, args, err := stmt.Where(
-		sq.Or{
-			sq.Eq{
-				MessageTextColAggregateID.identifier(): orgID,
-			},
-			sq.Eq{
-				MessageTextColAggregateID.identifier(): q.iamID,
-			},
-		}).
-		OrderBy(MessageTextColAggregateID.identifier()).
-		Limit(1).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-90n3N", "Errors.Query.SQLStatement")
-	}
-
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
-}
-
 func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(sq.Eq{

@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
-type PasswordAgeProjection struct {
+type passwordAgeProjection struct {
 	crdb.StatementHandler
 }
 
@@ -22,15 +22,15 @@ const (
 	PasswordAgeTable = "zitadel.projections.password_age_policies"
 )
 
-func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordAgeProjection {
-	p := &PasswordAgeProjection{}
+func newPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerConfig) *passwordAgeProjection {
+	p := &passwordAgeProjection{}
 	config.ProjectionName = PasswordAgeTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *PasswordAgeProjection) reducers() []handler.AggregateReducer {
+func (p *passwordAgeProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -65,7 +65,7 @@ func (p *PasswordAgeProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordAgeProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordAgePolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -94,7 +94,7 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 		}), nil
 }
 
-func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordAgeProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordAgePolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PasswordAgePolicyChangedEvent:
@@ -123,7 +123,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 		}), nil
 }
 
-func (p *PasswordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordAgePolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-iwqfN", "seq", event.Sequence(), "expectedType", org.PasswordAgePolicyRemovedEventType).Error("wrong event type")

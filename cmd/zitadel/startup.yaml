@@ -70,7 +70,7 @@ Queries:
 
 Projections:
   RequeueEvery: 10s
-  RetryFailedAfter: 1s
+  RetryFailedAfter: 40ms
   MaxFailureCount: 5
   BulkLimit: 200
   MaxIterators: 1

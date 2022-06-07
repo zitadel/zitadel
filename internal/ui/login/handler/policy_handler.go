@@ -15,7 +15,7 @@ func (l *Login) getOrgIamPolicy(r *http.Request, orgID string) (*query.OrgIAMPol
 	if orgID == "" {
 		return l.query.DefaultOrgIAMPolicy(r.Context())
 	}
-	return l.query.OrgIAMPolicyByOrg(r.Context(), orgID)
+	return l.query.OrgIAMPolicyByOrg(r.Context(), false, orgID)
 }
 
 func (l *Login) getIDPConfigByID(r *http.Request, idpConfigID string) (*iam_model.IDPConfigView, error) {
@@ -26,5 +26,5 @@ func (l *Login) getLoginPolicy(r *http.Request, orgID string) (*query.LoginPolic
 	if orgID == "" {
 		return l.query.DefaultLoginPolicy(r.Context())
 	}
-	return l.query.LoginPolicyByID(r.Context(), orgID)
+	return l.query.LoginPolicyByID(r.Context(), false, orgID)
 }

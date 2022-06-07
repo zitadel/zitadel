@@ -65,7 +65,7 @@ type labelPolicyProvider interface {
 }
 
 type privacyPolicyProvider interface {
-	PrivacyPolicyByOrg(context.Context, string) (*query.PrivacyPolicy, error)
+	PrivacyPolicyByOrg(context.Context, bool, string) (*query.PrivacyPolicy, error)
 }
 
 type userSessionViewProvider interface {
@@ -79,11 +79,11 @@ type userViewProvider interface {
 }
 
 type loginPolicyViewProvider interface {
-	LoginPolicyByID(context.Context, string) (*query.LoginPolicy, error)
+	LoginPolicyByID(context.Context, bool, string) (*query.LoginPolicy, error)
 }
 
 type lockoutPolicyViewProvider interface {
-	LockoutPolicyByOrg(context.Context, string) (*query.LockoutPolicy, error)
+	LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -99,7 +99,7 @@ type userCommandProvider interface {
 }
 
 type orgViewProvider interface {
-	OrgByID(context.Context, string) (*query.Org, error)
+	OrgByID(context.Context, bool, string) (*query.Org, error)
 	OrgByDomainGlobal(context.Context, string) (*query.Org, error)
 }
 
@@ -533,7 +533,7 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 }
 
 func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*query.LoginPolicy, []*domain.IDPProvider, error) {
-	policy, err := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, orgID)
+	policy, err := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, false, orgID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -955,7 +955,7 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 }
 
 func (repo *AuthRequestRepo) GetPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
-	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, orgID)
+	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, false, orgID)
 	if errors.IsNotFound(err) {
 		return new(domain.PrivacyPolicy), nil
 	}
@@ -983,7 +983,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
-	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, orgID)
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -1169,7 +1169,7 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
-	org, err := queries.OrgByID(context.TODO(), user.ResourceOwner)
+	org, err := queries.OrgByID(context.TODO(), false, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

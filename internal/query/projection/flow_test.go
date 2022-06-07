@@ -30,7 +30,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 					[]byte(`{"flowType": 1, "triggerType": 1, "actionIDs": ["id1", "id2"]}`),
 				), org.TriggerActionsSetEventMapper),
 			},
-			reduce: (&FlowProjection{}).reduceTriggerActionsSetEventType,
+			reduce: (&flowProjection{}).reduceTriggerActionsSetEventType,
 			want: wantReduce{
 				projection:       FlowTriggerTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -79,7 +79,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 					[]byte(`{"flowType": 1}`),
 				), org.FlowClearedEventMapper),
 			},
-			reduce: (&FlowProjection{}).reduceFlowClearedEventType,
+			reduce: (&flowProjection{}).reduceFlowClearedEventType,
 			want: wantReduce{
 				projection:       FlowTriggerTable,
 				aggregateType:    eventstore.AggregateType("org"),

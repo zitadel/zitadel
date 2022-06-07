@@ -31,7 +31,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
 				), org.LabelPolicyAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceAdded,
+			reduce: (&labelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -75,7 +75,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
 				), org.LabelPolicyChangedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceChanged,
+			reduce: (&labelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -109,7 +109,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					nil,
 				), org.LabelPolicyRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceRemoved,
+			reduce: (&labelPolicyProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -136,7 +136,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					nil,
 				), org.LabelPolicyActivatedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceActivated,
+			reduce: (&labelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -167,7 +167,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), org.LabelPolicyLogoAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
+			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -198,7 +198,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), org.LabelPolicyLogoDarkAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
+			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -229,7 +229,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
+			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -260,7 +260,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconDarkAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
+			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -291,7 +291,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), org.LabelPolicyLogoRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
+			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -322,7 +322,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), org.LabelPolicyLogoDarkRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
+			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -353,7 +353,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
+			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -384,7 +384,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), org.LabelPolicyIconDarkRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
+			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -415,7 +415,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
 				), org.LabelPolicyFontAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceFontAdded,
+			reduce: (&labelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -446,7 +446,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
 				), org.LabelPolicyFontRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceFontRemoved,
+			reduce: (&labelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -477,7 +477,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					nil,
 				), org.LabelPolicyAssetsRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceAssetsRemoved,
+			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -512,7 +512,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
 				), iam.LabelPolicyAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceAdded,
+			reduce: (&labelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -556,7 +556,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "primaryColorDark": "#ffffff","backgroundColorDark": "#ffffff", "warnColorDark": "#ffffff", "fontColorDark": "#ffffff", "hideLoginNameSuffix": true, "errorMsgPopup": true, "disableWatermark": true}`),
 				), iam.LabelPolicyChangedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceChanged,
+			reduce: (&labelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -597,7 +597,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					nil,
 				), iam.LabelPolicyActivatedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceActivated,
+			reduce: (&labelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -628,7 +628,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), iam.LabelPolicyLogoAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
+			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -659,7 +659,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), iam.LabelPolicyLogoDarkAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
+			reduce: (&labelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -690,7 +690,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
+			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -721,7 +721,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconDarkAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
+			reduce: (&labelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -752,7 +752,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), iam.LabelPolicyLogoRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
+			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -783,7 +783,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
 				), iam.LabelPolicyLogoDarkRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
+			reduce: (&labelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -814,7 +814,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
+			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -845,7 +845,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
 				), iam.LabelPolicyIconDarkRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
+			reduce: (&labelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -876,7 +876,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
 				), iam.LabelPolicyFontAddedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceFontAdded,
+			reduce: (&labelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -907,7 +907,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
 				), iam.LabelPolicyFontRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceFontRemoved,
+			reduce: (&labelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
@@ -938,7 +938,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					nil,
 				), iam.LabelPolicyAssetsRemovedEventMapper),
 			},
-			reduce: (&LabelPolicyProjection{}).reduceAssetsRemoved,
+			reduce: (&labelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,

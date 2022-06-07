@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
-	user, err := s.query.GetUserByID(ctx, authz.GetCtxData(ctx).UserID)
+	user, err := s.query.GetUserByID(ctx, authz.GetCtxData(ctx).UserID, true)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, authz.GetCtxData(ctx).UserID, queries)
+	res, err := s.query.SearchUserMetadata(ctx, authz.GetCtxData(ctx).UserID, false, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 }
 
 func (s *Server) GetMyMetadata(ctx context.Context, req *auth_pb.GetMyMetadataRequest) (*auth_pb.GetMyMetadataResponse, error) {
-	data, err := s.query.GetUserMetadataByKey(ctx, authz.GetCtxData(ctx).UserID, req.Key)
+	data, err := s.query.GetUserMetadataByKey(ctx, authz.GetCtxData(ctx).UserID, req.Key, true)
 	if err != nil {
 		return nil, err
 	}

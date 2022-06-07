@@ -21,19 +21,19 @@ const (
 	FlowActionIDCol              = "action_id"
 )
 
-type FlowProjection struct {
+type flowProjection struct {
 	crdb.StatementHandler
 }
 
-func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FlowProjection {
-	p := &FlowProjection{}
+func newFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) *flowProjection {
+	p := &flowProjection{}
 	config.ProjectionName = FlowTriggerTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *FlowProjection) reducers() []handler.AggregateReducer {
+func (p *flowProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -51,7 +51,7 @@ func (p *FlowProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event) (*handler.Statement, error) {
+func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.TriggerActionsSetEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", org.TriggerActionsSetEventType).Error("was not an trigger actions set event")
@@ -79,7 +79,7 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 	return crdb.NewMultiStatement(e, stmts...), nil
 }
 
-func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
+func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FlowClearedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", org.FlowClearedEventType).Error("was not a flow cleared event")

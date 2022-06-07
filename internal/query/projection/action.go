@@ -27,19 +27,19 @@ const (
 	ActionAllowedToFailCol = "allowed_to_fail"
 )
 
-type ActionProjection struct {
+type actionProjection struct {
 	crdb.StatementHandler
 }
 
-func NewActionProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ActionProjection {
-	p := &ActionProjection{}
+func newActionProjection(ctx context.Context, config crdb.StatementHandlerConfig) *actionProjection {
+	p := &actionProjection{}
 	config.ProjectionName = ActionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *ActionProjection) reducers() []handler.AggregateReducer {
+func (p *actionProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: action.AggregateType,
@@ -69,7 +69,7 @@ func (p *ActionProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *ActionProjection) reduceActionAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.AddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Sgg31", "seq", event.Sequence, "expectedType", action.AddedEventType).Error("wrong event type")
@@ -92,7 +92,7 @@ func (p *ActionProjection) reduceActionAdded(event eventstore.Event) (*handler.S
 	), nil
 }
 
-func (p *ActionProjection) reduceActionChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Dg2th", "seq", event.Sequence, "expected", action.ChangedEventType).Error("wrong event type")
@@ -123,7 +123,7 @@ func (p *ActionProjection) reduceActionChanged(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *ActionProjection) reduceActionDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.DeactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Fhhjd", "seq", event.Sequence, "expectedType", action.DeactivatedEventType).Error("wrong event type")
@@ -142,7 +142,7 @@ func (p *ActionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *ActionProjection) reduceActionReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Fg4r3", "seq", event.Sequence, "expectedType", action.ReactivatedEventType).Error("wrong event type")
@@ -161,7 +161,7 @@ func (p *ActionProjection) reduceActionReactivated(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *ActionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Dgwh2", "seq", event.Sequence, "expectedType", action.RemovedEventType).Error("wrong event type")

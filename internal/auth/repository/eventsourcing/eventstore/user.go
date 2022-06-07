@@ -59,7 +59,7 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierID
 		change.ModifierLoginName = change.ModifierID
-		user, _ := repo.Query.GetUserByID(ctx, change.ModifierID)
+		user, _ := repo.Query.GetUserByID(ctx, change.ModifierID, false)
 		if user != nil {
 			change.ModifierLoginName = user.PreferredLoginName
 			if user.Human != nil {

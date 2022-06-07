@@ -16,7 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
-type FeatureProjection struct {
+type featureProjection struct {
 	crdb.StatementHandler
 }
 
@@ -24,15 +24,15 @@ const (
 	FeatureTable = "zitadel.projections.features"
 )
 
-func NewFeatureProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FeatureProjection {
-	p := &FeatureProjection{}
+func newFeatureProjection(ctx context.Context, config crdb.StatementHandlerConfig) *featureProjection {
+	p := &featureProjection{}
 	config.ProjectionName = FeatureTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *FeatureProjection) reducers() []handler.AggregateReducer {
+func (p *featureProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -88,7 +88,7 @@ const (
 	FeatureMaxActionsCol               = "max_actions"
 )
 
-func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *featureProjection) reduceFeatureSet(event eventstore.Event) (*handler.Statement, error) {
 	var featureEvent features.FeaturesSetEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -193,7 +193,7 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 		cols), nil
 }
 
-func (p *FeatureProjection) reduceFeatureRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *featureProjection) reduceFeatureRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FeaturesRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-fN903", "seq", event.Sequence(), "expectedType", org.FeaturesRemovedEventType).Error("wrong event type")

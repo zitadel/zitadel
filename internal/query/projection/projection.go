@@ -17,7 +17,45 @@ const (
 	FailedEventsTable = "projections.failed_events"
 )
 
-func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, defaults systemdefaults.SystemDefaults, keyChan chan<- interface{}) error {
+var (
+	OrgProjection                 *orgProjection
+	LoginNameProjection           *loginNameProjection
+	ActionProjection              *actionProjection
+	FlowProjection                *flowProjection
+	ProjectProjection             *projectProjection
+	PasswordComplexityProjection  *passwordComplexityProjection
+	PasswordAgeProjection         *passwordAgeProjection
+	LockoutPolicyProjection       *lockoutPolicyProjection
+	PrivacyPolicyProjection       *privacyPolicyProjection
+	OrgIAMPolicyProjection        *orgIAMPolicyProjection
+	LabelPolicyProjection         *labelPolicyProjection
+	ProjectGrantProjection        *projectGrantProjection
+	ProjectRoleProjection         *projectRoleProjection
+	OrgDomainProjection           *orgDomainProjection
+	LoginPolicyProjection         *loginPolicyProjection
+	IDPProjection                 *idpProjection
+	AppProjection                 *appProjection
+	IDPUserLinkProjection         *idpUserLinkProjection
+	IDPLoginPolicyLinkProjection  *idpLoginPolicyLinkProjection
+	MailTemplateProjection        *mailTemplateProjection
+	MessageTextProjection         *messageTextProjection
+	CustomTextProjection          *customTextProjection
+	FeatureProjection             *featureProjection
+	UserProjection                *userProjection
+	OrgMemberProjection           *orgMemberProjection
+	IAMMemberProjection           *iamMemberProjection
+	ProjectMemberProjection       *projectMemberProjection
+	ProjectGrantMemberProjection  *projectGrantMemberProjection
+	AuthNKeyProjection            *authNKeyProjection
+	PersonalAccessTokenProjection *personalAccessTokenProjection
+	UserGrantProjection           *userGrantProjection
+	UserMetadataProjection        *userMetadataProjection
+	UserAuthMethodProjection      *userAuthMethodProjection
+	IAMProjection                 *iamProjection
+	KeyProjection                 *keyProjection
+)
+
+func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, defaults systemdefaults.SystemDefaults, keyChan chan<- interface{}) (err error) {
 	projectionConfig := crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
@@ -34,42 +72,42 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		BulkLimit:         config.BulkLimit,
 	}
 
-	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
-	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
-	NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
-	NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
-	NewPasswordComplexityProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_complexities"]))
-	NewPasswordAgeProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_age_policy"]))
-	NewLockoutPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["lockout_policy"]))
-	NewPrivacyPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["privacy_policy"]))
-	NewOrgIAMPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_iam_policy"]))
-	NewLabelPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["label_policy"]))
-	NewProjectGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grants"]))
-	NewProjectRoleProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles"]))
+	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
+	ActionProjection = newActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
+	FlowProjection = newFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
+	ProjectProjection = newProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
+	PasswordComplexityProjection = newPasswordComplexityProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_complexities"]))
+	PasswordAgeProjection = newPasswordAgeProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_age_policy"]))
+	LockoutPolicyProjection = newLockoutPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["lockout_policy"]))
+	PrivacyPolicyProjection = newPrivacyPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["privacy_policy"]))
+	OrgIAMPolicyProjection = newOrgIAMPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_iam_policy"]))
+	LabelPolicyProjection = newLabelPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["label_policy"]))
+	ProjectGrantProjection = newProjectGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grants"]))
+	ProjectRoleProjection = newProjectRoleProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles"]))
 	// owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
-	NewOrgDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_domains"]))
-	NewLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
-	NewIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
-	NewAppProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["apps"]))
-	NewIDPUserLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_user_links"]))
-	NewIDPLoginPolicyLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_login_policy_links"]))
-	NewMailTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["mail_templates"]))
-	NewMessageTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["message_texts"]))
-	NewCustomTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["custom_texts"]))
-	NewFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["features"]))
-	NewUserProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["users"]))
-	NewLoginNameProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_names"]))
-	NewOrgMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_members"]))
-	NewIAMMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
-	NewProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
-	NewProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
-	NewAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
-	NewPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
-	NewUserGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_grants"]))
-	NewUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
-	NewUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
-	NewIAMProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam"]))
-	_, err := NewKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), defaults.KeyConfig, keyChan)
+	OrgDomainProjection = newOrgDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_domains"]))
+	LoginPolicyProjection = newLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
+	IDPProjection = newIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
+	AppProjection = newAppProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["apps"]))
+	IDPUserLinkProjection = newIDPUserLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_user_links"]))
+	IDPLoginPolicyLinkProjection = newIDPLoginPolicyLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_login_policy_links"]))
+	MailTemplateProjection = newMailTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["mail_templates"]))
+	MessageTextProjection = newMessageTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["message_texts"]))
+	CustomTextProjection = newCustomTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["custom_texts"]))
+	FeatureProjection = newFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["features"]))
+	UserProjection = newUserProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["users"]))
+	LoginNameProjection = newLoginNameProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_names"]))
+	OrgMemberProjection = newOrgMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_members"]))
+	IAMMemberProjection = newIAMMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
+	ProjectMemberProjection = newProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
+	ProjectGrantMemberProjection = newProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
+	AuthNKeyProjection = newAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
+	PersonalAccessTokenProjection = newPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
+	UserGrantProjection = newUserGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_grants"]))
+	UserMetadataProjection = newUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
+	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
+	IAMProjection = newIAMProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam"]))
+	KeyProjection, err = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), defaults.KeyConfig, keyChan)
 
 	return err
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRequest) (*mgmt_pb.GetOrgIDPByIDResponse, error) {
-	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, true, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOr
 }
 
 func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequest) (*mgmt_pb.RemoveOrgIDPResponse, error) {
-	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, false, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

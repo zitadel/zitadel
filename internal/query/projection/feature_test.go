@@ -55,7 +55,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 					}`),
 				), org.FeaturesSetEventMapper),
 			},
-			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			reduce: (&featureProjection{}).reduceFeatureSet,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -129,7 +129,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 					}`),
 				), org.FeaturesSetEventMapper),
 			},
-			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			reduce: (&featureProjection{}).reduceFeatureSet,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -180,7 +180,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.FeaturesSetEventMapper),
 			},
-			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			reduce: (&featureProjection{}).reduceFeatureSet,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -203,7 +203,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceFeatureRemoved",
-			reduce: (&FeatureProjection{}).reduceFeatureRemoved,
+			reduce: (&featureProjection{}).reduceFeatureRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.FeaturesRemovedEventType),
@@ -230,7 +230,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceFeatureSet old",
-			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			reduce: (&featureProjection{}).reduceFeatureSet,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.FeaturesSetEventType),
@@ -303,7 +303,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "iam.reduceFeatureSet new",
-			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			reduce: (&featureProjection{}).reduceFeatureSet,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.FeaturesSetEventType),

@@ -36,7 +36,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.GrantMemberAddedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceAdded,
+			reduce: (&projectGrantMemberProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -74,7 +74,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.GrantMemberChangedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceChanged,
+			reduce: (&projectGrantMemberProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -109,7 +109,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.GrantMemberCascadeRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceCascadeRemoved,
+			reduce: (&projectGrantMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -141,7 +141,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.GrantMemberRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceRemoved,
+			reduce: (&projectGrantMemberProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -170,7 +170,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceUserRemoved,
+			reduce: (&projectGrantMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -197,7 +197,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceOrgRemoved,
+			reduce: (&projectGrantMemberProjection{}).reduceOrgRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -224,7 +224,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceProjectRemoved,
+			reduce: (&projectGrantMemberProjection{}).reduceProjectRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -251,7 +251,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grant-id"}`),
 				), project.GrantRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantMemberProjection{}).reduceProjectGrantRemoved,
+			reduce: (&projectGrantMemberProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
