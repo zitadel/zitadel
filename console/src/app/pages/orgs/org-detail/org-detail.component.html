@@ -16,7 +16,7 @@
     (addClicked)="openAddMember()"
     (showDetailClicked)="showDetail()"
     (refreshClicked)="loadMembers()"
-    [disabled]="false"
+    [disabled]="(['org.member.write'] | hasRole | async) === false"
   >
   </cnsl-contributors>
 
@@ -24,8 +24,16 @@
 </cnsl-top-view>
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <ng-template cnslHasRole [hasRole]="['policy.read']">
+    <ng-container *ngIf="['policy.read'] | hasRole | async; else nopolicyreadpermission">
       <cnsl-settings-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-settings-grid>
+    </ng-container>
+
+    <ng-template #nopolicyreadpermission>
+      <div class="no-permission-warn-wrapper">
+        <cnsl-info-section class="info-section-warn" [fitWidth]="true" [type]="InfoSectionType.ALERT">{{
+          'ORG.PAGES.NOPERMISSION' | translate
+        }}</cnsl-info-section>
+      </div>
     </ng-template>
 
     <div metainfo>

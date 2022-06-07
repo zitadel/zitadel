@@ -7,6 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
@@ -21,6 +22,7 @@ import { SecretGeneratorComponent } from './secret-generator.component';
     MatIconModule,
     CardModule,
     FormsModule,
+    HasRolePipeModule,
     MatButtonModule,
     FormFieldModule,
     ReactiveFormsModule,
