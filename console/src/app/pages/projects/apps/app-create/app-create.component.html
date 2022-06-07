@@ -24,7 +24,7 @@
         <ng-template matStepLabel>{{ 'APP.OIDC.NAMEANDTYPESECTION' | translate }}</ng-template>
 
         <p class="step-title">{{ 'APP.OIDC.TITLEFIRST' | translate }}</p>
-        <cnsl-form-field appearance="outline" class="name-formfield">
+        <cnsl-form-field class="name-formfield">
           <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
           <input cnslInput cdkFocusInitial formControlName="name" />
           <span cnslError *ngIf="name?.errors?.required">{{ 'PROJECT.APP.NAMEREQUIRED' | translate }}</span>
@@ -250,12 +250,12 @@
   <div *ngIf="devmode" class="dev">
     <form [formGroup]="form" (ngSubmit)="createApp()" [attr.data-e2e]="'create-app-wizzard-3'">
       <div class="content">
-        <cnsl-form-field appearance="outline" class="formfield">
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="name" />
         </cnsl-form-field>
 
-        <cnsl-form-field appearance="outline" class="formfield">
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'APP.TYPE' | translate }}</cnsl-label>
           <mat-select formControlName="appType">
             <mat-option *ngFor="let appType of appTypes" [value]="appType">
@@ -265,7 +265,7 @@
         </cnsl-form-field>
 
         <ng-container *ngIf="formappType?.value?.createType === AppCreateType.OIDC">
-          <cnsl-form-field appearance="outline" class="formfield">
+          <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'APP.OIDC.GRANTTYPE' | translate }}</cnsl-label>
             <mat-select formControlName="grantTypesList" multiple>
               <mat-option *ngFor="let grant of oidcGrantTypes" [value]="grant.type">
@@ -274,7 +274,7 @@
             </mat-select>
           </cnsl-form-field>
 
-          <cnsl-form-field appearance="outline" class="formfield">
+          <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'APP.OIDC.RESPONSETYPE' | translate }}</cnsl-label>
             <mat-select formControlName="responseTypesList" multiple>
               <mat-option *ngFor="let type of oidcResponseTypes" [value]="type.type">
@@ -284,7 +284,7 @@
           </cnsl-form-field>
         </ng-container>
 
-        <cnsl-form-field appearance="outline" class="formfield">
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
           <mat-select formControlName="authMethodType">
             <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
