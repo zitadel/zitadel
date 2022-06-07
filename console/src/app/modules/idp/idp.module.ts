@@ -14,6 +14,7 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
+import { CardModule } from '../card/card.module';
 import { InfoRowModule } from '../info-row/info-row.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { TopViewModule } from '../top-view/top-view.module';
@@ -37,6 +38,7 @@ import { IdpComponent } from './idp.component';
     TopViewModule,
     MatTooltipModule,
     MatSelectModule,
+    CardModule,
     TranslateModule,
     MatCheckboxModule,
     InfoRowModule,

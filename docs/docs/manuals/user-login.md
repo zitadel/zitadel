@@ -4,10 +4,15 @@ title: Login
 
 ## Login Username
 
-Enter your login name in the input field. Your loginname consists of the username with @ organisation domain. E.g road.runner@acme.caos.ch
+Enter your login name in the input field. Your loginname consists of the username with @ organisation domain. E.g road.runner@acme.zitadel.cloud
 If the organization is already pre-selected you do not have to enter the domain.
 
 ![Login Username](/img/accounts_page.png)
+
+## Select Account
+
+If you already have logged in with an account in this browser. ZITADEL has stored your usersession and you will be able to choose one of the accounts.
+
 
 
 ## Login with Password
@@ -25,18 +30,18 @@ If you have registered a One time password (OTP) as a second factor you need to 
 
 ![Login OTP](/img/accounts_multifactor.png)
 
-You can find out how to register OTP [here](./user-factors).
+You can find out how to register OTP [here](./user-profile##one-time-password-otp).
 
 ### Can't remember your otp
 
-If you have a problem with your OTP, please contact your organization support. If you have a user in the Global Organization feel free to contact support@zitadel.com
+If you have a problem with your OTP, please contact the support of your organization.
 
 ## Login with Universal Second Factor (U2F) (FaceID, FingerPrint, etc.)
 
 If you have registered U2F as second factor for your account you will have to verify this factor.
 1. Click the button "Verify Token"
 2. Your browser/device will show you the methods you have to verify your account (e.g FingerScan, Face Recognition, External Hardware Token, etc)
-3. Use your verification method
+3. Follow the steps your browser shows you
 
 ![Login Multi Factor](/img/login-mfa.gif)
 

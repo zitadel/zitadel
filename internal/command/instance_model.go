@@ -15,7 +15,7 @@ type InstanceWriteModel struct {
 	State           domain.InstanceState
 	GeneratedDomain string
 
-	GlobalOrgID     string
+	DefaultOrgID    string
 	ProjectID       string
 	DefaultLanguage language.Tag
 }
@@ -46,8 +46,8 @@ func (wm *InstanceWriteModel) Reduce() error {
 			wm.GeneratedDomain = e.Domain
 		case *instance.ProjectSetEvent:
 			wm.ProjectID = e.ProjectID
-		case *instance.GlobalOrgSetEvent:
-			wm.GlobalOrgID = e.OrgID
+		case *instance.DefaultOrgSetEvent:
+			wm.DefaultOrgID = e.OrgID
 		case *instance.DefaultLanguageSetEvent:
 			wm.DefaultLanguage = e.Language
 		}
@@ -68,7 +68,7 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.InstanceDomainAddedEventType,
 			instance.InstanceDomainRemovedEventType,
 			instance.ProjectSetEventType,
-			instance.GlobalOrgSetEventType,
+			instance.DefaultOrgSetEventType,
 			instance.DefaultLanguageSetEventType).
 		Builder()
 }
