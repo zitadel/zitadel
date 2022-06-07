@@ -413,6 +413,10 @@ $custom-typography: mat.define-typography-config(
   }
 }
 
+.mat-calendar-table {
+  height: 280px;
+}
+
 @include component-themes($caos-dark-app-theme);
 @include mat.all-component-themes($caos-dark-app-theme);
 
@@ -448,7 +452,8 @@ $custom-typography: mat.define-typography-config(
   }
 
   .main-container,
-  .mat-dialog-container {
+  .mat-dialog-container,
+  .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
@@ -510,7 +515,8 @@ $custom-typography: mat.define-typography-config(
   }
 
   .main-container,
-  .mat-dialog-container {
+  .mat-dialog-container,
+  .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }

@@ -7,7 +7,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
-import { OutsideClickModule } from 'src/app/directives/outside-click/outside-click.module';
 
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { InputModule } from '../input/input.module';
@@ -26,7 +25,6 @@ import { FilterComponent } from './filter.component';
     MatCheckboxModule,
     InputModule,
     MatSelectModule,
-    OutsideClickModule,
   ],
   exports: [FilterComponent],
 })
