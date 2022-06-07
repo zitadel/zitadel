@@ -92,6 +92,7 @@
               color="warn"
               (click)="$event.stopPropagation(); triggerDeleteMember(member)"
               mat-icon-button
+              [disabled]="canDelete === false"
             >
               <i class="las la-trash"></i>
             </button>
@@ -110,13 +111,13 @@
             <mat-chip
               class="cnsl-chip"
               *ngFor="let role of member.rolesList"
-              [removable]="true"
+              [removable]="canWrite"
               [selectable]="false"
               (removed)="removeRole(member, role)"
             >
               <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
               <span>{{ role | roletransform }}</span>
-              <button matChipRemove>
+              <button *ngIf="canWrite" matChipRemove>
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip>
@@ -126,8 +127,9 @@
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr
-        class="highlight pointer"
-        (click)="addRole(member)"
+        class="highlight"
+        [ngClass]="{ pointer: canWrite }"
+        (click)="canWrite ? addRole(member) : null"
         mat-row
         *matRowDef="let member; columns: displayedColumns"
       ></tr>

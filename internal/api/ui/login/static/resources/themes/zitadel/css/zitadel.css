@@ -40,7 +40,7 @@
   --zitadel-color-background-contrast: rgb(0, 0, 0);
   --zitadel-color-footer-line: rgba(0, 0, 0, 0.12);
   --zitadel-color-input-background: #00000003;
-  --zitadel-color-input-border: #00000040;
+  --zitadel-color-input-border: #1a191938;
   --zitadel-color-input-border-hover: #1a1b1b;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
@@ -136,7 +136,7 @@
   --zitadel-color-background-contrast: rgb(255, 255, 255);
   --zitadel-color-footer-line: rgba(255, 255, 255, 0.12);
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
-  --zitadel-color-input-border: #403e3e;
+  --zitadel-color-input-border: #f9f7f725;
   --zitadel-color-input-border-hover: #aeafb1;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
@@ -2721,9 +2721,9 @@ select:focus,
 .lgn-select:focus {
   border-color: var(--zitadel-color-input-border-active);
 }
-.lgn-input[color=warn],
-select[color=warn],
-.lgn-select[color=warn] {
+.lgn-input.lgn-touched[color=warn],
+select.lgn-touched[color=warn],
+.lgn-select.lgn-touched[color=warn] {
   border-color: var(--zitadel-color-warn);
 }
 
@@ -2919,6 +2919,10 @@ ul li i.lgn-valid {
 .lgn-idp.google {
   color: var(--zitadel-color-google-text);
   background-color: var(--zitadel-color-google-background);
+}
+
+.lgn-idp-providers .lgn-idp-desc {
+  color: var(--zitadel-color-label);
 }
 
 .lgn-success-label {

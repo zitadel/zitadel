@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { take } from 'rxjs';
 import {
     AddSMSProviderTwilioRequest,
     UpdateSMTPConfigPasswordRequest,
@@ -9,6 +10,7 @@ import {
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -44,18 +46,27 @@ export class NotificationSettingsComponent implements OnInit {
     private dialog: MatDialog,
     private toast: ToastService,
     private fb: FormBuilder,
+    private authService: GrpcAuthService,
   ) {
     this.form = this.fb.group({
-      senderAddress: ['', [Validators.required]],
-      senderName: ['', [Validators.required]],
-      tls: [true, [Validators.required]],
-      host: ['', [Validators.required]],
-      user: ['', [Validators.required]],
+      senderAddress: [{ disabled: true, value: '' }, [Validators.required]],
+      senderName: [{ disabled: true, value: '' }, [Validators.required]],
+      tls: [{ disabled: true, value: true }, [Validators.required]],
+      host: [{ disabled: true, value: '' }, [Validators.required]],
+      user: [{ disabled: true, value: '' }, [Validators.required]],
     });
   }
 
   ngOnInit(): void {
     this.fetchData();
+    this.authService
+      .isAllowed(['iam.write'])
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.form.enable();
+        }
+      });
   }
 
   private fetchData(): void {

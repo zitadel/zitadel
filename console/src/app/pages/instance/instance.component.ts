@@ -81,7 +81,7 @@ export class InstanceComponent {
             }),
           )
             .then(() => {
-              this.toast.showInfo('IAM.TOAST.MEMBERADDED');
+              this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
               setTimeout(() => {
                 this.loadMembers();
               }, 1000);

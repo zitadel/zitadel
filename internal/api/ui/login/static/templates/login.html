@@ -42,7 +42,7 @@
 
     {{if hasExternalLogin }}
     <div class="lgn-idp-providers">
-        <p>{{t "Login.ExternalUserDescription"}}</p>
+        <p class="lgn-idp-desc">{{t "Login.ExternalUserDescription"}}</p>
 
         {{ $reqid := .AuthReqID}}
         {{range $provider := .IDPProviders}}
