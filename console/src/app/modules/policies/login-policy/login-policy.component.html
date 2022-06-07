@@ -1,5 +1,3 @@
-<!-- <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section> -->
-
 <div class="spinner-wr">
   <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
 </div>
@@ -50,13 +48,14 @@
   </cnsl-form-field>
 </div>
 
-<cnsl-card class="max-card-width">
+<cnsl-card class="max-card-width" *ngIf="loginData">
   <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.MultiFactor"
     [list]="loginData.multiFactorsList"
-    (listChanged)="fetchData()"
+    (typeRemoved)="removeFactor($event)"
+    (typeAdded)="addFactor($event)"
     [disabled]="
       loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
       ([
@@ -100,13 +99,14 @@
     {{ 'POLICY.DATA.FORCEMFA' | translate }}
   </mat-checkbox>
 </div>
-<cnsl-card class="max-card-width">
+<cnsl-card class="max-card-width" *ngIf="loginData">
   <cnsl-factor-table
     [service]="service"
     [serviceType]="serviceType"
     [componentType]="LoginMethodComponentType.SecondFactor"
     [list]="loginData.secondFactorsList"
-    (listChanged)="fetchData()"
+    (typeRemoved)="removeFactor($event)"
+    (typeAdded)="addFactor($event)"
     [disabled]="
       ([
         serviceType === PolicyComponentServiceType.ADMIN

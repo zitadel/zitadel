@@ -11,6 +11,12 @@
   footer {
     background-color: var(--zitadel-color-footer-background);
     border-top: 1px solid var(--zitadel-color-footer-line);
+    backdrop-filter: blur(10px);
+
+    @-moz-document url-prefix() {
+      background-color: var(--zitadel-color-footer-background-mozilla);
+      backdrop-filter: none;
+    }
 
     a {
       color: var(--zitadel-color-font-500);

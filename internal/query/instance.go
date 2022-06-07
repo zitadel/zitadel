@@ -39,8 +39,8 @@ var (
 		name:  projection.InstanceColumnSequence,
 		table: instanceTable,
 	}
-	InstanceColumnGlobalOrgID = Column{
-		name:  projection.InstanceColumnGlobalOrgID,
+	InstanceColumnDefaultOrgID = Column{
+		name:  projection.InstanceColumnDefaultOrgID,
 		table: instanceTable,
 	}
 	InstanceColumnProjectID = Column{
@@ -68,7 +68,7 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	GlobalOrgID  string
+	DefaultOrgID string
 	IAMProjectID string
 	ConsoleID    string
 	ConsoleAppID string
@@ -108,6 +108,10 @@ func (i *Instance) RequestedHost() string {
 
 func (i *Instance) DefaultLanguage() language.Tag {
 	return i.DefaultLang
+}
+
+func (i *Instance) DefaultOrganisationID() string {
+	return i.DefaultOrgID
 }
 
 type InstanceSearchQueries struct {
@@ -200,7 +204,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
-			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
@@ -215,7 +219,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				&instance.CreationDate,
 				&instance.ChangeDate,
 				&instance.Sequence,
-				&instance.GlobalOrgID,
+				&instance.DefaultOrgID,
 				&instance.IAMProjectID,
 				&instance.ConsoleID,
 				&instance.ConsoleAppID,
@@ -239,7 +243,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
 			InstanceColumnName.identifier(),
-			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
@@ -258,7 +262,7 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, err
 					&instance.ChangeDate,
 					&instance.Sequence,
 					&instance.Name,
-					&instance.GlobalOrgID,
+					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
 					&instance.ConsoleAppID,
@@ -292,7 +296,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
 			InstanceColumnName.identifier(),
-			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
@@ -328,7 +332,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					&instance.ChangeDate,
 					&instance.Sequence,
 					&instance.Name,
-					&instance.GlobalOrgID,
+					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
 					&instance.ConsoleAppID,

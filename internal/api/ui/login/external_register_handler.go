@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
@@ -111,12 +112,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	instance, err := l.query.Instance(r.Context(), false)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	resourceOwner := instance.GlobalOrgID
+	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
 	if authReq.RequestedOrgID != "" {
 		resourceOwner = authReq.RequestedOrgID
 	}
@@ -134,11 +130,11 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
 		return
 	}
-	l.registerExternalUser(w, r, authReq, instance, user, externalIDP)
+	l.registerExternalUser(w, r, authReq, user, externalIDP)
 }
 
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.Instance, user *domain.Human, externalIDP *domain.UserIDPLink) {
-	resourceOwner := iam.GlobalOrgID
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *domain.Human, externalIDP *domain.UserIDPLink) {
+	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
@@ -204,15 +200,10 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	instance, err := l.query.Instance(r.Context(), false)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	resourceOwner := instance.GlobalOrgID
+	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != instance.GlobalOrgID {
+	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
 		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}

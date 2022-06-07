@@ -75,12 +75,8 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 		return nil, err
 	}
 	return &auth_pb.ListMyMetadataResponse{
-		Result: metadata.MetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  metadata.MetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
@@ -133,12 +129,8 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 		return nil, err
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
-		Result: UserGrantsToPb(res.UserGrants),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  UserGrantsToPb(res.UserGrants),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 

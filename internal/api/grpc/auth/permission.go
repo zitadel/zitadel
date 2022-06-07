@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/query"
 	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
@@ -53,11 +53,7 @@ func (s *Server) ListMyMemberships(ctx context.Context, req *auth_pb.ListMyMembe
 		return nil, err
 	}
 	return &auth_pb.ListMyMembershipsResponse{
-		Result: user_grpc.MembershipsToMembershipsPb(response.Memberships),
-		Details: obj_grpc.ToListDetails(
-			response.Count,
-			response.Sequence,
-			response.Timestamp,
-		),
+		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
+		Details: object.ToListDetails(response.Count, response.Sequence, response.Timestamp),
 	}, nil
 }

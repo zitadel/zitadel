@@ -24,6 +24,7 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	admin.UnimplementedAdminServiceServer
+	database        string
 	command         *command.Commands
 	query           *query.Queries
 	administrator   repository.AdministratorRepository
@@ -35,13 +36,16 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands,
+func CreateServer(
+	database string,
+	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
 	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
 	return &Server{
+		database:        database,
 		command:         command,
 		query:           query,
 		administrator:   repo,

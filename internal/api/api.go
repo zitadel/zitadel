@@ -26,6 +26,7 @@ type API struct {
 	health         health
 	router         *mux.Router
 	externalSecure bool
+	http1HostName  string
 }
 
 type health interface {
@@ -33,21 +34,14 @@ type health interface {
 	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
-func New(
-	port uint16,
-	router *mux.Router,
-	queries *query.Queries,
-	verifier *internal_authz.TokenVerifier,
-	authZ internal_authz.Config,
-	externalSecure bool,
-	http2HostName string,
-) *API {
+func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, http2HostName, http1HostName string) *API {
 	api := &API{
 		port:           port,
 		verifier:       verifier,
 		health:         queries,
 		router:         router,
 		externalSecure: externalSecure,
+		http1HostName:  http1HostName,
 	}
 	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName)
 	api.routeGRPC()
@@ -59,7 +53,7 @@ func New(
 
 func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) error {
 	grpcServer.RegisterServer(a.grpcServer)
-	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port)
+	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port, a.http1HostName)
 	if err != nil {
 		return err
 	}

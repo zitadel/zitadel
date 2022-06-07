@@ -17,7 +17,7 @@
         (addClicked)="openAddMember()"
         (showDetailClicked)="showDetail()"
         (refreshClicked)="loadMembers()"
-        [disabled]="false"
+        [disabled]="(['iam.member.write'] | hasRole | async) === false"
       >
       </cnsl-contributors>
     </div>

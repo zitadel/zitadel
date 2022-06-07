@@ -16,12 +16,9 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	if resourceOwner == "" {
 		resourceOwner = config.AggregateID
 	}
-	if resourceOwner == authz.GetInstance(ctx).InstanceID() {
-		instance, err := l.query.Instance(ctx, false)
-		if err != nil {
-			return nil, err
-		}
-		resourceOwner = instance.GlobalOrgID
+	instance := authz.GetInstance(ctx)
+	if resourceOwner == instance.InstanceID() {
+		resourceOwner = instance.DefaultOrganisationID()
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
 	if err != nil {

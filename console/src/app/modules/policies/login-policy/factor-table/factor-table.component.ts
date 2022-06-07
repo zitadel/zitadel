@@ -41,7 +41,9 @@ export class FactorTableComponent {
   @Input() service!: AdminService | ManagementService;
   @Input() disabled: boolean = false;
   @Input() list: Array<MultiFactorType | SecondFactorType> = [];
-  @Output() listChanged: EventEmitter<void> = new EventEmitter();
+  @Output() typeRemoved: EventEmitter<Promise<any>> = new EventEmitter();
+  @Output() typeAdded: EventEmitter<Promise<any>> = new EventEmitter();
+
   @ViewChild(MatPaginator) public paginator!: MatPaginator;
 
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -64,38 +66,32 @@ export class FactorTableComponent {
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
+        let request;
+
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new MgmtRemoveMultiFactorFromLoginPolicyRequest();
             req.setType(type as MultiFactorType);
-            (this.service as ManagementService).removeMultiFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            request = (this.service as ManagementService).removeMultiFactorFromLoginPolicy(req);
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new MgmtRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
-            (this.service as ManagementService).removeSecondFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            request = (this.service as ManagementService).removeSecondFactorFromLoginPolicy(req);
           }
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new AdminRemoveMultiFactorFromLoginPolicyRequest();
             req.setType(type as MultiFactorType);
-            (this.service as AdminService).removeMultiFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            request = (this.service as AdminService).removeMultiFactorFromLoginPolicy(req);
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new AdminRemoveSecondFactorFromLoginPolicyRequest();
             req.setType(type as SecondFactorType);
-            (this.service as AdminService).removeSecondFactorFromLoginPolicy(req).then(() => {
-              this.toast.showInfo('MFA.TOAST.DELETED', true);
-              this.listChanged.emit();
-            });
+            request = (this.service as AdminService).removeSecondFactorFromLoginPolicy(req);
           }
+        }
+
+        if (request) {
+          this.typeRemoved.emit(request);
         }
       }
     });
@@ -114,58 +110,32 @@ export class FactorTableComponent {
 
     dialogRef.afterClosed().subscribe((mfaType: MultiFactorType | SecondFactorType) => {
       if (mfaType) {
+        let request;
+
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new MgmtAddMultiFactorToLoginPolicyRequest();
             req.setType(mfaType as MultiFactorType);
-            (this.service as ManagementService)
-              .addMultiFactorToLoginPolicy(req)
-              .then(() => {
-                this.toast.showInfo('MFA.TOAST.ADDED', true);
-                this.listChanged.emit();
-              })
-              .catch((error) => {
-                this.toast.showError(error);
-              });
+            request = (this.service as ManagementService).addMultiFactorToLoginPolicy(req);
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new MgmtAddSecondFactorToLoginPolicyRequest();
             req.setType(mfaType as SecondFactorType);
-            (this.service as ManagementService)
-              .addSecondFactorToLoginPolicy(req)
-              .then(() => {
-                this.toast.showInfo('MFA.TOAST.ADDED', true);
-                this.listChanged.emit();
-              })
-              .catch((error) => {
-                this.toast.showError(error);
-              });
+            request = (this.service as ManagementService).addSecondFactorToLoginPolicy(req);
           }
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
           if (this.componentType === LoginMethodComponentType.MultiFactor) {
             const req = new AdminAddMultiFactorToLoginPolicyRequest();
             req.setType(mfaType as MultiFactorType);
-            (this.service as AdminService)
-              .addMultiFactorToLoginPolicy(req)
-              .then(() => {
-                this.toast.showInfo('MFA.TOAST.ADDED', true);
-                this.listChanged.emit();
-              })
-              .catch((error) => {
-                this.toast.showError(error);
-              });
+            request = (this.service as AdminService).addMultiFactorToLoginPolicy(req);
           } else if (this.componentType === LoginMethodComponentType.SecondFactor) {
             const req = new AdminAddSecondFactorToLoginPolicyRequest();
             req.setType(mfaType as SecondFactorType);
-            (this.service as AdminService)
-              .addSecondFactorToLoginPolicy(req)
-              .then(() => {
-                this.toast.showInfo('MFA.TOAST.ADDED', true);
-                this.listChanged.emit();
-              })
-              .catch((error) => {
-                this.toast.showError(error);
-              });
+            request = (this.service as AdminService).addSecondFactorToLoginPolicy(req);
           }
+        }
+
+        if (request) {
+          this.typeAdded.emit(request);
         }
       }
     });

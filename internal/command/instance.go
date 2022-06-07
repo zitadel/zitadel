@@ -270,22 +270,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		ClockSkew:                0,
 	}
 
-	if setup.SMTPConfiguration != nil {
-		validations = append(validations,
-			c.prepareAddSMTPConfig(
-				instanceAgg,
-				setup.SMTPConfiguration.From,
-				setup.SMTPConfiguration.FromName,
-				setup.SMTPConfiguration.SMTP.Host,
-				setup.SMTPConfiguration.SMTP.User,
-				[]byte(setup.SMTPConfiguration.SMTP.Password),
-				setup.SMTPConfiguration.Tls,
-			),
-		)
-	}
-
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
+		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
 		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
@@ -332,15 +319,30 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		c.AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
-	addGenerateddDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
+
+	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
 	if err != nil {
 		return "", nil, err
 	}
-	validations = append(validations, addGenerateddDomain...)
+	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
 		validations = append(validations,
 			c.addInstanceDomain(instanceAgg, setup.CustomDomain, false),
 			setPrimaryInstanceDomain(instanceAgg, setup.CustomDomain),
+		)
+	}
+
+	if setup.SMTPConfiguration != nil {
+		validations = append(validations,
+			c.prepareAddSMTPConfig(
+				instanceAgg,
+				setup.SMTPConfiguration.From,
+				setup.SMTPConfiguration.FromName,
+				setup.SMTPConfiguration.SMTP.Host,
+				setup.SMTPConfiguration.SMTP.User,
+				[]byte(setup.SMTPConfiguration.SMTP.Password),
+				setup.SMTPConfiguration.Tls,
+			),
 		)
 	}
 
@@ -363,6 +365,24 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	validation := c.prepareSetDefaultLanguage(instanceAgg, defaultLanguage)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareSetDefaultOrg(instanceAgg, orgID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -411,15 +431,25 @@ func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation
 	}
 }
 
-func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, orgID string) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
-	if err != nil {
-		return nil, err
+func (c *Commands) prepareSetDefaultOrg(a *instance.Aggregate, orgID string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if orgID == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-SWffe", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			if writeModel.DefaultOrgID == orgID {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-SDfw2", "Errors.Instance.NotChanged")
+			}
+			if exists, err := ExistsOrg(ctx, filter, orgID); err != nil || !exists {
+				return nil, errors.ThrowPreconditionFailed(err, "INSTA-Wfe21", "Errors.Org.NotFound")
+			}
+			return []eventstore.Command{instance.NewDefaultOrgSetEventEvent(ctx, &a.Aggregate, orgID)}, nil
+		}, nil
 	}
-	if iamWriteModel.GlobalOrgID != "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "IAM-HGG24", "Errors.IAM.GlobalOrgAlreadySet")
-	}
-	return instance.NewGlobalOrgSetEventEvent(ctx, iamAgg, orgID), nil
 }
 
 func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, projectID string) (eventstore.Command, error) {

@@ -50,12 +50,8 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectsResponse{
-		Result: project_grpc.ProjectViewsToPb(projects.Projects),
-		Details: object_grpc.ToListDetails(
-			projects.Count,
-			projects.Sequence,
-			projects.Timestamp,
-		),
+		Result:  project_grpc.ProjectViewsToPb(projects.Projects),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.Timestamp),
 	}, nil
 }
 
@@ -77,12 +73,8 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 		return nil, err
 	}
 	return &mgmt_pb.ListGrantedProjectsResponse{
-		Result: project_grpc.GrantedProjectViewsToPb(projects.ProjectGrants),
-		Details: object_grpc.ToListDetails(
-			projects.Count,
-			projects.Sequence,
-			projects.Timestamp,
-		),
+		Result:  project_grpc.GrantedProjectViewsToPb(projects.ProjectGrants),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.Timestamp),
 	}, nil
 }
 
@@ -100,12 +92,8 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 		return nil, err
 	}
 	return &mgmt_pb.ListGrantedProjectRolesResponse{
-		Result: project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(
-			roles.Count,
-			roles.Sequence,
-			roles.Timestamp,
-		),
+		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.Timestamp),
 	}, nil
 }
 
@@ -127,12 +115,8 @@ func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest)
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectResponse{
-		Id: project.AggregateID,
-		Details: object_grpc.AddToDetailsPb(
-			project.Sequence,
-			project.ChangeDate,
-			project.ResourceOwner,
-		),
+		Id:      project.AggregateID,
+		Details: object_grpc.AddToDetailsPb(project.Sequence, project.ChangeDate, project.ResourceOwner),
 	}, nil
 }
 
@@ -208,12 +192,8 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectRolesResponse{
-		Result: project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(
-			roles.Count,
-			roles.Sequence,
-			roles.Timestamp,
-		),
+		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.Timestamp),
 	}, nil
 }
 
@@ -302,12 +282,8 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
-		Result: member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object_grpc.ToListDetails(
-			members.Count,
-			members.Sequence,
-			members.Timestamp,
-		),
+		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
+		Details: object_grpc.ToListDetails(members.Count, members.Sequence, members.Timestamp),
 	}, nil
 }
 
@@ -317,11 +293,7 @@ func (s *Server) AddProjectMember(ctx context.Context, req *mgmt_pb.AddProjectMe
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectMemberResponse{
-		Details: object_grpc.AddToDetailsPb(
-			member.Sequence,
-			member.ChangeDate,
-			member.ResourceOwner,
-		),
+		Details: object_grpc.AddToDetailsPb(member.Sequence, member.ChangeDate, member.ResourceOwner),
 	}, nil
 }
 

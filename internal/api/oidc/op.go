@@ -26,10 +26,6 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
-const (
-	HandlerPrefix = "/oauth/v2"
-)
-
 type Config struct {
 	CodeMethodS256                    bool
 	AuthMethodPost                    bool
@@ -89,7 +85,7 @@ func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI st
 	}
 	provider, err := op.NewDynamicOpenIDProvider(
 		ctx,
-		HandlerPrefix,
+		"",
 		opConfig,
 		storage,
 		options...,

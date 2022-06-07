@@ -6,20 +6,14 @@ import { filter, switchMap } from 'rxjs/operators';
 import { GrpcAuthService } from '../services/grpc-auth.service';
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class RoleGuard implements CanActivate {
+  constructor(private authService: GrpcAuthService) {}
 
-    constructor(private authService: GrpcAuthService) { }
-
-    public canActivate(
-        route: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot,
-    ): Observable<boolean> {
-        return this.authService.fetchedZitadelPermissions.pipe(
-            filter((permissionsFetched) => !!permissionsFetched),
-        ).pipe(
-            switchMap(_ => this.authService.isAllowed(route.data['roles'])),
-        );
-    }
+  public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    return this.authService.fetchedZitadelPermissions
+      .pipe(filter((permissionsFetched) => !!permissionsFetched))
+      .pipe(switchMap((_) => this.authService.isAllowed(route.data['roles'], route.data['requiresAll'])));
+  }
 }

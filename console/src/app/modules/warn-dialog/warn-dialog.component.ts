@@ -1,6 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
+import { InfoSectionType } from '../info-section/info-section.component';
+
 @Component({
   selector: 'cnsl-warn-dialog',
   templateUrl: './warn-dialog.component.html',
@@ -8,6 +10,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 })
 export class WarnDialogComponent {
   public confirm: string = '';
+  InfoSectionType: any = InfoSectionType;
   constructor(public dialogRef: MatDialogRef<WarnDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   public closeDialog(): void {

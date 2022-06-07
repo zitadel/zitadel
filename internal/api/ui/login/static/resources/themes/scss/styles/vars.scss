@@ -42,10 +42,10 @@
   --zitadel-color-background-900: rgb(142, 142, 142);
   --zitadel-color-background-contrast: rgb(0, 0, 0);
 
-  --zitadel-color-footer-line: #e3e8ee;
+  --zitadel-color-footer-line: rgba(0, 0, 0, 0.12);
 
   --zitadel-color-input-background: #00000003;
-  --zitadel-color-input-border: #00000040;
+  --zitadel-color-input-border: #1a191938;
   --zitadel-color-input-border-hover: #1a1b1b;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
@@ -73,7 +73,10 @@
   --zitadel-color-state-warn-font: #620e0e;
   --zitadel-color-state-warn-background: #ffc1c1;
 
-  --zitadel-color-footer-background: #00000008;
+  --zitadel-color-footer-background: #00000002;
+  --zitadel-color-footer-background-mozilla: var(
+    --zitadel-color-background-600
+  );
 
   --zitadel-color-divider: rgba(0, 0, 0, 0.12);
 
@@ -150,10 +153,10 @@
   --zitadel-color-background-900: rgb(23, 23, 23);
   --zitadel-color-background-contrast: rgb(255, 255, 255);
 
-  --zitadel-color-footer-line: #303131;
+  --zitadel-color-footer-line: rgba(255, 255, 255, 0.12);
 
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
-  --zitadel-color-input-border: #403e3e;
+  --zitadel-color-input-border: #f9f7f725;
   --zitadel-color-input-border-hover: #aeafb1;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
@@ -182,6 +185,9 @@
   --zitadel-color-state-warn-background: #af455359;
 
   --zitadel-color-footer-background: #00000020;
+  --zitadel-color-footer-background-mozilla: var(
+    --zitadel-color-background-600
+  );
 
   --zitadel-color-divider: rgba(255, 255, 255, 0.12);
 
