@@ -24,7 +24,6 @@
   (detach)="submitColor()"
   [cdkConnectedOverlayOrigin]="trigger"
   [cdkConnectedOverlayOpen]="isOpen"
-  (overlayOutsideClick)="isOpen = false"
 >
   <color-chrome class="picker" [color]="previewColor" (onChangeComplete)="changeComplete($event)"> </color-chrome>
   <button class="close-icon" mat-mini-fab color="primary" (click)="submitColor()"><mat-icon>check</mat-icon></button>
