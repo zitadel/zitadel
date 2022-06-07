@@ -387,14 +387,14 @@ If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
 
 ## userinfo_endpoint
 
-{your_domain}/oauth/v2/userinfo
+{your_domain}/oidc/v1/userinfo
 
 This endpoint will return information about the authorized user.
 
 Send the `access_token` of the **user** (not the client) as Bearer Token in the `authorization` header:
 ```BASH
 curl --request GET \
-  --url {your_domain}/oauth/v2/userinfo
+  --url {your_domain}/oidc/v1/userinfo
   --header 'Authorization: Bearer dsfdsjk29fm2as...'
 ```
 
@@ -482,7 +482,7 @@ curl --request POST \
 
 ## end_session_endpoint
 
-{your_domain}/oauth/v2/endsession
+{your_domain}/oidc/v1/endsession
 
 > The end_session_endpoint is located with the login page, due to the need of accessing the same cookie domain
 
