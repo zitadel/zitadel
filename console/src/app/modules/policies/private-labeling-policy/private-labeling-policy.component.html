@@ -1,20 +1,25 @@
 <div class="policy enlarged-container">
   <div class="header">
-    <a [routerLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']" mat-icon-button>
+    <a [routerLink]="[serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']" mat-icon-button>
       <mat-icon class="icon">arrow_back</mat-icon>
     </a>
     <div class="col">
-      <h1>{{'POLICY.PRIVATELABELING.TITLE' | translate}}</h1>
-      <p>{{'POLICY.PRIVATELABELING.DESCRIPTION' | translate}}</p>
+      <h1>{{ 'POLICY.PRIVATELABELING.TITLE' | translate }}</h1>
+      <p>{{ 'POLICY.PRIVATELABELING.DESCRIPTION' | translate }}</p>
     </div>
   </div>
-  <p class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</p>
-  <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
+  <p class="desc">{{ 'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate }}</p>
+  <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
   <cnsl-info-section
-    *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false"
-    [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-    <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.private_label'})"></span>
+    *ngIf="
+      serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false
+    "
+    [featureLink]="['/org/features']"
+    class="info"
+    [type]="InfoSectionType.WARN"
+  >
+    <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'label_policy.private_label' }"></span>
   </cnsl-info-section>
 
   <div class="spinner-wr">
@@ -23,14 +28,22 @@
 
   <div class="top-row">
     <div>
-      <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
+      <p>{{ 'POLICY.PRIVATELABELING.THEME' | translate }}</p>
       <div class="theme-changer">
-        <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}" class="light"
-          [ngClass]="{'active': theme === Theme.LIGHT}">
+        <button
+          (click)="theme = Theme.LIGHT"
+          matTooltip="{{ 'POLICY.PRIVATELABELING.LIGHT' | translate }}"
+          class="light"
+          [ngClass]="{ active: theme === Theme.LIGHT }"
+        >
           <i class="icon las la-edit"></i>
         </button>
-        <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark"
-          [ngClass]="{'active': theme === Theme.DARK}">
+        <button
+          (click)="theme = Theme.DARK"
+          matTooltip="{{ 'POLICY.PRIVATELABELING.DARK' | translate }}"
+          class="dark"
+          [ngClass]="{ active: theme === Theme.DARK }"
+        >
           <i class="icon las la-edit"></i>
         </button>
       </div>
@@ -39,21 +52,32 @@
     <span class="fill-space"></span>
 
     <ng-template cnslHasRole [hasRole]="['policy.delete']">
-      <button class="reset-button" *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-        matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
-        {{'POLICY.RESET' | translate}}
+      <button
+        class="reset-button"
+        *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+        matTooltip="{{ 'POLICY.RESET' | translate }}"
+        color="warn"
+        (click)="removePolicy()"
+        mat-stroked-button
+      >
+        {{ 'POLICY.RESET' | translate }}
       </button>
     </ng-template>
 
-    <button class="activate-button"
-      [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false"
-      mat-raised-button color="primary" (click)="activatePolicy()">
-      {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
+    <button
+      class="activate-button"
+      [disabled]="
+        serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false
+      "
+      mat-raised-button
+      color="primary"
+      (click)="activatePolicy()"
+    >
+      {{ 'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate }}
     </button>
   </div>
 
   <div *ngIf="previewData && data" class="lab-policy-content">
-
     <mat-accordion class="settings">
       <mat-expansion-panel class="expansion">
         <mat-expansion-panel-header [attr.data-e2e]="'policy-category'">
@@ -63,16 +87,13 @@
               Logo
             </div>
           </mat-panel-title>
-          <mat-panel-description>
-
-          </mat-panel-description>
+          <mat-panel-description> </mat-panel-description>
         </mat-expansion-panel-header>
 
-        <p class="description">{{'POLICY.PRIVATELABELING.USEOFLOGO' | translate}}</p>
+        <p class="description">{{ 'POLICY.PRIVATELABELING.USEOFLOGO' | translate }}</p>
 
-        <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.MAXSIZE' | translate}}</cnsl-info-section>
-        <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
-        </cnsl-info-section>
+        <cnsl-info-section class="max-size-desc"> {{ 'POLICY.PRIVATELABELING.MAXSIZE' | translate }}</cnsl-info-section>
+        <cnsl-info-section class="max-size-desc"> {{ 'POLICY.PRIVATELABELING.EMAILNOSVG' | translate }} </cnsl-info-section>
 
         <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
         <div class="logo-setup-wrapper">
@@ -82,8 +103,13 @@
             <container [ngSwitch]="theme">
               <div class="logo-view" *ngSwitchCase="Theme.DARK">
                 <div class="img-wrapper mat-elevation-z3" *ngIf="previewData.logoUrlDark">
-                  <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                    (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
+                  <mat-icon
+                    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                    color="warn"
+                    class="dl-btn"
+                    (click)="deleteAsset(AssetType.LOGO, theme)"
+                    >remove_circle</mat-icon
+                  >
                   <img matTooltip="Preview" class="prev" [src]="previewData.logoUrlDark" alt="dark logo preview" />
                 </div>
                 <span class="fill-space"></span>
@@ -93,8 +119,13 @@
               </div>
               <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
                 <div class="img-wrapper" *ngIf="previewData.logoUrl">
-                  <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                    (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
+                  <mat-icon
+                    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                    color="warn"
+                    class="dl-btn"
+                    (click)="deleteAsset(AssetType.LOGO, theme)"
+                    >remove_circle</mat-icon
+                  >
                   <img matTooltip="Preview" class="prev" [src]="previewData.logoUrl" alt="logo preview" />
                 </div>
                 <span class="fill-space"></span>
@@ -103,18 +134,38 @@
                 </div>
               </div>
             </container>
-            <div class="dropzone" cnslDropzone (hovered)="toggleHoverLogo(theme, $event)"
-              (dropped)="onDropLogo(theme, $event)" [class.hovering]="isHoveringOverDarkLogo">
+            <div
+              class="dropzone"
+              cnslDropzone
+              (hovered)="toggleHoverLogo(theme, $event)"
+              (dropped)="onDropLogo(theme, $event)"
+              [class.hovering]="isHoveringOverDarkLogo"
+            >
               <label class="file-label">
                 <i class="icon las la-image"></i>
-                <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
-                  ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
-                <input #selectedFile style="display: none;" class="file-input" type="file"
-                  (change)="onDropLogo(theme, $any($event.target).files)">
-                <a class="btn"
-                  *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                  (click)="$event.preventDefault(); selectedFile.click();">
-                  {{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
+                <span>{{
+                  isHoveringOverDarkLogo
+                    ? ('POLICY.PRIVATELABELING.RELEASE' | translate)
+                    : ('POLICY.PRIVATELABELING.DROP' | translate)
+                }}</span>
+                <input
+                  #selectedFile
+                  style="display: none"
+                  class="file-input"
+                  type="file"
+                  (change)="onDropLogo(theme, $any($event.target).files)"
+                />
+                <a
+                  class="btn"
+                  *ngIf="
+                    serviceType === PolicyComponentServiceType.ADMIN ||
+                    (serviceType === PolicyComponentServiceType.MGMT &&
+                      (['label_policy.private_label'] | hasFeature | async))
+                  "
+                  (click)="$event.preventDefault(); selectedFile.click()"
+                >
+                  {{ 'POLICY.PRIVATELABELING.BTN' | translate }}</a
+                >
               </label>
             </div>
           </div>
@@ -124,8 +175,13 @@
             <container [ngSwitch]="theme">
               <div class="logo-view" *ngSwitchCase="Theme.DARK">
                 <div class="img-wrapper" *ngIf="previewData.iconUrlDark">
-                  <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                    (click)="deleteAsset(AssetType.ICON, theme)">remove_circle</mat-icon>
+                  <mat-icon
+                    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                    color="warn"
+                    class="dl-btn"
+                    (click)="deleteAsset(AssetType.ICON, theme)"
+                    >remove_circle</mat-icon
+                  >
                   <img matTooltip="Preview" class="prev" [src]="previewData.iconUrlDark" alt="dark icon preview" />
                 </div>
                 <span class="fill-space"></span>
@@ -135,8 +191,13 @@
               </div>
               <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
                 <div class="img-wrapper" *ngIf="previewData.iconUrl">
-                  <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                    (click)="deleteAsset(AssetType.ICON,theme)">remove_circle</mat-icon>
+                  <mat-icon
+                    matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
+                    color="warn"
+                    class="dl-btn"
+                    (click)="deleteAsset(AssetType.ICON, theme)"
+                    >remove_circle</mat-icon
+                  >
                   <img matTooltip="Preview" class="prev" [src]="previewData.iconUrl" alt="icon preview" />
                 </div>
                 <span class="fill-space"></span>
@@ -145,23 +206,42 @@
                 </div>
               </div>
             </container>
-            <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
-              (dropped)="onDropIcon(theme, $event)" [class.hovering]="isHoveringOverDarkIcon">
+            <div
+              class="dropzone"
+              cnslDropzone
+              (hovered)="toggleHoverIcon(theme, $event)"
+              (dropped)="onDropIcon(theme, $event)"
+              [class.hovering]="isHoveringOverDarkIcon"
+            >
               <label class="file-label">
                 <i class="icon las la-image"></i>
-                <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
-                  ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
-                <input #selectedFileIcon style="display: none;" class="file-input" type="file"
-                  (change)="onDropIcon(theme, $any($event.target).files)">
-                <a class="btn"
-                  *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                  (click)="$event.preventDefault(); selectedFileIcon.click();">
-                  {{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
+                <span>{{
+                  isHoveringOverDarkIcon
+                    ? ('POLICY.PRIVATELABELING.RELEASE' | translate)
+                    : ('POLICY.PRIVATELABELING.DROP' | translate)
+                }}</span>
+                <input
+                  #selectedFileIcon
+                  style="display: none"
+                  class="file-input"
+                  type="file"
+                  (change)="onDropIcon(theme, $any($event.target).files)"
+                />
+                <a
+                  class="btn"
+                  *ngIf="
+                    serviceType === PolicyComponentServiceType.ADMIN ||
+                    (serviceType === PolicyComponentServiceType.MGMT &&
+                      (['label_policy.private_label'] | hasFeature | async))
+                  "
+                  (click)="$event.preventDefault(); selectedFileIcon.click()"
+                >
+                  {{ 'POLICY.PRIVATELABELING.BTN' | translate }}</a
+                >
               </label>
             </div>
           </div>
         </div>
-
       </mat-expansion-panel>
 
       <mat-expansion-panel class="expansion" [expanded]="true">
@@ -169,7 +249,7 @@
           <mat-panel-title>
             <div class="panel-title">
               <i class="icon las la-palette"></i>
-              {{'POLICY.PRIVATELABELING.COLORS' | translate}}
+              {{ 'POLICY.PRIVATELABELING.COLORS' | translate }}
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
@@ -177,25 +257,44 @@
         <ng-container *ngIf="theme === Theme.DARK">
           <div class="colors" *ngIf="data && previewData">
             <div class="color">
-              <cnsl-color [colorType]="ColorType.BACKGROUNDDARK"
-                (previewChanged)="previewData.backgroundColorDark = $event" name="Background Color"
-                [color]="data.backgroundColorDark" [previewColor]="previewData.backgroundColorDark"></cnsl-color>
+              <cnsl-color
+                [colorType]="ColorType.BACKGROUNDDARK"
+                (previewChanged)="previewData.backgroundColorDark = $event"
+                name="Background Color"
+                [color]="data.backgroundColorDark"
+                [previewColor]="previewData.backgroundColorDark"
+              ></cnsl-color>
             </div>
 
             <div class="color">
-              <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColorDark = $event"
-                name="Primary Color" [color]="data.primaryColorDark" [previewColor]="previewData.primaryColorDark">
+              <cnsl-color
+                [colorType]="ColorType.PRIMARY"
+                (previewChanged)="previewData.primaryColorDark = $event"
+                name="Primary Color"
+                [color]="data.primaryColorDark"
+                [previewColor]="previewData.primaryColorDark"
+              >
               </cnsl-color>
             </div>
 
             <div class="color">
-              <cnsl-color [colorType]="ColorType.WARN" (previewChanged)="previewData.warnColorDark =  $event"
-                name="Warn Color" [color]="data.warnColorDark" [previewColor]="previewData.warnColorDark"></cnsl-color>
+              <cnsl-color
+                [colorType]="ColorType.WARN"
+                (previewChanged)="previewData.warnColorDark = $event"
+                name="Warn Color"
+                [color]="data.warnColorDark"
+                [previewColor]="previewData.warnColorDark"
+              ></cnsl-color>
             </div>
 
             <div class="color">
-              <cnsl-color [colorType]="ColorType.FONTDARK" (previewChanged)="previewData.fontColorDark = $event"
-                name="Font Color" [color]="data.fontColorDark" [previewColor]="previewData.fontColorDark"></cnsl-color>
+              <cnsl-color
+                [colorType]="ColorType.FONTDARK"
+                (previewChanged)="previewData.fontColorDark = $event"
+                name="Font Color"
+                [color]="data.fontColorDark"
+                [previewColor]="previewData.fontColorDark"
+              ></cnsl-color>
             </div>
           </div>
         </ng-container>
@@ -203,31 +302,49 @@
         <ng-container *ngIf="theme === Theme.LIGHT">
           <div class="colors" *ngIf="data && previewData">
             <div class="color">
-              <cnsl-color [colorType]="ColorType.BACKGROUNDLIGHT"
-                (previewChanged)="previewData.backgroundColor = $event" name="Background Color"
-                [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
+              <cnsl-color
+                [colorType]="ColorType.BACKGROUNDLIGHT"
+                (previewChanged)="previewData.backgroundColor = $event"
+                name="Background Color"
+                [color]="data.backgroundColor"
+                [previewColor]="previewData.backgroundColor"
+              ></cnsl-color>
             </div>
 
             <div class="color">
-              <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColor = $event"
-                name="Primary Color" [color]="data.primaryColor" [previewColor]="previewData.primaryColor"></cnsl-color>
+              <cnsl-color
+                [colorType]="ColorType.PRIMARY"
+                (previewChanged)="previewData.primaryColor = $event"
+                name="Primary Color"
+                [color]="data.primaryColor"
+                [previewColor]="previewData.primaryColor"
+              ></cnsl-color>
             </div>
 
             <div class="color">
-              <cnsl-color [colorType]="ColorType.WARN" name="Warn Color"
-                (previewChanged)="previewData.warnColor= $event" [color]="data.warnColor"
-                [previewColor]="previewData.warnColor"></cnsl-color>
+              <cnsl-color
+                [colorType]="ColorType.WARN"
+                name="Warn Color"
+                (previewChanged)="previewData.warnColor = $event"
+                [color]="data.warnColor"
+                [previewColor]="previewData.warnColor"
+              ></cnsl-color>
             </div>
 
             <div class="color">
-              <cnsl-color [colorType]="ColorType.FONTLIGHT" (previewChanged)="previewData.fontColor = $event"
-                name="Font Color" [color]="data.fontColor" [previewColor]="previewData.fontColor"></cnsl-color>
+              <cnsl-color
+                [colorType]="ColorType.FONTLIGHT"
+                (previewChanged)="previewData.fontColor = $event"
+                name="Font Color"
+                [color]="data.fontColor"
+                [previewColor]="previewData.fontColor"
+              ></cnsl-color>
             </div>
           </div>
         </ng-container>
 
         <div class="clr-btn-wrapper">
-          <button color="primary" mat-raised-button (click)="savePolicy()">{{'ACTIONS.SAVE' | translate}}</button>
+          <button color="primary" mat-raised-button (click)="savePolicy()">{{ 'ACTIONS.SAVE' | translate }}</button>
         </div>
       </mat-expansion-panel>
 
@@ -236,37 +353,66 @@
           <mat-panel-title>
             <div class="panel-title">
               <i class="icon las la-font"></i>
-              {{'POLICY.PRIVATELABELING.FONT' | translate}}
+              {{ 'POLICY.PRIVATELABELING.FONT' | translate }}
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="fonts">
-          <cnsl-info-section class="info-section">{{'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate}}
+          <cnsl-info-section class="info-section"
+            >{{ 'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate }}
           </cnsl-info-section>
-          <div class="font-preview mat-elevation-z3"
-            *ngIf="preview === Preview.PREVIEW && previewData.fontUrl || preview === Preview.CURRENT && data.fontUrl">
+          <div
+            class="font-preview mat-elevation-z3"
+            *ngIf="(preview === Preview.PREVIEW && previewData.fontUrl) || (preview === Preview.CURRENT && data.fontUrl)"
+          >
             <mat-icon class="icon">text_fields</mat-icon>
             <span>ABC • abc • 123</span>
 
             <span class="fill-space"></span>
             <button
-              [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false"
-              matTooltip="{{'ACTIONS.REMOVE' | translate}}" mat-icon-button color="warn" (click)="deleteFont()">
+              [disabled]="
+                serviceType === PolicyComponentServiceType.MGMT &&
+                (['label_policy.private_label'] | hasFeature | async) === false
+              "
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              mat-icon-button
+              color="warn"
+              (click)="deleteFont()"
+            >
               <mat-icon>remove_circle</mat-icon>
             </button>
           </div>
 
-          <div class="dropzone" cnslDropzone (hovered)="toggleHoverFont($event)" (dropped)="onDropFont($event)"
-            [class.hovering]="isHoveringOverFont">
+          <div
+            class="dropzone"
+            cnslDropzone
+            (hovered)="toggleHoverFont($event)"
+            (dropped)="onDropFont($event)"
+            [class.hovering]="isHoveringOverFont"
+          >
             <label class="file-label">
               <i class="icon las la-file"></i>
-              <span>{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' | translate):
-                ('POLICY.PRIVATELABELING.DROPFONT' | translate)}}</span>
-              <input #selectedFontFile style="display: none;" class="file-input" type="file"
-                (change)="onDropFont($any($event.target).files)">
-              <a class="btn"
-                *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                (click)="selectedFontFile.click()">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
+              <span>{{
+                isHoveringOverFont
+                  ? ('POLICY.PRIVATELABELING.RELEASEFONT' | translate)
+                  : ('POLICY.PRIVATELABELING.DROPFONT' | translate)
+              }}</span>
+              <input
+                #selectedFontFile
+                style="display: none"
+                class="file-input"
+                type="file"
+                (change)="onDropFont($any($event.target).files)"
+              />
+              <a
+                class="btn"
+                *ngIf="
+                  serviceType === PolicyComponentServiceType.ADMIN ||
+                  (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))
+                "
+                (click)="selectedFontFile.click()"
+                >{{ 'POLICY.PRIVATELABELING.BTN' | translate }}</a
+              >
             </label>
           </div>
         </div>
@@ -277,35 +423,58 @@
           <mat-panel-title>
             <div class="panel-title">
               <i class="icon las la-universal-access"></i>
-              {{'POLICY.PRIVATELABELING.ADVANCEDBEHAVIOR' | translate}}
+              {{ 'POLICY.PRIVATELABELING.ADVANCEDBEHAVIOR' | translate }}
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="adv-container" *ngIf="previewData">
-
           <ng-container
-            *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false">
+            *ngIf="
+              serviceType === PolicyComponentServiceType.MGMT &&
+              (['label_policy.private_label'] | hasFeature | async) === false
+            "
+          >
             <cnsl-info-section [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-              <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.private_label'})"></span>
+              <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'label_policy.private_label' }"></span>
             </cnsl-info-section>
           </ng-container>
 
-          <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
-            [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false"
-            [(ngModel)]="previewData.hideLoginNameSuffix" (change)="savePolicy()">
-            {{'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate}}
+          <mat-slide-toggle
+            class="toggle"
+            color="primary"
+            ngDefaultControl
+            [disabled]="
+              serviceType === PolicyComponentServiceType.MGMT &&
+              (['label_policy.private_label'] | hasFeature | async) === false
+            "
+            [(ngModel)]="previewData.hideLoginNameSuffix"
+            (change)="savePolicy()"
+          >
+            {{ 'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate }}
           </mat-slide-toggle>
 
-          <ng-container
-            *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) === false">
-            <cnsl-info-section [featureLink]="['/org/features']" class="info" type]="InfoSectionType.WARN">
-              <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'label_policy.watermark'})"></span>
-            </cnsl-info-section>
-          </ng-container>
-          <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
-            [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) === false"
-            [(ngModel)]="previewData.disableWatermark" (change)="savePolicy()">
-            {{'POLICY.DATA.DISABLEWATERMARK' | translate}}
+          <cnsl-info-section
+            *ngIf="
+              serviceType === PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) === false
+            "
+            [featureLink]="['/org/features']"
+            class="info"
+            [type]="InfoSectionType.WARN"
+          >
+            <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: { value: 'label_policy.watermark' }"></span>
+          </cnsl-info-section>
+
+          <mat-slide-toggle
+            class="toggle"
+            color="primary"
+            ngDefaultControl
+            [disabled]="
+              serviceType === PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) === false
+            "
+            [(ngModel)]="previewData.disableWatermark"
+            (change)="savePolicy()"
+          >
+            {{ 'POLICY.DATA.DISABLEWATERMARK' | translate }}
           </mat-slide-toggle>
         </div>
       </mat-expansion-panel>
@@ -314,18 +483,38 @@
     <div class="preview-wrapper">
       <!-- <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data"></cnsl-preview> -->
       <div class="col">
-        <button color="primary" mat-raised-button class="preview-changer"
+        <button
+          color="primary"
+          mat-raised-button
+          class="preview-changer"
           (click)="preview = preview === Preview.PREVIEW ? Preview.CURRENT : Preview.PREVIEW"
-          matTooltip="{{'POLICY.PRIVATELABELING.CHANGEVIEW' | translate}}"
-          [ngClass]="{'active': preview === Preview.PREVIEW}">
-          <span><span [ngClass]="{'strong': preview === Preview.PREVIEW}">P</span> / <span
-              [ngClass]="{'strong': preview === Preview.CURRENT}">C</span></span>
+          matTooltip="{{ 'POLICY.PRIVATELABELING.CHANGEVIEW' | translate }}"
+          [ngClass]="{ active: preview === Preview.PREVIEW }"
+        >
+          <span
+            ><span [ngClass]="{ strong: preview === Preview.PREVIEW }">P</span> /
+            <span [ngClass]="{ strong: preview === Preview.CURRENT }">C</span></span
+          >
         </button>
 
-        <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [preview]="preview" [theme]="theme"
-          class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
-        <cnsl-preview *ngIf="preview === Preview.PREVIEW" [refresh]="refreshPreview" [preview]="preview" [theme]="theme"
-          class="prev" label="PREVIEW" [policy]="previewData"></cnsl-preview>
+        <cnsl-preview
+          *ngIf="preview === Preview.CURRENT"
+          [refresh]="refreshPreview"
+          [preview]="preview"
+          [theme]="theme"
+          class="prev"
+          label="CURRENT"
+          [policy]="data"
+        ></cnsl-preview>
+        <cnsl-preview
+          *ngIf="preview === Preview.PREVIEW"
+          [refresh]="refreshPreview"
+          [preview]="preview"
+          [theme]="theme"
+          class="prev"
+          label="PREVIEW"
+          [policy]="previewData"
+        ></cnsl-preview>
       </div>
     </div>
   </div>
