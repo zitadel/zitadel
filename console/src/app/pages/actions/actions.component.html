@@ -22,7 +22,7 @@
 
     <ng-template cnslHasRole [hasRole]="['org.flow.read']">
       <div *ngIf="flow" class="flow">
-        <cnsl-form-field class="formfield" appearance="outline">
+        <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'FLOWS.FLOWTYPE' | translate }}</cnsl-label>
           <mat-select [formControl]="typeControl">
             <mat-option *ngFor="let type of typesForSelection" [value]="type">

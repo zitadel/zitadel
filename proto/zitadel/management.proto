@@ -2877,8 +2877,10 @@ message GetOIDCInformationResponse {
 message GetIAMRequest {}
 
 message GetIAMResponse {
+    //deprecated: use default_org_id instead
     string global_org_id = 1;
     string iam_project_id = 2;
+    string default_org_id = 3;
 }
 
 //This is an empty request

@@ -17,7 +17,7 @@ const (
 	InstanceColumnName            = "name"
 	InstanceColumnChangeDate      = "change_date"
 	InstanceColumnCreationDate    = "creation_date"
-	InstanceColumnGlobalOrgID     = "global_org_id"
+	InstanceColumnDefaultOrgID    = "default_org_id"
 	InstanceColumnProjectID       = "iam_project_id"
 	InstanceColumnConsoleID       = "console_client_id"
 	InstanceColumnConsoleAppID    = "console_app_id"
@@ -39,7 +39,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(InstanceColumnName, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(InstanceColumnDefaultOrgID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleAppID, crdb.ColumnTypeText, crdb.Default("")),
@@ -63,8 +63,8 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceInstanceAdded,
 				},
 				{
-					Event:  instance.GlobalOrgSetEventType,
-					Reduce: p.reduceGlobalOrgSet,
+					Event:  instance.DefaultOrgSetEventType,
+					Reduce: p.reduceDefaultOrgSet,
 				},
 				{
 					Event:  instance.ProjectSetEventType,
@@ -100,17 +100,17 @@ func (p *InstanceProjection) reduceInstanceAdded(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.GlobalOrgSetEvent)
+func (p *InstanceProjection) reduceDefaultOrgSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.DefaultOrgSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.GlobalOrgSetEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.DefaultOrgSetEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
-			handler.NewCol(InstanceColumnGlobalOrgID, e.OrgID),
+			handler.NewCol(InstanceColumnDefaultOrgID, e.OrgID),
 		},
 		[]handler.Condition{
 			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),

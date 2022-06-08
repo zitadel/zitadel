@@ -24,7 +24,7 @@ const (
 
 type IAM struct {
 	es_models.ObjectRoot
-	GlobalOrgID  string
+	DefaultOrgID string
 	IAMProjectID string
 	SetUpDone    domain.Step
 	SetUpStarted domain.Step

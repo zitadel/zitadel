@@ -168,6 +168,12 @@
             flex: 1;
           }
 
+          .asset-add-btn {
+            &[disabled] {
+              color: map-get($foreground, disabled-text);
+            }
+          }
+
           .img-wrapper {
             position: relative;
             height: 70px;

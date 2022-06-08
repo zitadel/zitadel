@@ -12,7 +12,7 @@ func (s *Server) ListViews(ctx context.Context, _ *system_pb.ListViewsRequest) (
 	if err != nil {
 		return nil, err
 	}
-	convertedCurrentSequences := CurrentSequencesToPb(currentSequences)
+	convertedCurrentSequences := CurrentSequencesToPb(s.database, currentSequences)
 	views, err := s.administrator.GetViews()
 	if err != nil {
 		return nil, err
