@@ -70,7 +70,7 @@ type OPStorage struct {
 	defaultRefreshTokenExpiration     time.Duration
 	encAlg                            crypto.EncryptionAlgorithm
 	locker                            crdb.Locker
-	assetAPIPrefix                    string
+	assetAPIPrefix                    func(ctx context.Context) string
 }
 
 func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *sql.DB, userAgentCookie, instanceHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
@@ -78,7 +78,7 @@ func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI st
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections)
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
 	options, err := createOptions(config, externalSecure, userAgentCookie, instanceHandler)
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
@@ -168,7 +168,7 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	return options
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, projections *sql.DB) *OPStorage {
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, projections *sql.DB, externalSecure bool) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -182,7 +182,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
 		encAlg:                            encAlg,
 		locker:                            crdb.NewLocker(projections, locksTable, signingKey),
-		assetAPIPrefix:                    assets.HandlerPrefix,
+		assetAPIPrefix:                    assets.AssetAPI(externalSecure),
 	}
 }
 
