@@ -30,6 +30,7 @@ message Instance {
             example: "\"1.0.0\"";
         }
     ];
+    repeated Domain domains = 6;
 }
 
 message InstanceDetail {
