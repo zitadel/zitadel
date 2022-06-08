@@ -39,7 +39,7 @@
 
   <button
     class="set-password-btn"
-    [disabled]="(['iam.write'] | hasRole | async) === false"
+    [disabled]="(['iam.write'] | hasRole | async) === false || hasSMTPConfig"
     (click)="setSMTPPassword()"
     mat-stroked-button
   >

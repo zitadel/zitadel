@@ -3,10 +3,11 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs';
 import {
-    AddSMSProviderTwilioRequest,
-    UpdateSMTPConfigPasswordRequest,
-    UpdateSMTPConfigPasswordResponse,
-    UpdateSMTPConfigRequest,
+  AddSMSProviderTwilioRequest,
+  AddSMTPConfigRequest,
+  UpdateSMTPConfigPasswordRequest,
+  UpdateSMTPConfigPasswordResponse,
+  UpdateSMTPConfigRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -38,6 +39,8 @@ export class NotificationSettingsComponent implements OnInit {
 
   public SMSProviderConfigState: any = SMSProviderConfigState;
   public InfoSectionType: any = InfoSectionType;
+
+  public hasSMTPConfig: boolean = false;
 
   // show available providers
 
@@ -76,6 +79,7 @@ export class NotificationSettingsComponent implements OnInit {
       .then((smtpConfig) => {
         this.smtpLoading = false;
         if (smtpConfig.smtpConfig) {
+          this.hasSMTPConfig = true;
           this.form.patchValue(smtpConfig.smtpConfig);
         }
       })
@@ -83,6 +87,7 @@ export class NotificationSettingsComponent implements OnInit {
         this.smtpLoading = false;
         if (error && error.code === 5) {
           console.log(error);
+          this.hasSMTPConfig = false;
         }
       });
 
@@ -109,9 +114,8 @@ export class NotificationSettingsComponent implements OnInit {
           this.logNotificationProvider = logNotificationProvider.provider;
         }
       })
-      .catch((error) => {
+      .catch(() => {
         this.logProviderLoading = false;
-        this.toast.showError(error);
       });
 
     this.fileProviderLoading = true;
@@ -123,23 +127,35 @@ export class NotificationSettingsComponent implements OnInit {
           this.fileNotificationProvider = fileNotificationProvider.provider;
         }
       })
-      .catch((error) => {
+      .catch(() => {
         this.fileProviderLoading = false;
-        this.toast.showError(error);
       });
   }
 
   private updateData(): Promise<UpdateSMTPConfigPasswordResponse.AsObject> | any {
-    const req = new UpdateSMTPConfigRequest();
-    req.setHost(this.host?.value ?? '');
-    req.setSenderAddress(this.senderAddress?.value ?? '');
-    req.setSenderName(this.senderName?.value ?? '');
-    req.setTls(this.tls?.value ?? false);
-    req.setUser(this.user?.value ?? '');
+    if (this.hasSMTPConfig) {
+      const req = new UpdateSMTPConfigRequest();
+      req.setHost(this.host?.value ?? '');
+      req.setSenderAddress(this.senderAddress?.value ?? '');
+      req.setSenderName(this.senderName?.value ?? '');
+      req.setTls(this.tls?.value ?? false);
+      req.setUser(this.user?.value ?? '');
 
-    return this.service.updateSMTPConfig(req).catch((error) => {
-      this.toast.showError(error);
-    });
+      return this.service.updateSMTPConfig(req).catch((error) => {
+        this.toast.showError(error);
+      });
+    } else {
+      const req = new AddSMTPConfigRequest();
+      req.setHost(this.host?.value ?? '');
+      req.setSenderAddress(this.senderAddress?.value ?? '');
+      req.setSenderName(this.senderName?.value ?? '');
+      req.setTls(this.tls?.value ?? false);
+      req.setUser(this.user?.value ?? '');
+
+      return this.service.addSMTPConfig(req).catch((error) => {
+        this.toast.showError(error);
+      });
+    }
   }
 
   public savePolicy(): void {
