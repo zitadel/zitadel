@@ -56,7 +56,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.idps.type`+
 						` FROM projections.login_policies`+
 						` LEFT JOIN projections.idp_login_policy_links ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.idp_id`+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
 						` LEFT JOIN projections.idps ON`+
 						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
 					nil,
@@ -101,7 +101,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.idps.type`+
 						` FROM projections.login_policies`+
 						` LEFT JOIN projections.idp_login_policy_links ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.idp_id`+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
 						` LEFT JOIN projections.idps ON`+
 						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
 					[]string{
@@ -216,7 +216,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.idps.type`+
 						` FROM projections.login_policies`+
 						` LEFT JOIN projections.idp_login_policy_links ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.idp_id`+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
 						` LEFT JOIN projections.idps ON`+
 						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
 					sql.ErrConnDone,
