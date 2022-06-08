@@ -237,6 +237,18 @@ service AdminService {
         };
     }
 
+    // Add system smtp configuration
+    rpc AddSMTPConfig(AddSMTPConfigRequest) returns (AddSMTPConfigResponse) {
+        option (google.api.http) = {
+            post: "/smtp";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // Update system smtp configuration
     rpc UpdateSMTPConfig(UpdateSMTPConfigRequest) returns (UpdateSMTPConfigResponse) {
         option (google.api.http) = {
@@ -2659,6 +2671,19 @@ message GetSMTPConfigRequest {}
 
 message GetSMTPConfigResponse {
     zitadel.settings.v1.SMTPConfig smtp_config = 1;
+}
+
+message AddSMTPConfigRequest {
+    string sender_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool tls = 3;
+    string host = 4 [(validate.rules).string = {min_len: 1, max_len: 500}];
+    string user = 5;
+    string password = 6;
+}
+
+message AddSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateSMTPConfigRequest {

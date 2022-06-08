@@ -116,6 +116,18 @@ Get system smtp configuration
     GET: /smtp
 
 
+### AddSMTPConfig
+
+> **rpc** AddSMTPConfig([AddSMTPConfigRequest](#addsmtpconfigrequest))
+[AddSMTPConfigResponse](#addsmtpconfigresponse)
+
+Add system smtp configuration
+
+
+
+    POST: /smtp
+
+
 ### UpdateSMTPConfig
 
 > **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
@@ -1642,6 +1654,33 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | id |  string | - |  |
+
+
+
+
+### AddSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+| password |  string | - |  |
+
+
+
+
+### AddSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
