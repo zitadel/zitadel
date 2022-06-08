@@ -56,6 +56,10 @@ var (
 		name:  projection.IDPLoginPolicyLinkSequenceCol,
 		table: idpLoginPolicyLinkTable,
 	}
+	IDPLoginPolicyLinkAggregateIDCol = Column{
+		name:  projection.IDPLoginPolicyLinkAggregateIDCol,
+		table: idpLoginPolicyLinkTable,
+	}
 	IDPLoginPolicyLinkResourceOwnerCol = Column{
 		name:  projection.IDPLoginPolicyLinkResourceOwnerCol,
 		table: idpLoginPolicyLinkTable,

@@ -23,8 +23,9 @@ func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 			instance.ChangeDate,
 			instance.InstanceID(),
 		),
-		Id:   instance.InstanceID(),
-		Name: instance.Name,
+		Id:      instance.InstanceID(),
+		Name:    instance.Name,
+		Domains: DomainsToPb(instance.Domains),
 	}
 }
 
