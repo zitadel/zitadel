@@ -182,6 +182,10 @@ import {
   UpdatePrivacyPolicyResponse,
   UpdateSecretGeneratorRequest,
   UpdateSecretGeneratorResponse,
+  UpdateSMSProviderTwilioRequest,
+  UpdateSMSProviderTwilioResponse,
+  UpdateSMSProviderTwilioTokenRequest,
+  UpdateSMSProviderTwilioTokenResponse,
   UpdateSMTPConfigPasswordRequest,
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
@@ -494,6 +498,16 @@ export class AdminService {
 
   public addSMSProviderTwilio(req: AddSMSProviderTwilioRequest): Promise<AddSMSProviderTwilioResponse.AsObject> {
     return this.grpcService.admin.addSMSProviderTwilio(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMSProviderTwilio(req: UpdateSMSProviderTwilioRequest): Promise<UpdateSMSProviderTwilioResponse.AsObject> {
+    return this.grpcService.admin.updateSMSProviderTwilio(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMSProviderTwilioToken(
+    req: UpdateSMSProviderTwilioTokenRequest,
+  ): Promise<UpdateSMSProviderTwilioTokenResponse.AsObject> {
+    return this.grpcService.admin.updateSMSProviderTwilioToken(req, null).then((resp) => resp.toObject());
   }
 
   /* lockout */

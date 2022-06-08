@@ -5,6 +5,7 @@ import { take } from 'rxjs';
 import {
   AddSMSProviderTwilioRequest,
   AddSMTPConfigRequest,
+  UpdateSMSProviderTwilioRequest,
   UpdateSMTPConfigPasswordRequest,
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
@@ -174,21 +175,35 @@ export class NotificationSettingsComponent implements OnInit {
     }
   }
 
-  public addSMSProvider(): void {
+  public editSMSProvider(): void {
     const dialogRef = this.dialog.open(DialogAddSMSProviderComponent, {
       width: '400px',
+      data: {
+        smsProviders: this.smsProviders,
+      },
     });
 
-    dialogRef.afterClosed().subscribe((req: AddSMSProviderTwilioRequest) => {
+    dialogRef.afterClosed().subscribe((req: AddSMSProviderTwilioRequest | UpdateSMSProviderTwilioRequest) => {
       if (req) {
-        this.service
-          .addSMSProviderTwilio(req)
-          .then(() => {
-            this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+        if (this.hasTwilio) {
+          this.service
+            .updateSMSProviderTwilio(req as UpdateSMSProviderTwilioRequest)
+            .then(() => {
+              this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        } else {
+          this.service
+            .addSMSProviderTwilio(req as AddSMSProviderTwilioRequest)
+            .then(() => {
+              this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
       }
     });
   }
@@ -237,5 +252,14 @@ export class NotificationSettingsComponent implements OnInit {
 
   public get host(): AbstractControl | null {
     return this.form.get('host');
+  }
+
+  public get hasTwilio(): boolean {
+    const twilioProvider: SMSProvider.AsObject | undefined = this.smsProviders.find((p) => p.twilio);
+    if (twilioProvider && !!twilioProvider.twilio) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
