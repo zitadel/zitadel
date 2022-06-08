@@ -152,6 +152,18 @@ Update system smtp configuration password for host
     PUT: /smtp/password
 
 
+### RemoveSMTPConfig
+
+> **rpc** RemoveSMTPConfig([RemoveSMTPConfigRequest](#removesmtpconfigrequest))
+[RemoveSMTPConfigResponse](#removesmtpconfigresponse)
+
+Remove system smtp configuration
+
+
+
+    DELETE: /smtp
+
+
 ### ListSMSProviders
 
 > **rpc** ListSMSProviders([ListSMSProvidersRequest](#listsmsprovidersrequest))
@@ -210,6 +222,18 @@ Update twilio sms provider token
 
 
     PUT: /sms/twilio/{id}/token
+
+
+### RemoveSMSProvider
+
+> **rpc** RemoveSMSProvider([RemoveSMSProviderRequest](#removesmsproviderrequest))
+[RemoveSMSProviderResponse](#removesmsproviderresponse)
+
+Remove sms provider token
+
+
+
+    DELETE: /sms/{id}
 
 
 ### GetOIDCSettings
@@ -2970,6 +2994,45 @@ This is an empty request
 
 
 ### RemoveMultiFactorFromLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveSMTPConfigRequest
+this is en empty request
+
+
+
+
+### RemoveSMTPConfigResponse
 
 
 

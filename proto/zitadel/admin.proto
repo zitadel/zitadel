@@ -273,6 +273,17 @@ service AdminService {
         };
     }
 
+    // Remove system smtp configuration
+    rpc RemoveSMTPConfig(RemoveSMTPConfigRequest) returns (RemoveSMTPConfigResponse) {
+        option (google.api.http) = {
+            delete: "/smtp";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // list sms provider configurations
     rpc ListSMSProviders(ListSMSProvidersRequest) returns (ListSMSProvidersResponse) {
         option (google.api.http) = {
@@ -325,6 +336,17 @@ service AdminService {
         option (google.api.http) = {
             put: "/sms/twilio/{id}/token";
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Remove sms provider token
+    rpc RemoveSMSProvider(RemoveSMSProviderRequest) returns (RemoveSMSProviderResponse) {
+        option (google.api.http) = {
+            delete: "/sms/{id}";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2706,6 +2728,13 @@ message UpdateSMTPConfigPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+//this is en empty request
+message RemoveSMTPConfigRequest {}
+
+message RemoveSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message ListSMSProvidersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
@@ -2751,6 +2780,14 @@ message UpdateSMSProviderTwilioTokenRequest {
 }
 
 message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveSMSProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

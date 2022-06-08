@@ -81,6 +81,19 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 	}, nil
 }
 
+func (s *Server) RemoveSMTPConfig(ctx context.Context, _ *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
+	details, err := s.command.RemoveSMTPConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.RemoveSMTPConfigResponse{
+		Details: object.ChangeToDetailsPb(
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner),
+	}, nil
+}
+
 func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
 	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.Password)
 	if err != nil {

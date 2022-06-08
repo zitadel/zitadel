@@ -73,3 +73,14 @@ func (s *Server) UpdateSMSProviderTwilioToken(ctx context.Context, req *admin_pb
 		Details: object.DomainToChangeDetailsPb(result),
 	}, nil
 }
+
+func (s *Server) RemoveSMSProvider(ctx context.Context, req *admin_pb.RemoveSMSProviderRequest) (*admin_pb.RemoveSMSProviderResponse, error) {
+	result, err := s.command.RemoveSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
+	if err != nil {
+		return nil, err
+
+	}
+	return &admin_pb.RemoveSMSProviderResponse{
+		Details: object.DomainToAddDetailsPb(result),
+	}, nil
+}
