@@ -214,9 +214,9 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 ### Entry into force
 
-These TOS shall enter into force as of August 23, 2021.
+These TOS shall enter into force as of July 9, 2022.
 
-Last revised: August 23, 2021
+Last revised: June 9, 2022
 
 ### Amendments
 
