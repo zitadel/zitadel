@@ -14,7 +14,6 @@ To get started, enter the following data:
 - Email
 - Username
 - Organization Name
-- Instance Name
 
 ![Customer Portal Landing Page](/img/manuals/portal/customer_portal_landing_page.png)
 
