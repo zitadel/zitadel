@@ -5,65 +5,59 @@ function ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) {
     let numberRegex = policyElement.dataset.hasNumber;
     let symbolRegex = policyElement.dataset.hasSymbol;
 
-    let valid = true;
+    let invalid = 0;
 
     let minlengthelem = document.getElementById('minlength');
     if (pwNew.length >= minLength) {
         ValidPolicy(minlengthelem);
-        valid = true;
     } else {
         InvalidPolicy(minlengthelem);
-        valid = false;
+        invalid++;
     }
     let upper = document.getElementById('uppercase');
     if (upperRegex !== "") {
         if (RegExp(upperRegex).test(pwNew)) {
             ValidPolicy(upper);
-            valid = true;
         } else {
             InvalidPolicy(upper);
-            valid = false;
+            invalid++;
         }
     }
     let lower = document.getElementById('lowercase');
     if (lowerRegex !== "") {
         if (RegExp(lowerRegex).test(pwNew)) {
             ValidPolicy(lower);
-            valid = true;
         } else {
             InvalidPolicy(lower);
-            valid = false;
+            invalid++;
         }
     }
     let number = document.getElementById('number');
-    if (numberRegex != "") {
+    if (numberRegex !== "") {
         if (RegExp(numberRegex).test(pwNew)) {
             ValidPolicy(number);
-            valid = true;
         } else {
             InvalidPolicy(number);
-            valid = false;
+            invalid++;
         }
     }
     let symbol = document.getElementById('symbol');
-    if (symbolRegex != "") {
+    if (symbolRegex !== "") {
         if (RegExp(symbolRegex).test(pwNew)) {
             ValidPolicy(symbol);
-            valid = true;
         } else {
             InvalidPolicy(symbol);
-            valid = false;
+            invalid++;
         }
     }
     let confirmation = document.getElementById('confirmation');
     if (pwNew === pwNewConfirmation && pwNewConfirmation !== "" ) {
         ValidPolicy(confirmation);
-        valid = true;
     } else {
         InvalidPolicy(confirmation);
-        valid = false;
+        invalid++;
     }
-    return valid;
+    return invalid===0;
 }
 
 function ValidPolicy(element) {
