@@ -4539,18 +4539,20 @@ message DataOrg {
     zitadel.management.v1.AddCustomPrivacyPolicyRequest privacy_policy = 9;
 
     repeated DataProject projects = 10;
-    repeated DataAPIApplication api_apps = 11;
-    repeated DataOIDCApplication oidc_apps = 12;
-    repeated DataHumanUser human_users = 13;
-    repeated DataMachineUser machine_users = 14;
-    repeated DataAction actions = 15;
+    repeated zitadel.management.v1.AddProjectRoleRequest project_roles = 11;
+    repeated DataAPIApplication api_apps = 12;
+    repeated DataOIDCApplication oidc_apps = 13;
+    repeated DataHumanUser human_users = 14;
+    repeated DataMachineUser machine_users = 15;
+    repeated zitadel.management.v1.SetTriggerActionsRequest  trigger_actions = 16;
+    repeated DataAction actions = 17;
 
-    repeated zitadel.management.v1.AddProjectGrantRequest project_grants = 16;
-    repeated zitadel.management.v1.AddUserGrantRequest user_grants = 17;
+    repeated DataProjectGrant project_grants = 18;
+    repeated zitadel.management.v1.AddUserGrantRequest user_grants = 19;
 
-    repeated zitadel.management.v1.AddOrgMemberRequest org_members = 18;
-    repeated zitadel.management.v1.AddProjectMemberRequest project_members = 19;
-    repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 20;
+    repeated zitadel.management.v1.AddOrgMemberRequest org_members = 20;
+    repeated zitadel.management.v1.AddProjectMemberRequest project_members = 21;
+    repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 22;
 }
 message DataProject {
     string project_id = 1;
@@ -4576,7 +4578,10 @@ message DataAction {
     string action_id = 1;
     zitadel.management.v1.CreateActionRequest action = 2;
 }
-
+message DataProjectGrant {
+    string grant_id = 1;
+    zitadel.management.v1.AddProjectGrantRequest project_grant = 2;
+}
 message ImportDataResponse{
     repeated ImportDataError errors = 1;
     ImportDataSuccess success = 2;
@@ -4594,21 +4599,23 @@ message ImportDataSuccess {
 message ImportDataSuccessOrg{
     string org_id = 1;
     repeated string project_ids = 2;
-    repeated string oidc_app_ids = 3;
-    repeated string api_app_ids = 4;
-    repeated string human_user_ids = 5;
-    repeated string machin_user_ids = 6;
-    repeated string action_ids = 7;
-    repeated ImportDataSuccessProjectGrant project_grants = 8;
-    repeated ImportDataSuccessUserGrant user_grants = 9;
-    repeated string org_members = 10;
-    repeated ImportDataSuccessProjectMember project_members = 11;
-    repeated ImportDataSuccessProjectGrantMember project_grant_members = 12;
+    repeated string project_roles = 3;
+    repeated string oidc_app_ids = 4;
+    repeated string api_app_ids = 5;
+    repeated string human_user_ids = 6;
+    repeated string machine_user_ids = 7;
+    repeated string action_ids = 8;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 9;
+    repeated ImportDataSuccessProjectGrant project_grants = 10;
+    repeated ImportDataSuccessUserGrant user_grants = 11;
+    repeated string org_members = 12;
+    repeated ImportDataSuccessProjectMember project_members = 13;
+    repeated ImportDataSuccessProjectGrantMember project_grant_members = 14;
 }
-
 message ImportDataSuccessProjectGrant{
-    string project_id = 1;
-    string org_id = 2;
+    string grant_id = 1;
+    string project_id = 2;
+    string org_id = 3;
 }
 message ImportDataSuccessUserGrant{
     string project_id = 1;
@@ -4623,7 +4630,6 @@ message ImportDataSuccessProjectGrantMember{
     string grant_id = 2;
     string user_id = 3;
 }
-
 message ExportDataRequest {
     repeated string org_ids = 1;
 }

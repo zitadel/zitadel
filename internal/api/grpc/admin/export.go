@@ -4,9 +4,11 @@ import (
 	"context"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -21,7 +23,9 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	orgs := make([]*admin_pb.DataOrg, 0)
 	processedOrgs := make([]string, 0)
 	processedProjects := make([]string, 0)
+	processedGrants := make([]string, 0)
 	processedUsers := make([]string, 0)
+	processedActions := make([]string, 0)
 
 	for _, queriedOrg := range queriedOrgs.Orgs {
 		if req.OrgIds != nil || len(req.OrgIds) > 0 {
@@ -47,6 +51,116 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		}
 		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
 
+		queriedDomain, err := s.query.DomainPolicyByOrg(ctx, org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		if !queriedDomain.IsDefault {
+			org.DomainPolicy = &admin_pb.AddCustomDomainPolicyRequest{
+				OrgId:                                  org.GetOrgId(),
+				UserLoginMustBeDomain:                  queriedDomain.UserLoginMustBeDomain,
+				ValidateOrgDomains:                     queriedDomain.ValidateOrgDomains,
+				SmtpSenderAddressMatchesInstanceDomain: queriedDomain.SMTPSenderAddressMatchesInstanceDomain,
+			}
+		}
+
+		queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		if !queriedLabel.IsDefault {
+			org.LabelPolicy = &management_pb.AddCustomLabelPolicyRequest{
+				PrimaryColor:        queriedLabel.Light.PrimaryColor,
+				HideLoginNameSuffix: queriedLabel.HideLoginNameSuffix,
+				WarnColor:           queriedLabel.Light.WarnColor,
+				BackgroundColor:     queriedLabel.Light.BackgroundColor,
+				FontColor:           queriedLabel.Light.FontColor,
+				PrimaryColorDark:    queriedLabel.Dark.PrimaryColor,
+				BackgroundColorDark: queriedLabel.Dark.BackgroundColor,
+				WarnColorDark:       queriedLabel.Dark.WarnColor,
+				FontColorDark:       queriedLabel.Dark.FontColor,
+				DisableWatermark:    queriedLabel.WatermarkDisabled,
+			}
+		}
+
+		queriedLogin, err := s.query.LoginPolicyByID(ctx, org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		if !queriedLogin.IsDefault {
+			pwCheck := durationpb.New(queriedLogin.PasswordCheckLifetime)
+			externalLogin := durationpb.New(queriedLogin.ExternalLoginCheckLifetime)
+			mfaInitSkip := durationpb.New(queriedLogin.MFAInitSkipLifetime)
+			secondFactor := durationpb.New(queriedLogin.SecondFactorCheckLifetime)
+			multiFactor := durationpb.New(queriedLogin.MultiFactorCheckLifetime)
+
+			secondFactors := []policy_pb.SecondFactorType{}
+			for _, factor := range queriedLogin.SecondFactors {
+				secondFactors = append(secondFactors, policy_pb.SecondFactorType(factor))
+			}
+
+			multiFactors := []policy_pb.MultiFactorType{}
+			for _, factor := range queriedLogin.MultiFactors {
+				multiFactors = append(multiFactors, policy_pb.MultiFactorType(factor))
+			}
+
+			org.LoginPolicy = &management_pb.AddCustomLoginPolicyRequest{
+				AllowUsernamePassword:      queriedLogin.AllowUsernamePassword,
+				AllowRegister:              queriedLogin.AllowRegister,
+				AllowExternalIdp:           queriedLogin.AllowExternalIDPs,
+				ForceMfa:                   queriedLogin.ForceMFA,
+				PasswordlessType:           policy_pb.PasswordlessType(queriedLogin.PasswordlessType),
+				HidePasswordReset:          queriedLogin.HidePasswordReset,
+				IgnoreUnknownUsernames:     queriedLogin.IgnoreUnknownUsernames,
+				DefaultRedirectUri:         queriedLogin.DefaultRedirectURI,
+				PasswordCheckLifetime:      pwCheck,
+				ExternalLoginCheckLifetime: externalLogin,
+				MfaInitSkipLifetime:        mfaInitSkip,
+				SecondFactorCheckLifetime:  secondFactor,
+				MultiFactorCheckLifetime:   multiFactor,
+				SecondFactors:              secondFactors,
+				MultiFactors:               multiFactors,
+				// TODO ???
+				//Idps:                       queriedLogin.id,
+			}
+		}
+
+		queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		if !queriedLockout.IsDefault {
+			org.LockoutPolicy = &management_pb.AddCustomLockoutPolicyRequest{
+				MaxPasswordAttempts: uint32(queriedLockout.MaxPasswordAttempts),
+			}
+		}
+
+		queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		if !queriedPasswordComplexity.IsDefault {
+			org.PasswordComplexityPolicy = &management_pb.AddCustomPasswordComplexityPolicyRequest{
+				MinLength:    queriedPasswordComplexity.MinLength,
+				HasUppercase: queriedPasswordComplexity.HasUppercase,
+				HasLowercase: queriedPasswordComplexity.HasLowercase,
+				HasNumber:    queriedPasswordComplexity.HasNumber,
+				HasSymbol:    queriedPasswordComplexity.HasSymbol,
+			}
+		}
+
+		queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		if !queriedPrivacy.IsDefault {
+			org.PrivacyPolicy = &management_pb.AddCustomPrivacyPolicyRequest{
+				TosLink:     queriedPrivacy.TOSLink,
+				PrivacyLink: queriedPrivacy.PrivacyLink,
+				HelpLink:    queriedPrivacy.HelpLink,
+			}
+		}
+
 		/******************************************************************************************************************
 		Users
 		******************************************************************************************************************/
@@ -66,13 +180,14 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Project and Applications
 		******************************************************************************************************************/
-		orgProjects, oidcApps, apiApps, err := s.getProjectsAndApps(ctx, queriedOrg.ID)
+		orgProjects, orgProjectRoles, oidcApps, apiApps, err := s.getProjectsAndApps(ctx, queriedOrg.ID)
 		if err != nil {
 			return nil, err
 		}
 		org.Projects = orgProjects
 		org.OidcApps = oidcApps
 		org.ApiApps = apiApps
+		org.ProjectRoles = orgProjectRoles
 
 		for _, processedProject := range orgProjects {
 			processedProjects = append(processedProjects, processedProject.ProjectId)
@@ -86,11 +201,22 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			return nil, err
 		}
 		org.Actions = actions
+		for _, processedAction := range actions {
+			processedActions = append(processedActions, processedAction.ActionId)
+		}
 
 		orgs = append(orgs, org)
 	}
 
 	for _, org := range orgs {
+		/******************************************************************************************************************
+		Flows
+		******************************************************************************************************************/
+		triggerActions, err := s.getTriggerActions(ctx, org.OrgId, processedActions)
+		if err != nil {
+			return nil, err
+		}
+		org.TriggerActions = triggerActions
 
 		/******************************************************************************************************************
 		Grants
@@ -100,13 +226,18 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			return nil, err
 		}
 		org.ProjectGrants = projectGrants
+		for _, processedGrant := range projectGrants {
+			processedGrants = append(processedGrants, processedGrant.GrantId)
+		}
 
-		userGrants, err := s.getNecessaryUserGrantsForOrg(ctx, org.OrgId, processedProjects, processedUsers)
+		userGrants, err := s.getNecessaryUserGrantsForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
 		if err != nil {
 			return nil, err
 		}
 		org.UserGrants = userGrants
+	}
 
+	for _, org := range orgs {
 		/******************************************************************************************************************
 		Members
 		******************************************************************************************************************/
@@ -122,7 +253,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		}
 		org.ProjectMembers = projectMembers
 
-		projectGrantMembers, err := s.getNecessaryProjectGrantMembersForOrg(ctx, org.OrgId, processedProjects, processedUsers)
+		projectGrantMembers, err := s.getNecessaryProjectGrantMembersForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
 		if err != nil {
 			return nil, err
 		}
@@ -189,6 +320,36 @@ func (s *Server) getUsers(ctx context.Context, org string) ([]*admin_pb.DataHuma
 	return humanUsers, machineUsers, nil
 }
 
+func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) ([]*management_pb.SetTriggerActionsRequest, error) {
+	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication}
+	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
+
+	for _, flowType := range flowTypes {
+		flow, err := s.query.GetFlow(ctx, flowType, org)
+		if err != nil {
+			return nil, err
+		}
+
+		for triggerType, triggerAction := range flow.TriggerActions {
+			actions := make([]string, 0)
+			for _, action := range triggerAction {
+				for _, actionID := range processedActions {
+					if action.ID == actionID {
+						actions = append(actions, action.ID)
+					}
+				}
+			}
+
+			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
+				FlowType:    action_pb.FlowType(flowType),
+				TriggerType: action_pb.TriggerType(triggerType),
+				ActionIds:   actions,
+			})
+		}
+	}
+	return triggerActions, nil
+}
+
 func (s *Server) getActions(ctx context.Context, org string) ([]*admin_pb.DataAction, error) {
 	actionSearch, err := query.NewActionResourceOwnerQuery(org)
 	if err != nil {
@@ -216,17 +377,18 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*admin_pb.DataAc
 	return actions, nil
 }
 
-func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_pb.DataProject, []*admin_pb.DataOIDCApplication, []*admin_pb.DataAPIApplication, error) {
+func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*admin_pb.DataOIDCApplication, []*admin_pb.DataAPIApplication, error) {
 	projectSearch, err := query.NewProjectResourceOwnerSearchQuery(org)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	projects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	orgProjects := make([]*admin_pb.DataProject, 0)
+	orgProjectRoles := make([]*management_pb.AddProjectRoleRequest, 0)
 	oidcApps := make([]*admin_pb.DataOIDCApplication, 0)
 	apiApps := make([]*admin_pb.DataAPIApplication, 0)
 	for _, project := range projects.Projects {
@@ -242,13 +404,31 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 			},
 		})
 
+		projectRoleSearch, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+		for _, role := range queriedProjectRoles.ProjectRoles {
+			orgProjectRoles = append(orgProjectRoles, &management_pb.AddProjectRoleRequest{
+				ProjectId:   role.ProjectID,
+				RoleKey:     role.Key,
+				DisplayName: role.DisplayName,
+				Group:       role.Group,
+			})
+		}
+
 		appSearch, err := query.NewAppProjectIDSearchQuery(project.ID)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}})
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		for _, app := range apps.Apps {
 			if app.OIDCConfig != nil {
@@ -297,27 +477,37 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 			}
 		}
 	}
-	return orgProjects, oidcApps, apiApps, nil
+	return orgProjects, orgProjectRoles, oidcApps, apiApps, nil
 }
 
-func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org string, processedProjects []string, processedUsers []string) ([]*management_pb.AddProjectGrantMemberRequest, error) {
+func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) ([]*management_pb.AddProjectGrantMemberRequest, error) {
 	projectMembers := make([]*management_pb.AddProjectGrantMemberRequest, 0)
 
 	for _, projectID := range processedProjects {
-		queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org})
-		if err != nil {
-			return nil, err
-		}
-		for _, projectMember := range queriedProjectMembers.Members {
-			for _, userID := range processedUsers {
-				if userID == projectMember.UserID {
-					projectMembers = append(projectMembers, &management_pb.AddProjectGrantMemberRequest{
-						ProjectId: projectID,
-						UserId:    userID,
-						Roles:     projectMember.Roles,
-					})
-					break
+		for _, grantID := range processedGrants {
+			search, err := query.NewMemberResourceOwnerSearchQuery(org)
+			if err != nil {
+				return nil, err
+			}
+
+			queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org, GrantID: grantID, MembersQuery: query.MembersQuery{Queries: []query.SearchQuery{search}}})
+			if err != nil {
+				return nil, err
+			}
+			for _, projectMember := range queriedProjectMembers.Members {
+				for _, userID := range processedUsers {
+					if userID == projectMember.UserID {
+
+						projectMembers = append(projectMembers, &management_pb.AddProjectGrantMemberRequest{
+							ProjectId: projectID,
+							UserId:    userID,
+							GrantId:   grantID,
+							Roles:     projectMember.Roles,
+						})
+						break
+					}
 				}
+
 			}
 		}
 	}
@@ -368,8 +558,8 @@ func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, p
 	return orgMembers, nil
 }
 
-func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*management_pb.AddProjectGrantRequest, error) {
-	projectGrants := make([]*management_pb.AddProjectGrantRequest, 0)
+func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*admin_pb.DataProjectGrant, error) {
+	projectGrants := make([]*admin_pb.DataProjectGrant, 0)
 	projectGrantSearchOrg, err := query.NewProjectGrantResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, err
@@ -384,10 +574,13 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 				foundOrg := false
 				for _, orgID := range processedOrgs {
 					if orgID == projectGrant.GrantedOrgID {
-						projectGrants = append(projectGrants, &management_pb.AddProjectGrantRequest{
-							ProjectId:    projectGrant.ProjectID,
-							GrantedOrgId: projectGrant.GrantedOrgID,
-							RoleKeys:     projectGrant.GrantedRoleKeys,
+						projectGrants = append(projectGrants, &admin_pb.DataProjectGrant{
+							GrantId: projectGrant.GrantID,
+							ProjectGrant: &management_pb.AddProjectGrantRequest{
+								ProjectId:    projectGrant.ProjectID,
+								GrantedOrgId: projectGrant.GrantedOrgID,
+								RoleKeys:     projectGrant.GrantedRoleKeys,
+							},
 						})
 						foundOrg = true
 						break
@@ -402,13 +595,14 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 	return projectGrants, nil
 }
 
-func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, processedProjects []string, processedUsers []string) ([]*management_pb.AddUserGrantRequest, error) {
+func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) ([]*management_pb.AddUserGrantRequest, error) {
 	userGrants := make([]*management_pb.AddUserGrantRequest, 0)
 
 	userGrantSearchOrg, err := query.NewUserGrantResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, err
 	}
+
 	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}})
 	if err != nil {
 		return nil, err
@@ -416,20 +610,33 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	for _, userGrant := range queriedUserGrants.UserGrants {
 		for _, projectID := range processedProjects {
 			if projectID == userGrant.ProjectID {
-				foundUser := false
-				for _, userID := range processedUsers {
-					if userID == userGrant.UserID {
-						userGrants = append(userGrants, &management_pb.AddUserGrantRequest{
-							UserId:    userGrant.UserID,
-							ProjectId: userGrant.ProjectID,
-							RoleKeys:  userGrant.Roles,
-						})
-						foundUser = true
-						break
+				//if usergrant is on a granted project
+				if userGrant.GrantID != "" {
+					for _, grantID := range processedGrants {
+						if grantID == userGrant.GrantID {
+							for _, userID := range processedUsers {
+								if userID == userGrant.UserID {
+									userGrants = append(userGrants, &management_pb.AddUserGrantRequest{
+										UserId:         userGrant.UserID,
+										ProjectId:      userGrant.ProjectID,
+										ProjectGrantId: userGrant.GrantID,
+										RoleKeys:       userGrant.Roles,
+									})
+								}
+							}
+						}
 					}
-				}
-				if foundUser {
-					break
+				} else {
+					for _, userID := range processedUsers {
+						if userID == userGrant.UserID {
+							userGrants = append(userGrants, &management_pb.AddUserGrantRequest{
+								UserId:         userGrant.UserID,
+								ProjectId:      userGrant.ProjectID,
+								ProjectGrantId: userGrant.GrantID,
+								RoleKeys:       userGrant.Roles,
+							})
+						}
+					}
 				}
 			}
 		}

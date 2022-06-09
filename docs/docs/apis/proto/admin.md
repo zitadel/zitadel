@@ -1759,7 +1759,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org_id |  string | - |  |
-| owner_id |  string | - |  |
 | org |  zitadel.management.v1.AddOrgRequest | - |  |
 | domain_policy |  AddCustomDomainPolicyRequest | - |  |
 | label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
@@ -1768,12 +1767,14 @@ This is an empty request
 | password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
 | privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
 | projects | repeated DataProject | - |  |
+| project_roles | repeated zitadel.management.v1.AddProjectRoleRequest | - |  |
 | api_apps | repeated DataAPIApplication | - |  |
 | oidc_apps | repeated DataOIDCApplication | - |  |
 | human_users | repeated DataHumanUser | - |  |
 | machine_users | repeated DataMachineUser | - |  |
+| trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
 | actions | repeated DataAction | - |  |
-| project_grants | repeated zitadel.management.v1.AddProjectGrantRequest | - |  |
+| project_grants | repeated DataProjectGrant | - |  |
 | user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
 | org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
 | project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
@@ -1789,8 +1790,19 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | project_id |  string | - |  |
-| owner_id |  string | - |  |
 | project |  zitadel.management.v1.AddProjectRequest | - |  |
+
+
+
+
+### DataProjectGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| grant_id |  string | - |  |
+| project_grant |  zitadel.management.v1.AddProjectGrantRequest | - |  |
 
 
 
@@ -2647,11 +2659,13 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | org_id |  string | - |  |
 | project_ids | repeated string | - |  |
+| project_roles | repeated string | - |  |
 | oidc_app_ids | repeated string | - |  |
 | api_app_ids | repeated string | - |  |
 | human_user_ids | repeated string | - |  |
-| machin_user_ids | repeated string | - |  |
+| machine_user_ids | repeated string | - |  |
 | action_ids | repeated string | - |  |
+| trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
 | project_grants | repeated ImportDataSuccessProjectGrant | - |  |
 | user_grants | repeated ImportDataSuccessUserGrant | - |  |
 | org_members | repeated string | - |  |
@@ -2667,6 +2681,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| grant_id |  string | - |  |
 | project_id |  string | - |  |
 | org_id |  string | - |  |
 

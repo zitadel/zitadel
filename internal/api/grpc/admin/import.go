@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/domain"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (*admin_pb.ImportDataResponse, error) {
@@ -23,9 +24,21 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 		_, err := s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
 		if err != nil {
 			errors = append(errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
-			continue
 		}
-		successOrg := &admin_pb.ImportDataSuccessOrg{OrgId: org.GetOrgId()}
+		successOrg := &admin_pb.ImportDataSuccessOrg{
+			OrgId:               org.GetOrgId(),
+			ProjectIds:          []string{},
+			OidcAppIds:          []string{},
+			ApiAppIds:           []string{},
+			HumanUserIds:        []string{},
+			MachineUserIds:      []string{},
+			ActionIds:           []string{},
+			ProjectGrants:       []*admin_pb.ImportDataSuccessProjectGrant{},
+			UserGrants:          []*admin_pb.ImportDataSuccessUserGrant{},
+			OrgMembers:          []string{},
+			ProjectMembers:      []*admin_pb.ImportDataSuccessProjectMember{},
+			ProjectGrantMembers: []*admin_pb.ImportDataSuccessProjectGrantMember{},
+		}
 
 		domainPolicy := org.GetDomainPolicy()
 		if org.DomainPolicy != nil {
@@ -81,7 +94,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
 					continue
 				}
-				successOrg.MachinUserIds = append(successOrg.MachinUserIds, user.GetUserId())
+				successOrg.MachineUserIds = append(successOrg.MachineUserIds, user.GetUserId())
 			}
 		}
 		if org.Projects != nil {
@@ -124,14 +137,44 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				successOrg.ActionIds = append(successOrg.ActionIds, action.ActionId)
 			}
 		}
-		if org.ProjectGrants != nil {
-			for _, grant := range org.GetProjectGrants() {
-				_, err := s.command.AddProjectGrant(ctx, management.AddProjectGrantRequestToDomain(grant), org.GetOrgId())
+		if org.ProjectRoles != nil {
+			for _, role := range org.GetProjectRoles() {
+				_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToDomain(role), org.GetOrgId())
 				if err != nil {
-					errors = append(errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectId() + "_" + grant.GetGrantedOrgId(), Message: err.Error()})
+					errors = append(errors, &admin_pb.ImportDataError{Type: "project_role", Id: role.ProjectId + "_" + role.RoleKey, Message: err.Error()})
 					continue
 				}
-				successOrg.ProjectGrants = append(successOrg.ProjectGrants, &admin_pb.ImportDataSuccessProjectGrant{ProjectId: grant.GetProjectId(), OrgId: grant.GetGrantedOrgId()})
+				successOrg.ProjectRoles = append(successOrg.ActionIds, role.ProjectId+"_"+role.RoleKey)
+			}
+		}
+		success.Orgs = append(success.Orgs, successOrg)
+	}
+
+	for _, org := range req.GetOrgs() {
+		var successOrg *admin_pb.ImportDataSuccessOrg
+		for _, oldOrd := range success.Orgs {
+			if org.OrgId == oldOrd.OrgId {
+				successOrg = oldOrd
+			}
+		}
+		if org.TriggerActions != nil {
+			for _, triggerAction := range org.GetTriggerActions() {
+				_, err := s.command.SetTriggerActions(ctx, domain.FlowType(triggerAction.FlowType), domain.TriggerType(triggerAction.TriggerType), triggerAction.ActionIds, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "trigger_action", Id: triggerAction.FlowType.String() + "_" + triggerAction.TriggerType.String(), Message: err.Error()})
+					continue
+				}
+				successOrg.TriggerActions = append(successOrg.TriggerActions, &management_pb.SetTriggerActionsRequest{FlowType: triggerAction.FlowType, TriggerType: triggerAction.TriggerType, ActionIds: triggerAction.GetActionIds()})
+			}
+		}
+		if org.ProjectGrants != nil {
+			for _, grant := range org.GetProjectGrants() {
+				_, err := s.command.AddProjectGrantWithID(ctx, management.AddProjectGrantRequestToDomain(grant.GetProjectGrant()), grant.GetGrantId(), org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectGrant().GetProjectId() + "_" + grant.GetProjectGrant().GetGrantedOrgId(), Message: err.Error()})
+					continue
+				}
+				successOrg.ProjectGrants = append(successOrg.ProjectGrants, &admin_pb.ImportDataSuccessProjectGrant{GrantId: grant.GetGrantId(), ProjectId: grant.GetProjectGrant().GetProjectId(), OrgId: grant.GetProjectGrant().GetGrantedOrgId()})
 			}
 		}
 		if org.UserGrants != nil {
@@ -144,40 +187,52 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				successOrg.UserGrants = append(successOrg.UserGrants, &admin_pb.ImportDataSuccessUserGrant{ProjectId: grant.GetProjectId(), UserId: grant.GetUserId()})
 			}
 		}
-		if org.OrgMembers != nil {
-			for _, member := range org.GetOrgMembers() {
-				_, err := s.command.AddOrgMember(ctx, org.GetOrgId(), member.GetUserId(), member.GetRoles()...)
-				if err != nil {
-					errors = append(errors, &admin_pb.ImportDataError{Type: "org_member", Id: org.GetOrgId() + "_" + member.GetUserId(), Message: err.Error()})
-					continue
-				}
-				successOrg.OrgMembers = append(successOrg.OrgMembers, member.GetUserId())
-			}
-		}
-		if org.ProjectGrantMembers != nil {
-			for _, member := range org.GetProjectGrantMembers() {
-				_, err := s.command.AddProjectGrantMember(ctx, management.AddProjectGrantMemberRequestToDomain(member))
-				if err != nil {
-					errors = append(errors, &admin_pb.ImportDataError{Type: "project_grant_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetGrantId() + "_" + member.GetUserId(), Message: err.Error()})
-					continue
-				}
-				successOrg.ProjectGrantMembers = append(successOrg.ProjectGrantMembers, &admin_pb.ImportDataSuccessProjectGrantMember{ProjectId: member.GetProjectId(), GrantId: member.GetProjectId(), UserId: member.GetUserId()})
-			}
-		}
-		if org.ProjectMembers != nil {
-			for _, member := range org.GetProjectMembers() {
-				_, err := s.command.AddProjectMember(ctx, management.AddProjectMemberRequestToDomain(member), org.GetOrgId())
-				if err != nil {
-					errors = append(errors, &admin_pb.ImportDataError{Type: "project_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetUserId(), Message: err.Error()})
-					continue
-				}
-				successOrg.ProjectMembers = append(successOrg.ProjectMembers, &admin_pb.ImportDataSuccessProjectMember{ProjectId: member.GetProjectId(), UserId: member.GetUserId()})
-			}
-
-			success.Orgs = append(success.Orgs, successOrg)
-		}
 	}
 
+	if success != nil && success.Orgs != nil {
+		for _, org := range req.GetOrgs() {
+			var successOrg *admin_pb.ImportDataSuccessOrg
+			for _, oldOrd := range success.Orgs {
+				if org.OrgId == oldOrd.OrgId {
+					successOrg = oldOrd
+				}
+			}
+			if successOrg == nil {
+				continue
+			}
+
+			if org.OrgMembers != nil {
+				for _, member := range org.GetOrgMembers() {
+					_, err := s.command.AddOrgMember(ctx, org.GetOrgId(), member.GetUserId(), member.GetRoles()...)
+					if err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "org_member", Id: org.GetOrgId() + "_" + member.GetUserId(), Message: err.Error()})
+						continue
+					}
+					successOrg.OrgMembers = append(successOrg.OrgMembers, member.GetUserId())
+				}
+			}
+			if org.ProjectGrantMembers != nil {
+				for _, member := range org.GetProjectGrantMembers() {
+					_, err := s.command.AddProjectGrantMember(ctx, management.AddProjectGrantMemberRequestToDomain(member))
+					if err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "project_grant_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetGrantId() + "_" + member.GetUserId(), Message: err.Error()})
+						continue
+					}
+					successOrg.ProjectGrantMembers = append(successOrg.ProjectGrantMembers, &admin_pb.ImportDataSuccessProjectGrantMember{ProjectId: member.GetProjectId(), GrantId: member.GetGrantId(), UserId: member.GetUserId()})
+				}
+			}
+			if org.ProjectMembers != nil {
+				for _, member := range org.GetProjectMembers() {
+					_, err := s.command.AddProjectMember(ctx, management.AddProjectMemberRequestToDomain(member), org.GetOrgId())
+					if err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "project_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetUserId(), Message: err.Error()})
+						continue
+					}
+					successOrg.ProjectMembers = append(successOrg.ProjectMembers, &admin_pb.ImportDataSuccessProjectMember{ProjectId: member.GetProjectId(), UserId: member.GetUserId()})
+				}
+			}
+		}
+	}
 	return &admin_pb.ImportDataResponse{
 		Errors:  errors,
 		Success: success,
