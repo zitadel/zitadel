@@ -41,6 +41,7 @@
     class="set-password-btn"
     [disabled]="(['iam.write'] | hasRole | async) === false"
     (click)="setSMTPPassword()"
+    type="button"
     mat-stroked-button
   >
     {{ 'SETTING.SMTP.SETPASSWORD' | translate }}

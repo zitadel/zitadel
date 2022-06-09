@@ -886,7 +886,10 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
-        "ADDED": "Twilio added successfully."
+        "ADDED": "Twilio added successfully.",
+        "CHANGETOKEN": "Change Token",
+        "SETTOKEN": "Set Token",
+        "TOKENSET": "Token successfully set."
       }
     },
     "OIDC": {

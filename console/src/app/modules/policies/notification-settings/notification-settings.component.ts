@@ -3,10 +3,10 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs';
 import {
-    AddSMSProviderTwilioRequest,
-    UpdateSMTPConfigPasswordRequest,
-    UpdateSMTPConfigPasswordResponse,
-    UpdateSMTPConfigRequest,
+  AddSMSProviderTwilioRequest,
+  UpdateSMTPConfigPasswordRequest,
+  UpdateSMTPConfigPasswordResponse,
+  UpdateSMTPConfigRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -16,7 +16,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
-import { SMTPPasswordDialogComponent } from './smtp-password-dialog/smtp-password-dialog.component';
+import { PasswordDialogComponent } from './password-dialog/password-dialog.component';
 
 @Component({
   selector: 'cnsl-notification-settings',
@@ -178,8 +178,12 @@ export class NotificationSettingsComponent implements OnInit {
   }
 
   public setSMTPPassword(): void {
-    const dialogRef = this.dialog.open(SMTPPasswordDialogComponent, {
+    const dialogRef = this.dialog.open(PasswordDialogComponent, {
       width: '400px',
+      data: {
+        i18nTitle: 'SETTING.SMTP.SETPASSWORD',
+        i18nLabel: 'SETTING.SMTP.PASSWORD',
+      },
     });
 
     dialogRef.afterClosed().subscribe((password: string) => {

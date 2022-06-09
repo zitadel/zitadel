@@ -15,10 +15,10 @@ import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSettingsComponent } from './notification-settings.component';
-import { SMTPPasswordDialogComponent } from './smtp-password-dialog/smtp-password-dialog.component';
+import { PasswordDialogComponent } from './password-dialog/password-dialog.component';
 
 @NgModule({
-  declarations: [NotificationSettingsComponent, DialogAddSMSProviderComponent, SMTPPasswordDialogComponent],
+  declarations: [NotificationSettingsComponent, DialogAddSMSProviderComponent, PasswordDialogComponent],
   imports: [
     CommonModule,
     CardModule,
