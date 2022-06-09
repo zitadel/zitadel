@@ -51,8 +51,8 @@ In this exercise we will add a new Google identity provider to federate identiti
 
 1. Register an OIDC Client in your preferred provider
 2. Make sure you add the ZITADEL callback redirect uris
-   https://accounts.zitadel.ch/register/externalidp/callback
-   https://accounts.zitadel.ch/login/externalidp/callback
+   - {your-domain}/ui/login/register/externalidp/callback
+   - {your-domain}/ui/login/login/externalidp/callback
 
 > **Information:** Make sure the provider is OIDC 1.0 compliant with a proper Discovery Endpoint
 
@@ -61,7 +61,9 @@ Google Example:
 1. Go to the Google Gloud Platform and choose youre project: <https://console.cloud.google.com/apis/credentials>
 2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
 3. Choose Web application as Application type and give a name
-4. Add the redirect uris from above
+4. Add the redirect uris
+   - {your-domain}/ui/login/register/externalidp/callback
+   - {your-domain}/ui/login/login/externalidp/callback
 5. Save clientid and client secret
 
 ![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
@@ -78,14 +80,15 @@ This case describes how to change it on the organization.
 
 ### 3.Configure new identity provider
 
-1. Go to the identity providers section and click new
-2. Fill out the form
-   - Use the issuer, clientid and client secret provided by your provider
+1. Go to the settings of your instance or a specific organization (depending on where you need the identity provider)
+2. Go to the identity providers section and click "New"
+3. Select "OIDC Configuration" and fill out the form
+   - Use the issuer, clientid and client secret provided by your provider (Google Issuer: https://accounts.google.com)
    - The scopes will be prefilled with openid, profile and email, because this information is relevant for ZITADEL
    - You can choose what fields you like to map as the display name and as username. The fields you can choose are preferred_username and email
      (Example: For Google you should choose email for both fields)
-3. Save your configuration
-4. Link your new configuration to your login policy. By searching in the organization category you will get you own configuration. If you choose system you can link all predefined providers.
+4. Save your configuration
+5. You will now see the created configuration in the list. Click on the activate icon at the end of the row you can see when hovering over the row, to activate it in the login flow.
 
 ![Configure identity provider](/img/console_org_identity_provider.gif)
 
