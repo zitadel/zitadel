@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { PasswordDialogComponent } from './password-dialog.component';
 
-describe('CodeDialogComponent', () => {
+describe('PasswordDialogComponent', () => {
   let component: PasswordDialogComponent;
   let fixture: ComponentFixture<PasswordDialogComponent>;
 
