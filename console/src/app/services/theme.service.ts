@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { ManagementService } from './mgmt.service';
+import { GrpcAuthService } from './grpc-auth.service';
 
 declare const tinycolor: any;
 
@@ -21,7 +21,7 @@ export class ThemeService {
   private warnColorPalette: Color[] = [];
   private backgroundColorPalette: Color[] = [];
 
-  constructor(private mgmtService: ManagementService) {
+  constructor(private authService: GrpcAuthService) {
     const theme = localStorage.getItem('theme');
     if (theme) {
       if (theme === 'light-theme') {
@@ -146,8 +146,8 @@ export class ThemeService {
     const isDark = (color: string) => this.isDark(color);
     const isLight = (color: string) => this.isLight(color);
 
-    this.mgmtService
-      .getLabelPolicy()
+    this.authService
+      .getMyLabelPolicy()
       .then((lpresp) => {
         const labelpolicy = lpresp.policy;
 
