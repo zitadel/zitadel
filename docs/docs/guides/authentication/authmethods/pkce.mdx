@@ -33,7 +33,7 @@ The request would finally look like (linebreaks and whitespace for display reaso
 
 ```curl
 curl --request GET \
-  --url 'https://accounts.zitadel.ch/oauth/v2/authorize
+  --url '{your-domain}/oauth/v2/authorize
     ?client_id=${client_id}
     &redirect_uri=${redirect_uri}
     &response_type=code
@@ -78,7 +78,7 @@ Send your `client_id` and the previously generated string as `code_verifier` for
 
 ```curl
 curl --request POST \
---url https://api.zitadel.ch/oauth/v2/token \
+--url {your-domain}/oauth/v2/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
 --data code=${code} \
