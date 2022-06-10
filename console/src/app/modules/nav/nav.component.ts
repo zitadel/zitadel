@@ -1,7 +1,7 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -80,7 +80,7 @@ export class NavComponent implements OnDestroy {
   );
 
   @Input() public org!: Org.AsObject;
-  public filterControl: FormControl = new FormControl('');
+  public filterControl: UntypedFormControl = new UntypedFormControl('');
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public showAccount: boolean = false;
   public hideAdminWarn: boolean = true;

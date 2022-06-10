@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
@@ -43,11 +43,11 @@ export class LoginPolicyComponent implements OnInit {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
-  public lifetimeForm!: FormGroup;
+  public lifetimeForm!: UntypedFormGroup;
   constructor(
     private toast: ToastService,
     private injector: Injector,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private authService: GrpcAuthService,
     private dialog: MatDialog,
   ) {
