@@ -81,6 +81,24 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 	}, nil
 }
 
+func (c *Commands) RemoveSMTPConfig(ctx context.Context) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareRemoveSMTPConfig(instanceAgg)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
 func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, host, user string, password []byte, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
@@ -166,6 +184,23 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 			}
 			return []eventstore.Command{
 				changedEvent,
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareRemoveSMTPConfig(a *instance.Aggregate) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getSMTPConfigWriteModel(ctx, filter, "")
+			if err != nil {
+				return nil, err
+			}
+			if writeModel.State != domain.SMTPConfigStateActive {
+				return nil, errors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
+			}
+			return []eventstore.Command{
+				instance.NewSMTPConfigRemovedEvent(ctx, &a.Aggregate),
 			}, nil
 		}, nil
 	}

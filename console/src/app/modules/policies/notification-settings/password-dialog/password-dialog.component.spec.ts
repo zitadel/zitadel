@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { SMTPPasswordDialogComponent } from './smtp-password-dialog.component';
+import { PasswordDialogComponent } from './password-dialog.component';
 
-describe('CodeDialogComponent', () => {
-  let component: SMTPPasswordDialogComponent;
-  let fixture: ComponentFixture<SMTPPasswordDialogComponent>;
+describe('PasswordDialogComponent', () => {
+  let component: PasswordDialogComponent;
+  let fixture: ComponentFixture<PasswordDialogComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SMTPPasswordDialogComponent],
+      declarations: [PasswordDialogComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SMTPPasswordDialogComponent);
+    fixture = TestBed.createComponent(PasswordDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
