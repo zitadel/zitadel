@@ -82,6 +82,14 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			if e.User != nil {
 				wm.User = *e.User
 			}
+		case *instance.SMTPConfigRemovedEvent:
+			wm.State = domain.SMTPConfigStateRemoved
+			wm.TLS = false
+			wm.SenderName = ""
+			wm.SenderAddress = ""
+			wm.Host = ""
+			wm.User = ""
+			wm.Password = nil
 		case *instance.DomainAddedEvent:
 			wm.domainState = domain.InstanceDomainStateActive
 		case *instance.DomainRemovedEvent:

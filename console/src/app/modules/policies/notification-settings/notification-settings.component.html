@@ -39,8 +39,9 @@
 
   <button
     class="set-password-btn"
-    [disabled]="(['iam.write'] | hasRole | async) === false"
+    [disabled]="(['iam.write'] | hasRole | async) === false || !hasSMTPConfig"
     (click)="setSMTPPassword()"
+    type="button"
     mat-stroked-button
   >
     {{ 'SETTING.SMTP.SETPASSWORD' | translate }}
@@ -77,7 +78,7 @@
       ></span>
 
       <span class="fill-space"></span>
-      <button [disabled]="(['iam.write'] | hasRole | async) === false" mat-icon-button (click)="addSMSProvider()">
+      <button [disabled]="(['iam.write'] | hasRole | async) === false" mat-icon-button (click)="editSMSProvider()">
         <i class="las la-pen"></i>
       </button>
     </div>

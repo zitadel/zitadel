@@ -109,6 +109,7 @@
           flex: 1;
           display: flex;
           flex-direction: column;
+          overflow-x: hidden;
 
           .user-title {
             font-weight: 500;
@@ -123,11 +124,14 @@
           .loginname {
             font-size: 0.8rem;
             line-height: 1rem;
+            white-space: nowrap;
             width: fit-content;
           }
 
           .loginname {
             color: $secondary-text;
+            text-overflow: ellipsis;
+            overflow: hidden;
           }
 
           .state {
@@ -135,10 +139,6 @@
             font-size: 11px;
             padding: 1px 0.5rem;
           }
-        }
-
-        .fill-space {
-          flex: 1;
         }
       }
     }
