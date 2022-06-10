@@ -68,7 +68,7 @@ import GrantedProjectDescription from '../../concepts/structure/_granted_project
 3. Select some roles you would like to grant to the organization ACME and confirm.
 4. You should now see ACME-CAOS in the section GRANTED ORGANIZATIONS
 
-![Grant a project](/img/projects_create_org_grant_caos2acme.gif)
+![Grant a project](/img/projects_create_org_grant.gif)
 
 ## Knowledge Check (2)
 
