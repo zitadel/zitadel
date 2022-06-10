@@ -97,7 +97,7 @@ type orgViewProvider interface {
 
 type userGrantProvider interface {
 	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
-	UserGrantsByProjectAndUserID(string, string) ([]*query.UserGrant, error)
+	UserGrantsByProjectAndUserID(context.Context, string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
@@ -1266,7 +1266,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	if !project.ProjectRoleCheck {
 		return false, nil
 	}
-	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(project.ID, user.ID)
+	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(ctx, project.ID, user.ID)
 	if err != nil {
 		return false, err
 	}

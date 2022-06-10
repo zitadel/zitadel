@@ -92,6 +92,7 @@ IdQuery is always equals
 | state |  State | - |  |
 | name |  string | - |  |
 | version |  string | - |  |
+| domains | repeated Domain | - |  |
 
 
 

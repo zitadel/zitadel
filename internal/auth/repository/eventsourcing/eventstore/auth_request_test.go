@@ -195,7 +195,7 @@ func (m *mockUserGrants) ProjectByOIDCClientID(ctx context.Context, s string) (*
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
-func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*query.UserGrant, error) {
+func (m *mockUserGrants) UserGrantsByProjectAndUserID(ctx context.Context, s string, s2 string) ([]*query.UserGrant, error) {
 	var grants []*query.UserGrant
 	if m.userGrants > 0 {
 		grants = make([]*query.UserGrant, m.userGrants)

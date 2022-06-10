@@ -170,7 +170,7 @@ func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, instanceID, id
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveSMSConfigTwilio(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-3j9fs", "Errors.IDMissing")
 	}
@@ -178,7 +178,7 @@ func (c *Commands) RemoveSMSConfigTwilio(ctx context.Context, instanceID, id str
 	if err != nil {
 		return nil, err
 	}
-	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
+	if !smsConfigWriteModel.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
 	}
 
