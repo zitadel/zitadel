@@ -2,6 +2,7 @@ package setup
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
@@ -57,6 +58,9 @@ type encryptionKeyConfig struct {
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("ZITADEL")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetConfigType("yaml")
 	err := v.ReadConfig(bytes.NewBuffer(defaultSteps))
 	logging.OnError(err).Fatal("unable to read setup steps")
