@@ -164,7 +164,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Users
 		******************************************************************************************************************/
-		humanUsers, machineUsers, err := s.getUsers(ctx, queriedOrg.ID)
+		humanUsers, machineUsers, err := s.getUsers(ctx, queriedOrg.ID, req.WithPasswords)
 		if err != nil {
 			return nil, err
 		}
@@ -265,7 +265,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	}, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, error) {
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
 		return nil, nil, err
@@ -281,9 +281,9 @@ func (s *Server) getUsers(ctx context.Context, org string) ([]*admin_pb.DataHuma
 		case domain.UserTypeHuman:
 			dataUser := &admin_pb.DataHumanUser{
 				UserId: user.ID,
-				User: &management_pb.AddHumanUserRequest{
+				User: &management_pb.ImportHumanUserRequest{
 					UserName: user.Username,
-					Profile: &management_pb.AddHumanUserRequest_Profile{
+					Profile: &management_pb.ImportHumanUserRequest_Profile{
 						FirstName:         user.Human.FirstName,
 						LastName:          user.Human.LastName,
 						NickName:          user.Human.NickName,
@@ -294,17 +294,30 @@ func (s *Server) getUsers(ctx context.Context, org string) ([]*admin_pb.DataHuma
 				},
 			}
 			if user.Human.Email != "" {
-				dataUser.User.Email = &management_pb.AddHumanUserRequest_Email{
+				dataUser.User.Email = &management_pb.ImportHumanUserRequest_Email{
 					Email:           user.Human.Email,
 					IsEmailVerified: user.Human.IsEmailVerified,
 				}
 			}
 			if user.Human.Phone != "" {
-				dataUser.User.Phone = &management_pb.AddHumanUserRequest_Phone{
+				dataUser.User.Phone = &management_pb.ImportHumanUserRequest_Phone{
 					Phone:           user.Human.Phone,
 					IsPhoneVerified: user.Human.IsPhoneVerified,
 				}
 			}
+			if withPasswords {
+				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
+				if err != nil {
+					return nil, nil, err
+				}
+				if hashedPassword != nil {
+					dataUser.User.HashedPassword = &management_pb.ImportHumanUserRequest_HashedPassword{
+						Value:     string(hashedPassword),
+						Algorithm: hashAlgorithm,
+					}
+				}
+			}
+
 			humanUsers = append(humanUsers, dataUser)
 		case domain.UserTypeMachine:
 			machineUsers = append(machineUsers, &admin_pb.DataMachineUser{

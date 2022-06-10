@@ -17,6 +17,18 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 	if err != nil {
 		return nil, err
 	}
+	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
 
 	ctxData := authz.GetCtxData(ctx)
 
@@ -79,7 +91,9 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 		}
 		if org.HumanUsers != nil {
 			for _, user := range org.GetHumanUsers() {
-				_, err := s.command.AddHumanWithID(ctx, org.GetOrgId(), user.GetUserId(), management.AddHumanUserRequestToAddHuman(user.GetUser()))
+				human, passwordless := management.ImportHumanUserRequestToDomain(user.User)
+				human.AggregateID = user.UserId
+				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 					continue

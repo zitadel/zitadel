@@ -4568,7 +4568,7 @@ message DataOIDCApplication {
 }
 message DataHumanUser {
     string user_id = 1;
-    zitadel.management.v1.AddHumanUserRequest user = 2;
+    zitadel.management.v1.ImportHumanUserRequest user = 2;
 }
 message DataMachineUser {
     string user_id = 1;
@@ -4632,6 +4632,7 @@ message ImportDataSuccessProjectGrantMember{
 }
 message ExportDataRequest {
     repeated string org_ids = 1;
+    bool with_passwords = 2;
 }
 message ExportDataResponse {
     repeated DataOrg orgs = 1;

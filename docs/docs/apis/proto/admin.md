@@ -1723,7 +1723,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - |  |
-| user |  zitadel.management.v1.AddHumanUserRequest | - |  |
+| user |  zitadel.management.v1.ImportHumanUserRequest | - |  |
 
 
 
@@ -1836,6 +1836,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org_ids | repeated string | - |  |
+| with_passwords |  bool | - |  |
 
 
 

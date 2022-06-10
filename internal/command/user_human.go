@@ -47,6 +47,8 @@ type AddHuman struct {
 	Phone Phone
 	//Password is optional
 	Password string
+	//BcryptedPassword is optional
+	BcryptedPassword string
 	//PasswordChangeRequired is used if the `Password`-field is set
 	PasswordChangeRequired bool
 	Passwordless           bool
@@ -182,6 +184,10 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 					return nil, err
 				}
 				createCmd.AddPasswordData(secret, human.PasswordChangeRequired)
+			}
+
+			if human.BcryptedPassword != "" {
+				createCmd.AddPasswordData(crypto.FillHash([]byte(human.BcryptedPassword), passwordAlg), human.PasswordChangeRequired)
 			}
 
 			cmds := make([]eventstore.Command, 0, 3)
@@ -372,8 +378,8 @@ func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Hum
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-67Ms8", "Errors.User.Invalid")
 	}
-	if human.Password != nil && human.SecretString != "" {
-		human.ChangeRequired = true
+	if human.Password != nil && human.Password.SecretString != "" {
+		human.Password.ChangeRequired = true
 	}
 	return c.createHuman(ctx, orgID, human, nil, false, false, domainPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 }
@@ -401,11 +407,11 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	if human != nil && human.Username == "" {
 		human.Username = human.EmailAddress
 	}
-	if orgID == "" || !human.IsValid() || link == nil && (human.Password == nil || human.SecretString == "") {
+	if orgID == "" || !human.IsValid() || link == nil && (human.Password == nil || human.Password.SecretString == "") {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-9dk45", "Errors.User.Invalid")
 	}
-	if human.Password != nil && human.SecretString != "" {
-		human.ChangeRequired = false
+	if human.Password != nil && human.Password.SecretString != "" {
+		human.Password.ChangeRequired = false
 	}
 	return c.createHuman(ctx, orgID, human, link, true, false, domainPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 }
@@ -427,14 +433,18 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 			return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 		}
 	}
-	userID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, nil, err
+
+	if human.AggregateID == "" {
+		userID, err := c.idGenerator.Next()
+		if err != nil {
+			return nil, nil, err
+		}
+		human.AggregateID = userID
 	}
-	human.AggregateID = userID
+
 	human.SetNamesAsDisplayname()
 	if human.Password != nil {
-		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.ChangeRequired); err != nil {
+		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.Password.ChangeRequired); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -527,7 +537,10 @@ func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, h
 			human.StreetAddress)
 	}
 	if human.Password != nil {
-		addEvent.AddPasswordData(human.SecretCrypto, human.ChangeRequired)
+		addEvent.AddPasswordData(human.Password.SecretCrypto, human.Password.ChangeRequired)
+	}
+	if human.HashedPassword != nil {
+		addEvent.AddPasswordData(human.HashedPassword.SecretCrypto, false)
 	}
 	return addEvent
 }
@@ -558,7 +571,10 @@ func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggrega
 			human.StreetAddress)
 	}
 	if human.Password != nil {
-		addEvent.AddPasswordData(human.SecretCrypto, human.ChangeRequired)
+		addEvent.AddPasswordData(human.Password.SecretCrypto, human.Password.ChangeRequired)
+	}
+	if human.HashedPassword != nil {
+		addEvent.AddPasswordData(human.HashedPassword.SecretCrypto, false)
 	}
 	return addEvent
 }
