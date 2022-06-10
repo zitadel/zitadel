@@ -184,10 +184,21 @@ service AdminService {
         };
     }
 
-    // Returns the domains of an instance
+    // Returns the details of the instance
+    rpc GetMyInstance(GetMyInstanceRequest) returns (GetMyInstanceResponse) {
+        option (google.api.http) = {
+            get: "/instances/me";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Returns the domains of the instance
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
-            get: "/domains";
+            post: "/domains/_search";
         };
     }
 
@@ -2638,6 +2649,13 @@ message GetDefaultOrgRequest {}
 
 message GetDefaultOrgResponse {
     zitadel.org.v1.Org org = 1;
+}
+
+//This is an empty request
+message GetMyInstanceRequest {}
+
+message GetMyInstanceResponse {
+    zitadel.instance.v1.InstanceDetail instance = 1;
 }
 
 message ListInstanceDomainsRequest {
