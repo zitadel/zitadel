@@ -83,6 +83,10 @@ func (p *SMSConfigProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceSMSConfigTwilioChanged,
 				},
 				{
+					Event:  instance.SMSConfigTwilioTokenChangedEventType,
+					Reduce: p.reduceSMSConfigTwilioTokenChanged,
+				},
+				{
 					Event:  instance.SMSConfigActivatedEventType,
 					Reduce: p.reduceSMSConfigActivated,
 				},
@@ -111,7 +115,6 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 			[]handler.Column{
 				handler.NewCol(SMSColumnID, e.ID),
 				handler.NewCol(SMSColumnAggregateID, e.Aggregate().ID),
-				handler.NewCol(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSColumnCreationDate, e.CreationDate()),
 				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
 				handler.NewCol(SMSColumnResourceOwner, e.Aggregate().ResourceOwner),
@@ -140,10 +143,43 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 	}
 	columns := make([]handler.Column, 0)
 	if e.SID != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSID, e.SID))
+		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSID, *e.SID))
 	}
 	if e.SenderNumber != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSenderNumber, e.SenderNumber))
+		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSenderNumber, *e.SenderNumber))
+	}
+
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(SMSTwilioConfigColumnSMSID, e.ID),
+				handler.NewCond(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(smsTwilioTableSuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
+				handler.NewCol(SMSColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(SMSColumnID, e.ID),
+				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *SMSConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.SMSConfigTwilioTokenChangedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioTokenChangedEventType)
+	}
+	columns := make([]handler.Column, 0)
+	if e.Token != nil {
+		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnToken, e.Token))
 	}
 
 	return crdb.NewMultiStatement(
