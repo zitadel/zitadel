@@ -26,7 +26,7 @@ ExternalPort: 443
 <!-- TODO: verify -->
 ZITADEL creates random subdomains for each instance created.
 However, for the default instance, this is most probably not the desired behavior.
-Your can give the default instance an explicit fixed custom domain here.
+You can give the default instance a fixed custom domain here.
 
 ```yaml
 S3DefaultInstance:
