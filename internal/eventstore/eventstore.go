@@ -104,10 +104,14 @@ func commandsToRepository(instanceID string, cmds []Command) (events []*reposito
 func uniqueConstraintsToRepository(instanceID string, constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
 	uniqueConstraints = make([]*repository.UniqueConstraint, len(constraints))
 	for i, constraint := range constraints {
+		var id string
+		if !constraint.IsGlobal {
+			id = instanceID
+		}
 		uniqueConstraints[i] = &repository.UniqueConstraint{
 			UniqueType:   constraint.UniqueType,
 			UniqueField:  constraint.UniqueField,
-			InstanceID:   instanceID,
+			InstanceID:   id,
 			Action:       uniqueConstraintActionToRepository(constraint.Action),
 			ErrorMessage: constraint.ErrorMessage,
 		}

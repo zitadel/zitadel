@@ -33,12 +33,8 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 		return nil, err
 	}
 	return &mgmt_pb.ListAppsResponse{
-		Result: project_grpc.AppsToPb(apps.Apps),
-		Details: object_grpc.ToListDetails(
-			apps.Count,
-			apps.Sequence,
-			apps.Timestamp,
-		),
+		Result:  project_grpc.AppsToPb(apps.Apps),
+		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.Timestamp),
 	}, nil
 }
 
@@ -49,7 +45,7 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 		return nil, err
 	}
 	return &mgmt_pb.ListAppChangesResponse{
-		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
@@ -251,12 +247,8 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 		return nil, err
 	}
 	return &mgmt_pb.ListAppKeysResponse{
-		Result: authn_grpc.KeysToPb(keys.AuthNKeys),
-		Details: object_grpc.ToListDetails(
-			keys.Count,
-			keys.Sequence,
-			keys.Timestamp,
-		),
+		Result:  authn_grpc.KeysToPb(keys.AuthNKeys),
+		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.Timestamp),
 	}, nil
 }
 

@@ -38,6 +38,11 @@ export class HeaderComponent implements OnDestroy {
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
+
+  public accountCardPositions: ConnectedPosition[] = [
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+  ];
   constructor(
     public authenticationService: AuthenticationService,
     private authService: GrpcAuthService,
@@ -67,10 +72,21 @@ export class HeaderComponent implements OnDestroy {
     return this.router.url === '/users/me';
   }
 
+  public errorHandler(event: any, fallbackSrc: string) {
+    (event.target as HTMLImageElement).src = fallbackSrc;
+  }
+
   public get isOnInstance(): boolean {
-    return (
-      ['/instance', '/views', '/orgs', '/settings', '/failed-events', '/instance/members'].includes(this.router.url) ||
-      this.router.url.includes('/settings')
-    );
+    const pages: string[] = [
+      '/instance',
+      '/settings',
+      '/views',
+      '/orgs',
+      '/settings',
+      '/failed-events',
+      '/instance/members',
+    ];
+
+    return pages.findIndex((p) => this.router.url.includes(p)) > -1;
   }
 }

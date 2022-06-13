@@ -3,7 +3,7 @@
 @import "../elevation/elevation";
 
 @mixin lgn-button-theme() {
-    @include lgn-button-color();
+  @include lgn-button-color();
 }
 
 @mixin lgn-button-color() {
@@ -16,10 +16,18 @@
     @include _lgn-button-theme-color(false);
   }
 
+  .lgn-stroked-button:hover,
+  .lgn-stroked-button:focus {
+    background: var(--zitadel-color-stroked-button-hover-background);
+  }
+
+  .lgn-stroked-button:active {
+    background: var(--zitadel-color-stroked-button-active-background);
+  }
+
   .lgn-button:focus,
-  .lgn-stroked-button:focus,
   .lgn-raised-button:focus {
-    @include lgn-button-elevation(8);
+    @include lgn-button-elevation(5);
     background: var(--zitadel-color-background);
   }
 
@@ -50,7 +58,7 @@
     @include _lgn-button-theme-background-color();
 
     &:active {
-      background-color: rgba(var(--zitadel-color-primary-rgb), 0.8);
+      background-color: var(--zitadel-color-raised-button-active-background);
     }
   }
 
@@ -63,7 +71,7 @@
     @include lgn-button-elevation(2);
 
     &:not([disabled]):active {
-      @include lgn-button-elevation(8);
+      @include lgn-button-elevation(5);
     }
 
     // &:focus {
@@ -81,7 +89,7 @@
     color: var(--zitadel-color-primary);
   }
   &.lgn-accent {
-    color: var(--zitadel-color-secondary);
+    color: var(--zitadel-color-primary);
   }
   &.lgn-warn {
     color: var(--zitadel-color-warn);
@@ -91,9 +99,9 @@
   &.lgn-accent,
   &.lgn-warn,
   &[disabled] {
-        &[disabled] {
-            color: var(--zitadel-color-button-disabled);
-        }
+    &[disabled] {
+      color: var(--zitadel-color-button-disabled);
+    }
   }
 }
 
@@ -102,7 +110,7 @@
     background-color: var(--zitadel-color-primary);
   }
   &.lgn-accent {
-    background-color: var(--zitadel-color-secondary);
+    background-color: var(--zitadel-color-primary);
   }
   &.lgn-warn {
     background-color: var(--zitadel-color-warn);
@@ -112,14 +120,18 @@
   &.lgn-accent,
   &.lgn-warn,
   &[disabled] {
-        &[disabled] {
-            background-color: var(--zitadel-color-button-disabled-background);
-        }
+    &[disabled] {
+      background-color: var(--zitadel-color-button-disabled-background);
+    }
   }
 }
 
 @mixin _lgn-button-theme-color($contrast) {
-  $color: if($contrast, var(--zitadel-color-primary-contrast), var(--zitadel-color-primary));
+  $color: if(
+    $contrast,
+    var(--zitadel-color-primary-contrast),
+    var(--zitadel-color-primary)
+  );
 
   &.lgn-primary {
     color: $color;
@@ -135,14 +147,13 @@
   &.lgn-accent,
   &.lgn-warn,
   &[disabled] {
-        &[disabled] {
-            color: var(--zitadel-color-button-disabled);
-        }
+    &[disabled] {
+      color: var(--zitadel-color-button-disabled);
+    }
   }
 }
 
 @mixin _lgn-button-theme-background-color() {
-
   &.lgn-primary {
     background-color: var(--zitadel-color-primary);
   }
@@ -157,20 +168,19 @@
   &.lgn-accent,
   &.lgn-warn,
   &[disabled] {
-        &[disabled] {
-            background-color: var(--zitadel-color-button-disabled-background);
-        }
+    &[disabled] {
+      background-color: var(--zitadel-color-button-disabled-background);
+    }
   }
 }
 
 @mixin _lgn-button-focus-overlay-color() {
-
   &.lgn-primary:focus {
     background-color: var(--zitadel-color-primary);
   }
 
   &.lgn-accent:focus {
-    background-color: var(--zitadel-color-secondary);
+    background-color: var(--zitadel-color-primary);
   }
 
   &.lgn-warn:focus {

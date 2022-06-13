@@ -323,6 +323,8 @@ Errors:
       Empty: La password è vuota
       Invalid: La password non è valida
       InvalidAndLocked: La password non è valida e l'utente è bloccato, contatta il tuo amministratore.
+    UsernameOrPassword:
+      Invalid: Il nome utente o la password non sono validi
     PasswordComplexityPolicy:
       NotFound: Impostazioni della password non trovate
       MinLength: La password è troppo corta

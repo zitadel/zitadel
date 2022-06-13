@@ -55,7 +55,7 @@ func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string,
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.Template)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.MailTemplate.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-49hfj", "Errors.Org.MailTemplate.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

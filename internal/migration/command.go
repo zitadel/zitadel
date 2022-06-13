@@ -73,15 +73,15 @@ func (s *SetupStep) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	switch s.Type() {
 	case startedType:
 		return []*eventstore.EventUniqueConstraint{
-			eventstore.NewAddEventUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
+			eventstore.NewAddGlobalEventUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
 		}
 	case failedType:
 		return []*eventstore.EventUniqueConstraint{
-			eventstore.NewRemoveEventUniqueConstraint("migration_started", s.migration.String()),
+			eventstore.NewRemoveGlobalEventUniqueConstraint("migration_started", s.migration.String()),
 		}
 	default:
 		return []*eventstore.EventUniqueConstraint{
-			eventstore.NewAddEventUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
+			eventstore.NewAddGlobalEventUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
 		}
 	}
 }

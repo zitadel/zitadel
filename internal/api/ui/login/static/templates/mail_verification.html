@@ -13,6 +13,7 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
     <input type="hidden" name="userID" value="{{ .UserID }}" />
+    <input type="hidden" name="orgID" value="{{ .OrgID }}" />
 
     <div class="fields">
         <label class="lgn-label" for="code">{{t "EmailVerification.CodeLabel"}}</label>
@@ -29,7 +30,7 @@
         <span class="fill-space"></span>
 
         {{ if .UserID }}
-        <button type="submit" name="resend" value="true" class="lgn-stroked-button lgn-primary" formnovalidate>{{t "EmailVerification.ResendButtonText"}}</button>
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "EmailVerification.ResendButtonText"}}</button>
         {{ end }}
 
         <a class="lgn-icon-button lgn-left-action" name="resetlinking" value="true" href="{{ loginUrl }}"

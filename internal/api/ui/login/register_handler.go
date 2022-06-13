@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -61,16 +62,11 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	iam, err := l.query.Instance(r.Context())
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
 
-	resourceOwner := iam.GlobalOrgID
+	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
-	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != iam.GlobalOrgID {
+	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != resourceOwner {
 		memberRoles = nil
 		resourceOwner = authRequest.RequestedOrgID
 	}
@@ -90,7 +86,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authRequest == nil {
-		http.Redirect(w, r, l.consolePath, http.StatusFound)
+		l.defaultRedirect(w, r)
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
@@ -114,10 +110,6 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	if formData.Language == "" {
 		formData.Language = l.renderer.ReqLang(translator, r).String()
 	}
-	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
-		registerFormData: *formData,
-	}
 
 	var resourceOwner string
 	if authRequest != nil {
@@ -125,12 +117,12 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	if resourceOwner == "" {
-		iam, err := l.query.Instance(r.Context())
-		if err != nil {
-			l.renderRegister(w, r, authRequest, formData, err)
-			return
-		}
-		resourceOwner = iam.GlobalOrgID
+		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
+	}
+
+	data := registerData{
+		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
+		registerFormData: *formData,
 	}
 
 	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, resourceOwner)

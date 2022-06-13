@@ -52,4 +52,8 @@ export class AvatarComponent implements OnInit {
     const toGen = this.forColor || this.name || '';
     return getColorHash(toGen);
   }
+
+  public errorHandler(event: any) {
+    (event.target as HTMLImageElement).style.display = 'none';
+  }
 }

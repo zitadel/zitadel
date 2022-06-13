@@ -25,7 +25,9 @@ type LoginPolicyAddedEvent struct {
 	AllowExternalIDP           bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA                   bool                    `json:"forceMFA,omitempty"`
 	HidePasswordReset          bool                    `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames     bool                    `json:"ignoreUnknownUsernames,omitempty"`
 	PasswordlessType           domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI         string                  `json:"defaultRedirectURI,omitempty"`
 	PasswordCheckLifetime      time.Duration           `json:"passwordCheckLifetime,omitempty"`
 	ExternalLoginCheckLifetime time.Duration           `json:"externalLoginCheckLifetime,omitempty"`
 	MFAInitSkipLifetime        time.Duration           `json:"mfaInitSkipLifetime,omitempty"`
@@ -47,8 +49,10 @@ func NewLoginPolicyAddedEvent(
 	allowRegister,
 	allowExternalIDP,
 	forceMFA,
-	hidePasswordReset bool,
+	hidePasswordReset,
+	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
 	passwordCheckLifetime,
 	externalLoginCheckLifetime,
 	mfaInitSkipLifetime,
@@ -63,6 +67,8 @@ func NewLoginPolicyAddedEvent(
 		ForceMFA:                   forceMFA,
 		PasswordlessType:           passwordlessType,
 		HidePasswordReset:          hidePasswordReset,
+		IgnoreUnknownUsernames:     ignoreUnknownUsernames,
+		DefaultRedirectURI:         defaultRedirectURI,
 		PasswordCheckLifetime:      passwordCheckLifetime,
 		ExternalLoginCheckLifetime: externalLoginCheckLifetime,
 		MFAInitSkipLifetime:        mfaInitSkipLifetime,
@@ -92,7 +98,9 @@ type LoginPolicyChangedEvent struct {
 	AllowExternalIDP           *bool                    `json:"allowExternalIdp,omitempty"`
 	ForceMFA                   *bool                    `json:"forceMFA,omitempty"`
 	HidePasswordReset          *bool                    `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames     *bool                    `json:"ignoreUnknownUsernames,omitempty"`
 	PasswordlessType           *domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI         *string                  `json:"defaultRedirectURI,omitempty"`
 	PasswordCheckLifetime      *time.Duration           `json:"passwordCheckLifetime,omitempty"`
 	ExternalLoginCheckLifetime *time.Duration           `json:"externalLoginCheckLifetime,omitempty"`
 	MFAInitSkipLifetime        *time.Duration           `json:"mfaInitSkipLifetime,omitempty"`
@@ -167,26 +175,43 @@ func ChangePasswordCheckLifetime(passwordCheckLifetime time.Duration) func(*Logi
 		e.PasswordCheckLifetime = &passwordCheckLifetime
 	}
 }
+
 func ChangeExternalLoginCheckLifetime(externalLoginCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.ExternalLoginCheckLifetime = &externalLoginCheckLifetime
 	}
 }
+
 func ChangeMFAInitSkipLifetime(mfaInitSkipLifetime time.Duration) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.MFAInitSkipLifetime = &mfaInitSkipLifetime
 	}
 }
+
 func ChangeSecondFactorCheckLifetime(secondFactorCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.SecondFactorCheckLifetime = &secondFactorCheckLifetime
 	}
 }
+
 func ChangeMultiFactorCheckLifetime(multiFactorCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.MultiFactorCheckLifetime = &multiFactorCheckLifetime
 	}
 }
+
+func ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.IgnoreUnknownUsernames = &ignoreUnknownUsernames
+	}
+}
+
+func ChangeDefaultRedirectURI(defaultRedirectURI string) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.DefaultRedirectURI = &defaultRedirectURI
+	}
+}
+
 func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LoginPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),

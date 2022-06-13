@@ -47,7 +47,7 @@ func (c *Commands) ChangeLockoutPolicy(ctx context.Context, resourceOwner string
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LockoutPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-4M9vs", "Errors.Org.LockoutPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-0JFSr", "Errors.Org.LockoutPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

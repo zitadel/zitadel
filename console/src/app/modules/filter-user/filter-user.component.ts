@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { ActivatedRoute, Router } from '@angular/router';
+import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
-  DisplayNameQuery,
-  EmailQuery,
-  SearchQuery as UserSearchQuery,
-  StateQuery,
-  UserNameQuery,
-  UserState,
+    DisplayNameQuery,
+    EmailQuery,
+    SearchQuery as UserSearchQuery,
+    StateQuery,
+    UserNameQuery,
+    UserState,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
@@ -24,7 +26,7 @@ enum SubQuery {
   templateUrl: './filter-user.component.html',
   styleUrls: ['./filter-user.component.scss'],
 })
-export class FilterUserComponent extends FilterComponent {
+export class FilterUserComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: UserSearchQuery[] = [];
 
@@ -36,8 +38,64 @@ export class FilterUserComponent extends FilterComponent {
     UserState.USER_STATE_LOCKED,
     UserState.USER_STATE_SUSPEND,
   ];
-  constructor() {
-    super();
+  constructor(router: Router, route: ActivatedRoute) {
+    super(router, route);
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
+      const { filter } = params;
+      if (filter) {
+        const stringifiedFilters = filter as string;
+        const filters: UserSearchQuery.AsObject[] = JSON.parse(stringifiedFilters) as UserSearchQuery.AsObject[];
+
+        const userQueries = filters.map((filter) => {
+          if (filter.userNameQuery) {
+            const userQuery = new UserSearchQuery();
+
+            const userNameQuery = new UserNameQuery();
+            userNameQuery.setUserName(filter.userNameQuery.userName);
+            userNameQuery.setMethod(filter.userNameQuery.method);
+
+            userQuery.setUserNameQuery(userNameQuery);
+            return userQuery;
+          } else if (filter.displayNameQuery) {
+            const userQuery = new UserSearchQuery();
+
+            const displayNameQuery = new DisplayNameQuery();
+            displayNameQuery.setDisplayName(filter.displayNameQuery.displayName);
+            displayNameQuery.setMethod(filter.displayNameQuery.method);
+
+            userQuery.setDisplayNameQuery(displayNameQuery);
+            return userQuery;
+          } else if (filter.emailQuery) {
+            const userQuery = new UserSearchQuery();
+
+            const emailQuery = new EmailQuery();
+            emailQuery.setEmailAddress(filter.emailQuery.emailAddress);
+            emailQuery.setMethod(filter.emailQuery.method);
+
+            userQuery.setEmailQuery(emailQuery);
+            return userQuery;
+          } else if (filter.stateQuery) {
+            const userQuery = new UserSearchQuery();
+
+            const stateQuery = new StateQuery();
+            stateQuery.setState(filter.stateQuery.state);
+
+            userQuery.setStateQuery(stateQuery);
+            return userQuery;
+          } else {
+            return undefined;
+          }
+        });
+
+        this.searchQueries = userQueries.filter((q) => q !== undefined) as UserSearchQuery[];
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+        // this.showFilter = true;
+        // this.filterOpen.emit(true);
+      }
+    });
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
@@ -123,23 +181,21 @@ export class FilterUserComponent extends FilterComponent {
     switch (subquery) {
       case SubQuery.STATE:
         (query as StateQuery).setState(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.EMAIL:
         (query as EmailQuery).setEmailAddress(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
       case SubQuery.USERNAME:
         (query as UserNameQuery).setUserName(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
         break;
     }
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public getSubFilter(subquery: SubQuery): any {
@@ -177,23 +233,17 @@ export class FilterUserComponent extends FilterComponent {
 
   public setMethod(query: any, event: any) {
     (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
   public emitFilter(): void {
-    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
     this.showFilter = false;
     this.filterOpen.emit(false);
-
-    this.filterCount$.next(this.filterCount);
   }
 
   public resetFilter(): void {
     this.searchQueries = [];
     this.emitFilter();
-  }
-
-  public get filterCount(): number {
-    return this.searchQueries.length;
   }
 }

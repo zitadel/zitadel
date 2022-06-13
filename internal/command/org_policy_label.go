@@ -82,7 +82,7 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 		policy.ErrorMsgPopup,
 		policy.DisableWatermark)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-8nfSr", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

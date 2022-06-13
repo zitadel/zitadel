@@ -4,13 +4,12 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/user"
-	"github.com/zitadel/zitadel/internal/query"
-
 	"github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
+	"github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -63,9 +62,16 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPTo
 
 func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveIDPFromLoginPolicyRequest) (*admin_pb.RemoveIDPFromLoginPolicyResponse, error) {
 	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
+	if err != nil {
+		return nil, err
+	}
 	idps, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
 	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	objectDetails, err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(idps.Links)...)
 	if err != nil {
@@ -88,7 +94,7 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 }
 
 func (s *Server) AddSecondFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddSecondFactorToLoginPolicyRequest) (*admin_pb.AddSecondFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.AddSecondFactorToDefaultLoginPolicy(ctx, policy_grpc.SecondFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +125,7 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 }
 
 func (s *Server) AddMultiFactorToLoginPolicy(ctx context.Context, req *admin_pb.AddMultiFactorToLoginPolicyRequest) (*admin_pb.AddMultiFactorToLoginPolicyResponse, error) {
-	_, objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
+	objectDetails, err := s.command.AddMultiFactorToDefaultLoginPolicy(ctx, policy_grpc.MultiFactorTypeToDomain(req.Type))
 	if err != nil {
 		return nil, err
 	}

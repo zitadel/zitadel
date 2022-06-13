@@ -77,11 +77,9 @@ export class ProjectMembersComponent {
                   }),
                   new Breadcrumb({
                     type: BreadcrumbType.PROJECT,
-                    // name: this.project.name,
                     param: { key: 'projectid', value: (this.project as Project.AsObject).id },
                     routerLink: ['/projects', (this.project as Project.AsObject).id],
                     isZitadel: isZitadel,
-                    hideNav: true,
                   }),
                 ];
                 breadcrumbService.setBreadcrumb(breadcrumbs);
@@ -105,6 +103,19 @@ export class ProjectMembersComponent {
                   this.grantId,
                 );
               };
+
+              const breadcrumbs = [
+                new Breadcrumb({
+                  type: BreadcrumbType.ORG,
+                  routerLink: ['/org'],
+                }),
+                new Breadcrumb({
+                  type: BreadcrumbType.GRANTEDPROJECT,
+                  param: { key: 'projectid', value: (this.project as GrantedProject.AsObject).projectId },
+                  routerLink: ['/projects', (this.project as GrantedProject.AsObject).projectId],
+                }),
+              ];
+              breadcrumbService.setBreadcrumb(breadcrumbs);
             }
           });
         }

@@ -63,14 +63,14 @@ Data processing | CH | custom | custom
 
 ### Infrastructure Provider
 
-CAOS offers the following guarantees for a given infrastructure provider and customer satisfies the [prerequisites](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance).
+CAOS offers the following guarantees for a given infrastructure provider and customer satisfies the [prerequisites](https://docs.zitadel.com/docs/guides/installation/managed-dedicated-instance).
 
 Guarantees | Google Cloud | Static / Other | Self-hosted
 ---|---|---|---
 Maintained by CAOS | yes | yes, product only | no
 24x7 monitoring | yes | yes, product only | yes, product only
 Availability SLO | [up to 99.9%](service-level-description#availability-objective) | none | none
-Performance SLO | up to [rate limits](https://docs.zitadel.ch/docs/legal/rate-limit-policy#what-rate-limits-do-apply) | none | none
+Performance SLO | up to [rate limits](https://docs.zitadel.com/docs/legal/rate-limit-policy#what-rate-limits-do-apply) | none | none
 
 ### Backup
 

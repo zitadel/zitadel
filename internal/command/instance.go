@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -32,6 +33,7 @@ const (
 
 type InstanceSetup struct {
 	zitadel          ZitadelConfig
+	idGenerator      id.Generator
 	InstanceName     string
 	CustomDomain     string
 	DefaultLanguage  language.Tag
@@ -58,8 +60,9 @@ type InstanceSetup struct {
 		MaxAgeDays     uint64
 	}
 	DomainPolicy struct {
-		UserLoginMustBeDomain bool
-		ValidateOrgDomains    bool
+		UserLoginMustBeDomain                  bool
+		ValidateOrgDomains                     bool
+		SMTPSenderAddressMatchesInstanceDomain bool
 	}
 	LoginPolicy struct {
 		AllowUsernamePassword      bool
@@ -67,7 +70,9 @@ type InstanceSetup struct {
 		AllowExternalIDP           bool
 		ForceMFA                   bool
 		HidePasswordReset          bool
+		IgnoreUnknownUsername      bool
 		PasswordlessType           domain.PasswordlessType
+		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
 		ExternalLoginCheckLifetime time.Duration
 		MfaInitSkipLifetime        time.Duration
@@ -96,8 +101,9 @@ type InstanceSetup struct {
 		MaxAttempts              uint64
 		ShouldShowLockoutFailure bool
 	}
-	EmailTemplate []byte
-	MessageTexts  []*domain.CustomMessageText
+	EmailTemplate     []byte
+	MessageTexts      []*domain.CustomMessageText
+	SMTPConfiguration *smtp.EmailConfig
 }
 
 type ZitadelConfig struct {
@@ -108,28 +114,28 @@ type ZitadelConfig struct {
 	consoleAppID string
 }
 
-func (s *InstanceSetup) generateIDs() (err error) {
-	s.zitadel.projectID, err = id.SonyFlakeGenerator.Next()
+func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
+	s.zitadel.projectID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.mgmtAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.mgmtAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.adminAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.adminAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.authAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.authAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.consoleAppID, err = id.SonyFlakeGenerator.Next()
+	s.zitadel.consoleAppID, err = idGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -137,7 +143,7 @@ func (s *InstanceSetup) generateIDs() (err error) {
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
-	instanceID, err := id.SonyFlakeGenerator.Next()
+	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -148,17 +154,17 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
-	orgID, err := id.SonyFlakeGenerator.Next()
+	orgID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	userID, err := id.SonyFlakeGenerator.Next()
+	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 
-	if err = setup.generateIDs(); err != nil {
+	if err = setup.generateIDs(c.idGenerator); err != nil {
 		return "", nil, err
 	}
 	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
@@ -169,16 +175,16 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
-		addInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
-		addSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
+		prepareAddInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
 
-		AddPasswordComplexityPolicy(
+		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,
 			setup.PasswordComplexityPolicy.MinLength,
 			setup.PasswordComplexityPolicy.HasLowercase,
@@ -186,38 +192,41 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.PasswordComplexityPolicy.HasNumber,
 			setup.PasswordComplexityPolicy.HasSymbol,
 		),
-		AddPasswordAgePolicy(
+		prepareAddDefaultPasswordAgePolicy(
 			instanceAgg,
 			setup.PasswordAgePolicy.ExpireWarnDays,
 			setup.PasswordAgePolicy.MaxAgeDays,
 		),
-		AddDefaultDomainPolicy(
+		prepareAddDefaultDomainPolicy(
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
 			setup.DomainPolicy.ValidateOrgDomains,
+			setup.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
 		),
-		AddDefaultLoginPolicy(
+		prepareAddDefaultLoginPolicy(
 			instanceAgg,
 			setup.LoginPolicy.AllowUsernamePassword,
 			setup.LoginPolicy.AllowRegister,
 			setup.LoginPolicy.AllowExternalIDP,
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
+			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.PasswordlessType,
+			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,
 			setup.LoginPolicy.ExternalLoginCheckLifetime,
 			setup.LoginPolicy.MfaInitSkipLifetime,
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
 		),
-		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
-		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
-		AddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
+		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
+		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
-		AddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
-		AddDefaultLabelPolicy(
+		prepareAddDefaultLabelPolicy(
 			instanceAgg,
 			setup.LabelPolicy.PrimaryColor,
 			setup.LabelPolicy.BackgroundColor,
@@ -231,13 +240,13 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LabelPolicy.ErrorMsgPopup,
 			setup.LabelPolicy.DisableWatermark,
 		),
-		ActivateDefaultLabelPolicy(instanceAgg),
+		prepareActivateDefaultLabelPolicy(instanceAgg),
 
-		AddEmailTemplate(instanceAgg, setup.EmailTemplate),
+		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
 
 	for _, msg := range setup.MessageTexts {
-		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
+		validations = append(validations, prepareSetInstanceCustomMessageTexts(instanceAgg, msg))
 	}
 
 	console := &addOIDCApp{
@@ -263,6 +272,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
+		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
 		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
@@ -270,7 +280,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -282,7 +292,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -294,7 +304,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddAPIAppCommand(
+		c.AddAPIAppCommand(
 			&addAPIApp{
 				AddApp: AddApp{
 					Aggregate: *projectAgg,
@@ -306,16 +316,33 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			nil,
 		),
 
-		AddOIDCAppCommand(console, nil),
+		c.AddOIDCAppCommand(console, nil),
 		SetIAMConsoleID(instanceAgg, &console.ClientID, &setup.zitadel.consoleAppID),
 	)
-	validations = append(validations,
-		c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)...,
-	)
+
+	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
+	if err != nil {
+		return "", nil, err
+	}
+	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
 		validations = append(validations,
 			c.addInstanceDomain(instanceAgg, setup.CustomDomain, false),
 			setPrimaryInstanceDomain(instanceAgg, setup.CustomDomain),
+		)
+	}
+
+	if setup.SMTPConfiguration != nil {
+		validations = append(validations,
+			c.prepareAddSMTPConfig(
+				instanceAgg,
+				setup.SMTPConfiguration.From,
+				setup.SMTPConfiguration.FromName,
+				setup.SMTPConfiguration.SMTP.Host,
+				setup.SMTPConfiguration.SMTP.User,
+				[]byte(setup.SMTPConfiguration.SMTP.Password),
+				setup.SMTPConfiguration.Tls,
+			),
 		)
 	}
 
@@ -353,7 +380,25 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	}, nil
 }
 
-func addInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
+func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareSetDefaultOrg(instanceAgg, orgID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
@@ -386,15 +431,25 @@ func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation
 	}
 }
 
-func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, orgID string) (eventstore.Command, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
-	if err != nil {
-		return nil, err
+func (c *Commands) prepareSetDefaultOrg(a *instance.Aggregate, orgID string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if orgID == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-SWffe", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			if writeModel.DefaultOrgID == orgID {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-SDfw2", "Errors.Instance.NotChanged")
+			}
+			if exists, err := ExistsOrg(ctx, filter, orgID); err != nil || !exists {
+				return nil, errors.ThrowPreconditionFailed(err, "INSTA-Wfe21", "Errors.Org.NotFound")
+			}
+			return []eventstore.Command{instance.NewDefaultOrgSetEventEvent(ctx, &a.Aggregate, orgID)}, nil
+		}, nil
 	}
-	if iamWriteModel.GlobalOrgID != "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "IAM-HGG24", "Errors.IAM.GlobalOrgAlreadySet")
-	}
-	return instance.NewGlobalOrgSetEventEvent(ctx, iamAgg, orgID), nil
 }
 
 func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *InstanceWriteModel, projectID string) (eventstore.Command, error) {

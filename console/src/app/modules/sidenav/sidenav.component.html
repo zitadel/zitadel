@@ -28,10 +28,16 @@
 
           <button
             (click)="value = setting.id"
+            *ngIf="
+              !setting.requiredRoles ||
+              (setting.requiredRoles.mgmt && (setting.requiredRoles.mgmt | hasRole: true | async)) ||
+              (setting.requiredRoles.admin && (setting.requiredRoles.admin | hasRole: true | async))
+            "
             class="sidenav-setting-list-element hide-on-mobile"
             [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
           >
             <span>{{ setting.i18nKey | translate }}</span>
+            <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
           </button>
         </ng-container>
         <ng-template #btn>

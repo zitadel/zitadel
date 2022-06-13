@@ -34,8 +34,8 @@
       "DESCRIPTION": "Iniziare rapidamente con ZITADEL."
     },
     "SHORTCUTS": {
-      "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Impostazioni dell' organizazzione",
+      "SHORTCUTS": "Scorciatoie",
+      "SETTINGS": "Scorciatoie disponibili",
       "PROJECTS": "Progetti",
       "REORDER": "Per spostare, tieni premuto e trascina il riquadro",
       "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
@@ -95,6 +95,7 @@
     "CANCEL": "cancella",
     "INFO": "Info",
     "OK": "OK",
+    "SELECT": "Seleziona",
     "VIEW": "Mostra",
     "SELECTIONDELETE": "Elimina selezione",
     "DELETE": "Elimina",
@@ -118,9 +119,28 @@
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti",
     "MORE": "azioni",
+    "STEP": "Passo",
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
+    "IAM_OWNER_VIEWER": "Ha l'autorizzazione per esaminare l'intera istanza, comprese tutte le organizzazioni",
+    "IAM_ORG_MANAGER": "Ha il permesso di creare e gestire organizzazioni",
+    "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
+    "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
+    "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
+    "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
+    "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
+    "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
+    "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
+    "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
+    "PROJECT_OWNER_GLOBAL": "Ha il permesso per l'intero progetto",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Ha il permesso di esaminare l'intero progetto",
+    "PROJECT_GRANT_OWNER": "Ha l'autorizzazione per gestire le sovvenzioni di progetto (Project Grant)",
+    "PROJECT_GRANT_OWNER_VIEWER": "Ha il permesso di esaminare le sovvenzioni di progetto (Project Grant)"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -133,7 +153,7 @@
       "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
     },
     "NAV": {
-      "TEXT": "Questa navigazione cambia in base ai breadcrumb sopra."
+      "TEXT": "Questa navigazione cambia in base all' organizzazione impostata sopra e la tua istanza."
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attenzione! L'organizzazione è appena stata cambiata."
@@ -273,12 +293,12 @@
       "U2F_DIALOG_TITLE": "Verifica autenticatore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo authenticatore o dispositivo usato.",
       "U2F_SUCCESS": "Autorizzazione passwordless creata con successo!",
-      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione di U2F!",
+      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
       "U2F_NAME": "Nome dell'autenticatore",
       "TYPE": {
         "0": "Nessun MFA definito",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
       },
       "STATE": {
         "0": "Nessuno Stato",
@@ -324,16 +344,16 @@
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Aggiungi OTP",
       "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
-      "U2F": "U2F (Universal 2nd Factor)",
-      "U2F_DIALOG_TITLE": "Verifica U2F",
+      "U2F": "Impronta digitale, chiave di sicurezza, Face ID e altri",
+      "U2F_DIALOG_TITLE": "Verifica Fattore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo methodo o dispositivo.",
-      "U2F_SUCCESS": "U2F creato con successo!",
-      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione di U2F!",
-      "U2F_NAME": "Nome U2F",
+      "U2F_SUCCESS": "Fattore aggiunto con successo!",
+      "U2F_ERROR": "Si \u00e8 verificato un errore durante la configurazione!",
+      "U2F_NAME": "Nome dell'autenticatore",
       "TYPE": {
         "0": "Nessun altro fattore definito",
-        "1": "OTP",
-        "2": "U2F"
+        "1": "One Time Password (OTP)",
+        "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
       },
       "STATE": {
         "0": "Nessuno Stato",
@@ -557,8 +577,8 @@
       "PHONEVERIFIED": "Telefono verificato con successo.",
       "PHONEVERIFICATIONSENT": "Codice di verifica telefonica inviato.",
       "EMAILVERIFICATIONSENT": "Codice di verifica e-mail inviato.",
-      "OTPREMOVED": "OTP rimosso.",
-      "U2FREMOVED": "U2F rimosso.",
+      "OTPREMOVED": "One Time Password (OTP) rimosso.",
+      "U2FREMOVED": "Fattore rimosso.",
       "PASSWORDLESSREMOVED": "Rimosso senza password.",
       "INITIALPASSWORDSET": "Password iniziale impostata.",
       "PASSWORDNOTIFICATIONSENT": "Notifica di cambio password inviata.",
@@ -736,6 +756,7 @@
       "LISTDESCRIPTION": "Scegli un'organizzazione.",
       "ACTIVE": "Attivo",
       "CREATE": "Creare un'organizzazione",
+      "NOPERMISSION": "Non hai l'autorizzazione per accedere alle impostazioni dell'organizzazione.",
       "USERSELFACCOUNT": "Usa il tuo account personale come proprietario dell'organizzazione",
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
@@ -816,16 +837,20 @@
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "complessità della password",
       "NOTIFICATIONS": "Notifiche",
+      "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
+      "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
-      "OIDC": "OIDC Configuration"
+      "OIDC": "OIDC Token lifetime e scadenza",
+      "SECRETS": "Aspetto dei segreti"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
       "LOGIN": "Accesso e login",
+      "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aussehen",
       "OTHER": "Altro"
@@ -845,8 +870,11 @@
       "HOST": "Host",
       "USER": "Utente",
       "PASSWORD": "Password",
+      "SETPASSWORD": "Imposta SMTP Password",
+      "PASSWORDSET": "SMTP Password impostata con successo.",
       "TLS": "Transport Layer Security (TLS)",
-      "SAVED": "Salvato con successo!"
+      "SAVED": "Salvato con successo!",
+      "REQUIREDWARN": "Per inviare notifiche dal tuo dominio, devi inserire i tuoi dati SMTP."
     },
     "SMS": {
       "TITLE": "Impostazioni SMS",
@@ -858,7 +886,10 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
-        "ADDED": "Twilio aggiunto con successo."
+        "ADDED": "Twilio aggiunto con successo.",
+        "CHANGETOKEN": "Cambia Token",
+        "SETTOKEN": "Cambia Token",
+        "TOKENSET": "Token cambiato con successo."
       }
     },
     "OIDC": {
@@ -869,6 +900,34 @@
       "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
       "INHOURS": "ore",
       "INDAYS": "giorni"
+    },
+    "SECRETS": {
+      "TITLE": "Aspetto dei segreti",
+      "TYPES": "Tipi di segreti",
+      "TYPE": {
+        "1": "Initializzazione email",
+        "2": "Verificazione dell' email",
+        "3": "Verificazione del numero di telefono",
+        "4": "Ripristino Password",
+        "5": "Inizializzazione Passwordless",
+        "6": "Segreto dell'applicazione"
+      },
+      "ADDGENERATOR": "Definisci aspetto",
+      "GENERATORTYPE": "Tipo",
+      "EXPIRY": "Scadenza (in ore)",
+      "INCLUDEDIGITS": "Contiene numeri",
+      "INCLUDESYMBOLS": "Contiene simboli",
+      "INCLUDELOWERLETTERS": "Contiene lettere minuscole",
+      "INCLUDEUPPERLETTERS": "Contiene lettere maiuscole",
+      "LENGTH": "Lunghezza",
+      "UPDATED": "Impostazioni aggiornati"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Ripristina impostazioni",
+        "DEFAULTDESCRIPTION": "Stai per ripristinare le impostazioni sulla configurazione predefinita della tua istanza. Sei sicuro di voler continuare?",
+        "LOGINPOLICY_DESCRIPTION": "Avviso: Se continui, anche le impostazioni del provider di identità verranno ripristinate sull'impostazione dell'istanza."
+      }
     }
   },
   "POLICY": {
@@ -926,9 +985,8 @@
       "TITLE": "Impostazioni di blocco",
       "DESCRIPTION": "Imposta un numero massimo di tentativi di password, dopo i quali gli account saranno bloccati."
     },
-    "IAM_POLICY": {
-      "TITLE": "Impostazioni di accesso IAM",
-      "DESCRIPTION": "Definisci le propriet\u00e0 di accesso dei tuoi utenti."
+    "DOMAIN_POLICY": {
+      "TITLE": "Impostazioni dominio"
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
@@ -942,6 +1000,7 @@
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "ADVANCED": "Impostazioni avanzate",
+      "LIFETIMEDURATIONS": "Login Lifetimes",
       "SAVED": "Salvato con successo!"
     },
     "PRIVACY_POLICY": {
@@ -1057,7 +1116,9 @@
       "MAXATTEMPTS": "Massimo numero di tentativi di password",
       "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
       "MAXAGEDAYS": "Lunghezza massima in giorni",
-      "USERLOGINMUSTBEDOMAIN": "Loginname dell'utente deve contenere il dominio",
+      "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
+      "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
       "ALLOWEXTERNALIDP": "IDP esterno consentito",
       "ALLOWREGISTER": "Registrazione consentita",
@@ -1069,8 +1130,18 @@
       "HIDEPASSWORDRESET": "Nascondi ripristino della password",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
+      "IGNOREUNKNOWNUSERNAMES": "Ignora un nome utente sconosciuto",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione \u00e8 selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
+      "DEFAULTREDIRECTURI": "Default Redirect URI",
+      "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
-      "DISABLEWATERMARK": "Nascondi la filigrana"
+      "DISABLEWATERMARK": "Nascondi la filigrana",
+      "PASSWORDCHECKLIFETIME": "Lifetime verificazione password",
+      "EXTERNALLOGINCHECKLIFETIME": "Lifetime verificazione login esterno",
+      "MFAINITSKIPLIFETIME": "Lifetime Initalizzazione Multifattore",
+      "SECONDFACTORCHECKLIFETIME": "Lifetime Second Factor Lifetime",
+      "MULTIFACTORCHECKLIFETIME": "Lifetime Multi Factor",
+      "INHOURS": "ore"
     },
     "RESET": "Ripristina l'impostazione dell'istanza",
     "CREATECUSTOM": "Crea un'impostazione personalizzata",
@@ -1140,11 +1211,11 @@
           "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Branding dell'organizzazione, prima che venga mostrato il default del sistema."
         },
         "1": {
-          "TITLE": "Applica l'impostazione Branding delle risorse del progetto",
+          "TITLE": "Applica l'impostazione del progetto",
           "DESC": "Branding dell'organizzazione del progetto sar\u00e0 mostrata"
         },
         "2": {
-          "TITLE": "Consentire l'accesso all'impostazione Branding dell'utente",
+          "TITLE": "Applica l'impostazione dell' organizzazione dell' utente",
           "DESC": "Verr\u00e0 mostrata l'impostazione Branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
         },
         "DIALOG": {
@@ -1360,7 +1431,7 @@
     },
     "OWNERTYPES": {
       "0": "sconosciuto",
-      "1": "Sistema",
+      "1": "Istanza",
       "2": "Organizzazione"
     },
     "TYPES": {
@@ -1411,12 +1482,14 @@
     "DELETE_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
+    "EMPTY": "Nessun IDP disponible",
     "OIDC": {
-      "TITLE": "OIDC IDP",
+      "GENERAL": "Informazioni generali",
+      "TITLE": "Configurazione OIDC",
       "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT IDP",
+      "TITLE": "Configurazione JWT",
       "DESCRIPTION": "Inserisci i dati per il JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -1429,7 +1502,9 @@
       "SELECTEDREACTIVATED": "IDP selezionati riattivati.",
       "SELECTEDDEACTIVATED": "IDP selezionati disattivati.",
       "SELECTEDKEYSDELETED": "IDP selezionati cancellati.",
-      "DELETED": "IDP rimosso con successo!"
+      "DELETED": "IDP rimosso con successo!",
+      "ADDED": "Aggiunto con successo.",
+      "REMOVED": "Rimosso con successo."
     }
   },
   "MFA": {
@@ -1455,12 +1530,12 @@
     "TYPE": "Tipo",
     "MULTIFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "U2F con Pin"
+      "1": "Impronta digitale, chiave di sicurezza, Face ID e altri"
     },
     "SECONDFACTORTYPES": {
       "0": "Sconosciuto",
-      "1": "OTP",
-      "2": "U2F"
+      "1": "One Time Password (OTP)",
+      "2": "Impronta digitale, chiave di sicurezza, Face ID e altri"
     }
   },
   "LOGINPOLICY": {
@@ -1485,6 +1560,7 @@
     "COMPLIANCE": "Conformità con OIDC",
     "URLS": "Urls",
     "CONFIGURATION": "Configurazione",
+    "TOKEN": "Impostazioni Token",
     "PAGES": {
       "TITLE": "Applicazione",
       "ID": "ID",
@@ -1506,6 +1582,9 @@
         }
       },
       "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Configurazione OIDC"
+        },
         "DELETE": {
           "TITLE": "Rimuovere App",
           "DESCRIPTION": "Vuoi davvero rimuovere questa applicazione?"
@@ -1677,8 +1756,8 @@
     "TOAST": {
       "REACTIVATED": "Applicazione riattivata.",
       "DEACTIVATED": "Applicazione disattivata.",
-      "OIDCUPDATED": "Configurazione OIDC aggiornata.",
-      "APIUPDATED": "Configurazione API aggiornata",
+      "OIDCUPDATED": "Applicazione aggiornata",
+      "APIUPDATED": "Applicazione aggiornata",
       "UPDATED": "App aggiornata.",
       "CREATED": "App creata.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",

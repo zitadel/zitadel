@@ -2,24 +2,32 @@
 module.exports = {
   title: "ZITADEL Docs",
   trailingSlash: false,
-  url: "https://docs.zitadel.ch",
+  url: "https://docs.zitadel.com",
   baseUrl: "/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "caos",
+  organizationName: "zitadel",
   projectName: "zitadel",
   scripts: [
     {
       src: "/proxy/js/script.js",
       async: true,
       defer: true,
-      "data-domain": "docs.zitadel.ch",
+      "data-domain": "docs.zitadel.com",
       "data-api": "/proxy/api/event",
     },
   ],
   themeConfig: {
     zoomSelector: ".markdown :not(em) > img",
+    announcementBar: {
+      id: 'documentation',
+      content:
+        'This page contains the documentation for ZITADEL version 2, if you are looking for version 1 please visit <a target="_blank" rel="noopener noreferrer" href="https://docs-v1.zitadel.com">https://docs-v1.zitadel.com</a>',
+      backgroundColor: '#fafbfc',
+      textColor: '#091E42',
+      isCloseable: false,
+    },
     navbar: {
       // title: 'ZITADEL',
       logo: {
@@ -77,60 +85,72 @@ module.exports = {
           title: "Community",
           items: [
             {
+              label: "Chat",
+              href: "https://zitadel.com/chat",
+            },
+            {
               label: "GitHub Discussions",
               href: "https://github.com/zitadel/zitadel/discussions",
             },
             {
               label: "Twitter",
-              href: "https://twitter.com/zitadel_ch",
+              href: "https://twitter.com/zitadel",
             },
             {
               label: "Linkedin",
-              href: "https://www.linkedin.com/company/caos-ag/",
+              href: "https://www.linkedin.com/company/zitadel/",
             },
             {
               label: "Blog",
-              href: "https://zitadel.ch/blog",
+              href: "https://zitadel.com/blog",
             },
           ],
         },
         {
-          title: "Company",
+          title: "Legal",
+          items: [
+
+            {
+              label: "Terms and Conditions",
+              href: "/docs/legal/terms-of-service",
+            },
+            {
+              label: "Privacy Policy",
+              href: "/docs/legal/privacy-policy",
+            },
+          ],
+        },
+        {
+          title: "About",
           items: [
             {
-              label: "About CAOS Ltd.",
-              href: "https://caos.ch/#about",
+              label: "Website",
+              href: "https://zitadel.com",
             },
             {
               label: "Contact",
-              href: "https://zitadel.ch/contact/",
+              href: "https://zitadel.com/contact/",
             },
             {
               label: "GitHub",
-              href: "https://github.com/caos",
+              href: "https://github.com/zitadel",
             },
             {
               label: "Status",
               href: "https://status.zitadel.ch/",
-            },
-            {
-              label: "Terms and Conditions",
-              href: "https://docs.zitadel.ch/docs/legal/terms-of-service",
-            },
-            {
-              label: "Privacy Policy",
-              href: "https://docs.zitadel.ch/docs/legal/privacy-policy",
-            },
+            }
           ],
         },
+        
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} CAOS Ltd. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     algolia: {
       appId: "8H6ZKXENLO",
-      apiKey: "c3899716db098111f5e89c8987b9c427",
-      indexName: "zitadel",
-    },
+      apiKey: "124fe1c102a184bc6fc70c75dc84f96f",
+      indexName: 'zitadel',
+      selector: 'div#'
+  },
     prism: {
       additionalLanguages: ["csharp", "dart", "groovy"],
     },
@@ -141,7 +161,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
+          editUrl: "https://github.com/zitadel/zitadel/edit/v2-alpha/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {

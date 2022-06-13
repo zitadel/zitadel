@@ -52,7 +52,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | gender             | `other`                                  | Gender of the subject                                                                         |
 | given_name         | `Road`                                   | Given name of the subject                                                                     |
 | iat                | `1311280970`                             | Issued at time of the token as unix time                                                      |
-| iss                | `https://issuer.zitadel.ch`              | Issuing domain of a token                                                                     |
+| iss                | `{your_domain}`              | Issuing domain of a token                                                                     |
 | locale             | `en`                                     | Language from the subject                                                                     |
 | name               | `Road Runner`                            | The subjects full name                                                                        |
 | nonce              | `blQtVEJHNTF0WHhFQmhqZ0RqeHJsdzdkd2d...` | The nonce provided by the client                                                              |

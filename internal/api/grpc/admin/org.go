@@ -3,8 +3,6 @@ package admin
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
@@ -12,12 +10,26 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	obj_pb "github.com/zitadel/zitadel/pkg/grpc/object"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
 	isUnique, err := s.query.IsOrgUnique(ctx, req.Name, req.Domain)
 	return &admin_pb.IsOrgUniqueResponse{IsUnique: isUnique}, err
+}
+
+func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgRequest) (*admin_pb.SetDefaultOrgResponse, error) {
+	details, err := s.command.SetDefaultOrg(ctx, req.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetDefaultOrgResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
+	org, err := s.query.OrgByID(ctx, authz.GetInstance(ctx).DefaultOrganisationID())
+	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
 }
 
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
@@ -38,12 +50,8 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 		return nil, err
 	}
 	return &admin_pb.ListOrgsResponse{
-		Result: org_grpc.OrgViewsToPb(orgs.Orgs),
-		Details: &obj_pb.ListDetails{
-			TotalResult:       orgs.Count,
-			ProcessedSequence: orgs.Sequence,
-			ViewTimestamp:     timestamppb.New(orgs.Timestamp),
-		},
+		Result:  org_grpc.OrgViewsToPb(orgs.Orgs),
+		Details: object.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
 	}, nil
 }
 
@@ -52,20 +60,20 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	_ = userIDs                                                                        //TODO: handle userIDs
 	human := setUpOrgHumanToCommand(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
-	org := setUpOrgOrgToDomain(req.Org)                                                //TODO: handle domain
-	_ = org
 
-	objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
-		Name:  req.Org.Name,
-		Human: human,
-	})
+	userID, objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
+		Name:         req.Org.Name,
+		CustomDomain: req.Org.Domain,
+		Human:        human,
+	}, userIDs...)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.SetUpOrgResponse{
 		Details: object.DomainToAddDetailsPb(objectDetails),
+		OrgId:   objectDetails.ResourceOwner,
+		UserId:  userID,
 	}, nil
 }
 

@@ -1,5 +1,7 @@
 @use '@angular/material' as mat;
 
+@import './preview/preview.component.scss';
+
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
@@ -68,6 +70,12 @@
             margin-right: 0.5rem;
           }
 
+          .info-i {
+            font-size: 1.2rem;
+            margin-left: 0.5rem;
+            margin-right: 0;
+          }
+
           .current-dot {
             height: 8px;
             width: 8px;
@@ -85,6 +93,11 @@
       .pl-action-button {
         align-self: flex-start;
         margin-top: 0.5rem;
+        margin-right: 0.5rem;
+
+        &:last-child {
+          margin-right: 0;
+        }
       }
     }
 
@@ -153,6 +166,12 @@
 
           .fill-space {
             flex: 1;
+          }
+
+          .asset-add-btn {
+            &[disabled] {
+              color: map-get($foreground, disabled-text);
+            }
           }
 
           .img-wrapper {
@@ -314,6 +333,16 @@
         min-height: 600px;
         width: fit-content;
         margin: auto;
+
+        .preview {
+          &.lightmode {
+            @include preview-theme(false);
+          }
+
+          &.darkmode {
+            @include preview-theme(true);
+          }
+        }
       }
     }
   }

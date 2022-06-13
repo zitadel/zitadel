@@ -16,7 +16,6 @@ title: zitadel/app.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | client_id |  string | - |  |
-| client_secret |  string | - |  |
 | auth_method_type |  APIAuthMethodType | - |  |
 
 
@@ -73,7 +72,6 @@ title: zitadel/app.proto
 | grant_types | repeated OIDCGrantType | - |  |
 | app_type |  OIDCAppType | - |  |
 | client_id |  string | - |  |
-| client_secret |  string | - |  |
 | auth_method_type |  OIDCAuthMethodType | - |  |
 | post_logout_redirect_uris | repeated string | - |  |
 | version |  OIDCVersion | - |  |

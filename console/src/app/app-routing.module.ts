@@ -16,6 +16,7 @@ const routes: Routes = [
   {
     path: 'orgs',
     loadChildren: () => import('./pages/org-list/org-list.module').then((m) => m.OrgListModule),
+    canActivate: [AuthGuard],
   },
   {
     path: 'granted-projects',
@@ -74,7 +75,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/actions/actions.module').then((m) => m.ActionsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
-      roles: ['org.read'],
+      roles: ['org.action.read', 'org.flow.read'],
     },
   },
   {
@@ -149,7 +150,8 @@ const routes: Routes = [
     loadChildren: () => import('./pages/instance-settings/instance-settings.module').then((m) => m.InstanceSettingsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
-      roles: ['iam.read', 'iam.write'],
+      roles: ['iam.read', 'iam.policy.read'],
+      requiresAll: true,
     },
   },
   {
@@ -165,7 +167,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/org-settings/org-settings.module').then((m) => m.OrgSettingsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
-      roles: ['iam.read', 'iam.write'],
+      roles: ['policy.read'],
     },
   },
   {

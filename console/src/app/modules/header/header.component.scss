@@ -57,7 +57,7 @@
 
         .org-link {
           font-size: 14px;
-          color: map-get($foreground, base);
+          color: map-get($foreground, text);
           text-decoration: none;
           padding: 0.5rem 0.75rem 0.5rem 0.75rem;
           height: 2.5rem;
@@ -90,7 +90,7 @@
           .org-switch-button {
             font-weight: bold;
             border: none;
-            color: map-get($foreground, base);
+            color: map-get($foreground, text);
             border-radius: 6px;
             position: relative;
             font-size: 14px;
@@ -118,7 +118,7 @@
 
               svg {
                 opacity: 0.7;
-                fill: map-get($foreground, base);
+                fill: map-get($foreground, text);
                 height: 1.25rem;
                 width: 1.25rem;
               }
@@ -135,7 +135,7 @@
 
         .breadcrumb-link {
           font-size: 14px;
-          color: map-get($foreground, base);
+          color: map-get($foreground, text);
           text-decoration: none;
           padding: 0.5rem 0.75rem 0.5rem 0.75rem;
           height: 2.5rem;
@@ -250,47 +250,56 @@
         }
       }
 
-      .icon-container {
-        display: flex;
-        justify-content: space-between;
+      .account-card-wrapper {
         position: relative;
-        user-select: none;
-        border: 2px solid #ffffff80;
-        border-radius: 50%;
-        transition: border ease 0.15s;
 
-        &.iam-user {
-          border: 2px solid $primary-color;
-        }
+        .icon-container {
+          display: flex;
+          justify-content: space-between;
+          position: relative;
+          user-select: none;
+          border-radius: 50%;
+          transition: border ease 0.15s;
+          padding: 0;
+          border: 2px solid if($is-dark-theme, #ffffff80, #00000010);
+          outline: none;
+          background: none;
 
-        &:hover {
-          border-color: if($is-dark-theme, #fff, #00000050);
-        }
+          &.iam-user {
+            border: 2px solid $primary-color;
+          }
 
-        .docs {
-          text-decoration: none;
-          font-size: 1.4rem;
-        }
+          &:hover,
+          &:focus {
+            border: 2px solid if($is-dark-theme, #fff, map-get($primary, 200));
+          }
 
-        .avatar-toggle {
-          display: block;
-          margin: auto;
-          cursor: pointer;
-        }
+          .docs {
+            text-decoration: none;
+            font-size: 1.4rem;
+          }
 
-        .name {
-          font-size: 1rem;
-          font-weight: 400;
-        }
+          .avatar-toggle {
+            display: block;
+            margin: auto;
+            cursor: pointer;
+            border: none;
+          }
 
-        .a_card {
-          position: absolute;
-          z-index: 300;
-          top: 55px;
-          right: 0;
-          overflow: hidden;
-          box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
-          border-radius: 0.5rem;
+          .name {
+            font-size: 1rem;
+            font-weight: 400;
+          }
+
+          .a_card {
+            position: absolute;
+            z-index: 300;
+            top: 55px;
+            right: 0;
+            overflow: hidden;
+            box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+            border-radius: 0.5rem;
+          }
         }
       }
     }

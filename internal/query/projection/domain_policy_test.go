@@ -30,7 +30,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					org.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true,
-						"validateOrgDomains": true
+						"validateOrgDomains": true,
+						"smtpSenderAddressMatchesInstanceDomain": true
 }`),
 				), org.DomainPolicyAddedEventMapper),
 			},
@@ -43,13 +44,14 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, validate_org_domains, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"agg-id",
 								domain.PolicyStateActive,
+								true,
 								true,
 								true,
 								false,
@@ -70,7 +72,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					org.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true,
-						"validateOrgDomains": true
+						"validateOrgDomains": true,
+						"smtpSenderAddressMatchesInstanceDomain": true
 		}`),
 				), org.DomainPolicyChangedEventMapper),
 			},
@@ -82,10 +85,11 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								true,
 								true,
 								true,
 								"agg-id",
@@ -131,7 +135,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true,
-						"validateOrgDomains": true
+						"validateOrgDomains": true,
+						"smtpSenderAddressMatchesInstanceDomain": true
 					}`),
 				), instance.DomainPolicyAddedEventMapper),
 			},
@@ -143,13 +148,14 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, validate_org_domains, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"agg-id",
 								domain.PolicyStateActive,
+								true,
 								true,
 								true,
 								true,
@@ -170,7 +176,8 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 					instance.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true,
-						"validateOrgDomains": true
+						"validateOrgDomains": true,
+						"smtpSenderAddressMatchesInstanceDomain": true
 					}`),
 				), instance.DomainPolicyChangedEventMapper),
 			},
@@ -182,10 +189,11 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								true,
 								true,
 								true,
 								"agg-id",

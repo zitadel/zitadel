@@ -27,8 +27,8 @@ type mailVerificationData struct {
 	UserID string
 }
 
-func MailVerificationLink(origin, userID, code string) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s", externalLink(origin), EndpointMailVerification, userID, code)
+func MailVerificationLink(origin, userID, code, orgID string) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s&orgID=%s", externalLink(origin), EndpointMailVerification, userID, code, orgID)
 }
 
 func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {

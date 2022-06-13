@@ -2,6 +2,12 @@ package domain
 
 import (
 	"strings"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+)
+
+var (
+	domainRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 )
 
 type InstanceDomainState int32
@@ -22,8 +28,11 @@ func (f InstanceDomainState) Exists() bool {
 	return f == InstanceDomainStateActive
 }
 
-func NewGeneratedInstanceDomain(instanceName, iamDomain string) string {
-	//TODO: Add random number/string to be unique
+func NewGeneratedInstanceDomain(instanceName, iamDomain string) (string, error) {
+	randomString, err := crypto.GenerateRandomString(6, domainRunes)
+	if err != nil {
+		return "", err
+	}
 	instanceName = strings.TrimSpace(instanceName)
-	return strings.ToLower(strings.ReplaceAll(instanceName, " ", "-") + "." + iamDomain)
+	return strings.ToLower(strings.ReplaceAll(instanceName, " ", "-") + "-" + randomString + "." + iamDomain), nil
 }

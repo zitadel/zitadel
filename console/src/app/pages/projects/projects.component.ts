@@ -53,6 +53,7 @@ export class ProjectsComponent {
         type:
           type === ProjectType.PROJECTTYPE_OWNED ? 'owned' : type === ProjectType.PROJECTTYPE_GRANTED ? 'granted' : 'owned',
       },
+      replaceUrl: true,
       queryParamsHandling: 'merge',
       skipLocationChange: false,
     });

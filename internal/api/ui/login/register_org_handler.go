@@ -66,14 +66,13 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_ = userIDs //TODO: handle userIDs
-	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg())
+	_, _, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), userIDs...)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
 	if authRequest == nil {
-		http.Redirect(w, r, l.consolePath, http.StatusFound)
+		l.defaultRedirect(w, r)
 		return
 	}
 	l.renderNextStep(w, r, authRequest)

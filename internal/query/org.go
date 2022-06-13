@@ -115,6 +115,9 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 }
 
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
+	if name == "" && domain == "" {
+		return false, errors.ThrowInvalidArgument(nil, "QUERY-DGqfd", "Errors.Query.InvalidRequest")
+	}
 	query, scan := prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(
 		sq.And{

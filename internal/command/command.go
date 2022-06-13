@@ -76,7 +76,7 @@ func StartCommands(es *eventstore.Eventstore,
 	repo = &Commands{
 		eventstore:            es,
 		static:                staticStore,
-		idGenerator:           id.SonyFlakeGenerator,
+		idGenerator:           id.SonyFlakeGenerator(),
 		zitadelRoles:          zitadelRoles,
 		externalDomain:        externalDomain,
 		externalSecure:        externalSecure,

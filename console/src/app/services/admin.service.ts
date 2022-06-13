@@ -1,183 +1,195 @@
 import { Injectable } from '@angular/core';
 
 import {
-    ActivateLabelPolicyRequest,
-    ActivateLabelPolicyResponse,
-    AddCustomOrgIAMPolicyRequest,
-    AddCustomOrgIAMPolicyResponse,
-    AddIAMMemberRequest,
-    AddIAMMemberResponse,
-    AddIDPToLoginPolicyRequest,
-    AddIDPToLoginPolicyResponse,
-    AddJWTIDPRequest,
-    AddJWTIDPResponse,
-    AddMultiFactorToLoginPolicyRequest,
-    AddMultiFactorToLoginPolicyResponse,
-    AddOIDCIDPRequest,
-    AddOIDCIDPResponse,
-    AddSecondFactorToLoginPolicyRequest,
-    AddSecondFactorToLoginPolicyResponse,
-    AddSMSProviderTwilioRequest,
-    AddSMSProviderTwilioResponse,
-    DeactivateIDPRequest,
-    DeactivateIDPResponse,
-    GetCustomDomainClaimedMessageTextRequest,
-    GetCustomDomainClaimedMessageTextResponse,
-    GetCustomInitMessageTextRequest,
-    GetCustomInitMessageTextResponse,
-    GetCustomLoginTextsRequest,
-    GetCustomLoginTextsResponse,
-    GetCustomOrgIAMPolicyRequest,
-    GetCustomOrgIAMPolicyResponse,
-    GetCustomPasswordlessRegistrationMessageTextRequest,
-    GetCustomPasswordlessRegistrationMessageTextResponse,
-    GetCustomPasswordResetMessageTextRequest,
-    GetCustomPasswordResetMessageTextResponse,
-    GetCustomVerifyEmailMessageTextRequest,
-    GetCustomVerifyEmailMessageTextResponse,
-    GetCustomVerifyPhoneMessageTextRequest,
-    GetCustomVerifyPhoneMessageTextResponse,
-    GetDefaultDomainClaimedMessageTextRequest,
-    GetDefaultDomainClaimedMessageTextResponse,
-    GetDefaultInitMessageTextRequest,
-    GetDefaultInitMessageTextResponse,
-    GetDefaultLanguageRequest,
-    GetDefaultLanguageResponse,
-    GetDefaultLoginTextsRequest,
-    GetDefaultLoginTextsResponse,
-    GetDefaultPasswordlessRegistrationMessageTextRequest,
-    GetDefaultPasswordlessRegistrationMessageTextResponse,
-    GetDefaultPasswordResetMessageTextRequest,
-    GetDefaultPasswordResetMessageTextResponse,
-    GetDefaultVerifyEmailMessageTextRequest,
-    GetDefaultVerifyEmailMessageTextResponse,
-    GetDefaultVerifyPhoneMessageTextRequest,
-    GetDefaultVerifyPhoneMessageTextResponse,
-    GetFileSystemNotificationProviderRequest,
-    GetFileSystemNotificationProviderResponse,
-    GetIDPByIDRequest,
-    GetIDPByIDResponse,
-    GetLabelPolicyRequest,
-    GetLabelPolicyResponse,
-    GetLockoutPolicyRequest,
-    GetLockoutPolicyResponse,
-    GetLoginPolicyRequest,
-    GetLoginPolicyResponse,
-    GetLogNotificationProviderRequest,
-    GetLogNotificationProviderResponse,
-    GetOIDCSettingsRequest,
-    GetOIDCSettingsResponse,
-    GetOrgIAMPolicyRequest,
-    GetOrgIAMPolicyResponse,
-    GetPasswordAgePolicyRequest,
-    GetPasswordAgePolicyResponse,
-    GetPasswordComplexityPolicyRequest,
-    GetPasswordComplexityPolicyResponse,
-    GetPreviewLabelPolicyRequest,
-    GetPreviewLabelPolicyResponse,
-    GetPrivacyPolicyRequest,
-    GetPrivacyPolicyResponse,
-    GetSMSProviderRequest,
-    GetSMSProviderResponse,
-    GetSMTPConfigRequest,
-    GetSMTPConfigResponse,
-    GetSupportedLanguagesRequest,
-    GetSupportedLanguagesResponse,
-    IDPQuery,
-    ListFailedEventsRequest,
-    ListFailedEventsResponse,
-    ListIAMMemberRolesRequest,
-    ListIAMMemberRolesResponse,
-    ListIAMMembersRequest,
-    ListIAMMembersResponse,
-    ListIDPsRequest,
-    ListIDPsResponse,
-    ListLoginPolicyIDPsRequest,
-    ListLoginPolicyIDPsResponse,
-    ListLoginPolicyMultiFactorsRequest,
-    ListLoginPolicyMultiFactorsResponse,
-    ListLoginPolicySecondFactorsRequest,
-    ListLoginPolicySecondFactorsResponse,
-    ListSMSProvidersRequest,
-    ListSMSProvidersResponse,
-    ListViewsRequest,
-    ListViewsResponse,
-    ReactivateIDPRequest,
-    ReactivateIDPResponse,
-    RemoveFailedEventRequest,
-    RemoveFailedEventResponse,
-    RemoveIAMMemberRequest,
-    RemoveIAMMemberResponse,
-    RemoveIDPFromLoginPolicyRequest,
-    RemoveIDPFromLoginPolicyResponse,
-    RemoveIDPRequest,
-    RemoveIDPResponse,
-    RemoveLabelPolicyFontRequest,
-    RemoveLabelPolicyFontResponse,
-    RemoveLabelPolicyIconDarkRequest,
-    RemoveLabelPolicyIconDarkResponse,
-    RemoveLabelPolicyIconRequest,
-    RemoveLabelPolicyIconResponse,
-    RemoveLabelPolicyLogoDarkRequest,
-    RemoveLabelPolicyLogoDarkResponse,
-    RemoveLabelPolicyLogoRequest,
-    RemoveLabelPolicyLogoResponse,
-    RemoveMultiFactorFromLoginPolicyRequest,
-    RemoveMultiFactorFromLoginPolicyResponse,
-    RemoveSecondFactorFromLoginPolicyRequest,
-    RemoveSecondFactorFromLoginPolicyResponse,
-    ResetCustomLoginTextsToDefaultRequest,
-    ResetCustomLoginTextsToDefaultResponse,
-    ResetCustomOrgIAMPolicyToDefaultRequest,
-    ResetCustomOrgIAMPolicyToDefaultResponse,
-    SetCustomLoginTextsRequest,
-    SetCustomLoginTextsResponse,
-    SetDefaultDomainClaimedMessageTextRequest,
-    SetDefaultDomainClaimedMessageTextResponse,
-    SetDefaultInitMessageTextRequest,
-    SetDefaultInitMessageTextResponse,
-    SetDefaultLanguageRequest,
-    SetDefaultLanguageResponse,
-    SetDefaultPasswordlessRegistrationMessageTextRequest,
-    SetDefaultPasswordlessRegistrationMessageTextResponse,
-    SetDefaultPasswordResetMessageTextRequest,
-    SetDefaultPasswordResetMessageTextResponse,
-    SetDefaultVerifyEmailMessageTextRequest,
-    SetDefaultVerifyEmailMessageTextResponse,
-    SetDefaultVerifyPhoneMessageTextRequest,
-    SetDefaultVerifyPhoneMessageTextResponse,
-    SetUpOrgRequest,
-    SetUpOrgResponse,
-    UpdateCustomOrgIAMPolicyRequest,
-    UpdateCustomOrgIAMPolicyResponse,
-    UpdateIAMMemberRequest,
-    UpdateIAMMemberResponse,
-    UpdateIDPJWTConfigRequest,
-    UpdateIDPJWTConfigResponse,
-    UpdateIDPOIDCConfigRequest,
-    UpdateIDPOIDCConfigResponse,
-    UpdateIDPRequest,
-    UpdateIDPResponse,
-    UpdateLabelPolicyRequest,
-    UpdateLabelPolicyResponse,
-    UpdateLockoutPolicyRequest,
-    UpdateLockoutPolicyResponse,
-    UpdateLoginPolicyRequest,
-    UpdateLoginPolicyResponse,
-    UpdateOIDCSettingsRequest,
-    UpdateOIDCSettingsResponse,
-    UpdateOrgIAMPolicyRequest,
-    UpdateOrgIAMPolicyResponse,
-    UpdatePasswordAgePolicyRequest,
-    UpdatePasswordAgePolicyResponse,
-    UpdatePasswordComplexityPolicyRequest,
-    UpdatePasswordComplexityPolicyResponse,
-    UpdatePrivacyPolicyRequest,
-    UpdatePrivacyPolicyResponse,
-    UpdateSMTPConfigPasswordRequest,
-    UpdateSMTPConfigPasswordResponse,
-    UpdateSMTPConfigRequest,
-    UpdateSMTPConfigResponse,
+  ActivateLabelPolicyRequest,
+  ActivateLabelPolicyResponse,
+  AddCustomDomainPolicyRequest,
+  AddCustomOrgIAMPolicyResponse,
+  AddIAMMemberRequest,
+  AddIAMMemberResponse,
+  AddIDPToLoginPolicyRequest,
+  AddIDPToLoginPolicyResponse,
+  AddJWTIDPRequest,
+  AddJWTIDPResponse,
+  AddMultiFactorToLoginPolicyRequest,
+  AddMultiFactorToLoginPolicyResponse,
+  AddOIDCIDPRequest,
+  AddOIDCIDPResponse,
+  AddSecondFactorToLoginPolicyRequest,
+  AddSecondFactorToLoginPolicyResponse,
+  AddSMSProviderTwilioRequest,
+  AddSMSProviderTwilioResponse,
+  AddSMTPConfigRequest,
+  AddSMTPConfigResponse,
+  DeactivateIDPRequest,
+  DeactivateIDPResponse,
+  GetCustomDomainClaimedMessageTextRequest,
+  GetCustomDomainClaimedMessageTextResponse,
+  GetCustomDomainPolicyRequest,
+  GetCustomDomainPolicyResponse,
+  GetCustomInitMessageTextRequest,
+  GetCustomInitMessageTextResponse,
+  GetCustomLoginTextsRequest,
+  GetCustomLoginTextsResponse,
+  GetCustomPasswordlessRegistrationMessageTextRequest,
+  GetCustomPasswordlessRegistrationMessageTextResponse,
+  GetCustomPasswordResetMessageTextRequest,
+  GetCustomPasswordResetMessageTextResponse,
+  GetCustomVerifyEmailMessageTextRequest,
+  GetCustomVerifyEmailMessageTextResponse,
+  GetCustomVerifyPhoneMessageTextRequest,
+  GetCustomVerifyPhoneMessageTextResponse,
+  GetDefaultDomainClaimedMessageTextRequest,
+  GetDefaultDomainClaimedMessageTextResponse,
+  GetDefaultInitMessageTextRequest,
+  GetDefaultInitMessageTextResponse,
+  GetDefaultLanguageRequest,
+  GetDefaultLanguageResponse,
+  GetDefaultLoginTextsRequest,
+  GetDefaultLoginTextsResponse,
+  GetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextResponse,
+  GetDefaultPasswordResetMessageTextRequest,
+  GetDefaultPasswordResetMessageTextResponse,
+  GetDefaultVerifyEmailMessageTextRequest,
+  GetDefaultVerifyEmailMessageTextResponse,
+  GetDefaultVerifyPhoneMessageTextRequest,
+  GetDefaultVerifyPhoneMessageTextResponse,
+  GetDomainPolicyRequest,
+  GetDomainPolicyResponse,
+  GetFileSystemNotificationProviderRequest,
+  GetFileSystemNotificationProviderResponse,
+  GetIDPByIDRequest,
+  GetIDPByIDResponse,
+  GetLabelPolicyRequest,
+  GetLabelPolicyResponse,
+  GetLockoutPolicyRequest,
+  GetLockoutPolicyResponse,
+  GetLoginPolicyRequest,
+  GetLoginPolicyResponse,
+  GetLogNotificationProviderRequest,
+  GetLogNotificationProviderResponse,
+  GetOIDCSettingsRequest,
+  GetOIDCSettingsResponse,
+  GetPasswordAgePolicyRequest,
+  GetPasswordAgePolicyResponse,
+  GetPasswordComplexityPolicyRequest,
+  GetPasswordComplexityPolicyResponse,
+  GetPreviewLabelPolicyRequest,
+  GetPreviewLabelPolicyResponse,
+  GetPrivacyPolicyRequest,
+  GetPrivacyPolicyResponse,
+  GetSecretGeneratorRequest,
+  GetSecretGeneratorResponse,
+  GetSMSProviderRequest,
+  GetSMSProviderResponse,
+  GetSMTPConfigRequest,
+  GetSMTPConfigResponse,
+  GetSupportedLanguagesRequest,
+  GetSupportedLanguagesResponse,
+  IDPQuery,
+  ListFailedEventsRequest,
+  ListFailedEventsResponse,
+  ListIAMMemberRolesRequest,
+  ListIAMMemberRolesResponse,
+  ListIAMMembersRequest,
+  ListIAMMembersResponse,
+  ListIDPsRequest,
+  ListIDPsResponse,
+  ListLoginPolicyIDPsRequest,
+  ListLoginPolicyIDPsResponse,
+  ListLoginPolicyMultiFactorsRequest,
+  ListLoginPolicyMultiFactorsResponse,
+  ListLoginPolicySecondFactorsRequest,
+  ListLoginPolicySecondFactorsResponse,
+  ListSecretGeneratorsRequest,
+  ListSecretGeneratorsResponse,
+  ListSMSProvidersRequest,
+  ListSMSProvidersResponse,
+  ListViewsRequest,
+  ListViewsResponse,
+  ReactivateIDPRequest,
+  ReactivateIDPResponse,
+  RemoveFailedEventRequest,
+  RemoveFailedEventResponse,
+  RemoveIAMMemberRequest,
+  RemoveIAMMemberResponse,
+  RemoveIDPFromLoginPolicyRequest,
+  RemoveIDPFromLoginPolicyResponse,
+  RemoveIDPRequest,
+  RemoveIDPResponse,
+  RemoveLabelPolicyFontRequest,
+  RemoveLabelPolicyFontResponse,
+  RemoveLabelPolicyIconDarkRequest,
+  RemoveLabelPolicyIconDarkResponse,
+  RemoveLabelPolicyIconRequest,
+  RemoveLabelPolicyIconResponse,
+  RemoveLabelPolicyLogoDarkRequest,
+  RemoveLabelPolicyLogoDarkResponse,
+  RemoveLabelPolicyLogoRequest,
+  RemoveLabelPolicyLogoResponse,
+  RemoveMultiFactorFromLoginPolicyRequest,
+  RemoveMultiFactorFromLoginPolicyResponse,
+  RemoveSecondFactorFromLoginPolicyRequest,
+  RemoveSecondFactorFromLoginPolicyResponse,
+  ResetCustomDomainPolicyToDefaultRequest,
+  ResetCustomDomainPolicyToDefaultResponse,
+  ResetCustomLoginTextsToDefaultRequest,
+  ResetCustomLoginTextsToDefaultResponse,
+  SetCustomLoginTextsRequest,
+  SetCustomLoginTextsResponse,
+  SetDefaultDomainClaimedMessageTextRequest,
+  SetDefaultDomainClaimedMessageTextResponse,
+  SetDefaultInitMessageTextRequest,
+  SetDefaultInitMessageTextResponse,
+  SetDefaultLanguageRequest,
+  SetDefaultLanguageResponse,
+  SetDefaultPasswordlessRegistrationMessageTextRequest,
+  SetDefaultPasswordlessRegistrationMessageTextResponse,
+  SetDefaultPasswordResetMessageTextRequest,
+  SetDefaultPasswordResetMessageTextResponse,
+  SetDefaultVerifyEmailMessageTextRequest,
+  SetDefaultVerifyEmailMessageTextResponse,
+  SetDefaultVerifyPhoneMessageTextRequest,
+  SetDefaultVerifyPhoneMessageTextResponse,
+  SetUpOrgRequest,
+  SetUpOrgResponse,
+  UpdateCustomDomainPolicyRequest,
+  UpdateCustomDomainPolicyResponse,
+  UpdateDomainPolicyRequest,
+  UpdateDomainPolicyResponse,
+  UpdateIAMMemberRequest,
+  UpdateIAMMemberResponse,
+  UpdateIDPJWTConfigRequest,
+  UpdateIDPJWTConfigResponse,
+  UpdateIDPOIDCConfigRequest,
+  UpdateIDPOIDCConfigResponse,
+  UpdateIDPRequest,
+  UpdateIDPResponse,
+  UpdateLabelPolicyRequest,
+  UpdateLabelPolicyResponse,
+  UpdateLockoutPolicyRequest,
+  UpdateLockoutPolicyResponse,
+  UpdateLoginPolicyRequest,
+  UpdateLoginPolicyResponse,
+  UpdateOIDCSettingsRequest,
+  UpdateOIDCSettingsResponse,
+  UpdatePasswordAgePolicyRequest,
+  UpdatePasswordAgePolicyResponse,
+  UpdatePasswordComplexityPolicyRequest,
+  UpdatePasswordComplexityPolicyResponse,
+  UpdatePrivacyPolicyRequest,
+  UpdatePrivacyPolicyResponse,
+  UpdateSecretGeneratorRequest,
+  UpdateSecretGeneratorResponse,
+  UpdateSMSProviderTwilioRequest,
+  UpdateSMSProviderTwilioResponse,
+  UpdateSMSProviderTwilioTokenRequest,
+  UpdateSMSProviderTwilioTokenResponse,
+  UpdateSMTPConfigPasswordRequest,
+  UpdateSMTPConfigPasswordResponse,
+  UpdateSMTPConfigRequest,
+  UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -460,6 +472,10 @@ export class AdminService {
     return this.grpcService.admin.getSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
+  public addSMTPConfig(req: AddSMTPConfigRequest): Promise<AddSMTPConfigResponse.AsObject> {
+    return this.grpcService.admin.addSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
   public updateSMTPConfig(req: UpdateSMTPConfigRequest): Promise<UpdateSMTPConfigResponse.AsObject> {
     return this.grpcService.admin.updateSMTPConfig(req, null).then((resp) => resp.toObject());
   }
@@ -482,6 +498,16 @@ export class AdminService {
 
   public addSMSProviderTwilio(req: AddSMSProviderTwilioRequest): Promise<AddSMSProviderTwilioResponse.AsObject> {
     return this.grpcService.admin.addSMSProviderTwilio(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMSProviderTwilio(req: UpdateSMSProviderTwilioRequest): Promise<UpdateSMSProviderTwilioResponse.AsObject> {
+    return this.grpcService.admin.updateSMSProviderTwilio(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSMSProviderTwilioToken(
+    req: UpdateSMSProviderTwilioTokenRequest,
+  ): Promise<UpdateSMSProviderTwilioTokenResponse.AsObject> {
+    return this.grpcService.admin.updateSMSProviderTwilioToken(req, null).then((resp) => resp.toObject());
   }
 
   /* lockout */
@@ -573,58 +599,55 @@ export class AdminService {
     return this.grpcService.admin.getLogNotificationProvider(req, null).then((resp) => resp.toObject());
   }
 
-  public getFileSystemNotificationProvider(
-    req: GetFileSystemNotificationProviderRequest,
-  ): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+  public getFileSystemNotificationProvider(): Promise<GetFileSystemNotificationProviderResponse.AsObject> {
+    const req = new GetFileSystemNotificationProviderRequest();
     return this.grpcService.admin.getFileSystemNotificationProvider(req, null).then((resp) => resp.toObject());
   }
 
-  /* org iam */
+  /* secrets generator */
 
-  public getCustomOrgIAMPolicy(orgId: string): Promise<GetCustomOrgIAMPolicyResponse.AsObject> {
-    const req = new GetCustomOrgIAMPolicyRequest();
+  public listSecretGenerators(): Promise<ListSecretGeneratorsResponse.AsObject> {
+    const req = new ListSecretGeneratorsRequest();
+    return this.grpcService.admin.listSecretGenerators(req, null).then((resp) => resp.toObject());
+  }
+
+  public getSecretGenerator(req: GetSecretGeneratorRequest): Promise<GetSecretGeneratorResponse.AsObject> {
+    return this.grpcService.admin.getSecretGenerator(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSecretGenerator(req: UpdateSecretGeneratorRequest): Promise<UpdateSecretGeneratorResponse.AsObject> {
+    return this.grpcService.admin.updateSecretGenerator(req, null).then((resp) => resp.toObject());
+  }
+
+  /* org domain policy */
+
+  public getDomainPolicy(): Promise<GetDomainPolicyResponse.AsObject> {
+    const req = new GetDomainPolicyRequest();
+    return this.grpcService.admin.getDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateDomainPolicy(req: UpdateDomainPolicyRequest): Promise<UpdateDomainPolicyResponse.AsObject> {
+    return this.grpcService.admin.updateDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomDomainPolicy(orgId: string): Promise<GetCustomDomainPolicyResponse.AsObject> {
+    const req = new GetCustomDomainPolicyRequest();
     req.setOrgId(orgId);
-    return this.grpcService.admin.getCustomOrgIAMPolicy(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.getCustomDomainPolicy(req, null).then((resp) => resp.toObject());
   }
 
-  public addCustomOrgIAMPolicy(
-    orgId: string,
-    userLoginMustBeDomain: boolean,
-  ): Promise<AddCustomOrgIAMPolicyResponse.AsObject> {
-    const req = new AddCustomOrgIAMPolicyRequest();
+  public addCustomDomainPolicy(req: AddCustomDomainPolicyRequest): Promise<AddCustomOrgIAMPolicyResponse.AsObject> {
+    return this.grpcService.admin.addCustomDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateCustomDomainPolicy(req: UpdateCustomDomainPolicyRequest): Promise<UpdateCustomDomainPolicyResponse.AsObject> {
+    return this.grpcService.admin.updateCustomDomainPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomDomainPolicyToDefault(orgId: string): Promise<ResetCustomDomainPolicyToDefaultResponse.AsObject> {
+    const req = new ResetCustomDomainPolicyToDefaultRequest();
     req.setOrgId(orgId);
-    req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-
-    return this.grpcService.admin.addCustomOrgIAMPolicy(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateCustomOrgIAMPolicy(
-    orgId: string,
-    userLoginMustBeDomain: boolean,
-  ): Promise<UpdateCustomOrgIAMPolicyResponse.AsObject> {
-    const req = new UpdateCustomOrgIAMPolicyRequest();
-    req.setOrgId(orgId);
-    req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-    return this.grpcService.admin.updateCustomOrgIAMPolicy(req, null).then((resp) => resp.toObject());
-  }
-
-  public resetCustomOrgIAMPolicyToDefault(orgId: string): Promise<ResetCustomOrgIAMPolicyToDefaultResponse.AsObject> {
-    const req = new ResetCustomOrgIAMPolicyToDefaultRequest();
-    req.setOrgId(orgId);
-    return this.grpcService.admin.resetCustomOrgIAMPolicyToDefault(req, null).then((resp) => resp.toObject());
-  }
-
-  /* admin iam */
-
-  public getOrgIAMPolicy(): Promise<GetOrgIAMPolicyResponse.AsObject> {
-    const req = new GetOrgIAMPolicyRequest();
-    return this.grpcService.admin.getOrgIAMPolicy(req, null).then((resp) => resp.toObject());
-  }
-
-  public updateOrgIAMPolicy(userLoginMustBeDomain: boolean): Promise<UpdateOrgIAMPolicyResponse.AsObject> {
-    const req = new UpdateOrgIAMPolicyRequest();
-    req.setUserLoginMustBeDomain(userLoginMustBeDomain);
-    return this.grpcService.admin.updateOrgIAMPolicy(req, null).then((resp) => resp.toObject());
+    return this.grpcService.admin.resetCustomDomainPolicyToDefault(req, null).then((resp) => resp.toObject());
   }
 
   /* policies end */

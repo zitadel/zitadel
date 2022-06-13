@@ -28,9 +28,6 @@ export class ProjectCreateComponent {
     breadcrumbService.setBreadcrumb([bread]);
   }
 
-  public createSteps: number = 1;
-  public currentCreateStep: number = 1;
-
   public saveProject(): void {
     this.mgmtService
       .addProject(this.project)

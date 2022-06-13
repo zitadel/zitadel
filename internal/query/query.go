@@ -73,3 +73,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql
 
 	return repo, nil
 }
+
+func (q *Queries) Health(ctx context.Context) error {
+	return q.client.Ping()
+}

@@ -190,8 +190,6 @@ func IDPViewToConfigPb(config *query.IDP) idp_pb.IDPConfig {
 
 func FieldNameToModel(fieldName idp_pb.IDPFieldName) query.Column {
 	switch fieldName {
-	// case admin.IdpSearchKey_IDPSEARCHKEY_IDP_CONFIG_ID: //TODO: not implemented in proto
-	// 	return iam_model.IDPConfigSearchKeyIdpConfigID
 	case idp_pb.IDPFieldName_IDP_FIELD_NAME_NAME:
 		return query.IDPNameCol
 	default:

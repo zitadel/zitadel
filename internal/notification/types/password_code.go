@@ -29,7 +29,7 @@ func SendPasswordCode(ctx context.Context, mailhtml string, translator *i18n.Tra
 	if err != nil {
 		return err
 	}
-	url := login.InitPasswordLink(origin, user.ID, codeString)
+	url := login.InitPasswordLink(origin, user.ID, codeString, user.ResourceOwner)
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString
 

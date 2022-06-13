@@ -39,7 +39,7 @@
             <div class="lgn-suffix-wrapper">
                 <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
                        value="{{ .Username }}" required>
-                {{if .DisplayLoginNameSuffix}}
+                {{if .ShowUsername}}
                 <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
             </div>
@@ -100,7 +100,7 @@
     {{template "error-message" .}}
 
     <div class="lgn-actions">
-        <a class="lgn-stroked-button lgn-primary" href="{{ registerOptionUrl }}">
+        <a class="lgn-stroked-button" href="{{ registerOptionUrl }}">
             {{t "ExternalRegistrationUserOverview.BackButtonText"}}
         </a>
         <span class="fill-space"></span>

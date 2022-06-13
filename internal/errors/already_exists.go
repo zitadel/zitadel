@@ -38,3 +38,7 @@ func IsErrorAlreadyExists(err error) bool {
 	_, ok := err.(AlreadyExists)
 	return ok
 }
+
+func (err *AlreadyExistsError) Unwrap() error {
+	return err.CaosError
+}

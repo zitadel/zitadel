@@ -19,15 +19,7 @@ This means that the users and also their authorizations will be managed within Z
 An organization is the ZITADEL resource which contains users, projects, applications, policies and so on. 
 In an organization projects and users are managed by the organization.
 You need at least one organization for your own company in our case "The Timing Company".
-
-For your customers you have different possibilities:
-1. Your customer already owns an organization in ZITADEL
-2. Your customer creates a new organization in ZITADEL by itself
-3. You create an organization for your customer (If you like to verify the domain, the customer has to do it)
-
-:::info
-Subscriptions are organization based. This means, that each organization can choose their own tier based on the needed features.
-:::
+As next step grate an organization for each of your costumers.
 
 ## Project
 
@@ -70,7 +62,7 @@ More about the [Scopes](../../apis/openidoauth/scopes)
 2. Show private labeling (branding) of the project organization
 
 You can configure on project-level which branding should be shown to users.
-In the default the design of ZITADEL will be shown, but as soon as the user is identified, the policy of the users organization will be triggered.
+In the default the design of the instance will be shown, but as soon as the user is identified, the policy of the users organization (if specified) will be triggered.
 If the setting is set to `Ensure Project Resource Owner Setting`, the private labeling of the project organization will always be triggered.
 The last possibility is to show the private labeling of the project organization and as soon as the user is identitfied the user organization settings will be triggered.
 For this the Allow User Resource Owner Setting should be set.

@@ -44,12 +44,21 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.passwordless_type,`+
 						` projections.login_policies.is_default,`+
 						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.ignore_unknown_usernames,`+
+						` projections.login_policies.default_redirect_uri,`+
 						` projections.login_policies.password_check_lifetime,`+
 						` projections.login_policies.external_login_check_lifetime,`+
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
-						` projections.login_policies.multi_factor_check_lifetime`+
-						` FROM projections.login_policies`),
+						` projections.login_policies.multi_factor_check_lifetime,`+
+						` projections.idp_login_policy_links.idp_id,`+
+						` projections.idps.name,`+
+						` projections.idps.type`+
+						` FROM projections.login_policies`+
+						` LEFT JOIN projections.idp_login_policy_links ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
+						` LEFT JOIN projections.idps ON`+
+						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
 					nil,
 					nil,
 				),
@@ -80,12 +89,21 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.passwordless_type,`+
 						` projections.login_policies.is_default,`+
 						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.ignore_unknown_usernames,`+
+						` projections.login_policies.default_redirect_uri,`+
 						` projections.login_policies.password_check_lifetime,`+
 						` projections.login_policies.external_login_check_lifetime,`+
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
-						` projections.login_policies.multi_factor_check_lifetime`+
-						` FROM projections.login_policies`),
+						` projections.login_policies.multi_factor_check_lifetime,`+
+						` projections.idp_login_policy_links.idp_id,`+
+						` projections.idps.name,`+
+						` projections.idps.type`+
+						` FROM projections.login_policies`+
+						` LEFT JOIN projections.idp_login_policy_links ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
+						` LEFT JOIN projections.idps ON`+
+						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
 					[]string{
 						"aggregate_id",
 						"creation_date",
@@ -100,11 +118,16 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"passwordless_type",
 						"is_default",
 						"hide_password_reset",
+						"ignore_unknown_usernames",
+						"default_redirect_uri",
 						"password_check_lifetime",
 						"external_login_check_lifetime",
 						"mfa_init_skip_lifetime",
 						"second_factor_check_lifetime",
 						"multi_factor_check_lifetime",
+						"idp_id",
+						"name",
+						"type",
 					},
 					[]driver.Value{
 						"ro",
@@ -120,11 +143,16 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
+						true,
+						"https://example.com/redirect",
 						time.Hour * 2,
 						time.Hour * 2,
 						time.Hour * 2,
 						time.Hour * 2,
 						time.Hour * 2,
+						"config1",
+						"IDP",
+						domain.IDPConfigTypeJWT,
 					},
 				),
 			},
@@ -142,11 +170,20 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				PasswordlessType:           domain.PasswordlessTypeAllowed,
 				IsDefault:                  true,
 				HidePasswordReset:          true,
+				IgnoreUnknownUsernames:     true,
+				DefaultRedirectURI:         "https://example.com/redirect",
 				PasswordCheckLifetime:      time.Hour * 2,
 				ExternalLoginCheckLifetime: time.Hour * 2,
 				MFAInitSkipLifetime:        time.Hour * 2,
 				SecondFactorCheckLifetime:  time.Hour * 2,
 				MultiFactorCheckLifetime:   time.Hour * 2,
+				IDPLinks: []*IDPLoginPolicyLink{
+					{
+						IDPID:   "config1",
+						IDPName: "IDP",
+						IDPType: domain.IDPConfigTypeJWT,
+					},
+				},
 			},
 		},
 		{
@@ -167,12 +204,21 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.passwordless_type,`+
 						` projections.login_policies.is_default,`+
 						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.ignore_unknown_usernames,`+
+						` projections.login_policies.default_redirect_uri,`+
 						` projections.login_policies.password_check_lifetime,`+
 						` projections.login_policies.external_login_check_lifetime,`+
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
-						` projections.login_policies.multi_factor_check_lifetime`+
-						` FROM projections.login_policies`),
+						` projections.login_policies.multi_factor_check_lifetime,`+
+						` projections.idp_login_policy_links.idp_id,`+
+						` projections.idps.name,`+
+						` projections.idps.type`+
+						` FROM projections.login_policies`+
+						` LEFT JOIN projections.idp_login_policy_links ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
+						` LEFT JOIN projections.idps ON`+
+						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

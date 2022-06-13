@@ -27,6 +27,8 @@ import (
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
+const unknownUserID = "UNKNOWN"
+
 type AuthRequestRepo struct {
 	Command      *command.Commands
 	Query        *query.Queries
@@ -63,11 +65,9 @@ type privacyPolicyProvider interface {
 type userSessionViewProvider interface {
 	UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error)
 	UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error)
-	PrefixAvatarURL() string
 }
 type userViewProvider interface {
 	UserByID(string, string) (*user_view_model.UserView, error)
-	PrefixAvatarURL() string
 }
 
 type loginPolicyViewProvider interface {
@@ -97,7 +97,7 @@ type orgViewProvider interface {
 
 type userGrantProvider interface {
 	ProjectByClientID(context.Context, string) (*query.Project, error)
-	UserGrantsByProjectAndUserID(string, string) ([]*query.UserGrant, error)
+	UserGrantsByProjectAndUserID(context.Context, string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
@@ -284,7 +284,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID, false)
 	if err != nil {
 		return err
 	}
@@ -304,13 +304,28 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, user
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequestEnsureUser(ctx, authReqID, userAgentID, userID)
 	if err != nil {
+		if isIgnoreUserNotFoundError(err, request) {
+			return errors.ThrowInvalidArgument(nil, "EVENT-SDe2f", "Errors.User.UsernameOrPassword.Invalid")
+		}
 		return err
 	}
 	policy, err := repo.getLockoutPolicy(ctx, resourceOwner)
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+	err = repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+	if isIgnoreUserInvalidPasswordError(err, request) {
+		return errors.ThrowInvalidArgument(nil, "EVENT-Jsf32", "Errors.User.UsernameOrPassword.Invalid")
+	}
+	return err
+}
+
+func isIgnoreUserNotFoundError(err error, request *domain.AuthRequest) bool {
+	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && errors.IsNotFound(err) && errors.Contains(err, "Errors.User.NotFound")
+}
+
+func isIgnoreUserInvalidPasswordError(err error, request *domain.AuthRequest) bool {
+	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && errors.IsErrorInvalidArgument(err) && errors.Contains(err, "Errors.User.Password.Invalid")
 }
 
 func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
@@ -499,9 +514,9 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 	if request.UserID != userID {
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
-	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, false)
 	if err != nil {
-		return nil, err
+		return request, err
 	}
 	return request, nil
 }
@@ -613,8 +628,8 @@ func (repo *AuthRequestRepo) tryUsingOnlyUserSession(request *domain.AuthRequest
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginName string) (err error) {
 	user := new(user_view_model.UserView)
+	preferredLoginName := loginName
 	if request.RequestedOrgID != "" {
-		preferredLoginName := loginName
 		if request.RequestedOrgID != "" {
 			preferredLoginName += "@" + request.RequestedPrimaryDomain
 		}
@@ -626,6 +641,15 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 			if err != nil {
 				return err
 			}
+		}
+	}
+	if request.LoginPolicy.IgnoreUnknownUsernames {
+		if errors.IsNotFound(err) || (user != nil && user.State == int32(domain.UserStateInactive)) {
+			if request.LabelPolicy.HideLoginNameSuffix {
+				preferredLoginName = loginName
+			}
+			request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)
+			return nil
 		}
 	}
 	if err != nil {
@@ -675,6 +699,7 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		MultiFactors:               policy.MultiFactors,
 		PasswordlessType:           policy.PasswordlessType,
 		HidePasswordReset:          policy.HidePasswordReset,
+		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
 		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
 		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
 		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
@@ -703,7 +728,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	if err != nil {
 		return err
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, externalIDP.UserID, false)
 	if err != nil {
 		return err
 	}
@@ -749,11 +774,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 		return steps, nil
 	}
-	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID)
+	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, request.LoginPolicy.IgnoreUnknownUsernames)
 	if err != nil {
 		return nil, err
 	}
-	request.LoginName = user.PreferredLoginName
+	if user.PreferredLoginName != "" {
+		request.LoginName = user.PreferredLoginName
+	}
 	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
 	if err != nil {
 		return nil, err
@@ -1079,7 +1106,7 @@ func userSessionsByUserAgentID(provider userSessionViewProvider, agentID, instan
 	if err != nil {
 		return nil, err
 	}
-	return user_view_model.UserSessionsToModel(session, provider.PrefixAvatarURL()), nil
+	return user_view_model.UserSessionsToModel(session), nil
 }
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
@@ -1093,7 +1120,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
 		logging.Log("EVENT-Hse6s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return user_view_model.UserSessionToModel(session, provider.PrefixAvatarURL()), nil
+		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
 	for _, event := range events {
@@ -1118,7 +1145,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
 				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
-				return user_view_model.UserSessionToModel(session, provider.PrefixAvatarURL()), nil
+				return user_view_model.UserSessionToModel(session), nil
 			}
 			if eventData.UserAgentID != agentID {
 				continue
@@ -1129,13 +1156,19 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		err := sessionCopy.AppendEvent(event)
 		logging.Log("EVENT-qbhj3").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("error appending event")
 	}
-	return user_view_model.UserSessionToModel(&sessionCopy, provider.PrefixAvatarURL()), nil
+	return user_view_model.UserSessionToModel(&sessionCopy), nil
 }
 
-func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string) (*user_model.UserView, error) {
+func activeUserByID(ctx context.Context, userViewProvider userViewProvider, userEventProvider userEventProvider, queries orgViewProvider, lockoutPolicyProvider lockoutPolicyViewProvider, userID string, ignoreUnknownUsernames bool) (user *user_model.UserView, err error) {
 	// PLANNED: Check LockoutPolicy
-	user, err := userByID(ctx, userViewProvider, userEventProvider, userID)
+	user, err = userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
+		if ignoreUnknownUsernames && errors.IsNotFound(err) {
+			return &user_model.UserView{
+				ID:        userID,
+				HumanView: &user_model.HumanView{},
+			}, nil
+		}
 		return nil, err
 	}
 
@@ -1168,24 +1201,24 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
 		logging.Log("EVENT-dfg42").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), nil
+		return user_view_model.UserToModel(user), nil
 	}
 	if len(events) == 0 {
 		if viewErr != nil {
 			return nil, viewErr
 		}
-		return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), viewErr
+		return user_view_model.UserToModel(user), viewErr
 	}
 	userCopy := *user
 	for _, event := range events {
 		if err := userCopy.AppendEvent(event); err != nil {
-			return user_view_model.UserToModel(user, viewProvider.PrefixAvatarURL()), nil
+			return user_view_model.UserToModel(user), nil
 		}
 	}
 	if userCopy.State == int32(user_model.UserStateDeleted) {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3F9so", "Errors.User.NotFound")
 	}
-	return user_view_model.UserToModel(&userCopy, viewProvider.PrefixAvatarURL()), nil
+	return user_view_model.UserToModel(&userCopy), nil
 }
 
 func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, request *domain.AuthRequest) error {
@@ -1236,7 +1269,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	if !project.ProjectRoleCheck {
 		return false, nil
 	}
-	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(project.ID, user.ID)
+	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(ctx, project.ID, user.ID)
 	if err != nil {
 		return false, err
 	}

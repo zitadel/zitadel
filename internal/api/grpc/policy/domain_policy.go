@@ -8,9 +8,10 @@ import (
 
 func DomainPolicyToPb(policy *query.DomainPolicy) *policy_pb.DomainPolicy {
 	return &policy_pb.DomainPolicy{
-		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
-		ValidateOrgDomains:    policy.ValidateOrgDomains,
-		IsDefault:             policy.IsDefault,
+		UserLoginMustBeDomain:                  policy.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     policy.ValidateOrgDomains,
+		SmtpSenderAddressMatchesInstanceDomain: policy.SMTPSenderAddressMatchesInstanceDomain,
+		IsDefault:                              policy.IsDefault,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,

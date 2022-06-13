@@ -1,89 +1,94 @@
 import { Injectable } from '@angular/core';
+import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, finalize, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import {
-    AddMyAuthFactorOTPRequest,
-    AddMyAuthFactorOTPResponse,
-    AddMyAuthFactorU2FRequest,
-    AddMyAuthFactorU2FResponse,
-    AddMyPasswordlessLinkRequest,
-    AddMyPasswordlessLinkResponse,
-    AddMyPasswordlessRequest,
-    AddMyPasswordlessResponse,
-    GetMyEmailRequest,
-    GetMyEmailResponse,
-    GetMyPasswordComplexityPolicyRequest,
-    GetMyPasswordComplexityPolicyResponse,
-    GetMyPhoneRequest,
-    GetMyPhoneResponse,
-    GetMyProfileRequest,
-    GetMyProfileResponse,
-    GetMyUserRequest,
-    GetMyUserResponse,
-    GetSupportedLanguagesRequest,
-    GetSupportedLanguagesResponse,
-    ListMyAuthFactorsRequest,
-    ListMyAuthFactorsResponse,
-    ListMyLinkedIDPsRequest,
-    ListMyLinkedIDPsResponse,
-    ListMyMembershipsRequest,
-    ListMyMembershipsResponse,
-    ListMyPasswordlessRequest,
-    ListMyPasswordlessResponse,
-    ListMyProjectOrgsRequest,
-    ListMyProjectOrgsResponse,
-    ListMyUserChangesRequest,
-    ListMyUserChangesResponse,
-    ListMyUserGrantsRequest,
-    ListMyUserGrantsResponse,
-    ListMyUserSessionsRequest,
-    ListMyUserSessionsResponse,
-    ListMyZitadelPermissionsRequest,
-    ListMyZitadelPermissionsResponse,
-    RemoveMyAuthFactorOTPRequest,
-    RemoveMyAuthFactorOTPResponse,
-    RemoveMyAuthFactorU2FRequest,
-    RemoveMyAuthFactorU2FResponse,
-    RemoveMyAvatarRequest,
-    RemoveMyAvatarResponse,
-    RemoveMyLinkedIDPRequest,
-    RemoveMyLinkedIDPResponse,
-    RemoveMyPasswordlessRequest,
-    RemoveMyPasswordlessResponse,
-    RemoveMyPhoneRequest,
-    RemoveMyPhoneResponse,
-    RemoveMyUserRequest,
-    RemoveMyUserResponse,
-    ResendMyEmailVerificationRequest,
-    ResendMyEmailVerificationResponse,
-    ResendMyPhoneVerificationRequest,
-    ResendMyPhoneVerificationResponse,
-    SendMyPasswordlessLinkRequest,
-    SendMyPasswordlessLinkResponse,
-    SetMyEmailRequest,
-    SetMyEmailResponse,
-    SetMyPhoneRequest,
-    SetMyPhoneResponse,
-    UpdateMyPasswordRequest,
-    UpdateMyPasswordResponse,
-    UpdateMyProfileRequest,
-    UpdateMyProfileResponse,
-    UpdateMyUserNameRequest,
-    UpdateMyUserNameResponse,
-    VerifyMyAuthFactorOTPRequest,
-    VerifyMyAuthFactorOTPResponse,
-    VerifyMyAuthFactorU2FRequest,
-    VerifyMyAuthFactorU2FResponse,
-    VerifyMyPasswordlessRequest,
-    VerifyMyPasswordlessResponse,
-    VerifyMyPhoneRequest,
-    VerifyMyPhoneResponse,
+  AddMyAuthFactorOTPRequest,
+  AddMyAuthFactorOTPResponse,
+  AddMyAuthFactorU2FRequest,
+  AddMyAuthFactorU2FResponse,
+  AddMyPasswordlessLinkRequest,
+  AddMyPasswordlessLinkResponse,
+  AddMyPasswordlessRequest,
+  AddMyPasswordlessResponse,
+  GetMyEmailRequest,
+  GetMyEmailResponse,
+  GetMyLabelPolicyRequest,
+  GetMyLabelPolicyResponse,
+  GetMyPasswordComplexityPolicyRequest,
+  GetMyPasswordComplexityPolicyResponse,
+  GetMyPhoneRequest,
+  GetMyPhoneResponse,
+  GetMyPrivacyPolicyRequest,
+  GetMyPrivacyPolicyResponse,
+  GetMyProfileRequest,
+  GetMyProfileResponse,
+  GetMyUserRequest,
+  GetMyUserResponse,
+  GetSupportedLanguagesRequest,
+  GetSupportedLanguagesResponse,
+  ListMyAuthFactorsRequest,
+  ListMyAuthFactorsResponse,
+  ListMyLinkedIDPsRequest,
+  ListMyLinkedIDPsResponse,
+  ListMyMembershipsRequest,
+  ListMyMembershipsResponse,
+  ListMyPasswordlessRequest,
+  ListMyPasswordlessResponse,
+  ListMyProjectOrgsRequest,
+  ListMyProjectOrgsResponse,
+  ListMyUserChangesRequest,
+  ListMyUserChangesResponse,
+  ListMyUserGrantsRequest,
+  ListMyUserGrantsResponse,
+  ListMyUserSessionsRequest,
+  ListMyUserSessionsResponse,
+  ListMyZitadelPermissionsRequest,
+  ListMyZitadelPermissionsResponse,
+  RemoveMyAuthFactorOTPRequest,
+  RemoveMyAuthFactorOTPResponse,
+  RemoveMyAuthFactorU2FRequest,
+  RemoveMyAuthFactorU2FResponse,
+  RemoveMyAvatarRequest,
+  RemoveMyAvatarResponse,
+  RemoveMyLinkedIDPRequest,
+  RemoveMyLinkedIDPResponse,
+  RemoveMyPasswordlessRequest,
+  RemoveMyPasswordlessResponse,
+  RemoveMyPhoneRequest,
+  RemoveMyPhoneResponse,
+  RemoveMyUserRequest,
+  RemoveMyUserResponse,
+  ResendMyEmailVerificationRequest,
+  ResendMyEmailVerificationResponse,
+  ResendMyPhoneVerificationRequest,
+  ResendMyPhoneVerificationResponse,
+  SendMyPasswordlessLinkRequest,
+  SendMyPasswordlessLinkResponse,
+  SetMyEmailRequest,
+  SetMyEmailResponse,
+  SetMyPhoneRequest,
+  SetMyPhoneResponse,
+  UpdateMyPasswordRequest,
+  UpdateMyPasswordResponse,
+  UpdateMyProfileRequest,
+  UpdateMyProfileResponse,
+  UpdateMyUserNameRequest,
+  UpdateMyUserNameResponse,
+  VerifyMyAuthFactorOTPRequest,
+  VerifyMyAuthFactorOTPResponse,
+  VerifyMyAuthFactorU2FRequest,
+  VerifyMyAuthFactorU2FResponse,
+  VerifyMyPasswordlessRequest,
+  VerifyMyPasswordlessResponse,
+  VerifyMyPhoneRequest,
+  VerifyMyPhoneResponse,
 } from '../proto/generated/zitadel/auth_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
-import { Org, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
@@ -215,9 +220,9 @@ export class GrpcAuthService {
    * returns true if user has one of the provided roles
    * @param roles roles of the user
    */
-  public isAllowed(roles: string[] | RegExp[]): Observable<boolean> {
+  public isAllowed(roles: string[] | RegExp[], requiresAll: boolean = false): Observable<boolean> {
     if (roles && roles.length > 0) {
-      return this.zitadelPermissions.pipe(switchMap((zroles) => of(this.hasRoles(zroles, roles))));
+      return this.zitadelPermissions.pipe(switchMap((zroles) => of(this.hasRoles(zroles, roles, requiresAll))));
     } else {
       return of(false);
     }
@@ -227,17 +232,18 @@ export class GrpcAuthService {
    * returns true if user has one of the provided roles
    * @param userRoles roles of the user
    * @param requestedRoles required roles for accessing the respective component
+   * @param requiresAll true - if all regexes must match, false - if only one regex must match
    */
-  public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[]): boolean {
-    return (
-      requestedRoles.findIndex((regexp: any) => {
-        return (
-          userRoles.findIndex((role) => {
-            return new RegExp(regexp).test(role);
-          }) > -1
-        );
-      }) > -1
-    );
+  public hasRoles(userRoles: string[], requestedRoles: string[] | RegExp[], requiresAll: boolean = false): boolean {
+    const test = (reqRegexp: string | RegExp) =>
+      userRoles.some((role) => {
+        return new RegExp(reqRegexp).test(role);
+      });
+
+    const allCheck = requestedRoles.map(test).every((x) => !!x);
+    const oneCheck = requestedRoles.some(test);
+
+    return requiresAll ? allCheck : oneCheck;
   }
 
   public getMyProfile(): Promise<GetMyProfileResponse.AsObject> {
@@ -248,6 +254,19 @@ export class GrpcAuthService {
     return this.grpcService.auth
       .getMyPasswordComplexityPolicy(new GetMyPasswordComplexityPolicyRequest(), null)
       .then((resp) => resp.toObject());
+  }
+
+  public loadMyUser(): void {
+    from(this.getMyUser())
+      .pipe(
+        map((resp) => resp.user),
+        catchError((_) => {
+          return of(undefined);
+        }),
+      )
+      .subscribe((user) => {
+        this.userSubject.next(user);
+      });
   }
 
   public getMyUser(): Promise<GetMyUserResponse.AsObject> {
@@ -262,6 +281,8 @@ export class GrpcAuthService {
     limit?: number,
     offset?: number,
     queryList?: OrgQuery[],
+    sortingColumn?: OrgFieldName,
+    sortingDirection?: SortDirection,
   ): Promise<ListMyProjectOrgsResponse.AsObject> {
     const req = new ListMyProjectOrgsRequest();
     const query = new ListQuery();
@@ -274,6 +295,9 @@ export class GrpcAuthService {
     if (queryList) {
       req.setQueriesList(queryList);
     }
+    // if (sortingColumn) {
+    //     req.setSortingColumn(sortingColumn);
+    // }
 
     req.setQuery(query);
 
@@ -533,5 +557,13 @@ export class GrpcAuthService {
     }
     req.setQuery(query);
     return this.grpcService.auth.listMyUserChanges(req, null).then((resp) => resp.toObject());
+  }
+
+  public getMyLabelPolicy(): Promise<GetMyLabelPolicyResponse.AsObject> {
+    return this.grpcService.auth.getMyLabelPolicy(new GetMyLabelPolicyRequest(), null).then((resp) => resp.toObject());
+  }
+
+  public getMyPrivacyPolicy(): Promise<GetMyPrivacyPolicyResponse.AsObject> {
+    return this.grpcService.auth.getMyPrivacyPolicy(new GetMyPrivacyPolicyRequest(), null).then((resp) => resp.toObject());
   }
 }

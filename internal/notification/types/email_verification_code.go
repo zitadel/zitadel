@@ -26,7 +26,7 @@ func SendEmailVerificationCode(ctx context.Context, mailhtml string, translator 
 	if err != nil {
 		return err
 	}
-	url := login.MailVerificationLink(origin, user.ID, codeString)
+	url := login.MailVerificationLink(origin, user.ID, codeString, user.ResourceOwner)
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString
 

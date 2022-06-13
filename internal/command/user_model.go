@@ -131,7 +131,7 @@ func CheckDomainPolicyForUserName(userName string, policy *domain.DomainPolicy) 
 		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-3Mb9s", "Errors.Users.DomainPolicyNil")
 	}
 	if policy.UserLoginMustBeDomain && strings.Contains(userName, "@") {
-		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-4M9vs", "Errors.User.EmailAsUsernameNotAllowed")
+		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-2k9fD", "Errors.User.EmailAsUsernameNotAllowed")
 	}
 	return nil
 }

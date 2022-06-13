@@ -9,6 +9,7 @@ export class CopyToClipboardDirective {
 
   @HostListener('click', ['$event']) onMouseEnter($event: any): void {
     $event.preventDefault();
+    $event.stopPropagation();
     this.copytoclipboard(this.valueToCopy);
   }
 

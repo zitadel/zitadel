@@ -15,6 +15,10 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
+const (
+	InstancesFilterTableAlias = "f"
+)
+
 var (
 	instanceTable = table{
 		name: projection.InstanceProjectionTable,
@@ -39,8 +43,8 @@ var (
 		name:  projection.InstanceColumnSequence,
 		table: instanceTable,
 	}
-	InstanceColumnGlobalOrgID = Column{
-		name:  projection.InstanceColumnGlobalOrgID,
+	InstanceColumnDefaultOrgID = Column{
+		name:  projection.InstanceColumnDefaultOrgID,
 		table: instanceTable,
 	}
 	InstanceColumnProjectID = Column{
@@ -68,7 +72,7 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	GlobalOrgID  string
+	DefaultOrgID string
 	IAMProjectID string
 	ConsoleID    string
 	ConsoleAppID string
@@ -110,6 +114,10 @@ func (i *Instance) DefaultLanguage() language.Tag {
 	return i.DefaultLang
 }
 
+func (i *Instance) DefaultOrganisationID() string {
+	return i.DefaultOrgID
+}
+
 type InstanceSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -132,8 +140,8 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 }
 
 func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
-	query, scan := prepareInstancesQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	filter, query, scan := prepareInstancesQuery()
+	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
 	}
@@ -196,7 +204,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
-			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
@@ -211,7 +219,7 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				&instance.CreationDate,
 				&instance.ChangeDate,
 				&instance.Sequence,
-				&instance.GlobalOrgID,
+				&instance.DefaultOrgID,
 				&instance.IAMProjectID,
 				&instance.ConsoleID,
 				&instance.ConsoleAppID,
@@ -228,44 +236,94 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 		}
 }
 
-func prepareInstancesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
+	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
+	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
 	return sq.Select(
 			InstanceColumnID.identifier(),
-			InstanceColumnCreationDate.identifier(),
-			InstanceColumnChangeDate.identifier(),
-			InstanceColumnSequence.identifier(),
-			InstanceColumnName.identifier(),
-			InstanceColumnGlobalOrgID.identifier(),
-			InstanceColumnProjectID.identifier(),
-			InstanceColumnConsoleID.identifier(),
-			InstanceColumnConsoleAppID.identifier(),
-			InstanceColumnDefaultLanguage.identifier(),
 			countColumn.identifier(),
-		).From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(instanceTable.identifier()),
+		func(builder sq.SelectBuilder) sq.SelectBuilder {
+			return sq.Select(
+				instanceFilterCountColumn,
+				instanceFilterIDColumn.identifier(),
+				InstanceColumnCreationDate.identifier(),
+				InstanceColumnChangeDate.identifier(),
+				InstanceColumnSequence.identifier(),
+				InstanceColumnName.identifier(),
+				InstanceColumnDefaultOrgID.identifier(),
+				InstanceColumnProjectID.identifier(),
+				InstanceColumnConsoleID.identifier(),
+				InstanceColumnConsoleAppID.identifier(),
+				InstanceColumnDefaultLanguage.identifier(),
+				InstanceDomainDomainCol.identifier(),
+				InstanceDomainIsPrimaryCol.identifier(),
+				InstanceDomainIsGeneratedCol.identifier(),
+				InstanceDomainCreationDateCol.identifier(),
+				InstanceDomainChangeDateCol.identifier(),
+				InstanceDomainSequenceCol.identifier(),
+			).FromSelect(builder, InstancesFilterTableAlias).
+				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
+				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
+				PlaceholderFormat(sq.Dollar)
+		},
 		func(rows *sql.Rows) (*Instances, error) {
 			instances := make([]*Instance, 0)
+			var lastInstance *Instance
 			var count uint64
 			for rows.Next() {
 				instance := new(Instance)
 				lang := ""
-				//TODO: Get Host
+				var (
+					domain       sql.NullString
+					isPrimary    sql.NullBool
+					isGenerated  sql.NullBool
+					changeDate   sql.NullTime
+					creationDate sql.NullTime
+					sequence     sql.NullInt64
+				)
 				err := rows.Scan(
+					&count,
 					&instance.ID,
 					&instance.CreationDate,
 					&instance.ChangeDate,
 					&instance.Sequence,
 					&instance.Name,
-					&instance.GlobalOrgID,
+					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
 					&instance.ConsoleAppID,
 					&lang,
-					&count,
+					&domain,
+					&isPrimary,
+					&isGenerated,
+					&changeDate,
+					&creationDate,
+					&sequence,
 				)
-				instance.DefaultLang = language.Make(lang)
 				if err != nil {
 					return nil, err
 				}
+				if instance.ID == "" || !domain.Valid {
+					continue
+				}
+				instance.DefaultLang = language.Make(lang)
+				instanceDomain := &InstanceDomain{
+					CreationDate: creationDate.Time,
+					ChangeDate:   changeDate.Time,
+					Sequence:     uint64(sequence.Int64),
+					Domain:       domain.String,
+					IsPrimary:    isPrimary.Bool,
+					IsGenerated:  isGenerated.Bool,
+					InstanceID:   instance.ID,
+				}
+				if lastInstance != nil && instance.ID == lastInstance.ID {
+					lastInstance.Domains = append(lastInstance.Domains, instanceDomain)
+					continue
+				}
+				lastInstance = instance
+				instance.Domains = append(instance.Domains, instanceDomain)
 				instances = append(instances, instance)
 			}
 
@@ -289,7 +347,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 			InstanceColumnChangeDate.identifier(),
 			InstanceColumnSequence.identifier(),
 			InstanceColumnName.identifier(),
-			InstanceColumnGlobalOrgID.identifier(),
+			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
@@ -317,7 +375,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					isGenerated  sql.NullBool
 					changeDate   sql.NullTime
 					creationDate sql.NullTime
-					sequecne     sql.NullInt64
+					sequence     sql.NullInt64
 				)
 				err := rows.Scan(
 					&instance.ID,
@@ -325,7 +383,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					&instance.ChangeDate,
 					&instance.Sequence,
 					&instance.Name,
-					&instance.GlobalOrgID,
+					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
 					&instance.ConsoleID,
 					&instance.ConsoleAppID,
@@ -335,7 +393,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					&isGenerated,
 					&changeDate,
 					&creationDate,
-					&sequecne,
+					&sequence,
 				)
 				if err != nil {
 					if errs.Is(err, sql.ErrNoRows) {
@@ -349,7 +407,7 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 				instance.Domains = append(instance.Domains, &InstanceDomain{
 					CreationDate: creationDate.Time,
 					ChangeDate:   changeDate.Time,
-					Sequence:     uint64(sequecne.Int64),
+					Sequence:     uint64(sequence.Int64),
 					Domain:       domain.String,
 					IsPrimary:    isPrimary.Bool,
 					IsGenerated:  isGenerated.Bool,

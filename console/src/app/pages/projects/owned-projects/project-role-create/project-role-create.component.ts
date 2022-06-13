@@ -36,8 +36,6 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     displayName: new FormControl(''),
     group: new FormControl(''),
   });
-  public createSteps: number = 1;
-  public currentCreateStep: number = 1;
 
   constructor(
     private router: Router,
@@ -89,7 +87,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
       .bulkAddProjectRoles(this.projectId, rolesToAdd)
       .then(() => {
         this.toast.showInfo('PROJECT.TOAST.ROLESCREATED', true);
-        this.router.navigate(['projects', this.projectId, 'roles']);
+        this.router.navigate(['projects', this.projectId], { queryParams: { id: 'roles' } });
       })
       .catch((error) => {
         this.toast.showError(error);

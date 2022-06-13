@@ -1,10 +1,12 @@
 package management
 
 import (
+	"context"
 	"time"
 
 	"google.golang.org/grpc"
 
+	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
@@ -25,11 +27,10 @@ type Server struct {
 	command           *command.Commands
 	query             *query.Queries
 	systemDefaults    systemdefaults.SystemDefaults
-	assetAPIPrefix    string
+	assetAPIPrefix    func(context.Context) string
 	passwordHashAlg   crypto.HashAlgorithm
 	userCodeAlg       crypto.EncryptionAlgorithm
 	externalSecure    bool
-	issuerPath        string
 	auditLogRetention time.Duration
 }
 
@@ -37,21 +38,18 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	sd systemdefaults.SystemDefaults,
-	assetAPIPrefix string,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	externalSecure bool,
-	issuerPath string,
 	auditLogRetention time.Duration,
 ) *Server {
 	return &Server{
 		command:           command,
 		query:             query,
 		systemDefaults:    sd,
-		assetAPIPrefix:    assetAPIPrefix,
+		assetAPIPrefix:    assets.AssetAPI(externalSecure),
 		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		userCodeAlg:       userCodeAlg,
 		externalSecure:    externalSecure,
-		issuerPath:        issuerPath,
 		auditLogRetention: auditLogRetention,
 	}
 }

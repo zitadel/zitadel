@@ -209,6 +209,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -250,6 +251,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -1036,6 +1038,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -1101,6 +1104,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -1157,6 +1161,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
 								true,
 								true,
 							),
@@ -1625,7 +1630,7 @@ func TestExistsUser(t *testing.T) {
 							"displayName",
 							language.German,
 							domain.GenderFemale,
-							"support@zitadel.ch",
+							"support@zitadel.com",
 							true,
 						),
 					}, nil
@@ -1651,7 +1656,7 @@ func TestExistsUser(t *testing.T) {
 							"displayName",
 							language.German,
 							domain.GenderFemale,
-							"support@zitadel.ch",
+							"support@zitadel.com",
 							true,
 						),
 					}, nil

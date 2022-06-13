@@ -1,0 +1,17 @@
+<div class="max-width-container">
+  <div class="enlarged-container">
+    <div class="create-layout-container">
+      <button (click)="close()" mat-icon-button matTooltip="{{ 'ACTIONS.CLOSE' | translate }}">
+        <mat-icon>close</mat-icon>
+      </button>
+      <span class="abort">{{ title }}</span
+      ><span class="abort-2" *ngIf="createSteps > 1"
+        >{{ 'ACTIONS.STEP' | translate }} {{ currentCreateStep }} {{ 'ACTIONS.OF' | translate }} {{ createSteps }}</span
+      >
+    </div>
+
+    <div class="create-layout-content">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

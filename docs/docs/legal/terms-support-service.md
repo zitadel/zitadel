@@ -180,7 +180,7 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.ch/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
 
 ## Liability
 

@@ -40,3 +40,7 @@ func (err *UnknownError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *UnknownError) Unwrap() error {
+	return err.CaosError
+}

@@ -34,6 +34,10 @@
       <mat-button-toggle [value]="View.PREVIEW">
         <div class="toggle-row">
           <span>{{ 'POLICY.PRIVATELABELING.VIEWS.PREVIEW' | translate }}</span>
+          <i
+            class="info-i las la-question-circle"
+            matTooltip="{{ 'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate }}"
+          ></i>
           <div *ngIf="view === View.PREVIEW" class="current-dot"></div>
         </div>
       </mat-button-toggle>
@@ -50,9 +54,21 @@
     <ng-template cnslHasRole [hasRole]="['policy.delete']">
       <button
         class="pl-action-button"
-        *ngIf="view === View.CURRENT && serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+        *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
         matTooltip="{{ 'POLICY.RESET' | translate }}"
         color="warn"
+        [disabled]="
+          view === View.CURRENT ||
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.delete'
+              : serviceType === PolicyComponentServiceType.MGMT
+              ? 'policy.delete'
+              : ''
+          ]
+            | hasRole
+            | async) === false
+        "
         (click)="removePolicy()"
         mat-stroked-button
       >
@@ -66,14 +82,21 @@
       mat-raised-button
       color="primary"
       (click)="activatePolicy()"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
     >
       {{ 'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate }}
     </button>
   </div>
-
-  <cnsl-info-section *ngIf="view === View.PREVIEW" class="desc cnsl-secondary-text">
-    {{ 'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate }}
-  </cnsl-info-section>
 
   <div *ngIf="previewData && data" class="lab-policy-content">
     <mat-accordion class="settings">
@@ -125,7 +148,18 @@
                   mat-icon-button
                   color="warn"
                   (click)="deleteAsset(AssetType.LOGO, theme)"
-                  [disabled]="view === View.CURRENT"
+                  [disabled]="
+                    view === View.CURRENT ||
+                    ([
+                      serviceType === PolicyComponentServiceType.ADMIN
+                        ? 'iam.policy.write'
+                        : serviceType === PolicyComponentServiceType.MGMT
+                        ? 'policy.write'
+                        : ''
+                    ]
+                      | hasRole
+                      | async) === false
+                  "
                   matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
                 >
                   <i class="las la-ban"></i>
@@ -140,9 +174,22 @@
                   (change)="onDropLogo(theme, $any($event.target).files)"
                 />
                 <button
+                  class="asset-add-btn"
                   mat-icon-button
                   matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
                   *ngIf="view !== View.CURRENT"
+                  [disabled]="
+                    view === View.CURRENT ||
+                    ([
+                      serviceType === PolicyComponentServiceType.ADMIN
+                        ? 'iam.policy.write'
+                        : serviceType === PolicyComponentServiceType.MGMT
+                        ? 'policy.write'
+                        : ''
+                    ]
+                      | hasRole
+                      | async) === false
+                  "
                   (click)="$event.preventDefault(); selectedFile.click()"
                 >
                   <mat-icon>add</mat-icon>
@@ -172,7 +219,18 @@
                   mat-icon-button
                   color="warn"
                   (click)="deleteAsset(AssetType.ICON, theme)"
-                  [disabled]="view === View.CURRENT"
+                  [disabled]="
+                    view === View.CURRENT ||
+                    ([
+                      serviceType === PolicyComponentServiceType.ADMIN
+                        ? 'iam.policy.write'
+                        : serviceType === PolicyComponentServiceType.MGMT
+                        ? 'policy.write'
+                        : ''
+                    ]
+                      | hasRole
+                      | async) === false
+                  "
                   matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
                 >
                   <i class="las la-ban"></i>
@@ -188,8 +246,21 @@
                 />
                 <button
                   mat-icon-button
+                  class="asset-add-btn"
                   matTooltip="{{ 'POLICY.PRIVATELABELING.BTN' | translate }}"
                   *ngIf="view !== View.CURRENT"
+                  [disabled]="
+                    view === View.CURRENT ||
+                    ([
+                      serviceType === PolicyComponentServiceType.ADMIN
+                        ? 'iam.policy.write'
+                        : serviceType === PolicyComponentServiceType.MGMT
+                        ? 'policy.write'
+                        : ''
+                    ]
+                      | hasRole
+                      | async) === false
+                  "
                   (click)="$event.preventDefault(); selectedIconFile.click()"
                 >
                   <mat-icon>add</mat-icon>
@@ -221,9 +292,20 @@
           <div class="colors" *ngIf="data && previewData">
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.BACKGROUNDDARK"
-                (previewChanged)="previewData.backgroundColorDark = $event; savePolicy()"
+                (previewChanged)="previewData.backgroundColorDark !== $event ? setDarkBackgroundColorAndSave($event) : null"
                 name="Background Color"
                 [color]="data.backgroundColorDark"
                 [previewColor]="previewData.backgroundColorDark"
@@ -232,9 +314,20 @@
 
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.PRIMARY"
-                (previewChanged)="previewData.primaryColorDark = $event; savePolicy()"
+                (previewChanged)="previewData.primaryColorDark !== $event ? setDarkPrimaryColorAndSave($event) : null"
                 name="Primary Color"
                 [color]="data.primaryColorDark"
                 [previewColor]="previewData.primaryColorDark"
@@ -244,9 +337,20 @@
 
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.WARN"
-                (previewChanged)="previewData.warnColorDark = $event; savePolicy()"
+                (previewChanged)="previewData.warnColorDark !== $event ? setDarkWarnColorAndSave($event) : null"
                 name="Warn Color"
                 [color]="data.warnColorDark"
                 [previewColor]="previewData.warnColorDark"
@@ -256,9 +360,20 @@
 
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.FONTDARK"
-                (previewChanged)="previewData.fontColorDark = $event; savePolicy()"
+                (previewChanged)="previewData.fontColorDark !== $event ? setDarkFontColorAndSave($event) : null"
                 name="Font Color"
                 [color]="data.fontColorDark"
                 [previewColor]="previewData.fontColorDark"
@@ -272,9 +387,20 @@
           <div class="colors" *ngIf="data && previewData">
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.BACKGROUNDLIGHT"
-                (previewChanged)="previewData.backgroundColor = $event; savePolicy()"
+                (previewChanged)="previewData.backgroundColor !== $event ? setBackgroundColorAndSave($event) : null"
                 name="Background Color"
                 [color]="data.backgroundColor"
                 [previewColor]="previewData.backgroundColor"
@@ -283,9 +409,20 @@
 
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.PRIMARY"
-                (previewChanged)="previewData.primaryColor = $event; savePolicy()"
+                (previewChanged)="previewData.primaryColor !== $event ? setPrimaryColorAndSave($event) : null"
                 name="Primary Color"
                 [color]="data.primaryColor"
                 [previewColor]="previewData.primaryColor"
@@ -295,10 +432,21 @@
 
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.WARN"
                 name="Warn Color"
-                (previewChanged)="previewData.warnColor = $event; savePolicy()"
+                (previewChanged)="previewData.warnColor !== $event ? setWarnColorAndSave($event) : null"
                 [color]="data.warnColor"
                 [previewColor]="previewData.warnColor"
               ></cnsl-color>
@@ -306,9 +454,20 @@
 
             <div class="color">
               <cnsl-color
-                [disabled]="view === View.CURRENT"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 [colorType]="ColorType.FONTLIGHT"
-                (previewChanged)="previewData.fontColor = $event; savePolicy()"
+                (previewChanged)="previewData.fontColor !== $event ? setFontColorAndSave($event) : null"
                 name="Font Color"
                 [color]="data.fontColor"
                 [previewColor]="previewData.fontColor"
@@ -338,7 +497,18 @@
 
             <button
               class="dl-btn"
-              [disabled]="view === View.CURRENT"
+              [disabled]="
+                view === View.CURRENT ||
+                ([
+                  serviceType === PolicyComponentServiceType.ADMIN
+                    ? 'iam.policy.write'
+                    : serviceType === PolicyComponentServiceType.MGMT
+                    ? 'policy.write'
+                    : ''
+                ]
+                  | hasRole
+                  | async) === false
+              "
               mat-icon-button
               color="warn"
               (click)="deleteFont()"
@@ -364,7 +534,19 @@
                 (change)="onDropFont($any($event.target).files)"
               />
               <a
-                class="btn"
+                class="asset-add-btn"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
                 mat-icon-button
                 *ngIf="view !== View.CURRENT"
                 (click)="selectedFontFile.click()"
@@ -391,7 +573,18 @@
             class="toggle"
             color="primary"
             ngDefaultControl
-            [disabled]="view === View.CURRENT"
+            [disabled]="
+              view === View.CURRENT ||
+              ([
+                serviceType === PolicyComponentServiceType.ADMIN
+                  ? 'iam.policy.write'
+                  : serviceType === PolicyComponentServiceType.MGMT
+                  ? 'policy.write'
+                  : ''
+              ]
+                | hasRole
+                | async) === false
+            "
             [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
             (change)="savePolicy()"
           >
@@ -402,9 +595,20 @@
             class="toggle"
             color="primary"
             ngDefaultControl
-            [disabled]="view === View.CURRENT"
             [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
             (change)="savePolicy()"
+            [disabled]="
+              view === View.CURRENT ||
+              ([
+                serviceType === PolicyComponentServiceType.ADMIN
+                  ? 'iam.policy.write'
+                  : serviceType === PolicyComponentServiceType.MGMT
+                  ? 'policy.write'
+                  : ''
+              ]
+                | hasRole
+                | async) === false
+            "
           >
             {{ 'POLICY.DATA.DISABLEWATERMARK' | translate }}
           </mat-slide-toggle>
@@ -420,6 +624,7 @@
           [refresh]="refreshPreview"
           [theme]="theme"
           class="preview"
+          [ngClass]="{ darkmode: theme === Theme.DARK, lightmode: theme === Theme.LIGHT }"
           [policy]="view === View.PREVIEW ? previewData : data"
         >
         </cnsl-preview>

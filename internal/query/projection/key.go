@@ -27,20 +27,23 @@ const (
 	KeyColumnAlgorithm     = "algorithm"
 	KeyColumnUse           = "use"
 
-	privateKeyTableSuffix  = "private"
-	KeyPrivateColumnID     = "id"
-	KeyPrivateColumnExpiry = "expiry"
-	KeyPrivateColumnKey    = "key"
+	privateKeyTableSuffix      = "private"
+	KeyPrivateColumnID         = "id"
+	KeyPrivateColumnInstanceID = "instance_id"
+	KeyPrivateColumnExpiry     = "expiry"
+	KeyPrivateColumnKey        = "key"
 
-	publicKeyTableSuffix  = "public"
-	KeyPublicColumnID     = "id"
-	KeyPublicColumnExpiry = "expiry"
-	KeyPublicColumnKey    = "key"
+	publicKeyTableSuffix      = "public"
+	KeyPublicColumnID         = "id"
+	KeyPublicColumnInstanceID = "instance_id"
+	KeyPublicColumnExpiry     = "expiry"
+	KeyPublicColumnKey        = "key"
 
-	certificateTableSuffix  = "certificate"
-	CertificateColumnID     = "id"
-	CertificateColumnExpiry = "expiry"
-	CertificateColumnKey    = "key"
+	certificateTableSuffix      = "certificate"
+	CertificateColumnID         = "id"
+	CertificateColumnInstanceID = "instance_id"
+	CertificateColumnExpiry     = "expiry"
+	CertificateColumnKey        = "key"
 )
 
 type KeyProjection struct {
@@ -64,27 +67,32 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
-			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
+			crdb.NewPrimaryKey(KeyColumnID, KeyColumnInstanceID),
 			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{KeyColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(KeyPrivateColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
 		},
-			crdb.NewPrimaryKey(KeyPrivateColumnID),
+			crdb.NewPrimaryKey(KeyPrivateColumnID, KeyPrivateColumnInstanceID),
 			privateKeyTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_private_ref_keys")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(KeyPublicColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
 		},
-			crdb.NewPrimaryKey(KeyPublicColumnID),
+			crdb.NewPrimaryKey(KeyPublicColumnID, KeyPublicColumnInstanceID),
 			publicKeyTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_public_ref_keys")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(CertificateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(CertificateColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(CertificateColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(CertificateColumnKey, crdb.ColumnTypeBytes),
 		},
@@ -140,6 +148,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			creates = append(creates, crdb.AddCreateStatement(
 				[]handler.Column{
 					handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
+					handler.NewCol(KeyPrivateColumnInstanceID, e.Aggregate().InstanceID),
 					handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
 					handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 				},
@@ -154,6 +163,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			creates = append(creates, crdb.AddCreateStatement(
 				[]handler.Column{
 					handler.NewCol(KeyPublicColumnID, e.Aggregate().ID),
+					handler.NewCol(KeyPublicColumnInstanceID, e.Aggregate().InstanceID),
 					handler.NewCol(KeyPublicColumnExpiry, e.PublicKey.Expiry),
 					handler.NewCol(KeyPublicColumnKey, publicKey),
 				},
@@ -166,6 +176,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			creates = append(creates, crdb.AddCreateStatement(
 				[]handler.Column{
 					handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
+					handler.NewCol(KeyPrivateColumnInstanceID, e.Aggregate().InstanceID),
 					handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
 					handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 				},
@@ -176,6 +187,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			creates = append(creates, crdb.AddCreateStatement(
 				[]handler.Column{
 					handler.NewCol(CertificateColumnID, e.Aggregate().ID),
+					handler.NewCol(CertificateColumnInstanceID, e.Aggregate().InstanceID),
 					handler.NewCol(CertificateColumnExpiry, e.Certificate.Expiry),
 					handler.NewCol(CertificateColumnKey, e.Certificate.Key),
 				},

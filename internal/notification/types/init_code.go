@@ -25,6 +25,7 @@ type UrlData struct {
 	UserID      string
 	Code        string
 	PasswordSet bool
+	OrgID       string
 }
 
 func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix, origin string) error {
@@ -32,7 +33,7 @@ func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Tra
 	if err != nil {
 		return err
 	}
-	url := login.InitUserLink(origin, user.ID, codeString, user.PasswordSet)
+	url := login.InitUserLink(origin, user.ID, codeString, user.ResourceOwner, user.PasswordSet)
 	var args = mapNotifyUserToArgs(user)
 	args["Code"] = codeString
 

@@ -11,44 +11,52 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type OrgSetup struct {
-	Name  string
-	Human AddHuman
+	Name         string
+	CustomDomain string
+	Human        AddHuman
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDetails, error) {
-	orgID, err := id.SonyFlakeGenerator.Next()
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string) (string, *domain.ObjectDetails, error) {
+	orgID, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	userID, err := id.SonyFlakeGenerator.Next()
+	userID, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
-		AddOrgCommand(ctx, orgAgg, o.Name),
+	validations := []preparation.Validation{
+		AddOrgCommand(ctx, orgAgg, o.Name, userIDs...),
 		AddHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.userEncryption),
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
-	)
+	}
+	if o.CustomDomain != "" {
+		validations = append(validations, AddOrgDomain(orgAgg, o.CustomDomain))
+		for _, userID := range userIDs {
+			validations = append(validations, c.prepareUserDomainClaimed(userID))
+		}
+	}
+
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	return &domain.ObjectDetails{
+	return userID, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
@@ -57,7 +65,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDet
 
 //AddOrgCommand defines the commands to create a new org,
 // this includes the verified default domain
-func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string) preparation.Validation {
+func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
@@ -201,6 +209,35 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, err
 	}
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
+}
+
+func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(id).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(id).
+		EventTypes(
+			org.OrgAddedEventType,
+			org.OrgDeactivatedEventType,
+			org.OrgReactivatedEventType,
+			org.OrgRemovedEventType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		switch event.(type) {
+		case *org.OrgAddedEvent, *org.OrgReactivatedEvent:
+			exists = true
+		case *org.OrgDeactivatedEvent, *org.OrgRemovedEvent:
+			exists = false
+		}
+	}
+
+	return exists, nil
 }
 
 func (c *Commands) setUpOrg(

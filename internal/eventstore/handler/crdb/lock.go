@@ -33,7 +33,7 @@ type locker struct {
 }
 
 func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
-	workerName, err := id.SonyFlakeGenerator.Next()
+	workerName, err := id.SonyFlakeGenerator().Next()
 	logging.OnError(err).Panic("unable to generate lockID")
 	return &locker{
 		client:         client,
@@ -67,7 +67,7 @@ func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration t
 
 func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, instanceID string) error {
 	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
-	res, err := h.client.Exec(h.lockStmt, h.workerName, lockDuration.Seconds(), h.projectionName, instanceID)
+	res, err := h.client.ExecContext(ctx, h.lockStmt, h.workerName, lockDuration.Seconds(), h.projectionName, instanceID)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
 	}

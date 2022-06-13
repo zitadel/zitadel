@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -20,11 +21,13 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.DomainPolicy
+		ctx                                    context.Context
+		userLoginMustBeDomain                  bool
+		validateOrgDomains                     bool
+		smtpSenderAddressMatchesInstanceDomain bool
 	}
 	type res struct {
-		want *domain.DomainPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -44,17 +47,17 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
-				},
+				ctx:                                    context.Background(),
+				userLoginMustBeDomain:                  true,
+				validateOrgDomains:                     true,
+				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -74,6 +77,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 									true,
+									true,
 								),
 							),
 						},
@@ -81,21 +85,14 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
-				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
-				},
+				ctx:                                    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				userLoginMustBeDomain:                  true,
+				validateOrgDomains:                     true,
+				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				want: &domain.DomainPolicy{
-					ObjectRoot: models.ObjectRoot{
-						InstanceID:    "INSTANCE",
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -105,7 +102,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultDomainPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultDomainPolicy(tt.args.ctx, tt.args.userLoginMustBeDomain, tt.args.validateOrgDomains, tt.args.smtpSenderAddressMatchesInstanceDomain)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -148,8 +145,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				},
 			},
 			res: res{
@@ -167,6 +165,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
@@ -175,8 +174,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: true,
-					ValidateOrgDomains:    true,
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
 				},
 			},
 			res: res{
@@ -194,13 +194,14 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 								true,
+								true,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultDomainPolicyChangedEvent(context.Background(), false, false),
+								newDefaultDomainPolicyChangedEvent(context.Background(), false, false, false),
 							),
 						},
 					),
@@ -209,8 +210,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.DomainPolicy{
-					UserLoginMustBeDomain: false,
-					ValidateOrgDomains:    false,
+					UserLoginMustBeDomain:                  false,
+					ValidateOrgDomains:                     false,
+					SMTPSenderAddressMatchesInstanceDomain: false,
 				},
 			},
 			res: res{
@@ -219,8 +221,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
 					},
-					UserLoginMustBeDomain: false,
-					ValidateOrgDomains:    false,
+					UserLoginMustBeDomain:                  false,
+					ValidateOrgDomains:                     false,
+					SMTPSenderAddressMatchesInstanceDomain: false,
 				},
 			},
 		},
@@ -244,12 +247,13 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain, validateOrgDomains bool) *instance.DomainPolicyChangedEvent {
+func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) *instance.DomainPolicyChangedEvent {
 	event, _ := instance.NewDomainPolicyChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.DomainPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
 			policy.ChangeValidateOrgDomains(validateOrgDomains),
+			policy.ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddressMatchesInstanceDomain),
 		},
 	)
 	return event

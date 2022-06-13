@@ -8,6 +8,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import {
     BRANDING,
     COMPLEXITY,
+    DOMAIN,
     IDP,
     LOCKOUT,
     LOGIN,
@@ -26,9 +27,10 @@ export class OrgSettingsComponent {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public settingsList: SidenavSetting[] = [
     LOGIN,
+    IDP,
     COMPLEXITY,
     LOCKOUT,
-    IDP,
+    DOMAIN,
     BRANDING,
     MESSAGETEXTS,
     LOGINTEXTS,

@@ -29,7 +29,6 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
-	//TODO: ensure splitting of command and query side durring auth request and login refactoring
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err

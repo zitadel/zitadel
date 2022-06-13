@@ -181,7 +181,7 @@ func (u *NotifyUser) ProcessOrg(event *es_models.Event) (err error) {
 }
 
 func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
-	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.ResourceOwner, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 }
 
 func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner, event.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -222,7 +222,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 }
 
 func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
-	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner, user.InstanceID)
 	if err != nil {
 		return err
 	}
@@ -240,8 +240,8 @@ func (u *NotifyUser) OnSuccess() error {
 	return spooler.HandleSuccess(u.view.UpdateNotifyUserSpoolerRunTimestamp)
 }
 
-func (u *NotifyUser) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
-	query, err := org_view.OrgByIDQuery(orgID, 0)
+func (u *NotifyUser) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
+	query, err := org_view.OrgByIDQuery(orgID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -262,8 +262,8 @@ func (u *NotifyUser) getOrgByID(ctx context.Context, orgID string) (*org_model.O
 	return org_es_model.OrgToModel(esOrg), nil
 }
 
-func (u *NotifyUser) loginNameInformation(ctx context.Context, orgID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
-	org, err := u.getOrgByID(ctx, orgID)
+func (u *NotifyUser) loginNameInformation(ctx context.Context, orgID, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
+	org, err := u.getOrgByID(ctx, orgID, instanceID)
 	if err != nil {
 		return false, "", nil, err
 	}

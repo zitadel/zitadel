@@ -1,14 +1,18 @@
-<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()">
+<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()" [queryCount]="searchQueries.length">
   <div class="filter-row" id="filtercomp">
     <div class="email-query">
-      <mat-checkbox id="name" class="cb" [checked]="getSubFilter(SubQuery.NAME)"
-        (change)="changeCheckbox(SubQuery.NAME, $event )">{{'FILTER.ORGNAME' | translate}}
+      <mat-checkbox
+        id="name"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.NAME)"
+        (change)="changeCheckbox(SubQuery.NAME, $event)"
+        >{{ 'FILTER.ORGNAME' | translate }}
       </mat-checkbox>
       <div class="subquery" *ngIf="getSubFilter(SubQuery.NAME) as eq">
         <cnsl-form-field class="filter-select-method">
           <mat-select [value]="eq.getMethod()" (selectionChange)="setMethod(eq, $event)">
             <mat-option *ngFor="let method of methods" [value]="method">
-              {{ 'FILTER.METHODS.'+method | translate}}
+              {{ 'FILTER.METHODS.' + method | translate }}
             </mat-option>
           </mat-select>
         </cnsl-form-field>

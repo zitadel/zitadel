@@ -45,7 +45,7 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 				"State",
 				"OIDCConfig.AuthorizationEndpoint",
 				"OIDCConfig.TokenEndpoint",
-				"Type", //TODO: default (0) is oidc
+				"Type",
 				"JWTConfig",
 			)
 		})
@@ -79,7 +79,7 @@ func Test_addOIDCIDPRequestToDomainOIDCIDPConfig(t *testing.T) {
 			got := addOIDCIDPRequestToDomainOIDCIDPConfig(tt.args.req)
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
-				"ClientSecret", //TODO: is client secret string enough for backend?
+				"ClientSecret",
 				"IDPConfigID",
 				"AuthorizationEndpoint",
 				"TokenEndpoint",
@@ -116,7 +116,7 @@ func Test_updateIDPToDomain(t *testing.T) {
 				"OIDCConfig",
 				"JWTConfig",
 				"State",
-				"Type", //TODO: type should not be changeable
+				"Type",
 			)
 		})
 	}

@@ -31,8 +31,10 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 		AllowRegister:              wm.AllowRegister,
 		AllowExternalIDP:           wm.AllowExternalIDP,
 		HidePasswordReset:          wm.HidePasswordReset,
+		IgnoreUnknownUsernames:     wm.IgnoreUnknownUsernames,
 		ForceMFA:                   wm.ForceMFA,
 		PasswordlessType:           wm.PasswordlessType,
+		DefaultRedirectURI:         wm.DefaultRedirectURI,
 		PasswordCheckLifetime:      wm.PasswordCheckLifetime,
 		ExternalLoginCheckLifetime: wm.ExternalLoginCheckLifetime,
 		MFAInitSkipLifetime:        wm.MFAInitSkipLifetime,
@@ -67,9 +69,10 @@ func writeModelToMailTemplate(wm *MailTemplateWriteModel) *domain.MailTemplate {
 
 func writeModelToDomainPolicy(wm *InstanceDomainPolicyWriteModel) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
-		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
-		ValidateOrgDomains:    wm.ValidateOrgDomains,
+		ObjectRoot:                             writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
+		UserLoginMustBeDomain:                  wm.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     wm.ValidateOrgDomains,
+		SMTPSenderAddressMatchesInstanceDomain: wm.SMTPSenderAddressMatchesInstanceDomain,
 	}
 }
 

@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
@@ -36,7 +35,7 @@ func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 	p := new(SMTPConfigProjection)
 	config.ProjectionName = SMTPConfigProjectionTable
 	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
+	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
@@ -61,7 +60,7 @@ func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 func (p *SMTPConfigProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: project.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.SMTPConfigAddedEventType,
@@ -133,6 +132,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		columns,
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -152,6 +152,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		},
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

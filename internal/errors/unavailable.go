@@ -40,3 +40,7 @@ func (err *UnavailableError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *UnavailableError) Unwrap() error {
+	return err.CaosError
+}

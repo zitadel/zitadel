@@ -78,7 +78,7 @@ func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.A
 
 func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
 	if !projectRole.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2ilfW", "Errors.Project.Invalid")
 	}
 	err = c.checkProjectExists(ctx, projectRole.AggregateID, resourceOwner)
 	if err != nil {
@@ -116,7 +116,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 
 func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string, cascadingProjectGrantIds []string, cascadeUserGrantIDs ...string) (details *domain.ObjectDetails, err error) {
 	if projectID == "" || key == "" {
-		return details, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
+		return details, caos_errs.ThrowInvalidArgument(nil, "COMMAND-fl9eF", "Errors.Project.Role.Invalid")
 	}
 	existingRole, err := c.getProjectRoleWriteModelByID(ctx, key, projectID, resourceOwner)
 	if err != nil {

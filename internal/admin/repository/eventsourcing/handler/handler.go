@@ -28,13 +28,12 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, static static.Storage, loginPrefix string) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, static static.Storage) []query.Handler {
 	handlers := []query.Handler{}
 	if static != nil {
 		handlers = append(handlers, newStyling(
 			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
-			static,
-			loginPrefix))
+			static))
 	}
 	return handlers
 }

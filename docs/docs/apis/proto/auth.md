@@ -570,6 +570,30 @@ Limit should always be set, there is a default limit set by the service
     POST: /memberships/me/_search
 
 
+### GetMyLabelPolicy
+
+> **rpc** GetMyLabelPolicy([GetMyLabelPolicyRequest](#getmylabelpolicyrequest))
+[GetMyLabelPolicyResponse](#getmylabelpolicyresponse)
+
+Returns the label policy of the current organisation
+
+
+
+    GET: /policies/label
+
+
+### GetMyPrivacyPolicy
+
+> **rpc** GetMyPrivacyPolicy([GetMyPrivacyPolicyRequest](#getmyprivacypolicyrequest))
+[GetMyPrivacyPolicyResponse](#getmyprivacypolicyresponse)
+
+Returns the privacy policy of the current organisation
+
+
+
+    GET: /policies/privacy
+
+
 
 
 
@@ -726,6 +750,23 @@ This is an empty request
 
 
 
+### GetMyLabelPolicyRequest
+This is an empty request
+
+
+
+
+### GetMyLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
+
+
 ### GetMyMetadataRequest
 
 
@@ -779,6 +820,23 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | phone |  zitadel.user.v1.Phone | - |  |
+
+
+
+
+### GetMyPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetMyPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
 
 
 
@@ -1341,7 +1399,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| email |  string | - | string.email: true<br />  |
 
 
 

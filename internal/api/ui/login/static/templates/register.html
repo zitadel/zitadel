@@ -42,7 +42,7 @@
             <label class="lgn-label" for="username">{{t "RegistrationUser.UsernameLabel"}}</label>
             <div class="lgn-suffix-wrapper">
                 <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
-                {{if .DisplayLoginNameSuffix}}
+                {{if .ShowUsername}}
                     <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
             </div>
@@ -128,7 +128,7 @@
     {{template "error-message" .}}
 
     <div class="lgn-actions">
-        <a class="lgn-stroked-button lgn-primary" href="{{ loginNameChangeUrl .AuthReqID }}">
+        <a class="lgn-stroked-button" href="{{ loginNameChangeUrl .AuthReqID }}">
             {{t "RegistrationUser.BackButtonText"}}
         </a>
         <span class="fill-space"></span>

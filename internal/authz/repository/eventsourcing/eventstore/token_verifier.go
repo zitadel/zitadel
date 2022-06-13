@@ -29,7 +29,13 @@ type TokenVerifierRepo struct {
 	Query                *query.Queries
 }
 
-func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
+func (repo *TokenVerifierRepo) Health() error {
+	return repo.View.Health()
+}
+
+func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (_ *usr_model.TokenView, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	token, viewErr := repo.View.TokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
@@ -78,7 +84,9 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if len(splittedToken) != 2 {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
 	}
+	_, tokenSpan := tracing.NewNamedSpan(ctx, "token")
 	token, err := repo.tokenByID(ctx, splittedToken[0], splittedToken[1])
+	tokenSpan.EndWithError(err)
 	if err != nil {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
 	}
@@ -89,7 +97,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return token.UserID, "", "", "", token.ResourceOwner, nil
 	}
 	for _, aud := range token.Audience {
-		if verifierClientID == aud || projectID == aud || authz.GetInstance(ctx).ProjectID() == aud {
+		if verifierClientID == aud || projectID == aud {
 			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
 		}
 	}
@@ -120,7 +128,9 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
+func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) (_ []*models.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
 	if err != nil {
 		return nil, err

@@ -10,7 +10,7 @@ function CheckChangePwPolicy() {
         policyElement.setAttribute("color", "primary");
     }
 
-    return pwNew == pwNewConfirmation;
+    return pwNew === pwNewConfirmation;
 }
 
 let button = document.getElementById("change-password-button");

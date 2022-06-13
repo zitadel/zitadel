@@ -15,7 +15,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class FailedEventsComponent implements AfterViewInit {
   @ViewChild(MatPaginator) public eventPaginator!: MatPaginator;
-  public eventDataSource!: MatTableDataSource<FailedEvent.AsObject>;
+  public eventDataSource: MatTableDataSource<FailedEvent.AsObject> = new MatTableDataSource<FailedEvent.AsObject>([]);
 
   public eventDisplayedColumns: string[] = [
     'viewName',
@@ -59,8 +59,8 @@ export class FailedEventsComponent implements AfterViewInit {
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
-      .subscribe((views) => {
-        this.eventDataSource = new MatTableDataSource(views);
+      .subscribe((events) => {
+        this.eventDataSource = new MatTableDataSource<FailedEvent.AsObject>(events);
         this.eventDataSource.paginator = this.eventPaginator;
       });
   }

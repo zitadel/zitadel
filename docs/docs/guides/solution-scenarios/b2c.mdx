@@ -12,14 +12,15 @@ When planning your applications, investing time in researching your apps archite
 
 This guide introduces you to the grouping and structuring of ZITADEL projects which forms the base for all projects. This can be used as a quick start to the [B2B scenario](./b2b), which is merely focused on planning considerations if you are having projects with multiple organizations.
 
-The journey of this guide starts with creating an Organization, the outermost layer of ZITADEL, as it is the vessel for projects, roles, applications and users.
+The journey of this guide starts with creating an Organization, the outermost layer of ZITADEL within your instance, as it is the vessel for projects, roles, applications and users.
 Creation can be done from [ZITADEL Console](https://console.zitadel.ch/org/create). You can choose your current account for the organization owner or create a new one.
 
 Depending on your Software Development Life Cycle (SDLC) you can create multiple organizations or projects to keep your applications environments seperated.
 
 ### Custom domain
 
-Right after org creation you'll be greeted with the domain section of your organization. ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.ch`, but you can set your own by saving a verification file on the specified location.  
+Right after org creation you'll be greeted with the domain section of your organization.
+ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.ch`, but you can create your own. Depending on the settings on the [Domain Policy](../../concepts/structure/policies) it has to be verified by saving a verification file on the specified location.
 We recommend that you create your domains early as they create a sense of confidence and trust for your application and changes later on might create additional migration effort.
 You can read more about how ZITADEL handles usernames [here](../basics/organizations#how-zitadel-handles-usernames).
 

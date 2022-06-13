@@ -11,8 +11,6 @@
   $warn-color: mat.get-color-from-palette($warn, 500);
   $accent-color: mat.get-color-from-palette($accent, 500);
   $is-dark-theme: map-get($theme, is-dark);
-  $back: map-get($background, background);
-  $base: map-get($foreground, base);
 
   .main-container {
     display: flex;

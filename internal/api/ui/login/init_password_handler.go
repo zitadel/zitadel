@@ -39,8 +39,8 @@ type initPasswordData struct {
 	HasSymbol                 string
 }
 
-func InitPasswordLink(origin, userID, code string) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s", externalLink(origin), EndpointInitPassword, userID, code)
+func InitPasswordLink(origin, userID, code, orgID string) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s&orgID=%s", externalLink(origin), EndpointInitPassword, userID, code, orgID)
 }
 
 func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {

@@ -22,7 +22,8 @@ func NewDomainPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userLoginMustBeDomain,
-	validateOrgDomain bool,
+	validateOrgDomain,
+	smtpSenderAddressMatchesInstanceDomain bool,
 ) *DomainPolicyAddedEvent {
 	return &DomainPolicyAddedEvent{
 		DomainPolicyAddedEvent: *policy.NewDomainPolicyAddedEvent(
@@ -32,6 +33,7 @@ func NewDomainPolicyAddedEvent(
 				DomainPolicyAddedEventType),
 			userLoginMustBeDomain,
 			validateOrgDomain,
+			smtpSenderAddressMatchesInstanceDomain,
 		),
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/muesli/gamut"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
@@ -31,16 +32,13 @@ type Styling struct {
 	handler
 	static       static.Storage
 	subscription *v1.Subscription
-	resourceUrl  string
 }
 
-func newStyling(handler handler, static static.Storage, loginPrefix string) *Styling {
+func newStyling(handler handler, static static.Storage) *Styling {
 	h := &Styling{
 		handler: handler,
 		static:  static,
 	}
-	h.resourceUrl = loginPrefix + "/resources/dynamic" //TODO: ?
-
 	h.subscribe()
 
 	return h
@@ -218,7 +216,7 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 	}
 	cssContent += "}"
 	if policy.FontURL != "" {
-		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, m.resourceUrl, policy.AggregateID, policy.FontURL)
+		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, login.HandlerPrefix+login.EndpointDynamicResources, policy.AggregateID, policy.FontURL)
 	}
 	cssContent += ".lgn-dark-theme {"
 	if policy.PrimaryColorDark != "" {
@@ -272,27 +270,27 @@ func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {
 	palette := make(map[string]string)
 	defaultColor := gamut.Hex(hex)
 
-	color50, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 1.0))
+	color50, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.52))
 	if ok {
 		palette["50"] = cssRGB(color50.RGB255())
 	}
 
-	color100, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.8))
+	color100, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.37))
 	if ok {
 		palette["100"] = cssRGB(color100.RGB255())
 	}
 
-	color200, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.6))
+	color200, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.26))
 	if ok {
 		palette["200"] = cssRGB(color200.RGB255())
 	}
 
-	color300, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.4))
+	color300, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.12))
 	if ok {
 		palette["300"] = cssRGB(color300.RGB255())
 	}
 
-	color400, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.1))
+	color400, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.06))
 	if ok {
 		palette["400"] = cssRGB(color400.RGB255())
 	}
@@ -302,22 +300,22 @@ func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {
 		palette["500"] = cssRGB(color500.RGB255())
 	}
 
-	color600, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.1))
+	color600, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.06))
 	if ok {
 		palette["600"] = cssRGB(color600.RGB255())
 	}
 
-	color700, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.2))
+	color700, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.12))
 	if ok {
 		palette["700"] = cssRGB(color700.RGB255())
 	}
 
-	color800, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.3))
+	color800, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.18))
 	if ok {
 		palette["800"] = cssRGB(color800.RGB255())
 	}
 
-	color900, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.4))
+	color900, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.24))
 	if ok {
 		palette["900"] = cssRGB(color900.RGB255())
 	}

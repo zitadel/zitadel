@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -67,6 +68,9 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	if err != nil {
 		return CtxData{}, err
 	}
+	if strings.HasPrefix(method, "/zitadel.system.v1.SystemService") {
+		return CtxData{UserID: userID}, nil
+	}
 	var projectID string
 	var origins []string
 	if clientID != "" {
@@ -125,7 +129,10 @@ func GetAllPermissionsFromCtx(ctx context.Context) []string {
 func checkOrigin(ctx context.Context, origins []string) error {
 	origin := grpc.GetGatewayHeader(ctx, http_util.Origin)
 	if origin == "" {
-		return nil
+		origin = http_util.OriginFromCtx(ctx)
+		if origin == "" {
+			return nil
+		}
 	}
 	if http_util.IsOriginAllowed(origins, origin) {
 		return nil

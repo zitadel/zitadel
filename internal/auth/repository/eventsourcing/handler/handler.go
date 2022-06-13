@@ -36,7 +36,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es}, queries),
 		newUserSession(
-			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
+			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}, queries),
 		newToken(
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
 		newIDPConfig(

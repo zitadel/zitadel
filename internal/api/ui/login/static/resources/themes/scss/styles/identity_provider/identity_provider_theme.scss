@@ -1,23 +1,31 @@
-@import 'identity_provider';
+@import "identity_provider";
 
 @mixin lgn-idp-theme() {
   @include lgn-idp-color();
 }
 
 @mixin lgn-idp-color() {
-
   .lgn-idp {
     border-color: var(--zitadel-color-divider);
+    color: var(--zitadel-color-font-500);
 
-    @include lgn-idp-elevation(1);
+    &:hover {
+      @include lgn-idp-elevation(1);
+    }
 
     &:not([disabled]):active {
-      @include lgn-idp-elevation(8);
+      @include lgn-idp-elevation(2);
     }
 
     &.google {
       color: var(--zitadel-color-google-text);
       background-color: var(--zitadel-color-google-background);
+    }
+  }
+
+  .lgn-idp-providers {
+    .lgn-idp-desc {
+      color: var(--zitadel-color-label);
     }
   }
 }

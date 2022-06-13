@@ -21,6 +21,10 @@
       border-bottom: 1px solid #ffffff20;
       flex-wrap: wrap;
 
+      &:last-child {
+        border-bottom: none;
+      }
+
       .left {
         .label {
           font-size: 13px;

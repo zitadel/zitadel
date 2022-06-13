@@ -483,6 +483,7 @@ func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, er
 	return &smtp.EmailConfig{
 		From:     config.SenderAddress,
 		FromName: config.SenderName,
+		Tls:      config.TLS,
 		SMTP: smtp.SMTP{
 			Host:     config.Host,
 			User:     config.User,
@@ -493,14 +494,18 @@ func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, er
 
 // Read iam twilio config
 func (n *Notification) getTwilioConfig(ctx context.Context) (*twilio.TwilioConfig, error) {
-	config, err := n.queries.SMSProviderConfigByID(ctx, authz.GetInstance(ctx).InstanceID())
+	active, err := query.NewSMSProviderStateQuery(domain.SMSConfigStateActive)
+	if err != nil {
+		return nil, err
+	}
+	config, err := n.queries.SMSProviderConfig(ctx, active)
 	if err != nil {
 		return nil, err
 	}
 	if config.TwilioConfig == nil {
 		return nil, errors.ThrowNotFound(nil, "HANDLER-8nfow", "Errors.SMS.Twilio.NotFound")
 	}
-	token, err := crypto.Decrypt(config.TwilioConfig.Token, n.smtpPasswordCrypto)
+	token, err := crypto.Decrypt(config.TwilioConfig.Token, n.smsTokenCrypto)
 	if err != nil {
 		return nil, err
 	}

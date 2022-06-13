@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -25,7 +24,7 @@ type addAPIApp struct {
 	ClientSecretPlain string
 }
 
-func AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
+func (c *Commands) AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if app.ID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument")
@@ -39,13 +38,11 @@ func AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashAlgorithm) prep
 				return nil, errors.ThrowNotFound(err, "PROJE-Sf2gb", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = domain.NewClientID(id.SonyFlakeGenerator, project.Name)
+			app.ClientID, err = domain.NewClientID(c.idGenerator, project.Name)
 			if err != nil {
 				return nil, errors.ThrowInternal(err, "V2-f0pgP", "Errors.Internal")
 			}
 
-			//requires client secret
-			// TODO(release blocking):we have to return the secret
 			if app.AuthMethodType == domain.APIAuthMethodTypeBasic {
 				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
 				if err != nil {

@@ -45,7 +45,7 @@ func (wm *InstanceSecretGeneratorConfigWriteModel) Reduce() error {
 			wm.IncludeLowerLetters = e.IncludeLowerLetters
 			wm.IncludeUpperLetters = e.IncludeUpperLetters
 			wm.IncludeDigits = e.IncludeDigits
-			wm.IncludeSymbols = e.IncludeDigits
+			wm.IncludeSymbols = e.IncludeSymbols
 			wm.State = domain.SecretGeneratorStateActive
 		case *instance.SecretGeneratorChangedEvent:
 			if wm.GeneratorType != e.GeneratorType {

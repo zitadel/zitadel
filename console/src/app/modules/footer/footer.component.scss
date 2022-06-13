@@ -96,7 +96,7 @@
         margin: 0.5rem 0;
 
         a {
-          color: map-get($foreground, base);
+          color: map-get($foreground, text);
           text-decoration: none;
           display: flex;
           align-items: center;

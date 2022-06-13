@@ -88,7 +88,6 @@ var (
 		` projections.users.change_date,` +
 		` projections.users.resource_owner,` +
 		` projections.users.sequence,` +
-		//` projections.users.state,` + //TODO:
 		` projections.users_humans.user_id,` +
 		` projections.users_humans.first_name,` +
 		` projections.users_humans.last_name,` +
@@ -105,7 +104,6 @@ var (
 		"change_date",
 		"resource_owner",
 		"sequence",
-		//"state", //TODO:
 		"user_id",
 		"first_name",
 		"last_name",
@@ -120,7 +118,6 @@ var (
 		` projections.users.change_date,` +
 		` projections.users.resource_owner,` +
 		` projections.users.sequence,` +
-		//` projections.users.state,` + //TODO:
 		` projections.users_humans.user_id,` +
 		` projections.users_humans.email,` +
 		` projections.users_humans.is_email_verified` +
@@ -132,7 +129,6 @@ var (
 		"change_date",
 		"resource_owner",
 		"sequence",
-		//"state", //TODO:
 		"user_id",
 		"email",
 		"is_email_verified",
@@ -142,7 +138,6 @@ var (
 		` projections.users.change_date,` +
 		` projections.users.resource_owner,` +
 		` projections.users.sequence,` +
-		//` projections.users.state,` + //TODO:
 		` projections.users_humans.user_id,` +
 		` projections.users_humans.phone,` +
 		` projections.users_humans.is_phone_verified` +
@@ -154,7 +149,6 @@ var (
 		"change_date",
 		"resource_owner",
 		"sequence",
-		//"state", //TODO:
 		"user_id",
 		"phone",
 		"is_phone_verified",
@@ -163,28 +157,15 @@ var (
 	userUniqueQuery = `SELECT projections.users.id,` +
 		` projections.users.state,` +
 		` projections.users.username,` +
-		//` login_names.login_names,` +
-		//` preferred_login_name.login_name,` +
 		` projections.users_humans.user_id,` +
 		` projections.users_humans.email,` +
 		` projections.users_humans.is_email_verified` +
 		` FROM projections.users` +
 		` LEFT JOIN projections.users_humans ON projections.users.id = projections.users_humans.user_id`
-	//` LEFT JOIN` +
-	//` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as login_names` +
-	//` FROM projections.login_names as login_names` +
-	//` GROUP BY login_names.user_id) as login_names` +
-	//` on login_names.user_id = projections.users.id` +
-	//` LEFT JOIN` +
-	//` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
-	//` on preferred_login_name.user_id = projections.users.id`
 	userUniqueCols = []string{
 		"id",
 		"state",
 		"username",
-		//"login_names",
-		//"login_name",
-		//human
 		"user_id",
 		"email",
 		"is_email_verified",

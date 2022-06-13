@@ -39,6 +39,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		if err != nil {
 			sentry.CurrentHub().Recover(err)
 			handler.Subscription().Unsubscribe()
+			logging.WithFields("HANDL-SAFe1").Errorf("reduce panicked: %v", err)
 		}
 	}()
 	currentSequence, err := handler.CurrentSequence(event.InstanceID)

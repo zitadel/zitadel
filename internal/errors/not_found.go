@@ -33,3 +33,7 @@ func (err *NotFoundError) Is(target error) bool {
 	}
 	return err.CaosError.Is(t.CaosError)
 }
+
+func (err *NotFoundError) Unwrap() error {
+	return err.CaosError
+}

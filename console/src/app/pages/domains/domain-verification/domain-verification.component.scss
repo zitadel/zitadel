@@ -14,9 +14,10 @@
 
 .entry {
   margin: 0.5rem 0;
+  display: inline-block;
 }
 
-.line {
+.domain-line {
   display: flex;
   align-items: center;
 }
@@ -24,8 +25,4 @@
 .action {
   display: flex;
   justify-content: flex-start;
-
-  .ok-button {
-    margin-left: 0.5rem;
-  }
 }

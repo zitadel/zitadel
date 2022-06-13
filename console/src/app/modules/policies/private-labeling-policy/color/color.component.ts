@@ -123,7 +123,12 @@ export class ColorComponent implements OnInit {
   }
 
   public changeComplete(event: ColorEvent): void {
-    this.emitPreview(event.color.hex);
+    this.color = event.color.hex;
+  }
+
+  public submitColor(): void {
+    this.emitPreview(this.color);
+    this.isOpen = false;
   }
 
   public get previewColorCropped(): string {

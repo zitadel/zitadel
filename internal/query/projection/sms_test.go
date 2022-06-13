@@ -3,18 +3,13 @@ package projection
 import (
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-)
-
-var (
-	sid          = "sid"
-	token        = "token"
-	senderNumber = "sender-number"
 )
 
 func TestSMSProjection_reduces(t *testing.T) {
@@ -39,7 +34,8 @@ func TestSMSProjection_reduces(t *testing.T) {
 						"token": {
 							"cryptoType": 0,
 							"algorithm": "RSA-265",
-							"keyId": "key-id"
+							"keyId": "key-id",
+							"crypted": "Y3J5cHRlZA=="
 						},
 						"senderNumber": "sender-number"
 					}`),
@@ -67,11 +63,17 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.sms_configs_twilio (sms_id, sid, token, sender_number) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.sms_configs_twilio (sms_id, instance_id, sid, token, sender_number) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"id",
+								"instance-id",
 								"sid",
-								anyArg{},
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "RSA-265",
+									KeyID:      "key-id",
+									Crypted:    []byte("crypted"),
+								},
 								"sender-number",
 							},
 						},
@@ -101,19 +103,72 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
-								&sid,
-								&senderNumber,
+								"sid",
+								"sender-number",
 								"id",
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceSMSConfigTwilioTokenChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.SMSConfigTwilioTokenChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+						"id": "id",
+						"token": {
+							"cryptoType": 0,
+							"algorithm": "RSA-265",
+							"keyId": "key-id",
+							"crypted": "Y3J5cHRlZA=="
+						}
+					}`),
+				), instance.SMSConfigTwilioTokenChangedEventMapper),
+			},
+			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioTokenChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				projection:       SMSConfigProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sms_configs_twilio SET (token) = ($1) WHERE (sms_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "RSA-265",
+									KeyID:      "key-id",
+									Crypted:    []byte("crypted"),
+								},
+								"id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"id",
+								"instance-id",
 							},
 						},
 					},
@@ -140,12 +195,13 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateActive,
 								anyArg{},
 								uint64(15),
 								"id",
+								"instance-id",
 							},
 						},
 					},
@@ -172,12 +228,13 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateInactive,
 								anyArg{},
 								uint64(15),
 								"id",
+								"instance-id",
 							},
 						},
 					},
@@ -204,9 +261,10 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.sms_configs WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.sms_configs WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"id",
+								"instance-id",
 							},
 						},
 					},

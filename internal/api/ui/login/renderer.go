@@ -211,6 +211,9 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"hasExternalLogin": func() bool {
 			return false
 		},
+		"hasRegistration": func() bool {
+			return true
+		},
 		"idpProviderClass": func(stylingType domain.IDPConfigStylingType) string {
 			return stylingType.GetCSSClass()
 		},
@@ -299,7 +302,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.LinkUsersStep:
 		l.linkUsers(w, r, authReq, err)
 	case *domain.ExternalNotFoundOptionStep:
-		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 	case *domain.ExternalLoginStep:
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	case *domain.GrantRequiredStep:
@@ -332,20 +335,21 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 }
 
 func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
+	lang, _ := l.renderer.ReqLang(l.getTranslator(r.Context(), authReq), r).Base()
 	baseData := baseData{
 		errorData: errorData{
 			ErrID:      errType,
 			ErrMessage: errMessage,
 		},
-		Lang:                   l.renderer.ReqLang(l.getTranslator(r.Context(), authReq), r).String(),
+		Lang:                   lang.String(),
 		Title:                  title,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
-		PrivateLabelingOrgID:   l.getPrivateLabelingID(authz.GetInstance(r.Context()).InstanceID(), authReq),
-		OrgID:                  l.getOrgID(authReq),
+		PrivateLabelingOrgID:   l.getPrivateLabelingID(r, authReq),
+		OrgID:                  l.getOrgID(r, authReq),
 		OrgName:                l.getOrgName(authReq),
-		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
+		PrimaryDomain:          l.getOrgPrimaryDomain(r, authReq),
 		DisplayLoginNameSuffix: l.isDisplayLoginNameSuffix(authReq),
 		AuthReqID:              getRequestID(authReq, r),
 		CSRF:                   csrf.TemplateField(r),
@@ -361,6 +365,10 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		}
 		privacyPolicy = authReq.PrivacyPolicy
 	} else {
+		labelPolicy, _ := l.query.ActiveLabelPolicyByOrg(r.Context(), baseData.PrivateLabelingOrgID)
+		if labelPolicy != nil {
+			baseData.LabelPolicy = labelPolicy.ToDomain()
+		}
 		policy, err := l.query.DefaultPrivacyPolicy(r.Context())
 		if err != nil {
 			return baseData
@@ -428,7 +436,7 @@ func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg strin
 }
 
 func (l *Login) getTheme(r *http.Request) string {
-	return "zitadel" //TODO: impl
+	return "zitadel"
 }
 
 func (l *Login) getThemeMode(r *http.Request) string {
@@ -446,9 +454,9 @@ func (l *Login) isDarkMode(r *http.Request) bool {
 	return strings.HasSuffix(cookie.Value, "dark")
 }
 
-func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
+func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 	if authReq == nil {
-		return ""
+		return r.FormValue(queryOrgID)
 	}
 	if authReq.RequestedOrgID != "" {
 		return authReq.RequestedOrgID
@@ -456,9 +464,12 @@ func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
-func (l *Login) getPrivateLabelingID(instanceID string, authReq *domain.AuthRequest) string {
-	privateLabelingOrgID := instanceID
+func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
+	privateLabelingOrgID := authz.GetInstance(r.Context()).InstanceID()
 	if authReq == nil {
+		if id := r.FormValue(queryOrgID); id != "" {
+			return id
+		}
 		return privateLabelingOrgID
 	}
 	if authReq.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
@@ -482,11 +493,17 @@ func (l *Login) getOrgName(authReq *domain.AuthRequest) string {
 	return authReq.RequestedOrgName
 }
 
-func (l *Login) getOrgPrimaryDomain(authReq *domain.AuthRequest) string {
-	if authReq == nil {
+func (l *Login) getOrgPrimaryDomain(r *http.Request, authReq *domain.AuthRequest) string {
+	orgID := authz.GetInstance(r.Context()).DefaultOrganisationID()
+	if authReq != nil && authReq.RequestedPrimaryDomain != "" {
+		return authReq.RequestedPrimaryDomain
+	}
+	org, err := l.query.OrgByID(r.Context(), orgID)
+	if err != nil {
+		logging.New().WithError(err).Error("cannot get default org")
 		return ""
 	}
-	return authReq.RequestedPrimaryDomain
+	return org.Domain
 }
 
 func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {

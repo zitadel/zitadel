@@ -55,8 +55,21 @@ func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigR
 	}, nil
 }
 
+func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) (*admin_pb.AddSMTPConfigResponse, error) {
+	details, err := s.command.AddSMTPConfig(ctx, AddSMTPToConfig(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddSMTPConfigResponse{
+		Details: object.ChangeToDetailsPb(
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner),
+	}, nil
+}
+
 func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
-	details, err := s.command.ChangeSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), UpdateSMTPToConfig(req))
+	details, err := s.command.ChangeSMTPConfig(ctx, UpdateSMTPToConfig(req))
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +81,21 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 	}, nil
 }
 
+func (s *Server) RemoveSMTPConfig(ctx context.Context, _ *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
+	details, err := s.command.RemoveSMTPConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.RemoveSMTPConfigResponse{
+		Details: object.ChangeToDetailsPb(
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner),
+	}, nil
+}
+
 func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
-	details, err := s.command.ChangeSMTPConfigPassword(ctx, authz.GetInstance(ctx).InstanceID(), req.Password)
+	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.Password)
 	if err != nil {
 		return nil, err
 	}
