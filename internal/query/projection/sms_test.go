@@ -141,7 +141,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMSConfigTwilioTokenChangedEventMapper),
 			},
-			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioTokenChanged,
+			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioTokenChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
