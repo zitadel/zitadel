@@ -14,7 +14,6 @@ You most probably need to configure these fields for making ZITADEL work on your
 
 For security reasons, ZITADEL only serves requests sent to the expected protocol, host and port
 
-<!-- TODO: verify -->
 ```yaml
 ExternalSecure: true
 ExternalDomain: 'zitadel.my.domain'
@@ -23,7 +22,6 @@ ExternalPort: 443
 
 ### Database Initialization Steps Config
 
-<!-- TODO: verify -->
 ZITADEL creates random subdomains for each instance created.
 However, for the default instance, this is most probably not the desired behavior.
 You can give the default instance a fixed custom domain here.
