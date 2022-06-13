@@ -6,11 +6,9 @@ title: Custom Domain
 
 This guide assumes you are already familiar with [configuring ZITADEL](./configure).
 
-## What to configure
-
 You most probably need to configure these fields for making ZITADEL work on your custom domain.
 
-### Standard Config
+## Standard Config
 
 For security reasons, ZITADEL only serves requests sent to the expected protocol, host and port
 
@@ -20,7 +18,7 @@ ExternalDomain: 'zitadel.my.domain'
 ExternalPort: 443
 ```
 
-### Database Initialization Steps Config
+## Database Initialization Steps Config
 
 ZITADEL creates random subdomains for each instance created.
 However, for the default instance, this is most probably not the desired behavior.

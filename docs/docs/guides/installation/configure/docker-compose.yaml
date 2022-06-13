@@ -1,12 +1,13 @@
 version: '3.8'
 
 services:
+
   zitadel:
     restart: 'always'
     networks:
       - 'zitadel'
     image: 'ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.24-amd64'
-    command: 'admin start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}"'
+    command: 'admin start-from-init --config /tmp/example-zitadel-config.yaml --config /tmp/example-zitadel-secrets.yaml --steps /tmp/example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}"'
     healthcheck:
       test: ["CMD", "zitadel", "admin", "status", "health"]
       interval: '10s'
@@ -14,14 +15,33 @@ services:
       retries: 5
       start_period: '40s'
     depends_on:
-      my-cockroach-db:
-        condition: 'service_healthy'
+      chown:
+        condition: 'service_completed_successfully'
     ports:
       - '8080:8080'
     volumes:
-      - './example-zitadel-config.yaml:/'
-      - './example-zitadel-secrets.yaml:/'
-      - './example-zitadel-init-steps.yaml:/'
+      - './example-zitadel-config.yaml:/tmp/example-zitadel-config.yaml:ro'
+      - './example-zitadel-secrets.yaml:/tmp/example-zitadel-secrets.yaml:ro'
+      - './example-zitadel-init-steps.yaml:/tmp/example-zitadel-init-steps.yaml:ro'
+      - 'chowned-certs:/crdb-certs/'
+
+  debug:
+    image: 'bash:5.1.16-alpine3.15'
+    command: 'sleep 99999'
+    volumes:
+      - 'certs:/certs/:ro'
+      - 'chowned-certs:/chowned-certs/:rw'
+
+  chown:
+    image: 'bash:5.1.16-alpine3.15'
+    command: '[ -n "$$(ls -A /certs)" ] && cp /certs/* /chowned-certs/ && chown 1000:1000 /chowned-certs/* && chmod 400 /chowned-certs/*'
+    restart: 'always'
+    volumes:
+      - 'certs:/certs/:ro'
+      - 'chowned-certs:/chowned-certs/:rw'
+    depends_on:
+      my-cockroach-db:
+        condition: 'service_healthy'
 
   my-cockroach-db:
     restart: 'always'
@@ -38,6 +58,14 @@ services:
     ports:
       - '9090:8080'
       - '26257:26257'
+    volumes:
+      - 'certs:/cockroach/certs/:rw'
+      - 'data:/cockroach/cockroach-data/:rw'
 
 networks:
   zitadel:
+
+volumes:
+  certs:
+  chowned-certs:
+  data:

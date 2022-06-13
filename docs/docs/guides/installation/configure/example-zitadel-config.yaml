@@ -1,3 +1,21 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/defaults.yaml
+Log:
+  Level: 'info'
+
 Database:
   Host: 'my-cockroach-db'
+  User:
+    SSL:
+      Mode: 'verify-full'
+      RootCert: "/crdb-certs/ca.crt"
+      Cert: "/crdb-certs/client.root.crt"
+      Key: "/crdb-certs/client.root.key"
+
+AdminUser:
+  Username: 'root'
+  Password: ''
+  SSL:
+    Mode: 'verify-full'
+    RootCert: "/crdb-certs/ca.crt"
+    Cert: "/crdb-certs/client.root.crt"
+    Key: "/crdb-certs/client.root.key"
