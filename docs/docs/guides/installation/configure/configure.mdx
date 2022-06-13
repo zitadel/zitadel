@@ -5,12 +5,9 @@ title: Configure
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import LinuxUnix from './linuxunix.mdx'
-import MacOS from './macos.mdx'
 import Windows from './windows.mdx'
 import Compose from './compose.mdx'
 import Helm from './helm.mdx'
-import Configuration from './configuration.mdx'
-import OpenLocal from './openlocal.mdx'
 
 # Configure ZITADEL
 
@@ -19,11 +16,11 @@ This guide assumes you are already familiar with [running ZITADEL with the most 
 ## Configuration Files
 
 ### Runtime Configuration
-See a description of all possible _runtime configuration_ options with their defaults [in the source code](https://github.com/zitadel/zitadel/blob/v2/cmd/defaults.yaml).
+See a description of all possible _runtime configuration_ options with their defaults [in the source code](https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/defaults.yaml).
 The `zitadel` binary expects the `--config` flag for this configuration.
 
 ### Database Initialization
-Apart from these options, ZITADEL uses a [different configuration](https://github.com/zitadel/zitadel/blob/v2/cmd/adminn/setup/steps.yaml) for _database initialization steps_.
+Apart from these options, ZITADEL uses a [different configuration](https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/adminn/setup/steps.yaml) for _database initialization steps_.
 The `zitadel` binary expects the `--steps` flag for this configuration.
 
 ### Split Configuration
@@ -71,9 +68,9 @@ For example, if you want to configure the default ZITADEL IAM admin username and
 ## What's next
 - If you want to run ZITADEL in production, you most certainly need to [customize your own domain](./custom-domain).
 - We strongly recommend you [run cockroachdb in secure mode](./secure-cockroachdb).
-- Also, you should configure a [different default IAM admin username and password](iam-admin-user).
+- Also, you should configure an own [username and password for the IAM admin user](iam-admin-user) created by ZITADEL.
 
 :::caution
 
 <!-- TODO: Better mark the link in the UI -->
-The ZITADEL management console [requires end-to-end HTTP/2 support](./http2)
+The ZITADEL management console [requires end-to-end HTTP/2 support](./http2-support)

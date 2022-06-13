@@ -1,11 +1,22 @@
-Download the docker compose example configuration
-
 ```bash
-wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/compose/docker-compose.yml
-```
+# Download the docker compose example configuration. For example:
+wget https://docs.zitadel.com/docs/guides/configure/docker-compose.yml
 
-Run the database and application containers
+# Download and adjust the example configuration file containing standard configuration. For example:
+wget https://docs.zitadel.com/docs/guides/configure/example-zitadel-config.yaml
 
-```bash
-docker compose up
+# Download and adjust the example configuration file containing secret configuration. For example:
+wget https://docs.zitadel.com/docs/guides/configure/example-zitadel-secrets.yaml
+
+# Download and adjust the example configuration file containing database initialization configuration. For example:
+wget https://docs.zitadel.com/docs/guides/configure/example-zitadel-init-steps.yaml
+
+# A single ZITADEL instance always needs the same 32 characters long masterkey
+# If you haven't done so already, you can generate a new one
+# The key must be passed as argument
+# For example:
+ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
+
+# Run the database and application containers
+docker compose up --detach
 ```
