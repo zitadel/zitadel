@@ -1,5 +1,5 @@
 ---
-title: Installation
+title: Get Started
 ---
 
 import Tabs from "@theme/Tabs";
@@ -9,12 +9,12 @@ import MacOS from './macos.mdx'
 import Windows from './windows.mdx'
 import Compose from './compose.mdx'
 import Helm from './helm.mdx'
-import Configuration from './configuration.mdx'
-import OpenLocal from './openlocal.mdx'
+import NextSelfHosted from './nextselfhosted.mdx'
 
 # Run ZITADEL
 
 Choose your platform and run ZITADEL with the most minimal configuration possible.
+For an easy self-hosted production setup, we recommend running ZITADEL on Kubernetes, using our official Helm chart.
 
 <Tabs
     groupId="installation-target"
@@ -25,7 +25,7 @@ Choose your platform and run ZITADEL with the most minimal configuration possibl
         {'label': 'MacOS', 'value': 'macos'},
         {'label': 'Windows', 'value': 'windows'},
         {'label': 'Docker Compose', 'value': 'compose'},
-        {'label': 'Kubernetes', 'value': 'k8s'}
+        {'label': 'Kubernetes (Helm)', 'value': 'k8s'}
     ]}
 >
     <TabItem value="saas">
@@ -33,23 +33,22 @@ Choose your platform and run ZITADEL with the most minimal configuration possibl
     </TabItem>
     <TabItem value="linux">
         <Linux/>
-        <Configuration/>
-        <OpenLocal/>
+        <NextSelfHosted/>
     </TabItem>
     <TabItem value="macos">
         <MacOS/>
-        <Configuration/>
-        <OpenLocal/>
+        <NextSelfHosted/>
     </TabItem>
     <TabItem value="windows">
         <Windows/>
+        <NextSelfHosted/>
     </TabItem>
     <TabItem value="compose">
         <Compose/>
-        <Configuration/>
-        <OpenLocal/>
+        <NextSelfHosted/>
     </TabItem>
     <TabItem value="k8s">
         <Helm/>
+        <NextSelfHosted/>
     </TabItem>
 </Tabs>

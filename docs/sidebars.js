@@ -36,7 +36,19 @@ module.exports = {
   ],
   guides: [
     "guides/overview",
-    "guides/installation/installation",
+    {
+      type: "category",
+      label: "Install ZITADEL",
+      collapsed: false,
+      items: [
+        "guides/installation/get-started/get-started",
+        "guides/installation/configure/configure",
+        "guides/installation/custom-domain",
+        "guides/installation/secure-cockroachdb",
+        "guides/installation/iam-admin-user",
+        "guides/installation/http2-support/http2-support",
+      ],
+    },
     {
       type: "category",
       label: "Get to know ZITADEL",

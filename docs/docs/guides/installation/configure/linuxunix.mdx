@@ -1,0 +1,43 @@
+### Configure by Files
+
+```bash
+# Create a configuration file containing standard configuration
+cat << EOF > ./zitadel-config.yaml
+Database:
+  Host: my.database
+EOF
+
+# Create a configuration file containing secrets
+cat << EOF > ./zitadel-secrets.yaml
+Database:
+  User:
+    Username: my_zitadel_db_user
+    Password: Secret_DB_User_Password
+EOF
+
+# Create a database initialization file
+cat << EOF > ./zitadel-init-steps.yaml
+S3DefaultInstance:
+  Org:
+    Human:
+      Username: root
+      Password: RootPassword1!
+EOF
+
+# Pass zitadel configuration by configuration files
+zitadel admin start-from-init --config ./zitadel-config.yaml --config ./zitadel-secrets.yaml --steps ./zitadel-init-steps.yaml --masterkey "MasterkeyNeedsToHave32Characters"
+```
+
+### Configure by Environment Variables
+
+```bash
+# Set runtime environment variables
+export ZITADEL_DATABASE_HOST="my.database"
+export ZITADEL_DATABASE_USER_USERNAME="my_zitadel_db_user"
+export ZITADEL_DATABASE_USER_PASSWORD="Secret_DB_User_Password"
+export ZITADEL_S3DEFAULTINSTANCE_ORG_HUMAN_USERNAME="root"
+export ZITADEL_S3DEFAULTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
+
+# Let the zitadel binary read configuration from environment variables
+zitadel admin start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
+```
