@@ -1565,9 +1565,9 @@
       "TITLE": "Application",
       "ID": "ID",
       "DESCRIPTION": "Here you can edit your application data and it's configuration.",
-      "CREATE_OIDC": "OIDC Application",
-      "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
-      "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "CREATE": "Create application",
+      "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
+      "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
       "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
@@ -1620,6 +1620,10 @@
     "ADDITIONALORIGINSDESC": "If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "The entered value is not an origin",
+    "PROSWITCH": "I'm a pro. Skip this wizard.",
+    "NAMEANDTYPESECTION": "Name and Type",
+    "TITLEFIRST": "Name of the application",
+    "TYPETITLE": "Type of application",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1628,10 +1632,6 @@
       "CURRENT": "Current Config",
       "TOKENSECTIONTITLE": "AuthToken Options",
       "REDIRECTSECTIONTITLE": "Redirect Settings",
-      "PROSWITCH": "I'm a pro. Skip this wizard.",
-      "NAMEANDTYPESECTION": "Name and Type",
-      "TITLEFIRST": "Insert a name first.",
-      "TYPETITLE": "What type of application do you want to create?",
       "REDIRECTTITLE": "Specify the URIs where the login will redirect to.",
       "POSTREDIRECTTITLE": "This is the redirect URI after logout.",
       "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
@@ -1722,6 +1722,13 @@
         "0": "Basic",
         "1": "Private Key JWT"
       }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Applications"
+      },
+      "CONFIGSECTION": "SAML Configuration"
     },
     "AUTHMETHODS": {
       "CODE": {

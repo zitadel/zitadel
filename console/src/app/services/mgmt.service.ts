@@ -63,6 +63,8 @@ import {
     AddProjectResponse,
     AddProjectRoleRequest,
     AddProjectRoleResponse,
+    AddSAMLAppRequest,
+    AddSAMLAppResponse,
     AddSecondFactorToLoginPolicyRequest,
     AddSecondFactorToLoginPolicyResponse,
     AddUserGrantRequest,
@@ -421,6 +423,8 @@ import {
     UpdateProjectResponse,
     UpdateProjectRoleRequest,
     UpdateProjectRoleResponse,
+    UpdateSAMLAppConfigRequest,
+    UpdateSAMLAppConfigResponse,
     UpdateUserGrantRequest,
     UpdateUserGrantResponse,
     UpdateUserNameRequest,
@@ -2265,6 +2269,10 @@ export class ManagementService {
     return this.grpcService.mgmt.addAPIApp(req, null).then((resp) => resp.toObject());
   }
 
+  public addSAMLApp(req: AddSAMLAppRequest): Promise<AddSAMLAppResponse.AsObject> {
+    return this.grpcService.mgmt.addSAMLApp(req, null).then((resp) => resp.toObject());
+  }
+
   public regenerateAPIClientSecret(appId: string, projectId: string): Promise<RegenerateAPIClientSecretResponse.AsObject> {
     const req = new RegenerateAPIClientSecretRequest();
     req.setAppId(appId);
@@ -2286,6 +2294,10 @@ export class ManagementService {
 
   public updateAPIAppConfig(req: UpdateAPIAppConfigRequest): Promise<UpdateAPIAppConfigResponse.AsObject> {
     return this.grpcService.mgmt.updateAPIAppConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSAMLAppConfig(req: UpdateSAMLAppConfigRequest): Promise<UpdateSAMLAppConfigResponse.AsObject> {
+    return this.grpcService.mgmt.updateSAMLAppConfig(req, null).then((resp) => resp.toObject());
   }
 
   public removeApp(projectId: string, appId: string): Promise<RemoveAppResponse.AsObject> {

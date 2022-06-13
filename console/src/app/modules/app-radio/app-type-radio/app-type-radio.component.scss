@@ -60,6 +60,8 @@
       box-sizing: border-box;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
+      position: relative;
+      overflow: hidden;
 
       span {
         margin: 2rem;

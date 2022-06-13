@@ -1,14 +1,24 @@
 <cnsl-create-layout
-  title="{{ 'APP.PAGES.CREATE_OIDC' | translate }}"
-  [createSteps]="createSteps"
+  title="{{ 'APP.PAGES.CREATE' | translate }}"
+  [createSteps]="
+    appType?.value?.createType === AppCreateType.OIDC
+      ? oidcAppRequest.appType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
+        ? 4
+        : 3
+      : appType?.value?.createType === AppCreateType.API
+      ? 3
+      : appType?.value?.createType === AppCreateType.SAML
+      ? 3
+      : 0
+  "
   [currentCreateStep]="currentCreateStep"
   (closed)="close()"
 >
-  <h1>{{ 'APP.PAGES.CREATE_OIDC_DESC_TITLE' | translate }}</h1>
+  <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
   <mat-checkbox class="proswitch" color="primary" [(ngModel)]="devmode">
-    {{ 'APP.OIDC.PROSWITCH' | translate }}
+    {{ 'APP.PROSWITCH' | translate }}
   </mat-checkbox>
 
   <mat-horizontal-stepper
@@ -21,16 +31,16 @@
   >
     <mat-step [stepControl]="firstFormGroup" [editable]="true">
       <form [formGroup]="firstFormGroup">
-        <ng-template matStepLabel>{{ 'APP.OIDC.NAMEANDTYPESECTION' | translate }}</ng-template>
+        <ng-template matStepLabel>{{ 'APP.NAMEANDTYPESECTION' | translate }}</ng-template>
 
-        <p class="step-title">{{ 'APP.OIDC.TITLEFIRST' | translate }}</p>
+        <p class="step-title">{{ 'APP.TITLEFIRST' | translate }}</p>
         <cnsl-form-field class="name-formfield">
           <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
           <input cnslInput cdkFocusInitial formControlName="name" />
           <span cnslError *ngIf="name?.errors?.required">{{ 'PROJECT.APP.NAMEREQUIRED' | translate }}</span>
         </cnsl-form-field>
 
-        <p class="step-title">{{ 'APP.OIDC.TYPETITLE' | translate }}</p>
+        <p class="step-title">{{ 'APP.TYPETITLE' | translate }}</p>
 
         <cnsl-type-radio [types]="appTypes" (selectedType)="appType?.setValue($event)" [selected]="appType?.value">
         </cnsl-type-radio>
@@ -48,9 +58,12 @@
       </form>
     </mat-step>
 
-    <!-- skip for native applications -->
+    <!-- skip for native OIDC and SAML applications -->
     <mat-step
-      *ngIf="oidcAppRequest.appType !== OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      *ngIf="
+        (appType?.value?.createType === AppCreateType.OIDC && oidcAppRequest.appType !== OIDCAppType.OIDC_APP_TYPE_NATIVE) ||
+        appType?.value?.createType === AppCreateType.API
+      "
       [stepControl]="secondFormGroup"
       [editable]="true"
     >
@@ -127,6 +140,27 @@
         [isNative]="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
       >
       </cnsl-redirect-uris>
+
+      <div class="app-create-actions">
+        <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
+        <button mat-raised-button color="primary" matStepperNext [attr.data-e2e]="'continue-button-redirecturis'">
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step *ngIf="appType?.value?.createType === AppCreateType.SAML" [editable]="true">
+      <ng-template matStepLabel>{{ 'APP.SAML.CONFIGSECTION' | translate }}</ng-template>
+
+      <cnsl-form-field class="formfield">
+        <cnsl-label>{{ 'USER.CODEDIALOG.CODE' | translate }}</cnsl-label>
+        <input cnslInput formControlName="metadataUrl" />
+      </cnsl-form-field>
+
+      <cnsl-form-field class="formfield">
+        <cnsl-label>{{ 'USER.CODEDIALOG.CODE' | translate }}</cnsl-label>
+        <input cnslInput formControlName="metadataUrl" />
+      </cnsl-form-field>
 
       <div class="app-create-actions">
         <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>

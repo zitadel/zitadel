@@ -10,6 +10,7 @@ import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 export enum AppCreateType {
   API = 'API',
   OIDC = 'OIDC',
+  SAML = 'SAML',
 }
 
 export interface RadioItemAppType {
@@ -59,4 +60,12 @@ export const API_TYPE: RadioItemAppType = {
   createType: AppCreateType.API,
   prefix: 'API',
   background: 'linear-gradient(40deg, #1f2937, #111827)',
+};
+
+export const SAML_TYPE: RadioItemAppType = {
+  titleI18nKey: 'APP.SAML.SELECTION.TITLE',
+  descI18nKey: 'APP.SAML.SELECTION.DESCRIPTION',
+  createType: AppCreateType.SAML,
+  prefix: 'SAML',
+  background: 'linear-gradient(40deg, #321f37, #301c36)',
 };

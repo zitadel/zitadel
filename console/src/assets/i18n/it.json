@@ -1565,9 +1565,9 @@
       "TITLE": "Applicazione",
       "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
-      "CREATE_OIDC": "Applicazione OIDC",
-      "CREATE_OIDC_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
-      "CREATE_OIDC_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
+      "CREATE": "Crea Applicazione",
+      "CREATE_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
+      "CREATE_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
       "STATE": "Stato",
       "DATECREATED": "Creato",
       "DATECHANGED": "Cambiato",
@@ -1620,6 +1620,10 @@
     "ADDITIONALORIGINSDESC": "Se vuoi aggiungere ulteriori Origini alla tua app che non \u00e8 usata come reindirizzamento puoi farlo qui.",
     "ORIGINS": "Origini",
     "NOTANORIGIN": "Il valore inserito non \u00e8 un'origine",
+    "PROSWITCH": "Sono un professionista. Salta questo passo.",
+    "NAMEANDTYPESECTION": "Nome e tipo",
+    "TITLEFIRST": "Nome dell' applicazione",
+    "TYPETITLE": "Che tipo di applicazione vuoi creare?",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1628,10 +1632,6 @@
       "CURRENT": "Configurazione attuale",
       "TOKENSECTIONTITLE": "Opzioni AuthToken",
       "REDIRECTSECTIONTITLE": "Impostazioni di reindirizzamento",
-      "PROSWITCH": "Sono un professionista. Salta questo passo.",
-      "NAMEANDTYPESECTION": "Nome e tipo",
-      "TITLEFIRST": "Inserisci un nome.",
-      "TYPETITLE": "Che tipo di applicazione vuoi creare?",
       "REDIRECTTITLE": "Specifica gli URI a cui il login sar\u00e0 reindirizzato.",
       "POSTREDIRECTTITLE": "Questo \u00e8 l'URI di reindirizzamento dopo il logout.",
       "REDIRECTDESCRIPTIONWEB": "Gli URI di reindirizzamento devono iniziare con https://. http:// \u00e8 valido solo con la modalit\u00e0 di sviluppo abilitata (DEV Mode).",
@@ -1722,6 +1722,13 @@
         "0": "Basic",
         "1": "Private Key JWT"
       }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Applicazioni SAMML"
+      },
+      "CONFIGSECTION": "Configurazione SAML"
     },
     "AUTHMETHODS": {
       "CODE": {

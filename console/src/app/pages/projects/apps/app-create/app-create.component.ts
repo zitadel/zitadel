@@ -20,6 +20,7 @@ import {
     AddAPIAppResponse,
     AddOIDCAppRequest,
     AddOIDCAppResponse,
+    AddSAMLAppRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -35,7 +36,7 @@ import {
     PKCE_METHOD,
     POST_METHOD,
 } from '../authmethods';
-import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
+import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
 
 @Component({
   selector: 'cnsl-app-create',
@@ -49,11 +50,11 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   public projectId: string = '';
   public loading: boolean = false;
 
-  public createSteps: number = 4;
   public currentCreateStep: number = 1;
 
   public oidcAppRequest: AddOIDCAppRequest.AsObject = new AddOIDCAppRequest().toObject();
   public apiAppRequest: AddAPIAppRequest.AsObject = new AddAPIAppRequest().toObject();
+  public samlAppRequest: AddSAMLAppRequest.AsObject = new AddSAMLAppRequest().toObject();
 
   public oidcResponseTypes: { type: OIDCResponseType; checked: boolean; disabled: boolean }[] = [
     { type: OIDCResponseType.OIDC_RESPONSE_TYPE_CODE, checked: false, disabled: false },
@@ -66,7 +67,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     OIDCAppType.OIDC_APP_TYPE_NATIVE,
     OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
   ];
-  public appTypes: any = [WEB_TYPE, NATIVE_TYPE, USER_AGENT_TYPE, API_TYPE];
+  public appTypes: any = [WEB_TYPE, NATIVE_TYPE, USER_AGENT_TYPE, API_TYPE, SAML_TYPE];
 
   public authMethods: RadioItemAuthType[] = [PKCE_METHOD, CODE_METHOD, PK_JWT_METHOD, POST_METHOD];
 
