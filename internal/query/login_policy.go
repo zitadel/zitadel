@@ -315,7 +315,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			IDPNameCol.identifier(),
 			IDPTypeCol.identifier(),
 		).From(loginPolicyTable.identifier()).
-			LeftJoin(join(IDPLoginPolicyLinkIDPIDCol, LoginPolicyColumnOrgID)).
+			LeftJoin(join(IDPLoginPolicyLinkAggregateIDCol, LoginPolicyColumnOrgID)).
 			LeftJoin(join(IDPIDCol, IDPLoginPolicyLinkIDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {

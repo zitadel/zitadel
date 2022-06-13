@@ -112,8 +112,8 @@ var (
 )
 
 func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (*SMSConfig, error) {
-	stmt, scan := prepareSMSConfigQuery()
-	query, args, err := stmt.Where(
+	query, scan := prepareSMSConfigQuery()
+	stmt, args, err := query.Where(
 		sq.Eq{
 			SMSConfigColumnID.identifier():         id,
 			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -123,7 +123,25 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (*SMSCon
 		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (*SMSConfig, error) {
+	query, scan := prepareSMSConfigQuery()
+	for _, searchQuery := range queries {
+		query = searchQuery.toQuery(query)
+	}
+	stmt, args, err := query.Where(
+		sq.Eq{
+			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
 	return scan(row)
 }
 
@@ -147,6 +165,10 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 	}
 	apps.LatestSequence, err = q.latestSequence(ctx, smsConfigsTable)
 	return apps, err
+}
+
+func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) {
+	return NewNumberQuery(SMSConfigColumnState, state, NumberEquals)
 }
 
 func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, error)) {

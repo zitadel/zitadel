@@ -116,6 +116,18 @@ Get system smtp configuration
     GET: /smtp
 
 
+### AddSMTPConfig
+
+> **rpc** AddSMTPConfig([AddSMTPConfigRequest](#addsmtpconfigrequest))
+[AddSMTPConfigResponse](#addsmtpconfigresponse)
+
+Add system smtp configuration
+
+
+
+    POST: /smtp
+
+
 ### UpdateSMTPConfig
 
 > **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
@@ -138,6 +150,18 @@ Update system smtp configuration password for host
 
 
     PUT: /smtp/password
+
+
+### RemoveSMTPConfig
+
+> **rpc** RemoveSMTPConfig([RemoveSMTPConfigRequest](#removesmtpconfigrequest))
+[RemoveSMTPConfigResponse](#removesmtpconfigresponse)
+
+Remove system smtp configuration
+
+
+
+    DELETE: /smtp
 
 
 ### ListSMSProviders
@@ -198,6 +222,42 @@ Update twilio sms provider token
 
 
     PUT: /sms/twilio/{id}/token
+
+
+### ActivateSMSProvider
+
+> **rpc** ActivateSMSProvider([ActivateSMSProviderRequest](#activatesmsproviderrequest))
+[ActivateSMSProviderResponse](#activatesmsproviderresponse)
+
+Activate sms provider
+
+
+
+    POST: /sms/{id}/_activate
+
+
+### DeactivateSMSProvider
+
+> **rpc** DeactivateSMSProvider([DeactivateSMSProviderRequest](#deactivatesmsproviderrequest))
+[DeactivateSMSProviderResponse](#deactivatesmsproviderresponse)
+
+Deactivate sms provider
+
+
+
+    POST: /sms/{id}/_deactivate
+
+
+### RemoveSMSProvider
+
+> **rpc** RemoveSMSProvider([RemoveSMSProviderRequest](#removesmsproviderrequest))
+[RemoveSMSProviderResponse](#removesmsproviderresponse)
+
+Remove sms provider token
+
+
+
+    DELETE: /sms/{id}
 
 
 ### GetOIDCSettings
@@ -1446,6 +1506,28 @@ This is an empty request
 
 
 
+### ActivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ActivateSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddCustomDomainPolicyRequest
 
 
@@ -1646,6 +1728,33 @@ This is an empty request
 
 
 
+### AddSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+| password |  string | - |  |
+
+
+
+
+### AddSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -1680,6 +1789,28 @@ This is an empty request
 
 
 ### DeactivateIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### DeactivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### DeactivateSMSProviderResponse
 
 
 
@@ -2931,6 +3062,45 @@ This is an empty request
 
 
 ### RemoveMultiFactorFromLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveSMTPConfigRequest
+this is en empty request
+
+
+
+
+### RemoveSMTPConfigResponse
 
 
 

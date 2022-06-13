@@ -132,8 +132,11 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		if event.AggregateID != event.InstanceID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
-		esConfig.AppendEvent(providerType, event)
-		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID, esConfig.InstanceID)
+		err = esConfig.AppendEvent(providerType, event)
+		if err != nil {
+			return err
+		}
+		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID, event.InstanceID)
 		if err != nil {
 			return err
 		}

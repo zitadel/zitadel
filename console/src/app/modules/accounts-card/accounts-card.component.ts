@@ -50,15 +50,13 @@ export class AccountsCardComponent implements OnInit {
     }
   }
 
-  public selectAccount(loginHint?: string): void {
+  public selectAccount(loginHint: string): void {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {
-        // prompt: 'select_account',
-      } as any,
+        login_hint: loginHint,
+      },
     };
-    if (loginHint) {
-      (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
-    }
+    (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
     this.authService.authenticate(configWithPrompt);
   }
 

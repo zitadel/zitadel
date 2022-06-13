@@ -1,12 +1,12 @@
 package admin
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
@@ -110,6 +110,19 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 		return domain.SecretGeneratorTypeAppSecret
 	default:
 		return domain.SecretGeneratorTypeUnspecified
+	}
+}
+
+func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.EmailConfig {
+	return &smtp.EmailConfig{
+		Tls:      req.Tls,
+		From:     req.SenderAddress,
+		FromName: req.SenderName,
+		SMTP: smtp.SMTP{
+			Host:     req.Host,
+			User:     req.User,
+			Password: req.Password,
+		},
 	}
 }
 

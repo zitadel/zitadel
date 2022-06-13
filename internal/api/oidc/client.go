@@ -209,7 +209,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 				userInfo.SetNickname(user.Human.NickName)
 				userInfo.SetGender(getGender(user.Human.Gender))
 				userInfo.SetLocale(user.Human.PreferredLanguage)
-				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix, user.ResourceOwner, user.Human.AvatarKey))
+				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix(ctx), user.ResourceOwner, user.Human.AvatarKey))
 			} else {
 				userInfo.SetName(user.Machine.Name)
 			}

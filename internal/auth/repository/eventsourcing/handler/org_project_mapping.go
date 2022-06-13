@@ -106,7 +106,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		mapping.OrgID = projectGrant.GrantedOrgID
 		mapping.ProjectID = event.AggregateID
 		mapping.ProjectGrantID = projectGrant.GrantID
-		mapping.InstanceID = projectGrant.InstanceID
+		mapping.InstanceID = event.InstanceID
 	case project.GrantRemovedType:
 		projectGrant := new(view_model.ProjectGrant)
 		projectGrant.SetData(event)
