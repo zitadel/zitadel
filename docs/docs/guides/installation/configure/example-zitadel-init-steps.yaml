@@ -2,5 +2,5 @@
 S3DefaultInstance:
   Org:
     Human:
-      Username: root
-      Password: RootPassword1!
+      Username: 'root'
+      Password: 'RootPassword1!'
