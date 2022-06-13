@@ -110,7 +110,7 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, i
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ActivateSMSConfigTwilio(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-dn93n", "Errors.IDMissing")
 	}
@@ -119,7 +119,7 @@ func (c *Commands) ActivateSMSConfigTwilio(ctx context.Context, instanceID, id s
 		return nil, err
 	}
 
-	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
+	if !smsConfigWriteModel.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
 	}
 	if smsConfigWriteModel.State == domain.SMSConfigStateActive {
@@ -140,7 +140,7 @@ func (c *Commands) ActivateSMSConfigTwilio(ctx context.Context, instanceID, id s
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeactivateSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-frkwf", "Errors.IDMissing")
 	}
@@ -148,7 +148,7 @@ func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, instanceID, id
 	if err != nil {
 		return nil, err
 	}
-	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
+	if !smsConfigWriteModel.State.Exists() {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-s39Kg", "Errors.SMSConfig.NotFound")
 	}
 	if smsConfigWriteModel.State == domain.SMSConfigStateInactive {
