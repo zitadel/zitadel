@@ -3,6 +3,7 @@ package admin
 import (
 	_ "embed"
 	"errors"
+	"github.com/zitadel/zitadel/cmd/admin/status"
 
 	"github.com/spf13/cobra"
 
@@ -28,6 +29,7 @@ func New() *cobra.Command {
 		start.New(),
 		start.NewStartFromInit(),
 		key.New(),
+		status.New(),
 	)
 
 	return adminCMD
