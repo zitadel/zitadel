@@ -172,7 +172,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 	), nil
 }
 
-func (p *SMSConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *smsConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigTwilioTokenChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioTokenChangedEventType)

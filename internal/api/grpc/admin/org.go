@@ -28,7 +28,7 @@ func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgR
 }
 
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
-	org, err := s.query.OrgByID(ctx, authz.GetInstance(ctx).DefaultOrganisationID())
+	org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
 	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
 }
 

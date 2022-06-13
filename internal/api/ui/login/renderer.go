@@ -498,7 +498,7 @@ func (l *Login) getOrgPrimaryDomain(r *http.Request, authReq *domain.AuthRequest
 	if authReq != nil && authReq.RequestedPrimaryDomain != "" {
 		return authReq.RequestedPrimaryDomain
 	}
-	org, err := l.query.OrgByID(r.Context(), orgID)
+	org, err := l.query.OrgByID(r.Context(), false, orgID)
 	if err != nil {
 		logging.New().WithError(err).Error("cannot get default org")
 		return ""
