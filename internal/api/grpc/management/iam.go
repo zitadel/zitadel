@@ -14,5 +14,6 @@ func (s *Server) GetIAM(ctx context.Context, _ *mgmt_pb.GetIAMRequest) (*mgmt_pb
 	return &mgmt_pb.GetIAMResponse{
 		GlobalOrgId:  instance.DefaultOrgID,
 		IamProjectId: instance.IAMProjectID,
+		DefaultOrgId: instance.DefaultOrgID,
 	}, nil
 }
