@@ -7,6 +7,7 @@
 @mixin lgn-idp-color() {
   .lgn-idp {
     border-color: var(--zitadel-color-divider);
+    color: var(--zitadel-color-font-500);
 
     &:hover {
       @include lgn-idp-elevation(1);

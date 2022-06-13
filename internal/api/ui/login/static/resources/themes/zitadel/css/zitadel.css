@@ -236,6 +236,12 @@ footer .watermark {
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
+  display: none;
+}
+@media only screen and (min-width: 600px) {
+  footer .watermark .powered {
+    display: inline-block;
+  }
 }
 footer .watermark .lgn-logo-watermark {
   height: 40px;
@@ -1153,6 +1159,12 @@ footer .watermark {
 footer .watermark .powered {
   font-size: 12px;
   margin: auto 2px;
+  display: none;
+}
+@media only screen and (min-width: 600px) {
+  footer .watermark .powered {
+    display: inline-block;
+  }
 }
 footer .watermark .lgn-logo-watermark {
   height: 40px;
@@ -2816,7 +2828,7 @@ footer .lgn-logo-watermark {
 }
 
 a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):not(.lgn-idp) {
-  color: var(--zitadel-color-font);
+  color: var(--zitadel-color-font-500);
 }
 a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):not(.lgn-idp):hover, a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):not(.lgn-idp):active {
   color: var(--zitadel-color-primary-500);
@@ -2911,6 +2923,7 @@ ul li i.lgn-valid {
 
 .lgn-idp {
   border-color: var(--zitadel-color-divider);
+  color: var(--zitadel-color-font-500);
 }
 .lgn-idp:hover {
   box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
