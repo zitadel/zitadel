@@ -18,12 +18,12 @@ const (
 	ProjectMemberProjectIDCol    = "project_id"
 )
 
-type ProjectMemberProjection struct {
+type projectMemberProjection struct {
 	crdb.StatementHandler
 }
 
-func NewProjectMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectMemberProjection {
-	p := new(ProjectMemberProjection)
+func newProjectMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectMemberProjection {
+	p := new(projectMemberProjection)
 	config.ProjectionName = ProjectMemberProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -40,7 +40,7 @@ func NewProjectMemberProjection(ctx context.Context, config crdb.StatementHandle
 	return p
 }
 
-func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
+func (p *projectMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -88,7 +88,7 @@ func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *ProjectMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-bgx5Q", "reduce.wrong.event.type %s", project.MemberAddedType)
@@ -99,7 +99,7 @@ func (p *ProjectMemberProjection) reduceAdded(event eventstore.Event) (*handler.
 	)
 }
 
-func (p *ProjectMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-90WJ1", "reduce.wrong.event.type %s", project.MemberChangedType)
@@ -110,7 +110,7 @@ func (p *ProjectMemberProjection) reduceChanged(event eventstore.Event) (*handle
 	)
 }
 
-func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberCascadeRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-aGd43", "reduce.wrong.event.type %s", project.MemberCascadeRemovedType)
@@ -121,7 +121,7 @@ func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (
 	)
 }
 
-func (p *ProjectMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eJZPh", "reduce.wrong.event.type %s", project.MemberRemovedType)
@@ -132,7 +132,7 @@ func (p *ProjectMemberProjection) reduceRemoved(event eventstore.Event) (*handle
 	)
 }
 
-func (p *ProjectMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-aYA60", "reduce.wrong.event.type %s", user.UserRemovedType)
@@ -140,7 +140,7 @@ func (p *ProjectMemberProjection) reduceUserRemoved(event eventstore.Event) (*ha
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
 
-func (p *ProjectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	//TODO: as soon as org deletion is implemented:
 	// Case: The user has resource owner A and project has resource owner B
 	// if org B deleted it works
@@ -152,7 +152,7 @@ func (p *ProjectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*han
 	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
 }
 
-func (p *ProjectMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-NGUEL", "reduce.wrong.event.type %s", project.ProjectRemovedType)

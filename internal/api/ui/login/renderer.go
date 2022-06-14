@@ -369,7 +369,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		if labelPolicy != nil {
 			baseData.LabelPolicy = labelPolicy.ToDomain()
 		}
-		policy, err := l.query.DefaultPrivacyPolicy(r.Context())
+		policy, err := l.query.DefaultPrivacyPolicy(r.Context(), false)
 		if err != nil {
 			return baseData
 		}
@@ -498,7 +498,7 @@ func (l *Login) getOrgPrimaryDomain(r *http.Request, authReq *domain.AuthRequest
 	if authReq != nil && authReq.RequestedPrimaryDomain != "" {
 		return authReq.RequestedPrimaryDomain
 	}
-	org, err := l.query.OrgByID(r.Context(), orgID)
+	org, err := l.query.OrgByID(r.Context(), false, orgID)
 	if err != nil {
 		logging.New().WithError(err).Error("cannot get default org")
 		return ""

@@ -31,12 +31,12 @@ const (
 	ComplexityPolicyHasNumberCol     = "has_number"
 )
 
-type PasswordComplexityProjection struct {
+type passwordComplexityProjection struct {
 	crdb.StatementHandler
 }
 
-func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordComplexityProjection {
-	p := new(PasswordComplexityProjection)
+func newPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *passwordComplexityProjection {
+	p := new(passwordComplexityProjection)
 	config.ProjectionName = PasswordComplexityTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -62,7 +62,7 @@ func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementH
 	return p
 }
 
-func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
+func (p *passwordComplexityProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -97,7 +97,7 @@ func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordComplexityProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordComplexityPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -129,7 +129,7 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 		}), nil
 }
 
-func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordComplexityProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordComplexityPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyChangedEvent:
@@ -166,7 +166,7 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 		}), nil
 }
 
-func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordComplexityProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordComplexityPolicyRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-wttCd", "reduce.wrong.event.type %s", org.PasswordComplexityPolicyRemovedEventType)

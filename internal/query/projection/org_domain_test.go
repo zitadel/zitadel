@@ -30,7 +30,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), org.DomainAddedEventMapper),
 			},
-			reduce: (&OrgDomainProjection{}).reduceDomainAdded,
+			reduce: (&orgDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
 				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -65,7 +65,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new", "validationType": 2}`),
 				), org.DomainVerificationAddedEventMapper),
 			},
-			reduce: (&OrgDomainProjection{}).reduceDomainVerificationAdded,
+			reduce: (&orgDomainProjection{}).reduceDomainVerificationAdded,
 			want: wantReduce{
 				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -97,7 +97,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), org.DomainVerifiedEventMapper),
 			},
-			reduce: (&OrgDomainProjection{}).reduceDomainVerified,
+			reduce: (&orgDomainProjection{}).reduceDomainVerified,
 			want: wantReduce{
 				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -129,7 +129,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), org.DomainPrimarySetEventMapper),
 			},
-			reduce: (&OrgDomainProjection{}).reducePrimaryDomainSet,
+			reduce: (&orgDomainProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
 				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -172,7 +172,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), org.DomainRemovedEventMapper),
 			},
-			reduce: (&OrgDomainProjection{}).reduceDomainRemoved,
+			reduce: (&orgDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
 				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),

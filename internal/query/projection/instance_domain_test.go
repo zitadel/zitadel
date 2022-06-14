@@ -29,7 +29,7 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new", "generated": true}`),
 				), instance.DomainAddedEventMapper),
 			},
-			reduce: (&InstanceDomainProjection{}).reduceDomainAdded,
+			reduce: (&instanceDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
 				projection:       InstanceDomainTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -62,7 +62,7 @@ func TestInstanceDomainProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), instance.DomainRemovedEventMapper),
 			},
-			reduce: (&InstanceDomainProjection{}).reduceDomainRemoved,
+			reduce: (&instanceDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
 				projection:       InstanceDomainTable,
 				aggregateType:    eventstore.AggregateType("instance"),

@@ -29,7 +29,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 					nil,
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&ProjectRoleProjection{}).reduceProjectRemoved,
+			reduce: (&projectRoleProjection{}).reduceProjectRemoved,
 			want: wantReduce{
 				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -56,7 +56,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 					[]byte(`{"key": "key"}`),
 				), project.RoleRemovedEventMapper),
 			},
-			reduce: (&ProjectRoleProjection{}).reduceProjectRoleRemoved,
+			reduce: (&projectRoleProjection{}).reduceProjectRoleRemoved,
 			want: wantReduce{
 				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -84,7 +84,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 					[]byte(`{"key": "key", "displayName": "New Key", "group": "New Group"}`),
 				), project.RoleChangedEventMapper),
 			},
-			reduce: (&ProjectRoleProjection{}).reduceProjectRoleChanged,
+			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
 				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -116,7 +116,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), project.RoleChangedEventMapper),
 			},
-			reduce: (&ProjectRoleProjection{}).reduceProjectRoleChanged,
+			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
 				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -134,7 +134,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 					[]byte(`{"key": "key", "displayName": "Key", "group": "Group"}`),
 				), project.RoleAddedEventMapper),
 			},
-			reduce: (&ProjectRoleProjection{}).reduceProjectRoleAdded,
+			reduce: (&projectRoleProjection{}).reduceProjectRoleAdded,
 			want: wantReduce{
 				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),

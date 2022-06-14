@@ -42,6 +42,9 @@ type ProjectionHandler struct {
 
 	requeueAfter time.Duration
 	shouldBulk   *time.Timer
+	bulkMu       sync.Mutex
+	bulkLocked   bool
+	execBulk     executeBulk
 
 	retryFailedAfter time.Duration
 	shouldPush       *time.Timer
@@ -53,7 +56,12 @@ type ProjectionHandler struct {
 	stmts  []*Statement
 }
 
-func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
+func NewProjectionHandler(
+	config ProjectionHandlerConfig,
+	reduce Reduce,
+	update Update,
+	query SearchQuery,
+) *ProjectionHandler {
 	h := &ProjectionHandler{
 		Handler:        NewHandler(config.HandlerConfig),
 		ProjectionName: config.ProjectionName,
@@ -63,6 +71,8 @@ func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 		shouldPush:       time.NewTimer(0),
 		retryFailedAfter: config.RetryFailedAfter,
 	}
+
+	h.execBulk = h.prepareExecuteBulk(query, reduce, update)
 
 	//unitialized timer
 	//https://github.com/golang/go/issues/12721
@@ -113,7 +123,6 @@ func (h *ProjectionHandler) Process(
 		logging.WithFields("projection", h.ProjectionName, "cause", cause, "stack", string(debug.Stack())).Error("projection handler paniced")
 	}()
 
-	execBulk := h.prepareExecuteBulk(query, reduce, update)
 	for {
 		select {
 		case <-ctx.Done():
@@ -122,15 +131,19 @@ func (h *ProjectionHandler) Process(
 			}
 			h.shutdown()
 			return
-		case event := <-h.Handler.EventQueue:
+		case event := <-h.EventQueue:
 			if err := h.processEvent(ctx, event, reduce); err != nil {
 				logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("process failed")
 				continue
 			}
 			h.triggerShouldPush(0)
 		case <-h.shouldBulk.C:
-			h.bulk(ctx, lock, execBulk, unlock)
+			h.bulkMu.Lock()
+			h.bulkLocked = true
+			h.bulk(ctx, lock, unlock)
 			h.ResetShouldBulk()
+			h.bulkLocked = false
+			h.bulkMu.Unlock()
 		default:
 			//lower prio select with push
 			select {
@@ -140,15 +153,19 @@ func (h *ProjectionHandler) Process(
 				}
 				h.shutdown()
 				return
-			case event := <-h.Handler.EventQueue:
+			case event := <-h.EventQueue:
 				if err := h.processEvent(ctx, event, reduce); err != nil {
 					logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("process failed")
 					continue
 				}
 				h.triggerShouldPush(0)
 			case <-h.shouldBulk.C:
-				h.bulk(ctx, lock, execBulk, unlock)
+				h.bulkMu.Lock()
+				h.bulkLocked = true
+				h.bulk(ctx, lock, unlock)
 				h.ResetShouldBulk()
+				h.bulkLocked = false
+				h.bulkMu.Unlock()
 			case <-h.shouldPush.C:
 				h.push(ctx, update, reduce)
 				h.ResetShouldBulk()
@@ -176,10 +193,38 @@ func (h *ProjectionHandler) processEvent(
 	return nil
 }
 
+func (h *ProjectionHandler) TriggerBulk(
+	ctx context.Context,
+	lock Lock,
+	unlock Unlock,
+) error {
+	if !h.shouldBulk.Stop() {
+		//make sure to flush shouldBulk chan
+		select {
+		case <-h.shouldBulk.C:
+		default:
+		}
+	}
+	defer h.ResetShouldBulk()
+
+	h.bulkMu.Lock()
+	if h.bulkLocked {
+		logging.WithFields("projection", h.ProjectionName).Debugf("waiting for existing bulk to finish")
+		h.bulkMu.Unlock()
+		return nil
+	}
+	h.bulkLocked = true
+	defer func() {
+		h.bulkLocked = false
+		h.bulkMu.Unlock()
+	}()
+
+	return h.bulk(ctx, lock, unlock)
+}
+
 func (h *ProjectionHandler) bulk(
 	ctx context.Context,
 	lock Lock,
-	executeBulk executeBulk,
 	unlock Unlock,
 ) error {
 	ctx, cancel := context.WithCancel(ctx)
@@ -193,7 +238,7 @@ func (h *ProjectionHandler) bulk(
 	}
 	go h.cancelOnErr(ctx, errs, cancel)
 
-	execErr := executeBulk(ctx)
+	execErr := h.execBulk(ctx)
 	logging.WithFields("projection", h.ProjectionName).OnError(execErr).Warn("unable to execute")
 
 	unlockErr := unlock(systemID)

@@ -71,7 +71,11 @@ var (
 	}
 )
 
-func (q *Queries) GetUserMetadataByKey(ctx context.Context, userID, key string, queries ...SearchQuery) (*UserMetadata, error) {
+func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, queries ...SearchQuery) (*UserMetadata, error) {
+	if shouldTriggerBulk {
+		projection.UserMetadataProjection.TriggerBulk(ctx)
+	}
+
 	query, scan := prepareUserMetadataQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
@@ -90,7 +94,11 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, userID, key string, 
 	return scan(row)
 }
 
-func (q *Queries) SearchUserMetadata(ctx context.Context, userID string, queries *UserMetadataSearchQueries) (*UserMetadataList, error) {
+func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries) (*UserMetadataList, error) {
+	if shouldTriggerBulk {
+		projection.UserMetadataProjection.TriggerBulk(ctx)
+	}
+
 	query, scan := prepareUserMetadataListQuery()
 	stmt, args, err := queries.toQuery(query).Where(
 		sq.Eq{
