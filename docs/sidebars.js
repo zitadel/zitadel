@@ -44,7 +44,6 @@ module.exports = {
         "guides/installation/get-started/get-started",
         "guides/installation/configure/configure",
         "guides/installation/custom-domain",
-        "guides/installation/secure-cockroachdb/secure-cockroachdb",
         "guides/installation/http2-support/http2-support",
       ],
     },

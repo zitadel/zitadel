@@ -10,7 +10,8 @@ You most probably need to configure these fields for making ZITADEL work on your
 
 ## Standard Config
 
-For security reasons, ZITADEL only serves requests sent to the expected protocol, host and port
+For security reasons, ZITADEL only serves requests sent to the expected protocol, host and port.
+If not using localhost as ExternalDomain, ExternalSecure must be true and you need to serve the ZITADEL console over HTTPS.
 
 ```yaml
 ExternalSecure: true
