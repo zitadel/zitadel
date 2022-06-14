@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.7
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker --serversTransport.insecureSkipVerify=true
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The ZITADEL port (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  zitadel:
+    labels:
+      # - "traefik.http.routers.zitadel.rule=Host(`zitadel.docker.localhost`)"
+      # - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
+
+      # - "traefik.tcp.routers.zitadel.rule=HostSNI(`adlerhurst.dev`)"
+      # - "traefik.tcp.services.zitadel.loadbalancer.server.port=8080"
+      # - traefik.http.routers.www-router.rule=Host(`example-a.com`)
+      # - traefik.http.routers.www-router.service=www-service
+      # - traefik.http.services.www-service.loadbalancer.server.port=8080
+
+      - traefik.http.routers.my-container.rule=Host(`adlerhurst.dev`)
+      # Tell Traefik to use the port 12345 to connect to `my-container`
+      - traefik.http.services.my-service.loadbalancer.server.port=8080
+    restart: always
+    networks:
+      - zitadel
+    image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.24-amd64
+    command: admin start-from-init --config /.zitadel/config.yaml --steps /.zitadel/steps.yaml --masterkey "MasterkeyNeedsToHave32Characters" --
+    depends_on:
+      db:
+        condition: service_healthy
+    # traefik should route
+    # ports:
+    #   - 8080:8080
+    volumes:
+      - ./config.yaml/:/.zitadel/config.yaml
+      - ./steps.yaml/:/.zitadel/steps.yaml
+
+  db:
+    restart: always
+    networks:
+      - zitadel
+    image: cockroachdb/cockroach:v22.1.0
+    command: start-single-node --insecure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
+    ports:
+      - 9090:8080
+      - 26257:26257
+
+networks:
+  zitadel:

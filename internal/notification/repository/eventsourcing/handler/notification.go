@@ -571,6 +571,7 @@ func (n *Notification) getUserByID(userID, instanceID string) (*model.NotifyUser
 
 func (n *Notification) origin(ctx context.Context) (string, error) {
 	primary, err := query.NewInstanceDomainPrimarySearchQuery(true)
+	logging.OnError(err).Debug("unable to create primary instance domain search query")
 	domains, err := n.queries.SearchInstanceDomains(ctx, &query.InstanceDomainSearchQueries{
 		Queries: []query.SearchQuery{primary},
 	})

@@ -84,10 +84,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
 		},
 		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
-			if policy != nil {
-				return true
-			}
-			return false
+			return policy != nil
 		},
 		"hasWatermark": func(policy *domain.LabelPolicy) bool {
 			if policy != nil && policy.DisableWatermark {

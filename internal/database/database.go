@@ -2,7 +2,7 @@ package database
 
 import (
 	"database/sql"
-	//sql import
+	//sql driver
 	_ "github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/errors"

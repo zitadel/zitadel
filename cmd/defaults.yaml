@@ -1,8 +1,22 @@
+# Log describes the output to the stdout.
 Log:
+  # Following log levels are allowed and print this and above levels.
+  # 1. panic:           Highest level of severity. After the log, ZITADEL will terminate with an error
+  # 2. fatal:           After this log ZITADEL will terminate with exit code 1
+  # 3. error:           Issues that definitely should be noted.
+  # 4. warn / warning:  Non-critical entries that deserve eyes. 
+  # 5. info / "":            General operational entries about what's going on inside the application.
+  # 6. debug:           Usually not intended for production. Very verbose logging.
+  # 7. trace:           Designates finer-grained informational events than the Debug.
   Level: debug
+  # Defines how the log data are formatted before sent to stdout
   Formatter:
+    # Allowed values are:
+    # text / "":  prints logs like `time="yyyy-mm-ddThh:mm:ssZ" level=logLevel msg="message"`
+    # json:       prints logs like `{"time": "yyyy-mm-ddThh:mm:ssZ", "level": "logLevel", "msg": "message"}`
     Format: text
 
+# The port ZITADEL listens for requests
 Port: 8080
 ExternalPort: 8080
 ExternalDomain: localhost
@@ -12,30 +26,48 @@ HTTP1HostHeader: "host"
 
 WebAuthNName: ZITADEL
 
+# Connection to the database
 Database:
+  # Hostname of the database
   Host: localhost
+  # Port the sql connection uses
   Port: 26257
+  # Name of the ZITADEL database in the DBMS
   Database: zitadel
+  # Amount of maximal open connections to the database
   MaxOpenConns: 20
+  # Maximum amount of time a connection may be reused. Expired connections may be closed lazily before reuse.
   MaxConnLifetime: 30m
+  # Maximum amount of time a connection may be idle. Expired connections may be closed lazily before reuse.
   MaxConnIdleTime: 30m
+  # Additional options parameters to connect to the database. Additional infos: https://www.cockroachlabs.com/docs/v22.1/connection-parameters#supported-options-parameters
   Options: ""
+  # The database user ZITADEL uses to connect to the ZITADEL database
   User:
     Username: zitadel
     Password: ""
     SSL:
+      # The SSL connection mode to connect to the database. Additional infos: https://www.cockroachlabs.com/docs/v22.1/connection-parameters#secure-connections-with-urls
       Mode: disable
+      # Path to the CA certificate, required when `Mode` is not disable.
       RootCert: ""
+      # Path to the client certificate, required when `Mode` is not disable.
       Cert: ""
+      # Path to the client private key, required when `Mode` is not disable.
       Key: ""
 
+# The database admin user is required to initialize the ZITADEL database on the DBMS during `zitadel admin init` and `zitadel admin start-from-init`
 AdminUser:
   Username: root
   Password: ""
   SSL:
+    # The SSL connection mode to connect to the database. Additional infos: https://www.cockroachlabs.com/docs/v22.1/connection-parameters#secure-connections-with-urls
     Mode: disable
+    # Path to the CA certificate, required when `Mode` is not disable.
     RootCert: ""
+    # Path to the client certificate, required when `Mode` is not disable.
     Cert: ""
+    # Path to the client private key, required when `Mode` is not disable.
     Key: ""
 
 Machine:
@@ -71,16 +103,221 @@ Machine:
     #   Url: "http://169.254.169.254/metadata/instance?api-version=2021-02-01"
     #   JPath: "$.compute.vmId"
 
+#Projections are used by ZITADEL to deliver query results
 Projections:
+  # The default sleep duration between ZITADEL verifies that a projection is up to date. 
   RequeueEvery: 10s
+  # If an event couldn't be processed ZITADEL retries to insert the event after this duration
   RetryFailedAfter: 1s
+  # Defines how many times ZITADEL tries to process an event before it will be skipped
   MaxFailureCount: 5
+  # Maximum amount of events processed in bulk
   BulkLimit: 200
-  MaxIterators: 1
+  # MaxIterators: 1
+  # Changes the defined default behaviour of a specific projection. Undefined projections will be skipped
   Customizations:
     projects:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
       BulkLimit: 2000
+    orgs:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    actions:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    flows:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    password_complexities:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    password_age_policy:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    lockout_policy:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    privacy_policy:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    org_iam_policy:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    label_policy:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    project_grants:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    project_roles:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    org_domains:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    login_policies:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    idps:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    apps:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    idp_user_links:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    idp_login_policy_links:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    mail_templates:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    message_texts:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    custom_texts:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    users:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    login_names:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    org_members:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    instance_domains:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    iam_members:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    project_members:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    project_grant_members:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    authn_keys:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    personal_access_tokens:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    user_grants:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    user_metadata:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    user_auth_method:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    instances:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    secret_generators:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    smtp_configs:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    sms_config:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    oidc_settings:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    debug_notification_provider:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
+    keys:
+      RequeueEvery:
+      RetryFailedAfter:
+      MaxFailureCount:
+      BulkLimit:
 
+# deprecated configuration for projections not yet migrated
 Auth:
   SearchLimit: 1000
   Spooler:
@@ -88,6 +325,7 @@ Auth:
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
+# Deprecated configuration for projections not yet migrated
 Admin:
   SearchLimit: 1000
   Spooler:
@@ -95,8 +333,11 @@ Admin:
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
+#Configuration of the cookie sent to the user agent (browser, etc.) for SSO purposes
 UserAgentCookie:
+  #Name of the cookie
   Name: zitadel.useragent
+  #Duration definig the max age of the cookie
   MaxAge: 8760h #365*24h (1 year)
 
 OIDC:
@@ -129,28 +370,35 @@ OIDC:
     Keys:
       Path: /oauth/v2/keys
 
+#Configurations for the login UI
 Login:
+  # Name of the cookie to safe the users selected language
   LanguageCookieName: zitadel.login.lang
+  # Name of the cookie for csrf projection
   CSRFCookieName: zitadel.login.csrf
+  # Caching information for assets
   Cache:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
 
+#Configuration of Console delivery
 Console:
+  # assets cache
   ShortCache:
     MaxAge: 0m
     SharedMaxAge: 5m
+  # assets cache
   LongCache:
     MaxAge: 12h
     SharedMaxAge: 168h
 
+# Projections for Message (EMail, etc.) delivery configuration
 Notification:
   Repository:
     Spooler:
       ConcurrentWorkers: 1
       BulkLimit: 10000
       FailureCountUntilSkip: 5
-      Handlers:
 
 EncryptionKeys:
   DomainVerification:
