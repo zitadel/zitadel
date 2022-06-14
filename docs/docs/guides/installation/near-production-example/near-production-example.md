@@ -31,6 +31,9 @@ export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 docker compose up --detach
 ```
 
-Make 127.0.0.1 available at my.domain. For example, this can be achived with an entry `127.0.1.1 my.domain` in the /etc/hosts file.
+Make `127.0.0.1` available at `my.domain`. For example, this can be achived with an entry `127.0.1.1 my.domain` in the `/etc/hosts` file.
 
 Open your browser at https://my.domain/ui/console/. You can safely proceed, if your browser warns you about the insecure self-signed TLS certificate.
+With the configuration from the example files, you can log in with the following credentials:
+- **username**: *root@<span></span>my-org.my.domain*
+- **password**: *RootPassword1!*
