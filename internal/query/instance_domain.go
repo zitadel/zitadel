@@ -66,9 +66,23 @@ func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDo
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-inlsF", "Errors.Query.SQLStatement")
 	}
 
+	return q.queryInstanceDomains(ctx, stmt, scan, args...)
+}
+
+func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *InstanceDomainSearchQueries) (domains *InstanceDomains, err error) {
+	query, scan := prepareInstanceDomainsQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-IHhLR", "Errors.Query.SQLStatement")
+	}
+
+	return q.queryInstanceDomains(ctx, stmt, scan, args...)
+}
+
+func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceDomains, error), args ...interface{}) (domains *InstanceDomains, err error) {
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-38Fni", "Errors.Internal")
+		return nil, errors.ThrowInternal(err, "QUERY-Dh9Ap", "Errors.Internal")
 	}
 	domains, err = scan(rows)
 	if err != nil {
