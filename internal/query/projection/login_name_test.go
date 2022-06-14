@@ -33,7 +33,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), user.HumanAddedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceUserCreated,
+			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -65,7 +65,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), user.HumanRegisteredEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceUserCreated,
+			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -97,7 +97,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), user.MachineAddedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceUserCreated,
+			reduce: (&loginNameProjection{}).reduceUserCreated,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -127,7 +127,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceUserRemoved,
+			reduce: (&loginNameProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -156,7 +156,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), user.UsernameChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceUserNameChanged,
+			reduce: (&loginNameProjection{}).reduceUserNameChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -186,7 +186,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), user.DomainClaimedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceUserDomainClaimed,
+			reduce: (&loginNameProjection{}).reduceUserDomainClaimed,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -216,7 +216,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), org.DomainPolicyAddedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyAdded,
+			reduce: (&loginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -248,7 +248,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), org.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
+			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -276,7 +276,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
+			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -296,7 +296,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.DomainPolicyRemovedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceDomainPolicyRemoved,
+			reduce: (&loginNameProjection{}).reduceDomainPolicyRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -325,7 +325,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 					}`),
 				), org.DomainVerifiedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceDomainVerified,
+			reduce: (&loginNameProjection{}).reduceDomainVerified,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -356,7 +356,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 					}`),
 				), org.DomainRemovedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceDomainRemoved,
+			reduce: (&loginNameProjection{}).reduceDomainRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -386,7 +386,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 					}`),
 				), org.DomainPrimarySetEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reducePrimaryDomainSet,
+			reduce: (&loginNameProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -425,7 +425,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), instance.DomainPolicyAddedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyAdded,
+			reduce: (&loginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -457,7 +457,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				}`),
 				), instance.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
+			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -485,7 +485,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), instance.DomainPolicyChangedEventMapper),
 			},
-			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
+			reduce: (&loginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,

@@ -22,12 +22,12 @@ const (
 	InstanceDomainIsPrimaryCol    = "is_primary"
 )
 
-type InstanceDomainProjection struct {
+type instanceDomainProjection struct {
 	crdb.StatementHandler
 }
 
-func NewInstanceDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *InstanceDomainProjection {
-	p := new(InstanceDomainProjection)
+func newInstanceDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *instanceDomainProjection {
+	p := new(instanceDomainProjection)
 	config.ProjectionName = InstanceDomainTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -47,7 +47,7 @@ func NewInstanceDomainProjection(ctx context.Context, config crdb.StatementHandl
 	return p
 }
 
-func (p *InstanceDomainProjection) reducers() []handler.AggregateReducer {
+func (p *instanceDomainProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -69,7 +69,7 @@ func (p *InstanceDomainProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *InstanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-38nNf", "reduce.wrong.event.type %s", instance.InstanceDomainAddedEventType)
@@ -88,7 +88,7 @@ func (p *InstanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *InstanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainPrimarySetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f8nlw", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
@@ -120,7 +120,7 @@ func (p *InstanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event
 	), nil
 }
 
-func (p *InstanceDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-388Nk", "reduce.wrong.event.type %s", instance.InstanceDomainRemovedEventType)

@@ -35,7 +35,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 }`),
 				), org.PrivacyPolicyAddedEventMapper),
 			},
-			reduce: (&PrivacyPolicyProjection{}).reduceAdded,
+			reduce: (&privacyPolicyProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -65,7 +65,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceChanged",
-			reduce: (&PrivacyPolicyProjection{}).reduceChanged,
+			reduce: (&privacyPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PrivacyPolicyChangedEventType),
@@ -101,7 +101,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&PrivacyPolicyProjection{}).reduceRemoved,
+			reduce: (&privacyPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PrivacyPolicyRemovedEventType),
@@ -128,7 +128,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceAdded",
-			reduce: (&PrivacyPolicyProjection{}).reduceAdded,
+			reduce: (&privacyPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.PrivacyPolicyAddedEventType),
@@ -169,7 +169,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceChanged",
-			reduce: (&PrivacyPolicyProjection{}).reduceChanged,
+			reduce: (&privacyPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.PrivacyPolicyChangedEventType),

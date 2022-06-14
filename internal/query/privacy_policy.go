@@ -79,7 +79,11 @@ var (
 	}
 )
 
-func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
+func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*PrivacyPolicy, error) {
+	if shouldTriggerBulk {
+		projection.PrivacyPolicyProjection.TriggerBulk(ctx)
+	}
+
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{
@@ -105,7 +109,11 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 	return scan(row)
 }
 
-func (q *Queries) DefaultPrivacyPolicy(ctx context.Context) (*PrivacyPolicy, error) {
+func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bool) (*PrivacyPolicy, error) {
+	if shouldTriggerBulk {
+		projection.PrivacyPolicyProjection.TriggerBulk(ctx)
+	}
+
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		PrivacyColID.identifier():         authz.GetInstance(ctx).InstanceID(),

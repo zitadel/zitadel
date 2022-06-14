@@ -19,7 +19,7 @@ func (s *Server) GetMyLabelPolicy(ctx context.Context, _ *auth_pb.GetMyLabelPoli
 }
 
 func (s *Server) GetMyPrivacyPolicy(ctx context.Context, _ *auth_pb.GetMyPrivacyPolicyRequest) (*auth_pb.GetMyPrivacyPolicyResponse, error) {
-	policy, err := s.query.PrivacyPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.PrivacyPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
