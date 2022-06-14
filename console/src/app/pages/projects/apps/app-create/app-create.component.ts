@@ -14,6 +14,7 @@ import {
     OIDCAuthMethodType,
     OIDCGrantType,
     OIDCResponseType,
+    SAMLConfig,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
     AddAPIAppRequest,
@@ -38,6 +39,8 @@ import {
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
 
+const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
+
 @Component({
   selector: 'cnsl-app-create',
   templateUrl: './app-create.component.html',
@@ -52,9 +55,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public currentCreateStep: number = 1;
 
-  public oidcAppRequest: AddOIDCAppRequest.AsObject = new AddOIDCAppRequest().toObject();
-  public apiAppRequest: AddAPIAppRequest.AsObject = new AddAPIAppRequest().toObject();
-  public samlAppRequest: AddSAMLAppRequest.AsObject = new AddSAMLAppRequest().toObject();
+  public oidcAppRequest: AddOIDCAppRequest = new AddOIDCAppRequest();
+  public apiAppRequest: AddAPIAppRequest = new AddAPIAppRequest();
+  public samlAppRequest: AddSAMLAppRequest = new AddSAMLAppRequest();
 
   public oidcResponseTypes: { type: OIDCResponseType; checked: boolean; disabled: boolean }[] = [
     { type: OIDCResponseType.OIDC_RESPONSE_TYPE_CODE, checked: false, disabled: false },
@@ -85,8 +88,12 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   ];
 
   // stepper
-  firstFormGroup!: FormGroup;
-  secondFormGroup!: FormGroup;
+  public firstFormGroup!: FormGroup;
+  public secondFormGroup!: FormGroup;
+  public samlConfigForm!: FormGroup;
+
+  public redirectUrisList: string[] = [];
+  public postLogoutRedirectUrisList: string[] = [];
 
   // devmode
   public form!: FormGroup;
@@ -135,25 +142,30 @@ export class AppCreateComponent implements OnInit, OnDestroy {
       appType: [WEB_TYPE, [Validators.required]],
     });
 
+    this.samlConfigForm = this.fb.group({
+      metadataUrl: ['', []],
+    });
+
     this.firstFormGroup.valueChanges.subscribe((value) => {
       if (this.firstFormGroup.valid) {
-        this.oidcAppRequest.name = this.name?.value;
-        this.apiAppRequest.name = this.name?.value;
+        this.oidcAppRequest.setName(this.name?.value);
+        this.apiAppRequest.setName(this.name?.value);
+        this.samlAppRequest.setName(this.name?.value);
 
         if (this.isStepperOIDC) {
           const oidcAppType = (this.appType?.value as RadioItemAppType).oidcAppType;
           if (oidcAppType !== undefined) {
-            this.oidcAppRequest.appType = oidcAppType;
+            this.oidcAppRequest.setAppType(oidcAppType);
           }
 
-          switch (this.oidcAppRequest.appType) {
+          switch (this.OIDCAppType) {
             case OIDCAppType.OIDC_APP_TYPE_NATIVE:
               this.authMethods = [PKCE_METHOD];
 
               // automatically set to PKCE and skip step
-              this.oidcAppRequest.responseTypesList = [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE];
-              this.oidcAppRequest.grantTypesList = [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE];
-              this.oidcAppRequest.authMethodType = OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
+              this.oidcAppRequest.setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE]);
+              this.oidcAppRequest.setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE]);
+              this.oidcAppRequest.setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE);
 
               break;
             case OIDCAppType.OIDC_APP_TYPE_WEB:
@@ -180,19 +192,30 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     this.secondFormGroup = this.fb.group({
       authMethod: [this.authMethods[0].key, [Validators.required]],
     });
+
     this.secondFormGroup.valueChanges.subscribe((form) => {
       const partialConfig = getPartialConfigFromAuthMethod(form.authMethod);
 
       if (this.isStepperOIDC && partialConfig && partialConfig.oidc) {
-        this.oidcAppRequest.responseTypesList = partialConfig.oidc?.responseTypesList ?? [];
+        this.oidcAppRequest.setResponseTypesList(partialConfig.oidc?.responseTypesList ?? []);
 
-        this.oidcAppRequest.grantTypesList = partialConfig.oidc?.grantTypesList ?? [];
+        this.oidcAppRequest.setGrantTypesList(partialConfig.oidc?.grantTypesList ?? []);
 
-        this.oidcAppRequest.authMethodType =
-          partialConfig.oidc?.authMethodType ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
+        this.oidcAppRequest.setAuthMethodType(
+          partialConfig.oidc?.authMethodType ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+        );
       } else if (this.isStepperAPI && partialConfig && partialConfig.api) {
-        this.apiAppRequest.authMethodType =
-          partialConfig.api?.authMethodType ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
+        this.apiAppRequest.setAuthMethodType(
+          partialConfig.api?.authMethodType ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC,
+        );
+      }
+    });
+
+    this.samlConfigForm.valueChanges.subscribe((form) => {
+      if (form.metadataUrl) {
+        const spConfig = new SAMLConfig();
+        spConfig.setMetadataUrl(form.metadataUrl);
+        this.samlAppRequest.setSpConfig(spConfig);
       }
     });
   }
@@ -226,18 +249,18 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public initForm(): void {
     this.form.valueChanges.pipe(takeUntil(this.destroyed$), debounceTime(150)).subscribe(() => {
-      this.oidcAppRequest.name = this.formname?.value;
-      this.apiAppRequest.name = this.formname?.value;
+      this.oidcAppRequest.setName(this.formname?.value);
+      this.apiAppRequest.setName(this.formname?.value);
 
-      this.oidcAppRequest.responseTypesList = this.formresponseTypesList?.value;
-      this.oidcAppRequest.grantTypesList = this.formgrantTypesList?.value;
+      this.oidcAppRequest.setResponseTypesList(this.formresponseTypesList?.value);
+      this.oidcAppRequest.setGrantTypesList(this.grantTypesList?.value);
 
-      this.oidcAppRequest.authMethodType = this.formauthMethodType?.value;
-      this.apiAppRequest.authMethodType = this.formauthMethodType?.value;
+      this.oidcAppRequest.setAuthMethodType(this.authMethodType?.value);
+      this.apiAppRequest.setAuthMethodType(this.authMethodType?.value);
 
       const oidcAppType = (this.formappType?.value as RadioItemAppType).oidcAppType;
       if (oidcAppType !== undefined) {
-        this.oidcAppRequest.appType = oidcAppType;
+        this.oidcAppRequest.setAppType(oidcAppType);
       }
     });
 
@@ -283,17 +306,42 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   private async getData({ projectid }: Params): Promise<void> {
     this.projectId = projectid;
-    this.oidcAppRequest.projectId = projectid;
-    this.apiAppRequest.projectId = projectid;
+    this.oidcAppRequest.setProjectId(projectid);
+    this.apiAppRequest.setProjectId(projectid);
+    this.samlAppRequest.setProjectId(projectid);
   }
 
   public close(): void {
     this._location.back();
   }
 
+  public onDropXML(filelist: FileList): void {
+    const file = filelist.item(0);
+    if (file) {
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+      } else {
+        const reader = new FileReader();
+        reader.onload = ((aXML) => {
+          return (e) => {
+            const xmlBase64 = e.target?.result;
+            if (xmlBase64 && typeof xmlBase64 === 'string') {
+              const samlConfig = new SAMLConfig();
+              const cropped = xmlBase64.replace('data:text/xml;base64,', '');
+              samlConfig.setMetadataXml(cropped);
+              this.samlAppRequest.setSpConfig(samlConfig);
+            }
+          };
+        })(file);
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
   public createApp(): void {
     const appOIDCCheck = this.devmode ? this.isDevOIDC : this.isStepperOIDC;
     const appAPICheck = this.devmode ? this.isDevAPI : this.isStepperAPI;
+    const appSAMLCheck = this.devmode ? this.isDevSAML : this.isStepperSAML;
 
     if (appOIDCCheck) {
       this.requestRedirectValuesSubject$.next();
@@ -327,6 +375,19 @@ export class AppCreateComponent implements OnInit, OnDestroy {
           } else {
             this.router.navigate(['projects', this.projectId, 'apps', resp.appId]);
           }
+        })
+        .catch((error) => {
+          this.loading = false;
+          this.toast.showError(error);
+        });
+    } else if (appSAMLCheck) {
+      this.loading = true;
+      this.toast.showInfo('APP.TOAST.CREATED', true);
+      this.mgmtService
+        .addSAMLApp(this.samlAppRequest)
+        .then((resp) => {
+          this.loading = false;
+          this.router.navigate(['projects', this.projectId, 'apps', resp.appId]);
         })
         .catch((error) => {
           this.loading = false;
@@ -382,19 +443,24 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   get formname(): AbstractControl | null {
     return this.form.get('name');
   }
+
   get formresponseTypesList(): AbstractControl | null {
     return this.form.get('responseTypesList');
   }
-  get formgrantTypesList(): AbstractControl | null {
+
+  get grantTypesList(): AbstractControl | null {
     return this.form.get('grantTypesList');
   }
+
   get formappType(): AbstractControl | null {
     return this.form.get('appType');
   }
+
   // get formapplicationType(): AbstractControl | null {
   //     return this.form.get('applicationType');
   // }
-  get formauthMethodType(): AbstractControl | null {
+
+  get authMethodType(): AbstractControl | null {
     return this.form.get('authMethodType');
   }
 
@@ -410,7 +476,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     return (this.formappType?.value as RadioItemAppType).createType === AppCreateType.API;
   }
 
+  get isDevSAML(): boolean {
+    return (this.formappType?.value as RadioItemAppType).createType === AppCreateType.SAML;
+  }
+
   get isStepperAPI(): boolean {
     return (this.appType?.value as RadioItemAppType).createType === AppCreateType.API;
+  }
+
+  get isStepperSAML(): boolean {
+    return (this.appType?.value as RadioItemAppType).createType === AppCreateType.SAML;
   }
 }

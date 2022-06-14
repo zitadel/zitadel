@@ -1728,7 +1728,10 @@
         "TITLE": "SAML",
         "DESCRIPTION": "SAML Applications"
       },
-      "CONFIGSECTION": "SAML Configuration"
+      "CONFIGSECTION": "SAML Configuration",
+      "URL": "Url where Metadata file is located",
+      "OR": "or",
+      "XML": "Upload Metadata XML"
     },
     "AUTHMETHODS": {
       "CODE": {

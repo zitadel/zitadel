@@ -21,6 +21,7 @@ export interface RadioItemAppType {
   descI18nKey: string;
   prefix: string;
   background: string;
+  protocol: 'OIDC' | 'SAML';
 }
 
 export const WEB_TYPE: RadioItemAppType = {
@@ -31,6 +32,7 @@ export const WEB_TYPE: RadioItemAppType = {
   oidcAppType: OIDCAppType.OIDC_APP_TYPE_WEB,
   prefix: 'WEB',
   background: 'linear-gradient(40deg, #059669 30%, #047857)',
+  protocol: 'OIDC',
 };
 
 export const USER_AGENT_TYPE: RadioItemAppType = {
@@ -41,6 +43,7 @@ export const USER_AGENT_TYPE: RadioItemAppType = {
   oidcAppType: OIDCAppType.OIDC_APP_TYPE_USER_AGENT,
   prefix: 'UA',
   background: 'linear-gradient(40deg, #dc2626 30%, #db2777)',
+  protocol: 'OIDC',
 };
 
 export const NATIVE_TYPE: RadioItemAppType = {
@@ -51,6 +54,7 @@ export const NATIVE_TYPE: RadioItemAppType = {
   oidcAppType: OIDCAppType.OIDC_APP_TYPE_NATIVE,
   prefix: 'N',
   background: 'linear-gradient(40deg, #306ccc 30%, #4f46e5)',
+  protocol: 'OIDC',
 };
 
 export const API_TYPE: RadioItemAppType = {
@@ -60,6 +64,7 @@ export const API_TYPE: RadioItemAppType = {
   createType: AppCreateType.API,
   prefix: 'API',
   background: 'linear-gradient(40deg, #1f2937, #111827)',
+  protocol: 'OIDC',
 };
 
 export const SAML_TYPE: RadioItemAppType = {
@@ -67,5 +72,6 @@ export const SAML_TYPE: RadioItemAppType = {
   descI18nKey: 'APP.SAML.SELECTION.DESCRIPTION',
   createType: AppCreateType.SAML,
   prefix: 'SAML',
-  background: 'linear-gradient(40deg, #321f37, #301c36)',
+  background: 'linear-gradient(40deg,rgb(110, 56, 124), rgb(88, 37, 103))',
+  protocol: 'SAML',
 };

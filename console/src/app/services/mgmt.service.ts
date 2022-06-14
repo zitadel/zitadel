@@ -2248,24 +2248,11 @@ export class ManagementService {
     return this.grpcService.mgmt.reactivateProjectGrant(req, null).then((resp) => resp.toObject());
   }
 
-  public addOIDCApp(app: AddOIDCAppRequest.AsObject): Promise<AddOIDCAppResponse.AsObject> {
-    const req: AddOIDCAppRequest = new AddOIDCAppRequest();
-    req.setAuthMethodType(app.authMethodType);
-    req.setName(app.name);
-    req.setProjectId(app.projectId);
-    req.setResponseTypesList(app.responseTypesList);
-    req.setGrantTypesList(app.grantTypesList);
-    req.setAppType(app.appType);
-    req.setPostLogoutRedirectUrisList(app.postLogoutRedirectUrisList);
-    req.setRedirectUrisList(app.redirectUrisList);
+  public addOIDCApp(req: AddOIDCAppRequest): Promise<AddOIDCAppResponse.AsObject> {
     return this.grpcService.mgmt.addOIDCApp(req, null).then((resp) => resp.toObject());
   }
 
-  public addAPIApp(app: AddAPIAppRequest.AsObject): Promise<AddAPIAppResponse.AsObject> {
-    const req: AddAPIAppRequest = new AddAPIAppRequest();
-    req.setAuthMethodType(app.authMethodType);
-    req.setName(app.name);
-    req.setProjectId(app.projectId);
+  public addAPIApp(req: AddAPIAppRequest): Promise<AddAPIAppResponse.AsObject> {
     return this.grpcService.mgmt.addAPIApp(req, null).then((resp) => resp.toObject());
   }
 

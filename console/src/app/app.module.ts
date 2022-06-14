@@ -76,6 +76,7 @@ const authConfig: AuthConfig = {
   scope: 'openid profile email', // offline_access
   responseType: 'code',
   oidc: true,
+  requireHttps: false,
 };
 
 @NgModule({
