@@ -29,3 +29,7 @@ You can give the default instance a fixed custom domain here.
 S3DefaultInstance:
   CustomDomain: 'zitadel.my.domain'
 ```
+
+## Example
+
+Go to the [near production example with Traefik](./near-production-example) for seeing a working example configuration.
