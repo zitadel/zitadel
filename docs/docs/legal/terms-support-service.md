@@ -102,7 +102,6 @@ You will take appropriate measures to prevent any misuse of the services you boo
 
 ### Disaster recovery
 
-
 Any liability for damages, indirect or direct, in case of data loss is explicitly rejected.
 
 ### Reporting obligations
@@ -212,9 +211,9 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 ### Entry into force
 
-These TOS shall enter into force as of August 23, 2021.
+These TOS shall enter into force as of 15.07.2022.
 
-Last revised: August 23, 2021
+Last revised: June 14, 2022
 
 ### Amendments
 

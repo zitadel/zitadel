@@ -25,3 +25,5 @@ We can not guarantee that during transit the data will only remain within this r
 - **Global**: All available cloud regions offered by our cloud provider
 - **Switzerland**: Exclusively on Swiss region
 - **GDPR safe countries**: Exclusively [Adequate Countries](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en) as recognized by the European Commission under the GDPR
+
+Last revised: June 14, 2022

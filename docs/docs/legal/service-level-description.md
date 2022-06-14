@@ -13,7 +13,7 @@ This document describes the current version of our offering. For terms regarding
 
 This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
 
-Last revised: June 3, 2022
+Last revised: June 14, 2022
 
 ## Definitions
 
