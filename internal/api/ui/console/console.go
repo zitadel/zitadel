@@ -3,6 +3,7 @@ package console
 import (
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
@@ -84,7 +85,10 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
+func Start(config Config, externalSecure bool, externalDomain string, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
+	if externalDomain != "localhost" && !externalSecure {
+		return nil, errors.New("running console on a non-localhost ExternalDomain is only supported with ExternalSecure set to true")
+	}
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
