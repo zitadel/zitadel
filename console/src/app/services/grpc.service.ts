@@ -72,6 +72,7 @@ export class GrpcService {
             issuer: data.issuer,
             redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
             postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
+            requireHttps: data.secure,
           };
 
           this.authenticationService.initConfig(authConfig);
