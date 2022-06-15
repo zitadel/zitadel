@@ -42,15 +42,12 @@ For example, if you want to configure the default ZITADEL IAM admin username and
     default="linux"
     values={[
         {'label': 'Linux', 'value': 'linux'},
-        {'label': 'MacOS', 'value': 'macos'},
+        {'label': 'Linux and Unix', 'value': 'linuxunix'},
         {'label': 'Docker Compose', 'value': 'compose'},
         {'label': 'Kubernetes (Helm)', 'value': 'k8s'}
     ]}
 >
-    <TabItem value="linux">
-        <LinuxUnix/>
-    </TabItem>
-    <TabItem value="macos">
+    <TabItem value="linuxunix">
         <LinuxUnix/>
     </TabItem>
     <TabItem value="compose">
