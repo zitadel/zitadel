@@ -120,7 +120,7 @@ func (u *NotifyUser) ProcessUser(event *es_models.Event) (err error) {
 		user.HumanRegisteredType,
 		user.HumanAddedType,
 		user.MachineAddedEventType:
-		err := notifyUser.AppendEvent(event)
+		err = notifyUser.AppendEvent(event)
 		if err != nil {
 			return err
 		}
