@@ -190,6 +190,9 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
+	if user.PreferredLoginName == "" {
+		return errors.ThrowNotFound(nil, "HANDL-Fzjog", "preferred login name empty")
+	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.InitCodeMessageType)
 	if err != nil {
@@ -276,6 +279,9 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
+	if user.LastEmail == "" {
+		return errors.ThrowNotFound(nil, "HANDL-IGZrN", "email of user is empty")
+	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyEmailMessageType)
 	if err != nil {
@@ -309,6 +315,10 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
+	if user.LastPhone == "" {
+		return errors.ThrowNotFound(nil, "HANDL-T6MV7", "phone not set on user")
+	}
+
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyPhoneMessageType)
 	if err != nil {
 		return err
