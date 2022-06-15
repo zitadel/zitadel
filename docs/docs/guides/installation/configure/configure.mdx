@@ -20,7 +20,7 @@ See a description of all possible _runtime configuration_ options with their def
 The `zitadel` binary expects the `--config` flag for this configuration.
 
 ### Database Initialization
-Apart from these options, ZITADEL uses a [different configuration](https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/adminn/setup/steps.yaml) for _database initialization steps_.
+Apart from these options, ZITADEL uses a [different configuration](https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/admin/setup/steps.yaml) for _database initialization steps_.
 The `zitadel` binary expects the `--steps` flag for this configuration.
 
 ### Split Configuration
@@ -65,8 +65,14 @@ For example, if you want to configure the default ZITADEL IAM admin username and
     </TabItem>
 </Tabs>
 
+Open your favorite internet browser and navigate to [http://localhost:8080/ui/console](http://localhost:8080/ui/console).
+This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
+- **username**: *root@<span></span>zitadel.localhost*
+- **password**: *RootPassword1!*
+
 ## What's next
-- If you want to run ZITADEL in production, you most certainly need to [customize your own domain](./custom-domain).
+
+If you want to run ZITADEL in production, you most certainly need to [customize your own domain](./custom-domain).
 
 :::caution
 
