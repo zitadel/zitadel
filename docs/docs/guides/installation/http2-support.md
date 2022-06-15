@@ -7,4 +7,4 @@ The ZITADEL backend service accepts gRPC-Web requests and translates them into r
 Because ZITADEL accepts gRPC-Web and translates it to gRPC itself, your reverse proxy doesn't need to be able to support gRPC or gRPC-Web.
 However, as gRPC requires HTTP/2, your reverse proxy is required to send and receive downstream and upstream HTTP/2 traffic.
 
-Go to the [near production example with Traefik](./near-production-example) for seeing a working example configuration.
+Go to the [loadbalancing example with Traefik](./loadbalancing-example) for seeing a working example configuration.

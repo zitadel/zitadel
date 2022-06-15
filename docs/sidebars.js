@@ -45,7 +45,7 @@ module.exports = {
         "guides/installation/configure/configure",
         "guides/installation/custom-domain",
         "guides/installation/http2-support",
-        "guides/installation/near-production-example/near-production-example",
+        "guides/installation/loadbalancing-example/loadbalancing-example",
       ],
     },
     {

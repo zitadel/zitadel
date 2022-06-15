@@ -32,4 +32,4 @@ S3DefaultInstance:
 
 ## Example
 
-Go to the [near production example with Traefik](./near-production-example) for seeing a working example configuration.
+Go to the [loadbalancing example with Traefik](./loadbalancing-example) for seeing a working example configuration.
