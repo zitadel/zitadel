@@ -374,15 +374,61 @@
           </cnsl-form-field>
         </ng-container>
 
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
-          <mat-select formControlName="authMethodType">
-            <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
-              <span *ngIf="type.oidc">{{ 'APP.OIDC.AUTHMETHOD.' + type.type | translate }}</span>
-              <span *ngIf="type.api">{{ 'APP.API.AUTHMETHOD.' + type.type | translate }}</span>
-            </mat-option>
-          </mat-select>
-        </cnsl-form-field>
+        <ng-container *ngIf="formappType?.value?.createType !== AppCreateType.SAML">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
+            <mat-select formControlName="authMethodType">
+              <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
+                <span *ngIf="type.oidc">{{ 'APP.OIDC.AUTHMETHOD.' + type.type | translate }}</span>
+                <span *ngIf="type.api">{{ 'APP.API.AUTHMETHOD.' + type.type | translate }}</span>
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+        </ng-container>
+      </div>
+
+      <div class="content">
+        <ng-container *ngIf="formappType?.value?.createType === AppCreateType.SAML">
+          <div class="saml">
+            <cnsl-form-field class="formfield">
+              <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
+              <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+            </cnsl-form-field>
+
+            <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+
+            <input
+              #xmlFileInput
+              style="display: none"
+              class="file-input"
+              type="file"
+              (change)="onDropXML($any($event.target).files)"
+            />
+            <button type="button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
+              {{ 'APP.SAML.XML' | translate }}
+            </button>
+
+            <div
+              class="saml-xml"
+              [ngClass]="{ disabled: !!formMetadataUrl?.value }"
+              *ngIf="
+                decodedBase64 &&
+                samlAppRequest.toObject().spConfig &&
+                samlAppRequest.toObject().spConfig?.metadataXml &&
+                !samlAppRequest.toObject().spConfig?.metadataUrl
+              "
+            >
+              <ngx-codemirror
+                [(ngModel)]="decodedBase64"
+                [options]="{
+                  lineNumbers: true,
+                  theme: 'material',
+                  mode: 'application/xml'
+                }"
+              ></ngx-codemirror>
+            </div>
+          </div>
+        </ng-container>
       </div>
 
       <div class="content" *ngIf="formappType?.value?.createType === AppCreateType.OIDC">

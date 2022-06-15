@@ -130,10 +130,13 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required]],
-      responseTypesList: ['', [Validators.required]],
-      grantTypesList: ['', [Validators.required]],
       appType: ['', [Validators.required]],
-      authMethodType: ['', [Validators.required]],
+      // apptype OIDC
+      responseTypesList: ['', []],
+      grantTypesList: ['', []],
+      authMethodType: ['', []],
+      // apptype SAML
+      metadataUrl: ['', []],
     });
 
     this.initForm();
@@ -252,12 +255,19 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     this.form.valueChanges.pipe(takeUntil(this.destroyed$), debounceTime(150)).subscribe(() => {
       this.oidcAppRequest.setName(this.formname?.value);
       this.apiAppRequest.setName(this.formname?.value);
+      this.samlAppRequest.setName(this.formname?.value);
 
       this.oidcAppRequest.setResponseTypesList(this.formresponseTypesList?.value);
       this.oidcAppRequest.setGrantTypesList(this.grantTypesList?.value);
 
       this.oidcAppRequest.setAuthMethodType(this.authMethodType?.value);
       this.apiAppRequest.setAuthMethodType(this.authMethodType?.value);
+
+      const spConfig = new SAMLConfig();
+      if (this.formMetadataUrl?.value) {
+        spConfig.setMetadataUrl(this.formMetadataUrl?.value);
+      }
+      this.samlAppRequest.setSpConfig(spConfig);
 
       const oidcAppType = (this.formappType?.value as RadioItemAppType).oidcAppType;
       if (oidcAppType !== undefined) {
@@ -458,6 +468,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     return this.form.get('appType');
   }
 
+  get formMetadataUrl(): AbstractControl | null {
+    return this.form.get('metadataUrl');
+  }
   // get formapplicationType(): AbstractControl | null {
   //     return this.form.get('applicationType');
   // }
