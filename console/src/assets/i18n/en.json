@@ -1731,7 +1731,9 @@
       "CONFIGSECTION": "SAML Configuration",
       "URL": "Url where Metadata file is located",
       "OR": "or",
-      "XML": "Upload Metadata XML"
+      "XML": "Upload Metadata XML",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata from File"
     },
     "AUTHMETHODS": {
       "CODE": {

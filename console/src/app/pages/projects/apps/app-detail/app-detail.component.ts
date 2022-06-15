@@ -34,6 +34,7 @@ import {
     GetOIDCInformationResponse,
     UpdateAPIAppConfigRequest,
     UpdateOIDCAppConfigRequest,
+    UpdateSAMLAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -390,6 +391,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       if (file.size > MAX_ALLOWED_SIZE) {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
       } else {
+        this.metadataUrl?.setValue('');
         const reader = new FileReader();
         reader.onload = ((aXML) => {
           return (e) => {
@@ -616,6 +618,31 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  public saveSAMLApp(): void {
+    if (this.samlForm.valid && this.app.samlConfig) {
+      const req = new UpdateSAMLAppConfigRequest();
+      req.setProjectId(this.projectId);
+      req.setAppId(this.app.id);
+
+      if (this.app.samlConfig) {
+        const spConfig = new SAMLConfig();
+
+        spConfig.setMetadataUrl(this.app.samlConfig?.metadataUrl);
+        spConfig.setMetadataXml(this.app.samlConfig?.metadataXml);
+        req.setSpConfig(spConfig);
+      }
+
+      this.mgmtService
+        .updateSAMLAppConfig(req)
+        .then(() => {
+          this.toast.showInfo('APP.TOAST.APIUPDATED', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
+  }
+
   public regenerateOIDCClientSecret(): void {
     this.mgmtService
       .regenerateOIDCClientSecret(this.app.id, this.projectId)
@@ -725,11 +752,25 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.oidcTokenForm.get('clockSkewSeconds');
   }
 
+  public get metadataUrl(): AbstractControl | null {
+    return this.samlForm.get('metadataUrl');
+  }
+
   get decodedBase64(): string {
     if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
       return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString();
     } else {
       return '';
+    }
+  }
+
+  set decodedBase64(xmlString) {
+    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
+      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
+
+      if (this.app.samlConfig) {
+        this.app.samlConfig.metadataXml = base64;
+      }
     }
   }
 }

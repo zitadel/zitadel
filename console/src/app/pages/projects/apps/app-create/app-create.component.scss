@@ -76,6 +76,15 @@ p.desc {
   }
 }
 
+.saml-xml {
+  margin-top: 2rem;
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
 .app-create-actions {
   margin-top: 2rem;
   display: flex;

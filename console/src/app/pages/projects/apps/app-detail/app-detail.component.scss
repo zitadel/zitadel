@@ -171,9 +171,9 @@
     .saml-xml {
       margin-top: 2rem;
 
-      .preview-text {
-        letter-spacing: 0.05em;
-        font-size: 14px;
+      &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
       }
     }
   }

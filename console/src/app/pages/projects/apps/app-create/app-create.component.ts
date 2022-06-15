@@ -5,6 +5,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Buffer } from 'buffer';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
@@ -212,9 +213,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     this.samlConfigForm.valueChanges.subscribe((form) => {
-      if (form.metadataUrl) {
+      if (form.metadataUrl && form.metadataUrl.length) {
         const spConfig = new SAMLConfig();
-        spConfig.setMetadataUrl(form.metadataUrl);
+        spConfig.setMetadataUrl(form.metadataUrl.value);
         this.samlAppRequest.setSpConfig(spConfig);
       }
     });
@@ -317,6 +318,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public onDropXML(filelist: FileList): void {
     const file = filelist.item(0);
+    this.metadataUrl?.setValue('');
     if (file) {
       if (file.size > MAX_ALLOWED_SIZE) {
         this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
@@ -486,5 +488,27 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   get isStepperSAML(): boolean {
     return (this.appType?.value as RadioItemAppType).createType === AppCreateType.SAML;
+  }
+
+  get decodedBase64(): string {
+    const samlReq = this.samlAppRequest.toObject();
+    if (samlReq && samlReq.spConfig && samlReq.spConfig.metadataXml) {
+      return Buffer.from(samlReq.spConfig.metadataXml, 'base64').toString();
+    } else {
+      return '';
+    }
+  }
+
+  set decodedBase64(xmlString) {
+    if (this.samlAppRequest) {
+      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
+      const config = new SAMLConfig();
+      config.setMetadataXml(base64);
+      this.samlAppRequest.setSpConfig(config);
+    }
+  }
+
+  public get metadataUrl(): AbstractControl | null {
+    return this.samlConfigForm.get('metadataUrl');
   }
 }

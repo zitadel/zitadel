@@ -1731,7 +1731,9 @@
       "CONFIGSECTION": "Configurazione SAML",
       "URL": "URL in cui si trova il file di metadati",
       "OR": "o",
-      "XML": "Carica Metadata XML"
+      "XML": "Carica Metadata XML",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadati dal file"
     },
     "AUTHMETHODS": {
       "CODE": {

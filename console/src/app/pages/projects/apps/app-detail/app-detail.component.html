@@ -177,10 +177,14 @@
               </button>
             </div>
 
-            <div class="saml-xml" *ngIf="decodedBase64">
-              <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
+            <div
+              class="saml-xml"
+              [ngClass]="{ disabled: !!metadataUrl?.value }"
+              *ngIf="decodedBase64 && app.samlConfig && !app.samlConfig.metadataUrl"
+            >
               <ngx-codemirror
-                [ngModel]="decodedBase64"
+                [(ngModel)]="decodedBase64"
+                [disabled]="!!metadataUrl?.value"
                 [options]="{
                   lineNumbers: true,
                   theme: 'material',
@@ -194,6 +198,7 @@
                 class="submit-button"
                 type="submit"
                 color="primary"
+                (click)="saveSAMLApp()"
                 [disabled]="samlForm.invalid || !canWrite"
                 mat-raised-button
               >

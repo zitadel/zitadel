@@ -165,9 +165,30 @@
         type="file"
         (change)="onDropXML($any($event.target).files)"
       />
-      <button mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
+      <button type="button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
         {{ 'APP.SAML.XML' | translate }}
       </button>
+
+      <div
+        class="saml-xml"
+        [ngClass]="{ disabled: !!metadataUrl?.value }"
+        *ngIf="
+          decodedBase64 &&
+          samlAppRequest.toObject().spConfig &&
+          samlAppRequest.toObject().spConfig?.metadataXml &&
+          !samlAppRequest.toObject().spConfig?.metadataUrl
+        "
+      >
+        <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
+        <ngx-codemirror
+          [(ngModel)]="decodedBase64"
+          [options]="{
+            lineNumbers: true,
+            theme: 'material',
+            mode: 'application/xml'
+          }"
+        ></ngx-codemirror>
+      </div>
 
       <div class="app-create-actions">
         <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
@@ -280,6 +301,22 @@
           <span class="right">
             <span>
               {{ 'APP.API.AUTHMETHOD.' + authMethodType?.value | translate }}
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.SAML">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.SAML.METADATA' | translate }}
+          </span>
+          <span class="right">
+            <span *ngIf="metadataUrl?.value">
+              {{ metadataUrl?.value }}
+            </span>
+            <span *ngIf="samlAppRequest.toObject().spConfig?.metadataXml">
+              {{ 'APP.SAML.METADATAFROMFILE' | translate }}
             </span>
           </span>
         </div>
