@@ -1,1 +1,23 @@
-Please jump straight to the [chart repo descriptions](https://github.com/zitadel/zitadel-charts).
+You will need to download the following files:
+- [example-zitadel-values.yaml](./example-zitadel-values.yaml)
+- [example-zitadel-values-secrets.yaml](./example-zitadel-values-secrets.yaml)
+
+By default, the chart installs a secure ZITADEL and CockroachDB. The example files make ZITADEL accessible by port forwarding the ZITADEL service to localhost
+
+```bash
+# Download and adjust the example configuration file containing standard configuration
+wget https://docs.zitadel.com/docs/guides/installation/configure/example-zitadel-values.yaml
+
+# Download and adjust the example configuration file containing secret configuration
+wget https://docs.zitadel.com/docs/guides/installation/configure/example-zitadel-values-secrets.yaml
+
+# Install an insecure zitadel release that works with localhost
+helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
+  --values ./example-zitadel-values.yaml \
+  --values ./example-zitadel-values-secrets.yaml
+
+# Forward the ZITADEL service port to your local machine
+kubectl --namespace zitadel port-forward svc/my-zitadel 8080:80
+```
+
+Please jump to the [chart repo descriptions](https://github.com/zitadel/zitadel-charts) for more details.

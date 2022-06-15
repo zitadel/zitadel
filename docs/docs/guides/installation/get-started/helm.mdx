@@ -2,8 +2,6 @@ Installation and configuration details are described in the [open source ZITADEL
 By default, the chart installs a secure and highly available ZITADEL instance.
 For running an easily testable, insecure, non-HA ZITADEL instance, run the following commands.
 
-<!-- TODO: make insecure helm work -->
-<!-- TODO: write in values.yaml that configMap is also passed using --steps arg -->
 ```bash
 # Add the helm repository
 helm repo add zitadel https://charts.zitadel.com
@@ -13,11 +11,11 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalDomain="localhost" \
   --set zitadel.configmapConfig.ExternalSecure=false \
+  --set zitadel.secretConfig.Database.User.Password="a-zitadel-db-user-password"
   --set replicaCount=1 \
   --set cockroachdb.single-node=true \
-  --set cockroachdb.statefulset.replicas=1 \
-  --set cockroachdb.tls.enabled=false
+  --set cockroachdb.statefulset.replicas=1
 
 # Forward the ZITADEL service port to your local machine
-kubectl port-forward svc/my-zitadel 8080
+kubectl port-forward svc/my-zitadel 8080:80
 ```
