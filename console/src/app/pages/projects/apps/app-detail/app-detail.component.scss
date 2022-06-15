@@ -158,6 +158,24 @@
         margin-left: 1rem;
       }
     }
+
+    .cnsl-saml-config-line {
+      display: flex;
+      align-items: center;
+
+      .cnsl-app-or {
+        margin-right: 1rem;
+      }
+    }
+
+    .saml-xml {
+      margin-top: 2rem;
+
+      .preview-text {
+        letter-spacing: 0.05em;
+        font-size: 14px;
+      }
+    }
   }
 }
 

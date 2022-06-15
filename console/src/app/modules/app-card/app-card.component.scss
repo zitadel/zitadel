@@ -55,5 +55,11 @@
       border: none;
       color: #fff;
     }
+
+    &.saml {
+      background: linear-gradient(40deg, rgb(110, 56, 124), rgb(88, 37, 103));
+      border: none;
+      color: #fff;
+    }
   }
 }

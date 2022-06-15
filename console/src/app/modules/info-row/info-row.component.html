@@ -197,7 +197,7 @@
       </p>
     </div>
 
-    <div class="info-wrapper">
+    <div class="info-wrapper" *ngIf="app?.oidcConfig?.clientId">
       <p class="info-row-title">{{ 'APP.OIDC.INFO.CLIENTID' | translate }}</p>
       <div class="copy-row" *ngIf="app?.oidcConfig?.clientId">
         <button

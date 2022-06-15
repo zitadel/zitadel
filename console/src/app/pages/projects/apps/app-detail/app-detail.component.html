@@ -153,6 +153,54 @@
               </div>
             </form>
           </cnsl-card>
+
+          <cnsl-card>
+            <form [formGroup]="samlForm">
+              <cnsl-form-field class="formfield">
+                <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
+                <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+              </cnsl-form-field>
+            </form>
+
+            <div class="cnsl-saml-config-line">
+              <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+
+              <input
+                #xmlFileInput
+                style="display: none"
+                class="file-input"
+                type="file"
+                (change)="onDropXML($any($event.target).files)"
+              />
+              <button mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
+                {{ 'APP.SAML.XML' | translate }}
+              </button>
+            </div>
+
+            <div class="saml-xml" *ngIf="decodedBase64">
+              <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
+              <ngx-codemirror
+                [ngModel]="decodedBase64"
+                [options]="{
+                  lineNumbers: true,
+                  theme: 'material',
+                  mode: 'application/xml'
+                }"
+              ></ngx-codemirror>
+            </div>
+
+            <div class="btn-container">
+              <button
+                class="submit-button"
+                type="submit"
+                color="primary"
+                [disabled]="samlForm.invalid || !canWrite"
+                mat-raised-button
+              >
+                {{ 'ACTIONS.SAVE' | translate }}
+              </button>
+            </div>
+          </cnsl-card>
         </ng-container>
 
         <ng-container *ngIf="currentSetting === 'token'">

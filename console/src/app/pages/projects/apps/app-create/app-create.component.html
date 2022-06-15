@@ -180,8 +180,8 @@
     <mat-step>
       <ng-template matStepLabel>{{ 'APP.OIDC.OVERVIEWSECTION' | translate }}</ng-template>
       <p class="step-title">{{ 'APP.OIDC.OVERVIEWTITLE' | translate }}</p>
-      <div class="row cnsl-secondary-text">
-        <span class="left">
+      <div class="row">
+        <span class="left cnsl-secondary-text">
           {{ 'APP.NAME' | translate }}
         </span>
         <span class="right">
@@ -190,50 +190,56 @@
       </div>
 
       <ng-container *ngIf="appType?.value?.createType === AppCreateType.OIDC">
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.TYPE' | translate }}
           </span>
           <span class="right">
-            {{ 'APP.OIDC.APPTYPE.' + appType?.value | translate }}
+            {{ 'APP.OIDC.APPTYPE.' + oidcAppRequest.toObject().appType | translate }}
           </span>
         </div>
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.GRANT' | translate }}
           </span>
-          <span class="right" *ngIf="grantTypesList?.value && grantTypesList?.value.length > 0">
-            [<span *ngFor="let element of grantTypesList?.value; index as i">
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().grantTypesList && oidcAppRequest.toObject().grantTypesList.length > 0"
+          >
+            [<span *ngFor="let element of oidcAppRequest.toObject().grantTypesList; index as i">
               {{ 'APP.OIDC.GRANT.' + element | translate }}
-              {{ i < grantTypesList?.value.length - 1 ? ', ' : '' }} </span
+              {{ i < oidcAppRequest.toObject().grantTypesList.length - 1 ? ', ' : '' }} </span
             >]
           </span>
         </div>
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.RESPONSETYPE' | translate }}
           </span>
-          <span class="right" *ngIf="responseTypesList?.value && responseTypesList?.value.length > 0">
-            [<span *ngFor="let element of responseTypesList?.value; index as i">
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().responseTypesList && oidcAppRequest.toObject().responseTypesList.length > 0"
+          >
+            [<span *ngFor="let element of oidcAppRequest.toObject().responseTypesList; index as i">
               {{ 'APP.OIDC.RESPONSE.' + element | translate }}
-              {{ i < responseTypesList?.value.length - 1 ? ', ' : '' }} </span
+              {{ i < oidcAppRequest.toObject().responseTypesList.length - 1 ? ', ' : '' }} </span
             >]
           </span>
         </div>
 
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.AUTHMETHOD' | translate }}
           </span>
           <span class="right">
             <span>
-              {{ 'APP.OIDC.AUTHMETHOD.' + authMethodType?.value | translate }}
+              {{ 'APP.OIDC.AUTHMETHOD.' + oidcAppRequest.toObject().authMethodType | translate }}
             </span>
           </span>
         </div>
 
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.REDIRECT' | translate }}
           </span>
           <span
@@ -247,8 +253,8 @@
           </span>
         </div>
 
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
           </span>
           <span
@@ -267,8 +273,8 @@
       </ng-container>
 
       <ng-container *ngIf="appType?.value?.createType === AppCreateType.API">
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.AUTHMETHOD' | translate }}
           </span>
           <span class="right">
