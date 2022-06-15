@@ -58,6 +58,16 @@ const (
 	MachineUserInstanceIDCol = "instance_id"
 	MachineNameCol           = "name"
 	MachineDescriptionCol    = "description"
+
+	// notify
+	UserNotifySuffix       = "notifications"
+	NotifyUserIDCol        = "user_id"
+	NotifyInstanceIDCol    = "instance_id"
+	NotifyLastEmailCol     = "last_email"
+	NotifyVerifiedEmailCol = "verified_email"
+	NotifyLastPhoneCol     = "last_phone"
+	NotifyVerifiedPhoneCol = "verified_phone"
+	NotifyPasswordSetCol   = "password_set"
 )
 
 func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userProjection {
@@ -109,6 +119,19 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewPrimaryKey(MachineUserIDCol, MachineUserInstanceIDCol),
 			UserMachineSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user")),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(NotifyUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(NotifyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(NotifyLastEmailCol, crdb.ColumnTypeText),
+			crdb.NewColumn(NotifyVerifiedEmailCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(NotifyLastPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(NotifyVerifiedPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(NotifyPasswordSetCol, crdb.ColumnTypeBool, crdb.Default(false)),
+		},
+			crdb.NewPrimaryKey(NotifyUserIDCol, NotifyInstanceIDCol),
+			UserNotifySuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -280,6 +303,16 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
+				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
+				handler.NewCol(NotifyPasswordSetCol, e.Secret != nil),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 
@@ -317,6 +350,16 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(HumanPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
+				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
+				handler.NewCol(NotifyPasswordSetCol, e.Secret != nil),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
 		),
 	), nil
 }
@@ -552,6 +595,16 @@ func (p *userProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handl
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
+			},
+			[]handler.Condition{
+				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 
@@ -584,6 +637,17 @@ func (p *userProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyLastPhoneCol, nil),
+				handler.NewCol(NotifyVerifiedPhoneCol, nil),
+			},
+			[]handler.Condition{
+				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 
@@ -614,6 +678,16 @@ func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyVerifiedPhoneCol, &sql.NullString{Valid: false}),
+			},
+			[]handler.Condition{
+				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
 		),
 	), nil
 }
