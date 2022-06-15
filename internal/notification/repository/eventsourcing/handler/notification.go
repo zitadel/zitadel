@@ -190,8 +190,11 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	if user.PreferredLoginName == "" {
-		return errors.ThrowNotFound(nil, "HANDL-Fzjog", "preferred login name empty")
+
+	if user.Sequence < event.Sequence {
+		if err := n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
 	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.InitCodeMessageType)
@@ -236,6 +239,11 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
+	if user.Sequence < event.Sequence {
+		if err := n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
+	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.PasswordResetMessageType)
 	if err != nil {
@@ -279,8 +287,10 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	if user.LastEmail == "" {
-		return errors.ThrowNotFound(nil, "HANDL-IGZrN", "email of user is empty")
+	if user.Sequence < event.Sequence {
+		if err = n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
 	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyEmailMessageType)
@@ -315,8 +325,10 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	if user.LastPhone == "" {
-		return errors.ThrowNotFound(nil, "HANDL-T6MV7", "phone not set on user")
+	if user.Sequence < event.Sequence {
+		if err := n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
 	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyPhoneMessageType)
@@ -591,4 +603,17 @@ func (n *Notification) origin(ctx context.Context) (string, error) {
 		return "", errors.ThrowInternal(nil, "NOTIF-Ef3r1", "Errors.Notification.NoDomain")
 	}
 	return http_utils.BuildHTTP(domains.Domains[0].Domain, n.externalPort, n.externalSecure), nil
+}
+
+func (n *Notification) verifyLatestUser(ctx context.Context, user *model.NotifyUser) error {
+	events, err := n.getUserEvents(ctx, user.ID, user.InstanceID, user.Sequence)
+	if err != nil {
+		return err
+	}
+	for _, event := range events {
+		if err = user.AppendEvent(event); err != nil {
+			return err
+		}
+	}
+	return nil
 }
