@@ -897,10 +897,6 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 			preferredLanguage := sql.NullString{}
 			gender := sql.NullInt32{}
 			avatarKey := sql.NullString{}
-			email := sql.NullString{}
-			isEmailVerified := sql.NullBool{}
-			phone := sql.NullString{}
-			isPhoneVerified := sql.NullBool{}
 
 			notifyUserID := sql.NullString{}
 			notifyEmail := sql.NullString{}
@@ -928,10 +924,6 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 				&preferredLanguage,
 				&gender,
 				&avatarKey,
-				&email,
-				&isEmailVerified,
-				&phone,
-				&isPhoneVerified,
 				&notifyUserID,
 				&notifyEmail,
 				&notifyVerifiedEmail,
