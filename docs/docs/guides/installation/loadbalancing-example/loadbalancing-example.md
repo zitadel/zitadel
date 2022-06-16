@@ -9,26 +9,26 @@ The stack consists of three long-running containers:
 - A secure ZITADEL container configured for a custom domain
 - A secure [CockroachDB](https://www.cockroachlabs.com/docs/stable/)
 
-You will need to download the following files:
+The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
+
+By executing the commands below, you will download the following files:
 - [docker-compose.yaml](./docker-compose.yaml)
 - [example-zitadel-config.yaml](./example-zitadel-config.yaml)
 - [example-zitadel-secrets.yaml](./example-zitadel-secrets.yaml)
 - [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml)
 
-The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
-
 ```bash
 # Download the docker compose example configuration. For example:
-wget https://docs.zitadel.com/docs/guides/installation/loadbalancing-example/docker-compose.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/docker-compose.yaml
 
 # Download and adjust the example configuration file containing standard configuration
-wget https://docs.zitadel.com/docs/guides/installation/loadbalancing-example/example-zitadel-config.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/example-zitadel-config.yaml
 
 # Download and adjust the example configuration file containing secret configuration
-wget https://docs.zitadel.com/docs/guides/installation/loadbalancing-example/example-zitadel-secrets.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/example-zitadel-secrets.yaml
 
 # Download and adjust the example configuration file containing database initialization configuration
-wget https://docs.zitadel.com/docs/guides/installation/loadbalancing-example/example-zitadel-init-steps.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/example-zitadel-init-steps.yaml
 
 # A single ZITADEL instance always needs the same 32 characters long masterkey
 # If you haven't done so already, you can generate a new one.

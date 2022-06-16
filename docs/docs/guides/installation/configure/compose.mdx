@@ -1,23 +1,23 @@
+The docker compose example mounts the example zitadel configuration files to the ZITADEL container.
+
 By executing the commands below, you will download the following files:
 - [docker-compose.yaml](./docker-compose.yaml)
 - [example-zitadel-config.yaml](./example-zitadel-config.yaml)
 - [example-zitadel-secrets.yaml](./example-zitadel-secrets.yaml)
 - [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml)
 
-These files are then mounted to the ZITADEL container by Docker Compose.
-
 ```bash
 # Download the docker compose example configuration for a secure CockroachDB. For example:
-wget https://docs.zitadel.com/docs/guides/installation/configure/docker-compose.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/configure/docker-compose.yaml
 
 # Download and adjust the example configuration file containing standard configuration
-wget https://docs.zitadel.com/docs/guides/installation/configure/example-zitadel-config.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/configure/example-zitadel-config.yaml
 
 # Download and adjust the example configuration file containing secret configuration
-wget https://docs.zitadel.com/docs/guides/installation/configure/example-zitadel-secrets.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/configure/example-zitadel-secrets.yaml
 
 # Download and adjust the example configuration file containing database initialization configuration
-wget https://docs.zitadel.com/docs/guides/installation/configure/example-zitadel-init-steps.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/configure/example-zitadel-init-steps.yaml
 
 # A single ZITADEL instance always needs the same 32 characters long masterkey
 # If you haven't done so already, you can generate a new one
