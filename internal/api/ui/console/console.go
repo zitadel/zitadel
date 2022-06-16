@@ -106,7 +106,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 			return
 		}
 		url := http_util.BuildOrigin(r.Host, externalSecure)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), externalSecure)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID())
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
@@ -127,17 +127,15 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(api, issuer, clientID string, secure bool) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID string) ([]byte, error) {
 	environment := struct {
 		API      string `json:"api,omitempty"`
 		Issuer   string `json:"issuer,omitempty"`
 		ClientID string `json:"clientid,omitempty"`
-		Secure   bool   `json:"secure"`
 	}{
 		API:      api,
 		Issuer:   issuer,
 		ClientID: clientID,
-		Secure:   secure,
 	}
 	return json.Marshal(environment)
 }
