@@ -1,1 +1,5 @@
-{ "api": "https://zitadel.cloud", "issuer": "https://zitadel.cloud/oauth/v2", "clientid": "163447659854627073@zitadel" }
+{
+  "api": "https://bringmos-jv1jqo.zitadel.app",
+  "issuer": "https://bringmos-jv1jqo.zitadel.app",
+  "clientid": "163706959596355841@zitadel"
+}

@@ -7,6 +7,7 @@ import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-m
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -60,6 +61,56 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public changeState(newState: OrgState): void {
+    if (newState === OrgState.ORG_STATE_ACTIVE) {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.REACTIVATE',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'ORG.PAGES.DIALOG.REACTIVATE.TITLE',
+          descriptionKey: 'ORG.PAGES.DIALOG.REACTIVATE.DESCRIPTION',
+        },
+        width: '400px',
+      });
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          this.mgmtService
+            .reactivateOrg()
+            .then(() => {
+              this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
+              this.org.state = OrgState.ORG_STATE_ACTIVE;
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
+    } else if (newState === OrgState.ORG_STATE_INACTIVE) {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.DEACTIVATE',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'ORG.PAGES.DIALOG.DEACTIVATE.TITLE',
+          descriptionKey: 'ORG.PAGES.DIALOG.DEACTIVATE.DESCRIPTION',
+        },
+        width: '400px',
+      });
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          this.mgmtService
+            .deactivateOrg()
+            .then(() => {
+              this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
+              this.org.state = OrgState.ORG_STATE_INACTIVE;
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
+    }
   }
 
   private async getData(): Promise<void> {
