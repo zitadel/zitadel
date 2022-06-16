@@ -69,8 +69,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         data: {
           confirmKey: 'ACTIONS.REACTIVATE',
           cancelKey: 'ACTIONS.CANCEL',
-          titleKey: 'ORG.PAGES.DIALOG.REACTIVATE.TITLE',
-          descriptionKey: 'ORG.PAGES.DIALOG.REACTIVATE.DESCRIPTION',
+          titleKey: 'ORG.DIALOG.REACTIVATE.TITLE',
+          descriptionKey: 'ORG.DIALOG.REACTIVATE.DESCRIPTION',
         },
         width: '400px',
       });
@@ -92,8 +92,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         data: {
           confirmKey: 'ACTIONS.DEACTIVATE',
           cancelKey: 'ACTIONS.CANCEL',
-          titleKey: 'ORG.PAGES.DIALOG.DEACTIVATE.TITLE',
-          descriptionKey: 'ORG.PAGES.DIALOG.DEACTIVATE.DESCRIPTION',
+          titleKey: 'ORG.DIALOG.DEACTIVATE.TITLE',
+          descriptionKey: 'ORG.DIALOG.DEACTIVATE.DESCRIPTION',
         },
         width: '400px',
       });

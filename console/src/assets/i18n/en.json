@@ -756,6 +756,8 @@
       "LISTDESCRIPTION": "Choose an organization.",
       "ACTIVE": "Active",
       "CREATE": "Create Organization",
+      "DEACTIVATE": "Deactivate Organization",
+      "REACTIVATE": "Reactivate Organization",
       "NOPERMISSION": "You don't have the permission to access organization settings.",
       "USERSELFACCOUNT": "Use your personal account as organization owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
@@ -820,6 +822,16 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deactivate organization",
+        "DESCRIPTION": "You are about to deactivate your organization. Users won't be able to login afterwards. Are you sure to proceed?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Reactivate organization",
+        "DESCRIPTION": "You are about to reactivate your organization. Users will be able to login again. Are you sure to proceed?"
+      }
     }
   },
   "SETTINGS": {
