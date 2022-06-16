@@ -46,3 +46,5 @@ You can safely proceed, if your browser warns you about the insecure self-signed
 This is the IAM admin users login according to your configuration in the [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml):
 - **username**: *root@<span></span>my-org.my.domain*
 - **password**: *RootPassword1!*
+
+Read more about [the login process](../../manuals/user-login).
