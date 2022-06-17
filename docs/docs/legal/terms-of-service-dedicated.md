@@ -4,7 +4,7 @@ custom_edit_url: null
 --- 
 ## General
 
-Last revised: July 20, 2021
+Last revised: June 3, 2022
 
 ### Background
 
@@ -20,9 +20,7 @@ Each Dedicated Instance consists, except agreed otherwise in writing, of a multi
 
 CAOS will install and manage the Dedicated Instance on infracstructure provided by preferred cloud providers. Costs for infrastructure or cloud providers are not included in the Subscription, if not agreed otherwise in writing.
 
-You may choose to provide the required infrastructure yourself. You must comply with the [requirements and prerequisites](https://docs.zitadel.com/docs/guides/installation/managed-dedicated-instance) as documented.
-
-Please refer to the [annex](dedicated-instance-annex) with regards to limitations of the deployment options, especially when using an own infrastructure provider. By accepting these terms you also accept the terms in the annex.
+You may choose to provide the required infrastructure yourself. You must comply with the requirements and prerequisites outlined in the purchase order.
 
 You may not modify, maintain or attempt to modify the Dedicated Instance, except with prior instructions by CAOS.
 

@@ -67,7 +67,7 @@ func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRe
 			domainQuery,
 		},
 	}
-	domains, err := s.query.SearchInstanceDomains(ctx, query)
+	domains, err := s.query.SearchInstanceDomainsGlobal(ctx, query)
 	if err != nil {
 		return nil, err
 	}
