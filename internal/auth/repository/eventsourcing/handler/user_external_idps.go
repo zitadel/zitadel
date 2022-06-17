@@ -197,9 +197,9 @@ func (i *ExternalIDP) OnSuccess() error {
 }
 
 func (i *ExternalIDP) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, aggregateID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID)
 }
 
 func (i *ExternalIDP) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, instanceID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID)
 }

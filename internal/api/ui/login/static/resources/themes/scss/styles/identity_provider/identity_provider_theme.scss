@@ -7,11 +7,14 @@
 @mixin lgn-idp-color() {
   .lgn-idp {
     border-color: var(--zitadel-color-divider);
+    color: var(--zitadel-color-text-500);
 
-    @include lgn-idp-elevation(1);
+    &:hover {
+      @include lgn-idp-elevation(1);
+    }
 
     &:not([disabled]):active {
-      @include lgn-idp-elevation(8);
+      @include lgn-idp-elevation(2);
     }
 
     &.google {

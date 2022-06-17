@@ -36,7 +36,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.MemberAddedEventMapper),
 			},
-			reduce: (&ProjectMemberProjection{}).reduceAdded,
+			reduce: (&projectMemberProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -73,7 +73,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.MemberChangedEventMapper),
 			},
-			reduce: (&ProjectMemberProjection{}).reduceChanged,
+			reduce: (&projectMemberProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -106,7 +106,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.MemberCascadeRemovedEventMapper),
 			},
-			reduce: (&ProjectMemberProjection{}).reduceCascadeRemoved,
+			reduce: (&projectMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -136,7 +136,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				}`),
 				), project.MemberRemovedEventMapper),
 			},
-			reduce: (&ProjectMemberProjection{}).reduceRemoved,
+			reduce: (&projectMemberProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,
@@ -164,7 +164,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&ProjectMemberProjection{}).reduceUserRemoved,
+			reduce: (&projectMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -191,7 +191,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgRemovedEventMapper),
 			},
-			reduce: (&ProjectMemberProjection{}).reduceOrgRemoved,
+			reduce: (&projectMemberProjection{}).reduceOrgRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -218,7 +218,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&ProjectMemberProjection{}).reduceProjectRemoved,
+			reduce: (&projectMemberProjection{}).reduceProjectRemoved,
 			want: wantReduce{
 				aggregateType:    project.AggregateType,
 				sequence:         15,

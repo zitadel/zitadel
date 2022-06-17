@@ -10,7 +10,6 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -192,7 +191,11 @@ var (
 	}
 )
 
-func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserGrant, error) {
+func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (*UserGrant, error) {
+	if shouldTriggerBulk {
+		projection.UserGrantProjection.TriggerBulk(ctx)
+	}
+
 	query, scan := prepareUserGrantQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)

@@ -39,7 +39,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPConfigAddedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPAdded,
+			reduce: (&idpProjection{}).reduceIDPAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -81,7 +81,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPChanged,
+			reduce: (&idpProjection{}).reduceIDPChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -116,7 +116,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPConfigDeactivatedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPDeactivated,
+			reduce: (&idpProjection{}).reduceIDPDeactivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -149,7 +149,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPConfigReactivatedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPReactivated,
+			reduce: (&idpProjection{}).reduceIDPReactivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -182,7 +182,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPConfigRemovedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPRemoved,
+			reduce: (&idpProjection{}).reduceIDPRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -224,7 +224,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPOIDCConfigAddedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceOIDCConfigAdded,
+			reduce: (&idpProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -284,7 +284,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPOIDCConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
+			reduce: (&idpProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -329,7 +329,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					[]byte("{}"),
 				), instance.IDPOIDCConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
+			reduce: (&idpProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -355,7 +355,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPJWTConfigAddedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceJWTConfigAdded,
+			reduce: (&idpProjection{}).reduceJWTConfigAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -403,7 +403,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 }`),
 				), instance.IDPJWTConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
+			reduce: (&idpProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -444,7 +444,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), instance.IDPJWTConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
+			reduce: (&idpProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -470,7 +470,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPConfigAddedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPAdded,
+			reduce: (&idpProjection{}).reduceIDPAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -512,7 +512,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPChanged,
+			reduce: (&idpProjection{}).reduceIDPChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -547,7 +547,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPConfigDeactivatedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPDeactivated,
+			reduce: (&idpProjection{}).reduceIDPDeactivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -580,7 +580,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPConfigReactivatedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPReactivated,
+			reduce: (&idpProjection{}).reduceIDPReactivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -613,7 +613,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPConfigRemovedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceIDPRemoved,
+			reduce: (&idpProjection{}).reduceIDPRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -655,7 +655,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPOIDCConfigAddedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceOIDCConfigAdded,
+			reduce: (&idpProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -715,7 +715,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPOIDCConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
+			reduce: (&idpProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -760,7 +760,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					[]byte("{}"),
 				), org.IDPOIDCConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
+			reduce: (&idpProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -786,7 +786,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPJWTConfigAddedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceJWTConfigAdded,
+			reduce: (&idpProjection{}).reduceJWTConfigAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -834,7 +834,7 @@ func TestIDPProjection_reduces(t *testing.T) {
         }`),
 				), org.IDPJWTConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
+			reduce: (&idpProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -875,7 +875,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.IDPJWTConfigChangedEventMapper),
 			},
-			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
+			reduce: (&idpProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,

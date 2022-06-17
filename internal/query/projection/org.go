@@ -25,12 +25,12 @@ const (
 	OrgColumnDomain        = "primary_domain"
 )
 
-type OrgProjection struct {
+type orgProjection struct {
 	crdb.StatementHandler
 }
 
-func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgProjection {
-	p := new(OrgProjection)
+func newOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgProjection {
+	p := new(orgProjection)
 	config.ProjectionName = OrgProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -54,7 +54,7 @@ func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	return p
 }
 
-func (p *OrgProjection) reducers() []handler.AggregateReducer {
+func (p *orgProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -84,7 +84,7 @@ func (p *OrgProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.OrgAddedEventType)
@@ -104,7 +104,7 @@ func (p *OrgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Stateme
 	), nil
 }
 
-func (p *OrgProjection) reduceOrgChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bg8oM", "reduce.wrong.event.type %s", org.OrgChangedEventType)
@@ -125,7 +125,7 @@ func (p *OrgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 	), nil
 }
 
-func (p *OrgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgDeactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BApK4", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
@@ -143,7 +143,7 @@ func (p *OrgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 	), nil
 }
 
-func (p *OrgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgReactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o37De", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
@@ -161,7 +161,7 @@ func (p *OrgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 	), nil
 }
 
-func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4TbKT", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)

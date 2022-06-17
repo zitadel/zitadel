@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetPasswordAgePolicyRequest) (*mgmt_pb.GetPasswordAgePolicyResponse, error) {
-	policy, err := s.query.PasswordAgePolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.PasswordAgePolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetPassw
 }
 
 func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetDefaultPasswordAgePolicyRequest) (*mgmt_pb.GetDefaultPasswordAgePolicyResponse, error) {
-	policy, err := s.query.DefaultPasswordAgePolicy(ctx)
+	policy, err := s.query.DefaultPasswordAgePolicy(ctx, true)
 	if err != nil {
 		return nil, err
 	}

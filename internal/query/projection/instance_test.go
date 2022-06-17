@@ -28,7 +28,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				[]byte(`{"name": "Name"}`),
 			), instance.InstanceAddedEventMapper),
 		},
-		reduce: (&InstanceProjection{}).reduceInstanceAdded,
+		reduce: (&instanceProjection{}).reduceInstanceAdded,
 		want: wantReduce{
 			projection:       InstanceProjectionTable,
 			aggregateType:    eventstore.AggregateType("instance"),
@@ -59,7 +59,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					[]byte(`{"orgId": "orgid"}`),
 				), instance.DefaultOrgSetMapper),
 			},
-			reduce: (&InstanceProjection{}).reduceDefaultOrgSet,
+			reduce: (&instanceProjection{}).reduceDefaultOrgSet,
 			want: wantReduce{
 				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -89,7 +89,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					[]byte(`{"iamProjectId": "project-id"}`),
 				), instance.ProjectSetMapper),
 			},
-			reduce: (&InstanceProjection{}).reduceIAMProjectSet,
+			reduce: (&instanceProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
 				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -119,7 +119,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					[]byte(`{"language": "en"}`),
 				), instance.DefaultLanguageSetMapper),
 			},
-			reduce: (&InstanceProjection{}).reduceDefaultLanguageSet,
+			reduce: (&instanceProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
 				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
