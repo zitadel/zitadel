@@ -26,16 +26,14 @@ import { CNSL_ERROR, CnslErrorDirective } from './error.directive';
 export const CNSL_FORM_FIELD = new InjectionToken<CnslFormFieldComponent>('CnslFormFieldComponent');
 
 class CnslFormFieldBase {
-  constructor(public _elementRef: ElementRef) { }
+  constructor(public _elementRef: ElementRef) {}
 }
 
 @Component({
   selector: 'cnsl-form-field',
   templateUrl: './form-field.component.html',
   styleUrls: ['./form-field.component.scss'],
-  providers: [
-    { provide: CNSL_FORM_FIELD, useExisting: CnslFormFieldComponent },
-  ],
+  providers: [{ provide: CNSL_FORM_FIELD, useExisting: CnslFormFieldComponent }],
   host: {
     '[class.ng-untouched]': '_shouldForward("untouched")',
     '[class.ng-touched]': '_shouldForward("touched")',
@@ -76,18 +74,20 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   @HostListener('blur', ['false'])
   _focusChanged(isFocused: boolean): void {
-    if (isFocused !== this.focused && (!isFocused)) {
+    if (isFocused !== this.focused && !isFocused) {
       this.focused = isFocused;
       this.stateChanges.next();
     }
   }
 
-  constructor(public _elementRef: ElementRef, private _changeDetectorRef: ChangeDetectorRef,
+  constructor(
+    public _elementRef: ElementRef,
+    private _changeDetectorRef: ChangeDetectorRef,
     @Inject(ElementRef)
-    // Use `ElementRef` here so Angular has something to inject.
-    _labelOptions: any) {
+    _labelOptions: // Use `ElementRef` here so Angular has something to inject.
+    any,
+  ) {
     super(_elementRef);
-
   }
 
   public ngAfterViewInit(): void {
@@ -135,13 +135,12 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
     if (this._control) {
       const ids: string[] = [];
 
-      if (this._control.userAriaDescribedBy &&
-        typeof this._control.userAriaDescribedBy === 'string') {
+      if (this._control.userAriaDescribedBy && typeof this._control.userAriaDescribedBy === 'string') {
         ids.push(...this._control.userAriaDescribedBy.split(' '));
       }
 
       if (this._errorChildren) {
-        ids.push(...this._errorChildren.map(error => error.id));
+        ids.push(...this._errorChildren.map((error) => error.id));
       }
 
       this._control.setDescribedByIds(ids);
@@ -150,12 +149,12 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
 
   /** Determines whether a class from the NgControl should be forwarded to the host element. */
   _shouldForward(prop: keyof NgControl): boolean {
-    const ngControl = this._control ? this._control.ngControl : null;
+    const ngControl: any = this._control ? this._control.ngControl : null;
     return ngControl && ngControl[prop];
   }
 
   /** Determines whether to display hints or errors. */
   _getDisplayedMessages(): 'error' | 'hint' {
-    return (this._errorChildren && this._errorChildren.length > 0) ? 'error' : 'hint';
+    return this._errorChildren && this._errorChildren.length > 0 ? 'error' : 'hint';
   }
 }
