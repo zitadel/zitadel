@@ -33,7 +33,7 @@
     "@types/uuid": "^8.3.0",
     "angular-oauth2-oidc": "^13.0.1",
     "buffer": "^6.0.3",
-    "codemirror": "^6.0.0",
+    "codemirror": "^5.65.0",
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "google-proto-files": "^2.5.0",
