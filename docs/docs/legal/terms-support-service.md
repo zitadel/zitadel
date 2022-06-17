@@ -38,6 +38,8 @@ We provide the Services under the conditions stated on our websites and the PO a
 
 We are entitled to offer new services, to withdraw existing services (**Termination**) or to modify the specifications and prices of existing services (**Modification**) at any time. If the modification or termination affects a service that you are using at that time, we will inform you via email that said service will be automatically modified and/or is no longer available after a period of 30 days.
 
+If such modification would have a disadvantageous impact on the Customer use of service, CAOS and Customer must discuss the change with the Customer first and, to the best of its ability, find a solution that is acceptable to both Parties. If such a solution cannot be found, CAOS may implement the modification and Customer may submit notice of termination of the relevant Service (email is sufficient) before the modification becomes effective without being obliged to pay contractual penalties or termination fees. CAOS may modify the prices for a service after the minimum term of the agreement.
+
 ### Modification of services booked by you
 
 You may change or terminate Services booked by you at any time. Modifications will take effect in the next billing period, or as agreed otherwise between the Parties. Changing services booked by you requires a new PO, stating the new conditions of the services after Modification, to be accepted by the Parties.
@@ -101,7 +103,6 @@ Initial know-how transfer for the services will be organized in training session
 You will take appropriate measures to prevent any misuse of the services you booked. These include, for example, securing the software used and the prompt installation of security updates as well as using suitably secure passwords.
 
 ### Disaster recovery
-
 
 Any liability for damages, indirect or direct, in case of data loss is explicitly rejected.
 
@@ -212,9 +213,9 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 ### Entry into force
 
-These TOS shall enter into force as of August 23, 2021.
+These TOS shall enter into force as of 15.07.2022.
 
-Last revised: August 23, 2021
+Last revised: June 14, 2022
 
 ### Amendments
 
