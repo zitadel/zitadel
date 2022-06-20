@@ -175,9 +175,9 @@ Grab the access_token value and export as an environment variable:
 export ACCESS_TOKEN="jZuRixKQTVecEjKqw...kc3G4"
 ```
 
-### Request user info
+### Request metadata from userinfo endpoint
 
-With the access token we can make a request to the userinfo endpoint to get the user's metadata.
+With the access token we can make a request to the userinfo endpoint to get the user's metadata. This method is the preferred method to retrieve a user's information.
 
 ```bash
 curl --request GET \
@@ -207,3 +207,24 @@ The response will look something like this
 ```
 
 You can grab the metadata from the reserved claim `"urn:zitadel:iam:user:metadata"` as key-value pairs. Note that the values are base64 encoded. So the value `MTIzNA` decodes to `1234`.
+
+### Send metadata inside the ID token (optional)
+
+Check "User Info inside ID Token" in the configuration of your application.
+
+![](static/img/console_projects_application_token_settings.png)
+
+Now request a new token from ZITADEL.
+
+The result will give you something like:
+
+```json
+{
+    "access_token":"jZuRixKQTVecEjKqw...kc3G4",
+    "token_type":"Bearer",
+    "expires_in":43199,
+    "id_token":"ey...Ww"
+}
+```
+
+Grab the id_token and inspect the contents of the token at [jwt.io](https://jwt.io/). You should get the same info in the ID token as when requested from the user endpoint.
