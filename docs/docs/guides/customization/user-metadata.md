@@ -212,7 +212,7 @@ You can grab the metadata from the reserved claim `"urn:zitadel:iam:user:metadat
 
 Check "User Info inside ID Token" in the configuration of your application.
 
-![](static/img/console_projects_application_token_settings.png)
+![](/img/console_projects_application_token_settings.png)
 
 Now request a new token from ZITADEL.
 
