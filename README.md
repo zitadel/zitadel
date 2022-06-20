@@ -46,7 +46,7 @@ With ZITADEL you rely on a battle tested, hardened and extensible turnkey soluti
 The easiest way to get started with ZITADEL is to use our public cloud offering.
 Currently ZITADEL V2 Beta is available, head over to our [Customer Portal](https://zitadel.cloud) to create your first ZITADEL instance.
 
-You can also discovery our pay-as-you-go [pricing](https://zitadel.com/pricing/v2).
+You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing/v2).
 
 ### Install ZITADEL
 
