@@ -111,6 +111,8 @@ Export the result to the environment variable `BASIC_AUTH`.
 
 ### Create Auth Request
 
+You need to create a valid auth request, including the reserved scope `urn:zitadel:iam:user:metadata`. Please refer to our API documentation for more information about [reserved scopes](https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes).
+
 <Tabs>
 
 <TabItem value="default" label="Default" default>
@@ -177,7 +179,7 @@ export ACCESS_TOKEN="jZuRixKQTVecEjKqw...kc3G4"
 
 ### Request metadata from userinfo endpoint
 
-With the access token we can make a request to the userinfo endpoint to get the user's metadata. This method is the preferred method to retrieve a user's information.
+With the access token we can make a request to the userinfo endpoint to get the user's metadata. This method is the preferred method to retrieve a user's information in combination with opaque tokens, to insure that the token is valid.
 
 ```bash
 curl --request GET \
