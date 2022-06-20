@@ -45,7 +45,7 @@ export ZITADEL_DOMAIN="https://...asd.zitadel.cloud"
 ```
 
 <Tabs>
-<TabItem value="zitadeltools" label="ZITADEL Tools" default>
+<TabItem value="go" label="Go" default>
 
 Grab zitadel-tools to create the [required string](https://docs.zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic) for Basic authentication:
 
@@ -57,7 +57,29 @@ export BASIC_AUTH="$(go run basicauth.go -id $CLIENT_ID -secret $CLIENT_SECRET)"
 
 </TabItem>
 
-<TabItem value="other" label="Other">
+<TabItem value="python" label="Python" default>
+
+Grab zitadel-tools to create the [required string](https://docs.zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic) for Basic authentication:
+
+```python
+import base64
+import urllib.parse
+import os
+
+clientId = os.environ.get("CLIENT_ID")
+clientSecret = os.environ.get("CLIENT_SECRET")
+
+escaped = safe_string = urllib.parse.quote_plus(clientId) + ":" + urllib.parse.quote_plus(clientSecret)
+message_bytes = escaped.encode('ascii')
+base64_bytes = base64.b64encode(message_bytes)
+base64_message = base64_bytes.decode('ascii')
+
+print(base64_message)
+```
+
+</TabItem>
+
+<TabItem value="manually" label="Manually">
 
 You need to create a string as described [here](https://docs.zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic).
 
