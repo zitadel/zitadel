@@ -31,7 +31,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 					[]byte(`{"generatorType": 1}`),
 				), instance.SecretGeneratorRemovedEventMapper),
 			},
-			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorRemoved,
+			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -59,7 +59,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
 				), instance.SecretGeneratorChangedEventMapper),
 			},
-			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorChanged,
+			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -95,7 +95,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
 				), instance.SecretGeneratorAddedEventMapper),
 			},
-			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorAdded,
+			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),

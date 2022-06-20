@@ -91,7 +91,7 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, saml *domain.SAMLA
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2n8uU", "Errors.Project.App.NotExisting")
 	}
 	if !existingSAML.IsSAML() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GBr34", "Errors.Project.App.IsNotOIDC")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GBr35", "Errors.Project.App.IsNotSAML")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingSAML.WriteModel)
 
@@ -102,6 +102,8 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, saml *domain.SAMLA
 			return nil, err
 		}
 		metadata = data
+	} else {
+		metadata = []byte(saml.Metadata)
 	}
 
 	entity, err := xml.ParseMetadataXmlIntoStruct(metadata)

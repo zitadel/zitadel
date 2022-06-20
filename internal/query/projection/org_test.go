@@ -30,7 +30,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), org.DomainPrimarySetEventMapper),
 			},
-			reduce: (&OrgProjection{}).reducePrimaryDomainSet,
+			reduce: (&orgProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -60,7 +60,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					nil,
 				), org.OrgReactivatedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgReactivated,
+			reduce: (&orgProjection{}).reduceOrgReactivated,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -90,7 +90,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					nil,
 				), org.OrgDeactivatedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgDeactivated,
+			reduce: (&orgProjection{}).reduceOrgDeactivated,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -120,7 +120,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "new name"}`),
 				), org.OrgChangedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgChanged,
+			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -150,7 +150,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgChangedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgChanged,
+			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -168,7 +168,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "name"}`),
 				), org.OrgAddedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgAdded,
+			reduce: (&orgProjection{}).reduceOrgAdded,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),

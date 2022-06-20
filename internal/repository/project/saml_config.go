@@ -98,7 +98,8 @@ func NewSAMLConfigChangedEvent(
 			aggregate,
 			SAMLConfigChangedType,
 		),
-		AppID: appID,
+		AppID:    appID,
+		EntityID: entityID,
 	}
 	for _, change := range changes {
 		change(changeEvent)

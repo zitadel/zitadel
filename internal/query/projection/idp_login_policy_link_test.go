@@ -34,7 +34,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 }`),
 				), instance.IdentityProviderAddedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceAdded,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
@@ -71,7 +71,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 }`),
 				), instance.IdentityProviderRemovedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceRemoved,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
@@ -102,7 +102,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 }`),
 				), instance.IdentityProviderCascadeRemovedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceCascadeRemoved,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
@@ -133,7 +133,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 }`),
 				), org.IdentityProviderAddedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceAdded,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -170,7 +170,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 }`),
 				), org.IdentityProviderRemovedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceRemoved,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -201,7 +201,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 }`),
 				), org.IdentityProviderCascadeRemovedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceCascadeRemoved,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -229,7 +229,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgRemovedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceOrgRemoved,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceOrgRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -258,7 +258,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 					}`),
 				), org.IDPConfigRemovedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -288,7 +288,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 					}`),
 				), instance.IDPConfigRemovedEventMapper),
 			},
-			reduce: (&IDPLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,

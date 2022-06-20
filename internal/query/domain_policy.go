@@ -80,7 +80,11 @@ var (
 	}
 )
 
-func (q *Queries) DomainPolicyByOrg(ctx context.Context, orgID string) (*DomainPolicy, error) {
+func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*DomainPolicy, error) {
+	if shouldTriggerBulk {
+		projection.DomainPolicyProjection.TriggerBulk(ctx)
+	}
+
 	stmt, scan := prepareDomainPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{

@@ -49,9 +49,11 @@ export class StatehandlerServiceImpl implements StatehandlerService, OnDestroy {
       switchMap((url: string) => {
         if (url.includes('?login_hint=')) {
           const newUrl = this.removeParam('login_hint', url);
-          return of(this.processor.createState(newUrl));
+          const urlWithoutBasePath = newUrl.startsWith('/ui/console') ? newUrl.replace('/ui/console', '') : newUrl;
+          return of(this.processor.createState(urlWithoutBasePath));
         } else if (url) {
-          return of(this.processor.createState(url));
+          const urlWithoutBasePath = url.startsWith('/ui/console') ? url.replace('/ui/console', '') : url;
+          return of(this.processor.createState(urlWithoutBasePath));
         } else {
           return of(undefined);
         }

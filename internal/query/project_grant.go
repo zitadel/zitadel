@@ -101,7 +101,11 @@ type ProjectGrantSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGrant, error) {
+func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string) (*ProjectGrant, error) {
+	if shouldTriggerBulk {
+		projection.ProjectGrantProjection.TriggerBulk(ctx)
+	}
+
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectGrantColumnGrantID.identifier():    id,
@@ -128,11 +132,6 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
-}
-
-func (q *Queries) ExistsProjectGrant(ctx context.Context, id string) (err error) {
-	_, err = q.ProjectGrantByID(ctx, id)
-	return err
 }
 
 func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries) (projects *ProjectGrants, err error) {

@@ -26,12 +26,12 @@ const (
 	PersonalAccessTokenColumnScopes        = "scopes"
 )
 
-type PersonalAccessTokenProjection struct {
+type personalAccessTokenProjection struct {
 	crdb.StatementHandler
 }
 
-func NewPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PersonalAccessTokenProjection {
-	p := new(PersonalAccessTokenProjection)
+func newPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *personalAccessTokenProjection {
+	p := new(personalAccessTokenProjection)
 	config.ProjectionName = PersonalAccessTokenProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -56,7 +56,7 @@ func NewPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 	return p
 }
 
-func (p *PersonalAccessTokenProjection) reducers() []handler.AggregateReducer {
+func (p *personalAccessTokenProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -78,7 +78,7 @@ func (p *PersonalAccessTokenProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DVgf7", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
@@ -99,7 +99,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 	), nil
 }
 
-func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g7u3F", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
@@ -112,7 +112,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 	), nil
 }
 
-func (p *PersonalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff3h", "reduce.wrong.event.type %s", user.UserRemovedType)

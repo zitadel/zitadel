@@ -187,8 +187,18 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 	}
 
 	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return err
+	}
+
+	if user.Sequence < event.Sequence {
+		if err = n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
+	}
+
+	if user.Sequence == 0 {
+		return errors.ThrowNotFound(nil, "HANDL-JED2R", "no user events found")
 	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.InitCodeMessageType)
@@ -230,8 +240,18 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	}
 
 	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return err
+	}
+
+	if user.Sequence < event.Sequence {
+		if err = n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
+	}
+
+	if user.Sequence == 0 {
+		return errors.ThrowNotFound(nil, "HANDL-JED2R", "no user events found")
 	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.PasswordResetMessageType)
@@ -273,8 +293,17 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 	}
 
 	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return err
+	}
+	if user.Sequence < event.Sequence {
+		if err = n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
+	}
+
+	if user.Sequence == 0 {
+		return errors.ThrowNotFound(nil, "HANDL-JED2R", "no user events found")
 	}
 
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyEmailMessageType)
@@ -306,9 +335,20 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 		return nil
 	}
 	user, err := n.getUserByID(event.AggregateID, event.InstanceID)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
+
+	if user.Sequence < event.Sequence {
+		if err = n.verifyLatestUser(ctx, user); err != nil {
+			return err
+		}
+	}
+
+	if user.Sequence == 0 {
+		return errors.ThrowNotFound(nil, "HANDL-JED2R", "no user events found")
+	}
+
 	translator, err := n.getTranslatorWithOrgTexts(ctx, user.ResourceOwner, domain.VerifyPhoneMessageType)
 	if err != nil {
 		return err
@@ -581,4 +621,17 @@ func (n *Notification) origin(ctx context.Context) (string, error) {
 		return "", errors.ThrowInternal(nil, "NOTIF-Ef3r1", "Errors.Notification.NoDomain")
 	}
 	return http_utils.BuildHTTP(domains.Domains[0].Domain, n.externalPort, n.externalSecure), nil
+}
+
+func (n *Notification) verifyLatestUser(ctx context.Context, user *model.NotifyUser) error {
+	events, err := n.getUserEvents(ctx, user.ID, user.InstanceID, user.Sequence)
+	if err != nil {
+		return err
+	}
+	for _, event := range events {
+		if err = user.AppendEvent(event); err != nil {
+			return err
+		}
+	}
+	return nil
 }

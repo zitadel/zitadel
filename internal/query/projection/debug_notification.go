@@ -27,12 +27,12 @@ const (
 	DebugNotificationProviderCompactCol       = "compact"
 )
 
-type DebugNotificationProviderProjection struct {
+type debugNotificationProviderProjection struct {
 	crdb.StatementHandler
 }
 
-func NewDebugNotificationProviderProjection(ctx context.Context, config crdb.StatementHandlerConfig) *DebugNotificationProviderProjection {
-	p := &DebugNotificationProviderProjection{}
+func newDebugNotificationProviderProjection(ctx context.Context, config crdb.StatementHandlerConfig) *debugNotificationProviderProjection {
+	p := &debugNotificationProviderProjection{}
 	config.ProjectionName = DebugNotificationProviderTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -54,7 +54,7 @@ func NewDebugNotificationProviderProjection(ctx context.Context, config crdb.Sta
 	return p
 }
 
-func (p *DebugNotificationProviderProjection) reducers() []handler.AggregateReducer {
+func (p *debugNotificationProviderProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -88,7 +88,7 @@ func (p *DebugNotificationProviderProjection) reducers() []handler.AggregateRedu
 	}
 }
 
-func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderAdded(event eventstore.Event) (*handler.Statement, error) {
 	var providerEvent settings.DebugNotificationProviderAddedEvent
 	var providerType domain.NotificationProviderType
 	switch e := event.(type) {
@@ -115,7 +115,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 	}), nil
 }
 
-func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderChanged(event eventstore.Event) (*handler.Statement, error) {
 	var providerEvent settings.DebugNotificationProviderChangedEvent
 	var providerType domain.NotificationProviderType
 	switch e := event.(type) {
@@ -147,7 +147,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderCha
 	), nil
 }
 
-func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var providerEvent settings.DebugNotificationProviderRemovedEvent
 	var providerType domain.NotificationProviderType
 	switch e := event.(type) {

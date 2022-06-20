@@ -31,7 +31,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"applicationId": "appId", "clientId":"clientId","keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
 				), project.ApplicationKeyAddedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyAdded,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyAdded,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -68,7 +68,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
 				), user.MachineKeyAddedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyAdded,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyAdded,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),
@@ -105,7 +105,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"keyId": "keyId"}`),
 				), project.ApplicationKeyRemovedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -132,7 +132,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"appId": "appId"}`),
 				), project.APIConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -152,7 +152,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"appId": "appId", "authMethodType": 0}`),
 				), project.APIConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -180,7 +180,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"appId": "appId", "authMethodType": 1}`),
 				), project.APIConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -208,7 +208,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"keyId": "keyId"}`),
 				), user.MachineKeyRemovedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),
@@ -235,7 +235,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"appId": "appId"}`),
 				), project.OIDCConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -255,7 +255,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"appId": "appId", "authMethodType": 0}`),
 				), project.OIDCConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -283,7 +283,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"appId": "appId", "authMethodType": 3}`),
 				), project.OIDCConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -311,7 +311,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"keyId": "keyId"}`),
 				), project.ApplicationKeyRemovedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -338,7 +338,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"appId": "appId"}`),
 				), project.ApplicationRemovedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -365,7 +365,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					nil,
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -392,7 +392,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"keyId": "keyId"}`),
 				), user.MachineKeyRemovedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),
@@ -419,7 +419,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 					[]byte(`{"keyId": "keyId"}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),

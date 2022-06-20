@@ -25,12 +25,12 @@ const (
 	OrgDomainValidationTypeCol = "validation_type"
 )
 
-type OrgDomainProjection struct {
+type orgDomainProjection struct {
 	crdb.StatementHandler
 }
 
-func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgDomainProjection {
-	p := new(OrgDomainProjection)
+func newOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgDomainProjection {
+	p := new(orgDomainProjection)
 	config.ProjectionName = OrgDomainTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -52,7 +52,7 @@ func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerCon
 	return p
 }
 
-func (p *OrgDomainProjection) reducers() []handler.AggregateReducer {
+func (p *orgDomainProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -82,7 +82,7 @@ func (p *OrgDomainProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DM2DI", "reduce.wrong.event.type %s", org.OrgDomainAddedEventType)
@@ -103,7 +103,7 @@ func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainProjection) reduceDomainVerificationAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerificationAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-EBzyu", "reduce.wrong.event.type %s", org.OrgDomainVerificationAddedEventType)
@@ -123,7 +123,7 @@ func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Eve
 	), nil
 }
 
-func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3Rvkr", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
@@ -143,7 +143,7 @@ func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-aIuei", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
@@ -177,7 +177,7 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *OrgDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gh1Mx", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)

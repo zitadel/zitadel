@@ -66,17 +66,12 @@ func (wm *SAMLApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *project.OIDCConfigAddedEvent:
+		case *project.SAMLConfigAddedEvent:
 			if e.AppID != wm.AppID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *project.OIDCConfigChangedEvent:
-			if e.AppID != wm.AppID {
-				continue
-			}
-			wm.WriteModel.AppendEvents(e)
-		case *project.OIDCConfigSecretChangedEvent:
+		case *project.SAMLConfigChangedEvent:
 			if e.AppID != wm.AppID {
 				continue
 			}

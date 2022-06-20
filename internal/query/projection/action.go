@@ -26,12 +26,12 @@ const (
 	ActionAllowedToFailCol = "allowed_to_fail"
 )
 
-type ActionProjection struct {
+type actionProjection struct {
 	crdb.StatementHandler
 }
 
-func NewActionProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ActionProjection {
-	p := new(ActionProjection)
+func newActionProjection(ctx context.Context, config crdb.StatementHandlerConfig) *actionProjection {
+	p := new(actionProjection)
 	config.ProjectionName = ActionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -56,7 +56,7 @@ func NewActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 	return p
 }
 
-func (p *ActionProjection) reducers() []handler.AggregateReducer {
+func (p *actionProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: action.AggregateType,
@@ -86,7 +86,7 @@ func (p *ActionProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *ActionProjection) reduceActionAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.AddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff21", "reduce.wrong.event.type% s", action.AddedEventType)
@@ -109,7 +109,7 @@ func (p *ActionProjection) reduceActionAdded(event eventstore.Event) (*handler.S
 	), nil
 }
 
-func (p *ActionProjection) reduceActionChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Gg43d", "reduce.wrong.event.type %s", action.ChangedEventType)
@@ -139,7 +139,7 @@ func (p *ActionProjection) reduceActionChanged(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *ActionProjection) reduceActionDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.DeactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Fgh32", "reduce.wrong.event.type %s", action.DeactivatedEventType)
@@ -157,7 +157,7 @@ func (p *ActionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *ActionProjection) reduceActionReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ReactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hwdqa", "reduce.wrong.event.type% s", action.ReactivatedEventType)
@@ -175,7 +175,7 @@ func (p *ActionProjection) reduceActionReactivated(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *ActionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type% s", action.RemovedEventType)

@@ -18,6 +18,7 @@ import (
 	query2 "github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
@@ -164,14 +165,44 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		user_repo.HumanPasswordlessInitCodeRequestedType:
 		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
-			return err
+			if !errors.IsNotFound(err) {
+				return err
+			}
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			if err != nil {
+				return err
+			}
+			events, err := u.es.FilterEvents(context.Background(), query)
+			if err != nil {
+				return err
+			}
+			for _, e := range events {
+				if err = user.AppendEvent(e); err != nil {
+					return err
+				}
+			}
 		}
 		err = user.AppendEvent(event)
 	case user_repo.UserDomainClaimedType,
 		user_repo.UserUserNameChangedType:
 		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
-			return err
+			if !errors.IsNotFound(err) {
+				return err
+			}
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			if err != nil {
+				return err
+			}
+			events, err := u.es.FilterEvents(context.Background(), query)
+			if err != nil {
+				return err
+			}
+			for _, e := range events {
+				if err = user.AppendEvent(e); err != nil {
+					return err
+				}
+			}
 		}
 		err = user.AppendEvent(event)
 		if err != nil {

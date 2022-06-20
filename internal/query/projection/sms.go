@@ -32,12 +32,12 @@ const (
 	SMSTwilioConfigColumnToken        = "token"
 )
 
-type SMSConfigProjection struct {
+type smsConfigProjection struct {
 	crdb.StatementHandler
 }
 
-func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SMSConfigProjection {
-	p := new(SMSConfigProjection)
+func newSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerConfig) *smsConfigProjection {
+	p := new(smsConfigProjection)
 	config.ProjectionName = SMSConfigProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewMultiTableCheck(
@@ -69,7 +69,7 @@ func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 	return p
 }
 
-func (p *SMSConfigProjection) reducers() []handler.AggregateReducer {
+func (p *smsConfigProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -103,7 +103,7 @@ func (p *SMSConfigProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigTwilioAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s8efs", "reduce.wrong.event.type %s", instance.SMSConfigTwilioAddedEventType)
@@ -136,7 +136,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 	), nil
 }
 
-func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigTwilioChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioChangedEventType)
@@ -172,7 +172,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 	), nil
 }
 
-func (p *SMSConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *smsConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigTwilioTokenChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioTokenChangedEventType)
@@ -205,7 +205,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore
 	), nil
 }
 
-func (p *SMSConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *smsConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigActivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fj9Ef", "reduce.wrong.event.type %s", instance.SMSConfigActivatedEventType)
@@ -224,7 +224,7 @@ func (p *SMSConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (
 	), nil
 }
 
-func (p *SMSConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *smsConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigDeactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dj9Js", "reduce.wrong.event.type %s", instance.SMSConfigDeactivatedEventType)
@@ -243,7 +243,7 @@ func (p *SMSConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event)
 	), nil
 }
 
-func (p *SMSConfigProjection) reduceSMSConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *smsConfigProjection) reduceSMSConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s9JJf", "reduce.wrong.event.type %s", instance.SMSConfigRemovedEventType)
