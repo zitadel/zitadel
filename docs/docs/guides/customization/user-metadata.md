@@ -77,6 +77,8 @@ base64_message = base64_bytes.decode('ascii')
 print(base64_message)
 ```
 
+Export the result to the environment variable `BASIC_AUTH`.
+
 </TabItem>
 
 <TabItem value="manually" label="Manually">
@@ -87,6 +89,8 @@ Use a programming language of your choice or manually create the strings with on
 
 - https://www.urlencoder.org/
 - https://www.base64encode.org/
+
+Export the result to the environment variable `BASIC_AUTH`.
 
 </TabItem>
 </Tabs>
