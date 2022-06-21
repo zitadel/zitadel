@@ -1176,6 +1176,18 @@ failed event. You can find out if it worked on the `failure_count`
     DELETE: /failedevents/{database}/{view_name}/{failed_sequence}
 
 
+### ExportData
+
+> **rpc** ExportData([ExportDataRequest](#exportdatarequest))
+[ExportDataResponse](#exportdataresponse)
+
+export data into instance and creates different objects
+
+
+
+    POST: /export
+
+
 
 
 
@@ -1391,6 +1403,121 @@ This is an empty response
 
 
 
+### DataAPIApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddAPIAppRequest | - |  |
+
+
+
+
+### DataAction
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| action_id |  string | - |  |
+| action |  zitadel.management.v1.CreateActionRequest | - |  |
+
+
+
+
+### DataHumanUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  ExportHumanUser | - |  |
+
+
+
+
+### DataMachineUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| user |  zitadel.management.v1.AddMachineUserRequest | - |  |
+
+
+
+
+### DataOIDCApplication
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| app |  zitadel.management.v1.AddOIDCAppRequest | - |  |
+
+
+
+
+### DataOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| org |  zitadel.management.v1.AddOrgRequest | - |  |
+| iam_policy |  AddCustomOrgIAMPolicyRequest | - |  |
+| label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
+| lockout_policy |  zitadel.management.v1.AddCustomLockoutPolicyRequest | - |  |
+| login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
+| password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
+| privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
+| projects | repeated DataProject | - |  |
+| project_roles | repeated zitadel.management.v1.AddProjectRoleRequest | - |  |
+| api_apps | repeated DataAPIApplication | - |  |
+| oidc_apps | repeated DataOIDCApplication | - |  |
+| human_users | repeated DataHumanUser | - |  |
+| machine_users | repeated DataMachineUser | - |  |
+| trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
+| actions | repeated DataAction | - |  |
+| project_grants | repeated DataProjectGrant | - |  |
+| user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
+| org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
+| project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
+| project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+
+
+
+
+### DataProject
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| project |  zitadel.management.v1.AddProjectRequest | - |  |
+
+
+
+
+### DataProjectGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| grant_id |  string | - |  |
+| project_grant |  zitadel.management.v1.AddProjectGrantRequest | - |  |
+
+
+
+
 ### DeactivateIDPRequest
 
 
@@ -1409,6 +1536,99 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ExportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_ids | repeated string | - |  |
+| with_passwords |  bool | - |  |
+
+
+
+
+### ExportDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated DataOrg | - |  |
+
+
+
+
+### ExportHumanUser
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| profile |  ExportHumanUser.Profile | - | message.required: true<br />  |
+| email |  ExportHumanUser.Email | - | message.required: true<br />  |
+| phone |  ExportHumanUser.Phone | - |  |
+| password |  string | - |  |
+| hashed_password |  ExportHumanUser.HashedPassword | - |  |
+| password_change_required |  bool | - |  |
+| request_passwordless_registration |  bool | - |  |
+
+
+
+
+### ExportHumanUser.Email
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| is_email_verified |  bool | - |  |
+
+
+
+
+### ExportHumanUser.HashedPassword
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| value |  string | - |  |
+| algorithm |  string | - |  |
+
+
+
+
+### ExportHumanUser.Phone
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| phone |  string | has to be a global number | string.min_len: 1<br /> string.max_len: 50<br /> string.prefix: +<br />  |
+| is_phone_verified |  bool | - |  |
+
+
+
+
+### ExportHumanUser.Profile
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| nick_name |  string | - | string.max_len: 200<br />  |
+| display_name |  string | - | string.max_len: 200<br />  |
+| preferred_language |  string | - | string.max_len: 10<br />  |
+| gender |  zitadel.user.v1.Gender | - |  |
 
 
 
