@@ -224,12 +224,17 @@ func TestSpooler_awaitError(t *testing.T) {
 			s := &spooledHandler{
 				Handler: tt.fields.currentHandler,
 			}
+			c := make(chan interface{})
 			errs := make(chan error)
 			ctx, cancel := context.WithCancel(context.Background())
 
-			go s.awaitError(cancel, errs, "test")
+			go func() {
+				s.awaitError(cancel, errs, "test")
+				c <- nil
+			}()
 			errs <- tt.fields.err
 
+			<-c
 			if ctx.Err() == nil {
 				t.Error("cancel function was not called")
 			}

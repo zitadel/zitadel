@@ -46,6 +46,7 @@ module.exports = {
         "guides/basics/instance",
         "guides/basics/organizations",
         "guides/basics/projects",
+        "guides/basics/applications",
       ],
     },
     {
@@ -54,6 +55,8 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/integrations/authenticated-mongodb-charts",
+        "guides/integrations/auth0",
+        "guides/integrations/gitlab-self-hosted",
       ],
     },
     {
@@ -234,24 +237,18 @@ module.exports = {
     "legal/data-processing-agreement",
     {
       type: "category",
-      label: "Service Descriptions",
+      label: "Service Description",
       collapsed: false,
-      items: ["legal/service-level-description", "legal/support-services"],
+      items: ["legal/cloud-service-description", "legal/service-level-description", "legal/support-services"],
     },
     {
       type: "category",
-      label: "Dedicated Instance",
-      collapsed: false,
+      label: "Additional terms",
+      collapsed: true,
       items: [
+        "legal/terms-support-service",
         "legal/terms-of-service-dedicated",
-        "legal/dedicated-instance-annex",
       ],
-    },
-    {
-      type: "category",
-      label: "Support Program",
-      collapsed: false,
-      items: ["legal/terms-support-service"],
     },
     {
       type: "category",

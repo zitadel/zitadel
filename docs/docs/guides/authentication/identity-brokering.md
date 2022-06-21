@@ -51,8 +51,8 @@ In this exercise we will add a new Google identity provider to federate identiti
 
 1. Register an OIDC Client in your preferred provider
 2. Make sure you add the ZITADEL callback redirect uris
-   https://accounts.zitadel.ch/register/externalidp/callback
-   https://accounts.zitadel.ch/login/externalidp/callback
+   - {your-domain}/ui/login/register/externalidp/callback
+   - {your-domain}/ui/login/login/externalidp/callback
 
 > **Information:** Make sure the provider is OIDC 1.0 compliant with a proper Discovery Endpoint
 
@@ -61,7 +61,9 @@ Google Example:
 1. Go to the Google Gloud Platform and choose youre project: <https://console.cloud.google.com/apis/credentials>
 2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
 3. Choose Web application as Application type and give a name
-4. Add the redirect uris from above
+4. Add the redirect uris
+   - {your-domain}/ui/login/register/externalidp/callback
+   - {your-domain}/ui/login/login/externalidp/callback
 5. Save clientid and client secret
 
 ![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
@@ -71,25 +73,26 @@ Google Example:
 The login policy can be configured on two levels. Once as default on the instance and this can be overwritten for each organization.
 This case describes how to change it on the organization.
 
-1. Go to your organization settings by clicking on "Organization" in the menu or using the following link: <https://console.zitadel.ch/org>
+1. Go to your organization settings by clicking on "Organization" in the menu
 2. Modify your login policy in the menu "Login Behaviour and Security"
 
 ![Add custom login policy](/img/console_org_custom_login_policy.gif)
 
-### 3.Configure new identity provider
+### 3. Configure new identity provider
 
-1. Go to the identity providers section and click new
-2. Fill out the form
-   - Use the issuer, clientid and client secret provided by your provider
+1. Go to the settings of your instance or a specific organization (depending on where you need the identity provider)
+2. Go to the identity providers section and click "New"
+3. Select "OIDC Configuration" and fill out the form
+   - Use the issuer, clientid and client secret provided by your provider (Google Issuer: https://accounts.google.com)
    - The scopes will be prefilled with openid, profile and email, because this information is relevant for ZITADEL
    - You can choose what fields you like to map as the display name and as username. The fields you can choose are preferred_username and email
      (Example: For Google you should choose email for both fields)
-3. Save your configuration
-4. Link your new configuration to your login policy. By searching in the organization category you will get you own configuration. If you choose system you can link all predefined providers.
+4. Save your configuration
+5. You will now see the created configuration in the list. Click on the activate icon at the end of the row you can see when hovering over the row, to activate it in the login flow.
 
 ![Configure identity provider](/img/console_org_identity_provider.gif)
 
-### 4.Send the primary domain scope on the authorization request
+### 4. Send the primary domain scope on the authorization request
 ZITADEL will show a set of identity providers by default. This configuration can be changed by users with the [manager role] (https://docs.zitadel.com/docs/concepts/zitadel/objects/managers) `IAM_OWNER`.
 
 An organization's login settings will be shown 
@@ -99,20 +102,9 @@ An organization's login settings will be shown
 To get your own configuration you will have to send the [primary domain scope](https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes) in your [authorization request](https://docs.zitadel.com/docs/guides/authentication/login-users/#auth-request) .
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login, also your branding and policies will trigger.
 
-See the following link as an example. Users will be able to register and login to the organization that verified the @caos.ch domain only.
-```
-https://accounts.zitadel.ch/oauth/v2/authorize?client_id=69234247558357051%40zitadel&scope=openid%20profile%20urn%3Azitadel%3Aiam%3Aorg%3Adomain%3Aprimary%3Acaos.ch&redirect_uri=https%3A%2F%2Fconsole.zitadel.ch%2Fauth%2Fcallback&state=testd&response_type=code&nonce=test&code_challenge=UY30LKMy4bZFwF7Oyk6BpJemzVblLRf0qmFT8rskUW0
-```
+:::note
 
-:::info
-
-Make sure to replace the domain `caos.ch` with your own domain to trigger the correct branding.
-
-:::
-
-:::caution
-
-This example uses the ZITADEL Cloud Application for demonstration. You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](https://docs.zitadel.com/docs/guides/authentication/login-users/#auth-request).
+You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](https://docs.zitadel.com/docs/guides/authentication/login-users/#auth-request).
 
 :::
 

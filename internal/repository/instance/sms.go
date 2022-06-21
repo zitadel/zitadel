@@ -140,7 +140,7 @@ type SMSConfigTwilioTokenChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID    string              `json:"id,omitempty"`
-	Token *crypto.CryptoValue `json:"password,omitempty"`
+	Token *crypto.CryptoValue `json:"token,omitempty"`
 }
 
 func NewSMSConfigTokenChangedEvent(

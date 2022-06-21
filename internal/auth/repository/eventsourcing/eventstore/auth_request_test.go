@@ -128,7 +128,7 @@ type mockLoginPolicy struct {
 	policy *query.LoginPolicy
 }
 
-func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, id string) (*query.LoginPolicy, error) {
+func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, _ bool, id string) (*query.LoginPolicy, error) {
 	return m.policy, nil
 }
 
@@ -136,7 +136,7 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, string) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error) {
 	return m.policy, nil
 }
 
@@ -164,7 +164,7 @@ type mockViewOrg struct {
 	State domain.OrgState
 }
 
-func (m *mockViewOrg) OrgByID(context.Context, string) (*query.Org, error) {
+func (m *mockViewOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
 	return &query.Org{
 		State: m.State,
 	}, nil
@@ -178,7 +178,7 @@ func (m *mockViewOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, er
 
 type mockViewErrOrg struct{}
 
-func (m *mockViewErrOrg) OrgByID(context.Context, string) (*query.Org, error) {
+func (m *mockViewErrOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -195,7 +195,7 @@ func (m *mockUserGrants) ProjectByOIDCClientID(ctx context.Context, s string) (*
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
-func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*query.UserGrant, error) {
+func (m *mockUserGrants) UserGrantsByProjectAndUserID(ctx context.Context, s string, s2 string) ([]*query.UserGrant, error) {
 	var grants []*query.UserGrant
 	if m.userGrants > 0 {
 		grants = make([]*query.UserGrant, m.userGrants)

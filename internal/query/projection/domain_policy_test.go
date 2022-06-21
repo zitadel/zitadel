@@ -35,7 +35,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 }`),
 				), org.DomainPolicyAddedEventMapper),
 			},
-			reduce: (&DomainPolicyProjection{}).reduceAdded,
+			reduce: (&domainPolicyProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
@@ -65,7 +65,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceChanged",
-			reduce: (&DomainPolicyProjection{}).reduceChanged,
+			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyChangedEventType),
@@ -101,7 +101,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&DomainPolicyProjection{}).reduceRemoved,
+			reduce: (&domainPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyRemovedEventType),
@@ -128,7 +128,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceAdded",
-			reduce: (&DomainPolicyProjection{}).reduceAdded,
+			reduce: (&domainPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DomainPolicyAddedEventType),
@@ -169,7 +169,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceChanged",
-			reduce: (&DomainPolicyProjection{}).reduceChanged,
+			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DomainPolicyChangedEventType),

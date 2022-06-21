@@ -115,7 +115,7 @@ type queryViewWrapper struct {
 	*auth_view.View
 }
 
-func (q queryViewWrapper) UserGrantsByProjectAndUserID(projectID, userID string) ([]*query.UserGrant, error) {
+func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, projectID, userID string) ([]*query.UserGrant, error) {
 	userGrantProjectID, err := query.NewUserGrantProjectIDSearchQuery(projectID)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(projectID, userID string)
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
-	grants, err := q.Queries.UserGrants(context.TODO(), queries)
+	grants, err := q.Queries.UserGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}

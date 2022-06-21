@@ -237,7 +237,11 @@ var (
 	}
 )
 
-func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (*User, error) {
+	if shouldTriggered {
+		projection.UserProjection.TriggerBulk(ctx)
+	}
+
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	query, scan := prepareUserQuery(instanceID)
 	for _, q := range queries {

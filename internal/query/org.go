@@ -86,7 +86,11 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (*Org, error) {
+	if shouldTriggerBulk {
+		projection.OrgProjection.TriggerBulk(ctx)
+	}
+
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnID.identifier():         id,
@@ -142,10 +146,9 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 }
 
 func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
-	_, err = q.OrgByID(ctx, id)
+	_, err = q.OrgByID(ctx, true, id)
 	return err
 }
-
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
 	query, scan := prepareOrgsQuery()
 	stmt, args, err := queries.toQuery(query).

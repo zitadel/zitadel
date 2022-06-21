@@ -28,12 +28,12 @@ const (
 	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
 )
 
-type ProjectProjection struct {
+type projectProjection struct {
 	crdb.StatementHandler
 }
 
-func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
-	p := new(ProjectProjection)
+func newProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectProjection {
+	p := new(projectProjection)
 	config.ProjectionName = ProjectProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -59,7 +59,7 @@ func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 	return p
 }
 
-func (p *ProjectProjection) reducers() []handler.AggregateReducer {
+func (p *projectProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -89,7 +89,7 @@ func (p *ProjectProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-l000S", "reduce.wrong.event.type %s", project.ProjectAddedType)
@@ -113,7 +113,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectChangeEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", project.ProjectChangedType)
@@ -149,7 +149,7 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectDeactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-LLp0f", "reduce.wrong.event.type %s", project.ProjectDeactivatedType)
@@ -167,7 +167,7 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectReactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9J98f", "reduce.wrong.event.type %s", project.ProjectReactivatedType)
@@ -185,7 +185,7 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-5N9fs", "reduce.wrong.event.type %s", project.ProjectRemovedType)

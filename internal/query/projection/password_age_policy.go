@@ -28,12 +28,12 @@ const (
 	AgePolicyMaxAgeDaysCol     = "max_age_days"
 )
 
-type PasswordAgeProjection struct {
+type passwordAgeProjection struct {
 	crdb.StatementHandler
 }
 
-func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordAgeProjection {
-	p := new(PasswordAgeProjection)
+func newPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerConfig) *passwordAgeProjection {
+	p := new(passwordAgeProjection)
 	config.ProjectionName = PasswordAgeTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -56,7 +56,7 @@ func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerC
 	return p
 }
 
-func (p *PasswordAgeProjection) reducers() []handler.AggregateReducer {
+func (p *passwordAgeProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -91,7 +91,7 @@ func (p *PasswordAgeProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordAgeProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordAgePolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -120,7 +120,7 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 		}), nil
 }
 
-func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordAgeProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordAgePolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PasswordAgePolicyChangedEvent:
@@ -148,7 +148,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 		}), nil
 }
 
-func (p *PasswordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *passwordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordAgePolicyRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-EtHWB", "reduce.wrong.event.type %s", org.PasswordAgePolicyRemovedEventType)

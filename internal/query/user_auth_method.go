@@ -3,17 +3,14 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
-	"github.com/zitadel/zitadel/internal/query/projection"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 var (
@@ -82,23 +79,6 @@ type AuthMethod struct {
 type UserAuthMethodSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
-}
-
-func (q *Queries) UserAuthMethodByIDs(ctx context.Context, userID, tokenID, resourceOwner string, methodType domain.UserAuthMethodType) (*AuthMethod, error) {
-	stmt, scan := prepareUserAuthMethodQuery()
-	query, args, err := stmt.Where(sq.Eq{
-		UserAuthMethodColumnUserID.identifier():        userID,
-		UserAuthMethodColumnTokenID.identifier():       tokenID,
-		UserAuthMethodColumnResourceOwner.identifier(): resourceOwner,
-		UserAuthMethodColumnMethodType.identifier():    methodType,
-		UserAuthMethodColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
-	}
-
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
 }
 
 func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries) (userAuthMethods *AuthMethods, err error) {
@@ -211,41 +191,6 @@ func (q *UserAuthMethodSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectB
 		query = q.toQuery(query)
 	}
 	return query
-}
-
-func prepareUserAuthMethodQuery() (sq.SelectBuilder, func(*sql.Row) (*AuthMethod, error)) {
-	return sq.Select(
-			UserAuthMethodColumnTokenID.identifier(),
-			UserAuthMethodColumnCreationDate.identifier(),
-			UserAuthMethodColumnChangeDate.identifier(),
-			UserAuthMethodColumnResourceOwner.identifier(),
-			UserAuthMethodColumnUserID.identifier(),
-			UserAuthMethodColumnSequence.identifier(),
-			UserAuthMethodColumnName.identifier(),
-			UserAuthMethodColumnState.identifier(),
-			UserAuthMethodColumnMethodType.identifier()).
-			From(userAuthMethodTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*AuthMethod, error) {
-			authMethod := new(AuthMethod)
-			err := row.Scan(
-				&authMethod.TokenID,
-				&authMethod.CreationDate,
-				&authMethod.ChangeDate,
-				&authMethod.ResourceOwner,
-				&authMethod.UserID,
-				&authMethod.Sequence,
-				&authMethod.Name,
-				&authMethod.State,
-				&authMethod.Type,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-dniiF", "Errors.AuthMethod.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-3n9Fs", "Errors.Internal")
-			}
-			return authMethod, nil
-		}
 }
 
 func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
