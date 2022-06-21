@@ -57,9 +57,7 @@ export BASIC_AUTH="$(go run basicauth.go -id $CLIENT_ID -secret $CLIENT_SECRET)"
 
 </TabItem>
 
-<TabItem value="python" label="Python" default>
-
-Grab zitadel-tools to create the [required string](https://docs.zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic) for Basic authentication:
+<TabItem value="python" label="Python">
 
 ```python
 import base64
