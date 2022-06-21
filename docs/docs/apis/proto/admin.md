@@ -1755,66 +1755,6 @@ This is an empty request
 
 
 
-### DataAPIApplication
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| app_id |  string | - |  |
-| app |  zitadel.management.v1.AddAPIAppRequest | - |  |
-
-
-
-
-### DataAction
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| action_id |  string | - |  |
-| action |  zitadel.management.v1.CreateActionRequest | - |  |
-
-
-
-
-### DataHumanUser
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - |  |
-| user |  zitadel.management.v1.ImportHumanUserRequest | - |  |
-
-
-
-
-### DataMachineUser
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - |  |
-| user |  zitadel.management.v1.AddMachineUserRequest | - |  |
-
-
-
-
-### DataOIDCApplication
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| app_id |  string | - |  |
-| app |  zitadel.management.v1.AddOIDCAppRequest | - |  |
-
-
-
-
 ### DataOrg
 
 
@@ -1829,43 +1769,19 @@ This is an empty request
 | login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
 | password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
 | privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
-| projects | repeated DataProject | - |  |
+| projects | repeated zitadel.v1.v1.DataProject | - |  |
 | project_roles | repeated zitadel.management.v1.AddProjectRoleRequest | - |  |
-| api_apps | repeated DataAPIApplication | - |  |
-| oidc_apps | repeated DataOIDCApplication | - |  |
-| human_users | repeated DataHumanUser | - |  |
-| machine_users | repeated DataMachineUser | - |  |
+| api_apps | repeated zitadel.v1.v1.DataAPIApplication | - |  |
+| oidc_apps | repeated zitadel.v1.v1.DataOIDCApplication | - |  |
+| human_users | repeated zitadel.v1.v1.DataHumanUser | - |  |
+| machine_users | repeated zitadel.v1.v1.DataMachineUser | - |  |
 | trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
-| actions | repeated DataAction | - |  |
-| project_grants | repeated DataProjectGrant | - |  |
+| actions | repeated zitadel.v1.v1.DataAction | - |  |
+| project_grants | repeated zitadel.v1.v1.DataProjectGrant | - |  |
 | user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
 | org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
 | project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
 | project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
-
-
-
-
-### DataProject
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| project_id |  string | - |  |
-| project |  zitadel.management.v1.AddProjectRequest | - |  |
-
-
-
-
-### DataProjectGrant
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| grant_id |  string | - |  |
-| project_grant |  zitadel.management.v1.AddProjectGrantRequest | - |  |
 
 
 
@@ -2681,13 +2597,25 @@ This is an empty response
 
 
 
-### ImportDataRequest
+### ImportDataOrg
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | orgs | repeated DataOrg | - |  |
+
+
+
+
+### ImportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs |  ImportDataOrg | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1 |  zitadel.v1.v1.ImportDataOrg | - |  |
 
 
 

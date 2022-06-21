@@ -11,6 +11,7 @@ import (
 	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -265,7 +266,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	}, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) ([]*v1_pb.DataHumanUser, []*v1_pb.DataMachineUser, error) {
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
 		return nil, nil, err
@@ -274,12 +275,12 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) (
 	if err != nil {
 		return nil, nil, err
 	}
-	humanUsers := make([]*admin_pb.DataHumanUser, 0)
-	machineUsers := make([]*admin_pb.DataMachineUser, 0)
+	humanUsers := make([]*v1_pb.DataHumanUser, 0)
+	machineUsers := make([]*v1_pb.DataMachineUser, 0)
 	for _, user := range users.Users {
 		switch user.Type {
 		case domain.UserTypeHuman:
-			dataUser := &admin_pb.DataHumanUser{
+			dataUser := &v1_pb.DataHumanUser{
 				UserId: user.ID,
 				User: &management_pb.ImportHumanUserRequest{
 					UserName: user.Username,
@@ -320,7 +321,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) (
 
 			humanUsers = append(humanUsers, dataUser)
 		case domain.UserTypeMachine:
-			machineUsers = append(machineUsers, &admin_pb.DataMachineUser{
+			machineUsers = append(machineUsers, &v1_pb.DataMachineUser{
 				UserId: user.ID,
 				User: &management_pb.AddMachineUserRequest{
 					UserName:    user.Username,
@@ -363,7 +364,7 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 	return triggerActions, nil
 }
 
-func (s *Server) getActions(ctx context.Context, org string) ([]*admin_pb.DataAction, error) {
+func (s *Server) getActions(ctx context.Context, org string) ([]*v1_pb.DataAction, error) {
 	actionSearch, err := query.NewActionResourceOwnerQuery(org)
 	if err != nil {
 		return nil, err
@@ -372,11 +373,11 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*admin_pb.DataAc
 	if err != nil {
 		return nil, err
 	}
-	actions := make([]*admin_pb.DataAction, 0)
+	actions := make([]*v1_pb.DataAction, 0)
 	for _, action := range queriedActions.Actions {
 		timeout := durationpb.New(action.Timeout)
 
-		actions = append(actions, &admin_pb.DataAction{
+		actions = append(actions, &v1_pb.DataAction{
 			ActionId: action.ID,
 			Action: &management_pb.CreateActionRequest{
 				Name:          action.Name,
@@ -390,7 +391,7 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*admin_pb.DataAc
 	return actions, nil
 }
 
-func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*admin_pb.DataOIDCApplication, []*admin_pb.DataAPIApplication, error) {
+func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*v1_pb.DataOIDCApplication, []*v1_pb.DataAPIApplication, error) {
 	projectSearch, err := query.NewProjectResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, nil, nil, nil, err
@@ -400,13 +401,13 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 		return nil, nil, nil, nil, err
 	}
 
-	orgProjects := make([]*admin_pb.DataProject, 0)
+	orgProjects := make([]*v1_pb.DataProject, 0)
 	orgProjectRoles := make([]*management_pb.AddProjectRoleRequest, 0)
-	oidcApps := make([]*admin_pb.DataOIDCApplication, 0)
-	apiApps := make([]*admin_pb.DataAPIApplication, 0)
+	oidcApps := make([]*v1_pb.DataOIDCApplication, 0)
+	apiApps := make([]*v1_pb.DataAPIApplication, 0)
 	for _, project := range projects.Projects {
 		setting := project_pb.PrivateLabelingSetting(project.PrivateLabelingSetting)
-		orgProjects = append(orgProjects, &admin_pb.DataProject{
+		orgProjects = append(orgProjects, &v1_pb.DataProject{
 			ProjectId: project.ID,
 			Project: &management_pb.AddProjectRequest{
 				Name:                   project.Name,
@@ -456,7 +457,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 				}
 				duration := durationpb.New(app.OIDCConfig.ClockSkew)
 
-				oidcApps = append(oidcApps, &admin_pb.DataOIDCApplication{
+				oidcApps = append(oidcApps, &v1_pb.DataOIDCApplication{
 					AppId: app.ID,
 					App: &management_pb.AddOIDCAppRequest{
 						ProjectId:                app.ProjectID,
@@ -479,7 +480,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 				})
 			}
 			if app.APIConfig != nil {
-				apiApps = append(apiApps, &admin_pb.DataAPIApplication{
+				apiApps = append(apiApps, &v1_pb.DataAPIApplication{
 					AppId: app.ID,
 					App: &management_pb.AddAPIAppRequest{
 						ProjectId:      app.ProjectID,
@@ -571,8 +572,8 @@ func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, p
 	return orgMembers, nil
 }
 
-func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*admin_pb.DataProjectGrant, error) {
-	projectGrants := make([]*admin_pb.DataProjectGrant, 0)
+func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*v1_pb.DataProjectGrant, error) {
+	projectGrants := make([]*v1_pb.DataProjectGrant, 0)
 	projectGrantSearchOrg, err := query.NewProjectGrantResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, err
@@ -587,7 +588,7 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 				foundOrg := false
 				for _, orgID := range processedOrgs {
 					if orgID == projectGrant.GrantedOrgID {
-						projectGrants = append(projectGrants, &admin_pb.DataProjectGrant{
+						projectGrants = append(projectGrants, &v1_pb.DataProjectGrant{
 							GrantId: projectGrant.GrantID,
 							ProjectGrant: &management_pb.AddProjectGrantRequest{
 								ProjectId:    projectGrant.ProjectID,

@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
 )
 
 func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (*admin_pb.ImportDataResponse, error) {
@@ -31,8 +32,19 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 	}
 
 	ctxData := authz.GetCtxData(ctx)
+	orgs := make([]*admin_pb.DataOrg, 0)
 
-	for _, org := range req.GetOrgs() {
+	if req.GetDataOrgsv1() != nil {
+		dataOrgs, err := s.dataOrgsV1ToDataOrgs(ctx, req.GetDataOrgsv1())
+		if err != nil {
+			return nil, err
+		}
+		orgs = dataOrgs.GetOrgs()
+	} else {
+		orgs = req.GetDataOrgs().GetOrgs()
+	}
+
+	for _, org := range orgs {
 		_, err := s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
 		if err != nil {
 			errors = append(errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
@@ -164,7 +176,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 		success.Orgs = append(success.Orgs, successOrg)
 	}
 
-	for _, org := range req.GetOrgs() {
+	for _, org := range orgs {
 		var successOrg *admin_pb.ImportDataSuccessOrg
 		for _, oldOrd := range success.Orgs {
 			if org.OrgId == oldOrd.OrgId {
@@ -204,7 +216,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 	}
 
 	if success != nil && success.Orgs != nil {
-		for _, org := range req.GetOrgs() {
+		for _, org := range orgs {
 			var successOrg *admin_pb.ImportDataSuccessOrg
 			for _, oldOrd := range success.Orgs {
 				if org.OrgId == oldOrd.OrgId {
@@ -250,5 +262,50 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 	return &admin_pb.ImportDataResponse{
 		Errors:  errors,
 		Success: success,
+	}, nil
+}
+
+func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.ImportDataOrg) (*admin_pb.ImportDataOrg, error) {
+	orgs := make([]*admin_pb.DataOrg, 0)
+	for _, orgV1 := range dataOrgs.Orgs {
+		org := &admin_pb.DataOrg{
+			OrgId:                    orgV1.GetOrgId(),
+			Org:                      orgV1.GetOrg(),
+			LabelPolicy:              orgV1.GetLabelPolicy(),
+			LockoutPolicy:            orgV1.GetLockoutPolicy(),
+			LoginPolicy:              orgV1.GetLoginPolicy(),
+			PasswordComplexityPolicy: orgV1.GetPasswordComplexityPolicy(),
+			PrivacyPolicy:            orgV1.GetPrivacyPolicy(),
+			Projects:                 orgV1.GetProjects(),
+			ProjectRoles:             orgV1.GetProjectRoles(),
+			ApiApps:                  orgV1.GetApiApps(),
+			OidcApps:                 orgV1.GetOidcApps(),
+			HumanUsers:               orgV1.GetHumanUsers(),
+			MachineUsers:             orgV1.GetMachineUsers(),
+			TriggerActions:           orgV1.GetTriggerActions(),
+			Actions:                  orgV1.GetActions(),
+			ProjectGrants:            orgV1.GetProjectGrants(),
+			UserGrants:               orgV1.GetUserGrants(),
+			OrgMembers:               orgV1.GetOrgMembers(),
+			ProjectMembers:           orgV1.GetProjectMembers(),
+			ProjectGrantMembers:      orgV1.GetProjectGrantMembers(),
+		}
+		if orgV1.IamPolicy != nil {
+			defaultDomainPolicy, err := s.query.DefaultDomainPolicy(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			org.DomainPolicy = &admin_pb.AddCustomDomainPolicyRequest{
+				UserLoginMustBeDomain:                  orgV1.IamPolicy.UserLoginMustBeDomain,
+				ValidateOrgDomains:                     defaultDomainPolicy.ValidateOrgDomains,
+				SmtpSenderAddressMatchesInstanceDomain: defaultDomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
+			}
+		}
+		orgs = append(orgs, org)
+	}
+
+	return &admin_pb.ImportDataOrg{
+		Orgs: orgs,
 	}, nil
 }
