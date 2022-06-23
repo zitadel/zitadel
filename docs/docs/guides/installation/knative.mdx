@@ -1,0 +1,64 @@
+## Prerequisites
+up and running cockroachdb
+TODO: "check cockroachdb with knative for happy path"
+
+## Existing Knative environment
+
+first, create a secret with your certificates for database connection and TLS termination
+
+```bash
+#describe happy path 
+kubectl create secret -f certs.yaml
+```
+
+start ZITADEL with Knative 
+
+
+```bash
+kn service create zitadel \
+--image ghcr.io/zitadel/zitadel:"$ZITADEL_VERSION" \
+--port 8080 \
+--env ZITADEL_EXTERNALSECURE=false \
+--env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
+--env ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=zitadel.default.127.0.0.1.sslip.io \
+--env ZITADEL_DATABASE_HOST="$DATABASE_HOST" \
+--env ZITADEL_DATABASE_OPTIONS="$DATABASE_OPTIONS" \
+--env ZITADEL_DATABASE_DATABASE="$DATABASE_NAME" \
+--env ZITADEL_ADMINUSER_USER="$DB_ADMINUSER_USER" \
+--env ZITADEL_ADMINUSER_PASSWORD="$DB_ADMINUSER_PASSWORD" \
+--env ZITADEL_ADMINUSER_SSL_MODE=verify-full \
+--env ZITADEL_ADMINUSER_SSL_ROOTCERT=/db.cert \
+--env ZITADEL_DATABASE_USER_USERNAME="$DATABSE_USERNAME" \
+--env ZITADEL_DATABASE_USER_PASSWORD="$ZITADEL_DATABASE_USER_PASSWORD" \
+--env ZITADEL_DATABASE_USER_SSL_MODE=verify-full \
+--env ZITADEL_DATABASE_USER_SSL_ROOTCERT=/db.cert \
+--arg "admin" --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" \
+--mount /db.cert=secret:certs/db.cert \
+--mount /tls.cert=secret:certs/tls.cert \
+--mount /tls.secret=secret:certs/tls.secret
+```
+
+## New Knative environment
+### Download and run Knative quickstart
+This is guide is for local/development environments and not production setup.
+
+Follow the Knative quickstart guide to get a local kind/minikube environment with Knative capabilities.
+
+It is basically 4 commands on Mac:
+
+```bash
+#install knative
+brew install knative/client/kn
+
+#install knative quickstart sandbox
+brew install knative-sandbox/kn-plugins/quickstart
+
+#install kind
+brew install kind
+
+#install quickstart cluster
+kn quickstart kind
+```
+
+See Knative documentation for your environment.
+https://knative.dev/docs/install/quickstart-install/
