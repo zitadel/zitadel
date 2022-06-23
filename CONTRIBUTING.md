@@ -139,10 +139,13 @@ docker build -f build/grpc/Dockerfile -t zitadel-base:local . \
 
 <!-- TODO: how to run E2E tests -->
 
-
 ## Contribute Docs
 
-<!-- TODO: ask maxpe for infos -->
+Project documentation is made with docusaurus and is located under [./docs](./docs).
+Please refer to the [README](./docs/README.md) for more information and local testing.
+
+When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
+Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
 ## Contribute Internationalization
 
