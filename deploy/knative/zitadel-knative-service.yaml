@@ -1,0 +1,38 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  name: zitadel
+spec:
+  template:
+    metadata:
+      annotations:
+        client.knative.dev/user-image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.30-amd64
+      creationTimestamp: null
+    spec:
+      containerConcurrency: 0
+      containers:
+      - args:
+        - admin
+        - start-from-init
+        - --masterkey
+        - MasterkeyNeedsToHave32Characters
+        env:
+        - name: ZITADEL_DATABASE_HOST
+          value: cockroachdb
+        - name: ZITADEL_EXTERNALSECURE
+          value: "false"
+        - name: ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN
+          value: zitadel.default.127.0.0.1.sslip.io
+        image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.30-amd64
+        name: user-container
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          successThreshold: 1
+          tcpSocket:
+            port: 0
+        resources: {}
+      enableServiceLinks: false
+      timeoutSeconds: 300

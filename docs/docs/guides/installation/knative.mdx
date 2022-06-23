@@ -1,46 +1,8 @@
-## Prerequisites
-up and running cockroachdb
-TODO: "check cockroachdb with knative for happy path"
-
-## Existing Knative environment
-
-first, create a secret with your certificates for database connection and TLS termination
-
-```bash
-#describe happy path 
-kubectl create secret -f certs.yaml
-```
-
-start ZITADEL with Knative 
-
-
-```bash
-kn service create zitadel \
---image ghcr.io/zitadel/zitadel:"$ZITADEL_VERSION" \
---port 8080 \
---env ZITADEL_EXTERNALSECURE=false \
---env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
---env ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=zitadel.default.127.0.0.1.sslip.io \
---env ZITADEL_DATABASE_HOST="$DATABASE_HOST" \
---env ZITADEL_DATABASE_OPTIONS="$DATABASE_OPTIONS" \
---env ZITADEL_DATABASE_DATABASE="$DATABASE_NAME" \
---env ZITADEL_ADMINUSER_USER="$DB_ADMINUSER_USER" \
---env ZITADEL_ADMINUSER_PASSWORD="$DB_ADMINUSER_PASSWORD" \
---env ZITADEL_ADMINUSER_SSL_MODE=verify-full \
---env ZITADEL_ADMINUSER_SSL_ROOTCERT=/db.cert \
---env ZITADEL_DATABASE_USER_USERNAME="$DATABSE_USERNAME" \
---env ZITADEL_DATABASE_USER_PASSWORD="$ZITADEL_DATABASE_USER_PASSWORD" \
---env ZITADEL_DATABASE_USER_SSL_MODE=verify-full \
---env ZITADEL_DATABASE_USER_SSL_ROOTCERT=/db.cert \
---arg "admin" --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" \
---mount /db.cert=secret:certs/db.cert \
---mount /tls.cert=secret:certs/tls.cert \
---mount /tls.secret=secret:certs/tls.secret
-```
+## Disclaimer
+This guide is for development / demonstration purpose only and does NOT reflect a production setup.
 
 ## New Knative environment
 ### Download and run Knative quickstart
-This is guide is for local/development environments and not production setup.
 
 Follow the Knative quickstart guide to get a local kind/minikube environment with Knative capabilities.
 
@@ -59,6 +21,55 @@ brew install kind
 #install quickstart cluster
 kn quickstart kind
 ```
+That will get you a ready to go knative/kubernetes environment.
 
-See Knative documentation for your environment.
+
+See Knative documentation here: 
 https://knative.dev/docs/install/quickstart-install/
+
+
+## Database
+start a single-node cockroachdb as statefulset
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/cockroachdb-statefulset-single-node.yaml
+```
+
+## Secret for TLS termination
+create a secret with your certificates for TLS termination
+
+```bash
+#describe happy path 
+kubectl apply secret -f certs.yaml
+```
+
+## Start ZITADEL with Knative 
+```bash
+kn service create zitadel \
+--image ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.30-amd64 \
+--port 8080 \
+--env ZITADEL_DATABASE_HOST=cockroachdb \
+--env ZITADEL_EXTERNALSECURE=false \
+--env ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=zitadel.default.127.0.0.1.sslip.io \
+--arg "admin" --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" \
+--mount /tls.secret=secret:certs/tls.secret \
+--mount /tls.key=secret:certs/tls.key
+```
+
+or use the knative service yaml
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/zitadel-knative-service.yaml
+```
+
+## get started with ZIDATEL
+```bash
+#get ZIDATEL URL
+kn services list
+
+NAME      URL                                         LATEST          AGE   CONDITIONS   READY   REASON
+zitadel   http://zitadel.default.127.0.0.1.sslip.io   zitadel-00001   10m   3 OK / 3     True
+```
+
+Add the console path to the URL and open in browser
+http://zitadel.default.127.0.0.1.sslip.io/ui/console
