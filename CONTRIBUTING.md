@@ -104,6 +104,12 @@ The code consists of the following parts:
 
 Please validate and test the code before you contribute.
 
+We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
+
+- [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- [All issues](https://github.com/zitadel/zitadel/issues)
+
+
 ### Backend / Login
 
 To keep the code clean and understandable we use [golangci-lint](https://golangci-lint.run). We recommend to format the code with this linter while working on ZITADEL to simplify the review process. The configuration is located [here](./.golangci.yaml).
@@ -137,11 +143,6 @@ docker build -f build/grpc/Dockerfile -t zitadel-base:local . \
 ## Contribute Docs
 
 <!-- TODO: ask maxpe for infos -->
-
-We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
-
-- [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-- [All issues](https://github.com/zitadel/zitadel/issues)
 
 ## Contribute Internationalization
 
