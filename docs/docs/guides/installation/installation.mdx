@@ -9,6 +9,7 @@ import MacOS from './macos.mdx'
 import Windows from './windows.mdx'
 import Compose from './compose.mdx'
 import Helm from './helm.mdx'
+import Knative from './knative.mdx'
 import Configuration from './configuration.mdx'
 import OpenLocal from './openlocal.mdx'
 
@@ -25,7 +26,8 @@ Choose your platform and run ZITADEL with the most minimal configuration possibl
         {'label': 'MacOS', 'value': 'macos'},
         {'label': 'Windows', 'value': 'windows'},
         {'label': 'Docker Compose', 'value': 'compose'},
-        {'label': 'Kubernetes', 'value': 'k8s'}
+        {'label': 'Kubernetes', 'value': 'k8s'},
+        {'label': 'Knative', 'value': 'knative'}
     ]}
 >
     <TabItem value="saas">
@@ -51,5 +53,8 @@ Choose your platform and run ZITADEL with the most minimal configuration possibl
     </TabItem>
     <TabItem value="k8s">
         <Helm/>
+    </TabItem>
+        <TabItem value="knative">
+        <Knative/>
     </TabItem>
 </Tabs>
