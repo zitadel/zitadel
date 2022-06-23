@@ -32,7 +32,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 					nil,
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectRemoved,
+			reduce: (&projectGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
 				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -59,7 +59,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grant-id"}`),
 				), project.GrantRemovedEventMapper),
 			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectGrantRemoved,
+			reduce: (&projectGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
 				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -87,7 +87,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grant-id"}`),
 				), project.GrantReactivatedEventMapper),
 			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectGrantReactivated,
+			reduce: (&projectGrantProjection{}).reduceProjectGrantReactivated,
 			want: wantReduce{
 				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -118,7 +118,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grant-id"}`),
 				), project.GrantDeactivateEventMapper),
 			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectGrantDeactivated,
+			reduce: (&projectGrantProjection{}).reduceProjectGrantDeactivated,
 			want: wantReduce{
 				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -149,7 +149,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
 				), project.GrantChangedEventMapper),
 			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectGrantChanged,
+			reduce: (&projectGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
 				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -180,7 +180,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grant-id", "roleKeys": ["admin", "user"] }`),
 				), project.GrantCascadeChangedEventMapper),
 			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectGrantCascadeChanged,
+			reduce: (&projectGrantProjection{}).reduceProjectGrantCascadeChanged,
 			want: wantReduce{
 				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -211,7 +211,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 					[]byte(`{"grantId": "grant-id", "grantedOrgId": "granted-org-id", "roleKeys": ["admin", "user"] }`),
 				), project.GrantAddedEventMapper),
 			},
-			reduce: (&ProjectGrantProjection{}).reduceProjectGrantAdded,
+			reduce: (&projectGrantProjection{}).reduceProjectGrantAdded,
 			want: wantReduce{
 				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),

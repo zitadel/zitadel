@@ -28,12 +28,12 @@ func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgR
 }
 
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
-	org, err := s.query.OrgByID(ctx, authz.GetInstance(ctx).DefaultOrganisationID())
+	org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
 	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
 }
 
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
-	org, err := s.query.OrgByID(ctx, req.Id)
+	org, err := s.query.OrgByID(ctx, true, req.Id)
 	if err != nil {
 		return nil, err
 	}

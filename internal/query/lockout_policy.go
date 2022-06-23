@@ -75,7 +75,11 @@ var (
 	}
 )
 
-func (q *Queries) LockoutPolicyByOrg(ctx context.Context, orgID string) (*LockoutPolicy, error) {
+func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*LockoutPolicy, error) {
+	if shouldTriggerBulk {
+		projection.LockoutPolicyProjection.TriggerBulk(ctx)
+	}
+
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{

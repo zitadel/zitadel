@@ -36,7 +36,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.ApplicationAddedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAppAdded,
+			reduce: (&appProjection{}).reduceAppAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -74,7 +74,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.ApplicationChangedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAppChanged,
+			reduce: (&appProjection{}).reduceAppChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -107,7 +107,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.ApplicationDeactivatedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAppDeactivated,
+			reduce: (&appProjection{}).reduceAppDeactivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -140,7 +140,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.ApplicationReactivatedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAppReactivated,
+			reduce: (&appProjection{}).reduceAppReactivated,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -173,7 +173,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.ApplicationRemovedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAppRemoved,
+			reduce: (&appProjection{}).reduceAppRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -201,7 +201,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), project.ProjectRemovedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceProjectRemoved,
+			reduce: (&appProjection{}).reduceProjectRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -234,7 +234,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				}`),
 				), project.APIConfigAddedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAPIConfigAdded,
+			reduce: (&appProjection{}).reduceAPIConfigAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -279,7 +279,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				}`),
 				), project.APIConfigChangedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAPIConfigChanged,
+			reduce: (&appProjection{}).reduceAPIConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -320,7 +320,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				}`),
 				), project.APIConfigChangedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAPIConfigChanged,
+			reduce: (&appProjection{}).reduceAPIConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -343,7 +343,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.APIConfigSecretChangedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceAPIConfigSecretChanged,
+			reduce: (&appProjection{}).reduceAPIConfigSecretChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -399,7 +399,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.OIDCConfigAddedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceOIDCConfigAdded,
+			reduce: (&appProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -468,7 +468,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.OIDCConfigChangedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceOIDCConfigChanged,
+			reduce: (&appProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -521,7 +521,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.OIDCConfigChangedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceOIDCConfigChanged,
+			reduce: (&appProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
@@ -544,7 +544,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		}`),
 				), project.OIDCConfigSecretChangedEventMapper),
 			},
-			reduce: (&AppProjection{}).reduceOIDCConfigSecretChanged,
+			reduce: (&appProjection{}).reduceOIDCConfigSecretChanged,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,

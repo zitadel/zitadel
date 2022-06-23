@@ -21,11 +21,10 @@ export class AuthGuard implements CanActivate {
         const hint = route.queryParams['login_hint'];
         const configWithPrompt: Partial<AuthConfig> = {
           customQueryParams: {
-            // prompt: 'select_account',
-          } as any,
+            login_hint: hint,
+          },
         };
-        (configWithPrompt as any).customQueryParams['login_hint'] = hint;
-        console.log('auth', hint);
+        console.log(`authenticate with login_hint: ${hint}`);
         this.auth.authenticate(configWithPrompt);
       } else {
         return this.auth.authenticate();

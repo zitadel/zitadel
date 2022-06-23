@@ -23,7 +23,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 	}{
 		{
 			name:   "instance.reduceNotificationProviderFileAdded",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
+			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DebugNotificationProviderFileAddedEventType),
@@ -60,7 +60,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceNotificationProviderFileChanged",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
+			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DebugNotificationProviderFileChangedEventType),
@@ -93,7 +93,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceNotificationProviderFileRemoved",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
+			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DebugNotificationProviderFileRemovedEventType),
@@ -121,7 +121,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceNotificationProviderLogAdded",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
+			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DebugNotificationProviderLogAddedEventType),
@@ -158,7 +158,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceNotificationProviderLogChanged",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
+			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DebugNotificationProviderLogChangedEventType),
@@ -191,7 +191,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "instance.reduceNotificationProviderLogRemoved",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
+			reduce: (&debugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DebugNotificationProviderLogRemovedEventType),

@@ -5,8 +5,8 @@
 }
 
 @mixin lgn-a-color() {
-  a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button) {
-    color: var(--zitadel-color-font);
+  a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):not(.lgn-idp) {
+    color: var(--zitadel-color-text-500);
 
     &:hover,
     &:active {

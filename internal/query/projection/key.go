@@ -39,13 +39,13 @@ const (
 	KeyPublicColumnKey        = "key"
 )
 
-type KeyProjection struct {
+type keyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
 }
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) *KeyProjection {
-	p := new(KeyProjection)
+func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) *keyProjection {
+	p := new(keyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewMultiTableCheck(
@@ -89,7 +89,7 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 	return p
 }
 
-func (p *KeyProjection) reducers() []handler.AggregateReducer {
+func (p *keyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: keypair.AggregateType,
@@ -103,7 +103,7 @@ func (p *KeyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAbr2", "reduce.wrong.event.type %s", keypair.AddedEventType)

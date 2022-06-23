@@ -46,13 +46,13 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Organization
 		******************************************************************************************************************/
-		queriedOrg, err := s.query.OrgByID(ctx, queriedOrg.ID)
+		queriedOrg, err := s.query.OrgByID(ctx, true, queriedOrg.ID)
 		if err != nil {
 			return nil, err
 		}
 		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
 
-		queriedDomain, err := s.query.DomainPolicyByOrg(ctx, org.GetOrgId())
+		queriedDomain, err := s.query.DomainPolicyByOrg(ctx, true, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +84,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			}
 		}
 
-		queriedLogin, err := s.query.LoginPolicyByID(ctx, org.GetOrgId())
+		queriedLogin, err := s.query.LoginPolicyByID(ctx, true, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +126,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			}
 		}
 
-		queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, org.GetOrgId())
+		queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, true, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +136,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			}
 		}
 
-		queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, org.GetOrgId())
+		queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
@@ -150,7 +150,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			}
 		}
 
-		queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, org.GetOrgId())
+		queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, true, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
@@ -423,7 +423,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			return nil, nil, nil, nil, err
 		}
 
-		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
