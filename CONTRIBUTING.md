@@ -148,7 +148,7 @@ We add the label "good first issue" for problems we think are a good starting po
 ZITADEL loads translations from four files:
 
 - [Console texts](./console/src/assets/i18n)
-- [Login interface](./internal/ui/login/static/i18n)
+- [Login interface](./internal/api/ui/login/static/i18n) 
 - [Email notification](./internal/notification/static/i18n)
 - [Common texts](./internal/static/i18n) for success or error toasts
 
