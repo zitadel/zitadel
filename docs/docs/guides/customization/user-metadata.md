@@ -81,8 +81,6 @@ Export the result to the environment variable `BASIC_AUTH`.
 
 <TabItem value="js" label="Javascript" default>
 
-Grab zitadel-tools to create the [required string](https://docs.zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic) for Basic authentication:
-
 ```javascript
 esc = encodeURIComponent(process.env.CLIENT_ID) + ":" + encodeURIComponent(process.env.CLIENT_SECRET)
 enc = btoa(esc)
