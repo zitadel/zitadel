@@ -194,7 +194,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 
-	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler)
+	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler, config.CustomerPortal)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
