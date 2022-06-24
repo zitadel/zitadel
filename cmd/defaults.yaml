@@ -3,11 +3,38 @@ Log:
   Formatter:
     Format: text
 
+# Port ZITADEL will listen on
 Port: 8080
+# Port ZITADEL is exposed on, itcan differ from port e.g. if you proxy the traffic
+# !!! Changing this after initial setup breaks your system !!!
 ExternalPort: 8080
+# Domain / hostname ZITADEL is exposed externally
+# !!! Changing this after initial setup breaks your system !!!
 ExternalDomain: localhost
+# specifies if ZITADEL is exposed externally through TLS
+# this must be set to true even if TLS is not enabled on ZITADEL itself
+# but TLS traffic is terminated on a reverse proxy
+# !!! Changing this after initial setup breaks your system !!!
 ExternalSecure: true
+TLS:
+  # if enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
+  # you must then also provide a private key and certificate to be used for the connection
+  # either directly or by a path to the corresponding file
+  Enabled: true
+  # Path to the private key of the TLS certificate, it will be loaded into the Key
+  # and overwrite any exising value
+  KeyPath: #/path/to/key/file.pem
+  # Private key of the TLS certificate (KeyPath will this overwrite, if specified)
+  Key: #<bas64 encoded content of a pem file>
+  # Path to the certificate for the TLS connection, it will be loaded into the Cert
+  # and overwrite any exising value
+  CertPath: #/path/to/cert/file.pem
+  # Certificate for the TLS connection (CertPath will this overwrite, if specified)
+  Cert: #<bas64 encoded content of a pem file>
+
+# Header name of HTTP2 (incl. gRPC) calls from which the instance will be matched
 HTTP2HostHeader: ":authority"
+# Header name of HTTP1 calls from which the instance will be matched
 HTTP1HostHeader: "host"
 
 WebAuthNName: ZITADEL

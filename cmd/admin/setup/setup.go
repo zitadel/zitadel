@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin/key"
+	"github.com/zitadel/zitadel/cmd/admin/tls"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/migration"
@@ -28,6 +29,9 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
+			err := tls.ModeFromFlag(cmd)
+			logging.OnError(err).Fatal("invalid tlsMode")
+
 			config := MustNewConfig(viper.GetViper())
 			steps := MustNewSteps(viper.New())
 
@@ -46,6 +50,7 @@ Requirements:
 func Flags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringArrayVar(&stepFiles, "steps", nil, "paths to step files to overwrite default steps")
 	key.AddMasterKeyFlag(cmd)
+	tls.AddTLSModeFlag(cmd)
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
