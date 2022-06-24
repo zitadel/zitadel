@@ -241,6 +241,7 @@ func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls
 	go func() {
 		logging.Infof("server is listening on %s", lis.Addr().String())
 		if tlsConfig != nil {
+			//we don't need to pass the files here, because we already initialized the TLS config on the server
 			errCh <- http1Server.ServeTLS(lis, "", "")
 		} else {
 			errCh <- http1Server.Serve(lis)
