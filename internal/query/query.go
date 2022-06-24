@@ -3,6 +3,8 @@ package query
 import (
 	"context"
 	"database/sql"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"net/http"
 	"sync"
 
@@ -37,6 +39,7 @@ type Queries struct {
 	NotificationTranslationFileContents map[string][]byte
 	supportedLangs                      []language.Tag
 	zitadelRoles                        []authz.RoleMapping
+	multifactors                        domain.MultifactorConfigs
 }
 
 type Config struct {
@@ -73,6 +76,17 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	action.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
+
+	aesOTPCrypto, err := crypto.NewAESCrypto(defaults.Multifactors.OTP.VerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	repo.multifactors = domain.MultifactorConfigs{
+		OTP: domain.OTPConfig{
+			CryptoMFA: aesOTPCrypto,
+			Issuer:    defaults.Multifactors.OTP.Issuer,
+		},
+	}
 
 	err = projection.Start(ctx, sqlClient, es, projections, defaults, keyChan)
 	if err != nil {

@@ -1556,6 +1556,7 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | org_ids | repeated string | - |  |
 | with_passwords |  bool | - |  |
+| with_otp |  bool | - |  |
 
 
 
@@ -1585,6 +1586,7 @@ This is an empty response
 | hashed_password |  ExportHumanUser.HashedPassword | - |  |
 | password_change_required |  bool | - |  |
 | request_passwordless_registration |  bool | - |  |
+| otp_code |  string | - |  |
 
 
 

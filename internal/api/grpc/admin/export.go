@@ -215,7 +215,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Users
 		******************************************************************************************************************/
-		humanUsers, machineUsers, userMetadata, err := s.getUsers(ctx, queriedOrg.ID, req.WithPasswords)
+		humanUsers, machineUsers, userMetadata, err := s.getUsers(ctx, queriedOrg.ID, req.WithPasswords, req.WithOtp)
 		if err != nil {
 			return nil, err
 		}
@@ -317,7 +317,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	}, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, []*management_pb.SetUserMetadataRequest, error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, []*management_pb.SetUserMetadataRequest, error) {
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
 		return nil, nil, nil, err
@@ -371,6 +371,15 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) (
 						Value:     string(hashedPassword),
 						Algorithm: hashAlgorithm,
 					}
+				}
+			}
+			if withOTP {
+				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
+				if err != nil {
+					return nil, nil, nil, err
+				}
+				if code != "" {
+					dataUser.User.OtpCode = code
 				}
 			}
 
