@@ -5,7 +5,7 @@ Log:
 
 # Port ZITADEL will listen on
 Port: 8080
-# Port ZITADEL is exposed on, itcan differ from port e.g. if you proxy the traffic
+# Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
 # !!! Changing this after initial setup breaks your system !!!
 ExternalPort: 8080
 # Domain / hostname ZITADEL is exposed externally
