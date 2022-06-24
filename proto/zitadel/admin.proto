@@ -4018,6 +4018,17 @@ message DataOrg {
     repeated zitadel.management.v1.AddOrgMemberRequest org_members = 20;
     repeated zitadel.management.v1.AddProjectMemberRequest project_members = 21;
     repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 22;
+
+    repeated zitadel.management.v1.SetUserMetadataRequest user_metadata = 23;
+
+    repeated zitadel.management.v1.SetCustomLoginTextsRequest login_texts = 24;
+
+    repeated zitadel.management.v1.SetCustomInitMessageTextRequest init_messages = 25;
+    repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest password_reset_messages = 26;
+    repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest verify_email_messages = 27;
+    repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest verify_phone_messages = 28;
+    repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest domain_claimed_messages = 29;
+    repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest passwordless_registration_messages = 30;
 }
 message DataProject {
     string project_id = 1;

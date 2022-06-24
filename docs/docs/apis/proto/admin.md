@@ -1490,6 +1490,14 @@ This is an empty response
 | org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
 | project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
 | project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+| user_metadata | repeated zitadel.management.v1.SetUserMetadataRequest | - |  |
+| login_texts | repeated zitadel.management.v1.SetCustomLoginTextsRequest | - |  |
+| init_messages | repeated zitadel.management.v1.SetCustomInitMessageTextRequest | - |  |
+| password_reset_messages | repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest | - |  |
+| verify_email_messages | repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest | - |  |
+| verify_phone_messages | repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest | - |  |
+| domain_claimed_messages | repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest | - |  |
+| passwordless_registration_messages | repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest | - |  |
 
 
 

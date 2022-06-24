@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -164,15 +165,63 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			}
 		}
 
+		langResp, err := s.GetSupportedLanguages(ctx, &admin_pb.GetSupportedLanguagesRequest{})
+		if err != nil {
+			return nil, err
+		}
+
+		loginTexts, err := s.getCustomLoginTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+		org.LoginTexts = loginTexts
+
+		initMessages, err := s.getCustomInitMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+		org.InitMessages = initMessages
+
+		passwordResetMessages, err := s.getCustomPasswordResetMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+		org.PasswordResetMessages = passwordResetMessages
+
+		verifyEmailMessages, err := s.getCustomVerifyEmailMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+		org.VerifyEmailMessages = verifyEmailMessages
+
+		verifyPhoneMessages, err := s.getCustomVerifyPhoneMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+		org.VerifyPhoneMessages = verifyPhoneMessages
+
+		domainClaimedMessages, err := s.getCustomDomainClaimedMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+		org.DomainClaimedMessages = domainClaimedMessages
+
+		passwordlessRegistrationMessages, err := s.getCustomPasswordlessRegistrationMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+		if err != nil {
+			return nil, err
+		}
+		org.PasswordlessRegistrationMessages = passwordlessRegistrationMessages
+
 		/******************************************************************************************************************
 		Users
 		******************************************************************************************************************/
-		humanUsers, machineUsers, err := s.getUsers(ctx, queriedOrg.ID, req.WithPasswords)
+		humanUsers, machineUsers, userMetadata, err := s.getUsers(ctx, queriedOrg.ID, req.WithPasswords)
 		if err != nil {
 			return nil, err
 		}
 		org.HumanUsers = humanUsers
 		org.MachineUsers = machineUsers
+		org.UserMetadata = userMetadata
 		for _, processedUser := range humanUsers {
 			processedUsers = append(processedUsers, processedUser.UserId)
 		}
@@ -213,8 +262,8 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 
 	for _, org := range orgs {
 		/******************************************************************************************************************
-		Flows
-		******************************************************************************************************************/
+		  Flows
+		  ******************************************************************************************************************/
 		triggerActions, err := s.getTriggerActions(ctx, org.OrgId, processedActions)
 		if err != nil {
 			return nil, err
@@ -222,8 +271,8 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		org.TriggerActions = triggerActions
 
 		/******************************************************************************************************************
-		Grants
-		******************************************************************************************************************/
+		  Grants
+		  ******************************************************************************************************************/
 		projectGrants, err := s.getNecessaryProjectGrantsForOrg(ctx, org.OrgId, processedOrgs, processedProjects)
 		if err != nil {
 			return nil, err
@@ -242,8 +291,8 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 
 	for _, org := range orgs {
 		/******************************************************************************************************************
-		Members
-		******************************************************************************************************************/
+		  Members
+		  ******************************************************************************************************************/
 		orgMembers, err := s.getNecessaryOrgMembersForOrg(ctx, org.OrgId, processedUsers)
 		if err != nil {
 			return nil, err
@@ -268,19 +317,20 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	}, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, []*management_pb.SetUserMetadataRequest, error) {
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
 	if err != nil && !caos_errors.IsNotFound(err) {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	humanUsers := make([]*admin_pb.DataHumanUser, 0)
 	machineUsers := make([]*admin_pb.DataMachineUser, 0)
+	userMetadata := make([]*management_pb.SetUserMetadataRequest, 0)
 	if err != nil && caos_errors.IsNotFound(err) {
-		return humanUsers, machineUsers, nil
+		return humanUsers, machineUsers, userMetadata, nil
 	}
 	for _, user := range users.Users {
 		switch user.Type {
@@ -314,7 +364,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) (
 			if withPasswords {
 				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
 				if err != nil {
-					return nil, nil, err
+					return nil, nil, nil, err
 				}
 				if hashedPassword != nil {
 					dataUser.User.HashedPassword = &admin_pb.ExportHumanUser_HashedPassword{
@@ -335,8 +385,24 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool) (
 				},
 			})
 		}
+
+		metadataOrgSearch, err := query.NewUserMetadataResourceOwnerSearchQuery(org)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		metadataList, err := s.query.SearchUserMetadata(ctx, user.ID, true, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		for _, metadata := range metadataList.Metadata {
+			userMetadata = append(userMetadata, &management_pb.SetUserMetadataRequest{
+				Id:    user.ID,
+				Key:   metadata.Key,
+				Value: metadata.Value,
+			})
+		}
 	}
-	return humanUsers, machineUsers, nil
+	return humanUsers, machineUsers, userMetadata, nil
 }
 
 func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) ([]*management_pb.SetTriggerActionsRequest, error) {
@@ -671,4 +737,205 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 		}
 	}
 	return userGrants, nil
+}
+func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomLoginTextsRequest, error) {
+
+	customTexts := make([]*management_pb.SetCustomLoginTextsRequest, 0)
+	for _, lang := range languages {
+		text, err := s.query.GetCustomLoginTexts(ctx, org, lang)
+		if err != nil {
+			return nil, err
+		}
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomLoginTextsRequest{
+				Language:                             lang,
+				SelectAccountText:                    text_grpc.SelectAccountScreenToPb(text.SelectAccount),
+				LoginText:                            text_grpc.LoginScreenTextToPb(text.Login),
+				PasswordText:                         text_grpc.PasswordScreenTextToPb(text.Password),
+				UsernameChangeText:                   text_grpc.UsernameChangeScreenTextToPb(text.UsernameChange),
+				UsernameChangeDoneText:               text_grpc.UsernameChangeDoneScreenTextToPb(text.UsernameChangeDone),
+				InitPasswordText:                     text_grpc.InitPasswordScreenTextToPb(text.InitPassword),
+				InitPasswordDoneText:                 text_grpc.InitPasswordDoneScreenTextToPb(text.InitPasswordDone),
+				EmailVerificationText:                text_grpc.EmailVerificationScreenTextToPb(text.EmailVerification),
+				EmailVerificationDoneText:            text_grpc.EmailVerificationDoneScreenTextToPb(text.EmailVerificationDone),
+				InitializeUserText:                   text_grpc.InitializeUserScreenTextToPb(text.InitUser),
+				InitializeDoneText:                   text_grpc.InitializeUserDoneScreenTextToPb(text.InitUserDone),
+				InitMfaPromptText:                    text_grpc.InitMFAPromptScreenTextToPb(text.InitMFAPrompt),
+				InitMfaOtpText:                       text_grpc.InitMFAOTPScreenTextToPb(text.InitMFAOTP),
+				InitMfaU2FText:                       text_grpc.InitMFAU2FScreenTextToPb(text.InitMFAU2F),
+				InitMfaDoneText:                      text_grpc.InitMFADoneScreenTextToPb(text.InitMFADone),
+				MfaProvidersText:                     text_grpc.MFAProvidersTextToPb(text.MFAProvider),
+				VerifyMfaOtpText:                     text_grpc.VerifyMFAOTPScreenTextToPb(text.VerifyMFAOTP),
+				VerifyMfaU2FText:                     text_grpc.VerifyMFAU2FScreenTextToPb(text.VerifyMFAU2F),
+				PasswordlessText:                     text_grpc.PasswordlessScreenTextToPb(text.Passwordless),
+				PasswordlessPromptText:               text_grpc.PasswordlessPromptScreenTextToPb(text.PasswordlessPrompt),
+				PasswordlessRegistrationText:         text_grpc.PasswordlessRegistrationScreenTextToPb(text.PasswordlessRegistration),
+				PasswordlessRegistrationDoneText:     text_grpc.PasswordlessRegistrationDoneScreenTextToPb(text.PasswordlessRegistrationDone),
+				PasswordChangeText:                   text_grpc.PasswordChangeScreenTextToPb(text.PasswordChange),
+				PasswordChangeDoneText:               text_grpc.PasswordChangeDoneScreenTextToPb(text.PasswordChangeDone),
+				PasswordResetDoneText:                text_grpc.PasswordResetDoneScreenTextToPb(text.PasswordResetDone),
+				RegistrationOptionText:               text_grpc.RegistrationOptionScreenTextToPb(text.RegisterOption),
+				RegistrationUserText:                 text_grpc.RegistrationUserScreenTextToPb(text.RegistrationUser),
+				ExternalRegistrationUserOverviewText: text_grpc.ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
+				RegistrationOrgText:                  text_grpc.RegistrationOrgScreenTextToPb(text.RegistrationOrg),
+				LinkingUserDoneText:                  text_grpc.LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
+				ExternalUserNotFoundText:             text_grpc.ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
+				SuccessLoginText:                     text_grpc.SuccessLoginScreenTextToPb(text.LoginSuccess),
+				LogoutText:                           text_grpc.LogoutDoneScreenTextToPb(text.LogoutDone),
+				FooterText:                           text_grpc.FooterTextToPb(text.Footer),
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomInitMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomInitMessageTextRequest, 0)
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.InitCodeMessageType, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomInitMessageTextRequest{
+				Language:   lang,
+				Title:      text.Title,
+				PreHeader:  text.PreHeader,
+				Subject:    text.Subject,
+				Greeting:   text.Greeting,
+				Text:       text.Text,
+				ButtonText: text.ButtonText,
+				FooterText: text.Footer,
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordResetMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomPasswordResetMessageTextRequest, 0)
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.PasswordResetMessageType, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomPasswordResetMessageTextRequest{
+				Language:   lang,
+				Title:      text.Title,
+				PreHeader:  text.PreHeader,
+				Subject:    text.Subject,
+				Greeting:   text.Greeting,
+				Text:       text.Text,
+				ButtonText: text.ButtonText,
+				FooterText: text.Footer,
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyEmailMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomVerifyEmailMessageTextRequest, 0)
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyEmailMessageType, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomVerifyEmailMessageTextRequest{
+				Language:   lang,
+				Title:      text.Title,
+				PreHeader:  text.PreHeader,
+				Subject:    text.Subject,
+				Greeting:   text.Greeting,
+				Text:       text.Text,
+				ButtonText: text.ButtonText,
+				FooterText: text.Footer,
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, 0)
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyPhoneMessageType, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomVerifyPhoneMessageTextRequest{
+				Language:   lang,
+				Title:      text.Title,
+				PreHeader:  text.PreHeader,
+				Subject:    text.Subject,
+				Greeting:   text.Greeting,
+				Text:       text.Text,
+				ButtonText: text.ButtonText,
+				FooterText: text.Footer,
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomDomainClaimedMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomDomainClaimedMessageTextRequest, 0)
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomDomainClaimedMessageTextRequest{
+				Language:   lang,
+				Title:      text.Title,
+				PreHeader:  text.PreHeader,
+				Subject:    text.Subject,
+				Greeting:   text.Greeting,
+				Text:       text.Text,
+				ButtonText: text.ButtonText,
+				FooterText: text.Footer,
+			})
+		}
+	}
+
+	return customTexts, nil
+}
+
+func (s *Server) getCustomPasswordlessRegistrationMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, error) {
+	customTexts := make([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, 0)
+	for _, lang := range languages {
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		if !text.IsDefault {
+			customTexts = append(customTexts, &management_pb.SetCustomPasswordlessRegistrationMessageTextRequest{
+				Language:   lang,
+				Title:      text.Title,
+				PreHeader:  text.PreHeader,
+				Subject:    text.Subject,
+				Greeting:   text.Greeting,
+				Text:       text.Text,
+				ButtonText: text.ButtonText,
+				FooterText: text.Footer,
+			})
+		}
+	}
+
+	return customTexts, nil
 }
