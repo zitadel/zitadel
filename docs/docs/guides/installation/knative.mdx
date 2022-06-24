@@ -43,10 +43,14 @@ create a secret with your certificates for TLS termination
 kubectl apply secret -f certs.yaml
 ```
 
+
 ## Start ZITADEL with Knative 
 ```bash
+
+# start zitadel
+
 kn service create zitadel \
---image ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.30-amd64 \
+--image ghcr.io/zitadel/zitadel:latest \
 --port 8080 \
 --env ZITADEL_DATABASE_HOST=cockroachdb \
 --env ZITADEL_EXTERNALSECURE=false \
@@ -62,7 +66,7 @@ or use the knative service yaml
 kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/zitadel-knative-service.yaml
 ```
 
-## get started with ZIDATEL
+## Get started with ZIDATEL
 ```bash
 #get ZIDATEL URL
 kn services list
@@ -73,3 +77,9 @@ zitadel   http://zitadel.default.127.0.0.1.sslip.io   zitadel-00001   10m   3 OK
 
 Add the console path to the URL and open in browser
 http://zitadel.default.127.0.0.1.sslip.io/ui/console
+
+If you didn't configure something else, this is the default IAM admin users login:
+
+* username: zitadel-admin@zitadel.localhost
+* password: Password1!
+
