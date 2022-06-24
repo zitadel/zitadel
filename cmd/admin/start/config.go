@@ -16,6 +16,7 @@ import (
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
+	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -31,6 +32,7 @@ type Config struct {
 	ExternalPort      uint16
 	ExternalDomain    string
 	ExternalSecure    bool
+	TLS               network.TLS
 	HTTP2HostHeader   string
 	HTTP1HostHeader   string
 	WebAuthNName      string
