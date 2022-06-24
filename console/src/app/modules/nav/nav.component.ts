@@ -105,7 +105,7 @@ export class NavComponent implements OnDestroy {
 
   public loadEnvironment(): void {
     this.http
-      .get('../../assets/environment.json')
+      .get('./assets/environment.json')
       .pipe(take(1))
       .subscribe((data: any) => {
         if (data && data.customer_portal) {
