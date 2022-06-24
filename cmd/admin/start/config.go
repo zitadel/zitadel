@@ -51,6 +51,7 @@ type Config struct {
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
 	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
+	CustomerPortal    string
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
