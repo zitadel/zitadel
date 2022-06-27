@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetMyInstance(ctx context.Context, _ *admin_pb.GetMyInstanceRequest) (*admin_pb.GetMyInstanceResponse, error) {
-	instance, err := s.query.Instance(ctx)
+	instance, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
 	}
