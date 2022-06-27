@@ -5,9 +5,9 @@ title: Load Balancing Example
 With this example configuration, you create a near production environment for ZITADEL with [Docker Compose](https://docs.docker.com/compose/).
 
 The stack consists of three long-running containers:
-- A [Traefik](https://doc.traefik.io/traefik/) reverse proxy with upstream HTTP/2 enabled, issuing a self-signed TLS certificate
-- A secure ZITADEL container configured for a custom domain
-- A secure [CockroachDB](https://www.cockroachlabs.com/docs/stable/)
+- A [Traefik](https://doc.traefik.io/traefik/) reverse proxy with upstream HTTP/2 enabled, issuing a self-signed TLS certificate.
+- A secure ZITADEL container configured for a custom domain. As we terminate TLS with Traefik, we configure ZITADEL for `--tlsMode external`.
+- A secure [CockroachDB](https://www.cockroachlabs.com/docs/stable/).
 
 The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
 
