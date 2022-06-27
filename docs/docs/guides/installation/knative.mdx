@@ -54,7 +54,9 @@ kn service create zitadel \
 --port 8080 \
 --env ZITADEL_DATABASE_HOST=cockroachdb \
 --env ZITADEL_EXTERNALSECURE=false \
---env ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=zitadel.default.127.0.0.1.sslip.io \
+--env ZITADEL_EXTERNALPORT=80 \
+--env ZITADEL_TLS_ENABLED=false \
+--env ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN=zitadel.default.127.0.0.1.sslip.io \
 --arg "admin" --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" \
 --mount /tls.secret=secret:certs/tls.secret \
 --mount /tls.key=secret:certs/tls.key
