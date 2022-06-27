@@ -10,7 +10,7 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
@@ -37,8 +37,8 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
   public addOnBlur: boolean = true;
   public separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  public myControl: FormControl = new FormControl();
-  public globalLoginNameControl: FormControl = new FormControl();
+  public myControl: UntypedFormControl = new UntypedFormControl();
+  public globalLoginNameControl: UntypedFormControl = new UntypedFormControl();
 
   public loginNames: string[] = [];
   @Input() public users: Array<User.AsObject> = [];

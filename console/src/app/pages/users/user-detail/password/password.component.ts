@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, take } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
@@ -33,13 +33,13 @@ export class PasswordComponent implements OnDestroy {
   userId: string = '';
 
   public policy!: PasswordComplexityPolicy.AsObject;
-  public passwordForm!: FormGroup;
+  public passwordForm!: UntypedFormGroup;
 
   private formSub: Subscription = new Subscription();
 
   constructor(
     activatedRoute: ActivatedRoute,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private authService: GrpcAuthService,
     private mgmtUserService: ManagementService,
     private toast: ToastService,

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs';
 import {
@@ -36,7 +36,7 @@ export class NotificationSettingsComponent implements OnInit {
   public logProviderLoading: boolean = false;
   public fileProviderLoading: boolean = false;
 
-  public form!: FormGroup;
+  public form!: UntypedFormGroup;
 
   public SMSProviderConfigState: any = SMSProviderConfigState;
   public InfoSectionType: any = InfoSectionType;
@@ -49,7 +49,7 @@ export class NotificationSettingsComponent implements OnInit {
     private service: AdminService,
     private dialog: MatDialog,
     private toast: ToastService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private authService: GrpcAuthService,
   ) {
     this.form = this.fb.group({

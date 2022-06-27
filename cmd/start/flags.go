@@ -4,15 +4,18 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/zitadel/zitadel/cmd/admin/key"
+	"github.com/zitadel/zitadel/cmd/key"
+	"github.com/zitadel/zitadel/cmd/tls"
 )
+
+var tlsMode *string
 
 func startFlags(cmd *cobra.Command) {
 	bindUint16Flag(cmd, "port", "port to run ZITADEL on")
 	bindStringFlag(cmd, "externalDomain", "domain ZITADEL will be exposed on")
 	bindStringFlag(cmd, "externalPort", "port ZITADEL will be exposed on")
-	bindBoolFlag(cmd, "externalSecure", "if ZITADEL will be served on HTTPS")
 
+	tls.AddTLSModeFlag(cmd)
 	key.AddMasterKeyFlag(cmd)
 }
 

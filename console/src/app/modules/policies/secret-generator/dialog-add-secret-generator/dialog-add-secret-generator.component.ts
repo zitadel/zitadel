@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { UpdateSecretGeneratorRequest } from 'src/app/proto/generated/zitadel/admin_pb';
@@ -22,10 +22,10 @@ export class DialogAddSecretGeneratorComponent {
   ];
   public req: UpdateSecretGeneratorRequest = new UpdateSecretGeneratorRequest();
 
-  public specsForm!: FormGroup;
+  public specsForm!: UntypedFormGroup;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<DialogAddSecretGeneratorComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {

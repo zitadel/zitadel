@@ -14,7 +14,6 @@ cockroach start-single-node --insecure --background --http-addr :9090
 Configure your environment and generate a master encryption key
 
 ```bash
-export ZITADEL_EXTERNALSECURE=false
 export ZITADEL_EXTERNALDOMAIN=localhost
 export ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
 ```
@@ -22,11 +21,11 @@ export ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
 Download the zitadel binary
 
 ```bash
-curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.17 | grep "browser_download_url.*zitadel_Linux_$(uname -i)" | cut -d '"' -f 4 | wget -i - -O - | sudo tar -x -z -v -C /usr/local/bin -f - zitadel && sudo chmod +x /usr/local/bin/zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.33 | grep "browser_download_url.*zitadel_Linux_$(uname -i)" | cut -d '"' -f 4 | wget -i - -O - | sudo tar -x -z -v -C /usr/local/bin -f - zitadel && sudo chmod +x /usr/local/bin/zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
 ```
 
 Run the database and application containers
 
 ```bash
-zitadel admin start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
+zitadel start-from-init --tlsMode disabled --masterkey "MasterkeyNeedsToHave32Characters"
 ```

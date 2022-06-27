@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
   private sub: Subscription = new Subscription();
 
   public privacyPolicy: PrivacyPolicy.AsObject | undefined = undefined;
-  public form!: FormGroup;
+  public form!: UntypedFormGroup;
   public InfoSectionType: any = InfoSectionType;
 
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
@@ -54,7 +54,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
   ) {
     this.form = this.fb.group({
       tosLink: ['', []],

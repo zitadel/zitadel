@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -46,9 +46,9 @@ export class IdpComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public projectId: string = '';
 
-  public idpForm!: FormGroup;
-  public oidcConfigForm!: FormGroup;
-  public jwtConfigForm!: FormGroup;
+  public idpForm!: UntypedFormGroup;
+  public oidcConfigForm!: UntypedFormGroup;
+  public jwtConfigForm!: UntypedFormGroup;
 
   IDPState: any = IDPState;
 
@@ -70,27 +70,27 @@ export class IdpComponent implements OnDestroy {
     private dialog: MatDialog,
     breadcrumbService: BreadcrumbService,
   ) {
-    this.idpForm = new FormGroup({
-      id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
-      name: new FormControl('', [Validators.required]),
-      stylingType: new FormControl('', [Validators.required]),
-      autoRegister: new FormControl(false, [Validators.required]),
+    this.idpForm = new UntypedFormGroup({
+      id: new UntypedFormControl({ disabled: true, value: '' }, [Validators.required]),
+      name: new UntypedFormControl('', [Validators.required]),
+      stylingType: new UntypedFormControl('', [Validators.required]),
+      autoRegister: new UntypedFormControl(false, [Validators.required]),
     });
 
-    this.oidcConfigForm = new FormGroup({
-      clientId: new FormControl('', [Validators.required]),
-      clientSecret: new FormControl(''),
-      issuer: new FormControl('', [Validators.required]),
-      scopesList: new FormControl([], []),
-      displayNameMapping: new FormControl(0),
-      usernameMapping: new FormControl(0),
+    this.oidcConfigForm = new UntypedFormGroup({
+      clientId: new UntypedFormControl('', [Validators.required]),
+      clientSecret: new UntypedFormControl(''),
+      issuer: new UntypedFormControl('', [Validators.required]),
+      scopesList: new UntypedFormControl([], []),
+      displayNameMapping: new UntypedFormControl(0),
+      usernameMapping: new UntypedFormControl(0),
     });
 
-    this.jwtConfigForm = new FormGroup({
-      jwtEndpoint: new FormControl('', [Validators.required]),
-      issuer: new FormControl('', [Validators.required]),
-      keysEndpoint: new FormControl('', [Validators.required]),
-      headerName: new FormControl('', [Validators.required]),
+    this.jwtConfigForm = new UntypedFormGroup({
+      jwtEndpoint: new UntypedFormControl('', [Validators.required]),
+      issuer: new UntypedFormControl('', [Validators.required]),
+      keysEndpoint: new UntypedFormControl('', [Validators.required]),
+      headerName: new UntypedFormControl('', [Validators.required]),
     });
 
     const serviceType = this.route.snapshot.data.serviceType;

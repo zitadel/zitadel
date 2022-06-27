@@ -12,6 +12,10 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin"
+	"github.com/zitadel/zitadel/cmd/initialise"
+	"github.com/zitadel/zitadel/cmd/key"
+	"github.com/zitadel/zitadel/cmd/setup"
+	"github.com/zitadel/zitadel/cmd/start"
 )
 
 var (
@@ -41,7 +45,14 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
 
-	cmd.AddCommand(admin.New())
+	cmd.AddCommand(
+		admin.New(), //is now deprecated, remove later on
+		initialise.New(),
+		setup.New(),
+		start.New(),
+		start.NewStartFromInit(),
+		key.New(),
+	)
 
 	return cmd
 }

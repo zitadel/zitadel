@@ -1,6 +1,6 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { forkJoin, from, Subject } from 'rxjs';
@@ -27,7 +27,7 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
   public removable: boolean = true;
   public addOnBlur: boolean = true;
   public separatorKeysCodes: number[] = [ENTER, COMMA];
-  public myControl: FormControl = new FormControl();
+  public myControl: UntypedFormControl = new UntypedFormControl();
   public names: string[] = [];
   public projects: Array<GrantedProject.AsObject | Project.AsObject | any> = [];
   public filteredProjects: Array<GrantedProject.AsObject | Project.AsObject | any> = [];
