@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { GetLockoutPolicyResponse as AdminGetPasswordLockoutPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
@@ -23,7 +23,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
   @Input() public service!: ManagementService | AdminService;
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-  public lockoutForm!: FormGroup;
+  public lockoutForm!: UntypedFormGroup;
   public lockoutData!: LockoutPolicy.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public InfoSectionType: any = InfoSectionType;

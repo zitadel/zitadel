@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
 
@@ -17,7 +17,7 @@ export class AddKeyDialogComponent {
   public startDate: Date = new Date();
   types: KeyType[] = [];
   public type!: KeyType;
-  public dateControl: FormControl = new FormControl('', []);
+  public dateControl: UntypedFormControl = new UntypedFormControl('', []);
 
   constructor(
     public dialogRef: MatDialogRef<AddKeyDialogComponent>,
