@@ -15,14 +15,8 @@ services:
     restart: 'always'
     networks:
       - 'zitadel'
-    image: 'ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.25-amd64'
+    image: 'ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.33-amd64'
     command: 'admin start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}"'
-    healthcheck:
-      test: ["CMD", "zitadel", "admin", "status", "health"]
-      interval: '10s'
-      timeout: '30s'
-      retries: 5
-      start_period: '40s'
     depends_on:
       chown:
         condition: 'service_completed_successfully'
