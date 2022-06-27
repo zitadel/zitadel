@@ -27,12 +27,12 @@ const (
 	CustomTextTextCol         = "text"
 )
 
-type CustomTextProjection struct {
+type customTextProjection struct {
 	crdb.StatementHandler
 }
 
-func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *CustomTextProjection {
-	p := new(CustomTextProjection)
+func newCustomTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *customTextProjection {
+	p := new(customTextProjection)
 	config.ProjectionName = CustomTextTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -55,7 +55,7 @@ func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerCo
 	return p
 }
 
-func (p *CustomTextProjection) reducers() []handler.AggregateReducer {
+func (p *customTextProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -94,7 +94,7 @@ func (p *CustomTextProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *CustomTextProjection) reduceSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *customTextProjection) reduceSet(event eventstore.Event) (*handler.Statement, error) {
 	var customTextEvent policy.CustomTextSetEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -123,7 +123,7 @@ func (p *CustomTextProjection) reduceSet(event eventstore.Event) (*handler.State
 		}), nil
 }
 
-func (p *CustomTextProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *customTextProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var customTextEvent policy.CustomTextRemovedEvent
 	switch e := event.(type) {
 	case *org.CustomTextRemovedEvent:
@@ -143,7 +143,7 @@ func (p *CustomTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 		}), nil
 }
 
-func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *customTextProjection) reduceTemplateRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var customTextEvent policy.CustomTextTemplateRemovedEvent
 	switch e := event.(type) {
 	case *org.CustomTextTemplateRemovedEvent:

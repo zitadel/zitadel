@@ -24,12 +24,12 @@ const (
 	ProjectRoleColumnGroupName     = "group_name"
 )
 
-type ProjectRoleProjection struct {
+type projectRoleProjection struct {
 	crdb.StatementHandler
 }
 
-func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectRoleProjection {
-	p := new(ProjectRoleProjection)
+func newProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectRoleProjection {
+	p := new(projectRoleProjection)
 	config.ProjectionName = ProjectRoleProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -51,7 +51,7 @@ func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerC
 	return p
 }
 
-func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
+func (p *projectRoleProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -77,7 +77,7 @@ func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.RoleAddedType)
@@ -98,7 +98,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sM0f", "reduce.wrong.event.type %s", project.GrantChangedType)
@@ -125,7 +125,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-L0fJf", "reduce.wrong.event.type %s", project.GrantRemovedType)
@@ -139,7 +139,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event)
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-l0geG", "reduce.wrong.event.type %s", project.ProjectRemovedType)

@@ -1,8 +1,9 @@
 package twilio
 
 import (
-	twilio "github.com/kevinburke/twilio-go"
+	"github.com/kevinburke/twilio-go"
 	"github.com/zitadel/logging"
+
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -11,7 +12,7 @@ import (
 func InitTwilioChannel(config TwilioConfig) channels.NotificationChannel {
 	client := twilio.NewClient(config.SID, config.Token, nil)
 
-	logging.Log("NOTIF-KaxDZ").Debug("successfully initialized twilio sms channel")
+	logging.Debug("successfully initialized twilio sms channel")
 
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 		twilioMsg, ok := message.(*messages.SMS)
@@ -22,7 +23,7 @@ func InitTwilioChannel(config TwilioConfig) channels.NotificationChannel {
 		if err != nil {
 			return caos_errs.ThrowInternal(err, "TWILI-osk3S", "could not send message")
 		}
-		logging.LogWithFields("SMS_-f335c523", "message_sid", m.Sid, "status", m.Status).Debug("sms sent")
+		logging.WithFields("message_sid", m.Sid, "status", m.Status).Debug("sms sent")
 		return nil
 	})
 }

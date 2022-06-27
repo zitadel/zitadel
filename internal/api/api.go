@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"crypto/tls"
 	"net/http"
 	"strings"
 
@@ -31,10 +32,10 @@ type API struct {
 
 type health interface {
 	Health(ctx context.Context) error
-	Instance(ctx context.Context) (*query.Instance, error)
+	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
-func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, http2HostName, http1HostName string) *API {
+func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, tlsConfig *tls.Config, http2HostName, http1HostName string) *API {
 	api := &API{
 		port:           port,
 		verifier:       verifier,
@@ -43,7 +44,7 @@ func New(port uint16, router *mux.Router, queries *query.Queries, verifier *inte
 		externalSecure: externalSecure,
 		http1HostName:  http1HostName,
 	}
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig)
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())

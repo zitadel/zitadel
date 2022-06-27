@@ -19,12 +19,12 @@ const (
 	ProjectGrantMemberGrantIDCol      = "grant_id"
 )
 
-type ProjectGrantMemberProjection struct {
+type projectGrantMemberProjection struct {
 	crdb.StatementHandler
 }
 
-func NewProjectGrantMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectGrantMemberProjection {
-	p := new(ProjectGrantMemberProjection)
+func newProjectGrantMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectGrantMemberProjection {
+	p := new(projectGrantMemberProjection)
 	config.ProjectionName = ProjectGrantMemberProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -42,7 +42,7 @@ func NewProjectGrantMemberProjection(ctx context.Context, config crdb.StatementH
 	return p
 }
 
-func (p *ProjectGrantMemberProjection) reducers() []handler.AggregateReducer {
+func (p *projectGrantMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -94,7 +94,7 @@ func (p *ProjectGrantMemberProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *ProjectGrantMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0EBQf", "reduce.wrong.event.type %s", project.GrantMemberAddedType)
@@ -106,7 +106,7 @@ func (p *ProjectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-YX5Tk", "reduce.wrong.event.type %s", project.GrantMemberChangedType)
@@ -118,7 +118,7 @@ func (p *ProjectGrantMemberProjection) reduceChanged(event eventstore.Event) (*h
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberCascadeRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-adnHG", "reduce.wrong.event.type %s", project.GrantMemberCascadeRemovedType)
@@ -130,7 +130,7 @@ func (p *ProjectGrantMemberProjection) reduceCascadeRemoved(event eventstore.Eve
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-MGNnA", "reduce.wrong.event.type %s", project.GrantMemberRemovedType)
@@ -142,7 +142,7 @@ func (p *ProjectGrantMemberProjection) reduceRemoved(event eventstore.Event) (*h
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-rufJr", "reduce.wrong.event.type %s", user.UserRemovedType)
@@ -150,7 +150,7 @@ func (p *ProjectGrantMemberProjection) reduceUserRemoved(event eventstore.Event)
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
 
-func (p *ProjectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	//TODO: as soon as org deletion is implemented:
 	// Case: The user has resource owner A and project has resource owner B
 	// if org B deleted it works
@@ -162,7 +162,7 @@ func (p *ProjectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) 
 	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
 }
 
-func (p *ProjectGrantMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-JLODy", "reduce.wrong.event.type %s", project.ProjectRemovedType)
@@ -170,7 +170,7 @@ func (p *ProjectGrantMemberProjection) reduceProjectRemoved(event eventstore.Eve
 	return reduceMemberRemoved(e, withMemberCond(ProjectGrantMemberProjectIDCol, e.Aggregate().ID))
 }
 
-func (p *ProjectGrantMemberProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantMemberProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-D1J9R", "reduce.wrong.event.type %s", project.GrantRemovedType)

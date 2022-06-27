@@ -236,6 +236,30 @@ Update twilio sms provider token
     PUT: /sms/twilio/{id}/token
 
 
+### ActivateSMSProvider
+
+> **rpc** ActivateSMSProvider([ActivateSMSProviderRequest](#activatesmsproviderrequest))
+[ActivateSMSProviderResponse](#activatesmsproviderresponse)
+
+Activate sms provider
+
+
+
+    POST: /sms/{id}/_activate
+
+
+### DeactivateSMSProvider
+
+> **rpc** DeactivateSMSProvider([DeactivateSMSProviderRequest](#deactivatesmsproviderrequest))
+[DeactivateSMSProviderResponse](#deactivatesmsproviderresponse)
+
+Deactivate sms provider
+
+
+
+    POST: /sms/{id}/_deactivate
+
+
 ### RemoveSMSProvider
 
 > **rpc** RemoveSMSProvider([RemoveSMSProviderRequest](#removesmsproviderrequest))
@@ -1494,6 +1518,28 @@ This is an empty request
 
 
 
+### ActivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ActivateSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddCustomDomainPolicyRequest
 
 
@@ -1755,6 +1801,28 @@ This is an empty request
 
 
 ### DeactivateIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### DeactivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### DeactivateSMSProviderResponse
 
 
 

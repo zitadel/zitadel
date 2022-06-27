@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
 func (s *Server) ListSMSProviders(ctx context.Context, req *admin_pb.ListSMSProvidersRequest) (*admin_pb.ListSMSProvidersResponse, error) {
@@ -17,10 +16,10 @@ func (s *Server) ListSMSProviders(ctx context.Context, req *admin_pb.ListSMSProv
 	result, err := s.query.SearchSMSConfigs(ctx, queries)
 	if err != nil {
 		return nil, err
-
 	}
 	return &admin_pb.ListSMSProvidersResponse{
 		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Result:  SMSConfigsToPb(result.Configs),
 	}, nil
 }
 
@@ -28,15 +27,9 @@ func (s *Server) GetSMSProvider(ctx context.Context, req *admin_pb.GetSMSProvide
 	result, err := s.query.SMSProviderConfigByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
-
 	}
 	return &admin_pb.GetSMSProviderResponse{
-		Config: &settings_pb.SMSProvider{
-			Details: object.ToViewDetailsPb(result.Sequence, result.CreationDate, result.ChangeDate, result.ResourceOwner),
-			Id:      result.ID,
-			State:   smsStateToPb(result.State),
-			Config:  SMSConfigToPb(result),
-		},
+		Config: SMSConfigToProviderPb(result),
 	}, nil
 }
 
@@ -44,7 +37,6 @@ func (s *Server) AddSMSProviderTwilio(ctx context.Context, req *admin_pb.AddSMSP
 	id, result, err := s.command.AddSMSConfigTwilio(ctx, authz.GetInstance(ctx).InstanceID(), AddSMSConfigTwilioToConfig(req))
 	if err != nil {
 		return nil, err
-
 	}
 	return &admin_pb.AddSMSProviderTwilioResponse{
 		Details: object.DomainToAddDetailsPb(result),
@@ -56,7 +48,6 @@ func (s *Server) UpdateSMSProviderTwilio(ctx context.Context, req *admin_pb.Upda
 	result, err := s.command.ChangeSMSConfigTwilio(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, UpdateSMSConfigTwilioToConfig(req))
 	if err != nil {
 		return nil, err
-
 	}
 	return &admin_pb.UpdateSMSProviderTwilioResponse{
 		Details: object.DomainToChangeDetailsPb(result),
@@ -74,11 +65,31 @@ func (s *Server) UpdateSMSProviderTwilioToken(ctx context.Context, req *admin_pb
 	}, nil
 }
 
+func (s *Server) ActivateSMSProvider(ctx context.Context, req *admin_pb.ActivateSMSProviderRequest) (*admin_pb.ActivateSMSProviderResponse, error) {
+	result, err := s.command.ActivateSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ActivateSMSProviderResponse{
+		Details: object.DomainToAddDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) DeactivateSMSProvider(ctx context.Context, req *admin_pb.DeactivateSMSProviderRequest) (*admin_pb.DeactivateSMSProviderResponse, error) {
+	result, err := s.command.DeactivateSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
+	if err != nil {
+		return nil, err
+
+	}
+	return &admin_pb.DeactivateSMSProviderResponse{
+		Details: object.DomainToAddDetailsPb(result),
+	}, nil
+}
+
 func (s *Server) RemoveSMSProvider(ctx context.Context, req *admin_pb.RemoveSMSProviderRequest) (*admin_pb.RemoveSMSProviderResponse, error) {
 	result, err := s.command.RemoveSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
-
 	}
 	return &admin_pb.RemoveSMSProviderResponse{
 		Details: object.DomainToAddDetailsPb(result),

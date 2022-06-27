@@ -63,6 +63,7 @@
           font-weight: 500;
           margin: 0.25rem 2px;
           white-space: nowrap;
+          position: relative;
 
           .c_label {
             display: flex;
@@ -72,6 +73,16 @@
             .count {
               display: none;
               margin-left: 6px;
+            }
+          }
+
+          &.external-link {
+            padding-right: 2rem;
+
+            i {
+              position: absolute;
+              right: 8px;
+              font-size: 1.2rem;
             }
           }
 

@@ -22,12 +22,12 @@ const (
 	FlowActionIDCol              = "action_id"
 )
 
-type FlowProjection struct {
+type flowProjection struct {
 	crdb.StatementHandler
 }
 
-func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FlowProjection {
-	p := new(FlowProjection)
+func newFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) *flowProjection {
+	p := new(flowProjection)
 	config.ProjectionName = FlowTriggerTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -48,7 +48,7 @@ func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 	return p
 }
 
-func (p *FlowProjection) reducers() []handler.AggregateReducer {
+func (p *flowProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -66,7 +66,7 @@ func (p *FlowProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event) (*handler.Statement, error) {
+func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.TriggerActionsSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.TriggerActionsSetEventType)
@@ -96,7 +96,7 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 	return crdb.NewMultiStatement(e, stmts...), nil
 }
 
-func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
+func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FlowClearedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.FlowClearedEventType)

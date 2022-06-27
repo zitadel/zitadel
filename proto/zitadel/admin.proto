@@ -354,6 +354,30 @@ service AdminService {
         };
     }
 
+    // Activate sms provider
+    rpc ActivateSMSProvider(ActivateSMSProviderRequest) returns (ActivateSMSProviderResponse) {
+        option (google.api.http) = {
+            post: "/sms/{id}/_activate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Deactivate sms provider
+    rpc DeactivateSMSProvider(DeactivateSMSProviderRequest) returns (DeactivateSMSProviderResponse) {
+        option (google.api.http) = {
+            post: "/sms/{id}/_deactivate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // Remove sms provider token
     rpc RemoveSMSProvider(RemoveSMSProviderRequest) returns (RemoveSMSProviderResponse) {
         option (google.api.http) = {
@@ -2798,6 +2822,22 @@ message UpdateSMSProviderTwilioTokenRequest {
 }
 
 message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ActivateSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ActivateSMSProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateSMSProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

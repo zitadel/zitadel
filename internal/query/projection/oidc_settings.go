@@ -26,12 +26,12 @@ const (
 	OIDCSettingsColumnRefreshTokenExpiration     = "refresh_token_expiration"
 )
 
-type OIDCSettingsProjection struct {
+type oidcSettingsProjection struct {
 	crdb.StatementHandler
 }
 
-func NewOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OIDCSettingsProjection {
-	p := new(OIDCSettingsProjection)
+func newOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandlerConfig) *oidcSettingsProjection {
+	p := new(oidcSettingsProjection)
 	config.ProjectionName = OIDCSettingsProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -55,7 +55,7 @@ func NewOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandler
 	return p
 }
 
-func (p *OIDCSettingsProjection) reducers() []handler.AggregateReducer {
+func (p *oidcSettingsProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -73,7 +73,7 @@ func (p *OIDCSettingsProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *oidcSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.OIDCSettingsAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-f9nwf", "reduce.wrong.event.type %s", instance.OIDCSettingsAddedEventType)
@@ -95,7 +95,7 @@ func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 	), nil
 }
 
-func (p *OIDCSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.OIDCSettingsChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-8JJ2d", "reduce.wrong.event.type %s", instance.OIDCSettingsChangedEventType)

@@ -25,12 +25,12 @@ const (
 	IDPUserLinkDisplayNameCol    = "display_name"
 )
 
-type IDPUserLinkProjection struct {
+type idpUserLinkProjection struct {
 	crdb.StatementHandler
 }
 
-func NewIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPUserLinkProjection {
-	p := new(IDPUserLinkProjection)
+func newIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *idpUserLinkProjection {
+	p := new(idpUserLinkProjection)
 	config.ProjectionName = IDPUserLinkTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -53,7 +53,7 @@ func NewIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 	return p
 }
 
-func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
+func (p *idpUserLinkProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -101,7 +101,7 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DpmXq", "reduce.wrong.event.type %s", user.UserIDPLinkAddedType)
@@ -122,7 +122,7 @@ func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.St
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", user.UserIDPLinkRemovedType)
@@ -137,7 +137,7 @@ func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkCascadeRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jQpv9", "reduce.wrong.event.type %s", user.UserIDPLinkCascadeRemovedType)
@@ -152,7 +152,7 @@ func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
@@ -165,7 +165,7 @@ func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uwlWE", "reduce.wrong.event.type %s", user.UserRemovedType)
@@ -178,7 +178,7 @@ func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*hand
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idpID string
 
 	switch e := event.(type) {
