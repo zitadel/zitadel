@@ -606,7 +606,8 @@ func (n *Notification) getTranslatorWithOrgTexts(ctx context.Context, orgID, tex
 }
 
 func (n *Notification) getUserByID(userID, instanceID string) (*model.NotifyUser, error) {
-	return n.view.NotifyUserByID(userID, instanceID)
+	// return n.view.NotifyUserByID(userID, instanceID)
+	return n.queries.NotifyUserByID(userID, intstanceID)
 }
 
 func (n *Notification) origin(ctx context.Context) (string, error) {
