@@ -5,9 +5,10 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/cmd/admin/initialise"
-	"github.com/zitadel/zitadel/cmd/admin/key"
-	"github.com/zitadel/zitadel/cmd/admin/setup"
+	"github.com/zitadel/zitadel/cmd/initialise"
+	"github.com/zitadel/zitadel/cmd/key"
+	"github.com/zitadel/zitadel/cmd/setup"
+	"github.com/zitadel/zitadel/cmd/tls"
 )
 
 func NewStartFromInit() *cobra.Command {
@@ -22,6 +23,9 @@ Last ZITADEL starts.
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
+			err := tls.ModeFromFlag(cmd)
+			logging.OnError(err).Fatal("invalid tlsMode")
+
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Panic("No master key provided")
 

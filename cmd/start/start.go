@@ -2,6 +2,7 @@ package start
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	_ "embed"
 	"fmt"
@@ -20,7 +21,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/zitadel/zitadel/cmd/admin/key"
+	"github.com/zitadel/zitadel/cmd/key"
+	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
@@ -57,6 +59,10 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			err := cmd_tls.ModeFromFlag(cmd)
+			if err != nil {
+				return err
+			}
 			config := MustNewConfig(viper.GetViper())
 			masterKey, err := key.MasterKey(cmd)
 			if err != nil {
@@ -136,14 +142,18 @@ func startZitadel(config *Config, masterKey string) error {
 	notification.Start(config.Notification, config.ExternalPort, config.ExternalSecure, commands, queries, dbClient, assets.HandlerPrefix, config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, config.SystemAPIUsers)
+	tlsConfig, err := config.TLS.Config()
 	if err != nil {
 		return err
 	}
-	return listen(ctx, router, config.Port)
+	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys)
+	if err != nil {
+		return err
+	}
+	return listen(ctx, router, config.Port, tlsConfig)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys, systemAPIKeys map[string]*internal_authz.SystemAPIUser) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -151,9 +161,12 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		authZRepo,
 		queries,
 	}
-	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), systemAPIKeys)
-
-	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader, config.HTTP1HostHeader)
+	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
+	tlsConfig, err := config.TLS.Config()
+	if err != nil {
+		return err
+	}
+	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader)
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
@@ -215,9 +228,9 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	return nil
 }
 
-func listen(ctx context.Context, router *mux.Router, port uint16) error {
+func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config) error {
 	http2Server := &http2.Server{}
-	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server)}
+	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig}
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		return fmt.Errorf("tcp listener on %d failed: %w", port, err)
@@ -227,7 +240,12 @@ func listen(ctx context.Context, router *mux.Router, port uint16) error {
 
 	go func() {
 		logging.Infof("server is listening on %s", lis.Addr().String())
-		errCh <- http1Server.Serve(lis)
+		if tlsConfig != nil {
+			//we don't need to pass the files here, because we already initialized the TLS config on the server
+			errCh <- http1Server.ServeTLS(lis, "", "")
+		} else {
+			errCh <- http1Server.Serve(lis)
+		}
 	}()
 
 	shutdown := make(chan os.Signal, 1)
