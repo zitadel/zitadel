@@ -36,7 +36,7 @@
     "codemirror": "^5.65.0",
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
-    "google-proto-files": "^2.5.0",
+    "google-proto-files": "^3.0.0",
     "google-protobuf": "^3.19.4",
     "grpc-web": "^1.3.0",
     "libphonenumber-js": "^1.10.6",
