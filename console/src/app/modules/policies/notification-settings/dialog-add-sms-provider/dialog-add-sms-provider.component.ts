@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
   AddSMSProviderTwilioRequest,
@@ -27,12 +27,12 @@ export class DialogAddSMSProviderComponent {
   public provider: SMSProviderType = SMSProviderType.Twilio;
   public req!: AddSMSProviderTwilioRequest | UpdateSMSProviderTwilioRequest;
 
-  public twilioForm!: FormGroup;
+  public twilioForm!: UntypedFormGroup;
 
   private smsProviders: SMSProvider.AsObject[] = [];
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private service: AdminService,
     public dialogRef: MatDialogRef<DialogAddSMSProviderComponent>,
     private toast: ToastService,

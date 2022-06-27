@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
@@ -115,9 +115,9 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
 
   public destroy$: Subject<void> = new Subject();
   public InfoSectionType: any = InfoSectionType;
-  public form: FormGroup = new FormGroup({
-    currentSubMap: new FormControl('emailVerificationDoneText'),
-    locale: new FormControl('en'),
+  public form: UntypedFormGroup = new UntypedFormGroup({
+    currentSubMap: new UntypedFormControl('emailVerificationDoneText'),
+    locale: new UntypedFormControl('en'),
   });
 
   public canWrite$: Observable<boolean> = this.authService.isAllowed([

@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -9,7 +9,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 })
 export class AddTokenDialogComponent {
   public startDate: Date = new Date();
-  public dateControl: FormControl = new FormControl('', []);
+  public dateControl: UntypedFormControl = new UntypedFormControl('', []);
 
   constructor(public dialogRef: MatDialogRef<AddTokenDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     const today = new Date();

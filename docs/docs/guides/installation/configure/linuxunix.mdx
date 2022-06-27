@@ -21,7 +21,7 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides
 ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 
 # Pass zitadel configuration by configuration files
-zitadel admin start-from-init \
+zitadel start-from-init \
     --config ./example-zitadel-config.yaml \
     --config ./example-zitadel-secrets.yaml \
     --steps ./example-zitadel-init-steps.yaml \

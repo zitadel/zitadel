@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { parsePhoneNumber } from 'libphonenumber-js';
 
@@ -17,7 +17,7 @@ export class EditDialogComponent {
   public isPhone: boolean = false;
   public isVerified: boolean = false;
   public phoneCountry: string = 'CH';
-  public valueControl: FormControl = new FormControl(['', [Validators.required]]);
+  public valueControl: UntypedFormControl = new UntypedFormControl(['', [Validators.required]]);
   public EditDialogType: any = EditDialogType;
   constructor(public dialogRef: MatDialogRef<EditDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.valueControl.setValue(data.value);
