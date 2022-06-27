@@ -21,8 +21,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/zitadel/zitadel/cmd/admin/key"
-	cmd_tls "github.com/zitadel/zitadel/cmd/admin/tls"
+	"github.com/zitadel/zitadel/cmd/key"
+	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
