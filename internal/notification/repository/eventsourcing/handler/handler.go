@@ -48,10 +48,10 @@ func Register(configs Configs,
 	smsEncryption crypto.EncryptionAlgorithm,
 ) []queryv1.Handler {
 	return []queryv1.Handler{
-		newNotifyUser(
-			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			queries,
-		),
+		// newNotifyUser(
+		// 	handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
+		// 	queries,
+		// ),
 		newNotification(
 			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
 			command,
