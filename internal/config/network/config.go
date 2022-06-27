@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrMissingConfig = errors.New("")
+	ErrMissingConfig = errors.New("TLS is enabled: please specify a key (path) and a cert (path) or disable TLS if needed (e.g. by setting flag `--tlsMode external` or `--tlsMode disabled")
 )
 
 type TLS struct {
