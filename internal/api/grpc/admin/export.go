@@ -19,7 +19,16 @@ import (
 )
 
 func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (*admin_pb.ExportDataResponse, error) {
-	queriedOrgs, err := s.query.SearchOrgs(ctx, &query.OrgSearchQueries{})
+
+	orgSearchQuery := &query.OrgSearchQueries{}
+	if req.OrgIds != nil && len(req.OrgIds) > 0 {
+		orgIdsSearchQuery, err := query.NewOrgIDsSearchQuery(req.OrgIds...)
+		if err != nil {
+			return nil, err
+		}
+		orgSearchQuery.Queries = []query.SearchQuery{orgIdsSearchQuery}
+	}
+	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -32,18 +41,6 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	processedActions := make([]string, 0)
 
 	for _, queriedOrg := range queriedOrgs.Orgs {
-		if req.OrgIds != nil || len(req.OrgIds) > 0 {
-			found := false
-			for _, searchingOrg := range req.OrgIds {
-				if queriedOrg.ID == searchingOrg {
-					found = true
-					break
-				}
-			}
-			if !found {
-				continue
-			}
-		}
 		processedOrgs = append(processedOrgs, queriedOrg.ID)
 
 		/******************************************************************************************************************
