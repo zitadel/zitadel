@@ -84,7 +84,7 @@ func (f *file) Stat() (_ fs.FileInfo, err error) {
 	return f, nil
 }
 
-func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
+func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, instanceHandler func(http.Handler) http.Handler, customerPortal string) (http.Handler, error) {
 	fSys, err := fs.Sub(static, "static")
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 			return
 		}
 		url := http_util.BuildOrigin(r.Host, externalSecure)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID())
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
@@ -127,15 +127,17 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(api, issuer, clientID string) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID, customerPortal string) ([]byte, error) {
 	environment := struct {
-		API      string `json:"api,omitempty"`
-		Issuer   string `json:"issuer,omitempty"`
-		ClientID string `json:"clientid,omitempty"`
+		API            string `json:"api,omitempty"`
+		Issuer         string `json:"issuer,omitempty"`
+		ClientID       string `json:"clientid,omitempty"`
+		CustomerPortal string `json:"customer_portal,omitempty"`
 	}{
-		API:      api,
-		Issuer:   issuer,
-		ClientID: clientID,
+		API:            api,
+		Issuer:         issuer,
+		ClientID:       clientID,
+		CustomerPortal: customerPortal,
 	}
 	return json.Marshal(environment)
 }

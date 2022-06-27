@@ -344,6 +344,14 @@ Depending on your authorization method you will have to provide additional param
 
 Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
+```BASH
+curl --request POST \
+  --url {your_domain}/oauth/v2/introspect \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Authorization: Basic {your_basic_auth_header}' \
+  --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
+```
+
 </TabItem>
 
 <TabItem value="private_key_jwt">
