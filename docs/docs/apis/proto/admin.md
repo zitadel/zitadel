@@ -1439,6 +1439,18 @@ This is an empty response
 
 
 
+### DataJWTIDP
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - |  |
+| idp |  zitadel.management.v1.AddOrgJWTIDPRequest | - |  |
+
+
+
+
 ### DataMachineUser
 
 
@@ -1459,6 +1471,18 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | app_id |  string | - |  |
 | app |  zitadel.management.v1.AddOIDCAppRequest | - |  |
+
+
+
+
+### DataOIDCIDP
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - |  |
+| idp |  zitadel.management.v1.AddOrgOIDCIDPRequest | - |  |
 
 
 
@@ -1498,6 +1522,13 @@ This is an empty response
 | verify_phone_messages | repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest | - |  |
 | domain_claimed_messages | repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest | - |  |
 | passwordless_registration_messages | repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest | - |  |
+| oidc_idps | repeated DataOIDCIDP | - |  |
+| jwt_idps | repeated DataJWTIDP | - |  |
+| second_factors | repeated zitadel.management.v1.AddSecondFactorToLoginPolicyRequest | - |  |
+| multi_factors | repeated zitadel.management.v1.AddMultiFactorToLoginPolicyRequest | - |  |
+| idps | repeated zitadel.management.v1.AddIDPToLoginPolicyRequest | - |  |
+| user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
+| domains | repeated zitadel.org.v1.Domain | - |  |
 
 
 

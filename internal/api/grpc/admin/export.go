@@ -9,7 +9,9 @@ import (
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	org_pb "github.com/zitadel/zitadel/pkg/grpc/org"
 	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
@@ -64,6 +66,74 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			}
 		}
 
+		orgDomainOrgID, err := query.NewOrgDomainOrgIDSearchQuery(org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		orgDomainsQuery, err := s.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{orgDomainOrgID}})
+		if err != nil {
+			return nil, err
+		}
+		orgDomains := make([]*org_pb.Domain, 0)
+		for _, orgDomain := range orgDomainsQuery.Domains {
+			orgDomains = append(orgDomains, &org_pb.Domain{
+				OrgId:          orgDomain.OrgID,
+				DomainName:     orgDomain.Domain,
+				IsVerified:     orgDomain.IsVerified,
+				IsPrimary:      orgDomain.IsPrimary,
+				ValidationType: org_pb.DomainValidationType(orgDomain.ValidationType),
+			})
+		}
+		org.Domains = orgDomains
+
+		ownerType, err := query.NewIDPOwnerTypeSearchQuery(domain.IdentityProviderTypeOrg)
+		if err != nil {
+			return nil, err
+		}
+		idpQuery, err := query.NewIDPResourceOwnerSearchQuery(queriedOrg.ID)
+		if err != nil {
+			return nil, err
+		}
+		idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{Queries: []query.SearchQuery{idpQuery, ownerType}})
+		if err != nil {
+			return nil, err
+		}
+		oidcIdps := make([]*admin_pb.DataOIDCIDP, 0)
+		jwtIdps := make([]*admin_pb.DataJWTIDP, 0)
+		for _, idp := range idps.IDPs {
+			if idp.OIDCIDP != nil {
+				oidcIdps = append(oidcIdps, &admin_pb.DataOIDCIDP{
+					IdpId: idp.ID,
+					Idp: &management_pb.AddOrgOIDCIDPRequest{
+						Name:               idp.Name,
+						StylingType:        idp_pb.IDPStylingType(idp.StylingType),
+						ClientId:           idp.ClientID,
+						ClientSecret:       string(idp.ClientSecret.Crypted),
+						Issuer:             idp.OIDCIDP.Issuer,
+						Scopes:             idp.Scopes,
+						DisplayNameMapping: idp_pb.OIDCMappingField(idp.DisplayNameMapping),
+						UsernameMapping:    idp_pb.OIDCMappingField(idp.UsernameMapping),
+						AutoRegister:       idp.AutoRegister,
+					},
+				})
+			} else if idp.JWTIDP != nil {
+				jwtIdps = append(jwtIdps, &admin_pb.DataJWTIDP{
+					IdpId: idp.ID,
+					Idp: &management_pb.AddOrgJWTIDPRequest{
+						Name:         idp.Name,
+						StylingType:  idp_pb.IDPStylingType(idp.StylingType),
+						JwtEndpoint:  idp.JWTIDP.Endpoint,
+						Issuer:       idp.JWTIDP.Issuer,
+						KeysEndpoint: idp.KeysEndpoint,
+						HeaderName:   idp.HeaderName,
+						AutoRegister: idp.AutoRegister,
+					},
+				})
+			}
+		}
+		org.OidcIdps = oidcIdps
+		org.JwtIdps = jwtIdps
+
 		queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, org.GetOrgId())
 		if err != nil {
 			return nil, err
@@ -88,22 +158,28 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			return nil, err
 		}
 		if !queriedLogin.IsDefault {
-			/*
-				pwCheck := durationpb.New(queriedLogin.PasswordCheckLifetime)
-				externalLogin := durationpb.New(queriedLogin.ExternalLoginCheckLifetime)
-				mfaInitSkip := durationpb.New(queriedLogin.MFAInitSkipLifetime)
-				secondFactor := durationpb.New(queriedLogin.SecondFactorCheckLifetime)
-				multiFactor := durationpb.New(queriedLogin.MultiFactorCheckLifetime)
-			*/
-
-			secondFactors := []policy_pb.SecondFactorType{}
+			secondFactors := []*management_pb.AddSecondFactorToLoginPolicyRequest{}
 			for _, factor := range queriedLogin.SecondFactors {
-				secondFactors = append(secondFactors, policy_pb.SecondFactorType(factor))
+				secondFactors = append(secondFactors, &management_pb.AddSecondFactorToLoginPolicyRequest{Type: policy_pb.SecondFactorType(factor)})
 			}
 
-			multiFactors := []policy_pb.MultiFactorType{}
+			multiFactors := []*management_pb.AddMultiFactorToLoginPolicyRequest{}
 			for _, factor := range queriedLogin.MultiFactors {
-				multiFactors = append(multiFactors, policy_pb.MultiFactorType(factor))
+				multiFactors = append(multiFactors, &management_pb.AddMultiFactorToLoginPolicyRequest{Type: policy_pb.MultiFactorType(factor)})
+			}
+
+			idpLinksQuery, err := s.query.IDPLoginPolicyLinks(ctx, org.GetOrgId(), &query.IDPLoginPolicyLinksSearchQuery{})
+			if err != nil && !caos_errors.IsNotFound(err) {
+				return nil, err
+			}
+			idpLinks := make([]*management_pb.AddIDPToLoginPolicyRequest, 0)
+			if !caos_errors.IsNotFound(err) && idpLinksQuery != nil {
+				for _, idpLink := range idpLinksQuery.Links {
+					idpLinks = append(idpLinks, &management_pb.AddIDPToLoginPolicyRequest{
+						IdpId:     idpLink.IDPID,
+						OwnerType: idp_pb.IDPOwnerType(idpLink.IDPType),
+					})
+				}
 			}
 
 			org.LoginPolicy = &management_pb.AddCustomLoginPolicyRequest{
@@ -115,17 +191,34 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 				HidePasswordReset:      queriedLogin.HidePasswordReset,
 				IgnoreUnknownUsernames: queriedLogin.IgnoreUnknownUsernames,
 				DefaultRedirectUri:     queriedLogin.DefaultRedirectURI,
-				/*
-					PasswordCheckLifetime:      pwCheck,
-					ExternalLoginCheckLifetime: externalLogin,
-					MfaInitSkipLifetime:        mfaInitSkip,
-					SecondFactorCheckLifetime:  secondFactor,
-					MultiFactorCheckLifetime:   multiFactor,
-					SecondFactors:              secondFactors,
-					MultiFactors:               multiFactors,
-				*/
 				// TODO ???
 				//Idps:                       queriedLogin.id,
+			}
+
+			org.MultiFactors = multiFactors
+			org.SecondFactors = secondFactors
+			org.Idps = idpLinks
+		}
+
+		userLinksResourceOwner, err := query.NewIDPUserLinksResourceOwnerSearchQuery(org.GetOrgId())
+		if err != nil {
+			return nil, err
+		}
+		idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}})
+		if err != nil && !caos_errors.IsNotFound(err) {
+			return nil, err
+		}
+		userLinks := make([]*idp_pb.IDPUserLink, 0)
+		if !caos_errors.IsNotFound(err) && idpUserLinks != nil {
+			for _, idpUserLink := range idpUserLinks.Links {
+				userLinks = append(userLinks, &idp_pb.IDPUserLink{
+					UserId:           idpUserLink.UserID,
+					IdpId:            idpUserLink.IDPID,
+					IdpName:          idpUserLink.IDPName,
+					ProvidedUserId:   idpUserLink.ProvidedUserID,
+					ProvidedUserName: idpUserLink.ProvidedUsername,
+					IdpType:          idp_pb.IDPType(idpUserLink.IDPType),
+				})
 			}
 		}
 
