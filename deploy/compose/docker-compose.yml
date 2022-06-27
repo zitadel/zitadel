@@ -5,8 +5,8 @@ services:
     restart: always
     networks:
       - zitadel
-    image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.32-amd64
-    command: admin start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+    image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.33-amd64
+    command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
     environment:
       - ZITADEL_DATABASE_HOST=db
       - ZITADEL_DEFAULTINSTANCE_CUSTOMDOMAIN=localhost
