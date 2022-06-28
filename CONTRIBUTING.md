@@ -40,7 +40,7 @@ We accept contributions through pull requests. You need a github account for tha
 
 > :warning: Currently main development is done on branch `v2-alpha`. Make sure you're merging into the correct branch.
 
-1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the zitadel/zitadel repository on Github
+1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
 
 `git checkout -b my-fix-branch v2-alpha`
@@ -59,11 +59,11 @@ We accept contributions through pull requests. You need a github account for tha
 
 7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
 
-8.  On Github, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:v2-alpha`. Request review from one of the maintainers.
+8.  On GitHub, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:v2-alpha`. Request review from one of the maintainers.
 
 ### Reviewing a Pull Request
 
-The reviewers will provide you feedback and approve your changes as soon as they are satisfied. If we ask you for changes in the code, you can follow the [Github Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
+The reviewers will provide you feedback and approve your changes as soon as they are satisfied. If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
 
 <!-- TODO: how to do this via git -->
 <!-- TODO: change commit message via git -->
