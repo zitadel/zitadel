@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -22,7 +22,7 @@ export class ActionsComponent {
   public flow!: Flow.AsObject;
   public flowType: FlowType = FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION;
 
-  public typeControl: FormControl = new FormControl(FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION);
+  public typeControl: UntypedFormControl = new UntypedFormControl(FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION);
 
   public typesForSelection: FlowType[] = [FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION];
 

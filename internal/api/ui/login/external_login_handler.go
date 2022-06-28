@@ -353,7 +353,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
-	user, metadata, err = l.customExternalUserToLoginUserMapping(user, nil, authReq, idpConfig, metadata, resourceOwner)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, nil, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
 		return
@@ -368,7 +368,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(authReq.UserID, nil, authReq, idpConfig, resourceOwner)
+	userGrants, err := l.customGrants(r.Context(), authReq.UserID, nil, authReq, idpConfig, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
