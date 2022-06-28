@@ -36,7 +36,18 @@ module.exports = {
   ],
   guides: [
     "guides/overview",
-    "guides/installation/installation",
+    {
+      type: "category",
+      label: "Install ZITADEL",
+      collapsed: false,
+      items: [
+        "guides/installation/get-started/get-started",
+        "guides/installation/configure/configure",
+        "guides/installation/custom-domain",
+        "guides/installation/http2-support",
+        "guides/installation/loadbalancing-example/loadbalancing-example",
+      ],
+    },
     {
       type: "category",
       label: "Get to know ZITADEL",
