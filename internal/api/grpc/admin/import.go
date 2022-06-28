@@ -5,6 +5,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
@@ -71,6 +73,34 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				errors = append(errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
 			}
 		}
+		if org.Domains != nil {
+			for _, domainR := range org.Domains {
+				orgDomain := &domain.OrgDomain{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: org.GetOrgId(),
+					},
+					Domain: domainR.DomainName,
+				}
+				_, err := s.command.AddOrgDomain(ctx, orgDomain, []string{})
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+					continue
+				}
+				if domainR.IsVerified {
+					if _, err := s.command.ValidateOrgDomain(ctx, orgDomain, []string{}); err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "vaildate_domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+						continue
+					}
+				}
+				if domainR.IsPrimary {
+					if _, err := s.command.SetPrimaryOrgDomain(ctx, orgDomain); err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "primary_domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+						continue
+					}
+				}
+				successOrg.Domains = append(successOrg.Domains, domainR.DomainName)
+			}
+		}
 		if org.LabelPolicy != nil {
 			_, err = s.command.AddLabelPolicy(ctx, org.GetOrgId(), management.AddLabelPolicyToDomain(org.GetLabelPolicy()))
 			if err != nil {
@@ -81,6 +111,26 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			_, err = s.command.AddLockoutPolicy(ctx, org.GetOrgId(), management.AddLockoutPolicyToDomain(org.GetLockoutPolicy()))
 			if err != nil {
 				errors = append(errors, &admin_pb.ImportDataError{Type: "lockout_policy", Id: org.GetOrgId(), Message: err.Error()})
+			}
+		}
+		if org.OidcIdps != nil {
+			for _, idp := range org.OidcIdps {
+				_, err := s.command.ImportIDPConfig(ctx, management.AddOIDCIDPRequestToDomain(idp.Idp), idp.IdpId, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "oidc_idp", Id: idp.IdpId, Message: err.Error()})
+					continue
+				}
+				successOrg.OidcIpds = append(successOrg.OidcIpds, idp.GetIdpId())
+			}
+		}
+		if org.JwtIdps != nil {
+			for _, idp := range org.JwtIdps {
+				_, err := s.command.ImportIDPConfig(ctx, management.AddJWTIDPRequestToDomain(idp.Idp), idp.IdpId, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "jwt_idp", Id: idp.IdpId, Message: err.Error()})
+					continue
+				}
+				successOrg.JwtIdps = append(successOrg.JwtIdps, idp.GetIdpId())
 			}
 		}
 		if org.LoginPolicy != nil {
@@ -101,6 +151,63 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				errors = append(errors, &admin_pb.ImportDataError{Type: "privacy_policy", Id: org.GetOrgId(), Message: err.Error()})
 			}
 		}
+		if org.LoginTexts != nil {
+			for _, text := range org.GetLoginTexts() {
+				_, err := s.command.SetOrgLoginText(ctx, org.GetOrgId(), management.SetLoginCustomTextToDomain(text))
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "login_texts", Id: org.GetOrgId() + "_" + text.Language, Message: err.Error()})
+				}
+			}
+		}
+		if org.InitMessages != nil {
+			for _, message := range org.GetInitMessages() {
+				_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetInitCustomTextToDomain(message))
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "init_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+				}
+			}
+		}
+		if org.PasswordResetMessages != nil {
+			for _, message := range org.GetPasswordResetMessages() {
+				_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetPasswordResetCustomTextToDomain(message))
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "password_reset_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+				}
+			}
+		}
+		if org.VerifyEmailMessages != nil {
+			for _, message := range org.GetVerifyEmailMessages() {
+				_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetVerifyEmailCustomTextToDomain(message))
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "verify_email_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+				}
+			}
+		}
+		if org.VerifyPhoneMessages != nil {
+			for _, message := range org.GetVerifyPhoneMessages() {
+				_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetVerifyPhoneCustomTextToDomain(message))
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "verify_phone_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+				}
+			}
+		}
+		if org.DomainClaimedMessages != nil {
+			for _, message := range org.GetDomainClaimedMessages() {
+				_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetDomainClaimedCustomTextToDomain(message))
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "domain_claimed_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+				}
+			}
+		}
+		if org.PasswordlessRegistrationMessages != nil {
+			for _, message := range org.GetPasswordlessRegistrationMessages() {
+				_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetPasswordlessRegistrationCustomTextToDomain(message))
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "passwordless_registration_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+				}
+			}
+		}
+
 		if org.HumanUsers != nil {
 			for _, user := range org.GetHumanUsers() {
 				human, passwordless := management.ImportHumanUserRequestToDomain(user.User)
@@ -121,6 +228,31 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 					continue
 				}
 				successOrg.MachineUserIds = append(successOrg.MachineUserIds, user.GetUserId())
+			}
+		}
+		if org.UserMetadata != nil {
+			for _, userMetadata := range org.GetUserMetadata() {
+				_, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: userMetadata.GetKey(), Value: userMetadata.GetValue()}, userMetadata.GetId(), org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "user_metadata", Id: userMetadata.GetId() + "_" + userMetadata.GetKey(), Message: err.Error()})
+					continue
+				}
+				successOrg.UserMetadata = append(successOrg.UserMetadata, &admin_pb.ImportDataSuccessUserMetadata{UserId: userMetadata.GetId(), Key: userMetadata.GetKey()})
+			}
+		}
+		if org.UserLinks != nil {
+			for _, userLinks := range org.GetUserLinks() {
+				externalIDP := &domain.UserIDPLink{
+					ObjectRoot:     es_models.ObjectRoot{AggregateID: userLinks.UserId},
+					IDPConfigID:    userLinks.IdpId,
+					ExternalUserID: userLinks.ProvidedUserId,
+					DisplayName:    userLinks.ProvidedUserName,
+				}
+				if err := s.command.AddUserIDPLink(ctx, userLinks.UserId, org.GetOrgId(), externalIDP); err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "user_link", Id: userLinks.UserId + "_" + userLinks.IdpId, Message: err.Error()})
+					continue
+				}
+				successOrg.UserLinks = append(successOrg.UserLinks, &admin_pb.ImportDataSuccessUserLinks{UserId: userLinks.GetUserId(), IdpId: userLinks.GetIdpId(), ExternalUserId: userLinks.GetProvidedUserId(), DisplayName: userLinks.GetProvidedUserName()})
 			}
 		}
 		if org.Projects != nil {
@@ -269,26 +401,39 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 	orgs := make([]*admin_pb.DataOrg, 0)
 	for _, orgV1 := range dataOrgs.Orgs {
 		org := &admin_pb.DataOrg{
-			OrgId:                    orgV1.GetOrgId(),
-			Org:                      orgV1.GetOrg(),
-			LabelPolicy:              orgV1.GetLabelPolicy(),
-			LockoutPolicy:            orgV1.GetLockoutPolicy(),
-			LoginPolicy:              orgV1.GetLoginPolicy(),
-			PasswordComplexityPolicy: orgV1.GetPasswordComplexityPolicy(),
-			PrivacyPolicy:            orgV1.GetPrivacyPolicy(),
-			Projects:                 orgV1.GetProjects(),
-			ProjectRoles:             orgV1.GetProjectRoles(),
-			ApiApps:                  orgV1.GetApiApps(),
-			OidcApps:                 orgV1.GetOidcApps(),
-			HumanUsers:               orgV1.GetHumanUsers(),
-			MachineUsers:             orgV1.GetMachineUsers(),
-			TriggerActions:           orgV1.GetTriggerActions(),
-			Actions:                  orgV1.GetActions(),
-			ProjectGrants:            orgV1.GetProjectGrants(),
-			UserGrants:               orgV1.GetUserGrants(),
-			OrgMembers:               orgV1.GetOrgMembers(),
-			ProjectMembers:           orgV1.GetProjectMembers(),
-			ProjectGrantMembers:      orgV1.GetProjectGrantMembers(),
+			OrgId:                            orgV1.GetOrgId(),
+			Org:                              orgV1.GetOrg(),
+			DomainPolicy:                     nil,
+			LabelPolicy:                      orgV1.GetLabelPolicy(),
+			LockoutPolicy:                    orgV1.GetLockoutPolicy(),
+			LoginPolicy:                      orgV1.GetLoginPolicy(),
+			PasswordComplexityPolicy:         orgV1.GetPasswordComplexityPolicy(),
+			PrivacyPolicy:                    orgV1.GetPrivacyPolicy(),
+			Projects:                         orgV1.GetProjects(),
+			ProjectRoles:                     orgV1.GetProjectRoles(),
+			ApiApps:                          orgV1.GetApiApps(),
+			OidcApps:                         orgV1.GetOidcApps(),
+			HumanUsers:                       orgV1.GetHumanUsers(),
+			MachineUsers:                     orgV1.GetMachineUsers(),
+			TriggerActions:                   orgV1.GetTriggerActions(),
+			Actions:                          orgV1.GetActions(),
+			ProjectGrants:                    orgV1.GetProjectGrants(),
+			UserGrants:                       orgV1.GetUserGrants(),
+			OrgMembers:                       orgV1.GetOrgMembers(),
+			ProjectMembers:                   orgV1.GetProjectMembers(),
+			ProjectGrantMembers:              orgV1.GetProjectGrantMembers(),
+			UserMetadata:                     orgV1.GetUserMetadata(),
+			LoginTexts:                       orgV1.GetLoginTexts(),
+			InitMessages:                     orgV1.GetInitMessages(),
+			PasswordResetMessages:            orgV1.GetPasswordResetMessages(),
+			VerifyEmailMessages:              orgV1.GetVerifyEmailMessages(),
+			VerifyPhoneMessages:              orgV1.GetVerifyPhoneMessages(),
+			DomainClaimedMessages:            orgV1.GetDomainClaimedMessages(),
+			PasswordlessRegistrationMessages: orgV1.GetPasswordlessRegistrationMessages(),
+			OidcIdps:                         orgV1.GetOidcIdps(),
+			JwtIdps:                          orgV1.GetJwtIdps(),
+			UserLinks:                        orgV1.GetUserLinks(),
+			Domains:                          orgV1.GetDomains(),
 		}
 		if orgV1.IamPolicy != nil {
 			defaultDomainPolicy, err := s.query.DefaultDomainPolicy(ctx)
@@ -300,6 +445,26 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 				UserLoginMustBeDomain:                  orgV1.IamPolicy.UserLoginMustBeDomain,
 				ValidateOrgDomains:                     defaultDomainPolicy.ValidateOrgDomains,
 				SmtpSenderAddressMatchesInstanceDomain: defaultDomainPolicy.SMTPSenderAddressMatchesInstanceDomain,
+			}
+		}
+		if org.LoginPolicy != nil {
+			if orgV1.SecondFactors != nil {
+				for _, factor := range orgV1.SecondFactors {
+					org.LoginPolicy.SecondFactors = append(org.LoginPolicy.SecondFactors, factor.GetType())
+				}
+			}
+			if orgV1.MultiFactors != nil {
+				for _, factor := range orgV1.MultiFactors {
+					org.LoginPolicy.MultiFactors = append(org.LoginPolicy.MultiFactors, factor.GetType())
+				}
+			}
+			if orgV1.Idps != nil {
+				for _, idpR := range orgV1.Idps {
+					org.LoginPolicy.Idps = append(org.LoginPolicy.Idps, &management_pb.AddCustomLoginPolicyRequest_IDP{
+						IdpId:     idpR.GetIdpId(),
+						OwnerType: idpR.GetOwnerType(),
+					})
+				}
 			}
 		}
 		orgs = append(orgs, org)

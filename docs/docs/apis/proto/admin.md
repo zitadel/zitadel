@@ -1828,6 +1828,18 @@ This is an empty request
 | org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
 | project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
 | project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+| user_metadata | repeated zitadel.management.v1.SetUserMetadataRequest | - |  |
+| login_texts | repeated zitadel.management.v1.SetCustomLoginTextsRequest | - |  |
+| init_messages | repeated zitadel.management.v1.SetCustomInitMessageTextRequest | - |  |
+| password_reset_messages | repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest | - |  |
+| verify_email_messages | repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest | - |  |
+| verify_phone_messages | repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest | - |  |
+| domain_claimed_messages | repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest | - |  |
+| passwordless_registration_messages | repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest | - |  |
+| oidc_idps | repeated zitadel.v1.v1.DataOIDCIDP | - |  |
+| jwt_idps | repeated zitadel.v1.v1.DataJWTIDP | - |  |
+| user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
+| domains | repeated zitadel.org.v1.Domain | - |  |
 
 
 
@@ -2731,6 +2743,12 @@ This is an empty response
 | org_members | repeated string | - |  |
 | project_members | repeated ImportDataSuccessProjectMember | - |  |
 | project_grant_members | repeated ImportDataSuccessProjectGrantMember | - |  |
+| oidc_ipds | repeated string | - |  |
+| jwt_idps | repeated string | - |  |
+| idp_links | repeated string | - |  |
+| user_links | repeated ImportDataSuccessUserLinks | - |  |
+| user_metadata | repeated ImportDataSuccessUserMetadata | - |  |
+| domains | repeated string | - |  |
 
 
 
@@ -2781,6 +2799,32 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | project_id |  string | - |  |
 | user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserLinks
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| external_user_id |  string | - |  |
+| display_name |  string | - |  |
+| idp_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserMetadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| key |  string | - |  |
 
 
 

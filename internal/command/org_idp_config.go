@@ -11,7 +11,27 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
+func (c *Commands) ImportIDPConfig(ctx context.Context, config *domain.IDPConfig, idpConfigID, resourceOwner string) (*domain.IDPConfig, error) {
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpConfigID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingIDP.State != domain.IDPConfigStateRemoved && existingIDP.State != domain.IDPConfigStateUnspecified {
+		return nil, errors.ThrowNotFound(nil, "Org-1J8fs", "Errors.Org.IDPConfig.AlreadyExisting")
+	}
+	return c.addIDPConfig(ctx, config, idpConfigID, resourceOwner)
+}
+
 func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
+	idpConfigID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.addIDPConfig(ctx, config, idpConfigID, resourceOwner)
+}
+
+func (c *Commands) addIDPConfig(ctx context.Context, config *domain.IDPConfig, idpConfigID, resourceOwner string) (*domain.IDPConfig, error) {
 	if resourceOwner == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
 	}
@@ -19,10 +39,6 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
 
-	idpConfigID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, resourceOwner)
 
 	orgAgg := OrgAggregateFromWriteModel(&addedConfig.WriteModel)

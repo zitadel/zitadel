@@ -4664,6 +4664,23 @@ message DataOrg {
     repeated zitadel.management.v1.AddOrgMemberRequest org_members = 20;
     repeated zitadel.management.v1.AddProjectMemberRequest project_members = 21;
     repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 22;
+
+    repeated zitadel.management.v1.SetUserMetadataRequest user_metadata = 23;
+
+    repeated zitadel.management.v1.SetCustomLoginTextsRequest login_texts = 24;
+
+    repeated zitadel.management.v1.SetCustomInitMessageTextRequest init_messages = 25;
+    repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest password_reset_messages = 26;
+    repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest verify_email_messages = 27;
+    repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest verify_phone_messages = 28;
+    repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest domain_claimed_messages = 29;
+    repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest passwordless_registration_messages = 30;
+
+    repeated zitadel.v1.v1.DataOIDCIDP oidc_idps = 31;
+    repeated zitadel.v1.v1.DataJWTIDP jwt_idps = 32;
+
+    repeated zitadel.idp.v1.IDPUserLink user_links = 33;
+    repeated zitadel.org.v1.Domain domains = 34;
 }
 
 message ImportDataResponse{
@@ -4695,6 +4712,12 @@ message ImportDataSuccessOrg{
     repeated string org_members = 12;
     repeated ImportDataSuccessProjectMember project_members = 13;
     repeated ImportDataSuccessProjectGrantMember project_grant_members = 14;
+    repeated string oidc_ipds = 15;
+    repeated string jwt_idps = 16;
+    repeated string idp_links = 17;
+    repeated ImportDataSuccessUserLinks user_links = 18;
+    repeated ImportDataSuccessUserMetadata user_metadata = 19;
+    repeated string domains = 20;
 }
 message ImportDataSuccessProjectGrant{
     string grant_id = 1;
@@ -4713,6 +4736,16 @@ message ImportDataSuccessProjectGrantMember{
     string project_id = 1;
     string grant_id = 2;
     string user_id = 3;
+}
+message ImportDataSuccessUserLinks {
+    string user_id = 1;
+    string external_user_id = 2;
+    string display_name = 3;
+    string idp_id = 4;
+}
+message ImportDataSuccessUserMetadata {
+    string user_id = 1;
+    string key = 2;
 }
 message ExportDataRequest {
     repeated string org_ids = 1;
