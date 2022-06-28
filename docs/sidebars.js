@@ -109,7 +109,8 @@ module.exports = {
       items: [
           "guides/customization/branding",
           "guides/customization/texts",
-          "guides/customization/behavior"
+          "guides/customization/behavior",
+          "guides/customization/user-metadata"
       ],
     },
     {
