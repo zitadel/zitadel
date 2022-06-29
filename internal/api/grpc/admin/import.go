@@ -9,7 +9,9 @@ import (
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/pkg/grpc/policy"
 	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (*admin_pb.ImportDataResponse, error) {
@@ -448,22 +450,35 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			}
 		}
 		if org.LoginPolicy != nil {
+			defaultLoginPolicy, err := s.query.DefaultLoginPolicy(ctx)
+			if err != nil {
+				return nil, err
+			}
+			org.LoginPolicy.ExternalLoginCheckLifetime = durationpb.New(defaultLoginPolicy.ExternalLoginCheckLifetime)
+			org.LoginPolicy.MultiFactorCheckLifetime = durationpb.New(defaultLoginPolicy.MultiFactorCheckLifetime)
+			org.LoginPolicy.SecondFactorCheckLifetime = durationpb.New(defaultLoginPolicy.SecondFactorCheckLifetime)
+			org.LoginPolicy.PasswordCheckLifetime = durationpb.New(defaultLoginPolicy.PasswordCheckLifetime)
+			org.LoginPolicy.MfaInitSkipLifetime = durationpb.New(defaultLoginPolicy.MFAInitSkipLifetime)
+
 			if orgV1.SecondFactors != nil {
-				for _, factor := range orgV1.SecondFactors {
-					org.LoginPolicy.SecondFactors = append(org.LoginPolicy.SecondFactors, factor.GetType())
+				org.LoginPolicy.SecondFactors = make([]policy.SecondFactorType, len(orgV1.SecondFactors))
+				for i, factor := range orgV1.SecondFactors {
+					org.LoginPolicy.SecondFactors[i] = factor.GetType()
 				}
 			}
 			if orgV1.MultiFactors != nil {
-				for _, factor := range orgV1.MultiFactors {
-					org.LoginPolicy.MultiFactors = append(org.LoginPolicy.MultiFactors, factor.GetType())
+				org.LoginPolicy.MultiFactors = make([]policy.MultiFactorType, len(orgV1.MultiFactors))
+				for i, factor := range orgV1.MultiFactors {
+					org.LoginPolicy.MultiFactors[i] = factor.GetType()
 				}
 			}
 			if orgV1.Idps != nil {
-				for _, idpR := range orgV1.Idps {
-					org.LoginPolicy.Idps = append(org.LoginPolicy.Idps, &management_pb.AddCustomLoginPolicyRequest_IDP{
+				org.LoginPolicy.Idps = make([]*management_pb.AddCustomLoginPolicyRequest_IDP, len(orgV1.Idps))
+				for i, idpR := range orgV1.Idps {
+					org.LoginPolicy.Idps[i] = &management_pb.AddCustomLoginPolicyRequest_IDP{
 						IdpId:     idpR.GetIdpId(),
 						OwnerType: idpR.GetOwnerType(),
-					})
+					}
 				}
 			}
 		}
