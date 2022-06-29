@@ -30,6 +30,8 @@ type RepeatableMigration interface {
 }
 
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
+	logging.Infof("verify migration %s", migration.String())
+
 	if should, err := shouldExec(ctx, es, migration); !should || err != nil {
 		return err
 	}
@@ -38,6 +40,7 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return err
 	}
 
+	logging.Infof("starting migration %s", migration.String())
 	err = migration.Execute(ctx)
 	logging.OnError(err).Error("migration failed")
 

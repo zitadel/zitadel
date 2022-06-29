@@ -54,6 +54,8 @@ func Flags(cmd *cobra.Command) {
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
+	logging.Info("setup started")
+
 	dbClient, err := database.Connect(config.Database)
 	logging.OnError(err).Fatal("unable to connect to database")
 
