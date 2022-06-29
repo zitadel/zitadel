@@ -18,15 +18,11 @@ func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner s
 	if err != nil {
 		return "", err
 	}
-	if existingOTP.State == domain.MFAStateReady || existingOTP.State == domain.MFAStateRemoved || existingOTP.State == domain.MFAStateUnspecified {
+	if existingOTP.State != domain.MFAStateReady {
 		return "", nil
 	}
 
-	decrypt, err := crypto.DecryptString(existingOTP.Secret, q.multifactors.OTP.CryptoMFA)
-	if err != nil {
-		return "", err
-	}
-	return decrypt, nil
+	return crypto.DecryptString(existingOTP.Secret, q.multifactors.OTP.CryptoMFA)
 }
 
 func (q *Queries) otpWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanOTPWriteModel, err error) {

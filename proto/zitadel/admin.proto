@@ -4009,7 +4009,7 @@ message DataOrg {
     repeated DataOIDCApplication oidc_apps = 13;
     repeated DataHumanUser human_users = 14;
     repeated DataMachineUser machine_users = 15;
-    repeated zitadel.management.v1.SetTriggerActionsRequest  trigger_actions = 16;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 16;
     repeated DataAction actions = 17;
 
     repeated DataProjectGrant project_grants = 18;
