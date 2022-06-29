@@ -38,7 +38,7 @@ func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (p
 		return existingPassword.Secret.Crypted, existingPassword.Secret.Algorithm, nil
 	}
 
-	return nil, "", nil
+	return nil, "", caos_errs.ThrowNotFound(nil, "QUERY-lp1m2i", "Errors.User.NotFound")
 }
 
 func (q *Queries) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {

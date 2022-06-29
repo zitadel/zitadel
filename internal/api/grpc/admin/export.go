@@ -355,7 +355,7 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (*management_
 			return nil, nil, nil, nil, err
 		}
 		idpLinks := make([]*management_pb.AddIDPToLoginPolicyRequest, len(queriedIdpLinks.Links))
-		if !caos_errors.IsNotFound(err) && queriedIdpLinks != nil {
+		if queriedIdpLinks != nil {
 			for i, idpLink := range queriedIdpLinks.Links {
 				idpLinks[i] = &management_pb.AddIDPToLoginPolicyRequest{
 					IdpId:     idpLink.IDPID,
@@ -496,10 +496,10 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			}
 			if withPasswords {
 				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
-				if err != nil {
+				if err != nil && !caos_errors.IsNotFound(err) {
 					return nil, nil, nil, err
 				}
-				if hashedPassword != nil {
+				if err == nil && hashedPassword != nil {
 					dataUser.User.HashedPassword = &admin_pb.ExportHumanUser_HashedPassword{
 						Value:     string(hashedPassword),
 						Algorithm: hashAlgorithm,
@@ -508,10 +508,10 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			}
 			if withOTP {
 				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
-				if err != nil {
+				if err != nil && !caos_errors.IsNotFound(err) {
 					return nil, nil, nil, err
 				}
-				if code != "" {
+				if err == nil && code != "" {
 					dataUser.User.OtpCode = code
 				}
 			}
@@ -625,7 +625,6 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 		return projects, orgProjectRoles, oidcApps, apiApps, nil
 	}
 	for i, queriedProject := range queriedProjects.Projects {
-		setting := project_pb.PrivateLabelingSetting(queriedProject.PrivateLabelingSetting)
 		projects[i] = &admin_pb.DataProject{
 			ProjectId: queriedProject.ID,
 			Project: &management_pb.AddProjectRequest{
@@ -633,7 +632,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 				ProjectRoleAssertion:   queriedProject.ProjectRoleAssertion,
 				ProjectRoleCheck:       queriedProject.ProjectRoleCheck,
 				HasProjectCheck:        queriedProject.HasProjectCheck,
-				PrivateLabelingSetting: setting,
+				PrivateLabelingSetting: project_pb.PrivateLabelingSetting(queriedProject.PrivateLabelingSetting),
 			},
 		}
 
@@ -677,7 +676,6 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 					for _, ty := range app.OIDCConfig.GrantTypes {
 						grantTypes = append(grantTypes, app_pb.OIDCGrantType(ty))
 					}
-					duration := durationpb.New(app.OIDCConfig.ClockSkew)
 
 					oidcApps = append(oidcApps, &admin_pb.DataOIDCApplication{
 						AppId: app.ID,
@@ -696,7 +694,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 							AccessTokenRoleAssertion: app.OIDCConfig.AssertAccessTokenRole,
 							IdTokenRoleAssertion:     app.OIDCConfig.AssertIDTokenRole,
 							IdTokenUserinfoAssertion: app.OIDCConfig.AssertIDTokenUserinfo,
-							ClockSkew:                duration,
+							ClockSkew:                durationpb.New(app.OIDCConfig.ClockSkew),
 							AdditionalOrigins:        app.OIDCConfig.AdditionalOrigins,
 						},
 					})

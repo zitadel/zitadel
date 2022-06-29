@@ -12,14 +12,14 @@ import (
 
 func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner string) (string, error) {
 	if userID == "" {
-		return "", caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
+		return "", caos_errs.ThrowPreconditionFailed(nil, "QUERY-8N9ds", "Errors.User.UserIDMissing")
 	}
 	existingOTP, err := q.otpWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return "", err
 	}
 	if existingOTP.State != domain.MFAStateReady {
-		return "", nil
+		return "", caos_errs.ThrowNotFound(nil, "QUERY-01982h", "Errors.User.NotFound")
 	}
 
 	return crypto.DecryptString(existingOTP.Secret, q.multifactors.OTP.CryptoMFA)
