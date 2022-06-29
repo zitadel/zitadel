@@ -9,7 +9,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "./traefik.yaml:/etc/traefik/traefik.yaml"
+      - "./example-traefik.yaml:/etc/traefik/traefik.yaml"
 
   zitadel:
     restart: 'always'
