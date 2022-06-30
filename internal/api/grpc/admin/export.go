@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/zitadel/logging"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -235,6 +236,13 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 				return nil, err
 			}
 			logging.Infof("Export: member resources for org %s", org.GetOrgId())
+		}
+	}
+
+	for _, org := range orgs {
+		_, err := json.Marshal(org)
+		if err != nil {
+			logging.Infof("json marshalling fault in org %s", org.GetOrgId())
 		}
 	}
 
