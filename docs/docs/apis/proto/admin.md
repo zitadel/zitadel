@@ -1589,9 +1589,6 @@ This is an empty response
 | excluded_org_ids | repeated string | - |  |
 | with_passwords |  bool | - |  |
 | with_otp |  bool | - |  |
-| without_basic_resources |  bool | - |  |
-| without_grant_resources |  bool | - |  |
-| without_member_resources |  bool | - |  |
 
 
 

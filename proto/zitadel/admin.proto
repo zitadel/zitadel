@@ -4083,9 +4083,6 @@ message ExportDataRequest {
     repeated string excluded_org_ids = 2;
     bool with_passwords = 3;
     bool with_otp = 4;
-    bool without_basic_resources = 5;
-    bool without_grant_resources = 6;
-    bool without_member_resources = 7;
 }
 message ExportDataResponse {
     repeated DataOrg orgs = 1;
