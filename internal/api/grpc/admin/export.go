@@ -41,184 +41,201 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	processedUsers := make([]string, 0)
 	processedActions := make([]string, 0)
 
-	for i, queriedOrg := range queriedOrgs.Orgs {
-		processedOrgs = append(processedOrgs, queriedOrg.ID)
+	if !req.WithoutBasicResources {
+		for i, queriedOrg := range queriedOrgs.Orgs {
+			if req.ExcludedOrgIds != nil {
+				found := false
+				for _, excludedOrg := range req.ExcludedOrgIds {
+					if excludedOrg == queriedOrg.ID {
+						found = true
+					}
+				}
+				if found {
+					continue
+				}
+			}
+			processedOrgs = append(processedOrgs, queriedOrg.ID)
 
-		/******************************************************************************************************************
-		Organization
-		******************************************************************************************************************/
-		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
-		orgs[i] = org
+			/******************************************************************************************************************
+			Organization
+			******************************************************************************************************************/
+			org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
+			orgs[i] = org
 
-		org.IamPolicy, err = s.getIAMPolicy(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.IamPolicy, err = s.getIAMPolicy(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.Domains, err = s.getDomains(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.Domains, err = s.getDomains(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.OidcIdps, org.JwtIdps, err = s.getIDPs(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.OidcIdps, org.JwtIdps, err = s.getIDPs(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.LabelPolicy, err = s.getLabelPolicy(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.LabelPolicy, err = s.getLabelPolicy(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.LoginPolicy, org.SecondFactors, org.MultiFactors, org.Idps, err = s.getLoginPolicy(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.LoginPolicy, org.SecondFactors, org.MultiFactors, org.Idps, err = s.getLoginPolicy(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.UserLinks, err = s.getUserLinks(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.UserLinks, err = s.getUserLinks(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.LockoutPolicy, err = s.getLockoutPolicy(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.LockoutPolicy, err = s.getLockoutPolicy(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.PasswordComplexityPolicy, err = s.getPasswordComplexityPolicy(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.PasswordComplexityPolicy, err = s.getPasswordComplexityPolicy(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		org.PrivacyPolicy, err = s.getPrivacyPolicy(ctx, org.GetOrgId())
-		if err != nil {
-			return nil, err
-		}
+			org.PrivacyPolicy, err = s.getPrivacyPolicy(ctx, org.GetOrgId())
+			if err != nil {
+				return nil, err
+			}
 
-		langResp, err := s.GetSupportedLanguages(ctx, &admin_pb.GetSupportedLanguagesRequest{})
-		if err != nil {
-			return nil, err
-		}
+			langResp, err := s.GetSupportedLanguages(ctx, &admin_pb.GetSupportedLanguagesRequest{})
+			if err != nil {
+				return nil, err
+			}
 
-		org.LoginTexts, err = s.getCustomLoginTexts(ctx, org.GetOrgId(), langResp.Languages)
-		if err != nil {
-			return nil, err
-		}
+			org.LoginTexts, err = s.getCustomLoginTexts(ctx, org.GetOrgId(), langResp.Languages)
+			if err != nil {
+				return nil, err
+			}
 
-		org.InitMessages, err = s.getCustomInitMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
-		if err != nil {
-			return nil, err
-		}
+			org.InitMessages, err = s.getCustomInitMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+			if err != nil {
+				return nil, err
+			}
 
-		org.PasswordResetMessages, err = s.getCustomPasswordResetMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
-		if err != nil {
-			return nil, err
-		}
+			org.PasswordResetMessages, err = s.getCustomPasswordResetMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+			if err != nil {
+				return nil, err
+			}
 
-		org.VerifyEmailMessages, err = s.getCustomVerifyEmailMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
-		if err != nil {
-			return nil, err
-		}
+			org.VerifyEmailMessages, err = s.getCustomVerifyEmailMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+			if err != nil {
+				return nil, err
+			}
 
-		org.VerifyPhoneMessages, err = s.getCustomVerifyPhoneMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
-		if err != nil {
-			return nil, err
-		}
+			org.VerifyPhoneMessages, err = s.getCustomVerifyPhoneMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+			if err != nil {
+				return nil, err
+			}
 
-		org.DomainClaimedMessages, err = s.getCustomDomainClaimedMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
-		if err != nil {
-			return nil, err
-		}
+			org.DomainClaimedMessages, err = s.getCustomDomainClaimedMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+			if err != nil {
+				return nil, err
+			}
 
-		org.PasswordlessRegistrationMessages, err = s.getCustomPasswordlessRegistrationMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
-		if err != nil {
-			return nil, err
-		}
+			org.PasswordlessRegistrationMessages, err = s.getCustomPasswordlessRegistrationMessageTexts(ctx, org.GetOrgId(), langResp.Languages)
+			if err != nil {
+				return nil, err
+			}
 
-		/******************************************************************************************************************
-		Users
-		******************************************************************************************************************/
-		org.HumanUsers, org.MachineUsers, org.UserMetadata, err = s.getUsers(ctx, queriedOrg.ID, req.WithPasswords, req.WithOtp)
-		if err != nil {
-			return nil, err
-		}
-		for _, processedUser := range org.HumanUsers {
-			processedUsers = append(processedUsers, processedUser.UserId)
-		}
-		for _, processedUser := range org.MachineUsers {
-			processedUsers = append(processedUsers, processedUser.UserId)
-		}
+			/******************************************************************************************************************
+			Users
+			******************************************************************************************************************/
+			org.HumanUsers, org.MachineUsers, org.UserMetadata, err = s.getUsers(ctx, queriedOrg.ID, req.WithPasswords, req.WithOtp)
+			if err != nil {
+				return nil, err
+			}
+			for _, processedUser := range org.HumanUsers {
+				processedUsers = append(processedUsers, processedUser.UserId)
+			}
+			for _, processedUser := range org.MachineUsers {
+				processedUsers = append(processedUsers, processedUser.UserId)
+			}
 
-		/******************************************************************************************************************
-		Project and Applications
-		******************************************************************************************************************/
-		org.Projects, org.ProjectRoles, org.OidcApps, org.ApiApps, err = s.getProjectsAndApps(ctx, queriedOrg.ID)
-		if err != nil {
-			return nil, err
-		}
-		for _, processedProject := range org.Projects {
-			processedProjects = append(processedProjects, processedProject.ProjectId)
-		}
+			/******************************************************************************************************************
+			Project and Applications
+			******************************************************************************************************************/
+			org.Projects, org.ProjectRoles, org.OidcApps, org.ApiApps, err = s.getProjectsAndApps(ctx, queriedOrg.ID)
+			if err != nil {
+				return nil, err
+			}
+			for _, processedProject := range org.Projects {
+				processedProjects = append(processedProjects, processedProject.ProjectId)
+			}
 
-		/******************************************************************************************************************
-		Actions
-		******************************************************************************************************************/
-		org.Actions, err = s.getActions(ctx, queriedOrg.ID)
-		if err != nil {
-			return nil, err
+			/******************************************************************************************************************
+			Actions
+			******************************************************************************************************************/
+			org.Actions, err = s.getActions(ctx, queriedOrg.ID)
+			if err != nil {
+				return nil, err
+			}
+			for _, processedAction := range org.Actions {
+				processedActions = append(processedActions, processedAction.ActionId)
+			}
+			logging.Infof("Export: basic resources for org %s", org.GetOrgId())
 		}
-		for _, processedAction := range org.Actions {
-			processedActions = append(processedActions, processedAction.ActionId)
-		}
-		logging.Infof("Export: basic resources for org %s", org.GetOrgId())
 	}
 
-	for _, org := range orgs {
-		/******************************************************************************************************************
-		  Flows
-		  ******************************************************************************************************************/
-		org.TriggerActions, err = s.getTriggerActions(ctx, org.OrgId, processedActions)
-		if err != nil {
-			return nil, err
-		}
+	if !req.WithoutGrantResources {
+		for _, org := range orgs {
+			/******************************************************************************************************************
+			  Flows
+			  ******************************************************************************************************************/
+			org.TriggerActions, err = s.getTriggerActions(ctx, org.OrgId, processedActions)
+			if err != nil {
+				return nil, err
+			}
 
-		/******************************************************************************************************************
-		  Grants
-		  ******************************************************************************************************************/
-		org.ProjectGrants, err = s.getNecessaryProjectGrantsForOrg(ctx, org.OrgId, processedOrgs, processedProjects)
-		if err != nil {
-			return nil, err
-		}
-		for _, processedGrant := range org.ProjectGrants {
-			processedGrants = append(processedGrants, processedGrant.GrantId)
-		}
+			/******************************************************************************************************************
+			  Grants
+			  ******************************************************************************************************************/
+			org.ProjectGrants, err = s.getNecessaryProjectGrantsForOrg(ctx, org.OrgId, processedOrgs, processedProjects)
+			if err != nil {
+				return nil, err
+			}
+			for _, processedGrant := range org.ProjectGrants {
+				processedGrants = append(processedGrants, processedGrant.GrantId)
+			}
 
-		org.UserGrants, err = s.getNecessaryUserGrantsForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
-		if err != nil {
-			return nil, err
+			org.UserGrants, err = s.getNecessaryUserGrantsForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
+			if err != nil {
+				return nil, err
+			}
+			logging.Infof("Export: grant resources for org %s", org.GetOrgId())
 		}
-		logging.Infof("Export: grant resources for org %s", org.GetOrgId())
 	}
 
-	for _, org := range orgs {
-		/******************************************************************************************************************
-		  Members
-		  ******************************************************************************************************************/
-		org.OrgMembers, err = s.getNecessaryOrgMembersForOrg(ctx, org.OrgId, processedUsers)
-		if err != nil {
-			return nil, err
-		}
+	if !req.WithoutMemberResources {
+		for _, org := range orgs {
+			/******************************************************************************************************************
+			  Members
+			  ******************************************************************************************************************/
+			org.OrgMembers, err = s.getNecessaryOrgMembersForOrg(ctx, org.OrgId, processedUsers)
+			if err != nil {
+				return nil, err
+			}
 
-		org.ProjectMembers, err = s.getNecessaryProjectMembersForOrg(ctx, processedProjects, processedUsers)
-		if err != nil {
-			return nil, err
-		}
+			org.ProjectMembers, err = s.getNecessaryProjectMembersForOrg(ctx, processedProjects, processedUsers)
+			if err != nil {
+				return nil, err
+			}
 
-		org.ProjectGrantMembers, err = s.getNecessaryProjectGrantMembersForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
-		if err != nil {
-			return nil, err
+			org.ProjectGrantMembers, err = s.getNecessaryProjectGrantMembersForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
+			if err != nil {
+				return nil, err
+			}
+			logging.Infof("Export: member resources for org %s", org.GetOrgId())
 		}
-		logging.Infof("Export: member resources for org %s", org.GetOrgId())
 	}
 
 	return &admin_pb.ExportDataResponse{
