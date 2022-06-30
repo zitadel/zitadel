@@ -242,49 +242,49 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	for _, org := range orgs {
 		_, err := json.Marshal(org)
 		if err != nil {
-			logging.Error("json marshalling fault in org %s", org.GetOrgId())
+			logging.Errorf("json marshalling fault in org %s", org.GetOrgId())
 			logging.Info(org)
 		}
 		for _, action := range org.Actions {
 			_, err := json.Marshal(action)
 			if err != nil {
-				logging.Error("json marshalling fault in org %s action %s", org.GetOrgId(), action.ActionId)
+				logging.Errorf("json marshalling fault in org %s action %s", org.GetOrgId(), action.ActionId)
 			}
 		}
 		for _, user := range org.HumanUsers {
 			_, err := json.Marshal(user)
 			if err != nil {
-				logging.Error("json marshalling fault in org %s user %s", org.GetOrgId(), user.GetUserId())
+				logging.Errorf("json marshalling fault in org %s user %s", org.GetOrgId(), user.GetUserId())
 			}
 		}
 		for _, user := range org.MachineUsers {
 			_, err := json.Marshal(user)
 			if err != nil {
-				logging.Error("json marshalling fault in org %s user %s", org.GetOrgId(), user.GetUserId())
+				logging.Errorf("json marshalling fault in org %s user %s", org.GetOrgId(), user.GetUserId())
 			}
 		}
 		for _, project := range org.Projects {
 			_, err := json.Marshal(project)
 			if err != nil {
-				logging.Error("json marshalling fault in org %s project %s", org.GetOrgId(), project.GetProjectId())
+				logging.Errorf("json marshalling fault in org %s project %s", org.GetOrgId(), project.GetProjectId())
 			}
 		}
 		for _, project := range org.ProjectRoles {
 			_, err := json.Marshal(project)
 			if err != nil {
-				logging.Error("json marshalling fault in org %s projectroles %s", org.GetOrgId(), project.GetProjectId())
+				logging.Errorf("json marshalling fault in org %s projectroles %s", org.GetOrgId(), project.GetProjectId())
 			}
 		}
 		for _, app := range org.OidcApps {
 			_, err := json.Marshal(app)
 			if err != nil {
-				logging.Error("json marshalling fault in org %s app %s", org.GetOrgId(), app.GetAppId())
+				logging.Errorf("json marshalling fault in org %s app %s", org.GetOrgId(), app.GetAppId())
 			}
 		}
 		for _, app := range org.ApiApps {
 			_, err := json.Marshal(app)
 			if err != nil {
-				logging.Error("json marshalling fault in org %s app %s", org.GetOrgId(), app.GetAppId())
+				logging.Errorf("json marshalling fault in org %s app %s", org.GetOrgId(), app.GetAppId())
 			}
 		}
 	}
