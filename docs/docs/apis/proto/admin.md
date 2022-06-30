@@ -56,16 +56,28 @@ Set the default language
     GET: /languages/default
 
 
+### GetMyInstance
+
+> **rpc** GetMyInstance([GetMyInstanceRequest](#getmyinstancerequest))
+[GetMyInstanceResponse](#getmyinstanceresponse)
+
+Returns the details of the instance
+
+
+
+    GET: /instances/me
+
+
 ### ListInstanceDomains
 
 > **rpc** ListInstanceDomains([ListInstanceDomainsRequest](#listinstancedomainsrequest))
 [ListInstanceDomainsResponse](#listinstancedomainsresponse)
 
-Returns the domains of an instance
+Returns the domains of the instance
 
 
 
-    GET: /domains
+    POST: /domains/_search
 
 
 ### ListSecretGenerators
@@ -2344,6 +2356,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
+
+
+
+
+### GetMyInstanceRequest
+This is an empty request
+
+
+
+
+### GetMyInstanceResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance |  zitadel.instance.v1.InstanceDetail | - |  |
 
 
 

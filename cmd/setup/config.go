@@ -58,9 +58,9 @@ type encryptionKeyConfig struct {
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
-	viper.AutomaticEnv()
-	viper.SetEnvPrefix("ZITADEL")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
+	v.SetEnvPrefix("ZITADEL")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.SetConfigType("yaml")
 	err := v.ReadConfig(bytes.NewBuffer(defaultSteps))
 	logging.OnError(err).Fatal("unable to read setup steps")

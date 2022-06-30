@@ -42,7 +42,3 @@ func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, a
 
 	return apps.Apps[0], nil
 }
-
-func (v *View) SearchApplications(request *query.AppSearchQueries) (*query.Apps, error) {
-	return v.Query.SearchApps(context.TODO(), request)
-}

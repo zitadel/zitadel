@@ -1,5 +1,5 @@
 ---
-title: Installation
+title: Get Started
 ---
 
 import Tabs from "@theme/Tabs";
@@ -10,12 +10,15 @@ import Windows from './windows.mdx'
 import Compose from './compose.mdx'
 import Helm from './helm.mdx'
 import Knative from './knative.mdx'
-import Configuration from './configuration.mdx'
-import OpenLocal from './openlocal.mdx'
+import NextSelfHosted from './nextselfhosted.mdx'
 
 # Run ZITADEL
 
 Choose your platform and run ZITADEL with the most minimal configuration possible.
+For an easy self-hosted production setup, we recommend running ZITADEL on [Kubernetes](https://kubernetes.io/docs/home/), using our official [Helm](https://helm.sh/docs/) chart.
+By default, it runs a highly available ZITADEL instance along with a secure and highly available [CockroachDB](https://www.cockroachlabs.com/docs/stable/) instance.
+
+<!-- TODO: Destroy -->
 
 <Tabs
     groupId="installation-target"
@@ -24,9 +27,8 @@ Choose your platform and run ZITADEL with the most minimal configuration possibl
         {'label': 'SaaS', 'value': 'saas'},
         {'label': 'Linux', 'value': 'linux'},
         {'label': 'MacOS', 'value': 'macos'},
-        {'label': 'Windows', 'value': 'windows'},
         {'label': 'Docker Compose', 'value': 'compose'},
-        {'label': 'Kubernetes', 'value': 'k8s'},
+        {'label': 'Kubernetes (Helm)', 'value': 'k8s'},
         {'label': 'Knative', 'value': 'knative'}
     ]}
 >
@@ -35,26 +37,21 @@ Choose your platform and run ZITADEL with the most minimal configuration possibl
     </TabItem>
     <TabItem value="linux">
         <Linux/>
-        <Configuration/>
-        <OpenLocal/>
+        <NextSelfHosted/>
     </TabItem>
     <TabItem value="macos">
         <MacOS/>
-        <Configuration/>
-        <OpenLocal/>
-    </TabItem>
-    <TabItem value="windows">
-        <Windows/>
+        <NextSelfHosted/>
     </TabItem>
     <TabItem value="compose">
         <Compose/>
-        <Configuration/>
-        <OpenLocal/>
+        <NextSelfHosted/>
     </TabItem>
     <TabItem value="k8s">
         <Helm/>
+        <NextSelfHosted/>
     </TabItem>
-        <TabItem value="knative">
+    <TabItem value="knative">
         <Knative/>
     </TabItem>
 </Tabs>
