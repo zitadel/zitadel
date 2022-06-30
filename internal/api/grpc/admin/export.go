@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"github.com/zitadel/logging"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
@@ -169,6 +170,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		for _, processedAction := range org.Actions {
 			processedActions = append(processedActions, processedAction.ActionId)
 		}
+		logging.Infof("Export: basic resources for org %s", org.GetOrgId())
 	}
 
 	for _, org := range orgs {
@@ -195,6 +197,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		if err != nil {
 			return nil, err
 		}
+		logging.Infof("Export: grant resources for org %s", org.GetOrgId())
 	}
 
 	for _, org := range orgs {
@@ -215,6 +218,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		if err != nil {
 			return nil, err
 		}
+		logging.Infof("Export: member resources for org %s", org.GetOrgId())
 	}
 
 	return &admin_pb.ExportDataResponse{
