@@ -292,13 +292,17 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) ([]*admin_pb.DataOID
 	jwtIdps := make([]*admin_pb.DataJWTIDP, 0)
 	for _, idp := range idps.IDPs {
 		if idp.OIDCIDP != nil {
+			clientSecret, err := s.query.GetOIDCIDPClientSecret(ctx, false, orgID, idp.ID)
+			if err != nil && !caos_errors.IsNotFound(err) {
+				return nil, nil, err
+			}
 			oidcIdps = append(oidcIdps, &admin_pb.DataOIDCIDP{
 				IdpId: idp.ID,
 				Idp: &management_pb.AddOrgOIDCIDPRequest{
 					Name:               idp.Name,
 					StylingType:        idp_pb.IDPStylingType(idp.StylingType),
 					ClientId:           idp.ClientID,
-					ClientSecret:       string(idp.ClientSecret.Crypted),
+					ClientSecret:       clientSecret,
 					Issuer:             idp.OIDCIDP.Issuer,
 					Scopes:             idp.Scopes,
 					DisplayNameMapping: idp_pb.OIDCMappingField(idp.DisplayNameMapping),

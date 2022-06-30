@@ -31,6 +31,8 @@ type Queries struct {
 	eventstore *eventstore.Eventstore
 	client     *sql.DB
 
+	idpConfigSecretCrypto crypto.EncryptionAlgorithm
+
 	DefaultLanguage                     language.Tag
 	LoginDir                            http.FileSystem
 	NotificationDir                     http.FileSystem
@@ -76,6 +78,11 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	action.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
+
+	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
+	if err != nil {
+		return nil, err
+	}
 
 	aesOTPCrypto, err := crypto.NewAESCrypto(defaults.Multifactors.OTP.VerificationKey)
 	if err != nil {
