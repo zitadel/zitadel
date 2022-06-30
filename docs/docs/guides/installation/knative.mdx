@@ -50,7 +50,7 @@ kubectl apply secret -f certs.yaml
 # start zitadel
 
 kn service create zitadel \
---image ghcr.io/zitadel/zitadel:latest \
+--image ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.33-amd64 \
 --port 8080 \
 --env ZITADEL_DATABASE_HOST=cockroachdb \
 --env ZITADEL_EXTERNALSECURE=false \
