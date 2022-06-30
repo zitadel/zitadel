@@ -223,7 +223,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 }
 
 func (s *Server) getIAMPolicy(ctx context.Context, orgID string) (*admin_pb.AddCustomOrgIAMPolicyRequest, error) {
-	queriedIAMPolicy, err := s.query.OrgIAMPolicyByOrg(ctx, true, orgID)
+	queriedIAMPolicy, err := s.query.OrgIAMPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -330,7 +330,7 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (*management_
 }
 
 func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLoginPolicyRequest, []*management_pb.AddSecondFactorToLoginPolicyRequest, []*management_pb.AddMultiFactorToLoginPolicyRequest, []*management_pb.AddIDPToLoginPolicyRequest, error) {
-	queriedLogin, err := s.query.LoginPolicyByID(ctx, true, orgID)
+	queriedLogin, err := s.query.LoginPolicyByID(ctx, false, orgID)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -406,7 +406,7 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) ([]*idp_pb.IDPU
 }
 
 func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLockoutPolicyRequest, error) {
-	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, true, orgID)
+	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -419,7 +419,7 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (*managemen
 }
 
 func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomPasswordComplexityPolicyRequest, error) {
-	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, orgID)
+	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -436,7 +436,7 @@ func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) 
 }
 
 func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomPrivacyPolicyRequest, error) {
-	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, true, orgID)
+	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -532,7 +532,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		metadataList, err := s.query.SearchUserMetadata(ctx, user.ID, true, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
+		metadataList, err := s.query.SearchUserMetadata(ctx, user.ID, false, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -641,7 +641,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 			return nil, nil, nil, nil, err
 		}
 
-		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
 		if err != nil && !caos_errors.IsNotFound(err) {
 			return nil, nil, nil, nil, err
 		}
