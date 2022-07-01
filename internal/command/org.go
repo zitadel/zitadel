@@ -155,6 +155,10 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 }
 
 func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
+	if name == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
+	}
+
 	orgID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
@@ -167,6 +171,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	if orgID == "" || name == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
+
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err

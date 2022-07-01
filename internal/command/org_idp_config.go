@@ -23,6 +23,12 @@ func (c *Commands) ImportIDPConfig(ctx context.Context, config *domain.IDPConfig
 }
 
 func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
+	if resourceOwner == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
+	}
+	if config.OIDCConfig == nil && config.JWTConfig == nil {
+		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
+	}
 	idpConfigID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -32,12 +38,6 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 }
 
 func (c *Commands) addIDPConfig(ctx context.Context, config *domain.IDPConfig, idpConfigID, resourceOwner string) (*domain.IDPConfig, error) {
-	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
-	}
-	if config.OIDCConfig == nil && config.JWTConfig == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
-	}
 
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, resourceOwner)
 

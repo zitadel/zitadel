@@ -24,6 +24,10 @@ func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action
 }
 
 func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
+	if !addAction.IsValid() {
+		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
+	}
+
 	actionID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -33,9 +37,6 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 }
 
 func (c *Commands) addActionWithID(ctx context.Context, addAction *domain.Action, resourceOwner, actionID string) (_ string, _ *domain.ObjectDetails, err error) {
-	if !addAction.IsValid() {
-		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
-	}
 	addAction.AggregateID = actionID
 	actionModel := NewActionWriteModel(addAction.AggregateID, resourceOwner)
 	actionAgg := ActionAggregateFromWriteModel(&actionModel.WriteModel)
