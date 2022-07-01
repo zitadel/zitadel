@@ -25,6 +25,10 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 }
 
 func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
+	if !project.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
+	}
+
 	projectID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -34,9 +38,6 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 }
 
 func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
-	if !projectAdd.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
-	}
 	projectAdd.AggregateID = projectID
 	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)

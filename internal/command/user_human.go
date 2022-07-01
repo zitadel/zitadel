@@ -69,9 +69,6 @@ func (c *Commands) AddHumanWithID(ctx context.Context, resourceOwner string, use
 }
 
 func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, userID string, human *AddHuman) (*domain.HumanDetails, error) {
-	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
-	}
 	agg := user.NewAggregate(userID, resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddHumanCommand(agg, human, c.userPasswordAlg, c.userEncryption))
 	if err != nil {
@@ -94,6 +91,9 @@ func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, use
 }
 
 func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman) (*domain.HumanDetails, error) {
+	if resourceOwner == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+	}
 	userID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -297,9 +297,16 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	if err != nil {
 		return nil, nil, errors.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
-	existing, err := c.getHumanWriteModelByID(ctx, human.AggregateID, human.ResourceOwner)
-	if isUserStateExists(existing.UserState) {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "COMMAND-ziuna", "Errors.User.AlreadyExisting")
+
+	if human.AggregateID != "" {
+		existing, err := c.getHumanWriteModelByID(ctx, human.AggregateID, human.ResourceOwner)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if isUserStateExists(existing.UserState) {
+			return nil, nil, errors.ThrowPreconditionFailed(nil, "COMMAND-ziuna", "Errors.User.AlreadyExisting")
+		}
 	}
 
 	events, addedHuman, addedCode, code, err := c.importHuman(ctx, orgID, human, passwordless, domainPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator)

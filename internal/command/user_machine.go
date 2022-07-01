@@ -9,26 +9,6 @@ import (
 )
 
 func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
-	userID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	return c.addMachineWithID(ctx, orgID, userID, machine)
-}
-
-func (c *Commands) AddMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
-	existingMachine, err := c.machineWriteModelByID(ctx, machine.AggregateID, machine.ResourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if isUserStateExists(existingMachine.UserState) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-k2una", "Errors.User.AlreadyExisting")
-	}
-
-	return c.addMachineWithID(ctx, orgID, userID, machine)
-}
-
-func (c *Commands) addMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
 	if !machine.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 	}
@@ -39,6 +19,33 @@ func (c *Commands) addMachineWithID(ctx context.Context, orgID string, userID st
 	if !domainPolicy.UserLoginMustBeDomain {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.Invalid")
 	}
+	userID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	return c.addMachineWithID(ctx, orgID, userID, machine, domainPolicy)
+}
+
+func (c *Commands) AddMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
+	existingMachine, err := c.machineWriteModelByID(ctx, machine.AggregateID, machine.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if isUserStateExists(existingMachine.UserState) {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-k2una", "Errors.User.AlreadyExisting")
+	}
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
+	}
+	if !domainPolicy.UserLoginMustBeDomain {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0dd", "Errors.User.Invalid")
+	}
+	return c.addMachineWithID(ctx, orgID, userID, machine, domainPolicy)
+}
+
+func (c *Commands) addMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine, domainPolicy *domain.DomainPolicy) (*domain.Machine, error) {
+
 	machine.AggregateID = userID
 	addedMachine := NewMachineWriteModel(machine.AggregateID, orgID)
 	userAgg := UserAggregateFromWriteModel(&addedMachine.WriteModel)

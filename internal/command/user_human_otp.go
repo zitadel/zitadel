@@ -17,7 +17,18 @@ func (c *Commands) ImportHumanOTP(ctx context.Context, userID, resourceowner str
 	if err != nil {
 		return err
 	}
-	return c.addHumanOTP(ctx, userID, resourceowner, encryptedSecret)
+
+	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
+	if err != nil {
+		return err
+	}
+	if otpWriteModel.State == domain.MFAStateReady {
+		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
+	}
+	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
+
+	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, encryptedSecret))
+	return err
 }
 
 func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string) (*domain.OTP, error) {
@@ -40,6 +51,15 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")
 	}
 
+	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
+	if err != nil {
+		return nil, err
+	}
+	if otpWriteModel.State == domain.MFAStateReady {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
+	}
+	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
+
 	accountName := domain.GenerateLoginName(human.GetUsername(), org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
 	if accountName == "" {
 		accountName = human.EmailAddress
@@ -49,7 +69,8 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 		return nil, err
 	}
 
-	if err := c.addHumanOTP(ctx, userID, resourceowner, secret); err != nil {
+	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
+	if err != nil {
 		return nil, err
 	}
 	return &domain.OTP{
@@ -59,23 +80,6 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 		SecretString: key.Secret(),
 		Url:          key.URL(),
 	}, nil
-}
-
-func (c *Commands) addHumanOTP(ctx context.Context, userID, resourceowner string, secret *crypto.CryptoValue) error {
-	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
-	if err != nil {
-		return err
-	}
-	if otpWriteModel.State == domain.MFAStateReady {
-		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
-	}
-	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
-
-	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (c *Commands) HumanCheckMFAOTPSetup(ctx context.Context, userID, code, userAgentID, resourceowner string) (*domain.ObjectDetails, error) {

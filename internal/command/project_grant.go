@@ -25,6 +25,14 @@ func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *domain.Proj
 }
 
 func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string) (_ *domain.ProjectGrant, err error) {
+	if !grant.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-3b8fs", "Errors.Project.Grant.Invalid")
+	}
+	err = c.checkProjectGrantPreCondition(ctx, grant)
+	if err != nil {
+		return nil, err
+	}
+
 	grantID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -34,13 +42,6 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGra
 }
 
 func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
-	if !grant.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-3b8fs", "Errors.Project.Grant.Invalid")
-	}
-	err = c.checkProjectGrantPreCondition(ctx, grant)
-	if err != nil {
-		return nil, err
-	}
 	grant.GrantID = grantID
 
 	addedGrant := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, resourceOwner)

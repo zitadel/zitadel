@@ -78,32 +78,38 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	if existingAPI.State != domain.AppStateUnspecified {
 		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Application.AlreadyExisting")
 	}
+	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "PROJECT-9fnsa", "Errors.Project.NotFound")
+	}
 
-	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID, appSecretGenerator)
+	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, project, appID, appSecretGenerator)
 }
 
 func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
+	if apiApp == nil || apiApp.AggregateID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
+	}
+	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
+	}
+
+	if !apiApp.IsValid() {
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
+	}
+
 	appID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 
-	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID, appSecretGenerator)
+	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, project, appID, appSecretGenerator)
 }
 
-func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner, appID string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
-	if apiApp == nil || apiApp.AggregateID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
-	}
-	if !apiApp.IsValid() {
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
-	}
+func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, project *domain.Project, appID string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
 	apiApp.AppID = appID
 
-	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
-	}
 	addedApplication := NewAPIApplicationWriteModel(apiApp.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 

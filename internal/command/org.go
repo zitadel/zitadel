@@ -129,6 +129,23 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
 	}
 
+	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
+}
+
+func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
+	if name == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
+	}
+
+	orgID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
+	}
+
+	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
+}
+
+func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, resourceOwner, orgID string, claimedUserIDs []string) (*domain.Org, error) {
 	orgAgg, addedOrg, events, err := c.addOrgWithID(ctx, &domain.Org{Name: name}, orgID, claimedUserIDs)
 	if err != nil {
 		return nil, err
@@ -152,19 +169,6 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 		return nil, err
 	}
 	return orgWriteModelToOrg(addedOrg), nil
-}
-
-func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
-	if name == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
-	}
-
-	orgID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
-	}
-
-	return c.AddOrgWithID(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
 }
 
 func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {

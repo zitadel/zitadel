@@ -125,19 +125,15 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Application.AlreadyExisting")
 	}
 
-	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID, appSecretGenerator)
+	project, err := c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "PROJECT-3m9s2", "Errors.Project.NotFound")
+	}
+
+	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID, appSecretGenerator)
 }
 
 func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
-	appID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-
-	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID, appSecretGenerator)
-}
-
-func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner, appID string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Application.Invalid")
 	}
@@ -145,12 +141,24 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "PROJECT-3m9ss", "Errors.Project.NotFound")
 	}
-	addedApplication := NewOIDCApplicationWriteModel(oidcApp.AggregateID, resourceOwner)
-	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Application.Invalid")
 	}
+
+	appID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID, appSecretGenerator)
+}
+
+func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, project *domain.Project, appID string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
+
+	addedApplication := NewOIDCApplicationWriteModel(oidcApp.AggregateID, resourceOwner)
+	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
+
 	oidcApp.AppID = appID
 
 	events := []eventstore.Command{
