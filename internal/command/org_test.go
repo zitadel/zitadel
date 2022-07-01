@@ -111,7 +111,6 @@ func TestCommandSide_AddOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
 					expectFilterOrgDomainNotFound(),
 					expectFilter(
 						eventFromEventPusher(
