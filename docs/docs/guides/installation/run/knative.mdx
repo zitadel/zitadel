@@ -1,6 +1,12 @@
 ## Disclaimer
 This guide is for development / demonstration purpose only and does NOT reflect a production setup.
 
+Things such as TLS termination and email verification will not be available unless you 
+
+- use an API gateway with valid certificates in front of the service
+- configure an appropriate email server
+
+
 ## New Knative environment
 ### Download and run Knative quickstart
 
@@ -35,14 +41,6 @@ start a single-node cockroachdb as statefulset
 kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/cockroachdb-statefulset-single-node.yaml
 ```
 
-## Secret for TLS termination
-create a secret with your certificates for TLS termination
-
-```bash
-#describe happy path 
-kubectl apply secret -f certs.yaml
-```
-
 
 ## Start ZITADEL with Knative 
 ```bash
@@ -58,9 +56,7 @@ kn service create zitadel \
 --env ZITADEL_TLS_ENABLED=false \
 --env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
 --env ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN=zitadel.default.127.0.0.1.sslip.io \
---arg "admin" --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" \
---mount /tls.secret=secret:certs/tls.secret \
---mount /tls.key=secret:certs/tls.key
+--arg "admin" --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" 
 ```
 
 or use the knative service yaml
