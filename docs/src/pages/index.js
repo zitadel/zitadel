@@ -67,8 +67,8 @@ const features = [
               description=""
             />
             <ListElement
-              link="docs/guides/installation"
-              type={ICONTYPE.STORAGE}
+              link="docs/guides/installation/run"
+              type={ICONTYPE.SYSTEM}
               title="Installation"
               description=""
             />
