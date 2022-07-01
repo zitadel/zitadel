@@ -871,6 +871,25 @@ func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*ha
 			handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
 			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 		},
+		crdb.WithTableSuffix(UserHumanSuffix),
+	), nil
+}
+
+func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordChangedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(NotifyPasswordSetCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+		},
 		crdb.WithTableSuffix(UserNotifySuffix),
 	), nil
 }
