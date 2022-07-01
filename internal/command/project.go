@@ -24,7 +24,7 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 	return c.addProjectWithID(ctx, project, resourceOwner, projectID)
 }
 
-func (c *Commands) AddProjectWithOwner(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
+func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
 	projectID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
