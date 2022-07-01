@@ -17,9 +17,10 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users2"
+	UserTable        = "projections.users"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
+	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
 
 	UserIDCol            = "id"
 	UserCreationDateCol  = "creation_date"
@@ -123,7 +124,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(NotifyUserIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(NotifyInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(NotifyLastEmailCol, crdb.ColumnTypeText),
+			crdb.NewColumn(NotifyLastEmailCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(NotifyVerifiedEmailCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(NotifyLastPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(NotifyVerifiedPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -870,7 +871,7 @@ func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*ha
 			handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
 			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(UserHumanSuffix),
+		crdb.WithTableSuffix(UserNotifySuffix),
 	), nil
 }
 
