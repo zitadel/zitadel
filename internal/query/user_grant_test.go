@@ -24,14 +24,14 @@ var (
 			", projections.user_grants.roles" +
 			", projections.user_grants.state" +
 			", projections.user_grants.user_id" +
-			", projections.users.username" +
-			", projections.users.type" +
-			", projections.users.resource_owner" +
-			", projections.users_humans.first_name" +
-			", projections.users_humans.last_name" +
-			", projections.users_humans.email" +
-			", projections.users_humans.display_name" +
-			", projections.users_humans.avatar_key" +
+			", projections.users2.username" +
+			", projections.users2.type" +
+			", projections.users2.resource_owner" +
+			", projections.users2_humans.first_name" +
+			", projections.users2_humans.last_name" +
+			", projections.users2_humans.email" +
+			", projections.users2_humans.display_name" +
+			", projections.users2_humans.avatar_key" +
 			", projections.login_names.login_name" +
 			", projections.user_grants.resource_owner" +
 			", projections.orgs.name" +
@@ -39,8 +39,8 @@ var (
 			", projections.user_grants.project_id" +
 			", projections.projects.name" +
 			" FROM projections.user_grants" +
-			" LEFT JOIN projections.users ON projections.user_grants.user_id = projections.users.id" +
-			" LEFT JOIN projections.users_humans ON projections.user_grants.user_id = projections.users_humans.user_id" +
+			" LEFT JOIN projections.users2 ON projections.user_grants.user_id = projections.users2.id" +
+			" LEFT JOIN projections.users2_humans ON projections.user_grants.user_id = projections.users2_humans.user_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
 			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id" +
 			" LEFT JOIN projections.login_names ON projections.user_grants.user_id = projections.login_names.user_id" +
@@ -78,14 +78,14 @@ var (
 			", projections.user_grants.roles" +
 			", projections.user_grants.state" +
 			", projections.user_grants.user_id" +
-			", projections.users.username" +
-			", projections.users.type" +
-			", projections.users.resource_owner" +
-			", projections.users_humans.first_name" +
-			", projections.users_humans.last_name" +
-			", projections.users_humans.email" +
-			", projections.users_humans.display_name" +
-			", projections.users_humans.avatar_key" +
+			", projections.users2.username" +
+			", projections.users2.type" +
+			", projections.users2.resource_owner" +
+			", projections.users2_humans.first_name" +
+			", projections.users2_humans.last_name" +
+			", projections.users2_humans.email" +
+			", projections.users2_humans.display_name" +
+			", projections.users2_humans.avatar_key" +
 			", projections.login_names.login_name" +
 			", projections.user_grants.resource_owner" +
 			", projections.orgs.name" +
@@ -94,8 +94,8 @@ var (
 			", projections.projects.name" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.user_grants" +
-			" LEFT JOIN projections.users ON projections.user_grants.user_id = projections.users.id" +
-			" LEFT JOIN projections.users_humans ON projections.user_grants.user_id = projections.users_humans.user_id" +
+			" LEFT JOIN projections.users2 ON projections.user_grants.user_id = projections.users2.id" +
+			" LEFT JOIN projections.users2_humans ON projections.user_grants.user_id = projections.users2_humans.user_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
 			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id" +
 			" LEFT JOIN projections.login_names ON projections.user_grants.user_id = projections.login_names.user_id" +
