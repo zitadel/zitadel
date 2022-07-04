@@ -913,7 +913,7 @@ Application:
       Implicit:
         RedirectUris:
           CustomNotAllowed: Le type de subvention implicite n'autorise pas les uris de redirection personnalisées
-          HttpNotAllowed: Grant tpye implicite n'autorise pas les uris de redirection http
+          HttpNotAllowed: Grant type implicite n'autorise pas les uris de redirection http
           HttpLocalhostOnlyForNative: Http://localhost redirect uri n'est autorisé que pour les applications natives.
       Native:
         AuthMethodType:

@@ -156,7 +156,7 @@ Errors:
     DomainNotVerified: Domain is not verified
     DomainAlreadyVerified: Domain is already verified
     DomainVerificationTypeInvalid: Domain verification type is invalid
-    DomainVerificationMissing: Domain verification not yet startet
+    DomainVerificationMissing: Domain verification not yet started
     DomainVerificationFailed: Domain verification failed
     PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
@@ -882,7 +882,7 @@ Application:
       Implicit:
         RedirectUris:
           CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
-          HttpNotAllowed: Grant tpye implicit doesn't allow http redirect uris
+          HttpNotAllowed: Grant type implicit doesn't allow http redirect uris
           HttpLocalhostOnlyForNative: Http://localhost redirect uri is only allowed for native applications.
       Native:
         AuthMethodType:
