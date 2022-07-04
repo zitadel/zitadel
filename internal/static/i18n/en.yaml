@@ -173,7 +173,7 @@ Errors:
     Domain:
       AlreadyExists: Domain already exists
     IDP:
-      InvalidSearchQuery: Paramètre de recherche non valide
+      InvalidSearchQuery: Invalid search query
     LoginPolicy:
       NotFound: Login Policy not found
       Invalid: Login Policy is invalid

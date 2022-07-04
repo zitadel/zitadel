@@ -173,7 +173,7 @@ Invalid : Le téléphone n'est pas valide
     Domain:
       AlreadyExists: Le domaine existe déjà
     IDP:
-InvalidSearchQuery : Ungültiger Suchparameter
+InvalidSearchQuery : Paramètre de recherche non valide
     LoginPolicy :
       NotFound : Politique de connexion non trouvée
       Invalid : La politique de connexion n'est pas valide
