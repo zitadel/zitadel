@@ -22,7 +22,7 @@
     "DISCLAIMERLINK": "Plus d'informations",
     "DOCUMENTATION": {
       "TITLE": "Documentation",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Pour un démarrage rapide de ZITADEL."
     },
     "GETSTARTED": {
       "TITLE": "Démarrer avec ZITADEL",
@@ -560,7 +560,7 @@
       "EXTERNAL": "Pour accorder un utilisateur de votre organisation",
       "CLICKHERE": "cliquez ici"
     },
-    "SIGNEDOUT": "Vous êtes déconnecté. Cliquez sur le bouton \Sign In\ pour vous reconnecter.",
+    "SIGNEDOUT": "Vous êtes déconnecté. Cliquez sur le bouton \"Se connecter\" pour vous reconnecter.",
     "SIGNEDOUT_BTN": "Se connecter",
     "EDITACCOUNT": "Modifier le compte",
     "ADDACCOUNT": "Se connecter avec un autre compte",
@@ -1150,7 +1150,7 @@
       "RESETSUCCESS": "Politique réinitialisée avec succès !",
       "UPLOADSUCCESS": "Téléchargé avec succès !",
       "DELETESUCCESS": "Suppression réussie !",
-      "UPLOADFAILED": "Echec du téléchargement !"
+      "UPLOADFAILED": "Échec du téléchargement !"
     }
   },
   "ORG_DETAIL": {
@@ -1379,7 +1379,7 @@
     "HAS_PROJECT_DESCRIPTION": "Il est vérifié si l'organisation de l'utilisateur possède ce projet. Si ce n'est pas le cas, l'utilisateur ne peut pas être authentifié.",
     "TABLE": {
       "TOTAL": "Total des entrées",
-      "SELECTION": "Eléments sélectionnés",
+      "SELECTION": "Éléments sélectionnés",
       "DEACTIVATE": "Désactiver le projet",
       "ACTIVATE": "Activer le projet",
       "DELETE": "Supprimer le projet",
@@ -1470,7 +1470,7 @@
     "SCOPESLIST": "Liste des champs d'application",
     "CLIENTID": "ID du client",
     "CLIENTSECRET": "Secret du client",
-    "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+    "IDPDISPLAYNAMMAPPING": "Mappage de IDP nom d'affichage",
     "USERNAMEMAPPING": "Mappage des noms d'utilisateur",
     "DATES": "Dates",
     "CREATIONDATE": "Créé à",
