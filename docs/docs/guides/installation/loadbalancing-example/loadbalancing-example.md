@@ -13,6 +13,7 @@ The setup is tested against Docker version 20.10.17 and Docker Compose version v
 
 By executing the commands below, you will download the following files:
 - [docker-compose.yaml](./docker-compose.yaml)
+- [example-traefik.yaml](./example-traefik.yaml)
 - [example-zitadel-config.yaml](./example-zitadel-config.yaml)
 - [example-zitadel-secrets.yaml](./example-zitadel-secrets.yaml)
 - [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml)
@@ -20,6 +21,9 @@ By executing the commands below, you will download the following files:
 ```bash
 # Download the docker compose example configuration. For example:
 wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/docker-compose.yaml
+
+# Download the docker compose example configuration. For example:
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/example-traefik.yaml
 
 # Download and adjust the example configuration file containing standard configuration
 wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/example-zitadel-config.yaml
