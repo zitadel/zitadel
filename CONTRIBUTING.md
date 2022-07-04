@@ -94,13 +94,13 @@ Provide a brief description of the change.
 
 The code consists of the following parts:
 
-| name | description | language | where to find |
-|---|---|---|---|
-| backend | Service that serves the grpc(-web) and RESTful API  | [go](https://go.dev) | [API implementation](./internal/api/grpc) |
-| console | Frontend the user interacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) |
-| login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) |
-| API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) |
-| docs | Project documentation made with docusaurus | [Docusaurus](https://docusaurus.io/) | [./docs](./docs) |
+| name            | description                                                        | language                                                                    | where to find                                      |
+| --------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------- |
+| backend         | Service that serves the grpc(-web) and RESTful API                 | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
+| console         | Frontend the user interacts with after he is logged in             | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
+| login           | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template)      | [./internal/api/ui/login](./internal/api/ui/login) |
+| API definitions | Specifications of the API                                          | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
+| docs            | Project documentation made with docusaurus                         | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
 
 Please validate and test the code before you contribute.
 
@@ -122,7 +122,10 @@ Make sure to use the following configurations:
 
 ### Console
 
-<!-- TODO: ask maxpe for infos -->
+To run console locally, navigate to the console subfolder and run `npm install` and then `npm start` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+
+Console loads its environment from the [environment.json](https://github.com/zitadel/zitadel/blob/v2-alpha/console/src/assets/environment.json), make sure to change the configuration to your instance project.
+When the backend is running locally ensure you are specifying your [localhost](http://localhost:8080/ui/console/assets/environment.json) endpoints.
 
 ### API Definitions
 
