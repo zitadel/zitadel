@@ -238,7 +238,7 @@ h2 {
   --ifm-menu-color-background-active: #ffffff10;
   --ifm-menu-color-active: #ffffff;
   --ifm-menu-color-background-hover: #3c405850;
-  --ifm-font-color-base: #c1c9d2;
+  --ifm-font-color-base: #dddddd;
   --ifm-menu-color: #a3acb9;
   --ifm-link-color: #ff2069;
   --docsearch-searchbox-background: #454a66;
@@ -285,7 +285,6 @@ h2 {
   --apisystembackground: linear-gradient(40deg, #6E695090, #6E695090);
   --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
   --overlaycolor: #ffffff15;
-  --ifm-hero-text-color: #023c2a;
 }
 
 .get-started:hover {
