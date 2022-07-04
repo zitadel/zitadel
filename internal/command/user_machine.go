@@ -27,7 +27,7 @@ func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain
 }
 
 func (c *Commands) AddMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
-	existingMachine, err := c.machineWriteModelByID(ctx, machine.AggregateID, machine.ResourceOwner)
+	existingMachine, err := c.machineWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}
