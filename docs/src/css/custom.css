@@ -238,7 +238,7 @@ h2 {
   --ifm-menu-color-background-active: #ffffff10;
   --ifm-menu-color-active: #ffffff;
   --ifm-menu-color-background-hover: #3c405850;
-  --ifm-font-color-base: #c1c9d2;
+  --ifm-font-color-base: #DDDDDD;
   --ifm-menu-color: #a3acb9;
   --ifm-link-color: #ff2069;
   --docsearch-searchbox-background: #454a66;
@@ -260,7 +260,7 @@ h2 {
   --ifm-hero-background-color: #0f1022;
   --ifm-hero-text-color: var(--ifm-font-color-base);
   --get-started-bg: var(--ifm-font-color-base);
-  --get-started: #059669;
+  --get-started: #FF1F69;
   --ifm-footer-color: #ffffff50;
   --ifm-heading-color: #ffffff;
   --ifm-font-color-base: #c1c9d2;
