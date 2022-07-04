@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -12,7 +12,7 @@ import { ToastService } from 'src/app/services/toast.service';
 export class ProjectRoleDetailDialogComponent {
   public projectId: string = '';
 
-  public formGroup!: FormGroup;
+  public formGroup!: UntypedFormGroup;
   constructor(
     private mgmtService: ManagementService,
     private toast: ToastService,
@@ -20,10 +20,10 @@ export class ProjectRoleDetailDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     this.projectId = data.projectId;
-    this.formGroup = new FormGroup({
-      key: new FormControl({ value: '', disabled: true }, [Validators.required]),
-      displayName: new FormControl(''),
-      group: new FormControl(''),
+    this.formGroup = new UntypedFormGroup({
+      key: new UntypedFormControl({ value: '', disabled: true }, [Validators.required]),
+      displayName: new UntypedFormControl(''),
+      group: new UntypedFormControl(''),
     });
 
     this.formGroup.patchValue(data.role);

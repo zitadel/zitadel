@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
@@ -49,9 +49,9 @@ function passwordConfirmValidator(c: AbstractControl): any {
   ],
 })
 export class OrgCreateComponent {
-  public orgForm!: FormGroup;
-  public userForm!: FormGroup;
-  public pwdForm!: FormGroup;
+  public orgForm!: UntypedFormGroup;
+  public userForm!: UntypedFormGroup;
+  public pwdForm!: UntypedFormGroup;
 
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
   public languages: string[] = ['de', 'en'];
@@ -66,7 +66,7 @@ export class OrgCreateComponent {
     private toast: ToastService,
     private adminService: AdminService,
     private _location: Location,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
     private authService: GrpcAuthService,
   ) {

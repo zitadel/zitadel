@@ -250,47 +250,56 @@
         }
       }
 
-      .icon-container {
-        display: flex;
-        justify-content: space-between;
+      .account-card-wrapper {
         position: relative;
-        user-select: none;
-        border: 2px solid #ffffff80;
-        border-radius: 50%;
-        transition: border ease 0.15s;
 
-        &.iam-user {
-          border: 2px solid $primary-color;
-        }
+        .icon-container {
+          display: flex;
+          justify-content: space-between;
+          position: relative;
+          user-select: none;
+          border-radius: 50%;
+          transition: border ease 0.15s;
+          padding: 0;
+          border: 2px solid if($is-dark-theme, #ffffff80, #00000010);
+          outline: none;
+          background: none;
 
-        &:hover {
-          border-color: if($is-dark-theme, #fff, #00000050);
-        }
+          &.iam-user {
+            border: 2px solid $primary-color;
+          }
 
-        .docs {
-          text-decoration: none;
-          font-size: 1.4rem;
-        }
+          &:hover,
+          &:focus {
+            border: 2px solid if($is-dark-theme, #fff, map-get($primary, 200));
+          }
 
-        .avatar-toggle {
-          display: block;
-          margin: auto;
-          cursor: pointer;
-        }
+          .docs {
+            text-decoration: none;
+            font-size: 1.4rem;
+          }
 
-        .name {
-          font-size: 1rem;
-          font-weight: 400;
-        }
+          .avatar-toggle {
+            display: block;
+            margin: auto;
+            cursor: pointer;
+            border: none;
+          }
 
-        .a_card {
-          position: absolute;
-          z-index: 300;
-          top: 55px;
-          right: 0;
-          overflow: hidden;
-          box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
-          border-radius: 0.5rem;
+          .name {
+            font-size: 1rem;
+            font-weight: 400;
+          }
+
+          .a_card {
+            position: absolute;
+            z-index: 300;
+            top: 55px;
+            right: 0;
+            overflow: hidden;
+            box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+            border-radius: 0.5rem;
+          }
         }
       }
     }

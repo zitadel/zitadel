@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -18,7 +18,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
   @Output() changedValues: EventEmitter<{ [key: string]: string }> = new EventEmitter();
   public currentMap: { [key: string]: string | boolean } = {}; // boolean because of isDefault
   private destroy$: Subject<void> = new Subject();
-  public form!: FormGroup;
+  public form!: UntypedFormGroup;
   public warnText: { [key: string]: string | boolean | undefined } = {};
 
   @Input() public chips: any[] = [];
@@ -30,10 +30,10 @@ export class EditTextComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.current$.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       this.currentMap = value;
-      this.form = new FormGroup({});
+      this.form = new UntypedFormGroup({});
       Object.keys(value).map((key) => {
         if (key !== 'isDefault') {
-          const control = new FormControl({ value: value[key], disabled: this.disabled });
+          const control = new UntypedFormControl({ value: value[key], disabled: this.disabled });
           this.form.addControl(key, control);
         }
       });

@@ -16,12 +16,12 @@ const (
 	OrgMemberOrgIDCol        = "org_id"
 )
 
-type OrgMemberProjection struct {
+type orgMemberProjection struct {
 	crdb.StatementHandler
 }
 
-func NewOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgMemberProjection {
-	p := new(OrgMemberProjection)
+func newOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *orgMemberProjection {
+	p := new(orgMemberProjection)
 	config.ProjectionName = OrgMemberProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -35,7 +35,7 @@ func NewOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 	return p
 }
 
-func (p *OrgMemberProjection) reducers() []handler.AggregateReducer {
+func (p *orgMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
@@ -74,7 +74,7 @@ func (p *OrgMemberProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.MemberAddedEventType)
@@ -82,7 +82,7 @@ func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bg8oM", "reduce.wrong.event.type %s", org.MemberChangedEventType)
@@ -90,7 +90,7 @@ func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.St
 	return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberCascadeRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4twP2", "reduce.wrong.event.type %s", org.MemberCascadeRemovedEventType)
@@ -98,7 +98,7 @@ func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*han
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-avatH", "reduce.wrong.event.type %s", org.MemberRemovedEventType)
@@ -109,7 +109,7 @@ func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.St
 	)
 }
 
-func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eBMqH", "reduce.wrong.event.type %s", user.UserRemovedType)
@@ -117,7 +117,7 @@ func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handle
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	//TODO: as soon as org deletion is implemented:
 	// Case: The user has resource owner A and an org has resource owner B
 	// if org B deleted it works

@@ -64,10 +64,24 @@
                   [routerLinkActiveOptions]="{ exact: false }"
                   [routerLinkActive]="['active']"
                   [routerLink]="['/settings']"
+                  *ngIf="['iam.read', 'iam.policy.read'] | hasRole: true | async"
                 >
                   <div class="c_label">
                     <span> {{ 'MENU.SETTINGS' | translate }} </span>
                   </div>
+                </a>
+
+                <a
+                  *ngIf="customerPortalLink"
+                  class="nav-item external-link"
+                  [href]="customerPortalLink"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.CUSTOMERPORTAL' | translate }} </span>
+                  </div>
+                  <i class="las la-external-link-alt"></i>
                 </a>
               </ng-template>
 
@@ -169,6 +183,7 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
+                    *ngIf="['policy.read'] | hasRole | async"
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>
@@ -178,67 +193,6 @@
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
           </ng-container>
-
-          <!-- <ng-container *ngSwitchCase="BreadcrumbType.PROJECT">
-            <div *ngIf="breadc[breadc.length - 1]?.param?.value" class="nav-row-abs" @navrowproject>
-              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-                <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/projects', breadc[breadc.length - 1]?.param?.value]"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.PROJECTOVERVIEW' | translate }} </span>
-                  </div>
-                </a>
-              </ng-template>
-
-              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-                <a
-                  *ngIf="!breadc[breadc.length - 1]?.isZitadel"
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/projects', breadc[breadc.length - 1]?.param?.value, 'roles']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.ROLES' | translate }} </span>
-                  </div>
-                </a>
-              </ng-template>
-
-              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-                <a
-                  *ngIf="!breadc[breadc.length - 1]?.isZitadel"
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/projects', breadc[breadc.length - 1]?.param?.value, 'projectgrants']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.PROJECTGRANTS' | translate }} </span>
-                  </div>
-                </a>
-              </ng-template>
-
-              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-                <a
-                  *ngIf="!breadc[breadc.length - 1]?.isZitadel"
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/projects', breadc[breadc.length - 1]?.param?.value, 'grants']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.GRANTS' | translate }} </span>
-                  </div>
-                </a>
-              </ng-template>
-
-              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
-            </div>
-          </ng-container> -->
         </div>
       </ng-container>
     </ng-container>
@@ -248,7 +202,7 @@
 <ng-template #shortcutKeyRef>
   <ng-container *ngIf="(isHandset$ | async) === false">
     <span class="fill-space"></span>
-    <div class="nav-shortcut-action-key" matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}">
+    <div (click)="openHelp()" class="nav-shortcut-action-key" matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}">
       <div class="nav-key-overlay"></div>
       <span>?</span>
     </div>

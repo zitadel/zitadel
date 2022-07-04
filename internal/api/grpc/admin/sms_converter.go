@@ -20,9 +20,26 @@ func listSMSConfigsToModel(req *admin_pb.ListSMSProvidersRequest) (*query.SMSCon
 	}, nil
 }
 
-func SMSConfigToPb(app *query.SMSConfig) settings_pb.SMSConfig {
-	if app.TwilioConfig != nil {
-		return TwilioConfigToPb(app.TwilioConfig)
+func SMSConfigsToPb(configs []*query.SMSConfig) []*settings_pb.SMSProvider {
+	c := make([]*settings_pb.SMSProvider, len(configs))
+	for i, config := range configs {
+		c[i] = SMSConfigToProviderPb(config)
+	}
+	return c
+}
+
+func SMSConfigToProviderPb(config *query.SMSConfig) *settings_pb.SMSProvider {
+	return &settings_pb.SMSProvider{
+		Details: object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
+		Id:      config.ID,
+		State:   smsStateToPb(config.State),
+		Config:  SMSConfigToPb(config),
+	}
+}
+
+func SMSConfigToPb(config *query.SMSConfig) settings_pb.SMSConfig {
+	if config.TwilioConfig != nil {
+		return TwilioConfigToPb(config.TwilioConfig)
 	}
 	return nil
 }

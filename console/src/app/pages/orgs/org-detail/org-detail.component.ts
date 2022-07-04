@@ -5,6 +5,7 @@ import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs'
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
@@ -31,6 +32,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
   public totalMemberResult: number = 0;
   public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
   private destroy$: Subject<void> = new Subject();
+
+  public InfoSectionType: any = InfoSectionType;
   constructor(
     private dialog: MatDialog,
     public mgmtService: ManagementService,

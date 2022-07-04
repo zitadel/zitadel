@@ -43,7 +43,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
 	}
-	projectRoles, err := o.query.SearchProjectRoles(ctx, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.query.GetUserByID(ctx, subject)
+	user, err := o.query.GetUserByID(ctx, true, subject)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.query.GetUserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return err
 	}
@@ -209,7 +209,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 				userInfo.SetNickname(user.Human.NickName)
 				userInfo.SetGender(getGender(user.Human.Gender))
 				userInfo.SetLocale(user.Human.PreferredLanguage)
-				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix, user.ResourceOwner, user.Human.AvatarKey))
+				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix(ctx), user.ResourceOwner, user.Human.AvatarKey))
 			} else {
 				userInfo.SetName(user.Machine.Name)
 			}
@@ -328,7 +328,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.query.SearchUserMetadata(ctx, userID, &query.UserMetadataSearchQueries{})
+	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{})
 	if err != nil {
 		return nil, err
 	}
@@ -341,11 +341,11 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.query.GetUserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return nil, err
 	}
-	resourceOwner, err := o.query.OrgByID(ctx, user.ResourceOwner)
+	resourceOwner, err := o.query.OrgByID(ctx, true, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

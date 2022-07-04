@@ -38,6 +38,11 @@ export class HeaderComponent implements OnDestroy {
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
+
+  public accountCardPositions: ConnectedPosition[] = [
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+  ];
   constructor(
     public authenticationService: AuthenticationService,
     private authService: GrpcAuthService,
@@ -65,6 +70,10 @@ export class HeaderComponent implements OnDestroy {
 
   public get isOnMe(): boolean {
     return this.router.url === '/users/me';
+  }
+
+  public errorHandler(event: any, fallbackSrc: string) {
+    (event.target as HTMLImageElement).src = fallbackSrc;
   }
 
   public get isOnInstance(): boolean {

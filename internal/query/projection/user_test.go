@@ -41,7 +41,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanAdded,
+			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -101,7 +101,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanAdded,
+			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -156,7 +156,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanAdded,
+			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -216,7 +216,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanRegisteredEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanRegistered,
+			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -276,7 +276,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanRegisteredEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanRegistered,
+			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -331,7 +331,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanRegisteredEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanRegistered,
+			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -381,7 +381,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanInitialCodeAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanInitCodeAdded,
+			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -410,7 +410,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanInitialCodeAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanInitCodeAdded,
+			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -439,7 +439,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanInitializedCheckSucceededEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanInitCodeSucceeded,
+			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -468,7 +468,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanInitializedCheckSucceededEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanInitCodeSucceeded,
+			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -497,7 +497,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserLockedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceUserLocked,
+			reduce: (&userProjection{}).reduceUserLocked,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -528,7 +528,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserUnlockedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceUserUnlocked,
+			reduce: (&userProjection{}).reduceUserUnlocked,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -559,7 +559,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserDeactivatedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceUserDeactivated,
+			reduce: (&userProjection{}).reduceUserDeactivated,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -590,7 +590,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserReactivatedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceUserReactivated,
+			reduce: (&userProjection{}).reduceUserReactivated,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -621,7 +621,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceUserRemoved,
+			reduce: (&userProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -651,7 +651,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.UsernameChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceUserNameChanged,
+			reduce: (&userProjection{}).reduceUserNameChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -689,7 +689,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanProfileChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanProfileChanged,
+			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -739,7 +739,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanProfileChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanProfileChanged,
+			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -784,7 +784,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						}`),
 				), user.HumanPhoneChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanPhoneChanged,
+			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -825,7 +825,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						}`),
 				), user.HumanPhoneChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanPhoneChanged,
+			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -864,7 +864,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanPhoneRemovedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanPhoneRemoved,
+			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -903,7 +903,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanPhoneRemovedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanPhoneRemoved,
+			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -942,7 +942,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanPhoneVerifiedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanPhoneVerified,
+			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -980,7 +980,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanPhoneVerifiedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanPhoneVerified,
+			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1020,7 +1020,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanEmailChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanEmailChanged,
+			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1061,7 +1061,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanEmailChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanEmailChanged,
+			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1100,7 +1100,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanEmailVerifiedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanEmailVerified,
+			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1138,7 +1138,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanEmailVerifiedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanEmailVerified,
+			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1178,7 +1178,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.HumanAvatarAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanAvatarAdded,
+			reduce: (&userProjection{}).reduceHumanAvatarAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1216,7 +1216,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.HumanAvatarRemovedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceHumanAvatarRemoved,
+			reduce: (&userProjection{}).reduceHumanAvatarRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1257,7 +1257,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.MachineAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceMachineAdded,
+			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1305,7 +1305,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.MachineAddedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceMachineAdded,
+			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1352,7 +1352,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.MachineChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceMachineChanged,
+			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1393,7 +1393,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.MachineChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceMachineChanged,
+			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1433,7 +1433,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					}`),
 				), user.MachineChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceMachineChanged,
+			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
@@ -1471,7 +1471,7 @@ func TestUserProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.MachineChangedEventMapper),
 			},
-			reduce: (&UserProjection{}).reduceMachineChanged,
+			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,

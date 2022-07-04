@@ -37,12 +37,25 @@
     <input id="smtp-user" cnslInput name="smtp-user" autocomplete="smtp-user" formControlName="user" />
   </cnsl-form-field>
 
-  <button class="set-password-btn" (click)="setSMTPPassword()" mat-stroked-button>
+  <button
+    class="set-password-btn"
+    [disabled]="(['iam.write'] | hasRole | async) === false || !hasSMTPConfig"
+    (click)="setSMTPPassword()"
+    type="button"
+    mat-stroked-button
+  >
     {{ 'SETTING.SMTP.SETPASSWORD' | translate }}
   </button>
 
   <div class="general-btn-container">
-    <button class="save-button" (click)="savePolicy()" color="primary" type="submit" mat-raised-button>
+    <button
+      class="save-button"
+      [disabled]="form.disabled"
+      (click)="savePolicy()"
+      color="primary"
+      type="submit"
+      mat-raised-button
+    >
       {{ 'ACTIONS.SAVE' | translate }}
     </button>
   </div>
@@ -65,13 +78,9 @@
       ></span>
 
       <span class="fill-space"></span>
-      <button mat-icon-button (click)="addSMSProvider()"><i class="las la-pen"></i></button>
+      <button [disabled]="(['iam.write'] | hasRole | async) === false" mat-icon-button (click)="editSMSProvider()">
+        <i class="las la-pen"></i>
+      </button>
     </div>
   </cnsl-card>
-  <!-- <button mat-stroked-button (click)="addSMSProvider()">
-    <div class="sms-card add">
-      <mat-icon>add</mat-icon>
-      <span>{{ 'ACTIONS.ADD' | translate }}</span>
-    </div>
-  </button> -->
 </div>

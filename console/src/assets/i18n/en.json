@@ -68,7 +68,8 @@
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
     "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
-    "SETTINGS": "Settings"
+    "SETTINGS": "Settings",
+    "CUSTOMERPORTAL": "Customer Portal"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",
@@ -123,6 +124,24 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Has control over the whole instance, including all organizations",
+    "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
+    "IAM_ORG_MANAGER": "Has permission to create and manage organizations",
+    "IAM_USER_MANAGER": "Has permission to create and manage users",
+    "ORG_OWNER": "Has permission over the whole organization",
+    "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
+    "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
+    "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
+    "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
+    "PROJECT_OWNER": "Has permission over the whole project",
+    "PROJECT_OWNER_VIEWER": "Has permission to review the whole project",
+    "PROJECT_OWNER_GLOBAL": "Has permission over the whole project",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Has permission to review the whole project",
+    "PROJECT_GRANT_OWNER": "Has permission to manage the project grant",
+    "PROJECT_GRANT_OWNER_VIEWER": "Has permission to review the project grant"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -738,6 +757,7 @@
       "LISTDESCRIPTION": "Choose an organization.",
       "ACTIVE": "Active",
       "CREATE": "Create Organization",
+      "NOPERMISSION": "You don't have the permission to access organization settings.",
       "USERSELFACCOUNT": "Use your personal account as organization owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
@@ -867,7 +887,10 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
-        "ADDED": "Twilio added successfully."
+        "ADDED": "Twilio added successfully.",
+        "CHANGETOKEN": "Change Token",
+        "SETTOKEN": "Set Token",
+        "TOKENSET": "Token successfully set."
       }
     },
     "OIDC": {
@@ -899,6 +922,13 @@
       "INCLUDEUPPERLETTERS": "Include Upper letters",
       "LENGTH": "Length",
       "UPDATED": "Settings updated."
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Reset Setting",
+        "DEFAULTDESCRIPTION": "You are about to reset your settings to the default configuration of your instance. Are you sure you want to continue?",
+        "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identiy Provider settings will be reset to the instance setting too."
+      }
     }
   },
   "POLICY": {
@@ -1402,7 +1432,7 @@
     },
     "OWNERTYPES": {
       "0": "unknown",
-      "1": "System",
+      "1": "Instance",
       "2": "Organization"
     },
     "TYPES": {
@@ -1455,11 +1485,12 @@
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "EMPTY": "No IPD available",
     "OIDC": {
-      "TITLE": "OIDC IDP",
+      "GENERAL": "General Information",
+      "TITLE": "OIDC Configuration",
       "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT IDP",
+      "TITLE": "JWT Configuration",
       "DESCRIPTION": "Enter the data for JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -1472,7 +1503,9 @@
       "SELECTEDREACTIVATED": "Selected Idps reactivated.",
       "SELECTEDDEACTIVATED": "Selected Idps deactivated.",
       "SELECTEDKEYSDELETED": "Selected Idps deleted.",
-      "DELETED": "Idp removed successfully!"
+      "DELETED": "Idp removed successfully!",
+      "ADDED": "Added successfully.",
+      "REMOVED": "Removed successfully."
     }
   },
   "MFA": {

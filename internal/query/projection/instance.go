@@ -17,7 +17,7 @@ const (
 	InstanceColumnName            = "name"
 	InstanceColumnChangeDate      = "change_date"
 	InstanceColumnCreationDate    = "creation_date"
-	InstanceColumnGlobalOrgID     = "global_org_id"
+	InstanceColumnDefaultOrgID    = "default_org_id"
 	InstanceColumnProjectID       = "iam_project_id"
 	InstanceColumnConsoleID       = "console_client_id"
 	InstanceColumnConsoleAppID    = "console_app_id"
@@ -25,12 +25,12 @@ const (
 	InstanceColumnDefaultLanguage = "default_language"
 )
 
-type InstanceProjection struct {
+type instanceProjection struct {
 	crdb.StatementHandler
 }
 
-func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConfig) *InstanceProjection {
-	p := new(InstanceProjection)
+func newInstanceProjection(ctx context.Context, config crdb.StatementHandlerConfig) *instanceProjection {
+	p := new(instanceProjection)
 	config.ProjectionName = InstanceProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -39,7 +39,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(InstanceColumnName, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(InstanceColumnDefaultOrgID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleAppID, crdb.ColumnTypeText, crdb.Default("")),
@@ -53,7 +53,7 @@ func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 	return p
 }
 
-func (p *InstanceProjection) reducers() []handler.AggregateReducer {
+func (p *instanceProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -63,8 +63,8 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceInstanceAdded,
 				},
 				{
-					Event:  instance.GlobalOrgSetEventType,
-					Reduce: p.reduceGlobalOrgSet,
+					Event:  instance.DefaultOrgSetEventType,
+					Reduce: p.reduceDefaultOrgSet,
 				},
 				{
 					Event:  instance.ProjectSetEventType,
@@ -83,7 +83,7 @@ func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *InstanceProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-29nlS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
@@ -100,17 +100,17 @@ func (p *InstanceProjection) reduceInstanceAdded(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.GlobalOrgSetEvent)
+func (p *instanceProjection) reduceDefaultOrgSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.DefaultOrgSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.GlobalOrgSetEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.DefaultOrgSetEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
-			handler.NewCol(InstanceColumnGlobalOrgID, e.OrgID),
+			handler.NewCol(InstanceColumnDefaultOrgID, e.OrgID),
 		},
 		[]handler.Condition{
 			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
@@ -118,7 +118,7 @@ func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ProjectSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
@@ -136,7 +136,7 @@ func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ConsoleSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
@@ -155,7 +155,7 @@ func (p *InstanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 	), nil
 }
 
-func (p *InstanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *instanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DefaultLanguageSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)

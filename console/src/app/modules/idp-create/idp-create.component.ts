@@ -1,7 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, OnDestroy, OnInit, Type } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -31,8 +31,8 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   public projectId: string = '';
 
-  public oidcFormGroup!: FormGroup;
-  public jwtFormGroup!: FormGroup;
+  public oidcFormGroup!: UntypedFormGroup;
+  public jwtFormGroup!: UntypedFormGroup;
 
   public createSteps: number = 2;
   public currentCreateStep: number = 1;
@@ -53,25 +53,25 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
-    this.oidcFormGroup = new FormGroup({
-      name: new FormControl('', [Validators.required]),
-      clientId: new FormControl('', [Validators.required]),
-      clientSecret: new FormControl('', [Validators.required]),
-      issuer: new FormControl('', [Validators.required]),
-      scopesList: new FormControl(['openid', 'profile', 'email'], []),
-      idpDisplayNameMapping: new FormControl(0),
-      usernameMapping: new FormControl(0),
-      autoRegister: new FormControl(false),
+    this.oidcFormGroup = new UntypedFormGroup({
+      name: new UntypedFormControl('', [Validators.required]),
+      clientId: new UntypedFormControl('', [Validators.required]),
+      clientSecret: new UntypedFormControl('', [Validators.required]),
+      issuer: new UntypedFormControl('', [Validators.required]),
+      scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+      idpDisplayNameMapping: new UntypedFormControl(0),
+      usernameMapping: new UntypedFormControl(0),
+      autoRegister: new UntypedFormControl(false),
     });
 
-    this.jwtFormGroup = new FormGroup({
-      jwtName: new FormControl('', [Validators.required]),
-      jwtHeaderName: new FormControl('', [Validators.required]),
-      jwtIssuer: new FormControl('', [Validators.required]),
-      jwtEndpoint: new FormControl('', [Validators.required]),
-      jwtKeysEndpoint: new FormControl('', [Validators.required]),
-      jwtStylingType: new FormControl(0),
-      jwtAutoRegister: new FormControl(false),
+    this.jwtFormGroup = new UntypedFormGroup({
+      jwtName: new UntypedFormControl('', [Validators.required]),
+      jwtHeaderName: new UntypedFormControl('', [Validators.required]),
+      jwtIssuer: new UntypedFormControl('', [Validators.required]),
+      jwtEndpoint: new UntypedFormControl('', [Validators.required]),
+      jwtKeysEndpoint: new UntypedFormControl('', [Validators.required]),
+      jwtStylingType: new UntypedFormControl(0),
+      jwtAutoRegister: new UntypedFormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -171,15 +171,16 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
         .then((idp) => {
           setTimeout(() => {
             this.loading = false;
-            this.router.navigate([
-              this.serviceType === PolicyComponentServiceType.MGMT
-                ? 'org'
-                : this.serviceType === PolicyComponentServiceType.ADMIN
-                ? 'iam'
-                : '',
-              'policy',
-              'login',
-            ]);
+            this.router.navigate(
+              [
+                this.serviceType === PolicyComponentServiceType.MGMT
+                  ? '/org-settings'
+                  : this.serviceType === PolicyComponentServiceType.ADMIN
+                  ? '/settings'
+                  : '',
+              ],
+              { queryParams: { id: 'idp' } },
+            );
           }, 2000);
         })
         .catch((error) => {

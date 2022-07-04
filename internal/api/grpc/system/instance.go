@@ -31,7 +31,7 @@ func (s *Server) ListInstances(ctx context.Context, req *system_pb.ListInstances
 
 func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequest) (*system_pb.GetInstanceResponse, error) {
 	ctx = authz.WithInstanceID(ctx, req.InstanceId)
-	instance, err := s.query.Instance(ctx)
+	instance, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
 	}
@@ -47,17 +47,15 @@ func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequ
 	}
 	return &system_pb.AddInstanceResponse{
 		InstanceId: id,
-		Details: object.AddToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
+		Details:    object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
-	return nil, nil
 }
 
 func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRequest) (*system_pb.ExistsDomainResponse, error) {
 	domainQuery, err := query.NewInstanceDomainDomainSearchQuery(query.TextEqualsIgnoreCase, req.Domain)
+	if err != nil {
+		return nil, err
+	}
 
 	query := &query.InstanceDomainSearchQueries{
 		SearchRequest: query.SearchRequest{
@@ -69,7 +67,7 @@ func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRe
 			domainQuery,
 		},
 	}
-	domains, err := s.query.SearchInstanceDomains(ctx, query)
+	domains, err := s.query.SearchInstanceDomainsGlobal(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -90,32 +88,26 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 		return nil, err
 	}
 	return &system_pb.ListDomainsResponse{
-		Result: instance_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(
-			domains.Count,
-			domains.Sequence,
-			domains.Timestamp,
-		),
+		Result:  instance_grpc.DomainsToPb(domains.Domains),
+		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
 	}, nil
 }
 
 func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest) (*system_pb.AddDomainResponse, error) {
+	//TODO: should be solved in interceptor
 	ctx = authz.WithInstanceID(ctx, req.InstanceId)
-	instance, err := s.query.Instance(ctx)
+	instance, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
 	}
 	ctx = authz.WithInstance(ctx, instance)
+
 	details, err := s.command.AddInstanceDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err
 	}
 	return &system_pb.AddDomainResponse{
-		Details: object.AddToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
+		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
 }
 
@@ -126,11 +118,7 @@ func (s *Server) RemoveDomain(ctx context.Context, req *system_pb.RemoveDomainRe
 		return nil, err
 	}
 	return &system_pb.RemoveDomainResponse{
-		Details: object.ChangeToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
+		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
 }
 
@@ -141,10 +129,6 @@ func (s *Server) SetPrimaryDomain(ctx context.Context, req *system_pb.SetPrimary
 		return nil, err
 	}
 	return &system_pb.SetPrimaryDomainResponse{
-		Details: object.ChangeToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner,
-		),
+		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
 }

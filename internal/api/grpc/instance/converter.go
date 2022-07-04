@@ -1,6 +1,7 @@
 package org
 
 import (
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -23,8 +24,10 @@ func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 			instance.ChangeDate,
 			instance.InstanceID(),
 		),
-		Id:   instance.InstanceID(),
-		Name: instance.Name,
+		Id:      instance.InstanceID(),
+		Name:    instance.Name,
+		Domains: DomainsToPb(instance.Domains),
+		Version: build.Version(),
 	}
 }
 
@@ -39,6 +42,7 @@ func InstanceDetailToPb(instance *query.Instance) *instance_pb.InstanceDetail {
 		Id:      instance.InstanceID(),
 		Name:    instance.Name,
 		Domains: DomainsToPb(instance.Domains),
+		Version: build.Version(),
 	}
 }
 

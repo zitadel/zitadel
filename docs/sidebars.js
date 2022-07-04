@@ -36,7 +36,6 @@ module.exports = {
   ],
   guides: [
     "guides/overview",
-    "guides/installation/installation",
     {
       type: "category",
       label: "Get to know ZITADEL",
@@ -46,6 +45,19 @@ module.exports = {
         "guides/basics/instance",
         "guides/basics/organizations",
         "guides/basics/projects",
+        "guides/basics/applications",
+      ],
+    },
+    {
+      type: "category",
+      label: "Install ZITADEL",
+      collapsed: false,
+      items: [
+        "guides/installation/run/run",
+        "guides/installation/configure/configure",
+        "guides/installation/custom-domain",
+        "guides/installation/http2-support",
+        "guides/installation/loadbalancing-example/loadbalancing-example",
       ],
     },
     {
@@ -54,6 +66,8 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/integrations/authenticated-mongodb-charts",
+        "guides/integrations/auth0",
+        "guides/integrations/gitlab-self-hosted",
       ],
     },
     {
@@ -95,7 +109,8 @@ module.exports = {
       items: [
           "guides/customization/branding",
           "guides/customization/texts",
-          "guides/customization/behavior"
+          "guides/customization/behavior",
+          "guides/customization/user-metadata"
       ],
     },
     {
@@ -211,20 +226,20 @@ module.exports = {
   ],
   manuals: [
     "manuals/introduction",
+    "manuals/user-profile",
+    "manuals/user-login",
     {
       type: "category",
-      label: "User",
+      label: "Customer Portal",
+      collapsed: true,
       items: [
-        "manuals/user-register",
-        "manuals/user-login",
-        "manuals/user-passwordless",
-        "manuals/user-password",
-        "manuals/user-factors",
-        "manuals/user-email",
-        "manuals/user-phone",
-        "manuals/user-social-login",
+        "manuals/customerportal/overview",
+        "manuals/customerportal/start",
+        "manuals/customerportal/instances",
+        "manuals/customerportal/billing",
+        "manuals/customerportal/users",
+        "manuals/customerportal/support",
       ],
-      collapsed: false,
     },
     "manuals/troubleshooting",
   ],
@@ -234,24 +249,18 @@ module.exports = {
     "legal/data-processing-agreement",
     {
       type: "category",
-      label: "Service Descriptions",
+      label: "Service Description",
       collapsed: false,
-      items: ["legal/service-level-description", "legal/support-services"],
+      items: ["legal/cloud-service-description", "legal/service-level-description", "legal/support-services"],
     },
     {
       type: "category",
-      label: "Dedicated Instance",
-      collapsed: false,
+      label: "Additional terms",
+      collapsed: true,
       items: [
+        "legal/terms-support-service",
         "legal/terms-of-service-dedicated",
-        "legal/dedicated-instance-annex",
       ],
-    },
-    {
-      type: "category",
-      label: "Support Program",
-      collapsed: false,
-      items: ["legal/terms-support-service"],
     },
     {
       type: "category",

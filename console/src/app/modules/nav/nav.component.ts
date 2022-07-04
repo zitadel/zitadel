@@ -1,14 +1,16 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject, take } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 @Component({
@@ -79,13 +81,14 @@ export class NavComponent implements OnDestroy {
   );
 
   @Input() public org!: Org.AsObject;
-  public filterControl: FormControl = new FormControl('');
+  public filterControl: UntypedFormControl = new UntypedFormControl('');
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public showAccount: boolean = false;
   public hideAdminWarn: boolean = true;
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
+  public customerPortalLink: string = '';
 
   constructor(
     public authenticationService: AuthenticationService,
@@ -93,8 +96,22 @@ export class NavComponent implements OnDestroy {
     public mgmtService: ManagementService,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
+    private http: HttpClient,
+    private shortcutService: KeyboardShortcutsService,
   ) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
+    this.loadEnvironment();
+  }
+
+  public loadEnvironment(): void {
+    this.http
+      .get('./assets/environment.json')
+      .pipe(take(1))
+      .subscribe((data: any) => {
+        if (data && data.customer_portal) {
+          this.customerPortalLink = data.customer_portal;
+        }
+      });
   }
 
   public toggleAdminHide(): void {
@@ -110,5 +127,9 @@ export class NavComponent implements OnDestroy {
   public get isUserLinkActive(): boolean {
     const url = this.router.url;
     return url.substring(0, 6) === '/users';
+  }
+
+  public openHelp() {
+    this.shortcutService.openOverviewDialog();
   }
 }

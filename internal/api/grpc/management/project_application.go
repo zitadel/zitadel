@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest) (*mgmt_pb.GetAppByIDResponse, error) {
-	app, err := s.query.AppByProjectAndAppID(ctx, req.ProjectId, req.AppId)
+	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId)
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +33,8 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 		return nil, err
 	}
 	return &mgmt_pb.ListAppsResponse{
-		Result: project_grpc.AppsToPb(apps.Apps),
-		Details: object_grpc.ToListDetails(
-			apps.Count,
-			apps.Sequence,
-			apps.Timestamp,
-		),
+		Result:  project_grpc.AppsToPb(apps.Apps),
+		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.Timestamp),
 	}, nil
 }
 
@@ -208,7 +204,7 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID, objectID)
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID, objectID)
 	if err != nil {
 		return nil, err
 	}
@@ -227,12 +223,8 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 		return nil, err
 	}
 	return &mgmt_pb.ListAppKeysResponse{
-		Result: authn_grpc.KeysToPb(keys.AuthNKeys),
-		Details: object_grpc.ToListDetails(
-			keys.Count,
-			keys.Sequence,
-			keys.Timestamp,
-		),
+		Result:  authn_grpc.KeysToPb(keys.AuthNKeys),
+		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.Timestamp),
 	}, nil
 }
 

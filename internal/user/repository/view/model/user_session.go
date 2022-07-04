@@ -55,7 +55,7 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 	return v, nil
 }
 
-func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *model.UserSessionView {
+func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
 		ChangeDate:                   userSession.ChangeDate,
 		CreationDate:                 userSession.CreationDate,
@@ -67,7 +67,6 @@ func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *m
 		LoginName:                    userSession.LoginName,
 		DisplayName:                  userSession.DisplayName,
 		AvatarKey:                    userSession.AvatarKey,
-		AvatarURL:                    domain.AvatarURL(prefixAvatarURL, userSession.ResourceOwner, userSession.AvatarKey),
 		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
 		PasswordVerification:         userSession.PasswordVerification,
 		PasswordlessVerification:     userSession.PasswordlessVerification,
@@ -80,10 +79,10 @@ func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *m
 	}
 }
 
-func UserSessionsToModel(userSessions []*UserSessionView, prefixAvatarURL string) []*model.UserSessionView {
+func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionView {
 	result := make([]*model.UserSessionView, len(userSessions))
 	for i, s := range userSessions {
-		result[i] = UserSessionToModel(s, prefixAvatarURL)
+		result[i] = UserSessionToModel(s)
 	}
 	return result
 }
@@ -172,6 +171,14 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
+	case user.HumanAvatarAddedType:
+		key, err := avatarKeyFromEvent(event)
+		if err != nil {
+			return err
+		}
+		v.AvatarKey = key
+	case user.HumanAvatarRemovedType:
+		v.AvatarKey = ""
 	}
 	return nil
 }
@@ -180,4 +187,13 @@ func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time
 	v.SecondFactorVerification = verificationTime
 	v.SecondFactorVerificationType = int32(mfaType)
 	v.State = int32(domain.UserSessionStateActive)
+}
+
+func avatarKeyFromEvent(event *models.Event) (string, error) {
+	data := make(map[string]string)
+	if err := json.Unmarshal(event.Data, &data); err != nil {
+		logging.Log("EVEN-Sfew2").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
+	}
+	return data["storeKey"], nil
 }

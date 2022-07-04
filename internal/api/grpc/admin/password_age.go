@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *admin_pb.GetPasswordAgePolicyRequest) (*admin_pb.GetPasswordAgePolicyResponse, error) {
-	policy, err := s.query.DefaultPasswordAgePolicy(ctx)
+	policy, err := s.query.DefaultPasswordAgePolicy(ctx, true)
 	if err != nil {
 		return nil, err
 	}

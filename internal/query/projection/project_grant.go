@@ -28,12 +28,12 @@ const (
 	ProjectGrantColumnRoleKeys      = "granted_role_keys"
 )
 
-type ProjectGrantProjection struct {
+type projectGrantProjection struct {
 	crdb.StatementHandler
 }
 
-func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectGrantProjection {
-	p := new(ProjectGrantProjection)
+func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectGrantProjection {
+	p := new(projectGrantProjection)
 	config.ProjectionName = ProjectGrantProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -47,7 +47,7 @@ func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ProjectGrantColumnResourceOwner})),
@@ -58,7 +58,7 @@ func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 	return p
 }
 
-func (p *ProjectGrantProjection) reducers() []handler.AggregateReducer {
+func (p *projectGrantProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
@@ -96,7 +96,7 @@ func (p *ProjectGrantProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.GrantAddedType)
@@ -118,7 +118,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g0fg4", "reduce.wrong.event.type %s", project.GrantChangedType)
@@ -137,7 +137,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantCascadeChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ll9Ts", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
@@ -156,7 +156,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantDeactivateEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0fj2f", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
@@ -175,7 +175,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantReactivatedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2M0ve", "reduce.wrong.event.type %s", project.GrantReactivatedType)
@@ -194,7 +194,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o0w4f", "reduce.wrong.event.type %s", project.GrantRemovedType)
@@ -208,7 +208,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *projectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-gn9rw", "reduce.wrong.event.type %s", project.ProjectRemovedType)

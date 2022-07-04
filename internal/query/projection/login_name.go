@@ -85,12 +85,12 @@ var (
 	)
 )
 
-type LoginNameProjection struct {
+type loginNameProjection struct {
 	crdb.StatementHandler
 }
 
-func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginNameProjection {
-	p := new(LoginNameProjection)
+func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerConfig) *loginNameProjection {
+	p := new(loginNameProjection)
 	config.ProjectionName = LoginNameProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewViewCheck(
@@ -129,7 +129,7 @@ func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 	return p
 }
 
-func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
+func (p *loginNameProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
@@ -216,7 +216,7 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *LoginNameProjection) reduceUserCreated(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceUserCreated(event eventstore.Event) (*handler.Statement, error) {
 	var userName string
 
 	switch e := event.(type) {
@@ -242,7 +242,7 @@ func (p *LoginNameProjection) reduceUserCreated(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *LoginNameProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QIe3C", "reduce.wrong.event.type %s", user.UserRemovedType)
@@ -257,7 +257,7 @@ func (p *LoginNameProjection) reduceUserRemoved(event eventstore.Event) (*handle
 	), nil
 }
 
-func (p *LoginNameProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UsernameChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QlwjC", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
@@ -275,7 +275,7 @@ func (p *LoginNameProjection) reduceUserNameChanged(event eventstore.Event) (*ha
 	), nil
 }
 
-func (p *LoginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.DomainClaimedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AQMBY", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
@@ -293,7 +293,7 @@ func (p *LoginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*
 	), nil
 }
 
-func (p *LoginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		policyEvent *policy.DomainPolicyAddedEvent
 		isDefault   bool
@@ -322,7 +322,7 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*
 	), nil
 }
 
-func (p *LoginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent *policy.DomainPolicyChangedEvent
 
 	switch e := event.(type) {
@@ -350,7 +350,7 @@ func (p *LoginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) 
 	), nil
 }
 
-func (p *LoginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPolicyRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ysEeB", "reduce.wrong.event.type %s", org.DomainPolicyRemovedEventType)
@@ -365,7 +365,7 @@ func (p *LoginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) 
 	), nil
 }
 
-func (p *LoginNameProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-weGAh", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
@@ -382,7 +382,7 @@ func (p *LoginNameProjection) reduceDomainVerified(event eventstore.Event) (*han
 	), nil
 }
 
-func (p *LoginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eOXPN", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
@@ -413,7 +413,7 @@ func (p *LoginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *LoginNameProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *loginNameProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4RHYq", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)

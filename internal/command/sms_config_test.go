@@ -364,7 +364,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ActivateSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id)
+			got, err := r.ActivateSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -482,7 +482,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.DeactivateSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id)
+			got, err := r.DeactivateSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -496,7 +496,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 	}
 }
 
-func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
+func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -547,7 +547,7 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 			},
 		},
 		{
-			name: "sms config twilio remove, ok",
+			name: "sms config remove, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -593,7 +593,7 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id)
+			got, err := r.RemoveSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

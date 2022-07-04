@@ -112,7 +112,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		err = nil
 	}
 	if !idpConfig.AutoRegister {
-		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 		return
 	}
 	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
@@ -128,7 +128,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 	}
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	user, metadata, err = l.customExternalUserToLoginUserMapping(user, tokens, authReq, idpConfig, metadata, resourceOwner)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, tokens, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -143,7 +143,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(authReq.UserID, tokens, authReq, idpConfig, resourceOwner)
+	userGrants, err := l.customGrants(r.Context(), authReq.UserID, tokens, authReq, idpConfig, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

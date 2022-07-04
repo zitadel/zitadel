@@ -19,7 +19,7 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.query.UserGrant(ctx, idQuery, ownerQuery)
+	grant, err := s.query.UserGrant(ctx, true, idQuery, ownerQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +38,8 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 		return nil, err
 	}
 	return &mgmt_pb.ListUserGrantResponse{
-		Result: user.UserGrantsToPb(s.assetAPIPrefix(ctx), res.UserGrants),
-		Details: obj_grpc.ToListDetails(
-			res.Count,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  user.UserGrantsToPb(s.assetAPIPrefix(ctx), res.UserGrants),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 

@@ -2,9 +2,18 @@
 title: Service Level
 custom_edit_url: null
 --- 
+
+:::note
+
+This document describes the current version of our offering. For terms regarding to our previous offering, which is being shut down on 31.12.2022, please refer to the [agreements under docs-v1.zitadel.com](https://docs-v1.zitadel.com/).
+
+:::
+
 ## Introduction
 
 This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
+
+Last revised: June 14, 2022
 
 ## Definitions
 
@@ -40,6 +49,7 @@ This excludes specifically:
 
 - **Authentication API** Endpoints
 - **OpenID Connect 1.0 / OAuth 2.0 API** Endpoints
+- **SAML 2.0** Endpoints
 - **Login Service** means the graphical user interface of ZITADEL Cloud for users to Login, Self-Register, and conduct a Password Reset.
 - **Identity Brokering Service** means the component of ZITADEL Cloud that handles federated authentication of users with third-party identity provider, excluding any failure or misconfiguration by the third-party
 
@@ -58,30 +68,11 @@ Achieved vs.  Guaranteed| 99.50% | 99.90% | 99.95%
 
 1. During the term of the subscription agreement under which CAOS has agreed to provide ZITADEL Cloud to Customer, the Core Services will provide a Monthly Uptime Percentage to Customer conditional on the subscription plan as follows (the “SLO”):
 
-Subscription plan | Monthly Uptime Percentage
+Option | Monthly Uptime Percentage
 --- | ---
-FREE | Not applicable
-OUTPOST | 99.50%
-STARBASE | 99.90%
-FORTRESS | 99.95%
-DEDICATED STANDARD | 99.50%
-DEDICATED ADVANCED | 99.90%
+Default | 99.50%
+Extended SLA | 99.95%
 
-2. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document. Financial Credit shall be the sole and exclusive remedy for breach of this SLA.
-3. The Customer must request Financial Credit and must notify CAOS Support in writing within 30 days of becoming eligible for Financial Credit and must prove Failed Customer Requests during Downtime Periods. Financial Credit will be made in the form of a monetary credit applied to the next possible subscription invoice of ZITADEL Cloud,  may only be used to book services in the future, and will in no case be paid as a cash equivalent. No further guarantees are provided.
-4. The Service Level commitments apply only to organizations with a subscription plan where a Service Level is applicable and does not include any other organizations of the same customer. The Customer is not entitled to any Financial Credit, if it is in breach of the Agreement at the time of the occurrence of the event giving rise to the credit.
-
-### Quality of Service Objective
-
-1. During the term of the subscription agreement under which CAOS has agreed to provide ZITADEL Cloud to Customer, the Customer Requests will be prioritized according to the the Quality of Service Level included in the respective Subscription Plan
-
-Subscription plan | Quality of Service Level | Request Priority
---- | --- | ---
-FORTRESS | high | When ZITADEL Cloud receives concurrent requests, it will try to process these requests first, and with higher priority over other requests
-STARBASE | medium | Give way to requests with  priority ‘high’
-OUTPOST | low | Give way to requests with priority ‘high’ or ‘medium’
-FREE | best effort | No priority for requests
-DEDICATED STANDARD | n/a | Dedicated instance, single tenancy
-DEDICATED ADVANCED | n/a | Dedicated instance, single tenancy
-
-2. The Service Level commitments apply only to organizations with a subscription plan where a Service Level is applicable and does not include any other organizations of the same customer. Customers are not entitled to Financial Credit or further reimbursement.
+1. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document. Financial Credit shall be the sole and exclusive remedy for breach of this SLA.
+2. The Customer must request Financial Credit and must notify CAOS Support in writing within 30 days of becoming eligible for Financial Credit and must prove Failed Customer Requests during Downtime Periods. Financial Credit will be made in the form of a monetary credit applied to the next possible subscription invoice of ZITADEL Cloud,  may only be used to book services in the future, and will in no case be paid as a cash equivalent. No further guarantees are provided.
+3. The Service Level commitments apply only to organizations with a subscription plan where a Service Level is applicable and does not include any other organizations of the same customer. The Customer is not entitled to any Financial Credit, if it is in breach of the Agreement at the time of the occurrence of the event giving rise to the credit.

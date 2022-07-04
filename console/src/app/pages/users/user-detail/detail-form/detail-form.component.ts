@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { Gender, Human, Profile } from 'src/app/proto/generated/zitadel/user_pb';
@@ -24,11 +24,11 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   @Output() public changeUsernameClicked: EventEmitter<void> = new EventEmitter();
   @Output() public avatarChanged: EventEmitter<void> = new EventEmitter();
 
-  public profileForm!: FormGroup;
+  public profileForm!: UntypedFormGroup;
 
   private sub: Subscription = new Subscription();
 
-  constructor(private fb: FormBuilder, private dialog: MatDialog) {
+  constructor(private fb: UntypedFormBuilder, private dialog: MatDialog) {
     this.profileForm = this.fb.group({
       userName: [{ value: '', disabled: true }, [Validators.required]],
       firstName: [{ value: '', disabled: this.disabled }, Validators.required],

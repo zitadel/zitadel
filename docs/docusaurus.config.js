@@ -4,7 +4,7 @@ module.exports = {
   trailingSlash: false,
   url: "https://docs.zitadel.com",
   baseUrl: "/",
-  onBrokenLinks: "warn",
+  onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
@@ -146,12 +146,9 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     algolia: {
-      appId: "1FD5EU44EF",
-      apiKey: "2ddc6c35930ec608baf832bf07b5e150",
-      siteId: '13929a6d-0c07-4205-af9b-42121333ec5d',
-      branch: 'v2-alpha-readme',
-      indexName: 'netlify_13929a6d-0c07-4205-af9b-42121333ec5d_v2-alpha-readme_all',
-      contextualSearch: false,
+      appId: "8H6ZKXENLO",
+      apiKey: "124fe1c102a184bc6fc70c75dc84f96f",
+      indexName: 'zitadel',
       selector: 'div#'
   },
     prism: {

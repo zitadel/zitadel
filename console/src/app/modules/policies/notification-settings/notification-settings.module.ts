@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
@@ -14,16 +15,17 @@ import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSettingsComponent } from './notification-settings.component';
-import { SMTPPasswordDialogComponent } from './smtp-password-dialog/smtp-password-dialog.component';
+import { PasswordDialogComponent } from './password-dialog/password-dialog.component';
 
 @NgModule({
-  declarations: [NotificationSettingsComponent, DialogAddSMSProviderComponent, SMTPPasswordDialogComponent],
+  declarations: [NotificationSettingsComponent, DialogAddSMSProviderComponent, PasswordDialogComponent],
   imports: [
     CommonModule,
     CardModule,
     InfoSectionModule,
     FormsModule,
     ReactiveFormsModule,
+    HasRolePipeModule,
     MatButtonModule,
     MatCheckboxModule,
     InputModule,

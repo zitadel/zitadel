@@ -68,7 +68,8 @@
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
     "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera",
-    "SETTINGS": "Impostazioni"
+    "SETTINGS": "Impostazioni",
+    "CUSTOMERPORTAL": "Customer Portal"
   },
   "ACTIONS": {
     "ACTIONS": "Azioni",
@@ -123,6 +124,24 @@
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
+    "IAM_OWNER_VIEWER": "Ha l'autorizzazione per esaminare l'intera istanza, comprese tutte le organizzazioni",
+    "IAM_ORG_MANAGER": "Ha il permesso di creare e gestire organizzazioni",
+    "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
+    "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
+    "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
+    "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
+    "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
+    "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
+    "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
+    "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
+    "PROJECT_OWNER_GLOBAL": "Ha il permesso per l'intero progetto",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Ha il permesso di esaminare l'intero progetto",
+    "PROJECT_GRANT_OWNER": "Ha l'autorizzazione per gestire le sovvenzioni di progetto (Project Grant)",
+    "PROJECT_GRANT_OWNER_VIEWER": "Ha il permesso di esaminare le sovvenzioni di progetto (Project Grant)"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -738,6 +757,7 @@
       "LISTDESCRIPTION": "Scegli un'organizzazione.",
       "ACTIVE": "Attivo",
       "CREATE": "Creare un'organizzazione",
+      "NOPERMISSION": "Non hai l'autorizzazione per accedere alle impostazioni dell'organizzazione.",
       "USERSELFACCOUNT": "Usa il tuo account personale come proprietario dell'organizzazione",
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
@@ -867,7 +887,10 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
-        "ADDED": "Twilio aggiunto con successo."
+        "ADDED": "Twilio aggiunto con successo.",
+        "CHANGETOKEN": "Cambia Token",
+        "SETTOKEN": "Cambia Token",
+        "TOKENSET": "Token cambiato con successo."
       }
     },
     "OIDC": {
@@ -899,6 +922,13 @@
       "INCLUDEUPPERLETTERS": "Contiene lettere maiuscole",
       "LENGTH": "Lunghezza",
       "UPDATED": "Impostazioni aggiornati"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Ripristina impostazioni",
+        "DEFAULTDESCRIPTION": "Stai per ripristinare le impostazioni sulla configurazione predefinita della tua istanza. Sei sicuro di voler continuare?",
+        "LOGINPOLICY_DESCRIPTION": "Avviso: Se continui, anche le impostazioni del provider di identità verranno ripristinate sull'impostazione dell'istanza."
+      }
     }
   },
   "POLICY": {
@@ -1402,7 +1432,7 @@
     },
     "OWNERTYPES": {
       "0": "sconosciuto",
-      "1": "Sistema",
+      "1": "Istanza",
       "2": "Organizzazione"
     },
     "TYPES": {
@@ -1455,11 +1485,12 @@
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "EMPTY": "Nessun IDP disponible",
     "OIDC": {
-      "TITLE": "OIDC IDP",
+      "GENERAL": "Informazioni generali",
+      "TITLE": "Configurazione OIDC",
       "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE": "JWT IDP",
+      "TITLE": "Configurazione JWT",
       "DESCRIPTION": "Inserisci i dati per il JWT Identity Provider.",
       "HEADERNAME": "Header Name",
       "JWTENDPOINT": "JWT Endpoint",
@@ -1472,7 +1503,9 @@
       "SELECTEDREACTIVATED": "IDP selezionati riattivati.",
       "SELECTEDDEACTIVATED": "IDP selezionati disattivati.",
       "SELECTEDKEYSDELETED": "IDP selezionati cancellati.",
-      "DELETED": "IDP rimosso con successo!"
+      "DELETED": "IDP rimosso con successo!",
+      "ADDED": "Aggiunto con successo.",
+      "REMOVED": "Rimosso con successo."
     }
   },
   "MFA": {

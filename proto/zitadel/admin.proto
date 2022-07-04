@@ -184,10 +184,21 @@ service AdminService {
         };
     }
 
-    // Returns the domains of an instance
+    // Returns the details of the instance
+    rpc GetMyInstance(GetMyInstanceRequest) returns (GetMyInstanceResponse) {
+        option (google.api.http) = {
+            get: "/instances/me";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Returns the domains of the instance
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
-            get: "/domains";
+            post: "/domains/_search";
         };
     }
 
@@ -237,6 +248,18 @@ service AdminService {
         };
     }
 
+    // Add system smtp configuration
+    rpc AddSMTPConfig(AddSMTPConfigRequest) returns (AddSMTPConfigResponse) {
+        option (google.api.http) = {
+            post: "/smtp";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // Update system smtp configuration
     rpc UpdateSMTPConfig(UpdateSMTPConfigRequest) returns (UpdateSMTPConfigResponse) {
         option (google.api.http) = {
@@ -254,6 +277,17 @@ service AdminService {
         option (google.api.http) = {
             put: "/smtp/password";
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Remove system smtp configuration
+    rpc RemoveSMTPConfig(RemoveSMTPConfigRequest) returns (RemoveSMTPConfigResponse) {
+        option (google.api.http) = {
+            delete: "/smtp";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -313,6 +347,41 @@ service AdminService {
         option (google.api.http) = {
             put: "/sms/twilio/{id}/token";
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Activate sms provider
+    rpc ActivateSMSProvider(ActivateSMSProviderRequest) returns (ActivateSMSProviderResponse) {
+        option (google.api.http) = {
+            post: "/sms/{id}/_activate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Deactivate sms provider
+    rpc DeactivateSMSProvider(DeactivateSMSProviderRequest) returns (DeactivateSMSProviderResponse) {
+        option (google.api.http) = {
+            post: "/sms/{id}/_deactivate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Remove sms provider token
+    rpc RemoveSMSProvider(RemoveSMSProviderRequest) returns (RemoveSMSProviderResponse) {
+        option (google.api.http) = {
+            delete: "/sms/{id}";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -420,6 +489,28 @@ service AdminService {
                     description: "ZITADEL NOT started yet";
                 };
             };
+        };
+    }
+
+    // Set the default org
+    rpc SetDefaultOrg(SetDefaultOrgRequest) returns (SetDefaultOrgResponse) {
+        option (google.api.http) = {
+            put: "/orgs/default/{org_id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Set the default org
+    rpc GetDefaultOrg(GetDefaultOrgRequest) returns (GetDefaultOrgResponse) {
+        option (google.api.http) = {
+            get: "/orgs/default";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
         };
     }
 
@@ -2569,6 +2660,28 @@ message GetDefaultLanguageResponse {
     string language = 1;
 }
 
+message SetDefaultOrgRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message SetDefaultOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetDefaultOrgRequest {}
+
+message GetDefaultOrgResponse {
+    zitadel.org.v1.Org org = 1;
+}
+
+//This is an empty request
+message GetMyInstanceRequest {}
+
+message GetMyInstanceResponse {
+    zitadel.instance.v1.InstanceDetail instance = 1;
+}
+
 message ListInstanceDomainsRequest {
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
@@ -2624,6 +2737,19 @@ message GetSMTPConfigResponse {
     zitadel.settings.v1.SMTPConfig smtp_config = 1;
 }
 
+message AddSMTPConfigRequest {
+    string sender_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool tls = 3;
+    string host = 4 [(validate.rules).string = {min_len: 1, max_len: 500}];
+    string user = 5;
+    string password = 6;
+}
+
+message AddSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message UpdateSMTPConfigRequest {
     string sender_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string sender_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -2641,6 +2767,13 @@ message UpdateSMTPConfigPasswordRequest {
 }
 
 message UpdateSMTPConfigPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//this is en empty request
+message RemoveSMTPConfigRequest {}
+
+message RemoveSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -2689,6 +2822,30 @@ message UpdateSMSProviderTwilioTokenRequest {
 }
 
 message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ActivateSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ActivateSMSProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateSMSProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveSMSProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

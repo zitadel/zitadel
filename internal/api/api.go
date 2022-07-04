@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"crypto/tls"
 	"net/http"
 	"strings"
 
@@ -14,7 +15,6 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/authz/repository"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -27,33 +27,24 @@ type API struct {
 	health         health
 	router         *mux.Router
 	externalSecure bool
+	http1HostName  string
 }
 
 type health interface {
 	Health(ctx context.Context) error
-	Instance(ctx context.Context) (*query.Instance, error)
+	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
-func New(
-	port uint16,
-	router *mux.Router,
-	repo *struct {
-		repository.Repository
-		*query.Queries
-	},
-	authZ internal_authz.Config,
-	externalSecure bool,
-	http2HostName string,
-) *API {
-	verifier := internal_authz.Start(repo)
+func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, tlsConfig *tls.Config, http2HostName, http1HostName string) *API {
 	api := &API{
 		port:           port,
 		verifier:       verifier,
-		health:         repo,
+		health:         queries,
 		router:         router,
 		externalSecure: externalSecure,
+		http1HostName:  http1HostName,
 	}
-	api.grpcServer = server.CreateServer(api.verifier, authZ, repo.Queries, http2HostName)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig)
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())
@@ -63,14 +54,12 @@ func New(
 
 func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) error {
 	grpcServer.RegisterServer(a.grpcServer)
-	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port)
+	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port, a.http1HostName)
 	if err != nil {
 		return err
 	}
 	a.RegisterHandler(prefix, handler)
-	if a.verifier != nil {
-		a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
-	}
+	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
 	return nil
 }
 

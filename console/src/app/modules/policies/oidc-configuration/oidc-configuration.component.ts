@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { take } from 'rxjs';
 import { SetDefaultLanguageResponse, UpdateOIDCSettingsRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCSettings } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -15,18 +17,31 @@ export class OIDCConfigurationComponent implements OnInit {
   public oidcSettings!: OIDCSettings.AsObject;
 
   public loading: boolean = false;
-  public form!: FormGroup;
-  constructor(private service: AdminService, private fb: FormBuilder, private toast: ToastService) {
+  public form!: UntypedFormGroup;
+  constructor(
+    private service: AdminService,
+    private fb: UntypedFormBuilder,
+    private toast: ToastService,
+    private authService: GrpcAuthService,
+  ) {
     this.form = this.fb.group({
-      accessTokenLifetime: [12, [Validators.required]],
-      idTokenLifetime: [12, [Validators.required]],
-      refreshTokenExpiration: [30, [Validators.required]],
-      refreshTokenIdleExpiration: [90, [Validators.required]],
+      accessTokenLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+      idTokenLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+      refreshTokenExpiration: [{ disabled: true, value: 30 }, [Validators.required]],
+      refreshTokenIdleExpiration: [{ disabled: true, value: 90 }, [Validators.required]],
     });
   }
 
   ngOnInit(): void {
     this.fetchData();
+    this.authService
+      .isAllowed(['iam.write'])
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.form.enable();
+        }
+      });
   }
 
   private fetchData(): void {

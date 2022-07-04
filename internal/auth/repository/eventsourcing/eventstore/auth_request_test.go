@@ -32,10 +32,6 @@ func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_v
 	return nil, nil
 }
 
-func (m *mockViewNoUserSession) PrefixAvatarURL() string {
-	return ""
-}
-
 type mockViewErrUserSession struct{}
 
 func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
@@ -44,10 +40,6 @@ func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user
 
 func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
-}
-
-func (m *mockViewErrUserSession) PrefixAvatarURL() string {
-	return ""
 }
 
 type mockViewUserSession struct {
@@ -87,18 +79,10 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 	return sessions, nil
 }
 
-func (m *mockViewUserSession) PrefixAvatarURL() string {
-	return "prefix/"
-}
-
 type mockViewNoUser struct{}
 
 func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, error) {
 	return nil, errors.ThrowNotFound(nil, "id", "user not found")
-}
-
-func (m *mockViewNoUser) PrefixAvatarURL() string {
-	return ""
 }
 
 type mockEventUser struct {
@@ -144,7 +128,7 @@ type mockLoginPolicy struct {
 	policy *query.LoginPolicy
 }
 
-func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, id string) (*query.LoginPolicy, error) {
+func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, _ bool, id string) (*query.LoginPolicy, error) {
 	return m.policy, nil
 }
 
@@ -152,7 +136,7 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, string) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error) {
 	return m.policy, nil
 }
 
@@ -176,15 +160,11 @@ func (m *mockViewUser) UserByID(string, string) (*user_view_model.UserView, erro
 	}, nil
 }
 
-func (m *mockViewUser) PrefixAvatarURL() string {
-	return ""
-}
-
 type mockViewOrg struct {
 	State domain.OrgState
 }
 
-func (m *mockViewOrg) OrgByID(context.Context, string) (*query.Org, error) {
+func (m *mockViewOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
 	return &query.Org{
 		State: m.State,
 	}, nil
@@ -198,7 +178,7 @@ func (m *mockViewOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, er
 
 type mockViewErrOrg struct{}
 
-func (m *mockViewErrOrg) OrgByID(context.Context, string) (*query.Org, error) {
+func (m *mockViewErrOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -215,7 +195,7 @@ func (m *mockUserGrants) ProjectByOIDCClientID(ctx context.Context, s string) (*
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
-func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*query.UserGrant, error) {
+func (m *mockUserGrants) UserGrantsByProjectAndUserID(ctx context.Context, s string, s2 string) ([]*query.UserGrant, error) {
 	var grants []*query.UserGrant
 	if m.userGrants > 0 {
 		grants = make([]*query.UserGrant, m.userGrants)

@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*mgmt_pb.GetMyOrgResponse, error) {
-	org, err := s.query.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
+	org, err := s.query.OrgByID(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 }
 
 func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPolicyRequest) (*mgmt_pb.GetDomainPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPoli
 }
 
 func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -134,12 +134,8 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
-		Result: org_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(
-			domains.Count,
-			domains.Sequence,
-			domains.Timestamp,
-		),
+		Result:  org_grpc.DomainsToPb(domains.Domains),
+		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
 	}, nil
 }
 
@@ -213,11 +209,11 @@ func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimar
 }
 
 func (s *Server) ListOrgMemberRoles(ctx context.Context, _ *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
-	iam, err := s.query.Instance(ctx)
+	instance, err := s.query.Instance(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID)
+	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == instance.DefaultOrgID)
 	return &mgmt_pb.ListOrgMemberRolesResponse{
 		Result: roles,
 	}, nil
@@ -233,12 +229,8 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
-		Result: member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object.ToListDetails(
-			members.Count,
-			members.Sequence,
-			members.Timestamp,
-		),
+		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
+		Details: object.ToListDetails(members.Count, members.Sequence, members.Timestamp),
 	}, nil
 }
 

@@ -56,16 +56,28 @@ Set the default language
     GET: /languages/default
 
 
+### GetMyInstance
+
+> **rpc** GetMyInstance([GetMyInstanceRequest](#getmyinstancerequest))
+[GetMyInstanceResponse](#getmyinstanceresponse)
+
+Returns the details of the instance
+
+
+
+    GET: /instances/me
+
+
 ### ListInstanceDomains
 
 > **rpc** ListInstanceDomains([ListInstanceDomainsRequest](#listinstancedomainsrequest))
 [ListInstanceDomainsResponse](#listinstancedomainsresponse)
 
-Returns the domains of an instance
+Returns the domains of the instance
 
 
 
-    GET: /domains
+    POST: /domains/_search
 
 
 ### ListSecretGenerators
@@ -116,6 +128,18 @@ Get system smtp configuration
     GET: /smtp
 
 
+### AddSMTPConfig
+
+> **rpc** AddSMTPConfig([AddSMTPConfigRequest](#addsmtpconfigrequest))
+[AddSMTPConfigResponse](#addsmtpconfigresponse)
+
+Add system smtp configuration
+
+
+
+    POST: /smtp
+
+
 ### UpdateSMTPConfig
 
 > **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
@@ -138,6 +162,18 @@ Update system smtp configuration password for host
 
 
     PUT: /smtp/password
+
+
+### RemoveSMTPConfig
+
+> **rpc** RemoveSMTPConfig([RemoveSMTPConfigRequest](#removesmtpconfigrequest))
+[RemoveSMTPConfigResponse](#removesmtpconfigresponse)
+
+Remove system smtp configuration
+
+
+
+    DELETE: /smtp
 
 
 ### ListSMSProviders
@@ -198,6 +234,42 @@ Update twilio sms provider token
 
 
     PUT: /sms/twilio/{id}/token
+
+
+### ActivateSMSProvider
+
+> **rpc** ActivateSMSProvider([ActivateSMSProviderRequest](#activatesmsproviderrequest))
+[ActivateSMSProviderResponse](#activatesmsproviderresponse)
+
+Activate sms provider
+
+
+
+    POST: /sms/{id}/_activate
+
+
+### DeactivateSMSProvider
+
+> **rpc** DeactivateSMSProvider([DeactivateSMSProviderRequest](#deactivatesmsproviderrequest))
+[DeactivateSMSProviderResponse](#deactivatesmsproviderresponse)
+
+Deactivate sms provider
+
+
+
+    POST: /sms/{id}/_deactivate
+
+
+### RemoveSMSProvider
+
+> **rpc** RemoveSMSProvider([RemoveSMSProviderRequest](#removesmsproviderrequest))
+[RemoveSMSProviderResponse](#removesmsproviderresponse)
+
+Remove sms provider token
+
+
+
+    DELETE: /sms/{id}
 
 
 ### GetOIDCSettings
@@ -270,6 +342,30 @@ Checks whether an organisation exists by the given parameters
 
 
     GET: /orgs/_is_unique
+
+
+### SetDefaultOrg
+
+> **rpc** SetDefaultOrg([SetDefaultOrgRequest](#setdefaultorgrequest))
+[SetDefaultOrgResponse](#setdefaultorgresponse)
+
+Set the default org
+
+
+
+    PUT: /orgs/default/{org_id}
+
+
+### GetDefaultOrg
+
+> **rpc** GetDefaultOrg([GetDefaultOrgRequest](#getdefaultorgrequest))
+[GetDefaultOrgResponse](#getdefaultorgresponse)
+
+Set the default org
+
+
+
+    GET: /orgs/default
 
 
 ### ListOrgs
@@ -1422,6 +1518,28 @@ This is an empty request
 
 
 
+### ActivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ActivateSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddCustomDomainPolicyRequest
 
 
@@ -1622,6 +1740,33 @@ This is an empty request
 
 
 
+### AddSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+| password |  string | - |  |
+
+
+
+
+### AddSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -1656,6 +1801,28 @@ This is an empty request
 
 
 ### DeactivateIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### DeactivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### DeactivateSMSProviderResponse
 
 
 
@@ -1964,6 +2131,23 @@ This is an empty request
 
 
 
+### GetDefaultOrgRequest
+This is an empty request
+
+
+
+
+### GetDefaultOrgResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org |  zitadel.org.v1.Org | - |  |
+
+
+
+
 ### GetDefaultPasswordResetMessageTextRequest
 
 
@@ -2172,6 +2356,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
+
+
+
+
+### GetMyInstanceRequest
+This is an empty request
+
+
+
+
+### GetMyInstanceResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance |  zitadel.instance.v1.InstanceDetail | - |  |
 
 
 
@@ -2900,6 +3101,45 @@ This is an empty request
 
 
 
+### RemoveSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveSMTPConfigRequest
+this is en empty request
+
+
+
+
+### RemoveSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveSecondFactorFromLoginPolicyRequest
 
 
@@ -3246,6 +3486,28 @@ This is an empty request
 
 
 ### SetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultOrgRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### SetDefaultOrgResponse
 
 
 

@@ -36,7 +36,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					),
 				), instance.SMTPConfigChangedEventMapper),
 			},
-			reduce: (&SMTPConfigProjection{}).reduceSMTPConfigChanged,
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
 				projection:       SMTPConfigProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -82,7 +82,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMTPConfigAddedEventMapper),
 			},
-			reduce: (&SMTPConfigProjection{}).reduceSMTPConfigAdded,
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigAdded,
 			want: wantReduce{
 				projection:       SMTPConfigProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -126,7 +126,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					}`),
 				), instance.SMTPConfigPasswordChangedEventMapper),
 			},
-			reduce: (&SMTPConfigProjection{}).reduceSMTPConfigPasswordChanged,
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigPasswordChanged,
 			want: wantReduce{
 				projection:       SMTPConfigProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),

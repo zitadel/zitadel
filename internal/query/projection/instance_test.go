@@ -28,7 +28,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				[]byte(`{"name": "Name"}`),
 			), instance.InstanceAddedEventMapper),
 		},
-		reduce: (&InstanceProjection{}).reduceInstanceAdded,
+		reduce: (&instanceProjection{}).reduceInstanceAdded,
 		want: wantReduce{
 			projection:       InstanceProjectionTable,
 			aggregateType:    eventstore.AggregateType("instance"),
@@ -51,15 +51,15 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		},
 	},
 		{
-			name: "reduceGlobalOrgSet",
+			name: "reduceDefaultOrgSet",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.GlobalOrgSetEventType),
+					repository.EventType(instance.DefaultOrgSetEventType),
 					instance.AggregateType,
-					[]byte(`{"globalOrgId": "orgid"}`),
-				), instance.GlobalOrgSetMapper),
+					[]byte(`{"orgId": "orgid"}`),
+				), instance.DefaultOrgSetMapper),
 			},
-			reduce: (&InstanceProjection{}).reduceGlobalOrgSet,
+			reduce: (&instanceProjection{}).reduceDefaultOrgSet,
 			want: wantReduce{
 				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -68,7 +68,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, global_org_id) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, default_org_id) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -89,7 +89,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					[]byte(`{"iamProjectId": "project-id"}`),
 				), instance.ProjectSetMapper),
 			},
-			reduce: (&InstanceProjection{}).reduceIAMProjectSet,
+			reduce: (&instanceProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
 				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
@@ -119,7 +119,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					[]byte(`{"language": "en"}`),
 				), instance.DefaultLanguageSetMapper),
 			},
-			reduce: (&InstanceProjection{}).reduceDefaultLanguageSet,
+			reduce: (&instanceProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
 				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),

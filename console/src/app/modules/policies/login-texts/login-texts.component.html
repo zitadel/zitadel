@@ -23,7 +23,7 @@
   </button>
 </div>
 <form *ngIf="form" class="top-actions" [formGroup]="form">
-  <cnsl-form-field class="keys" appearance="outline">
+  <cnsl-form-field class="keys">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
     <mat-select formControlName="currentSubMap" name="currentSubMap">
       <mat-option *ngFor="let key of KeyNamesArray" [value]="key">

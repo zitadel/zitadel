@@ -132,8 +132,11 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		if event.AggregateID != event.InstanceID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
-		esConfig.AppendEvent(providerType, event)
-		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID, esConfig.InstanceID)
+		err = esConfig.AppendEvent(providerType, event)
+		if err != nil {
+			return err
+		}
+		providers, err := i.view.IDPProvidersByIDPConfigID(esConfig.IDPConfigID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -205,9 +208,9 @@ func (i *IDPProvider) OnSuccess() error {
 }
 
 func (i *IDPProvider) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, aggregateID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID)
 }
 
 func (u *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, instanceID)
+	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID)
 }

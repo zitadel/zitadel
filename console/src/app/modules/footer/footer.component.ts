@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { LabelPolicy, PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
-import { ManagementService } from 'src/app/services/mgmt.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
   selector: 'cnsl-footer',
@@ -10,8 +10,8 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 export class FooterComponent {
   public policy!: PrivacyPolicy.AsObject;
   @Input() public privateLabelPolicy!: LabelPolicy.AsObject;
-  constructor(mgmtService: ManagementService) {
-    mgmtService.getPrivacyPolicy().then((policyResp) => {
+  constructor(authService: GrpcAuthService) {
+    authService.getMyPrivacyPolicy().then((policyResp) => {
       if (policyResp.policy) {
         this.policy = policyResp.policy;
       }

@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  zitadel:
+    restart: 'always'
+    networks:
+      - 'zitadel'
+    image: 'ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.33-amd64'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    environment:
+      - 'ZITADEL_DATABASE_HOST=db'
+      - 'ZITADEL_EXTERNALSECURE=false'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    ports:
+      - '8080:8080'
+
+  db:
+    restart: 'always'
+    networks:
+      - 'zitadel'
+    image: 'cockroachdb/cockroach:v22.1.0'
+    command: 'start-single-node --insecure'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+    ports:
+      - '9090:8080'
+      - '26257:26257'
+
+networks:
+  zitadel:

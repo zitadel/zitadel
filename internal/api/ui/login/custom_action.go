@@ -16,12 +16,9 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	if resourceOwner == "" {
 		resourceOwner = config.AggregateID
 	}
-	if resourceOwner == authz.GetInstance(ctx).InstanceID() {
-		iam, err := l.query.Instance(ctx)
-		if err != nil {
-			return nil, err
-		}
-		resourceOwner = iam.GlobalOrgID
+	instance := authz.GetInstance(ctx)
+	if resourceOwner == instance.InstanceID() {
+		resourceOwner = instance.DefaultOrganisationID()
 	}
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
 	if err != nil {
@@ -38,8 +35,8 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	return user, err
 }
 
-func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, metadata []*domain.Metadata, resourceOwner string) (*domain.Human, []*domain.Metadata, error) {
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation, resourceOwner)
+func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, metadata []*domain.Metadata, resourceOwner string) (*domain.Human, []*domain.Metadata, error) {
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -54,8 +51,8 @@ func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens 
 	return user, metadata, err
 }
 
-func (l *Login) customGrants(userID string, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, resourceOwner string) ([]*domain.UserGrant, error) {
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, resourceOwner)
+func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, resourceOwner string) ([]*domain.UserGrant, error) {
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

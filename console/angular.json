@@ -31,6 +31,7 @@
               "src/app/proto/generated/zitadel/admin_pb",
               "src/app/proto/generated/zitadel/org_pb",
               "src/app/proto/generated/zitadel/management_pb",
+              "src/app/proto/generated/zitadel/user_pb",
               "src/app/proto/generated/**",
               "google-protobuf/google/protobuf/empty_pb",
               "file-saver",
@@ -150,9 +151,10 @@
       }
     }
   },
-  "defaultProject": "console",
   "cli": {
     "analytics": "2b4e8e6c-f053-4562-b7a6-00c6c06a6791",
-    "defaultCollection": "@angular-eslint/schematics"
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

@@ -2,6 +2,7 @@ import { PlatformLocation } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthConfig } from 'angular-oauth2-oidc';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
@@ -27,6 +28,7 @@ export class GrpcService {
     private authenticationService: AuthenticationService,
     private storageService: StorageService,
     private dialog: MatDialog,
+    private translate: TranslateService,
   ) {}
 
   public async loadAppEnvironment(): Promise<any> {
@@ -39,7 +41,7 @@ export class GrpcService {
             unaryInterceptors: [
               new OrgInterceptor(this.storageService),
               new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
-              new I18nInterceptor(),
+              new I18nInterceptor(this.translate),
             ],
           };
 
@@ -70,6 +72,7 @@ export class GrpcService {
             issuer: data.issuer,
             redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
             postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
+            requireHttps: false,
           };
 
           this.authenticationService.initConfig(authConfig);
