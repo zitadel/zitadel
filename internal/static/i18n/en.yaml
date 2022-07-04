@@ -70,7 +70,7 @@ Errors:
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
-      Invalid: Profildata invalid
+      Invalid: Profile data invalid
     Email:
       NotFound: Email not found
       Invalid: Email is invalid
@@ -173,7 +173,7 @@ Errors:
     Domain:
       AlreadyExists: Domain already exists
     IDP:
-      InvalidSearchQuery: Ungültiger Suchparameter
+      InvalidSearchQuery: Paramètre de recherche non valide
     LoginPolicy:
       NotFound: Login Policy not found
       Invalid: Login Policy is invalid
@@ -266,7 +266,7 @@ Errors:
     UserIDMisisng: User ID missing
   IAM:
     Member:
-      RolesNotChanged: Roles habe not been changed
+      RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
     MemberAlreadyExisting: Member already exists
     MemberNotExisting: Member does not exist
