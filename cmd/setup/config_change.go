@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-type configChange struct {
+type externalConfigChange struct {
 	es             *eventstore.Eventstore
 	ExternalDomain string `json:"externalDomain"`
 	ExternalSecure bool   `json:"externalSecure"`
@@ -19,20 +19,20 @@ type configChange struct {
 	currentExternalPort   uint16
 }
 
-func (mig *configChange) SetLastExecution(lastRun map[string]interface{}) {
+func (mig *externalConfigChange) SetLastExecution(lastRun map[string]interface{}) {
 	mig.currentExternalDomain, _ = lastRun["externalDomain"].(string)
 	externalPort, _ := lastRun["externalPort"].(float64)
 	mig.currentExternalPort = uint16(externalPort)
 	mig.currentExternalSecure, _ = lastRun["externalSecure"].(bool)
 }
 
-func (mig *configChange) Check() bool {
+func (mig *externalConfigChange) Check() bool {
 	return mig.currentExternalSecure != mig.ExternalSecure ||
 		mig.currentExternalPort != mig.ExternalPort ||
 		mig.currentExternalDomain != mig.ExternalDomain
 }
 
-func (mig *configChange) Execute(ctx context.Context) error {
+func (mig *externalConfigChange) Execute(ctx context.Context) error {
 	cmd, err := command.StartCommands(mig.es,
 		systemdefaults.SystemDefaults{},
 		nil,
@@ -55,6 +55,6 @@ func (mig *configChange) Execute(ctx context.Context) error {
 	return cmd.ChangeSystemConfig(ctx, mig.currentExternalDomain, mig.currentExternalPort, mig.currentExternalSecure)
 }
 
-func (mig *configChange) String() string {
+func (mig *externalConfigChange) String() string {
 	return "config_change"
 }

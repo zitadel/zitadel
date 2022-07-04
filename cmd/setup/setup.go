@@ -79,7 +79,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.S3DefaultInstance.externalPort = config.ExternalPort
 
 	repeatableSteps := []migration.RepeatableMigration{
-		&configChange{
+		&externalConfigChange{
 			es:             eventstoreClient,
 			ExternalDomain: config.ExternalDomain,
 			ExternalPort:   config.ExternalPort,
