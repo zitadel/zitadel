@@ -9,7 +9,7 @@ PasswordReset:
   Title: ZITADEL - Réinitialiser le mot de passe
   PreHeader: Réinitialiser le mot de passe
   Subject: Réinitialiser le mot de passe
-  Greeting: Bonjout {{.FirstName}} {{.LastName}},
+  Greeting: Bonjour {{.FirstName}} {{.LastName}},
   Text: Nous avons reçu une demande de réinitialisation du mot de passe. Veuillez utiliser le bouton ci-dessous pour réinitialiser votre mot de passe. (Code {{.Code}}) Si vous n'avez pas demandé cet e-mail, veuillez l'ignorer.
   ButtonText: Réinitialiser le mot de passe
 VerifyEmail:
