@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
 import { SetDefaultLanguageResponse, UpdateOIDCSettingsRequest } from 'src/app/proto/generated/zitadel/admin_pb';
@@ -17,10 +17,10 @@ export class OIDCConfigurationComponent implements OnInit {
   public oidcSettings!: OIDCSettings.AsObject;
 
   public loading: boolean = false;
-  public form!: FormGroup;
+  public form!: UntypedFormGroup;
   constructor(
     private service: AdminService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private toast: ToastService,
     private authService: GrpcAuthService,
   ) {

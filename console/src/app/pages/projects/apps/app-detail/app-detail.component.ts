@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -106,10 +106,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public oidcTokenTypes: OIDCTokenType[] = [OIDCTokenType.OIDC_TOKEN_TYPE_BEARER, OIDCTokenType.OIDC_TOKEN_TYPE_JWT];
 
   public AppState: any = AppState;
-  public oidcForm!: FormGroup;
-  public oidcTokenForm!: FormGroup;
-  public apiForm!: FormGroup;
-  public samlForm!: FormGroup;
+  public oidcForm!: UntypedFormGroup;
+  public oidcTokenForm!: UntypedFormGroup;
+  public apiForm!: UntypedFormGroup;
+  public samlForm!: UntypedFormGroup;
 
   public redirectUrisList: string[] = [];
   public postLogoutRedirectUrisList: string[] = [];
@@ -138,7 +138,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     public translate: TranslateService,
     private route: ActivatedRoute,
     private toast: ToastService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private _location: Location,
     private dialog: MatDialog,
     private mgmtService: ManagementService,
@@ -728,8 +728,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.apiForm.get('authMethodType');
   }
 
-  public get devMode(): FormControl | null {
-    return this.oidcForm.get('devMode') as FormControl;
+  public get devMode(): UntypedFormControl | null {
+    return this.oidcForm.get('devMode') as UntypedFormControl;
   }
 
   public get accessTokenType(): AbstractControl | null {

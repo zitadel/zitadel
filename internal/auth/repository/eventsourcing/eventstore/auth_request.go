@@ -137,7 +137,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	request.AppendAudIfNotExisting(project.ID)
 	request.ApplicationResourceOwner = project.ResourceOwner
 	request.PrivateLabelingSetting = project.PrivateLabelingSetting
-	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
+	if err := setOrgID(ctx, repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
 	if request.LoginHint != "" {
@@ -1056,13 +1056,13 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	return false, nil
 }
 
-func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
+func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
 		return nil
 	}
 
-	org, err := orgViewProvider.OrgByDomainGlobal(context.TODO(), primaryDomain)
+	org, err := orgViewProvider.OrgByDomainGlobal(ctx, primaryDomain)
 	if err != nil {
 		return err
 	}

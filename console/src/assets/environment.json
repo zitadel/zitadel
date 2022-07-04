@@ -1,1 +1,6 @@
-{ "api": "http://localhost:8080", "issuer": "http://localhost:8080", "clientid": "165621023348097309@zitadel" }
+{
+  "api": "https://bringmos-jv1jqo.zitadel.app",
+  "issuer": "https://bringmos-jv1jqo.zitadel.app",
+  "clientid": "163706959596355841@zitadel",
+  "customer_portal": "https://zitadel.cloud"
+}

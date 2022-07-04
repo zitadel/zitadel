@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Buffer } from 'buffer';
@@ -89,15 +89,15 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   ];
 
   // stepper
-  public firstFormGroup!: FormGroup;
-  public secondFormGroup!: FormGroup;
-  public samlConfigForm!: FormGroup;
+  public firstFormGroup!: UntypedFormGroup;
+  public secondFormGroup!: UntypedFormGroup;
+  public samlConfigForm!: UntypedFormGroup;
 
   public redirectUrisList: string[] = [];
   public postLogoutRedirectUrisList: string[] = [];
 
   // devmode
-  public form!: FormGroup;
+  public form!: UntypedFormGroup;
 
   public AppCreateType: any = AppCreateType;
   public OIDCAppType: any = OIDCAppType;
@@ -124,7 +124,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private dialog: MatDialog,
     private mgmtService: ManagementService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
   ) {
@@ -282,8 +282,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public setDevFormValidators(): void {
     if (this.isDevOIDC) {
-      const grantTypesControl = new FormControl('', [Validators.required]);
-      const responseTypesControl = new FormControl('', [Validators.required]);
+      const grantTypesControl = new UntypedFormControl('', [Validators.required]);
+      const responseTypesControl = new UntypedFormControl('', [Validators.required]);
 
       this.form.addControl('grantTypesList', grantTypesControl);
       this.form.addControl('responseTypesList', responseTypesControl);

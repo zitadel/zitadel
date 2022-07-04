@@ -964,6 +964,8 @@ github.com/zitadel/saml v0.0.3-0.20220505142843-5223749b19ea h1:Xw58x9n2t1zAXe5M
 github.com/zitadel/saml v0.0.3-0.20220505142843-5223749b19ea/go.mod h1:PjsQTf/y5ZjFcpR4AduCgaCELZmNWjuMGGt4x70i08E=
 github.com/zitadel/saml v0.0.3-0.20220512072611-73e2955740e9 h1:Gycco/Ksy1Gq2df7A6+NPP1pZWJGiZs4Bw0fflgwrKc=
 github.com/zitadel/saml v0.0.3-0.20220512072611-73e2955740e9/go.mod h1:X36RoZSh+o/NhR7kczGTq3CBHe+g4sPeIO1yRrYUf6Y=
+github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.3 h1:Z0WrhhjPLrbywD+6226Ca7Mvt9VKAU3J/ojYq24CUEY=
+github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.3/go.mod h1:uoJw5Xc6HXfnQbNZiLbld9dED0/8UMu0M4gOipTRZBA=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738/go.mod h1:dnLIgRNXwCJa5e+c6mIZCrds/GIG4ncV9HhK5PX7jPg=
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
