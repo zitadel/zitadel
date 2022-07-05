@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	KeyProjectionTable = "projections.keys"
+	KeyProjectionTable = "projections.keys2"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 	CertificateTable   = KeyProjectionTable + "_" + certificateTableSuffix
@@ -96,8 +96,9 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(CertificateColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(CertificateColumnKey, crdb.ColumnTypeBytes),
 		},
-			crdb.NewPrimaryKey(CertificateColumnID),
+			crdb.NewPrimaryKey(CertificateColumnID, CertificateColumnInstanceID),
 			certificateTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_certificate_ref_keys")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -214,6 +214,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("unable to start saml provider: %w", err)
 	}
+	apis.RegisterHandler(saml.HandlerPrefix, samlProvider.HttpHandler())
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler, config.CustomerPortal)
 	if err != nil {
@@ -233,7 +234,6 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	//it might make sense to handle the discovery endpoint and oauth and oidc prefixes individually
 	//but this will require a change in the oidc lib
 	apis.RegisterHandler("", oidcProvider.HttpHandler())
-	apis.RegisterHandler(saml.HandlerPrefix, samlProvider.HttpHandler())
 	return nil
 }
 

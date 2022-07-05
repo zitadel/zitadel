@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps"
+	AppProjectionTable = "projections.apps2"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
