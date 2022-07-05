@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, catchError, debounceTime, finalize, from, map, Observable, of, pipe, tap } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
@@ -17,7 +17,7 @@ export class OrgContextComponent implements OnInit {
 
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public orgs$: Observable<Org.AsObject[]> = of([]);
-  public filterControl: FormControl = new FormControl('');
+  public filterControl: UntypedFormControl = new UntypedFormControl('');
   @Input() public org!: Org.AsObject;
   @ViewChild('input', { static: false }) input!: ElementRef;
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();

@@ -35,7 +35,19 @@ The detail shows you general information about your instance, which options you 
 
 ![New Instance](/img/manuals/portal/customer_portal_instance_detail.png)
 
-## Custom Domain
+### Upgrade Instance
+
+A free instance can be upgraded to a "pay as you go" instance. By upgrading your authenticated request will no longer be capped and you will be able to choose more options. To upgrade you must enter your billing information.
+
+1. Go to the detail of your instance
+2. Click "Upgrade to paid tier!" in the General Information
+3. Choose the options you need (can be changed later)
+   1. Data Region
+   2. Custom Domain
+   3. Extended SLA
+4. Add a payment method or choose an existing one
+
+### Add Custom Domain
 
 We recommend register a custom domain to access your ZITADEL instance.
 The primary domain of your ZITADEL instance will be the issuer of the instance. All other domains can be used to access the instance itself
@@ -44,7 +56,9 @@ Be aware that it has some impacts if you change the primary domain of your insta
 1. The urls and issuer have to change in your app
 2. Passwordless authentication is based on the domain, if you change it, your users will not be able to login with the registered passwordless authentication
 
-### Verify Domain
+![Add custom domain](/img/manuals/portal/portal_add_domain.png)
+
+#### Verify Domain
 
 If you need a custom domain for your ZITADEL instance, you need to verify the domain.
 
@@ -53,3 +67,33 @@ If you need a custom domain for your ZITADEL instance, you need to verify the do
 3. After adding the CNAME you need to wait till the domain is verified (this can take some time)
 
 You will now be able to use the added custom domain to access your ZITADEL instance
+
+### Change Options
+
+You can change your selected options in the detail of your instance. 
+This can have an impact on your instance cost.
+
+1. Go to the detail of your instance
+2. Click the edit button on the Options section
+3. Choose your options
+   1. Extended SLA
+   2. Data Region
+4. Save
+
+![Edit Options](/img/manuals/portal/portal_edit_options.png)
+
+### Downgrade Instance
+
+If you are in the "Pay as you go tier" with your instance, you can downgrade it to the free tier.
+
+:::caution
+Be aware that this might have an impact for your users and application.
+If you have registered a custom domain, it will be deleted.
+The data region will be set to "Global", if you have selected something else.
+:::
+
+1. Go to the detail of your instance
+2. Click "Change to free tier" in the General Information 
+3. You will see an overview of what happens when downgrading, click "Downgrade anyway"
+4. In the popup you need to confirm by clicking "I am sure"
+
