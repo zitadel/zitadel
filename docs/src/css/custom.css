@@ -258,7 +258,7 @@ h2 {
   --ifm-color-primary-lightest: #ff90b4;
   --ifm-background-color: #141735;
   --ifm-hero-background-color: #0f1022;
-  --ifm-hero-text-color: var(--ifm-font-color-base);
+  --ifm-hero-text-color: #ffffff;
   --get-started-bg: var(--ifm-font-color-base);
   --get-started: #FF1F69;
   --ifm-footer-color: #ffffff50;
