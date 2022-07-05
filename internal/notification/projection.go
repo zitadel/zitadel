@@ -511,7 +511,7 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	err = p.commands.HumanInitCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	err = p.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}
