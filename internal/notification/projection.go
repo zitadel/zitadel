@@ -349,8 +349,7 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 	}
 	ctx := setNotificationContext(event.Aggregate())
 	alreadyHandled, err := p.checkIfAlreadyHandled(ctx, event, nil,
-		user.UserV1EmailCodeAddedType, user.UserV1EmailCodeSentType,
-		user.HumanEmailCodeAddedType, user.HumanEmailCodeSentType)
+		user.UserDomainClaimedType, user.UserDomainClaimedSentType)
 	if err != nil {
 		return nil, err
 	}
@@ -432,7 +431,7 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.DomainClaimedMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PasswordlessRegistrationMessageType)
 	if err != nil {
 		return nil, err
 	}
@@ -490,7 +489,7 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.InitCodeMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.VerifyPhoneMessageType)
 	if err != nil {
 		return nil, err
 	}
