@@ -34,7 +34,7 @@ An event has the following data:
 | Schema | Description | Examples |
 | --- | --- | --- |
 | System | The system contains everything that is needed outside the ZITADEL instances.  | assets, encryption_key |
-| Eventstore | Eventstore is the base of ZITADEL and is the single source of truth. All the events stored in the eventstore can be used in to generated different projections. | events, instance sequences, system wide unique constraints
+| Eventstore | Eventstore is the base of ZITADEL and is the single source of truth. All the events stored in the eventstore can be used to generate different projections. | events, instance sequences, system wide unique constraints
 | Projections| The projections contain all the computed objects which are used for reading requests. | users, projects, etc|
 | Auth | This contains projections which are used for the auth api. All projections in this schema should be moved to Projections soon | users, auth_request, etc. |
 | Adminapi | This contains projections which are used for the admin api. All projections in this schema should be moved to Projections soon | styling|
