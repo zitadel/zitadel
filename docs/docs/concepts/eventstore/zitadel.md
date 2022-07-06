@@ -73,3 +73,25 @@ The current sequence is stored for each ZITADEL instance and table.
 | timestamp | Timestamp when the table was updated | 2022-07-05 13:57:59.454798+00 |
 
 ### Failed Events
+
+Sometimes an event cannot be processed correctly for some reason and an error occurs.
+The event is then tried to be processed n times. 
+When a defined number of attempts have failed, the event is stored in the Failed Events Table and the next event is processed. 
+This must be done so that the projection is not blocked and no further events are processed.
+
+You can find the failed_events in the following tables:
+- projections.failed_events
+- notification.failed_events
+- auth.failed_events
+- adminapi.failed_events
+
+| Attribute | Description | Examples |
+| --- | --- | --- |
+| projection_name | The name of the projection for which the failed even should have been processed.  | projection.users |
+| failed_sequence | The sequence of the event that failed | 1234 |
+| failure_count | The number of times the event was attempted to be processed. If the number is lower than the max. attempts the event could be processed, but not on the first attempt | 5 | 
+| error | The error message that occurred when the event could not be processed | User not found |
+| instance_id | The instance to which the event belongs | 165460784409737834 |
+
+
+
