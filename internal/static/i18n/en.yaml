@@ -70,7 +70,7 @@ Errors:
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
-      Invalid: Profildata invalid
+      Invalid: Profile data invalid
     Email:
       NotFound: Email not found
       Invalid: Email is invalid
@@ -156,7 +156,7 @@ Errors:
     DomainNotVerified: Domain is not verified
     DomainAlreadyVerified: Domain is already verified
     DomainVerificationTypeInvalid: Domain verification type is invalid
-    DomainVerificationMissing: Domain verification not yet startet
+    DomainVerificationMissing: Domain verification not yet started
     DomainVerificationFailed: Domain verification failed
     PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
@@ -173,7 +173,7 @@ Errors:
     Domain:
       AlreadyExists: Domain already exists
     IDP:
-      InvalidSearchQuery: Ungültiger Suchparameter
+      InvalidSearchQuery: Invalid search query
     LoginPolicy:
       NotFound: Login Policy not found
       Invalid: Login Policy is invalid
@@ -266,7 +266,7 @@ Errors:
     UserIDMisisng: User ID missing
   IAM:
     Member:
-      RolesNotChanged: Roles habe not been changed
+      RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
     MemberAlreadyExisting: Member already exists
     MemberNotExisting: Member does not exist
@@ -882,7 +882,7 @@ Application:
       Implicit:
         RedirectUris:
           CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
-          HttpNotAllowed: Grant tpye implicit doesn't allow http redirect uris
+          HttpNotAllowed: Grant type implicit doesn't allow http redirect uris
           HttpLocalhostOnlyForNative: Http://localhost redirect uri is only allowed for native applications.
       Native:
         AuthMethodType:

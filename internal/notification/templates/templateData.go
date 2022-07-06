@@ -21,7 +21,7 @@ type TemplateData struct {
 	Subject         string
 	Greeting        string
 	Text            string
-	Href            string
+	URL             string
 	ButtonText      string
 	PrimaryColor    string
 	BackgroundColor string
