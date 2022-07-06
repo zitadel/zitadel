@@ -867,10 +867,6 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 			HumanPreferredLanguageCol.identifier(),
 			HumanGenderCol.identifier(),
 			HumanAvatarURLCol.identifier(),
-			HumanEmailCol.identifier(),
-			HumanIsEmailVerifiedCol.identifier(),
-			HumanPhoneCol.identifier(),
-			HumanIsPhoneVerifiedCol.identifier(),
 			NotifyUserIDCol.identifier(),
 			NotifyEmailCol.identifier(),
 			NotifyVerifiedEmailCol.identifier(),
@@ -939,6 +935,10 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 				return nil, errors.ThrowInternal(err, "QUERY-Dbwsg", "Errors.Internal")
 			}
 
+			if !notifyUserID.Valid {
+				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-Sfw3f", "Errors.User.NotFound")
+			}
+
 			u.LoginNames = loginNames
 			if preferredLoginName.Valid {
 				u.PreferredLoginName = preferredLoginName.String
@@ -952,13 +952,12 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 				u.PreferredLanguage = language.Make(preferredLanguage.String)
 				u.Gender = domain.Gender(gender.Int32)
 			}
-			if notifyUserID.Valid {
-				u.LastEmail = notifyEmail.String
-				u.VerifiedEmail = notifyVerifiedEmail.String
-				u.LastPhone = notifyPhone.String
-				u.VerifiedPhone = notifyVerifiedPhone.String
-				u.PasswordSet = notifyPasswordSet.Bool
-			}
+			u.LastEmail = notifyEmail.String
+			u.VerifiedEmail = notifyVerifiedEmail.String
+			u.LastPhone = notifyPhone.String
+			u.VerifiedPhone = notifyVerifiedPhone.String
+			u.PasswordSet = notifyPasswordSet.Bool
+
 			return u, nil
 		}
 }
