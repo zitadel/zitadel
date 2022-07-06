@@ -11,12 +11,22 @@ import Compose from './compose.mdx'
 import Helm from './helm.mdx'
 import Knative from './knative.mdx'
 import NextSelfHosted from './nextselfhosted.mdx'
+import DefaultUser from './defaultuser.mdx'
 
 # Run ZITADEL
 
 Choose your platform and run ZITADEL with the most minimal configuration possible.
 For an easy self-hosted production setup, we recommend running ZITADEL on [Kubernetes](https://kubernetes.io/docs/home/), using our official [Helm](https://helm.sh/docs/) chart.
 By default, it runs a highly available ZITADEL instance along with a secure and highly available [CockroachDB](https://www.cockroachlabs.com/docs/stable/) instance.
+
+## Disclaimer
+This guide is for development / demonstration purpose only and does NOT reflect a production setup.
+
+Things such as TLS termination and email verification will not be available unless you 
+
+- use an API gateway with valid certificates in front of the service
+- configure an appropriate email server
+
 
 <!-- TODO: Destroy -->
 
@@ -37,21 +47,26 @@ By default, it runs a highly available ZITADEL instance along with a secure and 
     </TabItem>
     <TabItem value="linux">
         <Linux/>
+        <DefaultUser/>
         <NextSelfHosted/>
     </TabItem>
     <TabItem value="macos">
         <MacOS/>
+        <DefaultUser/>
         <NextSelfHosted/>
     </TabItem>
     <TabItem value="compose">
         <Compose/>
+        <DefaultUser/>
         <NextSelfHosted/>
     </TabItem>
     <TabItem value="k8s">
         <Helm/>
+        <DefaultUser/>
         <NextSelfHosted/>
     </TabItem>
     <TabItem value="knative">
         <Knative/>
+        <NextSelfHosted/>
     </TabItem>
 </Tabs>
