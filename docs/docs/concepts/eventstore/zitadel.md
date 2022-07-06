@@ -87,7 +87,7 @@ You can find the failed_events in the following tables:
 
 | Attribute | Description | Examples |
 | --- | --- | --- |
-| projection_name | The name of the projection for which the failed even should have been processed.  | projection.users |
+| projection_name | The name of the projection for which the failed event should have been processed.  | projection.users |
 | failed_sequence | The sequence of the event that failed | 1234 |
 | failure_count | The number of times the event was attempted to be processed. If the number is lower than the max. attempts the event could be processed, but not on the first attempt | 5 | 
 | error | The error message that occurred when the event could not be processed | User not found |
