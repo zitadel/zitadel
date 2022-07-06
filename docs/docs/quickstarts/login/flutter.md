@@ -407,10 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 If you run this application, you can authenticate with a valid ZITADEL user.
 
-<div style={{display:'flex', 'justify-content': 'center'}}>
-  <div style={{display:'flex', 'align-items': 'center'}}>
+  <div style={{display: grid, grid-column-gap: 1rem, grid-template-columns: 1fr 1fr}}>
     <img src="/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
-    <span style={{padding:'1rem'}}>becomes</span>
     <img src="/img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
   </div>
-</div>
