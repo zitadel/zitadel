@@ -3,6 +3,7 @@ package crdb
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/lib/pq"
 
@@ -51,10 +52,18 @@ func NewCreateStatement(event eventstore.Event, values []handler.Column, opts ..
 	}
 }
 
-func NewUpsertStatement(event eventstore.Event, values []handler.Column, opts ...execOption) *handler.Statement {
+func NewUpsertStatement(event eventstore.Event, conflictCols []handler.Column, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
-	columnNames := strings.Join(cols, ", ")
-	valuesPlaceholder := strings.Join(params, ", ")
+
+	// updates := make([]string, len(values))
+	// for i, col := range cols {
+	// 	updates[i] = col + " = " + params[i]
+	// }
+
+	conflictTarget := make([]string, len(conflictCols))
+	for i, col := range conflictCols {
+		conflictTarget[i] = col.Name
+	}
 
 	config := execConfig{
 		args: args,
@@ -65,7 +74,8 @@ func NewUpsertStatement(event eventstore.Event, values []handler.Column, opts ..
 	}
 
 	q := func(config execConfig) string {
-		return "UPSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
+		return "INSERT INTO " + config.tableName + " (" + strings.Join(cols, ", ") + ") VALUES (" + strings.Join(params, ", ") + ")" +
+			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO UPDATE SET (" + strings.Join(cols, ", ") + ") = (" + strings.Join(params, ", ") + ")"
 	}
 
 	return &handler.Statement{
@@ -99,7 +109,7 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	}
 
 	q := func(config execConfig) string {
-		return "UPDATE " + config.tableName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
+		return "UPDATE " + config.tableName + " SET (" + columnNames + ") = (SELECT " + valuesPlaceholder + ") WHERE " + wheresPlaceholders
 	}
 
 	return &handler.Statement{
@@ -171,9 +181,9 @@ func AddCreateStatement(columns []handler.Column, opts ...execOption) func(event
 	}
 }
 
-func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.Event) Exec {
+func AddUpsertStatement(indexCols []handler.Column, values []handler.Column, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
-		return NewUpsertStatement(event, values, opts...).Execute
+		return NewUpsertStatement(event, indexCols, values, opts...).Execute
 	}
 }
 
@@ -233,20 +243,24 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.Event, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
+func NewCopyStatement(event eventstore.Event, conflictCols []handler.Column, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
 	columnNames := make([]string, len(cols))
 	selectColumns := make([]string, len(cols))
+	updateColumns := make([]string, len(columnNames))
 	argCounter := 0
 	args := []interface{}{}
 
 	for i, col := range cols {
 		columnNames[i] = col.Name
 		selectColumns[i] = col.Name
+		updateColumns[i] = "EXCLUDED." + col.Name
 		if col.Value != nil {
 			argCounter++
 			selectColumns[i] = "$" + strconv.Itoa(argCounter)
+			updateColumns[i] = selectColumns[i]
 			args = append(args, col.Value)
 		}
+
 	}
 
 	wheres := make([]string, len(conds))
@@ -254,6 +268,11 @@ func NewCopyStatement(event eventstore.Event, cols []handler.Column, conds []han
 		argCounter++
 		wheres[i] = "copy_table." + cond.Name + " = $" + strconv.Itoa(argCounter)
 		args = append(args, cond.Value)
+	}
+
+	conflictTargets := make([]string, len(conflictCols))
+	for i, conflictCol := range conflictCols {
+		conflictTargets[i] = conflictCol.Name
 	}
 
 	config := execConfig{
@@ -269,7 +288,7 @@ func NewCopyStatement(event eventstore.Event, cols []handler.Column, conds []han
 	}
 
 	q := func(config execConfig) string {
-		return "UPSERT INTO " +
+		return "INSERT INTO " +
 			config.tableName +
 			" (" +
 			strings.Join(columnNames, ", ") +
@@ -277,7 +296,14 @@ func NewCopyStatement(event eventstore.Event, cols []handler.Column, conds []han
 			strings.Join(selectColumns, ", ") +
 			" FROM " +
 			config.tableName + " AS copy_table WHERE " +
-			strings.Join(wheres, " AND ")
+			strings.Join(wheres, " AND ") +
+			" ON CONFLICT (" +
+			strings.Join(conflictTargets, ", ") +
+			") DO UPDATE SET (" +
+			strings.Join(columnNames, ", ") +
+			") = (" +
+			strings.Join(updateColumns, ", ") +
+			")"
 	}
 
 	return &handler.Statement{
@@ -296,6 +322,9 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 	for i, col := range cols {
 		names[i] = col.Name
 		values[i] = col.Value
+		if timestamp, ok := col.Value.(time.Time); ok {
+			values[i] = pq.FormatTimestamp(timestamp)
+		}
 		parameters[i] = "$" + strconv.Itoa(i+1)
 		if col.ParameterOpt != nil {
 			parameters[i] = col.ParameterOpt(parameters[i])

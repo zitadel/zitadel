@@ -291,9 +291,9 @@ func prepareOrgMember() string {
 		OrgMemberResourceOwner.identifier(),
 		OrgMemberInstanceID.identifier(),
 		OrgMemberOrgID.identifier(),
-		"NULL::STRING AS "+membershipIAMID.name,
-		"NULL::STRING AS "+membershipProjectID.name,
-		"NULL::STRING AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipIAMID.name,
+		"NULL::TEXT AS "+membershipProjectID.name,
+		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(orgMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -307,10 +307,10 @@ func prepareIAMMember() string {
 		InstanceMemberSequence.identifier(),
 		InstanceMemberResourceOwner.identifier(),
 		InstanceMemberInstanceID.identifier(),
-		"NULL::STRING AS "+membershipOrgID.name,
+		"NULL::TEXT AS "+membershipOrgID.name,
 		InstanceMemberIAMID.identifier(),
-		"NULL::STRING AS "+membershipProjectID.name,
-		"NULL::STRING AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipProjectID.name,
+		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(instanceMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -324,10 +324,10 @@ func prepareProjectMember() string {
 		ProjectMemberSequence.identifier(),
 		ProjectMemberResourceOwner.identifier(),
 		ProjectMemberInstanceID.identifier(),
-		"NULL::STRING AS "+membershipOrgID.name,
-		"NULL::STRING AS "+membershipIAMID.name,
+		"NULL::TEXT AS "+membershipOrgID.name,
+		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
-		"NULL::STRING AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(projectMemberTable.identifier()).MustSql()
 
 	return stmt
@@ -342,8 +342,8 @@ func prepareProjectGrantMember() string {
 		ProjectGrantMemberSequence.identifier(),
 		ProjectGrantMemberResourceOwner.identifier(),
 		ProjectGrantMemberInstanceID.identifier(),
-		"NULL::STRING AS "+membershipOrgID.name,
-		"NULL::STRING AS "+membershipIAMID.name,
+		"NULL::TEXT AS "+membershipOrgID.name,
+		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
 	).From(projectGrantMemberTable.identifier()).MustSql()

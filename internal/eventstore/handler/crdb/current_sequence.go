@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	currentSequenceStmtFormat        = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 FOR UPDATE`
-	updateCurrentSequencesStmtFormat = `UPSERT INTO %s (projection_name, aggregate_type, current_sequence, instance_id, timestamp) VALUES `
+	currentSequenceStmtFormat          = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 FOR UPDATE`
+	updateCurrentSequencesStmtFormat   = `INSERT INTO %s (projection_name, aggregate_type, current_sequence, instance_id, timestamp) VALUES `
+	updateCurrentSequencesConflictStmt = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`
 )
 
 type currentSequences map[eventstore.AggregateType][]*instanceSequence
@@ -72,7 +73,7 @@ func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, sequences currentS
 		}
 	}
 
-	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", "), values...)
+	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", ")+updateCurrentSequencesConflictStmt, values...)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-TrH2Z", "unable to exec update sequence")
 	}

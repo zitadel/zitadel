@@ -73,12 +73,12 @@ func NewStatementHandler(
 		aggregates:              aggregateTypes,
 		reduces:                 reduces,
 		bulkLimit:               config.BulkLimit,
-		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
+		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
 	}
 	h.ProjectionHandler = handler.NewProjectionHandler(config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery)
 
 	err := h.Init(ctx, config.InitCheck)
-	logging.OnError(err).Fatal("unable to initialize projections")
+	logging.OnError(err).WithField("projection", config.ProjectionName).Fatal("unable to initialize projections")
 
 	go h.Process(
 		ctx,

@@ -35,9 +35,9 @@ var (
 			", members.resource_owner" +
 			", members.instance_id" +
 			", members.org_id" +
-			", NULL::STRING AS id" +
-			", NULL::STRING AS project_id" +
-			", NULL::STRING AS grant_id" +
+			", NULL::TEXT AS id" +
+			", NULL::TEXT AS project_id" +
+			", NULL::TEXT AS grant_id" +
 			" FROM projections.org_members as members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
@@ -47,10 +47,10 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", members.instance_id" +
-			", NULL::STRING AS org_id" +
+			", NULL::TEXT AS org_id" +
 			", members.id" +
-			", NULL::STRING AS project_id" +
-			", NULL::STRING AS grant_id" +
+			", NULL::TEXT AS project_id" +
+			", NULL::TEXT AS grant_id" +
 			" FROM projections.instance_members as members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
@@ -60,10 +60,10 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", members.instance_id" +
-			", NULL::STRING AS org_id" +
-			", NULL::STRING AS id" +
+			", NULL::TEXT AS org_id" +
+			", NULL::TEXT AS id" +
 			", members.project_id" +
-			", NULL::STRING AS grant_id" +
+			", NULL::TEXT AS grant_id" +
 			" FROM projections.project_members as members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
@@ -73,8 +73,8 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", members.instance_id" +
-			", NULL::STRING AS org_id" +
-			", NULL::STRING AS id" +
+			", NULL::TEXT AS org_id" +
+			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", members.grant_id" +
 			" FROM projections.project_grant_members as members" +

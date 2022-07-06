@@ -44,8 +44,9 @@ const (
 var (
 	viewStmt = fmt.Sprintf("SELECT"+
 		" user_id"+
-		" , IF(%[1]s, CONCAT(%[2]s, '@', domain), %[2]s) AS login_name"+
-		" , IFNULL(%[3]s, true) AS %[3]s"+
+		" , (CASE WHEN %[1]s THEN CONCAT(%[2]s, '@', domain) ELSE %[2]s END) AS login_name"+
+		// " , IF(%[1]s, CONCAT(%[2]s, '@', domain), %[2]s) AS login_name"+
+		" , COALESCE(%[3]s, true) AS %[3]s"+
 		" , %[4]s"+
 		" FROM ("+
 		" SELECT"+
@@ -62,12 +63,12 @@ var (
 		" , users.%[2]s"+
 		" , users.%[4]s"+
 		" , users.%[5]s"+
-		" , IFNULL(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
+		" , COALESCE(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
 		" FROM %[7]s users"+
 		" LEFT JOIN %[8]s policy_custom on policy_custom.%[9]s = users.%[5]s AND policy_custom.%[10]s = users.%[4]s"+
 		" LEFT JOIN %[8]s policy_default on policy_default.%[11]s = true AND policy_default.%[10]s = users.%[4]s) policy_users"+
 		" LEFT JOIN %[12]s domains ON policy_users.%[1]s AND policy_users.%[5]s = domains.%[13]s AND policy_users.%[10]s = domains.%[14]s"+
-		");",
+		") AS login_names;",
 		LoginNamePoliciesMustBeDomainCol,
 		LoginNameUserUserNameCol,
 		LoginNameDomainIsPrimaryCol,
@@ -103,7 +104,7 @@ func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 		},
 			crdb.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{LoginNameUserResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("ln_ro_idx", []string{LoginNameUserResourceOwnerCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),

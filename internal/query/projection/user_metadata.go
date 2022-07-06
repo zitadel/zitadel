@@ -43,7 +43,7 @@ func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("usr_md_ro_idx", []string{UserGrantResourceOwner})),
 		),
 	)
 
@@ -84,6 +84,10 @@ func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 	}
 	return crdb.NewUpsertStatement(
 		e,
+		[]handler.Column{
+			handler.NewCol(UserMetadataColumnInstanceID, nil),
+			handler.NewCol(UserMetadataColumnUserID, nil),
+		},
 		[]handler.Column{
 			handler.NewCol(UserMetadataColumnUserID, e.Aggregate().ID),
 			handler.NewCol(UserMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),

@@ -49,7 +49,7 @@ func newActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 			crdb.NewColumn(ActionAllowedToFailCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ActionInstanceIDCol, ActionIDCol),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ActionResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("actions_ro_idx", []string{ActionResourceOwnerCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

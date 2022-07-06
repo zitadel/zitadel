@@ -29,7 +29,7 @@ func newInstanceMemberProjection(ctx context.Context, config crdb.StatementHandl
 		crdb.NewTable(
 			append(memberColumns, crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, InstanceColumnID, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("inst_memb_user_idx", []string{MemberUserIDCol})),
 		),
 	)
 

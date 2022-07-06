@@ -46,7 +46,7 @@ func newIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(IDPUserLinkInstanceIDCol, IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{IDPUserLinkUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("idp_user_idx", []string{IDPUserLinkUserIDCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
