@@ -27,7 +27,7 @@ Travel back in time: With our way of storing data we can show you all of your re
 
 ## Definitions
 
-Eventsourcing has some specific terms that are often used in our documentation. To unserstand how ZITADEL works it is important to understand this key definitions.
+Eventsourcing has some specific terms that are often used in our documentation. To understand how ZITADEL works it is important to understand this key definitions.
 
 ### Events
 
