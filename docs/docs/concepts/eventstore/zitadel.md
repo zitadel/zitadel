@@ -35,4 +35,41 @@ An event has the following data:
 | --- | --- | --- |
 | System | The system contains everything that is needed outside the ZITADEL instances.  | assets, encryption_key |
 | Eventstore | Eventstore is the base of ZITADEL and is the single source of truth. All the events stored in the eventstore can be used in to generated different projections. | events, instance sequences, system wide unique constraints
-| Projections| | users, projects, etc|
+| Projections| The projections contain all the computed objects which are used for reading requests. | users, projects, etc|
+| Auth | This contains projections which are used for the auth api. All projections in this schema should be moved to Projections soon | users, auth_request, etc. |
+| Adminapi | This contains projections which are used for the admin api. All projections in this schema should be moved to Projections soon | styling|
+| Notification | This contains projections which are used for sending notification. All projections in this schema should be moved to Projections soon | styling|
+
+## Projections
+
+The projections in ZITADEL contain all the computed objects, that are used for the reading requests.
+It is possible that the projections are slightly behind the actual event and not all objects are up-to-date.
+
+### Pub-Sub
+To keep the projections as up-to-date as possible, an internal pub-sub system is used. 
+As soon as an event is written to the event store, it is sent to the projections that have subscribed to this aggregate.
+
+### Spooler
+It is sometimes possible for technical reasons that not all events were sent to the projections. 
+For this reason, a spooler runs in parallel, which checks every n minutes whether there are new events that have not yet been processed.
+
+### Current Sequence
+
+To ensure that no events get missed when creating the Projections, ZITADEL stores the current sequence, that was processed.
+You can find the current sequence in the following tables:
+- projections.current_sequences
+- notification.current_sequences
+- auth.current_Sequences
+- adminapi.current_sequences
+
+The current sequence is stored for each ZITADEL instance and table.
+
+| Attribute | Description | Examples |
+| --- | --- | --- |
+| projection_name | The name of the projection for which the sequence is valid.  | projection.users |
+| aggregate_type | The aggregate type where the sequence was from | user |
+| current_sequence | The sequence that was last processed | 1234 |
+| instance_id | The instance to which the event belongs | 165460784409737834 | 
+| timestamp | Timestamp when the table was updated | 2022-07-05 13:57:59.454798+00 |
+
+### Failed Events
