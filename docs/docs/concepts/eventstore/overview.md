@@ -44,7 +44,7 @@ Possible Events:
 ### Aggregate
 
 An aggregate consist of multiple events. All events together in will lead to the current state of the aggregate.
-The aggregate can be compared with an object or a resources.
+The aggregate can be compared with an object or a resources. Aggregates define transaction boundaries.
 
 ### Projections
 
