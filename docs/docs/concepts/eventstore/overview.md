@@ -42,8 +42,10 @@ Possible Events:
 
 ### Aggregate
 
+An aggregate consist of multiple events. All events together in will lead to the current state of the aggregate.
+The aggregate can be compared with an object or a resources.
+
 ### Projections
 
-### Read Model 
+Projections contain the computed objects, that will be used on the query side for all the requests.
 
-### Write Model
