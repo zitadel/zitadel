@@ -454,7 +454,7 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 	if err != nil {
 		return nil, err
 	}
-	err = p.commands.HumanPasswordlessInitCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, e.ID)
+	err = p.commands.HumanPasswordlessInitCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
 	if err != nil {
 		return nil, err
 	}
