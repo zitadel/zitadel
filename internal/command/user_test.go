@@ -19,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -929,7 +928,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			instanceID             string
 			orgID                  string
 			userID                 string
-			cascadeUserMemberships []*query.Membership
+			cascadeUserMemberships []*CascadingMembership
 			cascadeUserGrants      []string
 		}
 	)
@@ -1215,16 +1214,16 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				cascadeUserMemberships: []*query.Membership{
+				cascadeUserMemberships: []*CascadingMembership{
 					{
-						IAM: &query.IAMMembership{
+						IAM: &CascadingIAMMembership{
 							IAMID: "INSTANCE",
 						},
 						UserID:        "user1",
 						ResourceOwner: "org1",
 					},
 					{
-						Org: &query.OrgMembership{
+						Org: &CascadingOrgMembership{
 							OrgID: "org1",
 						},
 						UserID:        "user1",
@@ -1232,14 +1231,14 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					},
 					{
 
-						Project: &query.ProjectMembership{
+						Project: &CascadingProjectMembership{
 							ProjectID: "project1",
 						},
 						UserID:        "user1",
 						ResourceOwner: "org1",
 					},
 					{
-						ProjectGrant: &query.ProjectGrantMembership{
+						ProjectGrant: &CascadingProjectGrantMembership{
 							ProjectID: "project1",
 							GrantID:   "grant1",
 						},
