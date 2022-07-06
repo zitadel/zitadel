@@ -31,7 +31,7 @@ Eventsourcing has some specific terms that are often used in our documentation. 
 
 ### Events
 
-An event is something that happen in the system and got written to the database. This is the single source of truth.
+An event is something that happens in the system and gets written to the database. This is the single source of truth.
 Events are immutable and the current state of your system is derived from the events.
 
 Possible Events:
