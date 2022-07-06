@@ -13,7 +13,7 @@ Traditionally, data is stored in relations as a state
 - That is valid for actual, as well as for historical data
 
 An Eventstore on the other hand stores events, meaning every change that happens to any piece of data relates to an event.
-The data is stored as events in an append-only lof.
+The data is stored as events in an append-only log.
 
 - Think of it as a ledger that gets new entries over time, accumulative
 - To request data, all you have to do is to sum the events as the summary reflects the actual state
