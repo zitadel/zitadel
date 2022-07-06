@@ -3,32 +3,32 @@ title: Angular
 ---
 
 This integration guide shows you the recommended way to integrate ZITADEL into your Angular application.
-It shows how to add user login to your application and fetch some data from the user info endpoint.  
+It shows how to add user login to your application and fetch some data from the user info endpoint.
 
-At the end of the guide, your application has login functionality and has access to the current user's profile.  
+At the end of the guide, your application has login functionality and has access to the current user's profile.
 
-> This documentation refers to our [example](https://github.com/zitadel/zitadel-examples/tree/main/angular) in GitHub. Note that we've written ZITADEL Console in Angular, so you can also use that as a reference.  
+> This documentation refers to our [example](https://github.com/zitadel/zitadel-examples/tree/main/angular) in GitHub. Note that we've written ZITADEL Console in Angular, so you can also use that as a reference.
 
 ## Setup Application and Get Keys
 
 Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
-You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your [Project](https://console.zitadel.ch/projects), then add a new application at the top of the page.
+You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select Web application type and continue.
-We recommend you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.  
+We recommend you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
 
-![Create app in console](/img/angular/app-create-light.png)
+![Create app in console](/img/angular/app-create.png)
 
 ### Redirect URIs
 
-With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.  
+With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
-> If you are following along with the [example](https://github.com/zitadel/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.  
+> If you are following along with the [example](https://github.com/zitadel/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.
 
-If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.  
+If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
 
 Continue and create the application.
 
-### Client ID and Secret
+### Client ID
 
 After successful app creation, a pop-up will appear, showing the app's client ID. Copy the client ID, as you will need it to configure your Angular client.
 
@@ -58,7 +58,7 @@ const authConfig: AuthConfig = {
     responseType: 'code',
     oidc: true,
     clientId: 'YOUR-CLIENT-ID', // replace with your appid
-    issuer: 'https://issuer.zitadel.ch',
+    issuer: 'https://instance-randomnumber.zitadel.cloud', // replace with your instance
     redirectUri: 'http://localhost:4200/auth/callback',
     postLogoutRedirectUri: 'http://localhost:4200/signedout', // optional
     requireHttps: false // required for running locally
@@ -68,14 +68,14 @@ const authConfig: AuthConfig = {
 ...
     imports: [
         OAuthModule.forRoot(),
-        HttpClientModule,        
+        HttpClientModule,
 ...
     providers: [
         {
             provide: AuthConfig,
             useValue: authConfig
         }
-...        
+...
 ```
 
 Set _openid_, _profile_ and _email_ as scope, _code_ as responseType, and oidc to _true_. Then create an authentication service to provide the functions to authenticate your user.
@@ -89,63 +89,62 @@ ng g service services/authentication
 Copy the following code to your service. This code provides a function `authenticate()` which redirects the user to ZITADEL. After successful login, ZITADEL redirects the user back to the redirect URI configured in _AuthModule_ and ZITADEL Console. Make sure both correspond, otherwise ZITADEL throws an error.
 
 ```ts
-import { Injectable } from '@angular/core';
-import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { AuthConfig, OAuthService } from "angular-oauth2-oidc";
+import { BehaviorSubject, from, Observable } from "rxjs";
 
-import { StatehandlerService } from './statehandler.service';
+import { StatehandlerService } from "./statehandler.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthenticationService {
-    private _authenticated: boolean = false;
-    private readonly _authenticationChanged: BehaviorSubject<
-        boolean
-    > = new BehaviorSubject(this.authenticated);
+  private _authenticated: boolean = false;
+  private readonly _authenticationChanged: BehaviorSubject<boolean> =
+    new BehaviorSubject(this.authenticated);
 
-    constructor(
-        private oauthService: OAuthService,
-        private authConfig: AuthConfig,
-        private statehandler: StatehandlerService,
-    ) { }
+  constructor(
+    private oauthService: OAuthService,
+    private authConfig: AuthConfig,
+    private statehandler: StatehandlerService
+  ) {}
 
-    public get authenticated(): boolean {
-        return this._authenticated;
+  public get authenticated(): boolean {
+    return this._authenticated;
+  }
+
+  public get authenticationChanged(): Observable<boolean> {
+    return this._authenticationChanged;
+  }
+
+  public getOIDCUser(): Observable<any> {
+    return from(this.oauthService.loadUserProfile());
+  }
+
+  public async authenticate(setState: boolean = true): Promise<boolean> {
+    this.oauthService.configure(this.authConfig);
+
+    this.oauthService.strictDiscoveryDocumentValidation = false;
+    await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+
+    this._authenticated = this.oauthService.hasValidAccessToken();
+
+    if (!this.oauthService.hasValidIdToken() || !this.authenticated) {
+      const newState = setState
+        ? await this.statehandler.createState().toPromise()
+        : undefined;
+      this.oauthService.initCodeFlow(newState);
     }
+    this._authenticationChanged.next(this.authenticated);
 
-    public get authenticationChanged(): Observable<boolean> {
-        return this._authenticationChanged;
-    }
+    return this.authenticated;
+  }
 
-    public getOIDCUser(): Observable<any> {
-        return from(this.oauthService.loadUserProfile());
-    }
-
-    public async authenticate(
-        setState: boolean = true,
-    ): Promise<boolean> {
-        this.oauthService.configure(this.authConfig);
-
-        this.oauthService.strictDiscoveryDocumentValidation = false;
-        await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-
-        this._authenticated = this.oauthService.hasValidAccessToken();
-
-        if (!this.oauthService.hasValidIdToken() || !this.authenticated) {
-            const newState = setState ? await this.statehandler.createState().toPromise() : undefined;
-            this.oauthService.initCodeFlow(newState);
-        }
-        this._authenticationChanged.next(this.authenticated);
-
-        return this.authenticated;
-    }
-
-    public signout(): void {
-        this.oauthService.logOut();
-        this._authenticated = false;
-        this._authenticationChanged.next(false);
-    }
+  public signout(): void {
+    this.oauthService.logOut();
+    this._authenticated = false;
+    this._authenticationChanged.next(false);
+  }
 }
 ```
 
@@ -215,26 +214,35 @@ ng g guard guards/auth
 This code shows the _AuthGuard_ used in ZITADEL Console.
 
 ```ts
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
-import { AuthenticationService } from '../services/authentication.service';
+import { Injectable } from "@angular/core";
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  RouterStateSnapshot,
+  UrlTree,
+} from "@angular/router";
+import { Observable } from "rxjs";
+import { AuthenticationService } from "../services/authentication.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthGuard implements CanActivate {
+  constructor(private auth: AuthenticationService) {}
 
-  constructor(private auth: AuthenticationService) { }
-  
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        if (!this.auth.authenticated) {
-            return this.auth.authenticate();
-        }
-        return this.auth.authenticated;
-    }  
+    state: RouterStateSnapshot
+  ):
+    | Observable<boolean | UrlTree>
+    | Promise<boolean | UrlTree>
+    | boolean
+    | UrlTree {
+    if (!this.auth.authenticated) {
+      return this.auth.authenticate();
+    }
+    return this.auth.authenticated;
+  }
 }
 ```
 
@@ -267,14 +275,14 @@ const routes: Routes = [
 Call `auth.signout()` for logging the current user out. Note that you can also configure a logout redirect URI if you want your users to be redirected after logout.
 
 ```ts
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { AuthenticationService } from "src/app/services/authentication.service";
 
 export class SomeComponentWithLogout {
-    constructor(private authService: AuthenticationService){}
+  constructor(private authService: AuthenticationService) {}
 
-    public signout(): Promise<void> {
-        return this.authService.signout();
-    }
+  public signout(): Promise<void> {
+    return this.authService.signout();
+  }
 }
 ```
 
@@ -297,7 +305,7 @@ And in your HTML file:
 
 ```html
 <div *ngIf="user$ | async as user">
-    <p>{{user | json}}</p>
+  <p>{{user | json}}</p>
 </div>
 ```
 

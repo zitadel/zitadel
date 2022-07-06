@@ -45,14 +45,14 @@ You may want to change the Flutter SDK version in `pubspec.yaml` from
 
 ```yaml
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: ">=2.7.0 <3.0.0"
 ```
 
 to
 
 ```yaml
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 ```
 
 With this, you'll enable "nullable by default" mode in Flutter, as well as new language features.
@@ -257,7 +257,7 @@ Future<void> _authenticate() async {
       AuthorizationTokenRequest(
         '<<CLIENT_ID>>', // Client ID of the native application
         '<<CALLBACK_URL>>', // The registered url from zitadel (e.g. ch.myexample.app://signin)
-        issuer: '<<ISSUER>>', // most of the cases: https://issuer.zitadel.ch
+        issuer: '<<ISSUER>>', // most of the cases: https://[your-instance].zitadel.cloud
         scopes: [
           'openid',
           'profile',
@@ -268,7 +268,7 @@ Future<void> _authenticate() async {
     );
 
     final userInfoResponse = await get(
-      Uri.parse('https://api.zitadel.ch/oauth/v2/userinfo'),
+      Uri.parse('https://[your-instance].zitadel.cloud/oauth/v2/userinfo'),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
         HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'
@@ -333,7 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       final userInfoResponse = await get(
-        Uri.parse('https://api.zitadel.ch/oauth/v2/userinfo'),
+        Uri.parse('https://[your-instance].zitadel.cloud/oauth/v2/userinfo'),
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
           HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'

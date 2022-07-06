@@ -10,7 +10,7 @@ At the end of the guide you should have an application able to login a user and 
 ## Setup Application and get Keys
 
 Before we can start building our application we have to do a few configuration steps in ZITADEL Console.
-You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your [Project](https://console.zitadel.ch/projects) and add a new application at the top of the page.
+You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project and add a new application at the top of the page.
 Select User Agent and continue. More about the different app types can you find [here](https://docs.zitadel.com/docs/guides/authorization/oauth-recommended-flows#different-client-profiles).
 We recommend that you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
 
@@ -54,38 +54,40 @@ This library helps integrating ZITADEL Authentication in your React Application.
 With the installed oidc pakage you will need an AuthProvider which should contain the OIDC configuration.
 
 The oidc configuration should contain **openid**, **profile** and **email** as scope and **code** as responseType.
-In the code below the authority is already set to the issuer of zitadel.ch you can find this in the ZITADEL Console on you application.
+In the code below make sure to change the issuer to your instance url. You can find this in the ZITADEL Console on you application.
 Replace the clientId value 'YOUR-CLIENT-ID' with the generated client id of you application in ZITADEL Console.
 
-
 ```ts
-
-import React from 'react';
-import { AuthProvider } from 'oidc-react';
-import './App.css';
+import React from "react";
+import { AuthProvider } from "oidc-react";
+import "./App.css";
 const oidcConfig = {
-    onSignIn: async (response: any) => {
-        alert('You logged in :' + response.profile.given_name + ' ' + response.profile.family_name);
-        window.location.hash = '';
-    },
-    authority: 'https://issuer.zitadel.ch',
-    clientId:
-        'YOUR-CLIENT-ID',
-    responseType: 'code',
-    redirectUri: 'http://localhost:3000/',
-    scope: 'openid profile email'
+  onSignIn: async (response: any) => {
+    alert(
+      "You logged in :" +
+        response.profile.given_name +
+        " " +
+        response.profile.family_name
+    );
+    window.location.hash = "";
+  },
+  authority: "https://[your-instance].zitadel.cloud",
+  clientId: "YOUR-CLIENT-ID",
+  responseType: "code",
+  redirectUri: "http://localhost:3000/",
+  scope: "openid profile email",
 };
 
 function App() {
-    return (
-        <AuthProvider {...oidcConfig}>
-        <div className="App">
+  return (
+    <AuthProvider {...oidcConfig}>
+      <div className="App">
         <header className="App-header">
-            <p>Hello World</p>
-    </header>
-    </div>
+          <p>Hello World</p>
+        </header>
+      </div>
     </AuthProvider>
-);
+  );
 }
 
 export default App;
@@ -100,7 +102,7 @@ npm start
 ```
 
 Your browser should automatically open the app site or just go to `http://localhost:3000/`.
-On opening the app in the browser you will be redirected to the login of zitadel.ch
+On opening the app in the browser you will be redirected to the login of your instance.
 After successfully authenticating your user, you will get back to you application.
 It should show a popup which says: **You logged in {FirstName} {LastName}**
 
