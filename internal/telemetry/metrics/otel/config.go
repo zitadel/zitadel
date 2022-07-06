@@ -10,7 +10,7 @@ type Config struct {
 
 func NewTracerFromConfig(rawConfig map[string]interface{}) (err error) {
 	c := new(Config)
-	c.MeterName, _ = rawConfig["meterName"].(string)
+	c.MeterName, _ = rawConfig["metername"].(string)
 	return c.NewMetrics()
 }
 
