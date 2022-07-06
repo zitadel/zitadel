@@ -48,4 +48,3 @@ The aggregate can be compared with an object or a resources.
 ### Projections
 
 Projections contain the computed objects, that will be used on the query side for all the requests.
-
