@@ -39,8 +39,8 @@ Errors:
     NotFound: Générateur de secret non trouvé
   SMSConfig:
     NotFound: Configuration SMS non trouvée
-      AlreadyActive: Configuration SMS déjà active
-      AlreadyDeactivated: Configuration SMS déjà désactivée
+    AlreadyActive: Configuration SMS déjà active
+    AlreadyDeactivated: Configuration SMS déjà désactivée
   SMTPConfig:
     NotFound: Configuration SMTP non trouvée
     AlreadyExists: La configuration SMTP existe déjà
