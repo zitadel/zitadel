@@ -1,14 +1,23 @@
 package database
 
 import (
+	"context"
 	"database/sql"
+
 	//sql import
 	_ "github.com/lib/pq"
+
+	"github.com/jackc/pgx/v4"
 
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
 func Connect(config Config) (*sql.DB, error) {
+	conn, err := pgx.Connect(context.Background(), config.String())
+	if err != nil {
+		return nil, err
+	}
+
 	client, err := sql.Open("postgres", config.String())
 	if err != nil {
 		return nil, err
