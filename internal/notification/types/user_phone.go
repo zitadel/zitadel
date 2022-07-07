@@ -3,20 +3,22 @@ package types
 import (
 	"context"
 
+	"github.com/zitadel/logging"
+
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/notification/channels/log"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
-	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
-func generateSms(ctx context.Context, user *view_model.NotifyUser, content string, getTwilioProvider func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastPhone bool) error {
+func generateSms(ctx context.Context, user *query.NotifyUser, content string, getTwilioProvider func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastPhone bool) error {
 	number := ""
-	twilio, err := getTwilioProvider(ctx)
+	twilioConfig, err := getTwilioProvider(ctx)
 	if err == nil {
-		number = twilio.SenderNumber
+		number = twilioConfig.SenderNumber
 	}
 	message := &messages.SMS{
 		SenderPhoneNumber:    number,
@@ -27,7 +29,8 @@ func generateSms(ctx context.Context, user *view_model.NotifyUser, content strin
 		message.RecipientPhoneNumber = user.LastPhone
 	}
 
-	channelChain, err := senders.SMSChannels(ctx, twilio, getFileSystemProvider, getLogProvider)
+	channelChain, err := senders.SMSChannels(ctx, twilioConfig, getFileSystemProvider, getLogProvider)
+	logging.OnError(err).Error("could not create sms channel")
 
 	if channelChain.Len() == 0 {
 		return caos_errors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")

@@ -22,11 +22,11 @@
     "DISCLAIMERLINK": "Further information",
     "DOCUMENTATION": {
       "TITLE": "Documentation",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Get started with ZITADEL quickly."
     },
     "GETSTARTED": {
       "TITLE": "Get started with ZITADEL",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Get started with ZITADEL quickly."
     },
     "QUICKSTARTS": {
       "LABEL": "First Steps",
@@ -154,7 +154,7 @@
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
     },
     "NAV": {
-      "TEXT": "This navigation changes based on your selected oranization above or your instance"
+      "TEXT": "This navigation changes based on your selected organization above or your instance"
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attention! The organization context has changed."
@@ -227,7 +227,7 @@
       "DETAIL": "Detail",
       "CREATE": "Create",
       "MY": "My Information",
-      "LOGINNAMES": "Loginnames",
+      "LOGINNAMES": "Login names",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
       "REACTIVATE": "Reactivate",
@@ -939,7 +939,7 @@
       "RESET": {
         "DEFAULTTITLE": "Reset Setting",
         "DEFAULTDESCRIPTION": "You are about to reset your settings to the default configuration of your instance. Are you sure you want to continue?",
-        "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identiy Provider settings will be reset to the instance setting too."
+        "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identity Provider settings will be reset to the instance setting too."
       }
     }
   },
@@ -1483,7 +1483,7 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
-    "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+    "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",
     "CREATIONDATE": "Created At",
