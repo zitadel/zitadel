@@ -94,7 +94,7 @@ Errors:
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
       AlreadyExists:  Username already taken
-      Reservied: Username is already taken
+      Reserved: Username is already taken
     Code:
       Empty: Code is empty
       NotFound: Code not found
@@ -263,7 +263,6 @@ Errors:
       HasNotExistingRole: One role doesn't exist on project
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
-    UserIDMisisng: User ID missing
   IAM:
     Member:
       RolesNotChanged: Roles have not been changed
@@ -786,7 +785,7 @@ EventTypes:
       changed: ZITADEL member changed
       removed: ZITADEL member removed
       cascade:
-        removeD: ZITADEL member cascade removed
+        removed: ZITADEL member cascade removed
     idp:
       config:
         added: IDP configuration added
@@ -802,6 +801,9 @@ EventTypes:
         config:
           added: SAML IDP configuration added
           changed: SAML IDP configuration changed
+    customtext:
+      set: Text was set
+      removed: Text was removed
     policy:
       login:
         added: Default Login Policy added

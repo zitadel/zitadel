@@ -8,7 +8,7 @@ Login:
   LoginnamePlaceHolder: nom d'utilisateur@domaine
   ExternalUserDescription: Se connecter avec un utilisateur externe.
   MustBeMemberOfOrg: L'utilisateur doit être membre de l'organisation {{.OrgName}} .
-  RegisterButtonText: s'inscrire 
+  RegisterButtonText: s'inscrire
   NextButtonText: suivant
 
 SelectAccount:
@@ -38,7 +38,7 @@ Password:
 UsernameChange:
   Title: Modifier le nom d'utilisateur
   Description: Définissez votre nouveau nom d'utilisateur
-  UsernameLabel: Nom d'utilisateur :
+  UsernameLabel: Nom d'utilisateur
   CancelButtonText: annuler
   NextButtonText: suivant
 
@@ -47,7 +47,7 @@ UsernameChangeDone:
   Description: Votre nom d'utilisateur a été changé avec succès.
   NextButtonText: suivant
 
-InitPassword: 
+InitPassword:
   Title: Définir un mot de passe
   Description: Vous avez reçu un code, que vous devez saisir dans le formulaire ci-dessous, pour définir votre nouveau mot de passe.
   CodeLabel: Code
@@ -107,6 +107,7 @@ InitMFADone:
   Description: La vérification multifactorielle a été effectuée avec succès. Le multifacteur doit être saisi à chaque connexion.
   NextButtonText: Suivant
   CancelButtonText: Annuler
+
 MFAProvider:
   Provider0: OTP (Mot de passe à usage unique)
   Provider1: U2F (2ne facteur universel)
@@ -137,162 +138,163 @@ PasswordlessPrompt:
   Title: Configuration sans mot de passe
   Description: Souhaitez-vous configurer une connexion sans mot de passe ?
   DescriptionInit: Vous devez configurer la connexion sans mot de passe. Utilisez le lien qui vous a été donné pour enregistrer votre appareil.
-  PasswordlessButtonText : Aller sans mot de passe
-  NextButtonText : suivant
-  SkipButtonText : Passer
+  PasswordlessButtonText: Aller sans mot de passe
+  NextButtonText: suivant
+  SkipButtonText: Passer
 
 PasswordlessRegistration:
-  Title : Configuration sans mot de passe
-  Description : Ajoutez votre Token en fournissant un nom et en cliquant sur le bouton 'Enregistrer le jeton' ci-dessous.
-  TokenNameLabel : Nom du jeton / de la machine
-  NotSupported : WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
-  RegisterTokenButtonText : Register Token
-  ErrorRetry : Réessayer, créer un nouveau défi ou choisir une autre méthode.
+  Title: Configuration sans mot de passe
+  Description: Ajoutez votre Token en fournissant un nom et en cliquant sur le bouton 'Enregistrer le jeton' ci-dessous.
+  TokenNameLabel: Nom du jeton / de la machine
+  NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
+  RegisterTokenButtonText: Register Token
+  ErrorRetry: Réessayer, créer un nouveau défi ou choisir une autre méthode.
 
 PasswordlessRegistrationDone:
-  Title : Configuration sans mot de passe
-  Description : Le jeton pour le système sans mot de passe a été ajouté avec succès.
-  DescriptionClose : Vous pouvez maintenant fermer cette fenêtre.
-  NextButtonText : suivant
-  CancelButtonText : annuler
+  Title: Configuration sans mot de passe
+  Description: Le jeton pour le système sans mot de passe a été ajouté avec succès.
+  DescriptionClose: Vous pouvez maintenant fermer cette fenêtre.
+  NextButtonText: suivant
+  CancelButtonText: annuler
 
 PasswordChange:
-  Title : Changer le mot de passe
-  Description : Changez votre mot de passe. Entrez votre ancien et votre nouveau mot de passe.
-  OldPasswordLabel : Ancien mot de passe
-  NewPasswordLabel : Nouveau mot de passe
-  NewPasswordConfirmLabel : Confirmation du mot de passe
-  CancelButtonText : annuler
-  NextButtonText : suivant
+  Title: Changer le mot de passe
+  Description: Changez votre mot de passe. Entrez votre ancien et votre nouveau mot de passe.
+  OldPasswordLabel: Ancien mot de passe
+  NewPasswordLabel: Nouveau mot de passe
+  NewPasswordConfirmLabel: Confirmation du mot de passe
+  CancelButtonText: annuler
+  NextButtonText: suivant
 
 PasswordChangeDone:
- Title : Changer le mot de passe
-  Description : Votre mot de passe a été modifié avec succès.
-  NextButtonText : suivant
+  Title: Changer le mot de passe
+  Description: Votre mot de passe a été modifié avec succès.
+  NextButtonText: suivant
 
-PasswordResetDone :
-  Title : Réinitialisation du jeu de liens
-  Description : Vérifiez votre e-mail pour réinitialiser votre mot de passe.
-  NextButtonText : suivant
+PasswordResetDone:
+  Title: Réinitialisation du jeu de liens
+  Description: Vérifiez votre e-mail pour réinitialiser votre mot de passe.
+  NextButtonText: suivant
 
-EmailVerification :
-  Title : Vérification de l'email
-  Description : Nous vous avons envoyé un e-mail pour vérifier votre adresse. Veuillez saisir le code dans le formulaire ci-dessous.
-  CodeLabel : Code
-  NextButtonText : suivant
-  ResendButtonText : envoyer à nouveau
+EmailVerification:
+  Title: Vérification de l'email
+  Description: Nous vous avons envoyé un e-mail pour vérifier votre adresse. Veuillez saisir le code dans le formulaire ci-dessous.
+  CodeLabel: Code
+  NextButtonText: suivant
+  ResendButtonText: envoyer à nouveau
 
-EmailVerificationDone :
-  Title : E-Mail Verification
-  Description : Votre adresse électronique a été vérifiée avec succès.
-  NextButtonText : suivant
-  CancelButtonText : annuler
-  LoginButtonText : connexion
+EmailVerificationDone:
+  Title: E-Mail Verification
+  Description: Votre adresse électronique a été vérifiée avec succès.
+  NextButtonText: suivant
+  CancelButtonText: annuler
+  LoginButtonText: connexion
 
-RegisterOption :
-  Title : Options d'enregistrement
-  Description : Choisissez comment vous souhaitez vous enregistrer
-   RegisterUsernamePasswordButtonText: Avec nom d'utilisateur et mot de passe
-  ExternalLoginDescription : ou s'enregistrer avec un utilisateur externe
-
+RegisterOption:
+  Title: Options d'enregistrement
+  Description: Choisissez comment vous souhaitez vous enregistrer
+  RegisterUsernamePasswordButtonText: Avec nom d'utilisateur et mot de passe
+  ExternalLoginDescription: ou s'enregistrer avec un utilisateur externe
 
 RegistrationUser:
-  Title : Inscription
-  Description : Entrez vos données d'utilisateur. Votre adresse e-mail sera utilisée comme nom de connexion.
-  DescriptionOrgRegister : Entrez vos données d'utilisateur.
-  EmailLabel : E-Mail
-  UsernameLabel : Username
-  FirstnameLabel : Firstname
-  LastnameLabel : Nom de famille
-  LangueLabel : Language : Langue
-  German : Deutsch
-  English : English
-  Italian : Italiano
-  GenderLabel : Genre
-  Female : Femme
-  Male : Homme
-  Diverse : divers / X
-  PasswordLabel : Mot de passe 
-  PasswordConfirmLabel : Confirmation du mot de passe
-  TosAndPrivacyLabel : Termes et conditions
-  TosConfirm : J'accepte les
-  TosLinkText : TOS
-  TosConfirmAnd : et la
-  PrivacyLinkText : politique de confidentialité
-  ExternalLogin : ou m'inscrire avec un utilisateur externe
-  BackButtonText : retour
-  NextButtonText : suivant
-
+  Title: Inscription
+  Description: Entrez vos données d'utilisateur. Votre adresse e-mail sera utilisée comme nom de connexion.
+  DescriptionOrgRegister: Entrez vos données d'utilisateur.
+  EmailLabel: E-Mail
+  UsernameLabel: Identifiant
+  FirstnameLabel: Prénom
+  LastnameLabel: Nom de famille
+  LanguageLabel: Langue
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  GenderLabel: Genre
+  Female: Femme
+  Male: Homme
+  Diverse: divers / X
+  PasswordLabel: Mot de passe
+  PasswordConfirmLabel: Confirmation du mot de passe
+  TosAndPrivacyLabel: Termes et conditions
+  TosConfirm: J'accepte les
+  TosLinkText: TOS
+  TosConfirmAnd: et la
+  PrivacyLinkText: politique de confidentialité
+  ExternalLogin: ou m'inscrire avec un utilisateur externe
+  BackButtonText: retour
+  NextButtonText: suivant
 
 ExternalRegistrationUserOverview:
-  Title : Enregistrement des utilisateurs externes
-  Description : Nous avons pris vos coordonnées d'utilisateur auprès du fournisseur sélectionné. Vous pouvez maintenant les modifier ou les compléter.
-  EmailLabel : E-Mail
-  UsernameLabel : Identifiant
-  FirstnameLabel : Prénom
-  LastnameLabel : Nom
-  NicknameLabel : Surnom 
-  PhoneLabel : Numéro de téléphone
-  LangueLabel : Language : Langue
-  German : Deutsch
-  English : English
-  Italian : Italiano
-  TosAndPrivacyLabel : Termes et conditions
-  TosConfirm : J'accepte les
-  TosLinkText : TOS
-  TosConfirmAnd : et la
-  PrivacyLinkText : politique de confidentialité
-  ExternalLogin : ou m'inscrire avec un utilisateur externe
-  BackButtonText : retour
-  NextButtonText : enregistrer
+  Title: Enregistrement des utilisateurs externes
+  Description: Nous avons pris vos coordonnées d'utilisateur auprès du fournisseur sélectionné. Vous pouvez maintenant les modifier ou les compléter.
+  EmailLabel: E-Mail
+  UsernameLabel: Identifiant
+  FirstnameLabel: Prénom
+  LastnameLabel: Nom de famille
+  NicknameLabel: Surnom
+  PhoneLabel: Numéro de téléphone
+  LanguageLabel: Langue
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  TosAndPrivacyLabel: Termes et conditions
+  TosConfirm: J'accepte les
+  TosLinkText: TOS
+  TosConfirmAnd: et la
+  PrivacyLinkText: politique de confidentialité
+  ExternalLogin: ou m'inscrire avec un utilisateur externe
+  BackButtonText: retour
+  NextButtonText: enregistrer
 
 RegistrationOrg:
-  Title : Enregistrement de l'organisation
-  Description : Entrez le nom de votre organisation et vos données d'utilisateur.
-  OrgNameLabel : Nom de l'organisation
-  EmailLabel : E-Mail
-  UsernameLabel : Nom d'utilisateur
-  FirstnameLabel : Prénom
-  LastnameLabel : Nom de famille
-  PasswordLabel : Password : Mot de passe
-  PasswordConfirmLabel : Confirmation du mot de passe
-  TosAndPrivacyLabel : Termes et conditions
-  TosConfirm : J'accepte les
-  TosLinkText : TOS
-  TosConfirmAnd : et la
-  PrivacyLinkText : politique de confidentialité
-  SaveButtonText : Créer une organisation
+  Title: Enregistrement de l'organisation
+  Description: Entrez le nom de votre organisation et vos données d'utilisateur.
+  OrgNameLabel: Nom de l'organisation
+  EmailLabel: E-Mail
+  UsernameLabel: Nom d'utilisateur
+  FirstnameLabel: Prénom
+  LastnameLabel: Nom de famille
+  PasswordLabel: Mot de passe
+  PasswordConfirmLabel: Confirmation du mot de passe
+  TosAndPrivacyLabel: Termes et conditions
+  TosConfirm: J'accepte les
+  TosLinkText: TOS
+  TosConfirmAnd: et la
+  PrivacyLinkText: politique de confidentialité
+  SaveButtonText: Créer une organisation
 
 LoginSuccess:
- Title : Connexion réussie
-  AutoRedirectDescription : Vous serez automatiquement redirigé vers votre application. Si ce n'est pas le cas, cliquez sur le bouton ci-dessous. Vous pouvez ensuite fermer la fenêtre.
-  RedirectedDescription : Vous pouvez maintenant fermer cette fenêtre.
-  NextButtonText : suivant
+  Title: Connexion réussie
+  AutoRedirectDescription: Vous serez automatiquement redirigé vers votre application. Si ce n'est pas le cas, cliquez sur le bouton ci-dessous. Vous pouvez ensuite fermer la fenêtre.
+  RedirectedDescription: Vous pouvez maintenant fermer cette fenêtre.
+  NextButtonText: suivant
 
 LogoutDone:
- Title : Déconnecté
-  Description : Vous vous êtes déconnecté avec succès.
-  LoginButtonText : connexion
+  Title: Déconnecté
+  Description: Vous vous êtes déconnecté avec succès.
+  LoginButtonText: connexion
 
 LinkingUsersDone:
- Title : Userlinking
-  Description : Le lien avec l'utilisateur est terminé.
-  CancelButtonText : annuler
-  NextButtonText : suivant
+  Title: Userlinking
+  Description: Le lien avec l'utilisateur est terminé.
+  CancelButtonText: annuler
+  NextButtonText: suivant
 
 ExternalNotFoundOption:
-  Title : Utilisateur externe
-  Description : Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur.
-  LinkButtonText : Lier
-  AutoRegisterButtonText : enregistrer
-  TosAndPrivacyLabel : Termes et conditions
-  TosConfirm : J'accepte les
-  TosLinkText : TOS
-  TosConfirmAnd : et la
-  PrivacyLinkText : politique de confidentialité
-  Allemand : Deutsch
-  English : English
-  Italian : Italiano
+  Title: Utilisateur externe
+  Description: Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur.
+  LinkButtonText: Lier
+  AutoRegisterButtonText: enregistrer
+  TosAndPrivacyLabel: Termes et conditions
+  TosConfirm: J'accepte les
+  TosLinkText: TOS
+  TosConfirmAnd: et la
+  PrivacyLinkText: politique de confidentialité
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
 
 Footer:
   PoweredBy: Promulgué par
@@ -301,45 +303,45 @@ Footer:
   Help: Aide
 
 Errors:
-Internal : Une erreur interne s'est produite
-  AuthRequest :
-    NotFound : Impossible de trouver l'authrequest
-    UserAgentNotCorresponding : L'agent utilisateur ne correspond pas
-    UserAgentNotFound : L'ID de l'agent utilisateur n'a pas été trouvé
-    TokenNotFound : Token non trouvé
-    RequestTypeNotSupported : Le type de demande n'est pas pris en charge
-    MissingParameters : Paramètres requis manquants
+  Internal: Une erreur interne s'est produite
+  AuthRequest:
+    NotFound: Impossible de trouver l'authrequest
+    UserAgentNotCorresponding: L'agent utilisateur ne correspond pas
+    UserAgentNotFound: L'ID de l'agent utilisateur n'a pas été trouvé
+    TokenNotFound: Token non trouvé
+    RequestTypeNotSupported: Le type de demande n'est pas pris en charge
+    MissingParameters: Paramètres requis manquants
   User:
-  NotFound : L'utilisateur n'a pas pu être trouvé
-    Inactive : L'utilisateur est inactif
-    NotFoundOnOrg : L'utilisateur n'a pas été trouvé dans l'organisation choisie
-    NotAllowedOrg : L'utilisateur n'est pas membre de l'organisation requise
-    NotMatchingUserID : L'utilisateur et l'utilisateur dans l'authrequest ne correspondent pas.
-    UserIDMissing : UserID est vide
-    Invalide : Données utilisateur non valides
-    DomainNotAllowedAsUsername : Le domaine est déjà réservé et ne peut pas être utilisé.
-    NotAllowedToLink : L'utilisateur n'est pas autorisé à établir un lien avec un fournisseur de connexion externe
+    NotFound: L'utilisateur n'a pas pu être trouvé
+    Inactive: L'utilisateur est inactif
+    NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
+    NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise
+    NotMatchingUserID: L'utilisateur et l'utilisateur dans l'authrequest ne correspondent pas.
+    UserIDMissing: UserID est vide
+    Invalid: Données utilisateur non valides
+    DomainNotAllowedAsUsername: Le domaine est déjà réservé et ne peut pas être utilisé.
+    NotAllowedToLink: L'utilisateur n'est pas autorisé à établir un lien avec un fournisseur de connexion externe
     Password:
-     ConfirmationWrong : La confirmation du mot de passe est erronée
-      Empty : Le mot de passe est vide
-      Invalid : Le mot de passe n'est pas valide
-      InvalidAndLocked : Le mot de passe n'est pas valide et l'utilisateur est verrouillé, contactez votre administrateur.
+      ConfirmationWrong: La confirmation du mot de passe est erronée
+      Empty: Le mot de passe est vide
+      Invalid: Le mot de passe n'est pas valide
+      InvalidAndLocked: Le mot de passe n'est pas valide et l'utilisateur est verrouillé, contactez votre administrateur.
     UsernameOrPassword:
-      Invalid : Le nom d'utilisateur ou le mot de passe n'est pas valide
-    PasswordComplexityPolicy :
-      NotFound : Politique de mot de passe non trouvée
-      MinLength : Le mot de passe est trop court
-      HasLower : Le mot de passe doit contenir une lettre minuscule
-      HasUpper : Le mot de passe doit contenir une lettre majuscule
-      HasNumber : Le mot de passe doit contenir un numéro
-      HasSymbol : Le mot de passe doit contenir un symbole
+      Invalid: Le nom d'utilisateur ou le mot de passe n'est pas valide
+    PasswordComplexityPolicy:
+      NotFound: Politique de mot de passe non trouvée
+      MinLength: Le mot de passe est trop court
+      HasLower: Le mot de passe doit contenir une lettre minuscule
+      HasUpper: Le mot de passe doit contenir une lettre majuscule
+      HasNumber: Le mot de passe doit contenir un numéro
+      HasSymbol: Le mot de passe doit contenir un symbole
     Code:
-      Expired : Le code est expiré
-      Invalid : Le code n'est pas valide
-      Empty : Le code est vide
-      CryptoCodeNil : Le code cryptographique est nul
-      NotFound : Impossible de trouver le code
-      GeneratorAlgNotSupported : Algorithme de générateur non pris en charge
+      Expired: Le code est expiré
+      Invalid: Le code n'est pas valide
+      Empty: Le code est vide
+      CryptoCodeNil: Le code cryptographique est nul
+      NotFound: Impossible de trouver le code
+      GeneratorAlgNotSupported: Algorithme de générateur non pris en charge
     EmailVerify:
       UserIDEmpty: L'ID utilisateur est vide
     ExternalData:
@@ -347,22 +349,22 @@ Internal : Une erreur interne s'est produite
     MFA:
       NoProviders: Aucun fournisseur multifactoriel disponible
       OTP:
-         AlreadyReady : L'OTP multifactoriel (Mot de passe à usage unique) est déjà configuré.
-        NotExisting : OTP multifactoriel (Mot de passe à usage unique) n'existe pas.
-        InvalidCode : Code invalide
-        NotReady : Le système OTP multifactoriel (Mot de passe à usage unique) n'est pas prêt.
+        AlreadyReady: L'OTP multifactoriel (Mot de passe à usage unique) est déjà configuré.
+        NotExisting: OTP multifactoriel (Mot de passe à usage unique) n'existe pas.
+        InvalidCode: Code invalide
+        NotReady: Le système OTP multifactoriel (Mot de passe à usage unique) n'est pas prêt.
     Locked: L'utilisateur est verrouillé
     SomethingWentWrong: Il y a eu un problème
     NotActive: L'utilisateur est inactif
     ExternalIDP:
-       IDPTypeNotImplemented : Le type d'IDP n'est pas implémenté
-      NotAllowed : Le fournisseur de connexion externe n'est pas autorisé
-      IDPConfigIDEmpty : L'ID du fournisseur d'identité est vide
-      ExternalUserIDEmpty : L'ID de l'utilisateur externe est vide
-      UserDisplayNameEmpty : Le nom d'affichage de l'utilisateur est vide
-      NoExternalUserData : Aucune donnée d'utilisateur externe reçue
-    GrantRequired : Connexion impossible. L'utilisateur doit avoir au moins une subvention sur l'application. Veuillez contacter votre administrateur.
-    ProjectRequired : Connexion impossible. L'organisation de l'utilisateur doit être accordée au projet. Veuillez contacter votre administrateur.
+      IDPTypeNotImplemented: Le type d'IDP n'est pas implémenté
+      NotAllowed: Le fournisseur de connexion externe n'est pas autorisé
+      IDPConfigIDEmpty: L'ID du fournisseur d'identité est vide
+      ExternalUserIDEmpty: L'ID de l'utilisateur externe est vide
+      UserDisplayNameEmpty: Le nom d'affichage de l'utilisateur est vide
+      NoExternalUserData: Aucune donnée d'utilisateur externe reçue
+    GrantRequired: Connexion impossible. L'utilisateur doit avoir au moins une subvention sur l'application. Veuillez contacter votre administrateur.
+    ProjectRequired: Connexion impossible. L'organisation de l'utilisateur doit être accordée au projet. Veuillez contacter votre administrateur.
   IdentityProvider:
     InvalidConfig: La configuration du fournisseur d'identité n'est pas valide
   IAM:
