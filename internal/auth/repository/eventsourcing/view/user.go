@@ -1,8 +1,12 @@
 package view
 
 import (
+	"context"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
@@ -18,15 +22,77 @@ func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
 }
 
 func (v *View) UserByUsername(userName, instanceID string) (*model.UserView, error) {
-	return view.UserByUserName(v.Db, userTable, userName, instanceID)
+	query, err := query.NewUserUsernameSearchQuery(userName, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.userByID(instanceID, query)
 }
 
 func (v *View) UserByLoginName(loginName, instanceID string) (*model.UserView, error) {
-	return view.UserByLoginName(v.Db, userTable, loginName, instanceID)
+	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.userByID(instanceID, loginNameQuery)
 }
 
 func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanceID string) (*model.UserView, error) {
-	return view.UserByLoginNameAndResourceOwner(v.Db, userTable, loginName, resourceOwner, instanceID)
+	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(resourceOwner, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.userByID(instanceID, loginNameQuery, resourceOwnerQuery)
+}
+
+func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
+	ctx := authz.WithInstanceID(context.Background(), instanceID)
+
+	queriedUser, err := v.query.GetUser(ctx, true, queries...)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+
+	if err != nil {
+		user = new(model.UserView)
+	}
+
+	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.Sequence)
+	if err != nil {
+		return nil, err
+	}
+	events, err := v.es.FilterEvents(ctx, query)
+	if err != nil && user.Sequence == 0 {
+		return nil, err
+	} else if err != nil {
+		return user, nil
+	}
+
+	userCopy := *user
+
+	for _, event := range events {
+		if err := user.AppendEvent(event); err != nil {
+			return &userCopy, nil
+		}
+	}
+
+	if user.State == int32(usr_model.UserStateDeleted) {
+		return nil, errors.ThrowNotFound(nil, "VIEW-r4y8r", "Errors.User.NotFound")
+	}
+
+	return user, nil
 }
 
 func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error) {
