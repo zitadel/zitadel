@@ -22,8 +22,9 @@ The data is stored as events in an append-only log.
 
 ## Benefits
 
-Audit: You have a built-in audit trail that tracks all changes over an unlimited period of time.
-Travel back in time: With our way of storing data we can show you all of your resources at a given point in time. 
+- Audit: You have a built-in audit trail that tracks all changes over an unlimited period of time.
+- Travel back in time: With our way of storing data we can show you all of your resources at a given point in time. 
+- Future Projections: It is easy to compute projections with new business logic by replaying all events since installation.
 
 ## Definitions
 
@@ -43,7 +44,7 @@ Possible Events:
 ### Aggregate
 
 An aggregate consist of multiple events. All events together in will lead to the current state of the aggregate.
-The aggregate can be compared with an object or a resources.
+The aggregate can be compared with an object or a resources. Aggregates define transaction boundaries.
 
 ### Projections
 
