@@ -58,7 +58,7 @@ const authConfig: AuthConfig = {
     responseType: 'code',
     oidc: true,
     clientId: 'YOUR-CLIENT-ID', // replace with your appid
-    issuer: 'https://issuer.zitadel.ch',
+    issuer: '<YOUR-DOMAIN>', // eg. https://acme-jdo9fs.zitadel.cloud
     redirectUri: 'http://localhost:4200/auth/callback',
     postLogoutRedirectUri: 'http://localhost:4200/signedout', // optional
     requireHttps: false // required for running locally
