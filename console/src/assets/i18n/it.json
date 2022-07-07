@@ -873,8 +873,9 @@
     "DEFAULTLANGUAGE": "Lingua standard",
     "LANGUAGE": {
       "de": "Deutsch",
+      "en": "English",
       "it": "Italiano",
-      "en": "English"
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1040,10 +1041,10 @@
       "UNSAVED_DESCRIPTION": "Hai fatto delle modifiche senza salvare. Vuoi salvare ora?",
       "LOCALE": "Codice locale",
       "LOCALES": {
-        "de": "Tedesco",
-        "en": "Inglese",
+        "de": "Deutsch",
+        "en": "English",
         "it": "Italiano",
-        "fr": "Francese"
+        "fr": "Français"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1785,9 +1786,10 @@
     "3": "Altro"
   },
   "LANGUAGES": {
-    "de": "Tedesco",
+    "de": "Deutsch",
+    "en": "English",
     "it": "Italiano",
-    "en": "Inglese"
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

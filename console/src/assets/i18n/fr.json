@@ -68,7 +68,8 @@
     "PRIVACY": "Vie privée",
     "TOS": "Conditions de service",
     "OPENSHORTCUTSTOOLTIP": "Tapez ? pour afficher les raccourcis clavier",
-    "SETTINGS": "Paramètres"
+    "SETTINGS": "Paramètres",
+    "CUSTOMERPORTAL": "Customer Portal"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",
@@ -860,8 +861,9 @@
     "DEFAULTLANGUAGE": "Langue par défaut",
     "LANGUAGE": {
       "de": "Deutsch",
+      "en": "English",
       "it": "Italiano",
-      "en": "English"
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1773,8 +1775,9 @@
   },
   "LANGUAGES": {
     "de": "Deutsch",
+    "en": "English",
     "it": "Italiano",
-    "en": "English"
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",
