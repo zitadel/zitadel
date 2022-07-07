@@ -9,6 +9,7 @@ import "zitadel/policy.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
+import "zitadel/management.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -2247,6 +2248,17 @@ service AdminService {
             };
         };
     }
+    // Export data into instance and creates different objects
+    rpc ExportData(ExportDataRequest) returns (ExportDataResponse) {
+        option (google.api.http) = {
+            post: "/export";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
 }
 
 
@@ -3979,4 +3991,135 @@ message FailedEvent {
             example: "\"ID=EXAMP-ID3ER Message=Example message\"";
         }
     ];
+}
+
+message DataOrg {
+    string org_id = 1;
+    zitadel.management.v1.AddOrgRequest org = 3;
+    AddCustomOrgIAMPolicyRequest iam_policy = 4;
+    zitadel.management.v1.AddCustomLabelPolicyRequest label_policy = 5;
+    zitadel.management.v1.AddCustomLockoutPolicyRequest lockout_policy = 6;
+    zitadel.management.v1.AddCustomLoginPolicyRequest login_policy = 7;
+    zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest password_complexity_policy = 8;
+    zitadel.management.v1.AddCustomPrivacyPolicyRequest privacy_policy = 9;
+
+    repeated DataProject projects = 10;
+    repeated zitadel.management.v1.AddProjectRoleRequest project_roles = 11;
+    repeated DataAPIApplication api_apps = 12;
+    repeated DataOIDCApplication oidc_apps = 13;
+    repeated DataHumanUser human_users = 14;
+    repeated DataMachineUser machine_users = 15;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 16;
+    repeated DataAction actions = 17;
+
+    repeated DataProjectGrant project_grants = 18;
+    repeated zitadel.management.v1.AddUserGrantRequest user_grants = 19;
+
+    repeated zitadel.management.v1.AddOrgMemberRequest org_members = 20;
+    repeated zitadel.management.v1.AddProjectMemberRequest project_members = 21;
+    repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 22;
+
+    repeated zitadel.management.v1.SetUserMetadataRequest user_metadata = 23;
+
+    repeated zitadel.management.v1.SetCustomLoginTextsRequest login_texts = 24;
+
+    repeated zitadel.management.v1.SetCustomInitMessageTextRequest init_messages = 25;
+    repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest password_reset_messages = 26;
+    repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest verify_email_messages = 27;
+    repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest verify_phone_messages = 28;
+    repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest domain_claimed_messages = 29;
+    repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest passwordless_registration_messages = 30;
+
+    repeated DataOIDCIDP oidc_idps = 31;
+    repeated DataJWTIDP jwt_idps = 32;
+
+    repeated zitadel.management.v1.AddSecondFactorToLoginPolicyRequest second_factors = 33;
+    repeated zitadel.management.v1.AddMultiFactorToLoginPolicyRequest multi_factors = 34;
+    repeated zitadel.management.v1.AddIDPToLoginPolicyRequest idps = 35;
+
+    repeated zitadel.idp.v1.IDPUserLink user_links = 36;
+    repeated zitadel.org.v1.Domain domains = 37;
+}
+message DataOIDCIDP{
+    string idp_id = 1;
+    zitadel.management.v1.AddOrgOIDCIDPRequest idp = 2;
+}
+message DataJWTIDP{
+    string idp_id = 1;
+    zitadel.management.v1.AddOrgJWTIDPRequest idp = 32;
+}
+
+message DataProject {
+    string project_id = 1;
+    zitadel.management.v1.AddProjectRequest project = 2;
+}
+message DataAPIApplication {
+    string app_id = 1;
+    zitadel.management.v1.AddAPIAppRequest app = 2;
+}
+message DataOIDCApplication {
+    string app_id = 1;
+    zitadel.management.v1.AddOIDCAppRequest app = 2;
+}
+message DataHumanUser {
+    string user_id = 1;
+    ExportHumanUser user = 2;
+}
+message DataMachineUser {
+    string user_id = 1;
+    zitadel.management.v1.AddMachineUserRequest user = 2;
+}
+message DataAction {
+    string action_id = 1;
+    zitadel.management.v1.CreateActionRequest action = 2;
+}
+message DataProjectGrant {
+    string grant_id = 1;
+    zitadel.management.v1.AddProjectGrantRequest project_grant = 2;
+}
+
+message ExportDataRequest {
+    repeated string org_ids = 1;
+    repeated string excluded_org_ids = 2;
+    bool with_passwords = 3;
+    bool with_otp = 4;
+}
+message ExportDataResponse {
+    repeated DataOrg orgs = 1;
+}
+
+message ExportHumanUser {
+    message Profile {
+        string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string nick_name = 3 [(validate.rules).string = {max_len: 200}];
+        string display_name = 4 [(validate.rules).string = {max_len: 200}];
+        string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
+        zitadel.user.v1.Gender gender = 6;
+    }
+    message Email {
+        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        bool is_email_verified = 2;
+    }
+    message Phone {
+        // has to be a global number
+        string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
+        bool is_phone_verified = 2;
+    }
+    message HashedPassword{
+        string value = 1;
+        string algorithm = 2;
+    }
+
+    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    Profile profile = 2 [(validate.rules).message.required = true];
+    Email email = 3 [(validate.rules).message.required = true];
+    Phone phone = 4;
+    string password = 5;
+    HashedPassword hashed_password = 6;
+    bool password_change_required = 7;
+    bool request_passwordless_registration = 8;
+
+    string otp_code = 9;
 }
