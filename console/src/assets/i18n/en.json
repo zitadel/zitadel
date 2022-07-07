@@ -1028,10 +1028,10 @@
       "UNSAVED_DESCRIPTION": "Your have made changes without saving. Do you want to save now?",
       "LOCALE": "Locale Code",
       "LOCALES": {
-        "de": "German",
+        "de": "Deutsch",
         "en": "English",
-        "it": "Italian",
-        "fr": "French"
+        "it": "Italiano",
+        "fr": "Français"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1773,9 +1773,10 @@
     "3": "Other"
   },
   "LANGUAGES": {
-    "de": "German",
-    "it": "Italian",
-    "en": "English"
+    "de": "Deutsch",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Add a Manager",
