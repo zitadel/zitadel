@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Human, Machine } from 'src/app/proto/generated/zitadel/user_pb';
 
@@ -14,11 +14,11 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
   @Input() public disabled: boolean = false;
   @Output() public submitData: EventEmitter<any> = new EventEmitter<any>();
 
-  public machineForm!: FormGroup;
+  public machineForm!: UntypedFormGroup;
 
   private sub: Subscription = new Subscription();
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: UntypedFormBuilder) {
     this.machineForm = this.fb.group({
       userName: [{ value: '', disabled: true }, [
         Validators.required,

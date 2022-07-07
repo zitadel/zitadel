@@ -342,21 +342,13 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
-}
-
-func userGrantsToIDs(userGrants []*query.UserGrant) []string {
-	converted := make([]string, len(userGrants))
-	for i, grant := range userGrants {
-		converted[i] = grant.ID
-	}
-	return converted
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
@@ -863,4 +855,52 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
 		Details: obj_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
 	}, nil
+}
+
+func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
+	cascades := make([]*command.CascadingMembership, len(memberships))
+	for i, membership := range memberships {
+		cascades[i] = &command.CascadingMembership{
+			UserID:        membership.UserID,
+			ResourceOwner: membership.ResourceOwner,
+			IAM:           cascadingIAMMembership(membership.IAM),
+			Org:           cascadingOrgMembership(membership.Org),
+			Project:       cascadingProjectMembership(membership.Project),
+			ProjectGrant:  cascadingProjectGrantMembership(membership.ProjectGrant),
+		}
+	}
+	return cascades
+}
+
+func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingIAMMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
+}
+func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
+}
+func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
+}
+func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectGrantMembership{ProjectID: membership.ProjectID, GrantID: membership.GrantID}
+}
+
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
 }

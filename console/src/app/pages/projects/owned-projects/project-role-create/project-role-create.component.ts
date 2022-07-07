@@ -1,7 +1,7 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BulkAddProjectRolesRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -30,11 +30,11 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   public projectId: string = '';
 
-  public formArray!: FormArray;
-  public formGroup: FormGroup = this.fb.group({
-    key: new FormControl('', [Validators.required]),
-    displayName: new FormControl(''),
-    group: new FormControl(''),
+  public formArray!: UntypedFormArray;
+  public formGroup: UntypedFormGroup = this.fb.group({
+    key: new UntypedFormControl('', [Validators.required]),
+    displayName: new UntypedFormControl(''),
+    group: new UntypedFormControl(''),
   });
 
   constructor(
@@ -42,17 +42,17 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private toast: ToastService,
     private mgmtService: ManagementService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private _location: Location,
   ) {
-    this.formArray = new FormArray([this.formGroup]);
+    this.formArray = new UntypedFormArray([this.formGroup]);
   }
 
   public addEntry(): void {
     const newGroup = this.fb.group({
-      key: new FormControl('', [Validators.required]),
-      displayName: new FormControl(''),
-      group: new FormControl(''),
+      key: new UntypedFormControl('', [Validators.required]),
+      displayName: new UntypedFormControl(''),
+      group: new UntypedFormControl(''),
     });
 
     this.formArray.push(newGroup);

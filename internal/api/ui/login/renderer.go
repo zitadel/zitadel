@@ -380,7 +380,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 }
 
 func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
-	translator, _ := l.renderer.NewTranslator(ctx)
+	translator, err := l.renderer.NewTranslator(ctx)
+	logging.OnError(err).Warn("cannot load translator")
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
 		l.addLoginTranslations(translator, authReq.OrgTranslations)
