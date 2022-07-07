@@ -4749,7 +4749,9 @@ message ImportDataSuccessUserMetadata {
 }
 message ExportDataRequest {
     repeated string org_ids = 1;
-    bool with_passwords = 2;
+    repeated string excluded_org_ids = 2;
+    bool with_passwords = 3;
+    bool with_otp = 4;
 }
 message ExportDataResponse {
     repeated DataOrg orgs = 1;

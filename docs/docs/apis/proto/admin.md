@@ -1895,7 +1895,9 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org_ids | repeated string | - |  |
+| excluded_org_ids | repeated string | - |  |
 | with_passwords |  bool | - |  |
+| with_otp |  bool | - |  |
 
 
 
