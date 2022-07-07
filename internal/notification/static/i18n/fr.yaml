@@ -31,7 +31,7 @@ DomainClaimed:
   PreHeader: Modifier l'email / le nom d'utilisateur
   Subject: Le domaine a été réclamé
   Greeting: Bonjour {{.FirstName}} {{.LastName}},
-  Text: Le domaine {{.Domaine}} a été revendiqué par une organisation. Votre utilisateur actuel {{.Username}} ne fait pas partie de cette organisation. Par conséquent, vous devrez changer votre adresse électronique lors de votre connexion. Nous avons créé un nom d'utilisateur temporaire ({{.TempUsername}}) pour cette connexion.
+  Text: Le domaine {{.Domain}} a été revendiqué par une organisation. Votre utilisateur actuel {{.Username}} ne fait pas partie de cette organisation. Par conséquent, vous devrez changer votre adresse électronique lors de votre connexion. Nous avons créé un nom d'utilisateur temporaire ({{.TempUsername}}) pour cette connexion.
   ButtonText: Connexion
 PasswordlessRegistration:
   Title: ZITADEL - Ajouter une connexion sans mot de passe

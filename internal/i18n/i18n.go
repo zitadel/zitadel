@@ -69,7 +69,7 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 	}
 	for _, file := range files {
 		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
-			return nil, errors.ThrowNotFound(err, "I18N-ZS2AW", "cannot append file to Bundle")
+			return nil, errors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
 		}
 	}
 	return bundle, nil
@@ -85,8 +85,8 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 	if err != nil {
 		return err
 	}
-	bundle.MustParseMessageFileBytes(content, file.Name())
-	return nil
+	_, err = bundle.ParseMessageFileBytes(content, file.Name())
+	return err
 }
 
 func SupportedLanguages(dir http.FileSystem) ([]language.Tag, error) {
