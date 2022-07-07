@@ -6,7 +6,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -215,7 +214,7 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					iamID       = sql.NullString{}
 					projectID   = sql.NullString{}
 					grantID     = sql.NullString{}
-					roles       = pq.StringArray{}
+					roles       = []string{}
 					projectName = sql.NullString{}
 					orgName     = sql.NullString{}
 				)

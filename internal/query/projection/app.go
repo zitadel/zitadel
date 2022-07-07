@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -95,7 +93,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
@@ -401,19 +399,19 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
-				handler.NewCol(AppOIDCConfigColumnRedirectUris, pq.StringArray(e.RedirectUris)),
-				handler.NewCol(AppOIDCConfigColumnResponseTypes, pq.Array(e.ResponseTypes)),
-				handler.NewCol(AppOIDCConfigColumnGrantTypes, pq.Array(e.GrantTypes)),
+				handler.NewCol(AppOIDCConfigColumnRedirectUris, e.RedirectUris),
+				handler.NewCol(AppOIDCConfigColumnResponseTypes, e.ResponseTypes),
+				handler.NewCol(AppOIDCConfigColumnGrantTypes, e.GrantTypes),
 				handler.NewCol(AppOIDCConfigColumnApplicationType, e.ApplicationType),
 				handler.NewCol(AppOIDCConfigColumnAuthMethodType, e.AuthMethodType),
-				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(e.PostLogoutRedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, e.PostLogoutRedirectUris),
 				handler.NewCol(AppOIDCConfigColumnDevMode, e.DevMode),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenType, e.AccessTokenType),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenRoleAssertion, e.AccessTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenRoleAssertion, e.IDTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenUserinfoAssertion, e.IDTokenUserinfoAssertion),
 				handler.NewCol(AppOIDCConfigColumnClockSkew, e.ClockSkew),
-				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, pq.StringArray(e.AdditionalOrigins)),
+				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, e.AdditionalOrigins),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -441,13 +439,13 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnVersion, *e.Version))
 	}
 	if e.RedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, pq.StringArray(*e.RedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, *e.RedirectUris))
 	}
 	if e.ResponseTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, pq.Array(*e.ResponseTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, *e.ResponseTypes))
 	}
 	if e.GrantTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, pq.Array(*e.GrantTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, *e.GrantTypes))
 	}
 	if e.ApplicationType != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnApplicationType, *e.ApplicationType))
@@ -456,7 +454,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAuthMethodType, *e.AuthMethodType))
 	}
 	if e.PostLogoutRedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(*e.PostLogoutRedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, *e.PostLogoutRedirectUris))
 	}
 	if e.DevMode != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnDevMode, *e.DevMode))
@@ -477,7 +475,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnClockSkew, *e.ClockSkew))
 	}
 	if e.AdditionalOrigins != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, pq.StringArray(*e.AdditionalOrigins)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, *e.AdditionalOrigins))
 	}
 
 	if len(cols) == 0 {

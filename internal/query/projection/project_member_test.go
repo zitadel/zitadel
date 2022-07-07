@@ -3,8 +3,6 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -48,7 +46,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 							expectedStmt: "INSERT INTO projections.project_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
-								pq.StringArray{"role"},
+								[]string{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -84,7 +82,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.project_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
-								pq.StringArray{"role", "changed"},
+								[]string{"role", "changed"},
 								anyArg{},
 								uint64(15),
 								"user-id",

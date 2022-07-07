@@ -3,8 +3,6 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -58,7 +56,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 								"user-id",
 								"project-id",
 								"",
-								pq.StringArray{"role"},
+								[]string{"role"},
 								domain.UserGrantStateActive,
 							},
 						},
@@ -89,7 +87,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.user_grants SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								pq.StringArray{"role"},
+								[]string{"role"},
 								uint64(15),
 								"agg-id",
 							},
@@ -121,7 +119,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.user_grants SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								pq.StringArray{"role"},
+								[]string{"role"},
 								uint64(15),
 								"agg-id",
 							},
@@ -373,7 +371,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.user_grants SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::TEXT[]))) WHERE (grant_id = $2)",
 							expectedArgs: []interface{}{
-								pq.StringArray{"key"},
+								[]string{"key"},
 								"grantID",
 							},
 						},

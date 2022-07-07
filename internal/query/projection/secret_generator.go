@@ -38,7 +38,7 @@ func newSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeText),
+			crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SecretGeneratorColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SecretGeneratorColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),

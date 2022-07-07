@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lib/pq"
+	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -280,7 +280,7 @@ func isErrAlreadyExists(err error) bool {
 	if !errors.As(err, &caosErr) {
 		return false
 	}
-	sqlErr, ok := caosErr.GetParent().(*pq.Error)
+	sqlErr, ok := caosErr.GetParent().(*pgconn.PgError)
 	if !ok {
 		return false
 	}

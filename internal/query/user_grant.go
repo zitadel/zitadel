@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -281,7 +280,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			g := new(UserGrant)
 
 			var (
-				roles              = pq.StringArray{}
+				roles              = []string{}
 				username           sql.NullString
 				firstName          sql.NullString
 				userType           sql.NullInt32
@@ -396,7 +395,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				g := new(UserGrant)
 
 				var (
-					roles              = pq.StringArray{}
+					roles              = []string{}
 					username           sql.NullString
 					userType           sql.NullInt32
 					userOwner          sql.NullString

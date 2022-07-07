@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -138,8 +136,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
-						pq.Int32Array{int32(domain.SecondFactorTypeOTP)},
-						pq.Int32Array{int32(domain.MultiFactorTypeU2FWithPIN)},
+						[]domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						[]domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
@@ -262,7 +260,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"second_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{int32(domain.SecondFactorTypeOTP)},
+						[]domain.SecondFactorType{domain.SecondFactorTypeOTP},
 					},
 				),
 			},
@@ -284,7 +282,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"second_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{},
+						[]int{},
 					},
 				),
 			},
@@ -341,7 +339,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"multi_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{int32(domain.MultiFactorTypeU2FWithPIN)},
+						[]domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
 					},
 				),
 			},
@@ -363,7 +361,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"multi_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{},
+						[]int{},
 					},
 				),
 			},

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -92,7 +91,7 @@ type ProjectGrant struct {
 	ProjectName       string
 	GrantedOrgID      string
 	OrgName           string
-	GrantedRoleKeys   pq.StringArray
+	GrantedRoleKeys   []string
 	ResourceOwnerName string
 }
 

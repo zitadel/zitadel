@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 
@@ -307,7 +306,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcIssuer := sql.NullString{}
-			oidcScopes := pq.StringArray{}
+			oidcScopes := []string{}
 			oidcDisplayNameMapping := sql.NullInt32{}
 			oidcUsernameMapping := sql.NullInt32{}
 			oidcAuthorizationEndpoint := sql.NullString{}
@@ -419,7 +418,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcIssuer := sql.NullString{}
-				oidcScopes := pq.StringArray{}
+				oidcScopes := []string{}
 				oidcDisplayNameMapping := sql.NullInt32{}
 				oidcUsernameMapping := sql.NullInt32{}
 				oidcAuthorizationEndpoint := sql.NullString{}

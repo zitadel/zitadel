@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-
-	"github.com/lib/pq"
 )
 
 var (
@@ -131,7 +129,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -173,7 +171,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -215,7 +213,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -257,7 +255,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -303,7 +301,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -317,7 +315,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -331,7 +329,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -345,7 +343,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							[]string{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),

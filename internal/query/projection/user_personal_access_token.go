@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -94,7 +92,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 			handler.NewCol(PersonalAccessTokenColumnSequence, e.Sequence()),
 			handler.NewCol(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
 			handler.NewCol(PersonalAccessTokenColumnExpiration, e.Expiration),
-			handler.NewCol(PersonalAccessTokenColumnScopes, pq.StringArray(e.Scopes)),
+			handler.NewCol(PersonalAccessTokenColumnScopes, e.Scopes),
 		},
 	), nil
 }

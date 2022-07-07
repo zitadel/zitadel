@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 
@@ -639,19 +638,19 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	redirectUris             pq.StringArray
+	redirectUris             []string
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   pq.StringArray
+	postLogoutRedirectUris   []string
 	devMode                  sql.NullBool
 	accessTokenType          sql.NullInt16
 	accessTokenRoleAssertion sql.NullBool
 	iDTokenRoleAssertion     sql.NullBool
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
-	additionalOrigins        pq.StringArray
-	responseTypes            pq.Int32Array
-	grantTypes               pq.Int32Array
+	additionalOrigins        []string
+	responseTypes            []domain.OIDCResponseType
+	grantTypes               []domain.OIDCGrantType
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -672,8 +671,8 @@ func (c sqlOIDCConfig) set(app *App) {
 		AssertIDTokenUserinfo:  c.iDTokenUserinfoAssertion.Bool,
 		ClockSkew:              time.Duration(c.clockSkew.Int64),
 		AdditionalOrigins:      c.additionalOrigins,
-		ResponseTypes:          oidcResponseTypesToDomain(c.responseTypes),
-		GrantTypes:             oidcGrantTypesToDomain(c.grantTypes),
+		ResponseTypes:          c.responseTypes,
+		GrantTypes:             c.grantTypes,
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems
@@ -697,20 +696,4 @@ func (c sqlAPIConfig) set(app *App) {
 		ClientID:       c.clientID.String,
 		AuthMethodType: domain.APIAuthMethodType(c.authMethod.Int16),
 	}
-}
-
-func oidcResponseTypesToDomain(t pq.Int32Array) []domain.OIDCResponseType {
-	types := make([]domain.OIDCResponseType, len(t))
-	for i, typ := range t {
-		types[i] = domain.OIDCResponseType(typ)
-	}
-	return types
-}
-
-func oidcGrantTypesToDomain(t pq.Int32Array) []domain.OIDCGrantType {
-	types := make([]domain.OIDCGrantType, len(t))
-	for i, typ := range t {
-		types[i] = domain.OIDCGrantType(typ)
-	}
-	return types
 }

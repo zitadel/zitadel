@@ -3,8 +3,6 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -250,7 +248,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"client-id",
 								anyArg{},
 								"issuer",
-								pq.StringArray{"profile"},
+								[]string{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"https://api.zitadel.ch/authorize",
@@ -309,7 +307,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"issuer",
 								"https://api.zitadel.ch/authorize",
 								"https://api.zitadel.ch/token",
-								pq.StringArray{"profile"},
+								[]string{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"idp-config-id",
@@ -681,7 +679,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"client-id",
 								anyArg{},
 								"issuer",
-								pq.StringArray{"profile"},
+								[]string{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"https://api.zitadel.ch/authorize",
@@ -740,7 +738,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"issuer",
 								"https://api.zitadel.ch/authorize",
 								"https://api.zitadel.ch/token",
-								pq.StringArray{"profile"},
+								[]string{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"idp-config-id",

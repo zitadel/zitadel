@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -24,19 +23,19 @@ const (
 )
 
 type ProjectGrantMemberView struct {
-	UserID             string         `json:"userId" gorm:"column:user_id;primary_key"`
-	GrantID            string         `json:"grantId" gorm:"column:grant_id;primary_key"`
-	ProjectID          string         `json:"-" gorm:"column:project_id"`
-	UserName           string         `json:"-" gorm:"column:user_name"`
-	Email              string         `json:"-" gorm:"column:email_address"`
-	FirstName          string         `json:"-" gorm:"column:first_name"`
-	LastName           string         `json:"-" gorm:"column:last_name"`
-	DisplayName        string         `json:"-" gorm:"column:display_name"`
-	Roles              pq.StringArray `json:"roles" gorm:"column:roles"`
-	Sequence           uint64         `json:"-" gorm:"column:sequence"`
-	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
-	AvatarKey          string         `json:"-" gorm:"column:avatar_key"`
-	UserResourceOwner  string         `json:"-" gorm:"column:user_resource_owner"`
+	UserID             string   `json:"userId" gorm:"column:user_id;primary_key"`
+	GrantID            string   `json:"grantId" gorm:"column:grant_id;primary_key"`
+	ProjectID          string   `json:"-" gorm:"column:project_id"`
+	UserName           string   `json:"-" gorm:"column:user_name"`
+	Email              string   `json:"-" gorm:"column:email_address"`
+	FirstName          string   `json:"-" gorm:"column:first_name"`
+	LastName           string   `json:"-" gorm:"column:last_name"`
+	DisplayName        string   `json:"-" gorm:"column:display_name"`
+	Roles              []string `json:"roles" gorm:"column:roles"`
+	Sequence           uint64   `json:"-" gorm:"column:sequence"`
+	PreferredLoginName string   `json:"-" gorm:"column:preferred_login_name"`
+	AvatarKey          string   `json:"-" gorm:"column:avatar_key"`
+	UserResourceOwner  string   `json:"-" gorm:"column:user_resource_owner"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -320,8 +319,8 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
-			secondFactors := pq.Int32Array{}
-			multiFactors := pq.Int32Array{}
+			secondFactors := []int{}
+			multiFactors := []int{}
 			defaultRedirectURI := sql.NullString{}
 			links := make([]*IDPLoginPolicyLink, 0)
 			for rows.Next() {
@@ -395,7 +394,7 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecondFactors, error) {
 			p := new(SecondFactors)
-			secondFactors := pq.Int32Array{}
+			secondFactors := []int{}
 			err := row.Scan(
 				&secondFactors,
 			)
@@ -421,7 +420,7 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MultiFactors, error) {
 			p := new(MultiFactors)
-			multiFactors := pq.Int32Array{}
+			multiFactors := []int{}
 			err := row.Scan(
 				&multiFactors,
 			)

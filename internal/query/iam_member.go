@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 
@@ -117,7 +116,7 @@ func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members,
 
 			for rows.Next() {
 				member := new(Member)
-				roles := pq.StringArray{}
+				roles := []string{}
 
 				var (
 					preferredLoginName = sql.NullString{}

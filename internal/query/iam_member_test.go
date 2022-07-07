@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-
-	"github.com/lib/pq"
 )
 
 var (
@@ -92,7 +90,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id",
-							pq.StringArray{"role-1", "role-2"},
+							[]string{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
 							"gigi@caos.ch",
 							"first-name",
@@ -140,7 +138,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id",
-							pq.StringArray{"role-1", "role-2"},
+							[]string{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
 							nil,
 							nil,
@@ -188,7 +186,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id-1",
-							pq.StringArray{"role-1", "role-2"},
+							[]string{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
 							"gigi@caos.ch",
 							"first-name",
@@ -203,7 +201,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id-2",
-							pq.StringArray{"role-1", "role-2"},
+							[]string{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
 							nil,
 							nil,

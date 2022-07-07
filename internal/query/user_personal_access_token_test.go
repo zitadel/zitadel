@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lib/pq"
-
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -103,7 +101,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						uint64(20211202),
 						"user-id",
 						time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						pq.StringArray{"openid"},
+						[]string{"openid"},
 					},
 				),
 			},
@@ -163,7 +161,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							pq.StringArray{"openid"},
+							[]string{"openid"},
 						},
 					},
 				),
@@ -202,7 +200,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							pq.StringArray{"openid"},
+							[]string{"openid"},
 						},
 						{
 							"token-id2",
@@ -212,7 +210,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							pq.StringArray{"openid"},
+							[]string{"openid"},
 						},
 					},
 				),

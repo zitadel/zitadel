@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -288,7 +287,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						pq.StringArray{"login_name1", "login_name2"},
+						[]string{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -354,7 +353,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeMachine,
 						"username",
-						pq.StringArray{"login_name1", "login_name2"},
+						[]string{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						nil,
@@ -795,7 +794,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							pq.StringArray{"login_name1", "login_name2"},
+							[]string{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -868,7 +867,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							pq.StringArray{"login_name1", "login_name2"},
+							[]string{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -897,7 +896,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeMachine,
 							"username",
-							pq.StringArray{"login_name1", "login_name2"},
+							[]string{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							nil,

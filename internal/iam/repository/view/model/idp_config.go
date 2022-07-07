@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 
-	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -40,7 +39,7 @@ type IDPConfigView struct {
 	OIDCClientID               string              `json:"clientId" gorm:"column:oidc_client_id"`
 	OIDCClientSecret           *crypto.CryptoValue `json:"clientSecret" gorm:"column:oidc_client_secret"`
 	OIDCIssuer                 string              `json:"issuer" gorm:"column:oidc_issuer"`
-	OIDCScopes                 pq.StringArray      `json:"scopes" gorm:"column:oidc_scopes"`
+	OIDCScopes                 []string            `json:"scopes" gorm:"column:oidc_scopes"`
 	OIDCIDPDisplayNameMapping  int32               `json:"idpDisplayNameMapping" gorm:"column:oidc_idp_display_name_mapping"`
 	OIDCUsernameMapping        int32               `json:"usernameMapping" gorm:"column:oidc_idp_username_mapping"`
 	OAuthAuthorizationEndpoint string              `json:"authorizationEndpoint" gorm:"column:oauth_authorization_endpoint"`

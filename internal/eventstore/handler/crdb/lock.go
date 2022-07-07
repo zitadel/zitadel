@@ -67,7 +67,7 @@ func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration t
 
 func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, instanceID string) error {
 	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
-	res, err := h.client.ExecContext(ctx, h.lockStmt, h.workerName, lockDuration.Seconds(), h.projectionName, instanceID)
+	res, err := h.client.ExecContext(ctx, h.lockStmt, h.workerName, lockDuration, h.projectionName, instanceID)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
 	}
@@ -80,7 +80,7 @@ func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, inst
 }
 
 func (h *locker) Unlock(instanceID string) error {
-	_, err := h.client.Exec(h.lockStmt, h.workerName, float64(0), h.projectionName, instanceID)
+	_, err := h.client.Exec(h.lockStmt, h.workerName, time.Duration(0), h.projectionName, instanceID)
 	if err != nil {
 		return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
 	}

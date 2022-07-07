@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 
@@ -161,7 +160,7 @@ func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*Perso
 			From(personalAccessTokensTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PersonalAccessToken, error) {
 			p := new(PersonalAccessToken)
-			scopes := pq.StringArray{}
+			scopes := []string{}
 			err := row.Scan(
 				&p.ID,
 				&p.CreationDate,
@@ -200,7 +199,7 @@ func preparePersonalAccessTokensQuery() (sq.SelectBuilder, func(*sql.Rows) (*Per
 			var count uint64
 			for rows.Next() {
 				token := new(PersonalAccessToken)
-				scopes := pq.StringArray{}
+				scopes := []string{}
 				err := rows.Scan(
 					&token.ID,
 					&token.CreationDate,

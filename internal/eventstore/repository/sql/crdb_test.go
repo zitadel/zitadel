@@ -6,8 +6,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -430,7 +428,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, pq.Array(tt.res.eventsRes.aggID))
+			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
 			var eventCount int
 			err := countEventRow.Scan(&eventCount)
 			if err != nil {
@@ -547,7 +545,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", pq.Array(tt.res.eventsRes.aggType), pq.Array(tt.res.eventsRes.aggID))
+			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
 			var count int
 			err := countRow.Scan(&count)
 			if err != nil {
@@ -781,7 +779,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				t.Errorf("CRDB.Push() error count = %d, wanted err count %d, errs: %v", len(errs), tt.res.errCount, errs)
 			}
 
-			rows, err := testCRDBClient.Query("SELECT event_data FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2) order by event_sequence", pq.Array(tt.res.eventsRes.aggTypes), pq.Array(tt.res.eventsRes.aggIDs))
+			rows, err := testCRDBClient.Query("SELECT event_data FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2) order by event_sequence", tt.res.eventsRes.aggTypes, tt.res.eventsRes.aggIDs)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return
@@ -1128,7 +1126,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 				}
 			}
 
-			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY event_sequence", tt.fields.aggregateType, pq.Array(tt.fields.aggregateIDs))
+			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY event_sequence", tt.fields.aggregateType, tt.fields.aggregateIDs)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return

@@ -3,9 +3,6 @@ package crdb
 import (
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/lib/pq"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -92,9 +89,10 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	wheres, whereArgs := conditionsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
 
-	columnNames := strings.Join(cols, ", ")
-	valuesPlaceholder := strings.Join(params, ", ")
-	wheresPlaceholders := strings.Join(wheres, " AND ")
+	updates := make([]string, len(cols))
+	for i, col := range cols {
+		updates[i] = col + "=" + params[i]
+	}
 
 	config := execConfig{
 		args: args,
@@ -109,7 +107,7 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	}
 
 	q := func(config execConfig) string {
-		return "UPDATE " + config.tableName + " SET (" + columnNames + ") = (SELECT " + valuesPlaceholder + ") WHERE " + wheresPlaceholders
+		return "UPDATE " + config.tableName + " SET " + strings.Join(updates, ", ") + " WHERE " + strings.Join(wheres, " AND ")
 	}
 
 	return &handler.Statement{
@@ -222,11 +220,12 @@ func NewArrayRemoveCol(column string, value interface{}) handler.Column {
 func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	var arrayType string
 	switch value.(type) {
-	case pq.StringArray:
+
+	case []string:
 		arrayType = "STRING"
-	case pq.Int32Array,
-		pq.Int64Array:
-		arrayType = "INT"
+		// case pq.Int32Array,
+		// 	pq.Int64Array:
+		// 	arrayType = "INT"
 		//TODO: handle more types if necessary
 	}
 	return handler.Column{
@@ -322,9 +321,6 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 	for i, col := range cols {
 		names[i] = col.Name
 		values[i] = col.Value
-		if timestamp, ok := col.Value.(time.Time); ok {
-			values[i] = pq.FormatTimestamp(timestamp)
-		}
 		parameters[i] = "$" + strconv.Itoa(i+1)
 		if col.ParameterOpt != nil {
 			parameters[i] = col.ParameterOpt(parameters[i])

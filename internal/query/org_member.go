@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 )
 
 var (
@@ -120,7 +119,7 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 				member := new(Member)
 
 				var (
-					roles              = pq.StringArray{}
+					roles              = []string{}
 					preferredLoginName = sql.NullString{}
 					email              = sql.NullString{}
 					firstName          = sql.NullString{}

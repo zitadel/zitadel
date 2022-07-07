@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -505,7 +504,7 @@ func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*Use
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*User, error) {
 			u := new(User)
-			loginNames := pq.StringArray{}
+			loginNames := []string{}
 			preferredLoginName := sql.NullString{}
 
 			humanID := sql.NullString{}
@@ -844,7 +843,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			var count uint64
 			for rows.Next() {
 				u := new(User)
-				loginNames := pq.StringArray{}
+				loginNames := []string{}
 				preferredLoginName := sql.NullString{}
 
 				humanID := sql.NullString{}

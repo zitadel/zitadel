@@ -3,8 +3,6 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -162,7 +160,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								pq.StringArray{"admin", "user"},
+								[]string{"admin", "user"},
 								"grant-id",
 								"agg-id",
 							},
@@ -193,7 +191,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								pq.StringArray{"admin", "user"},
+								[]string{"admin", "user"},
 								"grant-id",
 								"agg-id",
 							},
@@ -231,7 +229,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 								domain.ProjectGrantStateActive,
 								uint64(15),
 								"granted-org-id",
-								pq.StringArray{"admin", "user"},
+								[]string{"admin", "user"},
 							},
 						},
 					},
