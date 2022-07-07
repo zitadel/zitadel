@@ -1181,7 +1181,7 @@ failed event. You can find out if it worked on the `failure_count`
 > **rpc** ExportData([ExportDataRequest](#exportdatarequest))
 [ExportDataResponse](#exportdataresponse)
 
-export data into instance and creates different objects
+Export data into instance and creates different objects
 
 
 

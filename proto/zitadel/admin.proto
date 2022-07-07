@@ -2248,7 +2248,7 @@ service AdminService {
             };
         };
     }
-    // export data into instance and creates different objects
+    // Export data into instance and creates different objects
     rpc ExportData(ExportDataRequest) returns (ExportDataResponse) {
         option (google.api.http) = {
             post: "/export";
