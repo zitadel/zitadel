@@ -827,11 +827,11 @@
     "DIALOG": {
       "DEACTIVATE": {
         "TITLE": "Organisation deaktivieren",
-        "DESCRIPTION": "Sie sind im Begriff Ihre organisation zu deaktivieren. User können Sich nachher nicht mehr anmelden? Wollen Sie fortfahren?"
+        "DESCRIPTION": "Sie sind im Begriff Ihre Organisation zu deaktivieren. User können Sich danach nicht mehr anmelden? Wollen Sie fortfahren?"
       },
       "REACTIVATE": {
         "TITLE": "Organisation reaktivieren",
-        "DESCRIPTION": "Sie sind im Begriff Ihre organisation zu reaktivieren. User können Sich dann wieder anmelden? Wollen Sie fortfahren?"
+        "DESCRIPTION": "Sie sind im Begriff Ihre Organisation zu reaktivieren. User können Sich danach wieder anmelden? Wollen Sie fortfahren?"
       }
     }
   },
