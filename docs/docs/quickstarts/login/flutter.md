@@ -257,7 +257,7 @@ Future<void> _authenticate() async {
       AuthorizationTokenRequest(
         '<<CLIENT_ID>>', // Client ID of the native application
         '<<CALLBACK_URL>>', // The registered url from zitadel (e.g. ch.myexample.app://signin)
-        issuer: '<<ISSUER>>', // most of the cases: https://[your-instance].zitadel.cloud
+        issuer: '<<ISSUER>>', // most of the cases: https:/[your-domain]-[random-string].zitadel.cloud
         scopes: [
           'openid',
           'profile',
@@ -333,7 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       final userInfoResponse = await get(
-        Uri.parse('https://[your-instance].zitadel.cloud/oauth/v2/userinfo'),
+        Uri.parse('https:/[your-domain]-[random-string].zitadel.cloud/oauth/v2/userinfo'), // replace with your instance
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
           HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'

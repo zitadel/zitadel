@@ -71,7 +71,7 @@ const oidcConfig = {
     );
     window.location.hash = "";
   },
-  authority: "https://[your-instance].zitadel.cloud",
+  authority: "https:/[your-domain]-[random-string].zitadel.cloud", // replace with your instance
   clientId: "YOUR-CLIENT-ID",
   responseType: "code",
   redirectUri: "http://localhost:3000/",

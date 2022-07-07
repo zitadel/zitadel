@@ -58,7 +58,7 @@ const authConfig: AuthConfig = {
     responseType: 'code',
     oidc: true,
     clientId: 'YOUR-CLIENT-ID', // replace with your appid
-    issuer: 'https:/[your-instance].zitadel.cloud', // replace with your instance
+    issuer: 'https:/[your-domain]-[random-string].zitadel.cloud', // replace with your instance
     redirectUri: 'http://localhost:4200/auth/callback',
     postLogoutRedirectUri: 'http://localhost:4200/signedout', // optional
     requireHttps: false // required for running locally

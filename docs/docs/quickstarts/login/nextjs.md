@@ -77,7 +77,7 @@ export default NextAuth({
 });
 ```
 
-Replace the endpoints `https://[your-instance].zitadel.cloud` with your instance or if your using a ZITADEL CLOUD tier or your own endpoint if your using a self hosted ENTERPRISE tier respectively.
+Replace the endpoints `https:/[your-domain]-[random-string].zitadel.cloud` with your instance or if your using a ZITADEL CLOUD tier or your own endpoint if your using a self hosted ENTERPRISE tier respectively.
 
 We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
 To be able to connect to ZITADEL, navigate to your Console Projects, create or select an existing project and add your app selecting WEB, then PKCE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
@@ -95,7 +95,7 @@ Create a file `.env` in the root of the project and add the following keys to it
 ```
 NEXTAUTH_URL=http://localhost:3000
 ZITADEL_CLIENT_ID=[yourClientId]
-ZITADEL_ISSUER=[your-instance].zitadel.cloud
+ZITADEL_ISSUER=https:/[your-domain]-[random-string].zitadel.cloud
 ```
 
 # User interface
