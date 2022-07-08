@@ -757,6 +757,8 @@
       "LISTDESCRIPTION": "Scegli un'organizzazione.",
       "ACTIVE": "Attivo",
       "CREATE": "Creare un'organizzazione",
+      "DEACTIVATE": "Disattiva organizzazione",
+      "REACTIVATE": "Riattiva organizzazione",
       "NOPERMISSION": "Non hai l'autorizzazione per accedere alle impostazioni dell'organizzazione.",
       "USERSELFACCOUNT": "Usa il tuo account personale come proprietario dell'organizzazione",
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
@@ -821,6 +823,16 @@
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo"
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Disattivare l'organizzazione",
+        "DESCRIPTION": "Stai per disattivate la tua organizzazione. Utenti dell' organizzazione non possono più accedere in seguito. Sei sicuro di procedere?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Riattivare l'organizzazione",
+        "DESCRIPTION": "Stai per riattivare la tua organizzazione. Utenti dell' organizzazione possono accedere nuovamente dopo l'attivazione. Vuoi procedere?"
+      }
     }
   },
   "SETTINGS": {

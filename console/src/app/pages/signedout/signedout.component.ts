@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ThemeService } from 'src/app/services/theme.service';
 
 @Component({
   selector: 'cnsl-signedout',
@@ -8,7 +9,9 @@ import { Component } from '@angular/core';
 export class SignedoutComponent {
   public dark: boolean = true;
 
-  constructor() {
+  constructor(themeService: ThemeService) {
+    themeService.loadPrivateLabelling();
+
     const theme = localStorage.getItem('theme');
     this.dark = theme === 'dark-theme' ? true : theme === 'light-theme' ? false : true;
   }

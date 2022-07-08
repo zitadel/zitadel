@@ -100,7 +100,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, keys.OIDC, config.InternalAuthZ.RolePermissionMappings)
+	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.SystemDefaults, keys.IDPConfig, keys.OTP, keys.OIDC, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}

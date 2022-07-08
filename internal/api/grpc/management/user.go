@@ -44,7 +44,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUser(ctx, loginName)
+	user, err := s.query.GetUser(ctx, true, loginName)
 	if err != nil {
 		return nil, err
 	}

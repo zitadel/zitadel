@@ -140,70 +140,72 @@ export class ThemeService {
     this.saveTextColor(lightText, false);
   };
 
-  public loadPrivateLabelling(): void {
-    this.setDefaultColors();
+  public loadPrivateLabelling(forceDefault: boolean = false): void {
+    if (forceDefault) {
+      this.setDefaultColors();
+    } else {
+      const isDark = (color: string) => this.isDark(color);
+      const isLight = (color: string) => this.isLight(color);
 
-    const isDark = (color: string) => this.isDark(color);
-    const isLight = (color: string) => this.isLight(color);
+      this.authService
+        .getMyLabelPolicy()
+        .then((lpresp) => {
+          const labelpolicy = lpresp.policy;
 
-    this.authService
-      .getMyLabelPolicy()
-      .then((lpresp) => {
-        const labelpolicy = lpresp.policy;
+          const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
+          const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
 
-        const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
-        const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
+          const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
+          const lightWarn = labelpolicy?.warnColor || '#cd3d56';
 
-        const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
-        const lightWarn = labelpolicy?.warnColor || '#cd3d56';
+          let darkBackground = labelpolicy?.backgroundColorDark;
+          let lightBackground = labelpolicy?.backgroundColor;
 
-        let darkBackground = labelpolicy?.backgroundColorDark;
-        let lightBackground = labelpolicy?.backgroundColor;
+          let darkText = labelpolicy?.fontColorDark ?? '#ffffff';
+          let lightText = labelpolicy?.fontColor ?? '#000000';
 
-        let darkText = labelpolicy?.fontColorDark ?? '#ffffff';
-        let lightText = labelpolicy?.fontColor ?? '#000000';
+          this.savePrimaryColor(darkPrimary, true);
+          this.savePrimaryColor(lightPrimary, false);
 
-        this.savePrimaryColor(darkPrimary, true);
-        this.savePrimaryColor(lightPrimary, false);
+          this.saveWarnColor(darkWarn, true);
+          this.saveWarnColor(lightWarn, false);
 
-        this.saveWarnColor(darkWarn, true);
-        this.saveWarnColor(lightWarn, false);
+          if (darkBackground && !isDark(darkBackground)) {
+            console.info(
+              `Background (${darkBackground}) is not dark enough for a dark theme. Falling back to zitadel background`,
+            );
+            darkBackground = '#111827';
+          }
+          this.saveBackgroundColor(darkBackground || '#111827', true);
 
-        if (darkBackground && !isDark(darkBackground)) {
-          console.info(
-            `Background (${darkBackground}) is not dark enough for a dark theme. Falling back to zitadel background`,
-          );
-          darkBackground = '#111827';
-        }
-        this.saveBackgroundColor(darkBackground || '#111827', true);
+          if (lightBackground && !isLight(lightBackground)) {
+            console.info(
+              `Background (${lightBackground}) is not light enough for a light theme. Falling back to zitadel background`,
+            );
+            lightBackground = '#fafafa';
+          }
+          this.saveBackgroundColor(lightBackground || '#fafafa', false);
 
-        if (lightBackground && !isLight(lightBackground)) {
-          console.info(
-            `Background (${lightBackground}) is not light enough for a light theme. Falling back to zitadel background`,
-          );
-          lightBackground = '#fafafa';
-        }
-        this.saveBackgroundColor(lightBackground || '#fafafa', false);
+          if (darkText && !isLight(darkText)) {
+            console.info(
+              `Text color (${darkText}) is not light enough for a dark theme. Falling back to zitadel's text color`,
+            );
+            darkText = '#ffffff';
+          }
+          this.saveTextColor(darkText || '#ffffff', true);
 
-        if (darkText && !isLight(darkText)) {
-          console.info(
-            `Text color (${darkText}) is not light enough for a dark theme. Falling back to zitadel's text color`,
-          );
-          darkText = '#ffffff';
-        }
-        this.saveTextColor(darkText || '#ffffff', true);
-
-        if (lightText && !isDark(lightText)) {
-          console.info(
-            `Text color (${lightText}) is not dark enough for a light theme. Falling back to zitadel's text color`,
-          );
-          lightText = '#000000';
-        }
-        this.saveTextColor(lightText || '#000000', false);
-      })
-      .catch((error) => {
-        console.error('could not load private labelling policy!', error);
-        this.setDefaultColors();
-      });
+          if (lightText && !isDark(lightText)) {
+            console.info(
+              `Text color (${lightText}) is not dark enough for a light theme. Falling back to zitadel's text color`,
+            );
+            lightText = '#000000';
+          }
+          this.saveTextColor(lightText || '#000000', false);
+        })
+        .catch((error) => {
+          console.error('could not load private labelling policy!', error);
+          this.setDefaultColors();
+        });
+    }
   }
 }

@@ -12,14 +12,14 @@ Login:
   NextButtonText: suivant
 
 SelectAccount:
-  Title: Select account
-  Description: Use your ZITADEL-Account
-  TitleLinking: Select account for user linking
-  DescriptionLinking: Select your account to link with your external user.
-  OtherUser: Other User
-  SessionState0: active
-  SessionState1: inactive
-  MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organisation.
+  Title: Sélectionner un compte
+  Description: Utilisez votre compte ZITADEL
+  TitleLinking: Sélectionnez le compte pour le lien avec l'utilisateur
+  DescriptionLinking: Sélectionnez votre compte pour établir un lien avec votre utilisateur externe.
+  OtherUser: Autre utilisateur
+  SessionState0: actif
+  SessionState1: inactif
+  MustBeMemberOfOrg: L'utilisateur doit être membre de l'organisation {{.OrgName}}.
 
 Password:
   Title: Mot de passe
