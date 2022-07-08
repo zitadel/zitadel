@@ -40,7 +40,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 	}
 	idGenerator := id.SonyFlakeGenerator()
 
-	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, idGenerator)
+	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, idGenerator, es)
 	if err != nil {
 		return nil, err
 	}
