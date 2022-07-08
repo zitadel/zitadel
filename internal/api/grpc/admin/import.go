@@ -210,6 +210,13 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 					continue
 				}
 				successOrg.HumanUserIds = append(successOrg.HumanUserIds, user.GetUserId())
+
+				if user.User.OtpCode != "" {
+					if err := s.command.ImportHumanOTP(ctx, user.UserId, org.GetOrgId(), user.User.OtpCode); err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "human_user_otp", Id: user.GetUserId(), Message: err.Error()})
+						continue
+					}
+				}
 			}
 		}
 		if org.MachineUsers != nil {

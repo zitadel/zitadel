@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Action, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -23,11 +23,11 @@ export class AddFlowDialogComponent {
       TriggerType.TRIGGER_TYPE_PRE_CREATION,      
     ];
     
-    public form!: FormGroup;
+    public form!: UntypedFormGroup;
     constructor(
       private toast: ToastService,
       private mgmtService: ManagementService,
-      private fb: FormBuilder,
+      private fb: UntypedFormBuilder,
       public dialogRef: MatDialogRef<AddFlowDialogComponent>,
       @Inject(MAT_DIALOG_DATA) public data: any,
     ) {

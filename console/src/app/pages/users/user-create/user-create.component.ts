@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import parsePhoneNumber from 'libphonenumber-js';
 import { Subject } from 'rxjs';
@@ -44,8 +44,8 @@ export class UserCreateComponent implements OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
   public languages: string[] = ['de', 'en'];
-  public userForm!: FormGroup;
-  public pwdForm!: FormGroup;
+  public userForm!: UntypedFormGroup;
+  public pwdForm!: UntypedFormGroup;
 
   public envSuffixLabel: string = '';
   private destroyed$: Subject<void> = new Subject();
@@ -61,7 +61,7 @@ export class UserCreateComponent implements OnDestroy {
   constructor(
     private router: Router,
     private toast: ToastService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
     private changeDetRef: ChangeDetectorRef,
     private _location: Location,

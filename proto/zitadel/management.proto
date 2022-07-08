@@ -3007,6 +3007,8 @@ message ImportHumanUserRequest {
     HashedPassword hashed_password = 6;
     bool password_change_required = 7;
     bool request_passwordless_registration = 8;
+
+    string otp_code = 9;
 }
 
 message ImportHumanUserResponse {

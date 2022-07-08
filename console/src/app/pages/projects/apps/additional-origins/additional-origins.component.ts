@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -11,7 +11,7 @@ export class AdditionalOriginsComponent implements OnInit, OnDestroy {
   @Input() title: string = '';
   @Input() canWrite: boolean = false;
   @Input() public urisList: string[] = [];
-  @Input() public redirectControl: FormControl = new FormControl({ value: '', disabled: true });
+  @Input() public redirectControl: UntypedFormControl = new UntypedFormControl({ value: '', disabled: true });
   @Output() public changedUris: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Input() public getValues: Observable<void> = new Observable();
   public placeholder: string = '<scheme> "://" <hostname> [ ":" <port> ]';

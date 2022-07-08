@@ -70,6 +70,19 @@
                     <span> {{ 'MENU.SETTINGS' | translate }} </span>
                   </div>
                 </a>
+
+                <a
+                  *ngIf="customerPortalLink"
+                  class="nav-item external-link"
+                  [href]="customerPortalLink"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.CUSTOMERPORTAL' | translate }} </span>
+                  </div>
+                  <i class="las la-external-link-alt"></i>
+                </a>
               </ng-template>
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>

@@ -4,13 +4,39 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
-func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*query.Membership) (_ []eventstore.Command, err error) {
+type CascadingMembership struct {
+	UserID        string
+	ResourceOwner string
+
+	IAM          *CascadingIAMMembership
+	Org          *CascadingOrgMembership
+	Project      *CascadingProjectMembership
+	ProjectGrant *CascadingProjectGrantMembership
+}
+
+type CascadingIAMMembership struct {
+	IAMID string
+}
+
+type CascadingOrgMembership struct {
+	OrgID string
+}
+
+type CascadingProjectMembership struct {
+	ProjectID string
+}
+
+type CascadingProjectGrantMembership struct {
+	ProjectID string
+	GrantID   string
+}
+
+func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*CascadingMembership) (_ []eventstore.Command, err error) {
 	events := make([]eventstore.Command, 0)
 	for _, membership := range memberships {
 		if membership.IAM != nil {

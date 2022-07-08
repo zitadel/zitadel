@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -15,7 +15,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class UserCreateMachineComponent implements OnDestroy {
   public user: AddMachineUserRequest.AsObject = new AddMachineUserRequest().toObject();
-  public userForm!: FormGroup;
+  public userForm!: UntypedFormGroup;
 
   private sub: Subscription = new Subscription();
   public loading: boolean = false;
@@ -24,7 +24,7 @@ export class UserCreateMachineComponent implements OnDestroy {
     private router: Router,
     private toast: ToastService,
     public userService: ManagementService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
   ) {
