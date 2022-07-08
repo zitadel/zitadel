@@ -11,7 +11,7 @@ import (
 
 func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, assetsPrefix, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
 	templateData := templates.TemplateData{
-		Href:            href,
+		URL:             href,
 		PrimaryColor:    templates.DefaultPrimaryColor,
 		BackgroundColor: templates.DefaultBackgroundColor,
 		FontColor:       templates.DefaultFontColor,

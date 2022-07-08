@@ -208,6 +208,7 @@ RegistrationUser:
   German: Deutsch
   English: English
   Italian: Italiano
+  French: Français
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -236,11 +237,13 @@ ExternalRegistrationUserOverview:
   German: Deutsch
   English: English
   Italian: Italiano
+  French: Français
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
   PrivacyLinkText: Datenschutzerklärung
+  ExternalLogin: oder registriere dich mit einem externen Benutzer
   BackButtonText: zurück
   NextButtonText: speichern
 
@@ -291,6 +294,7 @@ ExternalNotFoundOption:
   German: Deutsch
   English: English
   Italian: Italiano
+  French: Français
 
 Footer:
   PoweredBy: Powered By
