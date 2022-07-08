@@ -1,4 +1,4 @@
-# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/defaults.yaml
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/v2-alpha/internal/config/options/defaults.yaml
 Log:
   Level: 'info'
 

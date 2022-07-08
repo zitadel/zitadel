@@ -1,10 +1,11 @@
 package start
 
 import (
-	"time"
-
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"github.com/zitadel/zitadel/internal/config/hook"
+	"time"
+
 	"github.com/zitadel/logging"
 
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
@@ -15,12 +16,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	tracing "github.com/zitadel/zitadel/internal/telemetry/tracing/config"
@@ -45,7 +44,6 @@ type Config struct {
 	OIDC              oidc.Config
 	Login             login.Config
 	Console           console.Config
-	Notification      notification.Config
 	AssetStorage      static_config.AssetStorageConfig
 	InternalAuthZ     internal_authz.Config
 	SystemDefaults    systemdefaults.SystemDefaults
@@ -54,6 +52,18 @@ type Config struct {
 	AuditLogRetention time.Duration
 	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
 	CustomerPortal    string
+}
+
+type encryptionKeyConfig struct {
+	DomainVerification   *crypto.KeyConfig
+	IDPConfig            *crypto.KeyConfig
+	OIDC                 *crypto.KeyConfig
+	OTP                  *crypto.KeyConfig
+	SMS                  *crypto.KeyConfig
+	SMTP                 *crypto.KeyConfig
+	User                 *crypto.KeyConfig
+	CSRFCookieKeyID      string
+	UserAgentCookieKeyID string
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -74,16 +84,4 @@ func MustNewConfig(v *viper.Viper) *Config {
 	logging.OnError(err).Fatal("unable to set tracer")
 
 	return config
-}
-
-type encryptionKeyConfig struct {
-	DomainVerification   *crypto.KeyConfig
-	IDPConfig            *crypto.KeyConfig
-	OIDC                 *crypto.KeyConfig
-	OTP                  *crypto.KeyConfig
-	SMS                  *crypto.KeyConfig
-	SMTP                 *crypto.KeyConfig
-	User                 *crypto.KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
 }

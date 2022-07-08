@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	eventstore "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -15,9 +16,10 @@ type View struct {
 	keyAlgorithm crypto.EncryptionAlgorithm
 	idGenerator  id.Generator
 	query        *query.Queries
+	es           eventstore.Eventstore
 }
 
-func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, idGenerator id.Generator) (*View, error) {
+func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, idGenerator id.Generator, es eventstore.Eventstore) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient)
 	if err != nil {
 		return nil, err
@@ -27,6 +29,7 @@ func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, queri
 		keyAlgorithm: keyAlgorithm,
 		idGenerator:  idGenerator,
 		query:        queries,
+		es:           es,
 	}, nil
 }
 

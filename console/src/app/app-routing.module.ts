@@ -14,6 +14,10 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'signedout',
+    loadChildren: () => import('./pages/signedout/signedout.module').then((m) => m.SignedoutModule),
+  },
+  {
     path: 'orgs',
     loadChildren: () => import('./pages/org-list/org-list.module').then((m) => m.OrgListModule),
     canActivate: [AuthGuard],
@@ -38,12 +42,7 @@ const routes: Routes = [
   {
     path: 'users',
     canActivate: [AuthGuard],
-    children: [
-      {
-        path: '',
-        loadChildren: () => import('src/app/pages/users/users.module').then((m) => m.UsersModule),
-      },
-    ],
+    loadChildren: () => import('src/app/pages/users/users.module').then((m) => m.UsersModule),
   },
   {
     path: 'instance',
@@ -169,10 +168,6 @@ const routes: Routes = [
     data: {
       roles: ['policy.read'],
     },
-  },
-  {
-    path: 'signedout',
-    loadChildren: () => import('./pages/signedout/signedout.module').then((m) => m.SignedoutModule),
   },
   {
     path: '**',
