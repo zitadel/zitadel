@@ -9,6 +9,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 50px;
 
     h1 {
       font-size: 3rem;
@@ -24,16 +25,6 @@
     img {
       height: 100px;
       max-width: 170px;
-      margin-bottom: 2rem;
-    }
-
-    button {
-      display: block;
-      padding: 0.5rem 4rem;
-
-      i {
-        margin-left: 0.5rem;
-      }
     }
   }
 }
