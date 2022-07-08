@@ -4,14 +4,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { SignedoutComponent } from './signedout.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: SignedoutComponent,
-    },
+  {
+    path: '',
+    component: SignedoutComponent,
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class SignedoutRoutingModule { }
+export class SignedoutRoutingModule {}
