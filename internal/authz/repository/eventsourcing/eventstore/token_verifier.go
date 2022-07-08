@@ -109,7 +109,7 @@ func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context
 	if err != nil {
 		return "", nil, err
 	}
-	return app.ProjectID, app.OIDCConfig.AllowedOrigins, nil
+	return app.ProjectID, app.OIDCConfig.AllowedOrigins.Data(), nil
 }
 
 func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (clientID, projectID string, err error) {

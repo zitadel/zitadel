@@ -50,19 +50,19 @@ func (c *Client) LoginURL(id string) string {
 }
 
 func (c *Client) RedirectURIs() []string {
-	return c.app.OIDCConfig.RedirectURIs
+	return c.app.OIDCConfig.RedirectURIs.Data()
 }
 
 func (c *Client) PostLogoutRedirectURIs() []string {
-	return c.app.OIDCConfig.PostLogoutRedirectURIs
+	return c.app.OIDCConfig.PostLogoutRedirectURIs.Data()
 }
 
 func (c *Client) ResponseTypes() []oidc.ResponseType {
-	return responseTypesToOIDC(c.app.OIDCConfig.ResponseTypes)
+	return responseTypesToOIDC(c.app.OIDCConfig.ResponseTypes.Data())
 }
 
 func (c *Client) GrantTypes() []oidc.GrantType {
-	return grantTypesToOIDC(c.app.OIDCConfig.GrantTypes)
+	return grantTypesToOIDC(c.app.OIDCConfig.GrantTypes.Data())
 }
 
 func (c *Client) DevMode() bool {

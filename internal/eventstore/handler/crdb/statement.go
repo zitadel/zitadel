@@ -197,6 +197,12 @@ func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func
 	}
 }
 
+func AddCopyStatement(conflict, from, to []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
+		return NewCopyStatement(event, conflict, from, to, conditions, opts...).Execute
+	}
+}
+
 func NewArrayAppendCol(column string, value interface{}) handler.Column {
 	return handler.Column{
 		Name:  column,
@@ -242,16 +248,16 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.Event, conflictCols []handler.Column, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
-	columnNames := make([]string, len(cols))
-	selectColumns := make([]string, len(cols))
+func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
+	columnNames := make([]string, len(to))
+	selectColumns := make([]string, len(from))
 	updateColumns := make([]string, len(columnNames))
 	argCounter := 0
 	args := []interface{}{}
 
-	for i, col := range cols {
-		columnNames[i] = col.Name
-		selectColumns[i] = col.Name
+	for i, col := range from {
+		columnNames[i] = to[i].Name
+		selectColumns[i] = from[i].Name
 		updateColumns[i] = "EXCLUDED." + col.Name
 		if col.Value != nil {
 			argCounter++
@@ -278,7 +284,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols []handler.Column, col
 		args: args,
 	}
 
-	if len(cols) == 0 {
+	if len(from) == 0 || len(to) == 0 || len(from) != len(to) {
 		config.err = handler.ErrNoValues
 	}
 

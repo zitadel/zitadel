@@ -18,18 +18,18 @@ var (
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names.login_name" +
-		", projections.users_humans.email" +
-		", projections.users_humans.first_name" +
-		", projections.users_humans.last_name" +
-		", projections.users_humans.display_name" +
-		", projections.users_machines.name" +
-		", projections.users_humans.avatar_key" +
+		", projections.users2_humans.email" +
+		", projections.users2_humans.first_name" +
+		", projections.users2_humans.last_name" +
+		", projections.users2_humans.display_name" +
+		", projections.users2_machines.name" +
+		", projections.users2_humans.avatar_key" +
 		", COUNT(*) OVER () " +
 		"FROM projections.project_members as members " +
-		"LEFT JOIN projections.users_humans " +
-		"ON members.user_id = projections.users_humans.user_id " +
-		"LEFT JOIN projections.users_machines " +
-		"ON members.user_id = projections.users_machines.user_id " +
+		"LEFT JOIN projections.users2_humans " +
+		"ON members.user_id = projections.users2_humans.user_id " +
+		"LEFT JOIN projections.users2_machines " +
+		"ON members.user_id = projections.users2_machines.user_id " +
 		"LEFT JOIN projections.login_names " +
 		"ON members.user_id = projections.login_names.user_id " +
 		"WHERE projections.login_names.is_primary = $1")
