@@ -81,24 +81,14 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: org.GetOrgId(),
 					},
-					Domain: domainR.DomainName,
+					Domain:   domainR.DomainName,
+					Verified: domainR.IsVerified,
+					Primary:  domainR.IsPrimary,
 				}
 				_, err := s.command.AddOrgDomain(ctx, orgDomain, []string{})
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
 					continue
-				}
-				if domainR.IsVerified {
-					if _, err := s.command.ValidateOrgDomain(ctx, orgDomain, []string{}); err != nil {
-						errors = append(errors, &admin_pb.ImportDataError{Type: "vaildate_domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
-						continue
-					}
-				}
-				if domainR.IsPrimary {
-					if _, err := s.command.SetPrimaryOrgDomain(ctx, orgDomain); err != nil {
-						errors = append(errors, &admin_pb.ImportDataError{Type: "primary_domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
-						continue
-					}
 				}
 				successOrg.Domains = append(successOrg.Domains, domainR.DomainName)
 			}
