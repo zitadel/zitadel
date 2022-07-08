@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
 	"flag"
 	"fmt"
 	"time"
+
+	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 
 	"github.com/zitadel/zitadel/internal/id"
 
@@ -25,20 +28,27 @@ import (
 	"github.com/zitadel/logging"
 )
 
+var (
+	//go:embed defaults.yaml
+	e2edefaults []byte
+)
+
 type userData struct {
 	desc, role, pw string
 }
 
 func main() {
-	//	masterkey := flag.String("materkey", "MasterkeyNeedsToHave32Characters", "the ZITADEL installations masterkey")
+	masterkey := flag.String("materkey", "MasterkeyNeedsToHave32Characters", "the ZITADEL installations masterkey")
 	debug := flag.Bool("debug", false, "print information that is helpful for debugging")
 
 	err := options.InitViper()
-	logging.OnError(err).Fatalf("unable to initialize config: %s", err)
+	logging.OnError(err).Fatalf("unable to initialize zitadel config: %s", err)
 
 	flag.Parse()
-	viper.
-		fmt.Println(x)
+
+	err = viper.MergeConfig(bytes.NewBuffer(e2edefaults))
+	logging.OnError(err).Fatalf("unable to initialize e2e config: %s", err)
+
 	conf := MustNewConfig(viper.GetViper())
 
 	if *debug {
@@ -47,10 +57,10 @@ func main() {
 
 	logging.New().OnError(err).Fatal("validating e2e config failed")
 
-	startE2ESetup(conf)
+	startE2ESetup(conf, *masterkey)
 }
 
-func startE2ESetup(conf *Config /*, masterkey string*/) {
+func startE2ESetup(conf *Config, masterkey string) {
 
 	id.Configure(conf.Machine)
 
@@ -59,14 +69,11 @@ func startE2ESetup(conf *Config /*, masterkey string*/) {
 	dbClient, err := database.Connect(conf.Database)
 	logging.New().OnError(err).Fatalf("cannot start client for projection: %s", err)
 
-	/*
-		keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterkey)
-		logging.New().OnError(err).Fatalf("cannot start key storage: %s", err)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterkey)
+	logging.New().OnError(err).Fatalf("cannot start key storage: %s", err)
 
-		   keys, err := ensureEncryptionKeys(conf.EncryptionKeys, keyStorage)
-		      	logging.New().OnError(err).Fatalf("failed ensuring encryption keys: %s", err)
-	*/
-
+	keys, err := ensureEncryptionKeys(conf.EncryptionKeys, keyStorage)
+	logging.New().OnError(err).Fatalf("failed ensuring encryption keys: %s", err)
 	eventstoreClient, err := eventstore.Start(dbClient)
 	logging.New().OnError(err).Fatalf("cannot start eventstore for queries: %s", err)
 
@@ -87,13 +94,13 @@ func startE2ESetup(conf *Config /*, masterkey string*/) {
 		conf.ExternalDomain,
 		conf.ExternalSecure,
 		conf.ExternalPort,
-		nil, //keys.IDPConfig,
-		nil, //keys.OTP,
-		nil, //keys.SMTP,
-		nil, //keys.SMS,
-		nil, //keys.User,
-		nil, //keys.DomainVerification,
-		nil, //keys.OIDC,
+		keys.IDPConfig,
+		keys.OTP,
+		keys.SMTP,
+		keys.SMS,
+		keys.User,
+		keys.DomainVerification,
+		keys.OIDC,
 	)
 	logging.New().OnError(err).Errorf("cannot start commands: %s", err)
 
@@ -118,7 +125,7 @@ func startE2ESetup(conf *Config /*, masterkey string*/) {
 	}}
 
 	err = execute(ctx, commands, *conf.E2E, users)
-	logging.New().OnError(err).Errorf("failed to execute commands steps")
+	logging.New().OnError(err).Fatalf("failed to execute commands steps")
 
 	eventualConsistencyCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()

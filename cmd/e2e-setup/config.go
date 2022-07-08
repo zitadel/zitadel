@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"regexp"
 
 	"github.com/zitadel/zitadel/internal/id"
@@ -33,6 +34,7 @@ type Config struct {
 	InternalAuthZ  internal_authz.Config
 	Machine        *id.Config
 	SystemDefaults systemdefaults.SystemDefaults
+	EncryptionKeys *encryptionKeyConfig
 }
 
 func (c Config) Validate() error {
@@ -98,6 +100,18 @@ func (e E2EConfig) Validate() (err error) {
 		return errors.New("field LoginPolicyUserPassword is empty")
 	}
 	return nil
+}
+
+type encryptionKeyConfig struct {
+	DomainVerification   *crypto.KeyConfig
+	IDPConfig            *crypto.KeyConfig
+	OIDC                 *crypto.KeyConfig
+	OTP                  *crypto.KeyConfig
+	SMS                  *crypto.KeyConfig
+	SMTP                 *crypto.KeyConfig
+	User                 *crypto.KeyConfig
+	CSRFCookieKeyID      string
+	UserAgentCookieKeyID string
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
