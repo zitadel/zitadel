@@ -3,8 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"regexp"
+
+	"github.com/zitadel/zitadel/internal/crypto"
 
 	"github.com/zitadel/zitadel/internal/id"
 
@@ -47,6 +48,7 @@ func (c Config) Validate() error {
 type E2EConfig struct {
 	Org                            string
 	MachineKeyPath                 string
+	InstanceID                     string
 	ZitadelProjectResourceID       string
 	APIURL                         string
 	IssuerURL                      string
@@ -70,7 +72,7 @@ func (e E2EConfig) Validate() (err error) {
 	}
 
 	audPattern := "number-[0-9]{17}"
-	matched, err := regexp.MatchString("number-[0-9]{17}", e.ZitadelProjectResourceID)
+	matched, err := regexp.MatchString("bignumber-[0-9]{17}", e.ZitadelProjectResourceID)
 	if err != nil {
 		return fmt.Errorf("validating ZitadelProjectResourceID failed: %w", err)
 	}

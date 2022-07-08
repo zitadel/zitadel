@@ -7,12 +7,16 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []userData) error {
+
+	ctx = authz.WithInstanceID(ctx, cfg.InstanceID)
 
 	orgOwner := newHuman(users[0])
 
@@ -75,7 +79,7 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 	}
 
 	for idx := range users[1:] {
-		user := users[idx]
+		user := users[idx+1]
 
 		createdHuman, err := cmd.AddHuman(ctx, org.ResourceOwner, newHuman(user))
 		if err != nil {

@@ -1,10 +1,11 @@
 E2E:
+  InstanceID: ""
+  ZitadelProjectResourceID: ""
   Org: "e2e-tests"
   MachineKeyPath: ".keys/e2e.json"
-  ZitadelProjectResourceID: ""
   APIURL: "http://localhost:8080"
   IssuerURL: "http://localhost:8080/oauth/v2"
-  Audience: ""
+  Audience: "http://localhost:8080"
   OrgOwnerPassword: "Password1!"
   OrgOwnerViewerPassword: "Password1!"
   OrgProjectCreatorPassword: "Password1!"
