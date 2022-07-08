@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"bytes"
 	_ "embed"
 	"errors"
 	"io"
-	"strings"
+
+	"github.com/zitadel/zitadel/internal/config/options"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin"
@@ -20,9 +19,6 @@ import (
 
 var (
 	configFiles []string
-
-	//go:embed defaults.yaml
-	defaultConfig []byte
 )
 
 func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
@@ -35,12 +31,8 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		},
 	}
 
-	viper.AutomaticEnv()
-	viper.SetEnvPrefix("ZITADEL")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetConfigType("yaml")
-	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.OnError(err).Fatal("unable to read default config")
+	err := options.InitViper()
+	logging.OnError(err).Fatalf("unable initialize config: %s", err)
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
@@ -58,9 +50,5 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 }
 
 func initConfig() {
-	for _, file := range configFiles {
-		viper.SetConfigFile(file)
-		err := viper.MergeInConfig()
-		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
-	}
+	options.MergeToViper(configFiles...)
 }

@@ -4,9 +4,8 @@ set -e
 
 DO_BUILD=1
 DO_DEPLOY=1
-DO_TEST=1
 
-while getopts 'bdt:' OPTION; do
+while getopts 'bd:' OPTION; do
   case "$OPTION" in
     b)
       echo "skipping build"
@@ -16,15 +15,10 @@ while getopts 'bdt:' OPTION; do
       echo "skipping deployment"
       DO_DEPLOY=0
       ;;
-    s)
-      echo "skipping tests"
-      DO_TEST=0
-      ;;
     ?)
       echo "script usage: $(basename \$0) [-b] [-d] [-t]" >&2
       echo "-b   skip build"
       echo "-d   skip deployment"
-      echo "-t   skip tests"
       exit 1
       ;;
   esac
@@ -54,10 +48,10 @@ if [ "$DO_BUILD" -eq "1" ]; then
     BUILD_VERSION="$(extract_metadata metadata.json '.version')"
 
     # build the docker image
-    docker build --file ./build/Dockerfile --tag zitadel:latest --tag zitadel:$BUILD_VERSION --tag zitadel:$BUILD_DATE $BUILD_PATH
+    DOCKER_BUILDKIT=1 docker build --file ./build/Dockerfile --tag zitadel:latest --tag zitadel:$BUILD_VERSION --tag zitadel:$BUILD_DATE $BUILD_PATH
 fi
 
 if [ "$DO_DEPLOY" -eq "1" ]; then
     # run cockroach and zitadel
-    docker compose --file ./docs/docs/guides/installation/run/docker-compose.yaml --file ./e2e/docker-compose-overwrite.yaml up --detach
+    ./e2e/docker-compose.sh up --detach
 fi

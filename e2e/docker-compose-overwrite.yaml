@@ -1,4 +1,3 @@
 services:
   zitadel:
     image: 'zitadel:${BUILD_DATE}'
-

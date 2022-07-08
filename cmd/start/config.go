@@ -1,10 +1,11 @@
 package start
 
 import (
-	"time"
-
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"github.com/zitadel/zitadel/internal/config/hook"
+	"time"
+
 	"github.com/zitadel/logging"
 
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
@@ -15,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -54,6 +54,18 @@ type Config struct {
 	CustomerPortal    string
 }
 
+type encryptionKeyConfig struct {
+	DomainVerification   *crypto.KeyConfig
+	IDPConfig            *crypto.KeyConfig
+	OIDC                 *crypto.KeyConfig
+	OTP                  *crypto.KeyConfig
+	SMS                  *crypto.KeyConfig
+	SMTP                 *crypto.KeyConfig
+	User                 *crypto.KeyConfig
+	CSRFCookieKeyID      string
+	UserAgentCookieKeyID string
+}
+
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 
@@ -72,16 +84,4 @@ func MustNewConfig(v *viper.Viper) *Config {
 	logging.OnError(err).Fatal("unable to set tracer")
 
 	return config
-}
-
-type encryptionKeyConfig struct {
-	DomainVerification   *crypto.KeyConfig
-	IDPConfig            *crypto.KeyConfig
-	OIDC                 *crypto.KeyConfig
-	OTP                  *crypto.KeyConfig
-	SMS                  *crypto.KeyConfig
-	SMTP                 *crypto.KeyConfig
-	User                 *crypto.KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
 }
