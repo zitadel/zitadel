@@ -17,6 +17,7 @@ import (
 func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []userData) error {
 
 	ctx = authz.WithInstanceID(ctx, cfg.InstanceID)
+	ctx = authz.WithRequestedDomain(ctx, "localhost")
 
 	orgOwner := newHuman(users[0])
 
@@ -92,6 +93,10 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 		}
 
 		if user.role != "" {
+			if _, err = cmd.AddInstanceMember(ctx, createdHuman.ID, domain.RoleIAMOwner); err != nil {
+				return err
+			}
+
 			if _, err = cmd.AddOrgMember(ctx, org.ResourceOwner, createdHuman.ID, user.role); err != nil {
 				return err
 			}
