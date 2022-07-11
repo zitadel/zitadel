@@ -4,13 +4,12 @@ import { AuthConfig } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
 
 import { AuthenticationService } from '../services/authentication.service';
-import { GrpcAuthService } from '../services/grpc-auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private auth: AuthenticationService, private authService: GrpcAuthService) {}
+  constructor(private auth: AuthenticationService) {}
 
   public canActivate(
     route: ActivatedRouteSnapshot,

@@ -127,7 +127,7 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 	return webAuthN, nil
 }
 
-func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerification domain.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
+func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerification domain.UserVerificationRequirement, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
 	webAuthNServer, err := w.serverFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -151,7 +151,7 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 	}, nil
 }
 
-func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) ([]byte, uint32, error) {
+func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNLogin, credData []byte, webAuthNs ...*domain.WebAuthNToken) ([]byte, uint32, error) {
 	assertionData, err := protocol.ParseCredentialRequestResponseBody(bytes.NewReader(credData))
 	if err != nil {
 		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-ADgv4", "Errors.User.WebAuthN.ValidateLoginFailed")
