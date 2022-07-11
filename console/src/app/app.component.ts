@@ -69,6 +69,7 @@ export class AppComponent implements OnDestroy {
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
   ) {
+    this.themeService.loadPrivateLabelling(true);
     console.log(
       '%cWait!',
       'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px',

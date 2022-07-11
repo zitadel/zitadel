@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -47,7 +46,6 @@ type Config struct {
 	OIDC              oidc.Config
 	Login             login.Config
 	Console           console.Config
-	Notification      notification.Config
 	AssetStorage      static_config.AssetStorageConfig
 	InternalAuthZ     internal_authz.Config
 	SystemDefaults    systemdefaults.SystemDefaults
