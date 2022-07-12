@@ -7,7 +7,7 @@ spec:
   template:
     metadata:
       annotations:
-        client.knative.dev/user-image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.33-amd64
+        client.knative.dev/user-image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.39-amd64
       creationTimestamp: null
     spec:
       containerConcurrency: 0
@@ -30,7 +30,7 @@ spec:
           value: zitadel.default.127.0.0.1.sslip.io
         - name: ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN
           value: zitadel.default.127.0.0.1.sslip.io
-        image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.33-amd64
+        image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.39-amd64
         name: user-container
         ports:
         - containerPort: 8080
