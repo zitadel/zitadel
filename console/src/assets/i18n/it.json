@@ -106,6 +106,7 @@
     "FINISHED": "Chiudi",
     "CHANGE": "Cambia",
     "REACTIVATE": "Riattiva",
+    "ACTIVATE": "Attiva",
     "DEACTIVATE": "Disattiva",
     "REFRESH": "Aggiorna",
     "LOGIN": "Accedi",
@@ -896,11 +897,21 @@
       "PROVIDER": "Fornitore SMS",
       "ADDPROVIDER": "Aggiungi fornitore SMS",
       "ADDPROVIDERDESCRIPTION": "Scegli uno dei provider disponibili e inserisci i dati richiesti.",
+      "REMOVEPROVIDER": "Elimina configurazione",
+      "REMOVEPROVIDER_DESC": "Stai per eliminare una configurazione. Vuoi continuare?",
+      "SMSPROVIDERSTATE": {
+        "0": "Non specificato",
+        "1": "Attivo",
+        "2": "Inattivo"
+      },
+      "ACTIVATED": "Fornitore attivato.",
+      "DEACTIVATED": "Fornitore disattivato.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio aggiunto con successo.",
+        "REMOVED": "Twilio rimosso con successo.",
         "CHANGETOKEN": "Cambia Token",
         "SETTOKEN": "Cambia Token",
         "TOKENSET": "Token cambiato con successo."
