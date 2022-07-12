@@ -35,6 +35,15 @@ All configuration properties are also configurable via environemnt variables.
 Prefix the key with *ZITADEL\_*, uppercase the propery and join sections by an underscore _.
 For example, if you want to configure the default ZITADEL IAM admin username and password, make sure the ZITADEL binary runtime has the variables *ZITADEL_S3DEFAULTINSTANCE_ORG_HUMAN_USERNAME* and *ZITADEL_S3DEFAULTINSTANCE_ORG_HUMAN_PASSWORD* set.
 
+## Masterkey
+
+The masterkey is used to AES256-encrypt other generated encryption keys.
+It needs to have 32 bytes.
+You can pass the masterkey in eighter of three possible ways:
+- By value: Use the flag `--masterkey My_Master_Key_Which_Has_32_Bytes`
+- By environment variable `ZITADEL_MASTERKEY`: Use the flag `--masterkeyFromEnv`
+- By file: Use the flag `--masterkeyFile /path/to/file`
+
 ## Passing the configuration
 
 <Tabs
