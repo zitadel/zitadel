@@ -665,7 +665,6 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
-        - "user.credential.write"
         - "project.read"
         - "project.role.read"
     - Role: "ORG_OWNER_VIEWER"
