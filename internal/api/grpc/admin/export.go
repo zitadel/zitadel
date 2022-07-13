@@ -1,7 +1,15 @@
 package admin
 
 import (
+	"bytes"
+	"cloud.google.com/go/storage"
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/zitadel/logging"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
@@ -16,10 +24,171 @@ import (
 	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	"google.golang.org/api/option"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
 )
 
-func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
+func Detach(ctx context.Context) context.Context { return detachedContext{ctx} }
+
+type response struct {
+	response *admin_pb.ExportDataResponse
+	err      error
+}
+type detachedContext struct {
+	parent context.Context
+}
+
+func (v detachedContext) Deadline() (time.Time, bool)       { return time.Time{}, false }
+func (v detachedContext) Done() <-chan struct{}             { return nil }
+func (v detachedContext) Err() error                        { return nil }
+func (v detachedContext) Value(key interface{}) interface{} { return v.parent.Value(key) }
+
+func (s *Server) ExportData(dctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
+	dctx, span := tracing.NewSpan(dctx)
+	defer func() { span.EndWithError(err) }()
+	logging.Info("Starting export")
+
+	timeoutDuration, err := time.ParseDuration(req.Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.GcsOutput != nil || req.S3Output != nil || req.LocalOutput != nil {
+		ctx := Detach(dctx)
+		go func() {
+			ch := make(chan error, 1)
+			ctxTimeout, cancel := context.WithTimeout(ctx, timeoutDuration)
+			defer cancel()
+			go func() {
+				orgData, err := s.exportData(ctxTimeout, req)
+				if err != nil {
+					logging.Error(err)
+					ch <- err
+					return
+				}
+
+				data, err := json.Marshal(orgData)
+				if err != nil {
+					logging.Error(err)
+					ch <- err
+					return
+				}
+
+				if err := s.transportDataToFiles(ctxTimeout, data, req.GetGcsOutput(), req.GetS3Output(), req.GetLocalOutput()); err != nil {
+					logging.Error(err)
+					ch <- err
+					return
+				}
+			}()
+
+			select {
+			case <-ctxTimeout.Done():
+				logging.Errorf("Export to file timeout: %v", ctxTimeout.Err())
+			case result := <-ch:
+				if result != nil {
+					logging.OnError(result)
+				} else {
+					logging.Info("Export done")
+				}
+			}
+		}()
+	}
+
+	if req.ResponseOutput {
+		ch := make(chan response, 1)
+		dctxTimeout, cancel := context.WithTimeout(dctx, timeoutDuration)
+		defer cancel()
+
+		go func() {
+			ret, err := s.exportData(dctxTimeout, req)
+			ch <- response{response: ret, err: err}
+		}()
+
+		select {
+		case <-dctxTimeout.Done():
+			logging.Errorf("Export to response timeout: %v", dctxTimeout.Err())
+			return nil, dctxTimeout.Err()
+		case result := <-ch:
+			if result.err != nil {
+				logging.OnError(result.err)
+				return nil, err
+			} else {
+				logging.Info("Export done")
+				return result.response, nil
+			}
+		}
+	}
+
+	return &admin_pb.ExportDataResponse{}, nil
+}
+
+func (s *Server) transportDataToFiles(ctx context.Context, data []byte, gcsOutput *admin_pb.ExportDataRequest_GCSOutput, s3Output *admin_pb.ExportDataRequest_S3Output, localOutput *admin_pb.ExportDataRequest_LocalOutput) error {
+	if localOutput != nil && localOutput.Path != "" {
+		if err := ioutil.WriteFile(localOutput.Path, data, os.ModePerm); err != nil {
+			return err
+		}
+	}
+
+	if s3Output != nil && s3Output.Endpoint != "" {
+		minioClient, err := minio.New(s3Output.Endpoint, &minio.Options{
+			Creds:  credentials.NewStaticV4(s3Output.AccessKeyId, s3Output.SecretAccessKey, ""),
+			Secure: s3Output.Ssl,
+		})
+		if err != nil {
+			return err
+		}
+
+		exists, err := minioClient.BucketExists(ctx, s3Output.Bucket)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return fmt.Errorf("bucket not existing: %v", err)
+		}
+		filename := filepath.Base(s3Output.Path) + ".json"
+		fullPath := s3Output.Path
+		if strings.HasSuffix(fullPath, ".json") {
+			fullPath = s3Output.Path + ".json"
+		}
+		buf := bytes.NewBuffer(data)
+		defer buf.Reset()
+		_, err = minioClient.PutObject(ctx, s3Output.Bucket, filename, buf, int64(len(data)), minio.PutObjectOptions{ContentType: "application/json"})
+		if err != nil {
+			return err
+		}
+	}
+
+	if gcsOutput != nil && gcsOutput.Bucket != "" {
+		saJson, err := base64.StdEncoding.DecodeString(gcsOutput.ServiceaccountJson)
+		if err != nil {
+			return err
+		}
+
+		client, err := storage.NewClient(ctx, option.WithCredentialsJSON(saJson))
+		if err != nil {
+			return err
+		}
+
+		bucket := client.Bucket(gcsOutput.Bucket)
+		wc := bucket.Object(gcsOutput.Path).NewWriter(ctx)
+		wc.ContentType = "text/plain"
+		if _, err := wc.Write(data); err != nil {
+			return err
+		}
+		if err := wc.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Server) exportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
