@@ -28,7 +28,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -48,8 +47,8 @@ func (v detachedContext) Done() <-chan struct{}             { return nil }
 func (v detachedContext) Err() error                        { return nil }
 func (v detachedContext) Value(key interface{}) interface{} { return v.parent.Value(key) }
 
-func (s *Server) ExportData(dctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
-	dctx, span := tracing.NewSpan(dctx)
+func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	logging.Info("Starting export")
 
@@ -59,36 +58,33 @@ func (s *Server) ExportData(dctx context.Context, req *admin_pb.ExportDataReques
 	}
 
 	if req.GcsOutput != nil || req.S3Output != nil || req.LocalOutput != nil {
-		ctx := Detach(dctx)
+		dctx := Detach(ctx)
 		go func() {
 			ch := make(chan error, 1)
-			ctxTimeout, cancel := context.WithTimeout(ctx, timeoutDuration)
+			dctxTimeout, cancel := context.WithTimeout(dctx, timeoutDuration)
 			defer cancel()
 			go func() {
-				orgData, err := s.exportData(ctxTimeout, req)
+				orgData, err := s.exportData(dctxTimeout, req)
 				if err != nil {
-					logging.Error(err)
 					ch <- err
 					return
 				}
 
 				data, err := json.Marshal(orgData)
 				if err != nil {
-					logging.Error(err)
 					ch <- err
 					return
 				}
 
-				if err := s.transportDataToFiles(ctxTimeout, data, req.GetGcsOutput(), req.GetS3Output(), req.GetLocalOutput()); err != nil {
-					logging.Error(err)
+				if err := s.transportDataToFiles(dctxTimeout, data, req.GetGcsOutput(), req.GetS3Output(), req.GetLocalOutput()); err != nil {
 					ch <- err
 					return
 				}
 			}()
 
 			select {
-			case <-ctxTimeout.Done():
-				logging.Errorf("Export to file timeout: %v", ctxTimeout.Err())
+			case <-dctxTimeout.Done():
+				logging.Errorf("Export to file timeout: %v", dctxTimeout.Err())
 			case result := <-ch:
 				if result != nil {
 					logging.OnError(result)
@@ -101,26 +97,22 @@ func (s *Server) ExportData(dctx context.Context, req *admin_pb.ExportDataReques
 
 	if req.ResponseOutput {
 		ch := make(chan response, 1)
-		dctxTimeout, cancel := context.WithTimeout(dctx, timeoutDuration)
+		ctxTimeout, cancel := context.WithTimeout(ctx, timeoutDuration)
 		defer cancel()
 
 		go func() {
-			ret, err := s.exportData(dctxTimeout, req)
+			ret, err := s.exportData(ctxTimeout, req)
 			ch <- response{response: ret, err: err}
 		}()
 
 		select {
-		case <-dctxTimeout.Done():
-			logging.Errorf("Export to response timeout: %v", dctxTimeout.Err())
-			return nil, dctxTimeout.Err()
+		case <-ctxTimeout.Done():
+			logging.Errorf("Export to response timeout: %v", ctxTimeout.Err())
+			return nil, ctxTimeout.Err()
 		case result := <-ch:
-			if result.err != nil {
-				logging.OnError(result.err)
-				return nil, err
-			} else {
-				logging.Info("Export done")
-				return result.response, nil
-			}
+			logging.OnError(result.err)
+			logging.Info("Export done")
+			return result.response, result.err
 		}
 	}
 
@@ -150,14 +142,14 @@ func (s *Server) transportDataToFiles(ctx context.Context, data []byte, gcsOutpu
 		if !exists {
 			return fmt.Errorf("bucket not existing: %v", err)
 		}
-		filename := filepath.Base(s3Output.Path) + ".json"
+
 		fullPath := s3Output.Path
 		if strings.HasSuffix(fullPath, ".json") {
 			fullPath = s3Output.Path + ".json"
 		}
 		buf := bytes.NewBuffer(data)
 		defer buf.Reset()
-		_, err = minioClient.PutObject(ctx, s3Output.Bucket, filename, buf, int64(len(data)), minio.PutObjectOptions{ContentType: "application/json"})
+		_, err = minioClient.PutObject(ctx, s3Output.Bucket, fullPath, buf, int64(len(data)), minio.PutObjectOptions{ContentType: "application/json"})
 		if err != nil {
 			return err
 		}
