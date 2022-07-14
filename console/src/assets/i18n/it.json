@@ -22,16 +22,16 @@
     "DISCLAIMERLINK": "Ulteriori informazioni",
     "DOCUMENTATION": {
       "TITLE": "Documentazione",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "GETSTARTED": {
       "TITLE": "Come iniziare con ZITADEL",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "QUICKSTARTS": {
       "LABEL": "Primi passi",
       "TITLE": "Quickstarts",
-      "DESCRIPTION": "Iniziare rapidamente con ZITADEL."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Scorciatoie",
@@ -757,6 +757,8 @@
       "LISTDESCRIPTION": "Scegli un'organizzazione.",
       "ACTIVE": "Attivo",
       "CREATE": "Creare un'organizzazione",
+      "DEACTIVATE": "Disattiva organizzazione",
+      "REACTIVATE": "Riattiva organizzazione",
       "NOPERMISSION": "Non hai l'autorizzazione per accedere alle impostazioni dell'organizzazione.",
       "USERSELFACCOUNT": "Usa il tuo account personale come proprietario dell'organizzazione",
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
@@ -821,6 +823,16 @@
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo"
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Disattivare l'organizzazione",
+        "DESCRIPTION": "Stai per disattivate la tua organizzazione. Utenti dell' organizzazione non possono più accedere in seguito. Sei sicuro di procedere?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Riattivare l'organizzazione",
+        "DESCRIPTION": "Stai per riattivare la tua organizzazione. Utenti dell' organizzazione possono accedere nuovamente dopo l'attivazione. Vuoi procedere?"
+      }
     }
   },
   "SETTINGS": {
@@ -861,8 +873,9 @@
     "DEFAULTLANGUAGE": "Lingua standard",
     "LANGUAGE": {
       "de": "Deutsch",
+      "en": "English",
       "it": "Italiano",
-      "en": "English"
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1028,10 +1041,10 @@
       "UNSAVED_DESCRIPTION": "Hai fatto delle modifiche senza salvare. Vuoi salvare ora?",
       "LOCALE": "Codice locale",
       "LOCALES": {
-        "de": "Tedesco",
-        "en": "Inglese",
+        "de": "Deutsch",
+        "en": "English",
         "it": "Italiano",
-        "fr": "Francese"
+        "fr": "Français"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1773,9 +1786,10 @@
     "3": "Altro"
   },
   "LANGUAGES": {
-    "de": "Tedesco",
+    "de": "Deutsch",
+    "en": "English",
     "it": "Italiano",
-    "en": "Inglese"
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",
