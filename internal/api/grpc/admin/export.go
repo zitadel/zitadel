@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
@@ -20,6 +21,8 @@ import (
 )
 
 func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	orgSearchQuery := &query.OrgSearchQueries{}
 	if len(req.OrgIds) > 0 {
@@ -237,7 +240,10 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	}, nil
 }
 
-func (s *Server) getDomainPolicy(ctx context.Context, orgID string) (*admin_pb.AddCustomDomainPolicyRequest, error) {
+func (s *Server) getDomainPolicy(ctx context.Context, orgID string) (_ *admin_pb.AddCustomDomainPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedDomain, err := s.query.DomainPolicyByOrg(ctx, true, orgID)
 	if err != nil {
 		return nil, err
@@ -253,7 +259,10 @@ func (s *Server) getDomainPolicy(ctx context.Context, orgID string) (*admin_pb.A
 	return nil, nil
 }
 
-func (s *Server) getDomains(ctx context.Context, orgID string) ([]*org_pb.Domain, error) {
+func (s *Server) getDomains(ctx context.Context, orgID string) (_ []*org_pb.Domain, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgDomainOrgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(orgID)
 	if err != nil {
 		return nil, err
@@ -275,7 +284,10 @@ func (s *Server) getDomains(ctx context.Context, orgID string) ([]*org_pb.Domain
 	return orgDomains, nil
 }
 
-func (s *Server) getIDPs(ctx context.Context, orgID string) ([]*v1_pb.DataOIDCIDP, []*v1_pb.DataJWTIDP, error) {
+func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*v1_pb.DataOIDCIDP, _ []*v1_pb.DataJWTIDP, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	ownerType, err := query.NewIDPOwnerTypeSearchQuery(domain.IdentityProviderTypeOrg)
 	if err != nil {
 		return nil, nil, err
@@ -328,7 +340,10 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) ([]*v1_pb.DataOIDCID
 	return oidcIdps, jwtIdps, nil
 }
 
-func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLabelPolicyRequest, error) {
+func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomLabelPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -350,7 +365,10 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (*management_
 	return nil, nil
 }
 
-func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLoginPolicyRequest, error) {
+func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomLoginPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedLogin, err := s.query.LoginPolicyByID(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -409,7 +427,10 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (*management_
 	return nil, nil
 }
 
-func (s *Server) getUserLinks(ctx context.Context, orgID string) ([]*idp_pb.IDPUserLink, error) {
+func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.IDPUserLink, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	userLinksResourceOwner, err := query.NewIDPUserLinksResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return nil, err
@@ -435,7 +456,10 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) ([]*idp_pb.IDPU
 	return userLinks, nil
 }
 
-func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLockoutPolicyRequest, error) {
+func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomLockoutPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -448,7 +472,10 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (*managemen
 	return nil, nil
 }
 
-func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomPasswordComplexityPolicyRequest, error) {
+func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomPasswordComplexityPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -465,7 +492,10 @@ func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) 
 	return nil, nil
 }
 
-func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomPrivacyPolicyRequest, error) {
+func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomPrivacyPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -480,7 +510,10 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (*managemen
 	return nil, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) ([]*v1_pb.DataHumanUser, []*v1_pb.DataMachineUser, []*management_pb.SetUserMetadataRequest, error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) (_ []*v1_pb.DataHumanUser, _ []*v1_pb.DataMachineUser, _ []*management_pb.SetUserMetadataRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
 		return nil, nil, nil, err
@@ -525,7 +558,9 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				}
 			}
 			if withPasswords {
+				ctx, pwspan := tracing.NewSpan(ctx)
 				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
+				pwspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
 					return nil, nil, nil, err
 				}
@@ -537,7 +572,9 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				}
 			}
 			if withOTP {
+				ctx, otpspan := tracing.NewSpan(ctx)
 				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
+				otpspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
 					return nil, nil, nil, err
 				}
@@ -558,11 +595,13 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			})
 		}
 
+		ctx, metaspan := tracing.NewSpan(ctx)
 		metadataOrgSearch, err := query.NewUserMetadataResourceOwnerSearchQuery(org)
 		if err != nil {
 			return nil, nil, nil, err
 		}
 		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
+		metaspan.EndWithError(err)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -577,7 +616,9 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 	return humanUsers, machineUsers, userMetadata, nil
 }
 
-func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) ([]*management_pb.SetTriggerActionsRequest, error) {
+func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) (_ []*management_pb.SetTriggerActionsRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication}
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 

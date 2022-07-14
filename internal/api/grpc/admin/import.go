@@ -1,20 +1,261 @@
 package admin
 
 import (
+	"cloud.google.com/go/storage"
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
 	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
+	"google.golang.org/api/option"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"io/ioutil"
+	"time"
 )
 
-func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (*admin_pb.ImportDataResponse, error) {
+type importResponse struct {
+	ret *admin_pb.ImportDataResponse
+	err error
+}
+
+func Detach(ctx context.Context) context.Context { return detachedContext{ctx} }
+
+type detachedContext struct {
+	parent context.Context
+}
+
+func (v detachedContext) Deadline() (time.Time, bool)       { return time.Time{}, false }
+func (v detachedContext) Done() <-chan struct{}             { return nil }
+func (v detachedContext) Err() error                        { return nil }
+func (v detachedContext) Value(key interface{}) interface{} { return v.parent.Value(key) }
+
+func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (_ *admin_pb.ImportDataResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if req.GetDataOrgs() != nil || req.GetDataOrgsv1() != nil {
+		timeoutDuration, err := time.ParseDuration(req.Timeout)
+		if err != nil {
+			return nil, err
+		}
+		ch := make(chan importResponse, 1)
+		ctxTimeout, cancel := context.WithTimeout(ctx, timeoutDuration)
+		defer cancel()
+
+		go func() {
+			orgs := make([]*admin_pb.DataOrg, 0)
+			if req.GetDataOrgsv1() != nil {
+				dataOrgs, err := s.dataOrgsV1ToDataOrgs(ctx, req.GetDataOrgsv1())
+				if err != nil {
+					ch <- importResponse{ret: nil, err: err}
+					return
+				}
+				orgs = dataOrgs.GetOrgs()
+			} else {
+				orgs = req.GetDataOrgs().GetOrgs()
+			}
+
+			ret, err := s.importData(ctx, orgs)
+			ch <- importResponse{ret: ret, err: err}
+		}()
+
+		select {
+		case <-ctxTimeout.Done():
+			logging.Errorf("Import to response timeout: %v", ctxTimeout.Err())
+			return nil, ctxTimeout.Err()
+		case result := <-ch:
+			logging.OnError(result.err)
+			logging.Info("Import done")
+			return result.ret, result.err
+		}
+	} else {
+		v1Transformation := false
+		var gcsInput *admin_pb.ImportDataRequest_GCSInput
+		var s3Input *admin_pb.ImportDataRequest_S3Input
+		var localInput *admin_pb.ImportDataRequest_LocalInput
+		if req.GetDataOrgsGcs() != nil {
+			gcsInput = req.GetDataOrgsGcs()
+		}
+		if req.GetDataOrgsv1Gcs() != nil {
+			gcsInput = req.GetDataOrgsv1Gcs()
+			v1Transformation = true
+		}
+		if req.GetDataOrgsS3() != nil {
+			s3Input = req.GetDataOrgsS3()
+		}
+		if req.GetDataOrgsv1S3() != nil {
+			s3Input = req.GetDataOrgsv1S3()
+			v1Transformation = true
+		}
+		if req.GetDataOrgsLocal() != nil {
+			localInput = req.GetDataOrgsLocal()
+		}
+		if req.GetDataOrgsv1Local() != nil {
+			localInput = req.GetDataOrgsv1Local()
+			v1Transformation = true
+		}
+
+		timeoutDuration, err := time.ParseDuration(req.Timeout)
+		if err != nil {
+			return nil, err
+		}
+		dctx := Detach(ctx)
+		go func() {
+			ch := make(chan importResponse, 1)
+			ctxTimeout, cancel := context.WithTimeout(dctx, timeoutDuration)
+			defer cancel()
+			go func() {
+				dataOrgs, err := s.transportDataFromFile(ctxTimeout, v1Transformation, gcsInput, s3Input, localInput)
+				if err != nil {
+					ch <- importResponse{nil, err}
+					return
+				}
+				resp, err := s.importData(ctxTimeout, dataOrgs)
+				if err != nil {
+					ch <- importResponse{nil, err}
+					return
+				}
+				ch <- importResponse{resp, nil}
+			}()
+
+			select {
+			case <-ctxTimeout.Done():
+				logging.Errorf("Export to response timeout: %v", ctxTimeout.Err())
+				return
+			case result := <-ch:
+				logging.OnError(result.err)
+				if result.ret != nil {
+					ret, err := json.Marshal(result.ret)
+					logging.OnError(err)
+
+					logging.Infof("Import done: %v", ret)
+				}
+			}
+		}()
+	}
+	return &admin_pb.ImportDataResponse{}, nil
+}
+
+func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation bool, gcsInput *admin_pb.ImportDataRequest_GCSInput, s3Input *admin_pb.ImportDataRequest_S3Input, localInput *admin_pb.ImportDataRequest_LocalInput) (_ []*admin_pb.DataOrg, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	dataOrgs := make([]*admin_pb.DataOrg, 0)
+	data := make([]byte, 0)
+	if gcsInput != nil {
+		gcsData, err := getFileFromGCS(ctx, gcsInput)
+		if err != nil {
+			return nil, err
+		}
+		data = gcsData
+	}
+	if s3Input != nil {
+		s3Data, err := getFileFromS3(ctx, s3Input)
+		if err != nil {
+			return nil, err
+		}
+		data = s3Data
+	}
+	if localInput != nil {
+		localData, err := ioutil.ReadFile(localInput.Path)
+		if err != nil {
+			return nil, err
+		}
+		data = localData
+	}
+
+	if v1Transformation {
+		dataImportV1 := new(v1_pb.ImportDataOrg)
+		if err := json.Unmarshal(data, dataImportV1); err != nil {
+			return nil, err
+		}
+
+		dataImport, err := s.dataOrgsV1ToDataOrgs(ctx, dataImportV1)
+		if err != nil {
+			return nil, err
+		}
+		dataOrgs = dataImport.Orgs
+	} else {
+		dataImport := new(admin_pb.ImportDataOrg)
+		if err := json.Unmarshal(data, dataImport); err != nil {
+			return nil, err
+		}
+		dataOrgs = dataImport.Orgs
+	}
+
+	return dataOrgs, nil
+}
+
+func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Input) ([]byte, error) {
+	minioClient, err := minio.New(input.Endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(input.AccessKeyId, input.SecretAccessKey, ""),
+		Secure: input.Ssl,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	exists, err := minioClient.BucketExists(ctx, input.Bucket)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, fmt.Errorf("bucket not existing: %v", err)
+	}
+
+	object, err := minioClient.GetObject(ctx, input.Bucket, input.Path, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, err
+	}
+	data := make([]byte, 0)
+	if _, err := object.Read(data); err != nil {
+		return nil, err
+	}
+	if err := object.Close(); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSInput) ([]byte, error) {
+	saJson, err := base64.StdEncoding.DecodeString(input.ServiceaccountJson)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := storage.NewClient(ctx, option.WithCredentialsJSON(saJson))
+	if err != nil {
+		return nil, err
+	}
+
+	bucket := client.Bucket(input.Bucket)
+	reader, err := bucket.Object(input.Path).NewReader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	data := make([]byte, reader.Remain())
+	if _, err := reader.Read(data); err != nil {
+		return nil, err
+	}
+	if err := reader.Close(); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*admin_pb.ImportDataResponse, error) {
 	errors := make([]*admin_pb.ImportDataError, 0)
 	success := &admin_pb.ImportDataSuccess{}
 
@@ -36,17 +277,6 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 	}
 
 	ctxData := authz.GetCtxData(ctx)
-	orgs := make([]*admin_pb.DataOrg, 0)
-
-	if req.GetDataOrgsv1() != nil {
-		dataOrgs, err := s.dataOrgsV1ToDataOrgs(ctx, req.GetDataOrgsv1())
-		if err != nil {
-			return nil, err
-		}
-		orgs = dataOrgs.GetOrgs()
-	} else {
-		orgs = req.GetDataOrgs().GetOrgs()
-	}
 
 	for _, org := range orgs {
 		_, err := s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
@@ -67,6 +297,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			ProjectMembers:      []*admin_pb.ImportDataSuccessProjectMember{},
 			ProjectGrantMembers: []*admin_pb.ImportDataSuccessProjectGrantMember{},
 		}
+		success.Orgs = append(success.Orgs, successOrg)
 
 		domainPolicy := org.GetDomainPolicy()
 		if org.DomainPolicy != nil {
@@ -304,7 +535,6 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				successOrg.ProjectRoles = append(successOrg.ActionIds, role.ProjectId+"_"+role.RoleKey)
 			}
 		}
-		success.Orgs = append(success.Orgs, successOrg)
 	}
 
 	for _, org := range orgs {
@@ -396,7 +626,10 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 	}, nil
 }
 
-func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.ImportDataOrg) (*admin_pb.ImportDataOrg, error) {
+func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.ImportDataOrg) (_ *admin_pb.ImportDataOrg, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgs := make([]*admin_pb.DataOrg, 0)
 	for _, orgV1 := range dataOrgs.Orgs {
 		org := &admin_pb.DataOrg{

@@ -4647,10 +4647,34 @@ message FailedEvent {
 
 
 message ImportDataRequest {
+    message LocalInput{
+        string path = 1;
+    }
+    message S3Input{
+        string path = 1;
+        string endpoint = 2;
+        string access_key_id =3;
+        string secret_access_key = 4;
+        bool ssl = 5;
+        string bucket = 6;
+    }
+    message GCSInput{
+        string bucket = 1;
+        string serviceaccount_json = 2;
+        string path = 3;
+    }
+
     oneof data {
         ImportDataOrg data_orgs = 1;
          zitadel.v1.v1.ImportDataOrg data_orgsv1 = 2;
+        LocalInput data_orgs_local = 3;
+        LocalInput data_orgsv1_local = 4;
+        S3Input data_orgs_s3 = 5;
+        S3Input data_orgsv1_s3 = 6;
+        GCSInput data_orgs_gcs = 7;
+        GCSInput data_orgsv1_gcs = 8;
     }
+    string timeout = 9;
 }
 
 message ImportDataOrg {

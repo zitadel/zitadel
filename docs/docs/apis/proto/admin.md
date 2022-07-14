@@ -2727,6 +2727,53 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs |  ImportDataOrg | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1 |  zitadel.v1.v1.ImportDataOrg | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_local |  ImportDataRequest.LocalInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_local |  ImportDataRequest.LocalInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_s3 |  ImportDataRequest.S3Input | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_s3 |  ImportDataRequest.S3Input | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_gcs |  ImportDataRequest.GCSInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_gcs |  ImportDataRequest.GCSInput | - |  |
+| timeout |  string | - |  |
+
+
+
+
+### ImportDataRequest.GCSInput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| bucket |  string | - |  |
+| serviceaccount_json |  string | - |  |
+| path |  string | - |  |
+
+
+
+
+### ImportDataRequest.LocalInput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+
+
+
+
+### ImportDataRequest.S3Input
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+| endpoint |  string | - |  |
+| access_key_id |  string | - |  |
+| secret_access_key |  string | - |  |
+| ssl |  bool | - |  |
+| bucket |  string | - |  |
 
 
 
