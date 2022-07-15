@@ -72,14 +72,14 @@
 :root {
   --ifm-navbar-background-color: #ffffff;
   --ifm-footer-background-color: #f4f4f4;
-  --ifm-menu-color-background-active: #f2f5ff;
-  --ifm-menu-color-active: #5469d4;
+  --ifm-menu-color-background-active: #7E21CE10;
+  --ifm-menu-color-active: #7E21CE;
   --ifm-menu-color-background-hover: #f7fafc;
   --ifm-font-color-base: #6b7280;
   --ifm-link-color: #5469d4;
   --ifm-menu-color: #697386;
   --ifm-footer-link-color: #000000;
-  --ifm-color-primary: #5469d4;
+  --ifm-color-primary: #7E21CE;
   --ifm-color-primary-dark: #4d61cf;
   --ifm-color-primary-darker: #4356c9;
   --ifm-color-primary-darkest: #3a4cc3; /* 293bb9 */
@@ -161,7 +161,7 @@
 }
 
 :root[data-theme="dark"] .navbar:not(.navbar-sidebar--show) {
-  background-color: rgba(31, 41, 55, 0.5019607843137255);
+  background-color: #15173580;
   backdrop-filter: saturate(110%) blur(5px);
 }
 
@@ -238,8 +238,8 @@ h2 {
   --ifm-menu-color-background-active: #ffffff10;
   --ifm-menu-color-active: #ffffff;
   --ifm-menu-color-background-hover: #3c405850;
-  --ifm-font-color-base: #c1c9d2;
-  --ifm-menu-color: #a3acb9;
+  --ifm-font-color-base: #DDDDDD;
+  --ifm-menu-color: #DDDDDD;
   --ifm-link-color: #ff2069;
   --docsearch-searchbox-background: #454a66;
   --docsearch-searchbox-focus-background: #454a66;
@@ -258,9 +258,9 @@ h2 {
   --ifm-color-primary-lightest: #ff90b4;
   --ifm-background-color: #141735;
   --ifm-hero-background-color: #0f1022;
-  --ifm-hero-text-color: var(--ifm-font-color-base);
+  --ifm-hero-text-color: #ffffff;
   --get-started-bg: var(--ifm-font-color-base);
-  --get-started: #059669;
+  --get-started: #FF1F69;
   --ifm-footer-color: #ffffff50;
   --ifm-heading-color: #ffffff;
   --ifm-font-color-base: #c1c9d2;
@@ -285,7 +285,6 @@ h2 {
   --apisystembackground: linear-gradient(40deg, #6E695090, #6E695090);
   --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
   --overlaycolor: #ffffff15;
-  --ifm-hero-text-color: #023c2a;
 }
 
 .get-started:hover {
