@@ -44,5 +44,5 @@ export ZITADEL_S3DEFAULTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 
 # Let the zitadel binary read configuration from environment variables
-zitadel admin start-from-init --masterkey "${ZITADEL_MASTERKEY}"
+zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled
 ```
