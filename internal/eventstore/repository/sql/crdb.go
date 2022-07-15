@@ -218,7 +218,7 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 	return events, nil
 }
 
-//LatestSequence returns the latests sequence found by the the search query
+//LatestSequence returns the latest sequence found by the search query
 func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
 	var seq Sequence
 	err := query(ctx, db, searchQuery, &seq)
@@ -226,6 +226,16 @@ func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.Sear
 		return 0, err
 	}
 	return uint64(seq), nil
+}
+
+//InstanceIDs returns the instance ids found by the search query
+func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQuery) ([]string, error) {
+	var ids []string
+	err := query(ctx, db, searchQuery, &ids)
+	if err != nil {
+		return nil, err
+	}
+	return ids, nil
 }
 
 func (db *CRDB) db() *sql.DB {
@@ -260,6 +270,10 @@ func (db *CRDB) eventQuery() string {
 
 func (db *CRDB) maxSequenceQuery() string {
 	return "SELECT MAX(event_sequence) FROM eventstore.events"
+}
+
+func (db *CRDB) instanceIDsQuery() string {
+	return "SELECT DISTINCT instance_id FROM eventstore.events"
 }
 
 func (db *CRDB) columnName(col repository.Field) string {

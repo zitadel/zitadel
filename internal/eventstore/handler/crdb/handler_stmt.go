@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -32,7 +31,7 @@ type StatementHandlerConfig struct {
 }
 
 type StatementHandler struct {
-	*handler.ProjectionHandler
+	*handler.Projection
 	Locker
 
 	client                  *sql.DB
@@ -75,84 +74,92 @@ func NewStatementHandler(
 		bulkLimit:               config.BulkLimit,
 		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
 	}
-	h.ProjectionHandler = handler.NewProjectionHandler(config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery)
+	h.Projection = handler.NewProjection(config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock)
 
 	err := h.Init(ctx, config.InitCheck)
 	logging.OnError(err).Fatal("unable to initialize projections")
-
-	go h.Process(
-		ctx,
-		h.reduce,
-		h.Update,
-		h.Lock,
-		h.Unlock,
-		h.SearchQuery,
-	)
+	//
+	//go h.Process(
+	//	ctx,
+	//	h.reduce,
+	//	h.Update,
+	//	h.Lock,
+	//	h.Unlock,
+	//	h.SearchQuery,
+	//)
 
 	h.Subscribe(h.aggregates...)
+	h.Trigger(context.Background(), "169927704915784237")
 
 	return h
 }
 
-func (h *StatementHandler) TriggerBulk(ctx context.Context) {
-	ctx, span := tracing.NewSpan(ctx)
-	var err error
-	defer span.EndWithError(err)
+//
+//func (h *StatementHandler) TriggerBulk(ctx context.Context) {
+//	ctx, span := tracing.NewSpan(ctx)
+//	var err error
+//	defer span.EndWithError(err)
+//
+//	err = h.ProjectionHandler.TriggerBulk(ctx, h.Lock, h.Unlock)
+//	logging.OnError(err).WithField("projection", h.ProjectionName).Warn("unable to trigger bulk")
+//}
 
-	err = h.ProjectionHandler.TriggerBulk(ctx, h.Lock, h.Unlock)
-	logging.OnError(err).WithField("projection", h.ProjectionName).Warn("unable to trigger bulk")
-}
-
-func (h *StatementHandler) SearchQuery(ctx context.Context) (*eventstore.SearchQueryBuilder, uint64, error) {
-	sequences, err := h.currentSequences(ctx, h.client.QueryContext)
+func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
+	sequences, err := h.currentSequences(ctx, h.client.QueryContext, instanceIDs)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit)
+
 	for _, aggregateType := range h.aggregates {
-		instances := make([]string, 0)
-		for _, sequence := range sequences[aggregateType] {
-			instances = appendToIgnoredInstances(instances, sequence.instanceID)
+		for _, instanceID := range instanceIDs {
+			var seq uint64
+			for _, sequence := range sequences[aggregateType] {
+				if sequence.instanceID == instanceID {
+					seq = sequence.sequence
+					break
+				}
+			}
 			queryBuilder.
 				AddQuery().
 				AggregateTypes(aggregateType).
-				SequenceGreater(sequence.sequence).
-				InstanceID(sequence.instanceID)
+				SequenceGreater(seq).
+				InstanceID(instanceID)
 		}
-		queryBuilder.
-			AddQuery().
-			AggregateTypes(aggregateType).
-			SequenceGreater(0).
-			ExcludedInstanceID(instances...)
 	}
 
 	return queryBuilder, h.bulkLimit, nil
 }
 
-func appendToIgnoredInstances(instances []string, id string) []string {
-	for _, instance := range instances {
-		if instance == id {
-			return instances
-		}
-	}
-	return append(instances, id)
-}
+//
+//func appendToIgnoredInstances(instances []string, id string) []string {
+//	for _, instance := range instances {
+//		if instance == id {
+//			return instances
+//		}
+//	}
+//	return append(instances, id)
+//}
 
 //Update implements handler.Update
-func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (unexecutedStmts []*handler.Statement, err error) {
+func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (index int, err error) {
 	if len(stmts) == 0 {
-		return nil, nil
+		return 0, nil
+	}
+	instanceIDs := make([]string, 0, len(stmts))
+	for _, stmt := range stmts {
+		instanceIDs = appendToInstanceIDs(instanceIDs, stmt.InstanceID)
 	}
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
-		return stmts, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
+		return 0, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
 	}
 
-	sequences, err := h.currentSequences(ctx, tx.QueryContext)
+	sequences, err := h.currentSequences(ctx, tx.QueryContext, instanceIDs)
 	if err != nil {
 		tx.Rollback()
-		return stmts, err
+		return 0, err
 	}
 
 	//checks for events between create statement and current sequence
@@ -162,7 +169,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
-			return stmts, err
+			return 0, err
 		}
 		stmts = append(previousStmts, stmts...)
 	}
@@ -173,27 +180,19 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		err = h.updateCurrentSequences(tx, sequences)
 		if err != nil {
 			tx.Rollback()
-			return stmts, err
+			return 0, err
 		}
 	}
 
 	if err = tx.Commit(); err != nil {
-		return stmts, err
+		return 0, err
 	}
 
-	if lastSuccessfulIdx == -1 && len(stmts) > 0 {
-		return stmts, handler.ErrSomeStmtsFailed
+	if lastSuccessfulIdx < len(stmts)-1 {
+		return lastSuccessfulIdx, handler.ErrSomeStmtsFailed
 	}
 
-	unexecutedStmts = make([]*handler.Statement, len(stmts)-(lastSuccessfulIdx+1))
-	copy(unexecutedStmts, stmts[lastSuccessfulIdx+1:])
-	stmts = nil
-
-	if len(unexecutedStmts) > 0 {
-		return unexecutedStmts, handler.ErrSomeStmtsFailed
-	}
-
-	return unexecutedStmts, nil
+	return lastSuccessfulIdx, nil
 }
 
 func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtSeq uint64, instanceID string, sequences currentSequences, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
@@ -315,4 +314,13 @@ func updateSequences(sequences currentSequences, stmt *handler.Statement) {
 		instanceID: stmt.InstanceID,
 		sequence:   stmt.Sequence,
 	})
+}
+
+func appendToInstanceIDs(instances []string, id string) []string {
+	for _, instance := range instances {
+		if instance == id {
+			return instances
+		}
+	}
+	return append(instances, id)
 }

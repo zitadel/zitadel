@@ -56,7 +56,7 @@ func (key sequenceSearchKey) ToColumnName() string {
 
 type sequenceSearchQuery struct {
 	key   sequenceSearchKey
-	value string
+	value interface{}
 }
 
 func (q *sequenceSearchQuery) GetKey() ColumnKey {
@@ -168,13 +168,15 @@ func LatestSequence(db *gorm.DB, table, viewName, instanceID string) (*CurrentSe
 	return nil, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
 }
 
-func LatestSequences(db *gorm.DB, table, viewName string) ([]*CurrentSequence, error) {
-	searchQueries := make([]SearchQuery, 0, 2)
-	searchQueries = append(searchQueries)
+func LatestSequences(db *gorm.DB, table, viewName string, instanceIDs ...string) ([]*CurrentSequence, error) {
+	searchQueries := []sequenceSearchQuery{
+		{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName},
+	}
+	if len(instanceIDs) > 0 {
+		searchQueries = append(searchQueries, sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyInstanceID), value: instanceIDs})
+	}
 	searchRequest := &sequenceSearchRequest{
-		queries: []sequenceSearchQuery{
-			{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName},
-		},
+		queries: searchQueries,
 	}
 
 	// ensure highest sequence of view

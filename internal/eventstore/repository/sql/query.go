@@ -22,6 +22,7 @@ type querier interface {
 	placeholder(query string) string
 	eventQuery() string
 	maxSequenceQuery() string
+	instanceIDsQuery() string
 	db() *sql.DB
 	orderByEventSequence(desc bool) string
 }
@@ -36,7 +37,7 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 	}
 	query += where
 
-	if searchQuery.Columns != repository.ColumnsMaxSequence {
+	if searchQuery.Columns == repository.ColumnsEvent {
 		query += criteria.orderByEventSequence(searchQuery.Desc)
 	}
 
@@ -76,6 +77,8 @@ func prepareColumns(criteria querier, columns repository.Columns) (string, func(
 	switch columns {
 	case repository.ColumnsMaxSequence:
 		return criteria.maxSequenceQuery(), maxSequenceScanner
+	case repository.ColumnsInstanceIDs:
+		return criteria.instanceIDsQuery(), instanceIDsScanner
 	case repository.ColumnsEvent:
 		return criteria.eventQuery(), eventsScanner
 	default:
@@ -93,6 +96,22 @@ func maxSequenceScanner(row scan, dest interface{}) (err error) {
 		return nil
 	}
 	return z_errors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
+}
+
+func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
+	ids, ok := dest.(*[]string)
+	if !ok {
+		return z_errors.ThrowInvalidArgument(nil, "SQL-Begh2", "type must be an array of string")
+	}
+	var id string
+	err = scanner(&id)
+	if err != nil {
+		logging.New().WithError(err).Warn("unable to scan row")
+		return z_errors.ThrowInternal(err, "SQL-DEFGe", "unable to scan row")
+	}
+	*ids = append(*ids, id)
+
+	return nil
 }
 
 func eventsScanner(scanner scan, dest interface{}) (err error) {

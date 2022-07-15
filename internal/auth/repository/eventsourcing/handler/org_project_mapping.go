@@ -62,30 +62,27 @@ func (p *OrgProjectMapping) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (p *OrgProjectMapping) EventQuery() (*es_models.SearchQuery, error) {
-	sequences, err := p.view.GetLatestOrgProjectMappingSequences()
+func (p *OrgProjectMapping) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
+	sequences, err := p.view.GetLatestOrgProjectMappingSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	query := es_models.NewSearchQuery()
-	instances := make([]string, 0)
+
+	searchQuery := es_models.NewSearchQuery()
 	for _, sequence := range sequences {
-		for _, instance := range instances {
-			if sequence.InstanceID == instance {
+		var seq uint64
+		for _, instanceID := range instanceIDs {
+			if sequence.InstanceID == instanceID {
+				seq = sequence.CurrentSequence
 				break
 			}
 		}
-		instances = append(instances, sequence.InstanceID)
-		query.AddQuery().
+		searchQuery.AddQuery().
 			AggregateTypeFilter(p.AggregateTypes()...).
-			LatestSequenceFilter(sequence.CurrentSequence).
+			LatestSequenceFilter(seq).
 			InstanceIDFilter(sequence.InstanceID)
 	}
-	return query.AddQuery().
-		AggregateTypeFilter(p.AggregateTypes()...).
-		LatestSequenceFilter(0).
-		ExcludedInstanceIDsFilter(instances...).
-		SearchQuery(), nil
+	return searchQuery, nil
 }
 
 func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {

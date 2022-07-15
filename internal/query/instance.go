@@ -159,7 +159,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 
 func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (*Instance, error) {
 	if shouldTriggerBulk {
-		projection.InstanceProjection.TriggerBulk(ctx)
+		projection.InstanceProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(authz.GetInstance(ctx).RequestedDomain())

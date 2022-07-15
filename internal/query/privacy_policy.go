@@ -81,7 +81,7 @@ var (
 
 func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*PrivacyPolicy, error) {
 	if shouldTriggerBulk {
-		projection.PrivacyPolicyProjection.TriggerBulk(ctx)
+		projection.PrivacyPolicyProjection.Trigger(ctx)
 	}
 
 	stmt, scan := preparePrivacyPolicyQuery()
@@ -111,7 +111,7 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 
 func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bool) (*PrivacyPolicy, error) {
 	if shouldTriggerBulk {
-		projection.PrivacyPolicyProjection.TriggerBulk(ctx)
+		projection.PrivacyPolicyProjection.Trigger(ctx)
 	}
 
 	stmt, scan := preparePrivacyPolicyQuery()

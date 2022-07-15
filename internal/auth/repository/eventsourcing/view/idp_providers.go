@@ -65,8 +65,8 @@ func (v *View) GetLatestIDPProviderSequence(instanceID string) (*global_view.Cur
 	return v.latestSequence(idpProviderTable, instanceID)
 }
 
-func (v *View) GetLatestIDPProviderSequences() ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(idpProviderTable)
+func (v *View) GetLatestIDPProviderSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(idpProviderTable, instanceIDs...)
 }
 
 func (v *View) ProcessedIDPProviderSequence(event *models.Event) error {

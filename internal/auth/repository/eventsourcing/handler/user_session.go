@@ -72,30 +72,27 @@ func (u *UserSession) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *UserSession) EventQuery() (*models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSessionSequences()
+func (u *UserSession) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSessionSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	query := models.NewSearchQuery()
-	instances := make([]string, 0)
+
+	searchQuery := models.NewSearchQuery()
 	for _, sequence := range sequences {
-		for _, instance := range instances {
-			if sequence.InstanceID == instance {
+		var seq uint64
+		for _, instanceID := range instanceIDs {
+			if sequence.InstanceID == instanceID {
+				seq = sequence.CurrentSequence
 				break
 			}
 		}
-		instances = append(instances, sequence.InstanceID)
-		query.AddQuery().
+		searchQuery.AddQuery().
 			AggregateTypeFilter(u.AggregateTypes()...).
-			LatestSequenceFilter(sequence.CurrentSequence).
+			LatestSequenceFilter(seq).
 			InstanceIDFilter(sequence.InstanceID)
 	}
-	return query.AddQuery().
-		AggregateTypeFilter(u.AggregateTypes()...).
-		LatestSequenceFilter(0).
-		ExcludedInstanceIDsFilter(instances...).
-		SearchQuery(), nil
+	return searchQuery, nil
 }
 
 func (u *UserSession) Reduce(event *models.Event) (err error) {

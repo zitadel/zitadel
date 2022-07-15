@@ -88,7 +88,7 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (*Org, error) {
 	if shouldTriggerBulk {
-		projection.OrgProjection.TriggerBulk(ctx)
+		projection.OrgProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareOrgQuery()

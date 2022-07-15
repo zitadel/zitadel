@@ -21,8 +21,8 @@ const (
 )
 
 type Locker interface {
-	Lock(ctx context.Context, lockDuration time.Duration, instanceID string) <-chan error
-	Unlock(instanceID string) error
+	Lock(ctx context.Context, lockDuration time.Duration, instanceIDs ...string) <-chan error
+	Unlock(instanceIDs ...string) error
 }
 
 type locker struct {
@@ -43,18 +43,18 @@ func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
 	}
 }
 
-func (h *locker) Lock(ctx context.Context, lockDuration time.Duration, instanceID string) <-chan error {
+func (h *locker) Lock(ctx context.Context, lockDuration time.Duration, instanceIDs ...string) <-chan error {
 	errs := make(chan error)
-	go h.handleLock(ctx, errs, lockDuration, instanceID)
+	go h.handleLock(ctx, errs, lockDuration, instanceIDs...)
 	return errs
 }
 
-func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration time.Duration, instanceID string) {
+func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration time.Duration, instanceIDs ...string) {
 	renewLock := time.NewTimer(0)
 	for {
 		select {
 		case <-renewLock.C:
-			errs <- h.renewLock(ctx, lockDuration, instanceID)
+			errs <- h.renewLock(ctx, lockDuration, instanceIDs...)
 			//refresh the lock 500ms before it times out. 500ms should be enough for one transaction
 			renewLock.Reset(lockDuration - (500 * time.Millisecond))
 		case <-ctx.Done():
@@ -65,24 +65,27 @@ func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration t
 	}
 }
 
-func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, instanceID string) error {
-	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
-	res, err := h.client.ExecContext(ctx, h.lockStmt, h.workerName, lockDuration.Seconds(), h.projectionName, instanceID)
-	if err != nil {
-		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
-	}
+func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, instanceIDs ...string) error {
+	for _, instanceID := range instanceIDs {
+		//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
+		res, err := h.client.ExecContext(ctx, h.lockStmt, h.workerName, lockDuration.Seconds(), h.projectionName, instanceID)
+		if err != nil {
+			return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
+		}
 
-	if rows, _ := res.RowsAffected(); rows == 0 {
-		return errors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
+		if rows, _ := res.RowsAffected(); rows == 0 {
+			return errors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
+		}
 	}
-
 	return nil
 }
 
-func (h *locker) Unlock(instanceID string) error {
-	_, err := h.client.Exec(h.lockStmt, h.workerName, float64(0), h.projectionName, instanceID)
-	if err != nil {
-		return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
+func (h *locker) Unlock(instanceIDs ...string) error {
+	for _, instanceID := range instanceIDs {
+		_, err := h.client.Exec(h.lockStmt, h.workerName, float64(0), h.projectionName, instanceID)
+		if err != nil {
+			return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
+		}
 	}
 	return nil
 }

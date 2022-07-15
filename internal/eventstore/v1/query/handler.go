@@ -17,7 +17,7 @@ const (
 
 type Handler interface {
 	ViewModel() string
-	EventQuery() (*models.SearchQuery, error)
+	EventQuery(instanceIDs ...string) (*models.SearchQuery, error)
 	Reduce(*models.Event) error
 	OnError(event *models.Event, err error) error
 	OnSuccess() error
