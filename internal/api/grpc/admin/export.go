@@ -86,11 +86,8 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			case <-dctxTimeout.Done():
 				logging.Errorf("Export to file timeout: %v", dctxTimeout.Err())
 			case result := <-ch:
-				if result != nil {
-					logging.OnError(result)
-				} else {
-					logging.Info("Export done")
-				}
+				logging.OnError(result).Errorf("error while exporting: %w", result)
+				logging.Info("Export done")
 			}
 		}()
 	}
@@ -110,7 +107,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			logging.Errorf("Export to response timeout: %v", ctxTimeout.Err())
 			return nil, ctxTimeout.Err()
 		case result := <-ch:
-			logging.OnError(result.err)
+			logging.OnError(result.err).Errorf("error while exporting: %w", result.err)
 			logging.Info("Export done")
 			return result.response, result.err
 		}
@@ -140,7 +137,7 @@ func (s *Server) transportDataToFiles(ctx context.Context, data []byte, gcsOutpu
 			return err
 		}
 		if !exists {
-			return fmt.Errorf("bucket not existing: %v", err)
+			return fmt.Errorf("bucket not existing")
 		}
 
 		fullPath := s3Output.Path
