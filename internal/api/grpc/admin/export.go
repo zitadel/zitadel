@@ -86,7 +86,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			case <-dctxTimeout.Done():
 				logging.Errorf("Export to file timeout: %v", dctxTimeout.Err())
 			case result := <-ch:
-				logging.OnError(result).Errorf("error while exporting: %w", result)
+				logging.OnError(result).Errorf("error while exporting: %v", result)
 				logging.Info("Export done")
 			}
 		}()
@@ -107,7 +107,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 			logging.Errorf("Export to response timeout: %v", ctxTimeout.Err())
 			return nil, ctxTimeout.Err()
 		case result := <-ch:
-			logging.OnError(result.err).Errorf("error while exporting: %w", result.err)
+			logging.OnError(result.err).Errorf("error while exporting: %v", result.err)
 			logging.Info("Export done")
 			return result.response, result.err
 		}
