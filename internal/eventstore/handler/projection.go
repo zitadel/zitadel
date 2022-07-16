@@ -83,7 +83,6 @@ func (p *Projection) schedule() {
 	for {
 		select {
 		case <-p.shouldBulk.C:
-			ctx, cancel := context.WithCancel(ctx)
 			ids, err := p.Eventstore.InstanceIDs(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AddQuery().ExcludedInstanceID("").Builder())
 			if err != nil {
 				logging.WithFields("projection", p.ProjectionName).WithError(err).Error("instance ids")
@@ -96,9 +95,11 @@ func (p *Projection) schedule() {
 					max = len(ids)
 				}
 				instances := ids[i:max]
+				ctx, cancel := context.WithCancel(ctx)
 				errs := p.lock(ctx, p.requeueAfter, instances...)
 				//wait until projection is locked
 				if err, ok := <-errs; err != nil || !ok {
+					cancel()
 					logging.WithFields("projection", p.ProjectionName).OnError(err).Warn("initial lock failed")
 					continue
 				}
@@ -108,10 +109,10 @@ func (p *Projection) schedule() {
 					logging.WithFields("projection", p.ProjectionName, "instanceIDs", instances).WithError(err).Error("trigger failed")
 				}
 
+				cancel()
 				unlockErr := p.unlock(instances...)
 				logging.WithFields("projection", p.ProjectionName).OnError(unlockErr).Warn("unable to unlock")
 			}
-			cancel()
 			p.shouldBulk.Reset(p.requeueAfter)
 		}
 	}

@@ -89,7 +89,6 @@ func NewStatementHandler(
 	//)
 
 	h.Subscribe(h.aggregates...)
-	h.Trigger(context.Background(), "169927704915784237")
 
 	return h
 }
