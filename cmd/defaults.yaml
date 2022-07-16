@@ -3,6 +3,25 @@ Log:
   Formatter:
     Format: text
 
+Database:
+  default:
+    Host: localhost
+    Port: 26257
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: ""
+    User:
+      Username: zitadel
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -38,23 +57,6 @@ HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"
 
 WebAuthNName: ZITADEL
-
-Database:
-  Host: localhost
-  Port: 26257
-  Database: zitadel
-  MaxOpenConns: 20
-  MaxConnLifetime: 30m
-  MaxConnIdleTime: 30m
-  Options: ""
-  User:
-    Username: zitadel
-    Password: ""
-    SSL:
-      Mode: disable
-      RootCert: ""
-      Cert: ""
-      Key: ""
 
 AdminUser:
   Username: root

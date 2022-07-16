@@ -1,10 +1,14 @@
-package database
+package postgres
 
 import (
+	"database/sql"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 const (
@@ -13,7 +17,7 @@ const (
 
 type Config struct {
 	Host            string
-	Port            string
+	Port            int32
 	Database        string
 	MaxOpenConns    uint32
 	MaxConnLifetime time.Duration
@@ -24,6 +28,34 @@ type Config struct {
 	//The value will be taken as is. Multiple options are space separated.
 	Options string
 }
+
+func (c *Config) MatchName(name string) bool {
+	for _, key := range []string{"pg", "postgres"} {
+		if name == key {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		DecodeHook: mapstructure.StringToTimeDurationHookFunc(),
+		Result:     c,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, config := range configs {
+		if err = decoder.Decode(config); err != nil {
+			return nil, err
+		}
+	}
+	return c, nil
+}
+
+func (c *Config) Connect() (*sql.DB, error) { return nil, nil }
 
 type User struct {
 	Username string
@@ -60,7 +92,7 @@ func (c Config) String() string {
 	c.checkSSL()
 	fields := []string{
 		"host=" + c.Host,
-		"port=" + c.Port,
+		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + c.Username,
 		"dbname=" + c.Database,
 		"application_name=zitadel",

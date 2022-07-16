@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 )
 
@@ -31,10 +30,10 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
+			// config := MustNewConfig(viper.New())
 
-			err := initialise(config, VerifyUser(config.Database.Username, config.Database.Password))
-			logging.OnError(err).Fatal("unable to init user")
+			// err := initialise(config, VerifyUser(config.Database.Username, config.Database.Password))
+			// logging.OnError(err).Fatal("unable to init user")
 		},
 	}
 }

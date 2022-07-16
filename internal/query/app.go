@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -37,13 +36,13 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs           database.TextArray[string]
-	ResponseTypes          database.IntegerArray[domain.OIDCResponseType]
-	GrantTypes             database.IntegerArray[domain.OIDCGrantType]
+	RedirectURIs           []string
+	ResponseTypes          []domain.OIDCResponseType
+	GrantTypes             []domain.OIDCGrantType
 	AppType                domain.OIDCApplicationType
 	ClientID               string
 	AuthMethodType         domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs database.TextArray[string]
+	PostLogoutRedirectURIs []string
 	Version                domain.OIDCVersion
 	ComplianceProblems     []string
 	IsDevMode              bool
@@ -52,8 +51,8 @@ type OIDCApp struct {
 	AssertIDTokenRole      bool
 	AssertIDTokenUserinfo  bool
 	ClockSkew              time.Duration
-	AdditionalOrigins      database.TextArray[string]
-	AllowedOrigins         database.TextArray[string]
+	AdditionalOrigins      []string
+	AllowedOrigins         []string
 }
 
 type APIApp struct {
@@ -637,19 +636,19 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	redirectUris             database.TextArray[string]
+	redirectUris             []string
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   database.TextArray[string]
+	postLogoutRedirectUris   []string
 	devMode                  sql.NullBool
 	accessTokenType          sql.NullInt16
 	accessTokenRoleAssertion sql.NullBool
 	iDTokenRoleAssertion     sql.NullBool
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
-	additionalOrigins        database.TextArray[string]
-	responseTypes            database.IntegerArray[domain.OIDCResponseType]
-	grantTypes               database.IntegerArray[domain.OIDCGrantType]
+	additionalOrigins        []string
+	responseTypes            []domain.OIDCResponseType
+	grantTypes               []domain.OIDCGrantType
 }
 
 func (c sqlOIDCConfig) set(app *App) {

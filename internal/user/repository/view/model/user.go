@@ -219,16 +219,15 @@ func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 }
 
 func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_model.OrgDomain) {
-	loginNames := make([]string, 0)
+	u.LoginNames = make([]string, 0, len(domains))
 	for _, d := range domains {
 		if d.Verified {
-			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
+			u.LoginNames = append(u.LoginNames, u.GenerateLoginName(d.Domain, true))
 		}
 	}
 	if !userLoginMustBeDomain {
-		loginNames = append(loginNames, u.UserName)
+		u.LoginNames = append(u.LoginNames, u.GenerateLoginName(u.UserName, true))
 	}
-	u.LoginNames = loginNames
 }
 
 func (u *UserView) AppendEvent(event *models.Event) (err error) {

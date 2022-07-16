@@ -39,13 +39,13 @@ func AppConfigToPb(app *query.App) app_pb.AppConfig {
 func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 	return &app_pb.App_OidcConfig{
 		OidcConfig: &app_pb.OIDCConfig{
-			RedirectUris:             app.RedirectURIs.Data(),
-			ResponseTypes:            OIDCResponseTypesFromModel(app.ResponseTypes.Data()),
-			GrantTypes:               OIDCGrantTypesFromModel(app.GrantTypes.Data()),
+			RedirectUris:             app.RedirectURIs,
+			ResponseTypes:            OIDCResponseTypesFromModel(app.ResponseTypes),
+			GrantTypes:               OIDCGrantTypesFromModel(app.GrantTypes),
 			AppType:                  OIDCApplicationTypeToPb(app.AppType),
 			ClientId:                 app.ClientID,
 			AuthMethodType:           OIDCAuthMethodTypeToPb(app.AuthMethodType),
-			PostLogoutRedirectUris:   app.PostLogoutRedirectURIs.Data(),
+			PostLogoutRedirectUris:   app.PostLogoutRedirectURIs,
 			Version:                  OIDCVersionToPb(domain.OIDCVersion(app.Version)),
 			NoneCompliant:            len(app.ComplianceProblems) != 0,
 			ComplianceProblems:       ComplianceProblemsToLocalizedMessages(app.ComplianceProblems),
@@ -55,8 +55,8 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			IdTokenRoleAssertion:     app.AssertIDTokenRole,
 			IdTokenUserinfoAssertion: app.AssertIDTokenUserinfo,
 			ClockSkew:                durationpb.New(app.ClockSkew),
-			AdditionalOrigins:        app.AdditionalOrigins.Data(),
-			AllowedOrigins:           app.AllowedOrigins.Data(),
+			AdditionalOrigins:        app.AdditionalOrigins,
+			AllowedOrigins:           app.AllowedOrigins,
 		},
 	}
 }
@@ -130,7 +130,7 @@ func OIDCGrantTypesFromModel(grantTypes []domain.OIDCGrantType) []app_pb.OIDCGra
 }
 
 func OIDCGrantTypesToDomain(grantTypes []app_pb.OIDCGrantType) []domain.OIDCGrantType {
-	if grantTypes == nil || len(grantTypes) == 0 {
+	if len(grantTypes) == 0 {
 		return []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode}
 	}
 	oidcGrantTypes := make([]domain.OIDCGrantType, len(grantTypes))

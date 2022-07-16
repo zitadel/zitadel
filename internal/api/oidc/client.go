@@ -128,7 +128,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		if err != nil {
 			return err
 		}
-		if origin != "" && !http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins.Data(), origin) {
+		if origin != "" && !http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 			return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}

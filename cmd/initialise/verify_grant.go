@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 )
 
@@ -26,10 +25,10 @@ Prereqesits:
 - cockroachdb
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
+			// config := MustNewConfig(viper.New())
 
-			err := initialise(config, VerifyGrant(config.Database.Database, config.Database.Username))
-			logging.OnError(err).Fatal("unable to set grant")
+			// err := initialise(config, VerifyGrant(config.Database.Database, config.Database.Username))
+			// logging.OnError(err).Fatal("unable to set grant")
 		},
 	}
 }

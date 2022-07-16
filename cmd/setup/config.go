@@ -31,11 +31,15 @@ type Config struct {
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 	err := v.Unmarshal(config,
+		func(c *mapstructure.DecoderConfig) {
+			c.ZeroFields = true
+		},
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
+			database.DecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")

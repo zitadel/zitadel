@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 
@@ -60,6 +61,12 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 
 func initConfig() {
 	for _, file := range configFiles {
+		fmt.Println(viper.Get("database"))
+		for _, key := range viper.AllKeys() {
+			if strings.HasPrefix(key, "database") {
+				fmt.Println(key)
+			}
+		}
 		viper.SetConfigFile(file)
 		err := viper.MergeInConfig()
 		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")

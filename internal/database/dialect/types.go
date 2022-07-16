@@ -1,19 +1,106 @@
-package database
+package dialect
 
 import (
 	"database/sql"
 	"database/sql/driver"
-
-	"github.com/jackc/pgtype"
-	"golang.org/x/exp/constraints"
-
-	"github.com/zitadel/zitadel/internal/errors"
 )
 
-type text interface {
+type User struct {
+	Username string
+	Password string
+	SSL      SSL
+}
+
+type SSL struct {
+	// type of connection security
+	Mode string
+	// RootCert Path to the CA certificate
+	RootCert string
+	// Cert Path to the client certificate
+	Cert string
+	// Key Path to the client private key
+	Key string
+}
+
+type Text interface {
 	~string | ~[]byte
 }
 
+type Field[T any] interface {
+	// Set([]T)
+	// Get() []T
+	// T
+
+	sql.Scanner
+	driver.Valuer
+}
+
+type Array[T any] interface {
+	// Set([]T)
+	// Get() []T
+	[]T
+
+	sql.Scanner
+	driver.Valuer
+}
+
+type TextArray[T Text] interface {
+	Array[T]
+}
+
+// import (
+// 	"database/sql"
+// 	"database/sql/driver"
+
+// 	"github.com/jackc/pgtype"
+// )
+
+// type text interface {
+// 	~string | ~[]byte
+// }
+
+// type TextArray[T any] struct {
+// 	asdf []T
+
+// 	sql.Scanner
+// 	driver.Valuer
+// }
+
+// func RegisterBlablaScanner()
+
+// type PostgresTextArray struct{
+// 	pgtype.TextArray
+// }
+
+// var _ TextArray[string] = (*PostgresTextArray[string])(nil)
+
+/*
+
+
+
+
+type PostgresTextArray[T text] pgtype.TextArray
+
+func (a PostgresTextArray[T]) Scan(src any) error {
+
+	return nil
+}
+
+func (a PostgresTextArray[T]) Value() (driver.Value, error) {
+	return nil, nil
+}
+
+func (a PostgresTextArray[T]) Get() []T {
+	return nil
+}
+
+func (a PostgresTextArray[T]) Set([]T) {
+	// return nil
+}
+
+*/
+
+/*
 type TextArray[T text] pgtype.TextArray
 
 type IntegerArray[T constraints.Integer] pgtype.NumericArray
@@ -60,7 +147,14 @@ func (dst *IntegerArray[T]) Scan(src any) error {
 		return (*pgtype.NumericArray)(dst).DecodeText(nil, nil)
 	}
 
-	return (*pgtype.NumericArray)(dst).DecodeText(nil, src.([]byte))
+	switch s := src.(type) {
+	case string:
+		return (*pgtype.NumericArray)(dst).DecodeText(nil, []byte(s))
+	case []byte:
+		return (*pgtype.NumericArray)(dst).DecodeText(nil, s)
+	}
+
+	return fmt.Errorf("unable to parse int array")
 }
 
 // Value implements the database/sql/driver Valuer interface.
@@ -84,3 +178,6 @@ func (data *IntegerArray[T]) Data() []T {
 	}
 	return res
 }
+
+
+*/

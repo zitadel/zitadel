@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
 )
@@ -94,7 +93,7 @@ func VerifyZitadel(db *sql.DB) error {
 }
 
 func verifyZitadel(config database.Config) error {
-	logging.WithFields("database", config.Database).Info("verify zitadel")
+	// logging.WithFields("database", config.Database).Info("verify zitadel")
 	db, err := database.Connect(config)
 	if err != nil {
 		return err
