@@ -5,7 +5,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/zitadel/logging"
 
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
@@ -38,7 +37,6 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		err := recover()
 
 		if err != nil {
-			sentry.CurrentHub().Recover(err)
 			handler.Subscription().Unsubscribe()
 			logging.WithFields("cause", err, "stack", string(debug.Stack())).Error("reduce panicked")
 		}

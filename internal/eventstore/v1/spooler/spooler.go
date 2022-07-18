@@ -2,11 +2,11 @@ package spooler
 
 import (
 	"context"
+	"runtime/debug"
 	"strconv"
 	"sync"
 	"time"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/zitadel/logging"
 
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
@@ -75,7 +75,7 @@ func (s *spooledHandler) load(workerID string) {
 		err := recover()
 
 		if err != nil {
-			sentry.CurrentHub().Recover(err)
+			logging.WithFields("cause", err, "stack", string(debug.Stack())).Error("reduce panicked")
 		}
 	}()
 	ctx, cancel := context.WithCancel(context.Background())
