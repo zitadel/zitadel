@@ -41,21 +41,7 @@ type Unlock func(...string) error
 
 type ProjectionHandler struct {
 	Handler
-
-	//requeueAfter time.Duration
-	//shouldBulk   *time.Timer
-	//bulkMu       sync.Mutex
-	//bulkLocked   bool
-	//execBulk     executeBulk
-
-	//retryFailedAfter time.Duration
-	//shouldPush       *time.Timer
-	//pushSet          bool
-
-	ProjectionName string
-
-	//lockMu sync.Mutex
-	//stmts  []*Statement
+	ProjectionName      string
 	reduce              Reduce
 	update              Update
 	searchQuery         SearchQuery
