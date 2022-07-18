@@ -17,6 +17,7 @@ import (
 func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []userData) error {
 
 	ctx = authz.WithInstanceID(ctx, cfg.InstanceID)
+	ctx = authz.WithRequestedDomain(ctx, "localhost")
 
 	orgOwner := newHuman(users[0])
 
@@ -38,6 +39,11 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 
 	// Avoids the change password screen
 	if _, err = cmd.ChangePassword(ctx, org.ResourceOwner, orgOwnerID, cfg.OrgOwnerPassword, cfg.OrgOwnerPassword, ""); err != nil {
+		return err
+	}
+
+	// skip mfa
+	if err = cmd.HumanSkipMFAInit(ctx, orgOwnerID, org.ResourceOwner); err != nil {
 		return err
 	}
 
@@ -88,6 +94,11 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 
 		// Avoids the change password screen
 		if _, err = cmd.ChangePassword(ctx, org.ResourceOwner, createdHuman.ID, user.pw, user.pw, ""); err != nil {
+			return err
+		}
+
+		// skip mfa
+		if err = cmd.HumanSkipMFAInit(ctx, orgOwnerID, org.ResourceOwner); err != nil {
 			return err
 		}
 
