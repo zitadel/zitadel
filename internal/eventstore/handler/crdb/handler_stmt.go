@@ -31,7 +31,7 @@ type StatementHandlerConfig struct {
 }
 
 type StatementHandler struct {
-	*handler.Projection
+	*handler.ProjectionHandler
 	Locker
 
 	client                  *sql.DB
@@ -74,34 +74,15 @@ func NewStatementHandler(
 		bulkLimit:               config.BulkLimit,
 		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
 	}
-	h.Projection = handler.NewProjection(config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock)
 
 	err := h.Init(ctx, config.InitCheck)
 	logging.OnError(err).Fatal("unable to initialize projections")
-	//
-	//go h.Process(
-	//	ctx,
-	//	h.reduce,
-	//	h.Update,
-	//	h.Lock,
-	//	h.Unlock,
-	//	h.SearchQuery,
-	//)
 
 	h.Subscribe(h.aggregates...)
 
 	return h
 }
-
-//
-//func (h *StatementHandler) TriggerBulk(ctx context.Context) {
-//	ctx, span := tracing.NewSpan(ctx)
-//	var err error
-//	defer span.EndWithError(err)
-//
-//	err = h.ProjectionHandler.TriggerBulk(ctx, h.Lock, h.Unlock)
-//	logging.OnError(err).WithField("projection", h.ProjectionName).Warn("unable to trigger bulk")
-//}
 
 func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
 	sequences, err := h.currentSequences(ctx, h.client.QueryContext, instanceIDs)
@@ -130,16 +111,6 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 
 	return queryBuilder, h.bulkLimit, nil
 }
-
-//
-//func appendToIgnoredInstances(instances []string, id string) []string {
-//	for _, instance := range instances {
-//		if instance == id {
-//			return instances
-//		}
-//	}
-//	return append(instances, id)
-//}
 
 //Update implements handler.Update
 func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (index int, err error) {
