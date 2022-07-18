@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"runtime/debug"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -39,7 +40,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		if err != nil {
 			sentry.CurrentHub().Recover(err)
 			handler.Subscription().Unsubscribe()
-			logging.WithFields("HANDL-SAFe1").Errorf("reduce panicked: %v", err)
+			logging.WithFields("cause", err, "stack", string(debug.Stack())).Error("reduce panicked")
 		}
 	}()
 	currentSequence, err := handler.CurrentSequence(event.InstanceID)
@@ -58,14 +59,14 @@ func ReduceEvent(handler Handler, event *models.Event) {
 
 	unprocessedEvents, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
 	if err != nil {
-		logging.WithFields("HANDL-L6YH1", "sequence", event.Sequence).Warn("filter failed")
+		logging.WithFields("sequence", event.Sequence).Warn("filter failed")
 		return
 	}
 
 	for _, unprocessedEvent := range unprocessedEvents {
 		currentSequence, err := handler.CurrentSequence(unprocessedEvent.InstanceID)
 		if err != nil {
-			logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
+			logging.New().WithError(err).Warn("unable to get current sequence")
 			return
 		}
 		if unprocessedEvent.Sequence < currentSequence {
@@ -78,12 +79,12 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		}
 
 		err = handler.Reduce(unprocessedEvent)
-		logging.WithFields("HANDL-V42TI", "sequence", unprocessedEvent.Sequence).OnError(err).Warn("reduce failed")
+		logging.WithFields("sequence", unprocessedEvent.Sequence).OnError(err).Warn("reduce failed")
 	}
 	if len(unprocessedEvents) == eventLimit {
-		logging.WithFields("QUERY-BSqe9", "sequence", event.Sequence).Warn("didnt process event")
+		logging.WithFields("sequence", event.Sequence).Warn("didnt process event")
 		return
 	}
 	err = handler.Reduce(event)
-	logging.WithFields("HANDL-wQDL2", "sequence", event.Sequence).OnError(err).Warn("reduce failed")
+	logging.WithFields("sequence", event.Sequence).OnError(err).Warn("reduce failed")
 }

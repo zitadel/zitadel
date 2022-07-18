@@ -173,6 +173,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 			if err != nil {
 				return err
 			}
+			user = &view_model.UserView{}
 			for _, e := range events {
 				if err = user.AppendEvent(e); err != nil {
 					return err
@@ -195,6 +196,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 			if err != nil {
 				return err
 			}
+			user = &view_model.UserView{}
 			for _, e := range events {
 				if err = user.AppendEvent(e); err != nil {
 					return err
