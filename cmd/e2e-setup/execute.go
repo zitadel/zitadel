@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -37,13 +36,7 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 		return err
 	}
 
-	// Avoids the change password screen
-	if _, err = cmd.ChangePassword(ctx, org.ResourceOwner, orgOwnerID, cfg.OrgOwnerPassword, cfg.OrgOwnerPassword, ""); err != nil {
-		return err
-	}
-
-	// skip mfa
-	if err = cmd.HumanSkipMFAInit(ctx, orgOwnerID, org.ResourceOwner); err != nil {
+	if err = initHuman(ctx, cmd, orgOwnerID, users[0], org.ResourceOwner); err != nil {
 		return err
 	}
 
@@ -92,18 +85,12 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 			return err
 		}
 
-		// Avoids the change password screen
-		if _, err = cmd.ChangePassword(ctx, org.ResourceOwner, createdHuman.ID, user.pw, user.pw, ""); err != nil {
-			return err
-		}
-
-		// skip mfa
-		if err = cmd.HumanSkipMFAInit(ctx, orgOwnerID, org.ResourceOwner); err != nil {
+		if err = initHuman(ctx, cmd, createdHuman.ID, user, org.ResourceOwner); err != nil {
 			return err
 		}
 
 		if user.role != "" {
-			if _, err = cmd.AddOrgMember(ctx, org.ResourceOwner, createdHuman.ID, user.role); err != nil {
+			if _, err := cmd.AddOrgMember(ctx, org.ResourceOwner, createdHuman.ID, user.role); err != nil {
 				return err
 			}
 		}
@@ -121,5 +108,19 @@ func newHuman(u userData) *command.AddHuman {
 			Address:  u.desc + ".e2e@zitadel.com",
 			Verified: true,
 		},
+		PasswordChangeRequired: false,
+		Register:               false,
 	}
+}
+
+// initHuman skips the MFA and change password screens
+func initHuman(ctx context.Context, cmd *command.Commands, userID string, user userData, orgID string) error {
+	// skip mfa
+	if err := cmd.HumanSkipMFAInit(ctx, userID, orgID); err != nil {
+		return err
+	}
+
+	// Avoids the change password screen
+	_, err := cmd.ChangePassword(ctx, orgID, userID, user.pw, user.pw, "")
+	return err
 }
