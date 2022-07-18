@@ -6,16 +6,16 @@ Follow the [Knative quickstart guide](https://knative.dev/docs/getting-started/q
 It is basically 4 commands on Mac:
 
 ```bash
-#install knative
+# Install knative
 brew install knative/client/kn
 
-#install knative quickstart sandbox
+# Install knative quickstart sandbox
 brew install knative-sandbox/kn-plugins/quickstart
 
-#install kind
+# Install kind
 brew install kind
 
-#install quickstart cluster
+# Install quickstart cluster
 kn quickstart kind
 ```
 That will get you a ready to go knative/kubernetes environment.
@@ -29,13 +29,13 @@ kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/depl
 ```
 
 
-## Start ZITADEL with Knative 
+## Start ZITADEL with Knative
+
+Either use the kn binary...
+
 ```bash
-
-# start zitadel
-
 kn service create zitadel \
---image ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.33-amd64 \
+--image ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.39-amd64 \
 --port 8080 \
 --env ZITADEL_DATABASE_HOST=cockroachdb \
 --env ZITADEL_EXTERNALSECURE=false \
@@ -46,15 +46,17 @@ kn service create zitadel \
 --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" 
 ```
 
-or use the knative service yaml
+... or use the knative service yaml
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/zitadel-knative-service.yaml
 ```
 
-## Get started with ZIDATEL
+## Get started with ZITADEL
+
+Get ZITADEL URL
+
 ```bash
-#get ZIDATEL URL
 kn services list
 
 NAME      URL                                         LATEST          AGE   CONDITIONS   READY   REASON

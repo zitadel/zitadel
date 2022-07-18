@@ -691,6 +691,17 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+    - Role: "ORG_SETTINGS_MANAGER"
+      Permissions:
+        - "org.read"
+        - "org.write"
+        - "org.member.read"
+        - "org.idp.read"
+        - "org.idp.write"
+        - "org.idp.delete"
+        - "policy.read"
+        - "policy.write"
+        - "policy.delete"
     - Role: "ORG_USER_PERMISSION_EDITOR"
       Permissions:
         - "org.read"
