@@ -4079,13 +4079,35 @@ message DataProjectGrant {
 }
 
 message ExportDataRequest {
+    message LocalOutput{
+        string path = 1;
+    }
+    message S3Output{
+        string path = 1;
+        string endpoint = 2;
+        string access_key_id =3;
+        string secret_access_key = 4;
+        bool ssl = 5;
+        string bucket = 6;
+    }
+    message GCSOutput{
+        string bucket = 1;
+        string serviceaccount_json = 2;
+        string path = 3;
+    }
     repeated string org_ids = 1;
     repeated string excluded_org_ids = 2;
     bool with_passwords = 3;
     bool with_otp = 4;
+    bool response_output = 5;
+    LocalOutput local_output = 6;
+    S3Output s3_output = 7;
+    GCSOutput gcs_output = 8;
+    string timeout = 9;
 }
 message ExportDataResponse {
     repeated DataOrg orgs = 1;
+    string error = 2;
 }
 
 message ExportHumanUser {

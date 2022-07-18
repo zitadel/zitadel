@@ -1589,6 +1589,51 @@ This is an empty response
 | excluded_org_ids | repeated string | - |  |
 | with_passwords |  bool | - |  |
 | with_otp |  bool | - |  |
+| response_output |  bool | - |  |
+| local_output |  ExportDataRequest.LocalOutput | - |  |
+| s3_output |  ExportDataRequest.S3Output | - |  |
+| gcs_output |  ExportDataRequest.GCSOutput | - |  |
+| timeout |  string | - |  |
+
+
+
+
+### ExportDataRequest.GCSOutput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| bucket |  string | - |  |
+| serviceaccount_json |  string | - |  |
+| path |  string | - |  |
+
+
+
+
+### ExportDataRequest.LocalOutput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+
+
+
+
+### ExportDataRequest.S3Output
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+| endpoint |  string | - |  |
+| access_key_id |  string | - |  |
+| secret_access_key |  string | - |  |
+| ssl |  bool | - |  |
+| bucket |  string | - |  |
 
 
 
@@ -1600,6 +1645,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | orgs | repeated DataOrg | - |  |
+| error |  string | - |  |
 
 
 

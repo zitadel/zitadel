@@ -1,11 +1,20 @@
 package admin
 
 import (
+	"bytes"
+	"cloud.google.com/go/storage"
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/zitadel/logging"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
@@ -15,10 +24,162 @@ import (
 	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	"google.golang.org/api/option"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"io/ioutil"
+	"os"
+	"strings"
+	"time"
 )
 
+func Detach(ctx context.Context) context.Context { return detachedContext{ctx} }
+
+type response struct {
+	response *admin_pb.ExportDataResponse
+	err      error
+}
+type detachedContext struct {
+	parent context.Context
+}
+
+func (v detachedContext) Deadline() (time.Time, bool)       { return time.Time{}, false }
+func (v detachedContext) Done() <-chan struct{}             { return nil }
+func (v detachedContext) Err() error                        { return nil }
+func (v detachedContext) Value(key interface{}) interface{} { return v.parent.Value(key) }
+
 func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	logging.Info("Starting export")
+
+	timeoutDuration, err := time.ParseDuration(req.Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.GcsOutput != nil || req.S3Output != nil || req.LocalOutput != nil {
+		dctx := Detach(ctx)
+		go func() {
+			ch := make(chan error, 1)
+			dctxTimeout, cancel := context.WithTimeout(dctx, timeoutDuration)
+			defer cancel()
+			go func() {
+				orgData, err := s.exportData(dctxTimeout, req)
+				if err != nil {
+					ch <- err
+					return
+				}
+
+				data, err := json.Marshal(orgData)
+				if err != nil {
+					ch <- err
+					return
+				}
+
+				if err := s.transportDataToFiles(dctxTimeout, data, req.GetGcsOutput(), req.GetS3Output(), req.GetLocalOutput()); err != nil {
+					ch <- err
+					return
+				}
+			}()
+
+			select {
+			case <-dctxTimeout.Done():
+				logging.Errorf("Export to file timeout: %v", dctxTimeout.Err())
+			case result := <-ch:
+				logging.OnError(result).Errorf("error while exporting: %v", result)
+				logging.Info("Export done")
+			}
+		}()
+	}
+
+	if req.ResponseOutput {
+		ch := make(chan response, 1)
+		ctxTimeout, cancel := context.WithTimeout(ctx, timeoutDuration)
+		defer cancel()
+
+		go func() {
+			ret, err := s.exportData(ctxTimeout, req)
+			ch <- response{response: ret, err: err}
+		}()
+
+		select {
+		case <-ctxTimeout.Done():
+			logging.Errorf("Export to response timeout: %v", ctxTimeout.Err())
+			return nil, ctxTimeout.Err()
+		case result := <-ch:
+			logging.OnError(result.err).Errorf("error while exporting: %v", result.err)
+			logging.Info("Export done")
+			return result.response, result.err
+		}
+	}
+
+	return &admin_pb.ExportDataResponse{}, nil
+}
+
+func (s *Server) transportDataToFiles(ctx context.Context, data []byte, gcsOutput *admin_pb.ExportDataRequest_GCSOutput, s3Output *admin_pb.ExportDataRequest_S3Output, localOutput *admin_pb.ExportDataRequest_LocalOutput) error {
+	if localOutput != nil && localOutput.Path != "" {
+		if err := ioutil.WriteFile(localOutput.Path, data, os.ModePerm); err != nil {
+			return err
+		}
+	}
+
+	if s3Output != nil && s3Output.Endpoint != "" {
+		minioClient, err := minio.New(s3Output.Endpoint, &minio.Options{
+			Creds:  credentials.NewStaticV4(s3Output.AccessKeyId, s3Output.SecretAccessKey, ""),
+			Secure: s3Output.Ssl,
+		})
+		if err != nil {
+			return err
+		}
+
+		exists, err := minioClient.BucketExists(ctx, s3Output.Bucket)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return fmt.Errorf("bucket not existing")
+		}
+
+		fullPath := s3Output.Path
+		if strings.HasSuffix(fullPath, ".json") {
+			fullPath = s3Output.Path + ".json"
+		}
+		buf := bytes.NewBuffer(data)
+		defer buf.Reset()
+		_, err = minioClient.PutObject(ctx, s3Output.Bucket, fullPath, buf, int64(len(data)), minio.PutObjectOptions{ContentType: "application/json"})
+		if err != nil {
+			return err
+		}
+	}
+
+	if gcsOutput != nil && gcsOutput.Bucket != "" {
+		saJson, err := base64.StdEncoding.DecodeString(gcsOutput.ServiceaccountJson)
+		if err != nil {
+			return err
+		}
+
+		client, err := storage.NewClient(ctx, option.WithCredentialsJSON(saJson))
+		if err != nil {
+			return err
+		}
+
+		bucket := client.Bucket(gcsOutput.Bucket)
+		wc := bucket.Object(gcsOutput.Path).NewWriter(ctx)
+		wc.ContentType = "text/plain"
+		if _, err := wc.Write(data); err != nil {
+			return err
+		}
+		if err := wc.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Server) exportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	orgSearchQuery := &query.OrgSearchQueries{}
 	if len(req.OrgIds) > 0 {
@@ -235,7 +396,10 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	}, nil
 }
 
-func (s *Server) getIAMPolicy(ctx context.Context, orgID string) (*admin_pb.AddCustomOrgIAMPolicyRequest, error) {
+func (s *Server) getIAMPolicy(ctx context.Context, orgID string) (_ *admin_pb.AddCustomOrgIAMPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedIAMPolicy, err := s.query.OrgIAMPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -249,7 +413,10 @@ func (s *Server) getIAMPolicy(ctx context.Context, orgID string) (*admin_pb.AddC
 	return nil, nil
 }
 
-func (s *Server) getDomains(ctx context.Context, orgID string) ([]*org_pb.Domain, error) {
+func (s *Server) getDomains(ctx context.Context, orgID string) (_ []*org_pb.Domain, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgDomainOrgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(orgID)
 	if err != nil {
 		return nil, err
@@ -271,7 +438,10 @@ func (s *Server) getDomains(ctx context.Context, orgID string) ([]*org_pb.Domain
 	return orgDomains, nil
 }
 
-func (s *Server) getIDPs(ctx context.Context, orgID string) ([]*admin_pb.DataOIDCIDP, []*admin_pb.DataJWTIDP, error) {
+func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*admin_pb.DataOIDCIDP, _ []*admin_pb.DataJWTIDP, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	ownerType, err := query.NewIDPOwnerTypeSearchQuery(domain.IdentityProviderTypeOrg)
 	if err != nil {
 		return nil, nil, err
@@ -324,7 +494,10 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) ([]*admin_pb.DataOID
 	return oidcIdps, jwtIdps, nil
 }
 
-func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLabelPolicyRequest, error) {
+func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomLabelPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -346,7 +519,16 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (*management_
 	return nil, nil
 }
 
-func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLoginPolicyRequest, []*management_pb.AddSecondFactorToLoginPolicyRequest, []*management_pb.AddMultiFactorToLoginPolicyRequest, []*management_pb.AddIDPToLoginPolicyRequest, error) {
+func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (
+	_ *management_pb.AddCustomLoginPolicyRequest,
+	_ []*management_pb.AddSecondFactorToLoginPolicyRequest,
+	_ []*management_pb.AddMultiFactorToLoginPolicyRequest,
+	_ []*management_pb.AddIDPToLoginPolicyRequest,
+	err error,
+) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedLogin, err := s.query.LoginPolicyByID(ctx, false, orgID)
 	if err != nil {
 		return nil, nil, nil, nil, err
@@ -396,7 +578,10 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (*management_
 	return nil, nil, nil, nil, nil
 }
 
-func (s *Server) getUserLinks(ctx context.Context, orgID string) ([]*idp_pb.IDPUserLink, error) {
+func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.IDPUserLink, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	userLinksResourceOwner, err := query.NewIDPUserLinksResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return nil, err
@@ -422,7 +607,10 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) ([]*idp_pb.IDPU
 	return userLinks, nil
 }
 
-func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomLockoutPolicyRequest, error) {
+func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomLockoutPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -435,7 +623,10 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (*managemen
 	return nil, nil
 }
 
-func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomPasswordComplexityPolicyRequest, error) {
+func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomPasswordComplexityPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -452,7 +643,10 @@ func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) 
 	return nil, nil
 }
 
-func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (*management_pb.AddCustomPrivacyPolicyRequest, error) {
+func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomPrivacyPolicyRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
@@ -467,7 +661,15 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (*managemen
 	return nil, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) ([]*admin_pb.DataHumanUser, []*admin_pb.DataMachineUser, []*management_pb.SetUserMetadataRequest, error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) (
+	_ []*admin_pb.DataHumanUser,
+	_ []*admin_pb.DataMachineUser,
+	_ []*management_pb.SetUserMetadataRequest,
+	err error,
+) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
 		return nil, nil, nil, err
@@ -512,7 +714,9 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				}
 			}
 			if withPasswords {
+				ctx, pwspan := tracing.NewSpan(ctx)
 				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
+				pwspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
 					return nil, nil, nil, err
 				}
@@ -524,7 +728,9 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				}
 			}
 			if withOTP {
+				ctx, otpspan := tracing.NewSpan(ctx)
 				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
+				otpspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
 					return nil, nil, nil, err
 				}
@@ -545,11 +751,13 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			})
 		}
 
+		ctx, metaspan := tracing.NewSpan(ctx)
 		metadataOrgSearch, err := query.NewUserMetadataResourceOwnerSearchQuery(org)
 		if err != nil {
 			return nil, nil, nil, err
 		}
 		metadataList, err := s.query.SearchUserMetadata(ctx, user.ID, false, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
+		metaspan.EndWithError(err)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -564,7 +772,10 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 	return humanUsers, machineUsers, userMetadata, nil
 }
 
-func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) ([]*management_pb.SetTriggerActionsRequest, error) {
+func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) (_ []*management_pb.SetTriggerActionsRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication}
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 
@@ -594,7 +805,10 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 	return triggerActions, nil
 }
 
-func (s *Server) getActions(ctx context.Context, org string) ([]*admin_pb.DataAction, error) {
+func (s *Server) getActions(ctx context.Context, org string) (_ []*admin_pb.DataAction, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	actionSearch, err := query.NewActionResourceOwnerQuery(org)
 	if err != nil {
 		return nil, err
@@ -624,7 +838,10 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*admin_pb.DataAc
 	return actions, nil
 }
 
-func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*admin_pb.DataOIDCApplication, []*admin_pb.DataAPIApplication, error) {
+func (s *Server) getProjectsAndApps(ctx context.Context, org string) (_ []*admin_pb.DataProject, _ []*management_pb.AddProjectRoleRequest, _ []*admin_pb.DataOIDCApplication, _ []*admin_pb.DataAPIApplication, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	projectSearch, err := query.NewProjectResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, nil, nil, nil, err
@@ -732,7 +949,10 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*admin_p
 	return projects, orgProjectRoles, oidcApps, apiApps, nil
 }
 
-func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) ([]*management_pb.AddProjectGrantMemberRequest, error) {
+func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) (_ []*management_pb.AddProjectGrantMemberRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	projectMembers := make([]*management_pb.AddProjectGrantMemberRequest, 0)
 
 	for _, projectID := range processedProjects {
@@ -766,7 +986,10 @@ func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org 
 	return projectMembers, nil
 }
 
-func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processedProjects []string, processedUsers []string) ([]*management_pb.AddProjectMemberRequest, error) {
+func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processedProjects []string, processedUsers []string) (_ []*management_pb.AddProjectMemberRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	projectMembers := make([]*management_pb.AddProjectMemberRequest, 0)
 
 	for _, projectID := range processedProjects {
@@ -790,7 +1013,10 @@ func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processed
 	return projectMembers, nil
 }
 
-func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, processedUsers []string) ([]*management_pb.AddOrgMemberRequest, error) {
+func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, processedUsers []string) (_ []*management_pb.AddOrgMemberRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedOrgMembers, err := s.query.OrgMembers(ctx, &query.OrgMembersQuery{OrgID: org})
 	if err != nil {
 		return nil, err
@@ -810,7 +1036,9 @@ func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, p
 	return orgMembers, nil
 }
 
-func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*admin_pb.DataProjectGrant, error) {
+func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) (_ []*admin_pb.DataProjectGrant, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	projectGrantSearchOrg, err := query.NewProjectGrantResourceOwnerSearchQuery(org)
 	if err != nil {
@@ -848,7 +1076,10 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 	return projectGrants, nil
 }
 
-func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) ([]*management_pb.AddUserGrantRequest, error) {
+func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) (_ []*management_pb.AddUserGrantRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	userGrantSearchOrg, err := query.NewUserGrantResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, err
@@ -895,7 +1126,10 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	}
 	return userGrants, nil
 }
-func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomLoginTextsRequest, error) {
+func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages []string) (_ []*management_pb.SetCustomLoginTextsRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	customTexts := make([]*management_pb.SetCustomLoginTextsRequest, 0, len(languages))
 	for _, lang := range languages {
 		text, err := s.query.GetCustomLoginTexts(ctx, org, lang)
@@ -946,7 +1180,10 @@ func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages 
 	return customTexts, nil
 }
 
-func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomInitMessageTextRequest, error) {
+func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, languages []string) (_ []*management_pb.SetCustomInitMessageTextRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	customTexts := make([]*management_pb.SetCustomInitMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
 		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.InitCodeMessageType, lang)
@@ -971,7 +1208,10 @@ func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, lang
 	return customTexts, nil
 }
 
-func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordResetMessageTextRequest, error) {
+func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org string, languages []string) (_ []*management_pb.SetCustomPasswordResetMessageTextRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	customTexts := make([]*management_pb.SetCustomPasswordResetMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
 		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.PasswordResetMessageType, lang)
@@ -996,7 +1236,10 @@ func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org str
 	return customTexts, nil
 }
 
-func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyEmailMessageTextRequest, error) {
+func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org string, languages []string) (_ []*management_pb.SetCustomVerifyEmailMessageTextRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	customTexts := make([]*management_pb.SetCustomVerifyEmailMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
 		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyEmailMessageType, lang)
@@ -1021,7 +1264,10 @@ func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org strin
 	return customTexts, nil
 }
 
-func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, error) {
+func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org string, languages []string) (_ []*management_pb.SetCustomVerifyPhoneMessageTextRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	customTexts := make([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
 		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyPhoneMessageType, lang)
@@ -1046,7 +1292,10 @@ func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org strin
 	return customTexts, nil
 }
 
-func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomDomainClaimedMessageTextRequest, error) {
+func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org string, languages []string) (_ []*management_pb.SetCustomDomainClaimedMessageTextRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	customTexts := make([]*management_pb.SetCustomDomainClaimedMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
 		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
@@ -1071,7 +1320,10 @@ func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org str
 	return customTexts, nil
 }
 
-func (s *Server) getCustomPasswordlessRegistrationMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, error) {
+func (s *Server) getCustomPasswordlessRegistrationMessageTexts(ctx context.Context, org string, languages []string) (_ []*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	customTexts := make([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
 		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
