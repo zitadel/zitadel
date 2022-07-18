@@ -1,9 +1,21 @@
+import CodeBlock from '@theme/CodeBlock';
+import ExampleZITADELConfigSource from '!!raw-loader!./example-zitadel-config.yaml'
+import ExampleZITADELSecretsSource from '!!raw-loader!./example-zitadel-secrets.yaml'
+import ExampleZITADELInitStepsSource from '!!raw-loader!./example-zitadel-init-steps.yaml'
+
 ### Configure by Files
 
 By executing the commands below, you will download the following files:
-- [example-zitadel-config.yaml](./example-zitadel-config.yaml)
-- [example-zitadel-secrets.yaml](./example-zitadel-secrets.yaml)
-- [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml)
+
+<details><summary>example-zitadel-config.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+</details>
+<details><summary>example-zitadel-secrets.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+</details>
+<details><summary>example-zitadel-init-steps.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+</details>
 
 ```bash
 # Download and adjust the example configuration file containing standard configuration
@@ -44,5 +56,5 @@ export ZITADEL_S3DEFAULTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
 
 # Let the zitadel binary read configuration from environment variables
-zitadel admin start-from-init --masterkey "${ZITADEL_MASTERKEY}"
+zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled
 ```
