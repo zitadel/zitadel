@@ -16,7 +16,7 @@ services:
     ports:
       - '8080:8080'
 
-  db:
+  pg:
     restart: 'always'
     networks:
       - 'zitadel'
@@ -32,6 +32,22 @@ services:
       start_period: 80s
     ports:
       - '5432:5432'
+
+  crdb:
+    restart: 'always'
+    networks:
+      - 'zitadel'
+    image: 'cockroachdb/cockroach:v22.1.3'
+    command: 'start-single-node --insecure'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+    ports:
+      - '9090:8080'
+      - '26257:26257'
 
 networks:
   zitadel:
