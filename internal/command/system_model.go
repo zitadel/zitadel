@@ -64,7 +64,8 @@ func (wm *SystemConfigWriteModel) Reduce() error {
 				if domain == e.Domain {
 					domains[i] = domains[len(domains)-1]
 					domains[len(domains)-1] = ""
-					domains = domains[:len(domains)-1]
+					wm.Instances[e.Aggregate().InstanceID].Domains = domains[:len(domains)-1]
+					break
 				}
 			}
 		case *instance.ProjectSetEvent:
