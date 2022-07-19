@@ -4,7 +4,7 @@ module.exports = {
   trailingSlash: false,
   url: "https://docs.zitadel.com",
   baseUrl: "/",
-  onBrokenLinks: "warn",
+  onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
@@ -19,7 +19,15 @@ module.exports = {
     },
   ],
   themeConfig: {
-    zoomSelector: ".markdown :not(em) > img",
+    zoom: {
+      selector: '.markdown :not(em) > img',
+      background: {
+        light: 'rgb(243, 244, 246)',
+        dark: 'rgb(55, 59, 82)'
+      },
+      // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
+      config: {}
+    },
     announcementBar: {
       id: 'documentation',
       content:
@@ -76,6 +84,16 @@ module.exports = {
           href: "https://github.com/zitadel/zitadel",
           label: "GitHub",
           position: "right",
+        },
+        {
+          href: "https://zitadel.com/chat",
+          label: "Chat",
+          position: "right",
+        },
+        {
+          label: "Discussions",
+          position: "right",
+          href: "https://github.com/zitadel/zitadel/discussions",
         },
       ],
     },
@@ -170,5 +188,5 @@ module.exports = {
       },
     ],
   ],
-  plugins: [require.resolve("plugin-image-zoom")],
+  plugins: [require.resolve("docusaurus-plugin-image-zoom")],
 };

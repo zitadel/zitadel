@@ -2,6 +2,13 @@
 title: Load Balancing Example
 ---
 
+import CodeBlock from '@theme/CodeBlock';
+import DockerComposeSource from '!!raw-loader!./docker-compose.yaml'
+import ExampleTraefikSource from '!!raw-loader!./example-traefik.yaml'
+import ExampleZITADELConfigSource from '!!raw-loader!./example-zitadel-config.yaml'
+import ExampleZITADELSecretsSource from '!!raw-loader!./example-zitadel-secrets.yaml'
+import ExampleZITADELInitStepsSource from '!!raw-loader!./example-zitadel-init-steps.yaml'
+
 With this example configuration, you create a near production environment for ZITADEL with [Docker Compose](https://docs.docker.com/compose/).
 
 The stack consists of three long-running containers:
@@ -12,14 +19,29 @@ The stack consists of three long-running containers:
 The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
 
 By executing the commands below, you will download the following files:
-- [docker-compose.yaml](./docker-compose.yaml)
-- [example-zitadel-config.yaml](./example-zitadel-config.yaml)
-- [example-zitadel-secrets.yaml](./example-zitadel-secrets.yaml)
-- [example-zitadel-init-steps.yaml](./example-zitadel-init-steps.yaml)
+
+<details><summary>docker-compose.yaml</summary>
+    <CodeBlock language="yaml">{DockerComposeSource}</CodeBlock>
+</details>
+<details><summary>example-traefik.yaml</summary>
+    <CodeBlock language="yaml">{ExampleTraefikSource}</CodeBlock>
+</details>
+<details><summary>example-zitadel-config.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELConfigSource}</CodeBlock>
+</details>
+<details><summary>example-zitadel-secrets.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELSecretsSource}</CodeBlock>
+</details>
+<details><summary>example-zitadel-init-steps.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELInitStepsSource}</CodeBlock>
+</details>
 
 ```bash
 # Download the docker compose example configuration. For example:
 wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/docker-compose.yaml
+
+# Download the docker compose example configuration. For example:
+wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/example-traefik.yaml
 
 # Download and adjust the example configuration file containing standard configuration
 wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides/installation/loadbalancing-example/example-zitadel-config.yaml

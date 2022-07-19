@@ -1,11 +1,20 @@
+import CodeBlock from '@theme/CodeBlock';
+import ExampleZITADELValuesSource from '!!raw-loader!./example-zitadel-values.yaml'
+import ExampleZITADELValuesSecretsSource from '!!raw-loader!./example-zitadel-values-secrets.yaml'
+
 By default, the chart installs a secure ZITADEL and CockroachDB.
 The example files makes an insecure ZITADEL accessible by port forwarding the ZITADEL service to localhost.
 For more configuration options, [go to the chart repo descriptions](https://github.com/zitadel/zitadel-charts).
-For a secure installation with Docker Compose, [go to the loadbalancing example](../loadbalancing-example/loadbalancing-example)
+For a secure installation with Docker Compose, [go to the loadbalancing example](/docs/guides/installation/loadbalancing-example)
 
 By executing the commands below, you will download the following files:
-- [example-zitadel-values.yaml](./example-zitadel-values.yaml)
-- [example-zitadel-values-secrets.yaml](./example-zitadel-values-secrets.yaml)
+
+<details><summary>example-zitadel-values.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELValuesSource}</CodeBlock>
+</details>
+<details><summary>example-zitadel-values-secrets.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELValuesSecretsSource}</CodeBlock>
+</details>
 
 ```bash
 # Download and adjust the example configuration file containing standard configuration
