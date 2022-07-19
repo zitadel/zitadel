@@ -3,6 +3,11 @@ Log:
   Formatter:
     Format: text
 
+# Exposes metrics on /debug/metrics
+Metrics:
+  # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
+  Type: otel
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic

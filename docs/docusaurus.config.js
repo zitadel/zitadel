@@ -85,6 +85,16 @@ module.exports = {
           label: "GitHub",
           position: "right",
         },
+        {
+          href: "https://zitadel.com/chat",
+          label: "Chat",
+          position: "right",
+        },
+        {
+          label: "Discussions",
+          position: "right",
+          href: "https://github.com/zitadel/zitadel/discussions",
+        },
       ],
     },
     footer: {

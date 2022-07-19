@@ -16,6 +16,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -130,6 +131,7 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
+	handler.Handle("/metrics", metricsExporter())
 
 	return handler
 }
@@ -172,4 +174,12 @@ func validate(ctx context.Context, validations []ValidationFunction) []error {
 		}
 	}
 	return errs
+}
+
+func metricsExporter() http.Handler {
+	exporter := metrics.GetExporter()
+	if exporter == nil {
+		return http.NotFoundHandler()
+	}
+	return exporter
 }
