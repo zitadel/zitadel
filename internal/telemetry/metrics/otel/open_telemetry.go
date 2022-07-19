@@ -15,6 +15,7 @@ import (
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	otel_resource "github.com/zitadel/zitadel/internal/telemetry/otel"
 )
 
 type Metrics struct {
@@ -26,6 +27,10 @@ type Metrics struct {
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
+	resource, err := otel_resource.ResourceWithService()
+	if err != nil {
+		return nil, err
+	}
 	exporter, err := prometheus.New(
 		prometheus.Config{},
 		controller.New(
@@ -34,6 +39,7 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 				aggregation.CumulativeTemporalitySelector(),
 				processor.WithMemory(true),
 			),
+			controller.WithResource(resource),
 		),
 	)
 	if err != nil {
