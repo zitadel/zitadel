@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -635,7 +636,11 @@ func TestProjection_subscribe(t *testing.T) {
 				update: tt.fields.update,
 			}
 			ctx, cancel := context.WithCancel(tt.args.ctx)
-			go h.subscribe(ctx)
+			go func() {
+				//changed go h.subscribe(ctx) to this to be able to ignore logs easily
+				t.Helper()
+				h.subscribe(ctx)
+			}()
 			for _, event := range tt.fields.events {
 				h.EventQueue <- event
 			}
@@ -658,10 +663,16 @@ func TestProjection_schedule(t *testing.T) {
 		unlock            *unlockMock
 		query             SearchQuery
 	}
+	type want struct {
+		locksCount   int
+		lockCanceled bool
+		unlockCount  int
+	}
 	tests := []struct {
 		name   string
 		args   args
 		fields fields
+		want   want
 	}{
 		{
 			"panic",
@@ -673,6 +684,7 @@ func TestProjection_schedule(t *testing.T) {
 					return nil
 				},
 			},
+			want{},
 		},
 		{
 			"filter instance ids error",
@@ -686,6 +698,11 @@ func TestProjection_schedule(t *testing.T) {
 					)
 				},
 				triggerProjection: time.NewTimer(0),
+			},
+			want{
+				locksCount:   0,
+				lockCanceled: false,
+				unlockCount:  0,
 			},
 		},
 		{
@@ -705,6 +722,11 @@ func TestProjection_schedule(t *testing.T) {
 					firstErr: ErrLock,
 					canceled: make(chan bool, 1),
 				},
+			},
+			want{
+				locksCount:   1,
+				lockCanceled: true,
+				unlockCount:  0,
 			},
 		},
 		{
@@ -727,6 +749,11 @@ func TestProjection_schedule(t *testing.T) {
 				unlock: &unlockMock{},
 				query:  testQuery(nil, 0, ErrQuery),
 			},
+			want{
+				locksCount:   1,
+				lockCanceled: true,
+				unlockCount:  1,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -746,14 +773,18 @@ func TestProjection_schedule(t *testing.T) {
 				concurrentInstances: 1,
 			}
 			ctx, cancel := context.WithCancel(tt.args.ctx)
-			go h.schedule(ctx)
+			go func() {
+				//changed go h.schedule(ctx) to this to be able to ignore logs easily
+				t.Helper()
+				h.schedule(ctx)
+			}()
 
 			time.Sleep(1 * time.Second)
 			if tt.fields.lock != nil {
-				tt.fields.lock.check(t, 1, true)
+				tt.fields.lock.check(t, tt.want.locksCount, tt.want.lockCanceled)
 			}
 			if tt.fields.unlock != nil {
-				tt.fields.unlock.check(t, 1)
+				tt.fields.unlock.check(t, tt.want.unlockCount)
 			}
 			cancel()
 		})
@@ -875,6 +906,7 @@ func testQuery(query *eventstore.SearchQueryBuilder, limit uint64, err error) Se
 type lockMock struct {
 	callCount int
 	canceled  chan bool
+	mu        sync.Mutex
 
 	firstErr error
 	err      error
@@ -883,6 +915,8 @@ type lockMock struct {
 
 func (m *lockMock) lock() Lock {
 	return func(ctx context.Context, _ time.Duration, _ ...string) <-chan error {
+		m.mu.Lock()
+		defer m.mu.Unlock()
 		m.callCount++
 		errs := make(chan error)
 		go func() {
@@ -907,6 +941,8 @@ func (m *lockMock) lock() Lock {
 
 func (m *lockMock) check(t *testing.T, callCount int, shouldBeCanceled bool) {
 	t.Helper()
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	if callCount != m.callCount {
 		t.Errorf("wrong call count: expected %v got: %v", callCount, m.callCount)
 	}
@@ -922,10 +958,13 @@ func (m *lockMock) check(t *testing.T, callCount int, shouldBeCanceled bool) {
 type unlockMock struct {
 	callCount int
 	err       error
+	mu        sync.Mutex
 }
 
 func (m *unlockMock) unlock() Unlock {
 	return func(instanceID ...string) error {
+		m.mu.Lock()
+		defer m.mu.Unlock()
 		m.callCount++
 		return m.err
 	}
@@ -933,6 +972,8 @@ func (m *unlockMock) unlock() Unlock {
 
 func (m *unlockMock) check(t *testing.T, callCount int) {
 	t.Helper()
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	if callCount != m.callCount {
 		t.Errorf("wrong call count: expected %v got: %v", callCount, m.callCount)
 	}
