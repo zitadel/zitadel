@@ -401,9 +401,9 @@ func join(join, from Column) string {
 
 type listContains struct {
 	col  Column
-	args []interface{}
+	args interface{}
 }
 
 func (q *listContains) ToSql() (string, []interface{}, error) {
-	return q.col.identifier() + " @> ? ", q.args, nil
+	return q.col.identifier() + " @> ? ", []interface{}{q.args}, nil
 }

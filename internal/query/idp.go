@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -41,7 +42,7 @@ type OIDCIDP struct {
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
 	Issuer                string
-	Scopes                []string
+	Scopes                database.StringArray
 	DisplayNameMapping    domain.OIDCMappingField
 	UsernameMapping       domain.OIDCMappingField
 	AuthorizationEndpoint string
@@ -306,7 +307,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcIssuer := sql.NullString{}
-			oidcScopes := []string{}
+			oidcScopes := database.StringArray{}
 			oidcDisplayNameMapping := sql.NullInt32{}
 			oidcUsernameMapping := sql.NullInt32{}
 			oidcAuthorizationEndpoint := sql.NullString{}
@@ -418,7 +419,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcIssuer := sql.NullString{}
-				oidcScopes := []string{}
+				oidcScopes := database.StringArray{}
 				oidcDisplayNameMapping := sql.NullInt32{}
 				oidcUsernameMapping := sql.NullInt32{}
 				oidcAuthorizationEndpoint := sql.NullString{}

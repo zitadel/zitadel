@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -91,7 +92,7 @@ type ProjectGrant struct {
 	ProjectName       string
 	GrantedOrgID      string
 	OrgName           string
-	GrantedRoleKeys   []string
+	GrantedRoleKeys   database.StringArray
 	ResourceOwnerName string
 }
 

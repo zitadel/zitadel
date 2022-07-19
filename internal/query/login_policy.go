@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -23,8 +24,8 @@ type LoginPolicy struct {
 	AllowUsernamePassword      bool
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
-	SecondFactors              []domain.SecondFactorType
-	MultiFactors               []domain.MultiFactorType
+	SecondFactors              database.EnumArray[domain.SecondFactorType]
+	MultiFactors               database.EnumArray[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
@@ -45,7 +46,7 @@ type SecondFactors struct {
 
 type MultiFactors struct {
 	SearchResponse
-	Factors []domain.MultiFactorType
+	Factors database.EnumArray[domain.MultiFactorType]
 }
 
 var (
@@ -319,8 +320,6 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
-			secondFactors := []int{}
-			multiFactors := []int{}
 			defaultRedirectURI := sql.NullString{}
 			links := make([]*IDPLoginPolicyLink, 0)
 			for rows.Next() {
@@ -338,8 +337,8 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&p.AllowUsernamePassword,
 					&p.AllowExternalIDPs,
 					&p.ForceMFA,
-					&secondFactors,
-					&multiFactors,
+					&p.SecondFactors,
+					&p.MultiFactors,
 					&p.PasswordlessType,
 					&p.IsDefault,
 					&p.HidePasswordReset,
@@ -375,14 +374,6 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 				return nil, errors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
 			}
 			p.DefaultRedirectURI = defaultRedirectURI.String
-			p.MultiFactors = make([]domain.MultiFactorType, len(multiFactors))
-			for i, mfa := range multiFactors {
-				p.MultiFactors[i] = domain.MultiFactorType(mfa)
-			}
-			p.SecondFactors = make([]domain.SecondFactorType, len(secondFactors))
-			for i, mfa := range secondFactors {
-				p.SecondFactors[i] = domain.SecondFactorType(mfa)
-			}
 			p.IDPLinks = links
 			return p, nil
 		}
@@ -394,9 +385,8 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecondFactors, error) {
 			p := new(SecondFactors)
-			secondFactors := []int{}
 			err := row.Scan(
-				&secondFactors,
+				&p.Factors,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -405,11 +395,7 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
-			p.Factors = make([]domain.SecondFactorType, len(secondFactors))
-			p.Count = uint64(len(secondFactors))
-			for i, mfa := range secondFactors {
-				p.Factors[i] = domain.SecondFactorType(mfa)
-			}
+			p.Count = uint64(len(p.Factors))
 			return p, nil
 		}
 }
@@ -420,9 +406,8 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MultiFactors, error) {
 			p := new(MultiFactors)
-			multiFactors := []int{}
 			err := row.Scan(
-				&multiFactors,
+				&p.Factors,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -431,11 +416,6 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
-			p.Factors = make([]domain.MultiFactorType, len(multiFactors))
-			p.Count = uint64(len(multiFactors))
-			for i, mfa := range multiFactors {
-				p.Factors[i] = domain.MultiFactorType(mfa)
-			}
 			return p, nil
 		}
 }

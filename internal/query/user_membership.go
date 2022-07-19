@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -19,7 +20,7 @@ type Memberships struct {
 
 type Membership struct {
 	UserID        string
-	Roles         []string
+	Roles         database.StringArray
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	Sequence      uint64
@@ -214,14 +215,13 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					iamID       = sql.NullString{}
 					projectID   = sql.NullString{}
 					grantID     = sql.NullString{}
-					roles       = []string{}
 					projectName = sql.NullString{}
 					orgName     = sql.NullString{}
 				)
 
 				err := rows.Scan(
 					&membership.UserID,
-					&roles,
+					&membership.Roles,
 					&membership.CreationDate,
 					&membership.ChangeDate,
 					&membership.Sequence,
@@ -238,8 +238,6 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 				if err != nil {
 					return nil, err
 				}
-
-				membership.Roles = roles
 
 				if orgID.Valid {
 					membership.Org = &OrgMembership{
