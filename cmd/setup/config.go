@@ -31,9 +31,6 @@ type Config struct {
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 	err := v.Unmarshal(config,
-		func(c *mapstructure.DecoderConfig) {
-			c.ZeroFields = true
-		},
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),

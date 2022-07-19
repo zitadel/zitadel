@@ -4,7 +4,7 @@ Log:
     Format: text
 
 Database:
-  default:
+  cockroach:
     Host: localhost
     Port: 26257
     Database: zitadel
@@ -14,6 +14,14 @@ Database:
     Options: ""
     User:
       Username: zitadel
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+    Admin:
+      Username: root
       Password: ""
       SSL:
         Mode: disable
@@ -57,15 +65,6 @@ HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"
 
 WebAuthNName: ZITADEL
-
-AdminUser:
-  Username: root
-  Password: ""
-  SSL:
-    Mode: disable
-    RootCert: ""
-    Cert: ""
-    Key: ""
 
 Machine:
   # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.

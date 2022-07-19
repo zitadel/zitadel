@@ -6,13 +6,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-)
-
-var (
-	searchDatabase = "SELECT database_name FROM [show databases] WHERE database_name = $1"
-
-	//go:embed sql/02_database.sql
-	databaseStmt string
+	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 func newDatabase() *cobra.Command {
@@ -30,19 +26,18 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			// config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.New())
 
-			// err := initialise(config, VerifyDatabase(config.Database.Database))
-			// logging.OnError(err).Fatal("unable to initialize the database")
+			err := initialise(config.Database, VerifyDatabase(config.Database.Database()))
+			logging.OnError(err).Fatal("unable to initialize the database")
 		},
 	}
 }
 
-func VerifyDatabase(database string) func(*sql.DB) error {
-	return func(db *sql.DB) error {
-		return verify(db,
-			exists(searchDatabase, database),
-			exec(fmt.Sprintf(databaseStmt, database)),
-		)
+func VerifyDatabase(databaseName string) func(*sql.DB, database.Config) error {
+	return func(db *sql.DB, config database.Config) error {
+		logging.WithFields("database", databaseName).Info("verify database")
+
+		return exec(db, fmt.Sprintf(string(databaseStmt), databaseName), []string{dbAlreadyExistsCode})
 	}
 }

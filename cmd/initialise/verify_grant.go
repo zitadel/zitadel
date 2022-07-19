@@ -6,13 +6,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-)
-
-var (
-	searchGrant = "SELECT * FROM [SHOW GRANTS ON DATABASE %s] where grantee = $1 AND privilege_type = 'ALL'"
-	//go:embed sql/03_grant_user.sql
-	grantStmt string
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 func newGrant() *cobra.Command {
@@ -25,20 +21,18 @@ Prereqesits:
 - cockroachdb
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			// config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.New())
 
-			// err := initialise(config, VerifyGrant(config.Database.Database, config.Database.Username))
-			// logging.OnError(err).Fatal("unable to set grant")
+			err := initialise(config.Database, VerifyGrant(config.Database.Database(), config.Database.Username()))
+			logging.OnError(err).Fatal("unable to set grant")
 		},
 	}
 }
 
-func VerifyGrant(database, username string) func(*sql.DB) error {
-	return func(db *sql.DB) error {
-		logging.WithFields("user", username, "database", database).Info("verify grant")
-		return verify(db,
-			exists(fmt.Sprintf(searchGrant, database), username),
-			exec(fmt.Sprintf(grantStmt, database, username)),
-		)
+func VerifyGrant(databaseName, username string) func(*sql.DB, database.Config) error {
+	return func(db *sql.DB, config database.Config) error {
+		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
+
+		return exec(db, fmt.Sprintf(grantStmt, databaseName, username), nil)
 	}
 }

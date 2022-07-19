@@ -28,7 +28,11 @@ type Matcher interface {
 }
 
 type Connector interface {
-	Connect() (*sql.DB, error)
+	Connect(useAdmin bool) (*sql.DB, error)
+	DatabaseName() string
+	Username() string
+	Password() string
+	Type() string
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {

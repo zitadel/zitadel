@@ -2,27 +2,25 @@ package initialise
 
 import (
 	"database/sql"
+	"errors"
+
+	"github.com/jackc/pgconn"
 )
 
-func exists(query string, args ...interface{}) func(*sql.DB) (exists bool, err error) {
-	return func(db *sql.DB) (exists bool, err error) {
-		row := db.QueryRow("SELECT EXISTS("+query+")", args...)
-		err = row.Scan(&exists)
-		return exists, err
+func exec(db *sql.DB, stmt string, possibleErrCodes []string, args ...interface{}) error {
+	// s, err := db.Prepare(stmt)
+	// if err != nil {
+	// 	return err
+	// }
+	// _, err = s.Exec(args...)
+	_, err := db.Exec(stmt, args...)
+	pgErr := new(pgconn.PgError)
+	if errors.As(err, &pgErr) {
+		for _, possibleCode := range possibleErrCodes {
+			if possibleCode == pgErr.Code {
+				return nil
+			}
+		}
 	}
-}
-
-func exec(stmt string, args ...interface{}) func(*sql.DB) error {
-	return func(db *sql.DB) error {
-		_, err := db.Exec(stmt, args...)
-		return err
-	}
-}
-
-func verify(db *sql.DB, checkExists func(*sql.DB) (bool, error), create func(*sql.DB) error) error {
-	exists, err := checkExists(db)
-	if exists || err != nil {
-		return err
-	}
-	return create(db)
+	return err
 }

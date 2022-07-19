@@ -22,7 +22,8 @@ type Config struct {
 	MaxOpenConns    uint32
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
-	User
+	User            User
+	Admin           User
 
 	//Additional options to be appended as options=<Options>
 	//The value will be taken as is. Multiple options are space separated.
@@ -30,7 +31,7 @@ type Config struct {
 }
 
 func (c *Config) MatchName(name string) bool {
-	for _, key := range []string{"crdb", "cockroach", "default"} {
+	for _, key := range []string{"crdb", "cockroach", "Cockroach"} {
 		if name == key {
 			return true
 		}
@@ -55,7 +56,25 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	return c, nil
 }
 
-func (c *Config) Connect() (*sql.DB, error) { return nil, nil }
+func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
+	return sql.Open("pgx", c.String(useAdmin))
+}
+
+func (c *Config) DatabaseName() string {
+	return c.Database
+}
+
+func (c *Config) Username() string {
+	return c.User.Username
+}
+
+func (c *Config) Password() string {
+	return c.User.Password
+}
+
+func (c *Config) Type() string {
+	return "cockroach"
+}
 
 type User struct {
 	Username string
@@ -74,43 +93,47 @@ type SSL struct {
 	Key string
 }
 
-func (s *Config) checkSSL() {
-	if s.SSL.Mode == sslDisabledMode || s.SSL.Mode == "" {
-		s.SSL = SSL{Mode: sslDisabledMode}
+func (c *Config) checkSSL(user User) {
+	if user.SSL.Mode == sslDisabledMode || user.SSL.Mode == "" {
+		user.SSL = SSL{Mode: sslDisabledMode}
 		return
 	}
-	if s.SSL.RootCert == "" {
+	if user.SSL.RootCert == "" {
 		logging.WithFields(
-			"cert set", s.SSL.Cert != "",
-			"key set", s.SSL.Key != "",
-			"rootCert set", s.SSL.RootCert != "",
+			"cert set", user.SSL.Cert != "",
+			"key set", user.SSL.Key != "",
+			"rootCert set", user.SSL.RootCert != "",
 		).Fatal("at least ssl root cert has to be set")
 	}
 }
 
-func (c Config) String() string {
-	c.checkSSL()
+func (c Config) String(useAdmin bool) string {
+	user := c.User
+	if useAdmin {
+		user = c.Admin
+	}
+	c.checkSSL(user)
 	fields := []string{
 		"host=" + c.Host,
 		"port=" + strconv.Itoa(int(c.Port)),
-		"user=" + c.Username,
+		"user=" + user.Username,
 		"dbname=" + c.Database,
 		"application_name=zitadel",
-		"sslmode=" + c.SSL.Mode,
+		"sslmode=" + user.SSL.Mode,
 	}
 	if c.Options != "" {
 		fields = append(fields, "options="+c.Options)
 	}
-	if c.Password != "" {
-		fields = append(fields, "password="+c.Password)
+	if user.Password != "" {
+		fields = append(fields, "password="+user.Password)
 	}
-	if c.SSL.Mode != sslDisabledMode {
-		fields = append(fields, "sslrootcert="+c.SSL.RootCert)
-		if c.SSL.Cert != "" {
-			fields = append(fields, "sslcert="+c.SSL.Cert)
+	if user.SSL.Mode != sslDisabledMode {
+		fields = append(fields, "sslrootcert="+user.SSL.RootCert)
+		if user.SSL.Cert != "" {
+			fields = append(fields, "sslcert="+user.SSL.Cert)
 		}
-		if c.SSL.Key != "" {
-			fields = append(fields, "sslkey="+c.SSL.Key)
+		if user.SSL.Key != "" {
+			fields = append(fields, "sslkey="+user.SSL.Key)
 		}
 	}
 

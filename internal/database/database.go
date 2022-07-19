@@ -2,20 +2,16 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"reflect"
-
-	"github.com/mitchellh/mapstructure"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
-	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type Config struct {
-	Dialects map[string]interface{} `mapstructure:",remain"`
-	dialect  dialect.Matcher
+	Dialects  map[string]interface{} `mapstructure:",remain"`
+	connector dialect.Connector
 }
 
 type User struct {
@@ -35,32 +31,22 @@ type SSL struct {
 	Key string
 }
 
-func Connect(config Config) (*sql.DB, error) {
-	// if len(config) > 2 {
-	// 	return nil, errors.ThrowInvalidArgument(nil, "DATAB-RbwLj", "too many dialects")
-	// }
-	// if len(config) == 1 {
-	// 	return config["default"].Connect()
-	// }
-	// for key, conn := range connectors {
-	// 	dialectConfig, ok := config[key]
-	// 	if !ok {
-	// 		continue
-	// 	}
-	// 	return conn(dialectConfig)
-	// }
+func Connect(config Config, useAdmin bool) (*sql.DB, error) {
+	client, err := config.connector.Connect(useAdmin)
+	if err != nil {
+		return nil, err
+	}
+	if err := client.Ping(); err != nil {
+		return nil, err
+	}
 
-	return nil, errors.ThrowNotFound(nil, "DATAB-rhOQ6", "dialect not found")
+	return client, nil
 }
 
 func DecodeHook(from, to reflect.Value) (interface{}, error) {
 	if to.Type() != reflect.TypeOf(Config{}) {
 		return from.Interface(), nil
 	}
-
-	confgi := &Config{}
-	asdf := mapstructure.Decode(from.Interface(), confgi)
-	fmt.Println(asdf, confgi)
 
 	configuredDialects, ok := from.Interface().(map[string]interface{})
 	if !ok {
@@ -78,5 +64,26 @@ func DecodeHook(from, to reflect.Value) (interface{}, error) {
 		configs = append(configs, dialectConfig)
 	}
 
-	return configuredDialect.Matcher.Decode(configs)
+	connector, err := configuredDialect.Matcher.Decode(configs)
+	if err != nil {
+		return nil, err
+	}
+
+	return Config{connector: connector}, nil
+}
+
+func (c Config) Database() string {
+	return c.connector.DatabaseName()
+}
+
+func (c Config) Username() string {
+	return c.connector.Username()
+}
+
+func (c Config) Password() string {
+	return c.connector.Password()
+}
+
+func (c Config) Type() string {
+	return c.connector.Type()
 }

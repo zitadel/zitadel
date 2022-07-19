@@ -2,6 +2,7 @@ package initialise
 
 import (
 	"database/sql"
+	"embed"
 	_ "embed"
 
 	"github.com/spf13/cobra"
@@ -10,6 +11,26 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/id"
+)
+
+var (
+	//go:embed sql/cockroach/*
+	//go:embed sql/postgres/*
+	stmts embed.FS
+
+	createUserStmt           string
+	grantStmt                string
+	databaseStmt             string
+	createEventstoreStmt     string
+	createProjectionsStmt    string
+	createSystemStmt         string
+	createEncryptionKeysStmt string
+	createEventsStmt         string
+	createSystemSequenceStmt string
+	createUniqueConstraints  string
+
+	roleAlreadyExistsCode = "42710"
+	dbAlreadyExistsCode   = "42P04"
 )
 
 func New() *cobra.Command {
@@ -39,9 +60,12 @@ The user provided by flags needs privileges to
 
 func InitAll(config *Config) {
 	id.Configure(config.Machine)
-	err := initialise(config) // VerifyUser(config.Database.Username, config.Database.Password),
-	// VerifyDatabase(config.Database.Database),
-	// VerifyGrant(config.Database.Database, config.Database.Username),
+
+	err := initialise(config.Database,
+		VerifyUser(config.Database.Username(), config.Database.Password()),
+		VerifyDatabase(config.Database.Database()),
+		VerifyGrant(config.Database.Database(), config.Database.Username()),
+	)
 
 	logging.OnError(err).Fatal("unable to initialize the database")
 
@@ -49,25 +73,80 @@ func InitAll(config *Config) {
 	logging.OnError(err).Fatal("unable to initialize ZITADEL")
 }
 
-func initialise(config *Config, steps ...func(*sql.DB) error) error {
+func initialise(config database.Config, steps ...func(*sql.DB, database.Config) error) error {
 	logging.Info("initialization started")
 
-	db, err := database.Connect(adminConfig(config))
-	if err != nil {
-		return err
-	}
-	err = Initialise(db, steps...)
-	if err != nil {
-		return err
-	}
-	return db.Close()
-}
+	readStmts(config.Type())
 
-func Initialise(db *sql.DB, steps ...func(*sql.DB) error) error {
+	db, err := database.Connect(config, true)
+	if err != nil {
+		return err
+	}
+
 	for _, step := range steps {
-		if err := step(db); err != nil {
+		if err := step(db, config); err != nil {
 			return err
 		}
 	}
+
+	return db.Close()
+}
+
+func readStmts(typ string) (err error) {
+	createUserStmt, err = readStmt(typ, "01_user")
+	if err != nil {
+		return err
+	}
+
+	databaseStmt, err = readStmt(typ, "02_database")
+	if err != nil {
+		return err
+	}
+
+	grantStmt, err = readStmt(typ, "03_grant_user")
+	if err != nil {
+		return err
+	}
+
+	createEventstoreStmt, err = readStmt(typ, "04_eventstore")
+	if err != nil {
+		return err
+	}
+
+	createProjectionsStmt, err = readStmt(typ, "05_projections")
+	if err != nil {
+		return err
+	}
+
+	createSystemStmt, err = readStmt(typ, "06_system")
+	if err != nil {
+		return err
+	}
+
+	createEncryptionKeysStmt, err = readStmt(typ, "07_encryption_keys_table")
+	if err != nil {
+		return err
+	}
+
+	createEventsStmt, err = readStmt(typ, "08_events_table")
+	if err != nil {
+		return err
+	}
+
+	createSystemSequenceStmt, err = readStmt(typ, "09_system_sequence")
+	if err != nil {
+		return err
+	}
+
+	createUniqueConstraints, err = readStmt(typ, "10_unique_constraints_table")
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func readStmt(typ, step string) (string, error) {
+	stmt, err := stmts.ReadFile("sql/" + typ + "/" + step + ".sql")
+	return string(stmt), err
 }

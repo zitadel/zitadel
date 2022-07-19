@@ -78,7 +78,7 @@ Requirements:
 func startZitadel(config *Config, masterKey string) error {
 	ctx := context.Background()
 
-	dbClient, err := database.Connect(config.Database)
+	dbClient, err := database.Connect(config.Database, false)
 	if err != nil {
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
