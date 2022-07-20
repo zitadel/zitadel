@@ -2,8 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"regexp"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 
@@ -66,18 +64,6 @@ func (e E2EConfig) Validate() (err error) {
 	}
 	if e.MachineKeyPath == "" {
 		return errors.New("field MachineKeyPath is empty")
-	}
-	if e.ZitadelProjectResourceID == "" {
-		return errors.New("field ZitadelProjectResourceID is empty")
-	}
-
-	audPattern := "number-[0-9]{17}"
-	matched, err := regexp.MatchString("bignumber-[0-9]{17}", e.ZitadelProjectResourceID)
-	if err != nil {
-		return fmt.Errorf("validating ZitadelProjectResourceID failed: %w", err)
-	}
-	if !matched {
-		return fmt.Errorf("ZitadelProjectResourceID doesn't match regular expression %s", audPattern)
 	}
 
 	if e.APIURL == "" {

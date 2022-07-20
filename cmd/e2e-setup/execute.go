@@ -13,9 +13,9 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
-func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []userData) error {
+func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []userData, instanceID string) error {
 
-	ctx = authz.WithInstanceID(ctx, cfg.InstanceID)
+	ctx = authz.WithInstanceID(ctx, instanceID)
 	ctx = authz.WithRequestedDomain(ctx, "localhost")
 
 	orgOwner := newHuman(users[0])

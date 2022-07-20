@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/logging"
 )
 
-func awaitConsistency(ctx context.Context, cfg E2EConfig, expectUsers []userData) (err error) {
+func awaitConsistency(ctx context.Context, cfg E2EConfig, expectUsers []userData, zitadelProjectResourceID string) (err error) {
 
 	retry := make(chan struct{})
 	go func() {
@@ -18,7 +18,7 @@ func awaitConsistency(ctx context.Context, cfg E2EConfig, expectUsers []userData
 	for {
 		select {
 		case <-retry:
-			err = checkCondition(ctx, cfg, expectUsers)
+			err = checkCondition(ctx, cfg, expectUsers, zitadelProjectResourceID)
 			if err == nil {
 				logging.Log("AWAIT-QIOOJ").Info("setup is consistent")
 				return nil
@@ -34,8 +34,8 @@ func awaitConsistency(ctx context.Context, cfg E2EConfig, expectUsers []userData
 	}
 }
 
-func checkCondition(ctx context.Context, cfg E2EConfig, expectUsers []userData) error {
-	token, err := newToken(cfg)
+func checkCondition(ctx context.Context, cfg E2EConfig, expectUsers []userData, zitadelProjectResourceID string) error {
+	token, err := newToken(cfg, zitadelProjectResourceID)
 	if err != nil {
 		return err
 	}

@@ -3,15 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
-func newToken(cfg E2EConfig) (string, error) {
+func newToken(cfg E2EConfig, zitadelProjectResourceID string) (string, error) {
 
 	keyBytes, err := os.ReadFile(cfg.MachineKeyPath)
 	if err != nil {
@@ -61,7 +61,7 @@ func newToken(cfg E2EConfig) (string, error) {
 
 	resp, err := http.PostForm(fmt.Sprintf("%s/oauth/v2/token", cfg.APIURL), map[string][]string{
 		"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
-		"scope":      {fmt.Sprintf("openid urn:zitadel:iam:org:project:id:%s:aud", strings.TrimPrefix(cfg.ZitadelProjectResourceID, "bignumber-"))},
+		"scope":      {fmt.Sprintf("openid urn:zitadel:iam:org:project:id:%s:aud", zitadelProjectResourceID)},
 		"assertion":  {tokenString},
 	})
 	if err != nil {
