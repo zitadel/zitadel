@@ -15,12 +15,12 @@ func ids(cfg *E2EConfig, dbClient *sql.DB) (string, string, error) {
 		return zitadelProjectResourceID, instanceID, nil
 	}
 
-	zitadelProjectResourceID, err := querySingleString(dbClient, `select aggregate_id from eventstore.events where event_type = 'project.added' and event_data = '{\"name\": \"ZITADEL\"}'`)
+	zitadelProjectResourceID, err := querySingleString(dbClient, `select aggregate_id from eventstore.events where event_type = 'project.added' and event_data = '{"name": "ZITADEL"}'`)
 	if err != nil {
 		return "", "", err
 	}
 
-	instanceID, err = querySingleString(dbClient, `select aggregate_id from eventstore.events where event_type = 'instance.added' and event_data = '{\"name\": \"Localhost\"}'`)
+	instanceID, err = querySingleString(dbClient, `select aggregate_id from eventstore.events where event_type = 'instance.added' and event_data = '{"name": "Localhost"}'`)
 	return instanceID, zitadelProjectResourceID, err
 }
 
