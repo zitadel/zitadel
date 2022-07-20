@@ -2,7 +2,7 @@
 
 set -ex
 
-projectRoot="."
+export projectRoot="."
 
 set -a
 source ./e2e/local.env
