@@ -2,12 +2,15 @@ package saml
 
 import (
 	"context"
+	"time"
+
 	"github.com/zitadel/saml/pkg/provider"
 	"github.com/zitadel/saml/pkg/provider/key"
 	"github.com/zitadel/saml/pkg/provider/models"
 	"github.com/zitadel/saml/pkg/provider/serviceprovider"
 	"github.com/zitadel/saml/pkg/provider/xml"
 	"github.com/zitadel/saml/pkg/provider/xml/samlp"
+
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
@@ -18,7 +21,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"time"
 )
 
 var _ provider.EntityStorage = &Storage{}
@@ -180,7 +182,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	if err != nil {
 		return err
 	}
-	user, err := p.query.GetUser(ctx, loginNameSQ)
+	user, err := p.query.GetUser(ctx, true, loginNameSQ)
 	if err != nil {
 		return err
 	}
