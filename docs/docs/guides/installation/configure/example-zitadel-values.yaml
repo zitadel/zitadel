@@ -9,7 +9,7 @@ zitadel:
     ExternalDomain: localhost
 
     # the configmap is also passed to the zitadel binary via the --steps flag
-    S3DefaultInstance:
+    FirstInstance:
       Org:
         Human:
           # use the loginname root@zitadel.localhost
