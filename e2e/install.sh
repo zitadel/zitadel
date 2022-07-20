@@ -2,6 +2,8 @@
 
 set -e
 
+export projectRoot="."
+
 DO_BUILD=1
 DO_DEPLOY=1
 
