@@ -32,6 +32,7 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 	// Avoids the MFA nudge
 	if _, err = cmd.AddLoginPolicy(ctx, org.ResourceOwner, &domain.LoginPolicy{
 		AllowUsernamePassword: true,
+		DefaultRedirectURI:    "http://localhost:8080/ui/console",
 	}); err != nil {
 		return err
 	}
