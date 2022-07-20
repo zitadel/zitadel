@@ -6,11 +6,10 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 	api_trace "go.opentelemetry.io/otel/trace"
 
+	otel_resource "github.com/zitadel/zitadel/internal/telemetry/otel"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -20,13 +19,7 @@ type Tracer struct {
 }
 
 func NewTracer(sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter) (*Tracer, error) {
-	resource, err := resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("ZITADEL"),
-		),
-	)
+	resource, err := otel_resource.ResourceWithService()
 	if err != nil {
 		return nil, err
 	}

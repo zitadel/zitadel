@@ -193,7 +193,15 @@ module.exports = {
   concepts: [
     "concepts/introduction",
     "concepts/principles",
-    "concepts/eventstore",
+    {
+      type: "category",
+      label: "Eventstore",
+      collapsed: false,
+      items: [
+        "concepts/eventstore/overview",
+        "concepts/eventstore/zitadel",
+      ],
+    },
     "concepts/architecture",
     {
       type: "category",

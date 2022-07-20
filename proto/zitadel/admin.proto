@@ -3099,6 +3099,8 @@ message SetUpOrgRequest {
         // oneof field for the user managing the organisation
         Human human = 2;
     }
+    // specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty)
+    repeated string roles = 3;
 }
 
 message SetUpOrgResponse {

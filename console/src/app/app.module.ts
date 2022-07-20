@@ -26,7 +26,6 @@ import { HeaderModule } from './modules/header/header.module';
 import { KeyboardShortcutsModule } from './modules/keyboard-shortcuts/keyboard-shortcuts.module';
 import { NavModule } from './modules/nav/nav.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
-import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { AdminService } from './services/admin.service';
 import { AuthenticationService } from './services/authentication.service';
@@ -80,7 +79,7 @@ const authConfig: AuthConfig = {
 };
 
 @NgModule({
-  declarations: [AppComponent, SignedoutComponent],
+  declarations: [AppComponent],
   imports: [
     AppRoutingModule,
     CommonModule,
