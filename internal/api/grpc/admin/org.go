@@ -66,6 +66,7 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 		Name:         req.Org.Name,
 		CustomDomain: req.Org.Domain,
 		Human:        human,
+		Roles:        req.Roles,
 	}, userIDs...)
 	if err != nil {
 		return nil, err

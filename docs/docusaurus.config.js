@@ -19,7 +19,15 @@ module.exports = {
     },
   ],
   themeConfig: {
-    zoomSelector: ".markdown :not(em) > img",
+    zoom: {
+      selector: '.markdown :not(em) > img',
+      background: {
+        light: 'rgb(243, 244, 246)',
+        dark: 'rgb(55, 59, 82)'
+      },
+      // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
+      config: {}
+    },
     announcementBar: {
       id: 'documentation',
       content:
@@ -170,5 +178,5 @@ module.exports = {
       },
     ],
   ],
-  plugins: [require.resolve("plugin-image-zoom")],
+  plugins: [require.resolve("docusaurus-plugin-image-zoom")],
 };

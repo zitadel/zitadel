@@ -3,6 +3,11 @@ Log:
   Formatter:
     Format: text
 
+# Exposes metrics on /debug/metrics
+Metrics:
+  # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
+  Type: otel
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -686,6 +691,17 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+    - Role: "ORG_SETTINGS_MANAGER"
+      Permissions:
+        - "org.read"
+        - "org.write"
+        - "org.member.read"
+        - "org.idp.read"
+        - "org.idp.write"
+        - "org.idp.delete"
+        - "policy.read"
+        - "policy.write"
+        - "policy.delete"
     - Role: "ORG_USER_PERMISSION_EDITOR"
       Permissions:
         - "org.read"

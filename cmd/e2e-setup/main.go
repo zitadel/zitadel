@@ -69,6 +69,9 @@ func startE2ESetup(conf *Config, masterkey string) {
 	dbClient, err := database.Connect(conf.Database)
 	logging.New().OnError(err).Fatalf("cannot start client for projection: %s", err)
 
+	zitadelProjectResourceID, instanceID, err := ids(conf.E2E, dbClient)
+	logging.New().OnError(err).Fatalf("cannot get instance and project IDs: %s", err)
+
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterkey)
 	logging.New().OnError(err).Fatalf("cannot start key storage: %s", err)
 
@@ -124,7 +127,7 @@ func startE2ESetup(conf *Config, masterkey string) {
 		pw:   conf.E2E.PasswordComplexityUserPassword,
 	}}
 
-	err = execute(ctx, commands, *conf.E2E, users)
+	err = execute(ctx, commands, *conf.E2E, users, instanceID)
 	logging.New().OnError(err).Fatalf("failed to execute commands steps")
 
 	eventualConsistencyCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
@@ -133,6 +136,7 @@ func startE2ESetup(conf *Config, masterkey string) {
 		eventualConsistencyCtx,
 		*conf.E2E,
 		users,
+		zitadelProjectResourceID,
 	)
 	logging.New().OnError(err).Fatal("failed to await consistency")
 }
