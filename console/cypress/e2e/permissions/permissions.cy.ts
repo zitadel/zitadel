@@ -24,7 +24,7 @@ describe('permissions', () => {
                     api = apiCalls
                     ensureProjectExists(apiCalls, testProjectName).then(projId => {
                         projectId = projId
-                        cy.visit(`${Cypress.env('consoleUrl')}/projects/${projId}`)
+                        cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects/${projId}`)
                     })
                 })
             })
@@ -54,19 +54,19 @@ describe('permissions', () => {
 describe('permissions', () => {
 
     before(()=> {
-//        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))
+//        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('baseUrl')/ui/console)
     })
 
     it('should show projects ', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/projects')
+        cy.visit(Cypress.env('baseUrl')/ui/console + '/projects')
         cy.url().should('contain', '/projects')
     })
 
     it('should add a role', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
+        cy.visit(Cypress.env('baseUrl')/ui/console + '/org').then(() => {
             cy.url().should('contain', '/org');
         })
-        cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
+        cy.visit(Cypress.env('baseUrl')/ui/console + '/projects').then(() => {
             cy.url().should('contain', '/projects');
             cy.get('.card').should('contain.text', "newProjectToTest")
         })
@@ -77,8 +77,8 @@ describe('permissions', () => {
             cy.log(url.split('/')[4])
             projectID = url.split('/')[4]
         });
-        
-        cy.then(() => cy.visit(Cypress.env('consoleUrl') + '/projects/' + projectID +'/roles/create'))
+
+        cy.then(() => cy.visit(Cypress.env('baseUrl')/ui/console + '/projects/' + projectID +'/roles/create'))
         cy.get('[formcontrolname^=key]').type("newdemorole")
         cy.get('[formcontrolname^=displayName]').type("newdemodisplayname")
         cy.get('[formcontrolname^=group]').type("newdemogroupname")
@@ -88,10 +88,10 @@ describe('permissions', () => {
     })
 
     it('should add a grant', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/org').then(() => {
+        cy.visit(Cypress.env('baseUrl')/ui/console + '/org').then(() => {
             cy.url().should('contain', '/org');
         })
-        cy.visit(Cypress.env('consoleUrl') + '/projects').then(() => {
+        cy.visit(Cypress.env('baseUrl')/ui/console + '/projects').then(() => {
             cy.url().should('contain', '/projects');
             cy.get('.card').should('contain.text', "newProjectToTest")
         })
@@ -102,8 +102,8 @@ describe('permissions', () => {
             cy.log(url.split('/')[4])
             projectID = url.split('/')[4]
         });
-        
-        cy.then(() => cy.visit(Cypress.env('consoleUrl') + '/grant-create/project/' + projectID ))
+
+        cy.then(() => cy.visit(Cypress.env('baseUrl')/ui/console + '/grant-create/project/' + projectID ))
         cy.get('input').type("demo")
         cy.get('[role^=listbox]').filter(`:contains("${Cypress.env("fullUserName")}")`).should('be.visible').click()
         cy.wait(5000)

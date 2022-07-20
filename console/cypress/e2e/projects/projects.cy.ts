@@ -18,7 +18,7 @@ describe('projects', () => {
           apiAuth().then((api) => {
             ensureProjectDoesntExist(api, testProjectNameCreate);
           });
-          cy.visit(`${Cypress.env('consoleUrl')}/projects`);
+          cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects`);
         });
 
         it('should add a project', () => {
@@ -37,7 +37,7 @@ describe('projects', () => {
             apiAuth().then((api) => {
               ensureProjectExists(api, testProjectNameDeleteList);
             });
-            cy.visit(`${Cypress.env('consoleUrl')}/projects`);
+            cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects`);
           });
 
           it('removes the project', () => {
@@ -58,7 +58,7 @@ describe('projects', () => {
             apiAuth().then((api) => {
               ensureProjectExists(api, testProjectNameDeleteGrid);
             });
-            cy.visit(`${Cypress.env('consoleUrl')}/projects`);
+            cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects`);
           });
 
           it('removes the project', () => {

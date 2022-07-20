@@ -3,7 +3,7 @@ import { ensureMachineUserExists, ensureUserDoesntExist } from '../../support/ap
 import { login, User, username } from '../../support/login/users';
 
 describe('machines', () => {
-  const machinesPath = `${Cypress.env('consoleUrl')}/users?type=machine`;
+  const machinesPath = `${Cypress.env('baseUrl')}/ui/console/users?type=machine`;
   const testMachineUserNameAdd = 'e2emachineusernameadd';
   const testMachineUserNameRemove = 'e2emachineusernameremove';
 

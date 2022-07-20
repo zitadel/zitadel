@@ -2,7 +2,7 @@ import { login, User } from "../../support/login/users";
 
 describe("password complexity", ()=> {
 
-    const orgPath = `${Cypress.env('consoleUrl')}/org`
+    const orgPath = `${Cypress.env('baseUrl')}/ui/console/org`
     const testProjectName = 'e2eproject'
 
     ;[User.OrgOwner].forEach(user => {

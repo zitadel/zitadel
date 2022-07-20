@@ -3,7 +3,7 @@ import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/
 import { login, User, username } from '../../support/login/users';
 
 describe('humans', () => {
-  const humansPath = `${Cypress.env('consoleUrl')}/users?type=human`;
+  const humansPath = `${Cypress.env('baseUrl')}/ui/console/users?type=human`;
   const testHumanUserNameAdd = 'e2ehumanusernameadd';
   const testHumanUserNameRemove = 'e2ehumanusernameremove';
 
@@ -64,18 +64,18 @@ describe('humans', () => {
 describe("users", ()=> {
 
     before(()=> {
-        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), Cypress.env('consoleUrl'))
+        cy.consolelogin(Cypress.env('username'), Cypress.env('password'), `Cypress.env('baseUrl')/ui/console`)
     })
 
     it('should show personal information', () => {
         cy.log(`USER: show personal information`);
-        //click on user information 
+        //click on user information
         cy.get('a[href*="users/me"').eq(0).click()
         cy.url().should('contain', '/users/me')
     })
 
     it('should show users', () => {
-        cy.visit(Cypress.env('consoleUrl') + '/users/list/humans')
+        cy.visit(Cypress.env('baseUrl')/ui/console + '/users/list/humans')
         cy.url().should('contain', 'users/list/humans')
     })
 })

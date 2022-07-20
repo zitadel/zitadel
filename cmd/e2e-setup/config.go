@@ -48,9 +48,7 @@ type E2EConfig struct {
 	MachineKeyPath                 string
 	InstanceID                     string
 	ZitadelProjectResourceID       string
-	APIURL                         string
-	IssuerURL                      string
-	Audience                       string
+	BaseURL                        string
 	OrgOwnerPassword               string
 	OrgOwnerViewerPassword         string
 	OrgProjectCreatorPassword      string
@@ -65,12 +63,8 @@ func (e E2EConfig) Validate() (err error) {
 	if e.MachineKeyPath == "" {
 		return errors.New("field MachineKeyPath is empty")
 	}
-
-	if e.APIURL == "" {
-		return errors.New("field APIURL is empty")
-	}
-	if e.IssuerURL == "" {
-		return errors.New("field IssuerURL is empty")
+	if e.BaseURL == "" {
+		return errors.New("field BaseURL is empty")
 	}
 	if e.OrgOwnerPassword == "" {
 		return errors.New("field OrgOwnerPassword is empty")

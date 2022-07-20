@@ -4,7 +4,7 @@ export enum User {
   OrgProjectCreator = 'org_project_creator',
   LoginPolicyUser = 'login_policy_user',
   PasswordComplexityUser = 'password_complexity_user',
-  IAMAdminUser = 'zitadel-admin',
+//  IAMAdminUser = 'zitadel-admin',
 }
 
 export function login(
@@ -17,8 +17,10 @@ export function login(
 ): void {
   let creds = credentials(user, pw);
 
-  const accountsUrl: string = Cypress.env('accountsUrl');
-  const consoleUrl: string = Cypress.env('consoleUrl');
+  const baseUrl: string = Cypress.env('baseUrl');
+  const consoleUrl: string = `${baseUrl}/ui/console`;
+  const loginUrl: string = `${baseUrl}/ui/login`;
+  const issuerUrl: string = `${baseUrl}/oauth/v2`;
   const otherZitadelIdpInstance: boolean = Cypress.env('otherZitadelIdpInstance');
 
   cy.session(
@@ -30,7 +32,7 @@ export function login(
         cy.intercept(
           {
             method: 'GET',
-            url: `${accountsUrl}/login*`,
+            url: `${loginUrl}*`,
             times: 1,
           },
           (req) => {
@@ -44,7 +46,7 @@ export function login(
         cy.intercept(
           {
             method: 'POST',
-            url: `${accountsUrl}/loginname*`,
+            url: `${loginUrl}/loginname*`,
             times: 1,
           },
           (req) => {
@@ -58,7 +60,7 @@ export function login(
         cy.intercept(
           {
             method: 'POST',
-            url: `${accountsUrl}/password*`,
+            url: `${loginUrl}/password*`,
             times: 1,
           },
           (req) => {
@@ -72,7 +74,7 @@ export function login(
         cy.intercept(
           {
             method: 'GET',
-            url: `${accountsUrl}/success*`,
+            url: `${loginUrl}/success*`,
             times: 1,
           },
           (req) => {
@@ -86,7 +88,7 @@ export function login(
         cy.intercept(
           {
             method: 'GET',
-            url: `${accountsUrl}/oauth/v2/authorize/callback*`,
+            url: `${issuerUrl}/authorize/callback*`,
             times: 1,
           },
           (req) => {
@@ -100,7 +102,7 @@ export function login(
         cy.intercept(
           {
             method: 'GET',
-            url: `${accountsUrl}/oauth/v2/authorize*`,
+            url: `${issuerUrl}/authorize*`,
             times: 1,
           },
           (req) => {
@@ -111,7 +113,7 @@ export function login(
         );
       }
 
-      cy.visit(`${consoleUrl}/loginname`, { retryOnNetworkFailure: true });
+      cy.visit(`${loginUrl}`, { retryOnNetworkFailure: true });
 
       otherZitadelIdpInstance && cy.wait('@login');
       onUsernameScreen ? onUsernameScreen() : null;
@@ -127,7 +129,7 @@ export function login(
 
       otherZitadelIdpInstance && cy.wait('@callback');
 
-      cy.location('pathname', { timeout: 5 * 1000 }).should('eq', '/');
+      cy.location('pathname', { timeout: 5 * 1000 }).should('eq', '/ui/console/');
     },
     {
       validate: () => {
@@ -141,14 +143,14 @@ export function login(
   );
 }
 
-export function username(withoutDomain: string, project?: string): string {
-  return `${withoutDomain}@${project ? `${project}.` : ''}${host(Cypress.env('apiUrl')).replace('api.', '')}`;
+export function username(withoutDomain: string, org?: string): string {
+  return `${withoutDomain}@${org}.${host(Cypress.env('baseUrl'))}`;
 }
 
 function credentials(user: User, pw?: string) {
-  const isAdmin = user == User.IAMAdminUser;
+//  const isAdmin = user == User.IAMAdminUser;
   return {
-    username: username(isAdmin ? user : `${user}_user_name`, isAdmin ? 'caos-ag' : Cypress.env('org')),
+    username: username(`${user}_user_name`, Cypress.env('org')),
     password: pw ? pw : Cypress.env(`${user}_password`),
   };
 }

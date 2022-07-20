@@ -6,8 +6,8 @@ export interface apiCallProperties {
 }
 
 export function apiAuth(): Cypress.Chainable<apiCallProperties> {
-    const apiUrl = Cypress.env('apiUrl')
-    const issuerUrl = Cypress.env('issuerUrl')
+    const baseUrl = Cypress.env('baseUrl')
+    const issuerUrl = `${baseUrl}/oauth/v2`
     const zitadelProjectResourceID = (<string>Cypress.env('zitadelProjectResourceId')).replace('bignumber-', '')
 
     const key = Cypress.env("parsedServiceAccountKey")
@@ -18,7 +18,7 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
     const bearerToken = sign({
         iss: key.userId,
         sub: key.userId,
-        aud: `${issuerUrl}`,
+        aud: `${baseUrl}`,
         iat: iat,
         exp: exp
     }, key.key, {
@@ -30,7 +30,7 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
 
     return cy.request({
         method: 'POST',
-        url: `${apiUrl}/oauth/v2/token`,
+        url: `${issuerUrl}/token`,
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -43,7 +43,7 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
 
         return <apiCallProperties>{
             authHeader: `Bearer ${token}`,
-            mgntBaseURL: `${apiUrl}/management/v1/`,
+            mgntBaseURL: `${baseUrl}/management/v1/`,
         }
     })
 }

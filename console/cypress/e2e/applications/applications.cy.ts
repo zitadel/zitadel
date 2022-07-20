@@ -16,7 +16,7 @@ describe('applications', () => {
                 apiAuth().then(api => {
                     ensureProjectExists(api, testProjectName).then(projectID => {
                         ensureProjectResourceDoesntExist(api, projectID, Apps, testAppName).then(() => {
-                            cy.visit(`${Cypress.env('consoleUrl')}/projects/${projectID}`)
+                            cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects/${projectID}`)
                         })
                     })
                 })
@@ -46,5 +46,5 @@ describe('applications', () => {
                 //TODO: check client ID/Secret
             })
         })
-    }) 
+    })
 })
