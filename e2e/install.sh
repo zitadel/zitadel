@@ -29,7 +29,7 @@ shift "$(($OPTIND -1))"
 
 if [ "$DO_BUILD" -eq "1" ]; then
     # build the zitadel binary
-    goreleaser build --snapshot --single-target --rm-dist
+    GOOS="linux" GOARCH="amd64" goreleaser build --snapshot --single-target --rm-dist
 fi
 
 # extract some metadata for building and tagging the docker image
