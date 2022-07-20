@@ -69,7 +69,7 @@ func startE2ESetup(conf *Config, masterkey string) {
 	dbClient, err := database.Connect(conf.Database)
 	logging.New().OnError(err).Fatalf("cannot start client for projection: %s", err)
 
-	zitadelProjectResourceID, instanceID, err := ids(conf.E2E, dbClient)
+	zitadelProjectResourceID, instanceID, err := ids(ctx, conf.E2E, dbClient)
 	logging.New().OnError(err).Fatalf("cannot get instance and project IDs: %s", err)
 
 	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterkey)
