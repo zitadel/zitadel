@@ -19,6 +19,7 @@ type OrgSetup struct {
 	Name         string
 	CustomDomain string
 	Human        AddHuman
+	Roles        []string
 }
 
 func (c *Commands) SetUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, *domain.ObjectDetails, error) {
@@ -37,10 +38,15 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
+	roles := []string{domain.RoleOrgOwner}
+	if len(o.Roles) > 0 {
+		roles = o.Roles
+	}
+
 	validations := []preparation.Validation{
 		AddOrgCommand(ctx, orgAgg, o.Name, userIDs...),
 		AddHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.userEncryption),
-		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
+		c.AddOrgMemberCommand(orgAgg, userID, roles...),
 	}
 	if o.CustomDomain != "" {
 		validations = append(validations, AddOrgDomain(orgAgg, o.CustomDomain))

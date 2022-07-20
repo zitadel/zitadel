@@ -54,6 +54,8 @@ func Flags(cmd *cobra.Command) {
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
+	logging.Info("setup started")
+
 	dbClient, err := database.Connect(config.Database)
 	logging.OnError(err).Fatal("unable to connect to database")
 
@@ -76,6 +78,15 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.S3DefaultInstance.externalSecure = config.ExternalSecure
 	steps.S3DefaultInstance.externalPort = config.ExternalPort
 
+	repeatableSteps := []migration.RepeatableMigration{
+		&externalConfigChange{
+			es:             eventstoreClient,
+			ExternalDomain: config.ExternalDomain,
+			ExternalPort:   config.ExternalPort,
+			ExternalSecure: config.ExternalSecure,
+		},
+	}
+
 	ctx := context.Background()
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
 	logging.OnError(err).Fatal("unable to migrate step 1")
@@ -83,14 +94,9 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 2")
 	err = migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
 	logging.OnError(err).Fatal("unable to migrate step 3")
-}
 
-func initSteps(v *viper.Viper, files ...string) func() {
-	return func() {
-		for _, file := range files {
-			v.SetConfigFile(file)
-			err := v.MergeInConfig()
-			logging.WithFields("file", file).OnError(err).Warn("unable to read setup file")
-		}
+	for _, repeatableStep := range repeatableSteps {
+		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
+		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
 }

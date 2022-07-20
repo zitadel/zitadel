@@ -3991,6 +3991,7 @@ this is en empty request
 | ----- | ---- | ----------- | ----------- |
 | org |  SetUpOrgRequest.Org | - | message.required: true<br />  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) user.human |  SetUpOrgRequest.Human | oneof field for the user managing the organisation |  |
+| roles | repeated string | specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty) |  |
 
 
 
