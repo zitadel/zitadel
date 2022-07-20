@@ -82,14 +82,19 @@ func initialise(config database.Config, steps ...func(*sql.DB, database.Config) 
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
+	return Init(db, config, steps...)
+}
+
+func Init(db *sql.DB, config database.Config, steps ...func(*sql.DB, database.Config) error) error {
 	for _, step := range steps {
 		if err := step(db, config); err != nil {
 			return err
 		}
 	}
 
-	return db.Close()
+	return nil
 }
 
 func readStmts(typ string) (err error) {
