@@ -15,23 +15,23 @@ import (
 var idRegexp = regexp.MustCompile("[0-9]{16}")
 
 func ids(ctx context.Context, cfg *E2EConfig, dbClient *sql.DB) (string, string, error) {
-	zitadelProjectResourceID := strings.TrimPrefix(cfg.ZitadelProjectResourceID, "bignumber-")
 	instanceID := strings.TrimPrefix(cfg.InstanceID, "bignumber-")
+	zitadelProjectResourceID := strings.TrimPrefix(cfg.ZitadelProjectResourceID, "bignumber-")
 
-	if idRegexp.MatchString(zitadelProjectResourceID) && idRegexp.MatchString(instanceID) {
-		return zitadelProjectResourceID, instanceID, nil
-	}
-
-	projCtx, projCancel := context.WithTimeout(ctx, time.Minute)
-	defer projCancel()
-	zitadelProjectResourceID, err := querySingleString(projCtx, dbClient, `select aggregate_id from eventstore.events where event_type = 'project.added' and event_data = '{"name": "ZITADEL"}'`)
-	if err != nil {
-		return "", "", err
+	if idRegexp.MatchString(instanceID) && idRegexp.MatchString(zitadelProjectResourceID) {
+		return instanceID, zitadelProjectResourceID, nil
 	}
 
 	instCtx, instCancel := context.WithTimeout(ctx, time.Minute)
 	defer instCancel()
-	instanceID, err = querySingleString(instCtx, dbClient, `select aggregate_id from eventstore.events where event_type = 'instance.added' and event_data = '{"name": "Localhost"}'`)
+	instanceID, err := querySingleString(instCtx, dbClient, `select aggregate_id from eventstore.events where event_type = 'instance.added' and event_data = '{"name": "Localhost"}'`)
+	if err != nil {
+		return "", "", err
+	}
+
+	projCtx, projCancel := context.WithTimeout(ctx, time.Minute)
+	defer projCancel()
+	zitadelProjectResourceID, err = querySingleString(projCtx, dbClient, `select aggregate_id from eventstore.events where event_type = 'project.added' and event_data = '{"name": "ZITADEL"}'`)
 	return instanceID, zitadelProjectResourceID, err
 }
 
