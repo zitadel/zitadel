@@ -76,7 +76,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			logging.Errorf("Import to response timeout: %v", ctxTimeout.Err())
 			return nil, ctxTimeout.Err()
 		case result := <-ch:
-			logging.OnError(result.err)
+			logging.OnError(result.err).Errorf("error while importing: %v", result.err)
 			logging.Info("Import done")
 			return result.ret, result.err
 		}
@@ -135,10 +135,10 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				logging.Errorf("Export to response timeout: %v", ctxTimeout.Err())
 				return
 			case result := <-ch:
-				logging.OnError(result.err)
+				logging.OnError(result.err).Errorf("error while importing: %v", err)
 				if result.ret != nil {
 					ret, err := json.Marshal(result.ret)
-					logging.OnError(err)
+					logging.OnError(err).Errorf("error while marshalling import result: %v", err)
 
 					logging.Infof("Import done: %v", ret)
 				}
@@ -219,14 +219,9 @@ func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Inpu
 	if err != nil {
 		return nil, err
 	}
-	data := make([]byte, 0)
-	if _, err := object.Read(data); err != nil {
-		return nil, err
-	}
-	if err := object.Close(); err != nil {
-		return nil, err
-	}
-	return data, nil
+
+	defer object.Close()
+	return ioutil.ReadAll(object)
 }
 
 func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSInput) ([]byte, error) {
@@ -245,14 +240,8 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 	if err != nil {
 		return nil, err
 	}
-	data := make([]byte, reader.Remain())
-	if _, err := reader.Read(data); err != nil {
-		return nil, err
-	}
-	if err := reader.Close(); err != nil {
-		return nil, err
-	}
-	return data, nil
+	defer reader.Close()
+	return ioutil.ReadAll(reader)
 }
 
 func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*admin_pb.ImportDataResponse, error) {
