@@ -247,8 +247,11 @@ export class UserCreateComponent implements OnDestroy {
   }
   private envSuffix(): string {
     if (this.userLoginMustBeDomain && this.primaryDomain?.domainName) {
+      console.log('noo', this.primaryDomain.domainName);
+
       return `@${this.primaryDomain.domainName}`;
     } else {
+      console.log('nothing');
       return '';
     }
   }
