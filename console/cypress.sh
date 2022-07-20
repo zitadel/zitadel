@@ -6,7 +6,7 @@ ENVFILE=$2
 shift
 shift
 
-projectRoot=".."
+export projectRoot=".."
 
 set -a; source $ENVFILE; set +a
 
