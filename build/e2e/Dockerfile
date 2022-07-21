@@ -4,8 +4,7 @@ ARG GO_VERSION=1.17
 ##  run initialize setup step for ZITADEL tests
 #######################
 FROM golang:${GO_VERSION}
-RUN mkdir -p /cmd/e2e-setup
-WORKDIR /
+WORKDIR /go/src/github.com/zitadel/zitadel
 
 # copy setup
 COPY . .
