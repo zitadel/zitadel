@@ -398,6 +398,41 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 	}, nil
 }
 
+func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string, externalPort uint16, externalSecure bool) error {
+	validations, err := c.prepareChangeSystemConfig(externalDomain, externalPort, externalSecure)(ctx, c.eventstore.Filter)
+	if err != nil {
+		return err
+	}
+	for instanceID, instanceValidations := range validations {
+		if len(instanceValidations.Validations) == 0 {
+			continue
+		}
+		ctx := authz.WithConsole(authz.WithInstanceID(ctx, instanceID), instanceValidations.ProjectID, instanceValidations.ConsoleAppID)
+		cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, instanceValidations.Validations...)
+		if err != nil {
+			return err
+		}
+		_, err = c.eventstore.Push(ctx, cmds...)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Commands) prepareChangeSystemConfig(externalDomain string, externalPort uint16, externalSecure bool) func(ctx context.Context, filter preparation.FilterToQueryReducer) (map[string]*SystemConfigChangesValidation, error) {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer) (map[string]*SystemConfigChangesValidation, error) {
+		if externalDomain == "" || externalPort == 0 {
+			return nil, nil
+		}
+		writeModel, err := getSystemConfigWriteModel(ctx, filter, externalDomain, c.externalDomain, externalPort, c.externalPort, externalSecure, c.externalSecure)
+		if err != nil {
+			return nil, err
+		}
+		return writeModel.NewChangedEvents(c), nil
+	}
+}
+
 func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -483,6 +518,20 @@ func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLangu
 
 func getInstanceWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (*InstanceWriteModel, error) {
 	writeModel := NewInstanceWriteModel(authz.GetInstance(ctx).InstanceID())
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return writeModel, nil
+	}
+	writeModel.AppendEvents(events...)
+	err = writeModel.Reduce()
+	return writeModel, err
+}
+
+func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, externalDomain, newExternalDomain string, externalPort, newExternalPort uint16, externalSecure, newExternalSecure bool) (*SystemConfigWriteModel, error) {
+	writeModel := NewSystemConfigWriteModel(externalDomain, newExternalDomain, externalPort, newExternalPort, externalSecure, newExternalSecure)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err
