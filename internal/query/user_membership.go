@@ -48,9 +48,10 @@ type ProjectMembership struct {
 }
 
 type ProjectGrantMembership struct {
-	ProjectID   string
-	ProjectName string
-	GrantID     string
+	ProjectID    string
+	ProjectName  string
+	GrantID      string
+	GrantedOrgID string
 }
 
 type MembershipSearchQuery struct {
@@ -76,6 +77,10 @@ func NewMembershipResourceOwnersSearchQuery(ids ...string) (SearchQuery, error) 
 		list[i] = value
 	}
 	return NewListQuery(membershipResourceOwner, list, ListIn)
+}
+
+func NewMembershipGrantedOrgIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(ProjectGrantColumnGrantedOrgID, id, TextEquals)
 }
 
 func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
@@ -173,6 +178,10 @@ var (
 		name:  projection.ProjectGrantMemberGrantIDCol,
 		table: membershipAlias,
 	}
+	membershipGrantGrantedOrgID = Column{
+		name:  projection.ProjectGrantColumnGrantedOrgID,
+		table: membershipAlias,
+	}
 
 	membershipFrom = "(" +
 		prepareOrgMember() +
@@ -197,12 +206,14 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			membershipIAMID.identifier(),
 			membershipProjectID.identifier(),
 			membershipGrantID.identifier(),
+			ProjectGrantColumnGrantedOrgID.identifier(),
 			ProjectColumnName.identifier(),
 			OrgColumnName.identifier(),
 			countColumn.identifier(),
 		).From(membershipFrom).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Memberships, error) {
 			memberships := make([]*Membership, 0)
@@ -210,14 +221,15 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			for rows.Next() {
 
 				var (
-					membership  = new(Membership)
-					orgID       = sql.NullString{}
-					iamID       = sql.NullString{}
-					projectID   = sql.NullString{}
-					grantID     = sql.NullString{}
-					roles       = pq.StringArray{}
-					projectName = sql.NullString{}
-					orgName     = sql.NullString{}
+					membership   = new(Membership)
+					orgID        = sql.NullString{}
+					iamID        = sql.NullString{}
+					projectID    = sql.NullString{}
+					grantID      = sql.NullString{}
+					grantedOrgID = sql.NullString{}
+					roles        = pq.StringArray{}
+					projectName  = sql.NullString{}
+					orgName      = sql.NullString{}
 				)
 
 				err := rows.Scan(
@@ -231,6 +243,7 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					&iamID,
 					&projectID,
 					&grantID,
+					&grantedOrgID,
 					&projectName,
 					&orgName,
 					&count,
@@ -252,11 +265,12 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 						IAMID: iamID.String,
 						Name:  iamID.String,
 					}
-				} else if projectID.Valid && grantID.Valid {
+				} else if projectID.Valid && grantID.Valid && grantedOrgID.Valid {
 					membership.ProjectGrant = &ProjectGrantMembership{
-						ProjectID:   projectID.String,
-						ProjectName: projectName.String,
-						GrantID:     grantID.String,
+						ProjectID:    projectID.String,
+						ProjectName:  projectName.String,
+						GrantID:      grantID.String,
+						GrantedOrgID: grantedOrgID.String,
 					}
 				} else if projectID.Valid {
 					membership.Project = &ProjectMembership{
@@ -294,6 +308,7 @@ func prepareOrgMember() string {
 		"NULL::STRING AS "+membershipIAMID.name,
 		"NULL::STRING AS "+membershipProjectID.name,
 		"NULL::STRING AS "+membershipGrantID.name,
+		//"NULL::STRING AS "+membershipGrantGrantedOrgID.name,
 	).From(orgMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -311,6 +326,7 @@ func prepareIAMMember() string {
 		InstanceMemberIAMID.identifier(),
 		"NULL::STRING AS "+membershipProjectID.name,
 		"NULL::STRING AS "+membershipGrantID.name,
+		//"NULL::STRING AS "+membershipGrantGrantedOrgID.name,
 	).From(instanceMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -328,6 +344,7 @@ func prepareProjectMember() string {
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
 		"NULL::STRING AS "+membershipGrantID.name,
+		//"NULL::STRING AS "+membershipGrantGrantedOrgID.name,
 	).From(projectMemberTable.identifier()).MustSql()
 
 	return stmt
@@ -346,7 +363,10 @@ func prepareProjectGrantMember() string {
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
-	).From(projectGrantMemberTable.identifier()).MustSql()
+		//ProjectGrantColumnGrantedOrgID.identifier(),
+	).From(projectGrantMemberTable.identifier()).
+		//LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID)).
+		MustSql()
 
 	return stmt
 }
