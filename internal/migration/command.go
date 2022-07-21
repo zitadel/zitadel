@@ -15,20 +15,23 @@ import (
 type SetupStep struct {
 	eventstore.BaseEvent `json:"-"`
 	migration            Migration
-	Name                 string `json:"name"`
-	Error                error  `json:"error,omitempty"`
+	Name                 string      `json:"name"`
+	Error                error       `json:"error,omitempty"`
+	LastRun              interface{} `json:"lastRun,omitempty"`
 }
 
 func (s *SetupStep) UnmarshalJSON(data []byte) error {
 	fields := struct {
-		Name  string            `json:"name,"`
-		Error *errors.CaosError `json:"error"`
+		Name    string                 `json:"name,"`
+		Error   *errors.CaosError      `json:"error"`
+		LastRun map[string]interface{} `json:"lastRun,omitempty"`
 	}{}
 	if err := json.Unmarshal(data, &fields); err != nil {
 		return err
 	}
 	s.Name = fields.Name
 	s.Error = fields.Error
+	s.LastRun = fields.LastRun
 	return nil
 }
 
@@ -46,15 +49,21 @@ func setupStartedCmd(migration Migration) eventstore.Command {
 
 func setupDoneCmd(migration Migration, err error) eventstore.Command {
 	ctx := authz.SetCtxData(service.WithService(context.Background(), "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
+	typ := doneType
+	var lastRun interface{}
+	if repeatable, ok := migration.(RepeatableMigration); ok {
+		typ = repeatableDoneType
+		lastRun = repeatable
+	}
+	if err != nil {
+		typ = failedType
+	}
+
 	s := &SetupStep{
 		migration: migration,
 		Name:      migration.String(),
 		Error:     err,
-	}
-
-	typ := doneType
-	if err != nil {
-		typ = failedType
+		LastRun:   lastRun,
 	}
 
 	s.BaseEvent = *eventstore.NewBaseEventForPush(
@@ -75,7 +84,8 @@ func (s *SetupStep) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 		return []*eventstore.EventUniqueConstraint{
 			eventstore.NewAddGlobalEventUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
 		}
-	case failedType:
+	case failedType,
+		repeatableDoneType:
 		return []*eventstore.EventUniqueConstraint{
 			eventstore.NewRemoveGlobalEventUniqueConstraint("migration_started", s.migration.String()),
 		}
@@ -90,6 +100,7 @@ func RegisterMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(startedType, SetupMapper)
 	es.RegisterFilterEventMapper(doneType, SetupMapper)
 	es.RegisterFilterEventMapper(failedType, SetupMapper)
+	es.RegisterFilterEventMapper(repeatableDoneType, SetupMapper)
 }
 
 func SetupMapper(event *repository.Event) (eventstore.Event, error) {
