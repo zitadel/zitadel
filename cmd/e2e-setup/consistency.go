@@ -40,7 +40,7 @@ func checkCondition(ctx context.Context, cfg E2EConfig, expectUsers []userData, 
 		return err
 	}
 
-	foundUsers, err := listUsers(ctx, cfg.APIURL, token)
+	foundUsers, err := listUsers(ctx, cfg.BaseURL, token)
 	if err != nil {
 		return err
 	}
