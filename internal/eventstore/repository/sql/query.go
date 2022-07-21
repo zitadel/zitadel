@@ -106,7 +106,7 @@ func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
 	var id string
 	err = scanner(&id)
 	if err != nil {
-		logging.New().WithError(err).Warn("unable to scan row")
+		logging.WithError(err).Warn("unable to scan row")
 		return z_errors.ThrowInternal(err, "SQL-DEFGe", "unable to scan row")
 	}
 	*ids = append(*ids, id)
