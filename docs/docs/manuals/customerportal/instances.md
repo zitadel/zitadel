@@ -37,15 +37,9 @@ The detail shows you general information about your instance, which options you 
 
 ### Upgrade Instance
 
-A free instance can be upgraded to a "pay as you go" instance. By upgrading your authenticated request will no longer be capped and you will be able to choose more options. To upgrade you must enter your billing information.
+import UpgradeInstanceDescription from '../../manuals/customerportal/_upgrade_instance_description.mdx';
 
-1. Go to the detail of your instance
-2. Click "Upgrade to paid tier!" in the General Information
-3. Choose the options you need (can be changed later)
-   1. Data Region
-   2. Custom Domain
-   3. Extended SLA
-4. Add a payment method or choose an existing one
+<UpgradeInstanceDescription name="UpgradeInstanceDescription" />
 
 ### Add Custom Domain
 
