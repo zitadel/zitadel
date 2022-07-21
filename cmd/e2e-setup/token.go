@@ -33,15 +33,10 @@ func newToken(cfg E2EConfig, zitadelProjectResourceID string) (string, error) {
 	iat := now.Unix()
 	exp := now.Add(55 * time.Minute).Unix()
 
-	audience := cfg.Audience
-	if audience == "" {
-		audience = cfg.IssuerURL
-	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"iss": key.UserId,
 		"sub": key.UserId,
-		"aud": audience,
+		"aud": cfg.BaseURL,
 		"iat": iat,
 		"exp": exp,
 	})
@@ -59,7 +54,7 @@ func newToken(cfg E2EConfig, zitadelProjectResourceID string) (string, error) {
 		return "", err
 	}
 
-	resp, err := http.PostForm(fmt.Sprintf("%s/oauth/v2/token", cfg.APIURL), map[string][]string{
+	resp, err := http.PostForm(fmt.Sprintf("%s/oauth/v2/token", cfg.BaseURL), map[string][]string{
 		"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
 		"scope":      {fmt.Sprintf("openid urn:zitadel:iam:org:project:id:%s:aud", zitadelProjectResourceID)},
 		"assertion":  {tokenString},
