@@ -42,10 +42,10 @@ describe('projects', () => {
 
           it('removes the project', () => {
             cy.get('[data-e2e=toggle-grid]').click();
-            cy.get('[data-cy=timestamp]');
+            cy.get('[data-e2e=timestamp]');
             cy.contains('tr', testProjectNameDeleteList, { timeout: 1000 })
-              .find('[data-e2e=delete-project-button]')
-              .click({ force: true });
+              .find('[data-e2e=table-actions-button]')
+              .click({force: true});
             cy.get('[e2e-data="confirm-dialog-button"]').click();
             cy.get('.data-e2e-success');
             cy.wait(200);
@@ -66,6 +66,7 @@ describe('projects', () => {
               .find('[data-e2e=delete-project-button]')
               .trigger('mouseover')
               .click();
+            cy.get('[e2e-data="confirm-dialog-input"]').type(testProjectNameDeleteGrid);
             cy.get('[e2e-data="confirm-dialog-button"]').click();
             cy.get('.data-e2e-success');
             cy.wait(200);
