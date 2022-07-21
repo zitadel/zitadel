@@ -12,7 +12,7 @@ describe('machines', () => {
       beforeEach(() => {
         login(user);
         cy.visit(machinesPath);
-        cy.get('[data-cy=timestamp]');
+        cy.get('[data-e2e=timestamp]');
       });
 
       describe('add', () => {
@@ -23,7 +23,7 @@ describe('machines', () => {
         });
 
         it('should add a machine', () => {
-          cy.get('a[href="/users/create-machine"]').click();
+          cy.get('[data-e2e="create-user-button"]').click();
           cy.url().should('contain', 'users/create-machine');
           //force needed due to the prefilled username prefix
           cy.get('[formcontrolname="userName"]').type(testMachineUserNameAdd, { force: true });

@@ -12,7 +12,7 @@ describe('humans', () => {
       beforeEach(() => {
         login(user);
         cy.visit(humansPath);
-        cy.get('[data-cy=timestamp]');
+        cy.get('[data-e2e=timestamp]');
       });
 
       describe('add', () => {
@@ -23,7 +23,7 @@ describe('humans', () => {
         });
 
         it('should add a user', () => {
-          cy.get('a[href="/users/create"]').click();
+          cy.get('[data-e2e="create-user-button"]').click();
           cy.url().should('contain', 'users/create');
           cy.get('[formcontrolname="email"]').type(username('e2ehuman'));
           //force needed due to the prefilled username prefix

@@ -9,10 +9,10 @@
   [showBorder]="true"
 >
   <div leftActions class="user-table-left-actions">
-    <button class="type-button" [ngClass]="{ active: type === Type.TYPE_HUMAN }" (click)="setType(Type.TYPE_HUMAN)">
+    <button class="type-button" [ngClass]="{ active: type === Type.TYPE_HUMAN }" (click)="setType(Type.TYPE_HUMAN)" [attr.data-e2e]="'list-humans'">
       {{ 'USER.TABLE.TYPES.HUMAN' | translate }}
     </button>
-    <button class="type-button" [ngClass]="{ active: type === Type.TYPE_MACHINE }" (click)="setType(Type.TYPE_MACHINE)">
+    <button class="type-button" [ngClass]="{ active: type === Type.TYPE_MACHINE }" (click)="setType(Type.TYPE_MACHINE)" [attr.data-e2e]="'list-machines'">
       {{ 'USER.TABLE.TYPES.MACHINE' | translate }}
     </button>
   </div>
@@ -52,6 +52,7 @@
       mat-raised-button
       [disabled]="!canWrite"
       class="cnsl-action-button"
+      [attr.data-e2e]="'create-user-button'"
     >
       <mat-icon class="icon">add</mat-icon>
       <span>{{ 'ACTIONS.NEW' | translate }}</span>

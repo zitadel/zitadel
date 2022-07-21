@@ -24,7 +24,7 @@ describe('permissions', () => {
                     api = apiCalls
                     ensureProjectExists(apiCalls, testProjectName).then(projId => {
                         projectId = projId
-                        cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects/${projId}`)
+                        cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects/${projId}?id=roles`)
                     })
                 })
             })
