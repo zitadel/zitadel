@@ -18,8 +18,12 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Test
-        run: docker build -f build/grpc/Dockerfile -t zitadel-base:local . && docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+      - name: Run Environment
+        run: ./e2e/install.sh
+      - name: Prepare for E2E Tests
+        run: ./e2e/e2e-setup.sh
+      - name: Run E2E Tests
+        run: cd ./console && npm run e2e
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:
