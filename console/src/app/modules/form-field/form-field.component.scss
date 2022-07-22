@@ -9,7 +9,7 @@
   .ng-untouched {
     .cnsl-error {
       visibility: hidden;
-      transition: visibility .2 ease;
+      transition: visibility 0.2 ease;
     }
   }
 
@@ -24,10 +24,14 @@
 
   [cnslSuffix] {
     position: absolute;
-    right: .5rem;
+    right: 0.5rem;
     top: 9px;
     height: inherit;
     vertical-align: middle;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   input {
