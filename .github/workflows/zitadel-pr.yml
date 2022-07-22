@@ -18,6 +18,11 @@ jobs:
         with:
           driver: docker
           install: true
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          install-only: true
+          version: v1.10.2
       - name: Run Environment
         run: ./e2e/install.sh
       - name: Prepare for E2E Tests
