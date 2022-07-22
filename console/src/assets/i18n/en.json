@@ -106,6 +106,7 @@
     "FINISHED": "Close",
     "CHANGE": "Change",
     "REACTIVATE": "Reactivate",
+    "ACTIVATE": "Activate",
     "DEACTIVATE": "Deactivate",
     "REFRESH": "Refresh",
     "LOGIN": "Login",
@@ -874,7 +875,8 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "it": "Italiano",
-      "en": "English"
+      "en": "English",
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -895,11 +897,21 @@
       "PROVIDER": "SMS Provider",
       "ADDPROVIDER": "Add SMS Provider",
       "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "REMOVEPROVIDER": "Remove Provider",
+      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "SMSPROVIDERSTATE": {
+        "0": "Unspecified",
+        "1": "Active",
+        "2": "Inactive"
+      },
+      "ACTIVATED": "Provider activated.",
+      "DEACTIVATED": "Provider deactivated.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully.",
+        "REMOVED": "Twilio removed",
         "CHANGETOKEN": "Change Token",
         "SETTOKEN": "Set Token",
         "TOKENSET": "Token successfully set."

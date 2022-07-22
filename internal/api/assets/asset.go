@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
@@ -89,7 +88,7 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 
 	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
-	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle, instanceInterceptor)
+	router.Use(instanceInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))
@@ -117,6 +116,10 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		ctx := r.Context()
 		ctxData := authz.GetCtxData(ctx)
 		err := r.ParseMultipartForm(maxMemory)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		file, handler, err := r.FormFile(paramFile)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)

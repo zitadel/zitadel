@@ -55,8 +55,9 @@ func (key sequenceSearchKey) ToColumnName() string {
 }
 
 type sequenceSearchQuery struct {
-	key   sequenceSearchKey
-	value string
+	key    sequenceSearchKey
+	method domain.SearchMethod
+	value  interface{}
 }
 
 func (q *sequenceSearchQuery) GetKey() ColumnKey {
@@ -64,7 +65,7 @@ func (q *sequenceSearchQuery) GetKey() ColumnKey {
 }
 
 func (q *sequenceSearchQuery) GetMethod() domain.SearchMethod {
-	return domain.SearchMethodEquals
+	return q.method
 }
 
 func (q *sequenceSearchQuery) GetValue() interface{} {
@@ -94,7 +95,7 @@ func (s *sequenceSearchRequest) GetAsc() bool {
 func (s *sequenceSearchRequest) GetQueries() []SearchQuery {
 	result := make([]SearchQuery, len(s.queries))
 	for i, q := range s.queries {
-		result[i] = &sequenceSearchQuery{key: q.key, value: q.value}
+		result[i] = &sequenceSearchQuery{key: q.key, value: q.value, method: q.method}
 	}
 	return result
 }
@@ -147,8 +148,8 @@ func UpdateCurrentSequences(db *gorm.DB, table string, currentSequences []*Curre
 
 func LatestSequence(db *gorm.DB, table, viewName, instanceID string) (*CurrentSequence, error) {
 	searchQueries := []SearchQuery{
-		&sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName},
-		&sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyInstanceID), value: instanceID},
+		&sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName, method: domain.SearchMethodEquals},
+		&sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyInstanceID), value: instanceID, method: domain.SearchMethodIsOneOf},
 	}
 
 	// ensure highest sequence of view
@@ -168,13 +169,15 @@ func LatestSequence(db *gorm.DB, table, viewName, instanceID string) (*CurrentSe
 	return nil, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
 }
 
-func LatestSequences(db *gorm.DB, table, viewName string) ([]*CurrentSequence, error) {
-	searchQueries := make([]SearchQuery, 0, 2)
-	searchQueries = append(searchQueries)
+func LatestSequences(db *gorm.DB, table, viewName string, instanceIDs ...string) ([]*CurrentSequence, error) {
+	searchQueries := []sequenceSearchQuery{
+		{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName, method: domain.SearchMethodEquals},
+	}
+	if len(instanceIDs) > 0 {
+		searchQueries = append(searchQueries, sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyInstanceID), value: instanceIDs, method: domain.SearchMethodIsOneOf})
+	}
 	searchRequest := &sequenceSearchRequest{
-		queries: []sequenceSearchQuery{
-			{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName},
-		},
+		queries: searchQueries,
 	}
 
 	// ensure highest sequence of view

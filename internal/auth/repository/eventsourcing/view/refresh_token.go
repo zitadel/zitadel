@@ -69,8 +69,8 @@ func (v *View) GetLatestRefreshTokenSequence(instanceID string) (*repository.Cur
 	return v.latestSequence(refreshTokenTable, instanceID)
 }
 
-func (v *View) GetLatestRefreshTokenSequences() ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(refreshTokenTable)
+func (v *View) GetLatestRefreshTokenSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(refreshTokenTable, instanceIDs...)
 }
 
 func (v *View) ProcessedRefreshTokenSequence(event *models.Event) error {
