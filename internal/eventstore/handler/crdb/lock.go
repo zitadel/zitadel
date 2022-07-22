@@ -20,7 +20,7 @@ const (
 		" (locker_id, locked_until, projection_name, instance_id) VALUES %[2]s" +
 		" ON CONFLICT (projection_name, instance_id)" +
 		" DO UPDATE SET locker_id = $1, locked_until = now()+$2::INTERVAL" +
-		" WHERE %[1]s.projection_name = $3 AND %[1]s.instance_id in ($%[3]d) AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
+		" WHERE %[1]s.projection_name = $3 AND %[1]s.instance_id = ANY ($%[3]d) AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
 )
 
 type Locker interface {

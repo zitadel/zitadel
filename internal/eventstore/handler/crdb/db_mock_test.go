@@ -294,7 +294,7 @@ func expectLock(lockTable, workerName string, d time.Duration, instanceID string
 			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\)`+
 			` ON CONFLICT \(projection_name, instance_id\)`+
 			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
-			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id in \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
 				float64(d),
@@ -314,7 +314,7 @@ func expectLockMultipleInstances(lockTable, workerName string, d time.Duration, 
 			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\), \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$5\)`+
 			` ON CONFLICT \(projection_name, instance_id\)`+
 			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
-			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id in \(\$6\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$6\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
 				float64(d),
@@ -335,7 +335,7 @@ func expectLockNoRows(lockTable, workerName string, d time.Duration, instanceID 
 			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\)`+
 			` ON CONFLICT \(projection_name, instance_id\)`+
 			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
-			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id in \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
 				float64(d),
@@ -353,7 +353,7 @@ func expectLockErr(lockTable, workerName string, d time.Duration, instanceID str
 			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\)`+
 			` ON CONFLICT \(projection_name, instance_id\)`+
 			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
-			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id in \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
 				float64(d),
