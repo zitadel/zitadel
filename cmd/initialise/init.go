@@ -73,7 +73,7 @@ func InitAll(config *Config) {
 	logging.OnError(err).Fatal("unable to initialize ZITADEL")
 }
 
-func initialise(config database.Config, steps ...func(*sql.DB, database.Config) error) error {
+func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 	logging.Info("initialization started")
 
 	readStmts(config.Type())
@@ -84,12 +84,12 @@ func initialise(config database.Config, steps ...func(*sql.DB, database.Config) 
 	}
 	defer db.Close()
 
-	return Init(db, config, steps...)
+	return Init(db, steps...)
 }
 
-func Init(db *sql.DB, config database.Config, steps ...func(*sql.DB, database.Config) error) error {
+func Init(db *sql.DB, steps ...func(*sql.DB) error) error {
 	for _, step := range steps {
-		if err := step(db, config); err != nil {
+		if err := step(db); err != nil {
 			return err
 		}
 	}

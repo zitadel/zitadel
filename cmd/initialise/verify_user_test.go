@@ -30,7 +30,6 @@ func Test_verifyUser(t *testing.T) {
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", false, "zitadel-user"),
 					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", sql.ErrTxDone, nil),
 				),
 				username: "zitadel-user",
@@ -42,7 +41,6 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct without password",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", false, "zitadel-user"),
 					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", nil, nil),
 				),
 				username: "zitadel-user",
@@ -54,7 +52,6 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct with password",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", false, "zitadel-user"),
 					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", nil, "password"),
 				),
 				username: "zitadel-user",
@@ -66,7 +63,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", true, "zitadel-user"),
+					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", nil, "password"),
 				),
 				username: "zitadel-user",
 				password: "",

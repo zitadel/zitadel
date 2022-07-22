@@ -31,11 +31,11 @@ func prepareDB(t *testing.T, expectations ...expectation) db {
 
 type expectation func(m sqlmock.Sqlmock)
 
-func expectExists(query string, value bool, args ...driver.Value) expectation {
-	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(value))
-	}
-}
+// func expectExists(query string, value bool, args ...driver.Value) expectation {
+// 	return func(m sqlmock.Sqlmock) {
+// 		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(value))
+// 	}
+// }
 
 func expectQueryErr(query string, err error, args ...driver.Value) expectation {
 	return func(m sqlmock.Sqlmock) {
