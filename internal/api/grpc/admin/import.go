@@ -627,7 +627,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 					continue
 				}
 				count.apiAppCount += 1
-				logging.Debugf("successful apiapplication %d: %s", app.GetAppId())
+				logging.Debugf("successful apiapplication %d: %s", count.apiAppCount, app.GetAppId())
 				successOrg.ApiAppIds = append(successOrg.ApiAppIds, app.GetAppId())
 			}
 		}
