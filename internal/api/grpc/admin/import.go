@@ -22,12 +22,62 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"io/ioutil"
+	"strconv"
 	"time"
 )
 
 type importResponse struct {
-	ret *admin_pb.ImportDataResponse
-	err error
+	ret   *admin_pb.ImportDataResponse
+	count *count
+	err   error
+}
+type count struct {
+	humanUserCount          int
+	humanUserLen            int
+	machineUserCount        int
+	machineUserLen          int
+	userMetadataCount       int
+	userMetadataLen         int
+	userLinksCount          int
+	userLinksLen            int
+	projectCount            int
+	projectLen              int
+	oidcAppCount            int
+	oidcAppLen              int
+	apiAppCount             int
+	apiAppLen               int
+	actionCount             int
+	actionLen               int
+	projectRolesCount       int
+	projectRolesLen         int
+	projectGrantCount       int
+	projectGrantLen         int
+	userGrantCount          int
+	userGrantLen            int
+	projectMembersCount     int
+	projectMembersLen       int
+	orgMemberCount          int
+	orgMemberLen            int
+	projectGrantMemberCount int
+	projectGrantMemberLen   int
+}
+
+func (c *count) getProgress() string {
+	return "progress:" +
+		"human_users " + strconv.Itoa(c.humanUserCount) + "/" + strconv.Itoa(c.humanUserLen) + ", " +
+		"machine_users " + strconv.Itoa(c.machineUserCount) + "/" + strconv.Itoa(c.machineUserLen) + ", " +
+		"user_metadata " + strconv.Itoa(c.userMetadataCount) + "/" + strconv.Itoa(c.userMetadataLen) + ", " +
+		"user_links " + strconv.Itoa(c.userLinksCount) + "/" + strconv.Itoa(c.userLinksLen) + ", " +
+		"projects " + strconv.Itoa(c.projectCount) + "/" + strconv.Itoa(c.projectLen) + ", " +
+		"oidc_apps " + strconv.Itoa(c.oidcAppCount) + "/" + strconv.Itoa(c.oidcAppLen) + ", " +
+		"api_apps " + strconv.Itoa(c.apiAppCount) + "/" + strconv.Itoa(c.apiAppLen) + ", " +
+		"actions " + strconv.Itoa(c.actionCount) + "/" + strconv.Itoa(c.actionLen) + ", " +
+		"project_roles " + strconv.Itoa(c.projectRolesCount) + "/" + strconv.Itoa(c.projectRolesLen) + ", " +
+		"project_grant " + strconv.Itoa(c.projectGrantCount) + "/" + strconv.Itoa(c.projectGrantLen) + ", " +
+		"user_grants " + strconv.Itoa(c.userGrantCount) + "/" + strconv.Itoa(c.userGrantLen) + ", " +
+		"project_members " + strconv.Itoa(c.projectMembersCount) + "/" + strconv.Itoa(c.projectMembersLen) + ", " +
+		"org_members " + strconv.Itoa(c.orgMemberCount) + "/" + strconv.Itoa(c.orgMemberLen) + ", " +
+		"project_grant_members " + strconv.Itoa(c.projectGrantMemberCount) + "/" + strconv.Itoa(c.projectGrantMemberLen)
 }
 
 func Detach(ctx context.Context) context.Context { return detachedContext{ctx} }
@@ -67,8 +117,8 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				orgs = req.GetDataOrgs().GetOrgs()
 			}
 
-			ret, err := s.importData(ctx, orgs)
-			ch <- importResponse{ret: ret, err: err}
+			ret, count, err := s.importData(ctx, orgs)
+			ch <- importResponse{ret: ret, count: count, err: err}
 		}()
 
 		select {
@@ -77,7 +127,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			return nil, ctxTimeout.Err()
 		case result := <-ch:
 			logging.OnError(result.err).Errorf("error while importing: %v", result.err)
-			logging.Info("Import done")
+			logging.Infof("Import done: %s", result.count.getProgress())
 			return result.ret, result.err
 		}
 	} else {
@@ -119,15 +169,15 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			go func() {
 				dataOrgs, err := s.transportDataFromFile(ctxTimeout, v1Transformation, gcsInput, s3Input, localInput)
 				if err != nil {
-					ch <- importResponse{nil, err}
+					ch <- importResponse{nil, nil, err}
 					return
 				}
-				resp, err := s.importData(ctxTimeout, dataOrgs)
+				resp, count, err := s.importData(ctxTimeout, dataOrgs)
 				if err != nil {
-					ch <- importResponse{nil, err}
+					ch <- importResponse{nil, count, err}
 					return
 				}
-				ch <- importResponse{resp, nil}
+				ch <- importResponse{resp, count, nil}
 			}()
 
 			select {
@@ -136,11 +186,8 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				return
 			case result := <-ch:
 				logging.OnError(result.err).Errorf("error while importing: %v", err)
-				if result.ret != nil {
-					ret, err := json.Marshal(result.ret)
-					logging.OnError(err).Errorf("error while marshalling import result: %v", err)
-
-					logging.Infof("Import done: %v", ret)
+				if result.count != nil {
+					logging.Infof("Import done: %s", result.count.getProgress())
 				}
 			}
 		}()
@@ -244,28 +291,45 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 	return ioutil.ReadAll(reader)
 }
 
-func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*admin_pb.ImportDataResponse, error) {
+func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*admin_pb.ImportDataResponse, *count, error) {
 	errors := make([]*admin_pb.ImportDataError, 0)
 	success := &admin_pb.ImportDataSuccess{}
+	count := &count{}
 
 	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	ctxData := authz.GetCtxData(ctx)
+	for _, org := range orgs {
+		count.humanUserLen += len(org.GetHumanUsers())
+		count.machineUserLen += len(org.GetMachineUsers())
+		count.userMetadataLen += len(org.GetUserMetadata())
+		count.userLinksLen += len(org.GetUserLinks())
+		count.projectLen += len(org.GetProjects())
+		count.oidcAppLen += len(org.GetOidcApps())
+		count.apiAppLen += len(org.GetApiApps())
+		count.actionLen += len(org.GetActions())
+		count.projectRolesLen += len(org.GetProjectRoles())
+		count.projectGrantLen += len(org.GetProjectGrants())
+		count.userGrantLen += len(org.GetUserGrants())
+		count.projectMembersLen += len(org.GetProjectMembers())
+		count.orgMemberLen += len(org.GetOrgMembers())
+		count.projectGrantMemberLen += len(org.GetProjectGrantMembers())
+	}
 
 	for _, org := range orgs {
 		_, err := s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
@@ -286,6 +350,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 			ProjectMembers:      []*admin_pb.ImportDataSuccessProjectMember{},
 			ProjectGrantMembers: []*admin_pb.ImportDataSuccessProjectGrantMember{},
 		}
+		logging.Debugf("successful org: %s", successOrg.OrgId)
 		success.Orgs = append(success.Orgs, successOrg)
 
 		domainPolicy := org.GetDomainPolicy()
@@ -308,8 +373,12 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				_, err := s.command.AddOrgDomain(ctx, orgDomain, []string{})
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				logging.Debugf("successful domain: %s", domainR.DomainName)
 				successOrg.Domains = append(successOrg.Domains, domainR.DomainName)
 			}
 		}
@@ -327,21 +396,31 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		}
 		if org.OidcIdps != nil {
 			for _, idp := range org.OidcIdps {
+				logging.Debugf("import oidcidp: %s", idp.IdpId)
 				_, err := s.command.ImportIDPConfig(ctx, management.AddOIDCIDPRequestToDomain(idp.Idp), idp.IdpId, org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "oidc_idp", Id: idp.IdpId, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				logging.Debugf("successful oidcidp: %s", idp.GetIdpId())
 				successOrg.OidcIpds = append(successOrg.OidcIpds, idp.GetIdpId())
 			}
 		}
 		if org.JwtIdps != nil {
 			for _, idp := range org.JwtIdps {
+				logging.Debugf("import jwtidp: %s", idp.IdpId)
 				_, err := s.command.ImportIDPConfig(ctx, management.AddJWTIDPRequestToDomain(idp.Idp), idp.IdpId, org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "jwt_idp", Id: idp.IdpId, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				logging.Debugf("successful jwtidp: %s", idp.GetIdpId())
 				successOrg.JwtIdps = append(successOrg.JwtIdps, idp.GetIdpId())
 			}
 		}
@@ -422,45 +501,70 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 		if org.HumanUsers != nil {
 			for _, user := range org.GetHumanUsers() {
+				logging.Debugf("import user: %s", user.GetUserId())
 				human, passwordless := management.ImportHumanUserRequestToDomain(user.User)
 				human.AggregateID = user.UserId
 				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.humanUserCount += 1
+				logging.Debugf("successful user %d: %s", count.humanUserCount, user.GetUserId())
 				successOrg.HumanUserIds = append(successOrg.HumanUserIds, user.GetUserId())
 
 				if user.User.OtpCode != "" {
+					logging.Debugf("import user otp: %s", user.GetUserId())
 					if err := s.command.ImportHumanOTP(ctx, user.UserId, org.GetOrgId(), user.User.OtpCode); err != nil {
 						errors = append(errors, &admin_pb.ImportDataError{Type: "human_user_otp", Id: user.GetUserId(), Message: err.Error()})
+						if isCtxTimeout(ctx) {
+							return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+						}
 						continue
+					} else {
+						logging.Debugf("successful user otp: %s", user.GetUserId())
 					}
 				}
 			}
 		}
 		if org.MachineUsers != nil {
 			for _, user := range org.GetMachineUsers() {
+				logging.Debugf("import user: %s", user.GetUserId())
 				_, err := s.command.AddMachineWithID(ctx, org.GetOrgId(), user.GetUserId(), management.AddMachineUserRequestToDomain(user.GetUser()))
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.machineUserCount += 1
+				logging.Debugf("successful user %d: %s", count.machineUserCount, user.GetUserId())
 				successOrg.MachineUserIds = append(successOrg.MachineUserIds, user.GetUserId())
 			}
 		}
 		if org.UserMetadata != nil {
 			for _, userMetadata := range org.GetUserMetadata() {
+				logging.Debugf("import usermetadata: %s", userMetadata.GetId()+"_"+userMetadata.GetKey())
 				_, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: userMetadata.GetKey(), Value: userMetadata.GetValue()}, userMetadata.GetId(), org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "user_metadata", Id: userMetadata.GetId() + "_" + userMetadata.GetKey(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.userMetadataCount += 1
+				logging.Debugf("successful usermetadata %d: %s", count.userMetadataCount, userMetadata.GetId()+"_"+userMetadata.GetKey())
 				successOrg.UserMetadata = append(successOrg.UserMetadata, &admin_pb.ImportDataSuccessUserMetadata{UserId: userMetadata.GetId(), Key: userMetadata.GetKey()})
 			}
 		}
 		if org.UserLinks != nil {
 			for _, userLinks := range org.GetUserLinks() {
+				logging.Debugf("import userlink: %s", userLinks.GetUserId()+"_"+userLinks.GetIdpId()+"_"+userLinks.GetProvidedUserId()+"_"+userLinks.GetProvidedUserName())
 				externalIDP := &domain.UserIDPLink{
 					ObjectRoot:     es_models.ObjectRoot{AggregateID: userLinks.UserId},
 					IDPConfigID:    userLinks.IdpId,
@@ -469,58 +573,93 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				}
 				if err := s.command.AddUserIDPLink(ctx, userLinks.UserId, org.GetOrgId(), externalIDP); err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "user_link", Id: userLinks.UserId + "_" + userLinks.IdpId, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.userLinksCount += 1
+				logging.Debugf("successful userlink %d: %s", count.userLinksCount, userLinks.GetUserId()+"_"+userLinks.GetIdpId()+"_"+userLinks.GetProvidedUserId()+"_"+userLinks.GetProvidedUserName())
 				successOrg.UserLinks = append(successOrg.UserLinks, &admin_pb.ImportDataSuccessUserLinks{UserId: userLinks.GetUserId(), IdpId: userLinks.GetIdpId(), ExternalUserId: userLinks.GetProvidedUserId(), DisplayName: userLinks.GetProvidedUserName()})
 			}
 		}
 		if org.Projects != nil {
 			for _, project := range org.GetProjects() {
+				logging.Debugf("import project: %s", project.GetProjectId())
 				_, err := s.command.AddProjectWithID(ctx, management.ProjectCreateToDomain(project.GetProject()), org.GetOrgId(), project.GetProjectId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "project", Id: project.GetProjectId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.projectCount += 1
+				logging.Debugf("successful project %d: %s", count.projectCount, project.GetProjectId())
 				successOrg.ProjectIds = append(successOrg.ProjectIds, project.GetProjectId())
 			}
 		}
 		if org.OidcApps != nil {
 			for _, app := range org.GetOidcApps() {
+				logging.Debugf("import oidcapplication: %s", app.GetAppId())
 				_, err := s.command.AddOIDCApplicationWithID(ctx, management.AddOIDCAppRequestToDomain(app.App), org.GetOrgId(), app.GetAppId(), appSecretGenerator)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.oidcAppCount += 1
+				logging.Debugf("successful oidcapplication %d: %s", count.oidcAppCount, app.GetAppId())
 				successOrg.OidcAppIds = append(successOrg.OidcAppIds, app.GetAppId())
 			}
 		}
 		if org.ApiApps != nil {
 			for _, app := range org.GetApiApps() {
+				logging.Debugf("import apiapplication: %s", app.GetAppId())
 				_, err := s.command.AddAPIApplicationWithID(ctx, management.AddAPIAppRequestToDomain(app.GetApp()), org.GetOrgId(), app.GetAppId(), appSecretGenerator)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "api_app", Id: app.GetAppId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.apiAppCount += 1
+				logging.Debugf("successful apiapplication %d: %s", app.GetAppId())
 				successOrg.ApiAppIds = append(successOrg.ApiAppIds, app.GetAppId())
 			}
 		}
 		if org.Actions != nil {
 			for _, action := range org.GetActions() {
+				logging.Debugf("import action: %s", action.GetActionId())
 				_, _, err := s.command.AddActionWithID(ctx, management.CreateActionRequestToDomain(action.GetAction()), org.GetOrgId(), action.GetActionId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "action", Id: action.GetActionId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.actionCount += 1
+				logging.Debugf("successful action %d: %s", count.actionCount, action.GetActionId())
 				successOrg.ActionIds = append(successOrg.ActionIds, action.ActionId)
 			}
 		}
 		if org.ProjectRoles != nil {
 			for _, role := range org.GetProjectRoles() {
+				logging.Debugf("import projectroles: %s", role.ProjectId+"_"+role.RoleKey)
 				_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToDomain(role), org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "project_role", Id: role.ProjectId + "_" + role.RoleKey, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.projectRolesCount += 1
+				logging.Debugf("successful projectroles %d: %s", count.projectRolesCount, role.ProjectId+"_"+role.RoleKey)
 				successOrg.ProjectRoles = append(successOrg.ActionIds, role.ProjectId+"_"+role.RoleKey)
 			}
 		}
@@ -545,21 +684,33 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		}
 		if org.ProjectGrants != nil {
 			for _, grant := range org.GetProjectGrants() {
+				logging.Debugf("import projectgrant: %s", grant.GetGrantId()+"_"+grant.GetProjectGrant().GetProjectId()+"_"+grant.GetProjectGrant().GetGrantedOrgId())
 				_, err := s.command.AddProjectGrantWithID(ctx, management.AddProjectGrantRequestToDomain(grant.GetProjectGrant()), grant.GetGrantId(), org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectGrant().GetProjectId() + "_" + grant.GetProjectGrant().GetGrantedOrgId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.projectGrantCount += 1
+				logging.Debugf("successful projectgrant %d: %s", count.projectGrantCount, grant.GetGrantId()+"_"+grant.GetProjectGrant().GetProjectId()+"_"+grant.GetProjectGrant().GetGrantedOrgId())
 				successOrg.ProjectGrants = append(successOrg.ProjectGrants, &admin_pb.ImportDataSuccessProjectGrant{GrantId: grant.GetGrantId(), ProjectId: grant.GetProjectGrant().GetProjectId(), OrgId: grant.GetProjectGrant().GetGrantedOrgId()})
 			}
 		}
 		if org.UserGrants != nil {
 			for _, grant := range org.GetUserGrants() {
+				logging.Debugf("import usergrant: %s", grant.GetProjectId()+"_"+grant.GetUserId())
 				_, err := s.command.AddUserGrant(ctx, management.AddUserGrantRequestToDomain(grant), org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "user_grant", Id: org.GetOrgId() + "_" + grant.GetProjectId() + "_" + grant.GetUserId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
 					continue
 				}
+				count.userGrantCount += 1
+				logging.Debugf("successful usergrant %d: %s", count.userGrantCount, grant.GetProjectId()+"_"+grant.GetUserId())
 				successOrg.UserGrants = append(successOrg.UserGrants, &admin_pb.ImportDataSuccessUserGrant{ProjectId: grant.GetProjectId(), UserId: grant.GetUserId()})
 			}
 		}
@@ -579,31 +730,49 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 			if org.OrgMembers != nil {
 				for _, member := range org.GetOrgMembers() {
+					logging.Debugf("import orgmember: %s", member.GetUserId())
 					_, err := s.command.AddOrgMember(ctx, org.GetOrgId(), member.GetUserId(), member.GetRoles()...)
 					if err != nil {
 						errors = append(errors, &admin_pb.ImportDataError{Type: "org_member", Id: org.GetOrgId() + "_" + member.GetUserId(), Message: err.Error()})
+						if isCtxTimeout(ctx) {
+							return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+						}
 						continue
 					}
+					count.orgMemberCount += 1
+					logging.Debugf("successful orgmember %d: %s", count.orgMemberCount, member.GetUserId())
 					successOrg.OrgMembers = append(successOrg.OrgMembers, member.GetUserId())
 				}
 			}
 			if org.ProjectGrantMembers != nil {
 				for _, member := range org.GetProjectGrantMembers() {
+					logging.Debugf("import projectgrantmember: %s", member.GetProjectId()+"_"+member.GetGrantId()+"_"+member.GetUserId())
 					_, err := s.command.AddProjectGrantMember(ctx, management.AddProjectGrantMemberRequestToDomain(member))
 					if err != nil {
 						errors = append(errors, &admin_pb.ImportDataError{Type: "project_grant_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetGrantId() + "_" + member.GetUserId(), Message: err.Error()})
+						if isCtxTimeout(ctx) {
+							return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+						}
 						continue
 					}
+					count.projectGrantMemberCount += 1
+					logging.Debugf("successful projectgrantmember %d: %s", count.projectGrantMemberCount, member.GetProjectId()+"_"+member.GetGrantId()+"_"+member.GetUserId())
 					successOrg.ProjectGrantMembers = append(successOrg.ProjectGrantMembers, &admin_pb.ImportDataSuccessProjectGrantMember{ProjectId: member.GetProjectId(), GrantId: member.GetGrantId(), UserId: member.GetUserId()})
 				}
 			}
 			if org.ProjectMembers != nil {
 				for _, member := range org.GetProjectMembers() {
+					logging.Debugf("import orgmember: %s", member.GetProjectId()+"_"+member.GetUserId())
 					_, err := s.command.AddProjectMember(ctx, management.AddProjectMemberRequestToDomain(member), org.GetOrgId())
 					if err != nil {
 						errors = append(errors, &admin_pb.ImportDataError{Type: "project_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetUserId(), Message: err.Error()})
+						if isCtxTimeout(ctx) {
+							return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+						}
 						continue
 					}
+					count.projectMembersCount += 1
+					logging.Debugf("successful orgmember %d: %s", count.projectMembersCount, member.GetProjectId()+"_"+member.GetUserId())
 					successOrg.ProjectMembers = append(successOrg.ProjectMembers, &admin_pb.ImportDataSuccessProjectMember{ProjectId: member.GetProjectId(), UserId: member.GetUserId()})
 				}
 			}
@@ -612,7 +781,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 	return &admin_pb.ImportDataResponse{
 		Errors:  errors,
 		Success: success,
-	}, nil
+	}, count, nil
 }
 
 func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.ImportDataOrg) (_ *admin_pb.ImportDataOrg, err error) {
@@ -707,4 +876,13 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 	return &admin_pb.ImportDataOrg{
 		Orgs: orgs,
 	}, nil
+}
+
+func isCtxTimeout(ctx context.Context) bool {
+	select {
+	case <-ctx.Done():
+		return true
+	default:
+		return false
+	}
 }
