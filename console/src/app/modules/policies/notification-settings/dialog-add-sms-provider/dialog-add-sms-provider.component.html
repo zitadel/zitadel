@@ -8,7 +8,7 @@
       <input cnslInput name="sid" formControlName="sid" />
     </cnsl-form-field>
 
-    <cnsl-form-field class="sms-form-field" label="Token">
+    <cnsl-form-field *ngIf="token" class="sms-form-field" label="Token">
       <cnsl-label>{{ 'SETTING.SMS.TWILIO.TOKEN' | translate }}</cnsl-label>
       <input cnslInput name="token" formControlName="token" />
     </cnsl-form-field>
