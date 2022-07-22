@@ -47,7 +47,7 @@ func (h *testHandler) Subscription() *v1.Subscription {
 	return nil
 }
 
-func (h *testHandler) EventQuery() (*models.SearchQuery, error) {
+func (h *testHandler) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
 	if h.queryError != nil {
 		return nil, h.queryError
 	}
@@ -110,6 +110,9 @@ func (es *eventstoreStub) PushAggregates(ctx context.Context, in ...*models.Aggr
 
 func (es *eventstoreStub) LatestSequence(ctx context.Context, in *models.SearchQueryFactory) (uint64, error) {
 	return 0, nil
+}
+func (es *eventstoreStub) InstanceIDs(ctx context.Context, in *models.SearchQuery) ([]string, error) {
+	return nil, nil
 }
 func (es *eventstoreStub) V2() *eventstore.Eventstore {
 	return nil

@@ -8,6 +8,7 @@ import (
 
 //SearchQuery is deprecated. Use SearchQueryFactory
 type SearchQuery struct {
+	Columns Columns
 	Limit   uint64
 	Desc    bool
 	Filters []*Filter
@@ -25,6 +26,11 @@ func NewSearchQuery() *SearchQuery {
 		Filters: make([]*Filter, 0, 4),
 		Queries: make([]*Query, 0),
 	}
+}
+
+func (q *SearchQuery) SetColumn(columns Columns) *SearchQuery {
+	q.Columns = columns
+	return q
 }
 
 func (q *SearchQuery) AddQuery() *Query {

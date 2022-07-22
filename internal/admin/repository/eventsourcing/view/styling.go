@@ -27,8 +27,8 @@ func (v *View) GetLatestStylingSequence(instanceID string) (*global_view.Current
 	return v.latestSequence(stylingTyble, instanceID)
 }
 
-func (v *View) GetLatestStylingSequences() ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(stylingTyble)
+func (v *View) GetLatestStylingSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(stylingTyble, instanceIDs...)
 }
 
 func (v *View) ProcessedStylingSequence(event *models.Event) error {
