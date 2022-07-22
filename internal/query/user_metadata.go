@@ -73,7 +73,7 @@ var (
 
 func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, queries ...SearchQuery) (*UserMetadata, error) {
 	if shouldTriggerBulk {
-		projection.UserMetadataProjection.TriggerBulk(ctx)
+		projection.UserMetadataProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserMetadataQuery()
@@ -96,7 +96,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 
 func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries) (*UserMetadataList, error) {
 	if shouldTriggerBulk {
-		projection.UserMetadataProjection.TriggerBulk(ctx)
+		projection.UserMetadataProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserMetadataListQuery()

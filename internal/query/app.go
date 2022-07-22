@@ -208,7 +208,7 @@ var (
 
 func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string) (*App, error) {
 	if shouldTriggerBulk {
-		projection.AppProjection.TriggerBulk(ctx)
+		projection.AppProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareAppQuery()

@@ -141,7 +141,7 @@ var (
 
 func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, orgID string) (*LoginPolicy, error) {
 	if shouldTriggerBulk {
-		projection.LoginPolicyProjection.TriggerBulk(ctx)
+		projection.LoginPolicyProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareLoginPolicyQuery()

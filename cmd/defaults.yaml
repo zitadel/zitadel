@@ -104,9 +104,10 @@ Machine:
     #   JPath: "$.compute.vmId"
 
 Projections:
-  RequeueEvery: 10s
+  RequeueEvery: 60s
   RetryFailedAfter: 1s
   MaxFailureCount: 5
+  ConcurrentInstances: 10
   BulkLimit: 200
   MaxIterators: 1
   Customizations:
@@ -117,6 +118,7 @@ Auth:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
+    ConcurrentInstances: 10
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -124,6 +126,7 @@ Admin:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
+    ConcurrentInstances: 10
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -180,6 +183,7 @@ Notification:
   Repository:
     Spooler:
       ConcurrentWorkers: 1
+      ConcurrentInstances: 10
       BulkLimit: 10000
       FailureCountUntilSkip: 5
       Handlers:

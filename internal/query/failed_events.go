@@ -115,7 +115,7 @@ func (q *FailedEventSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareFailedEventQuery() (sq.SelectBuilder, func(*sql.Row) (*FailedEvent, error)) {
+func prepareFailedEventQuery(instanceIDs ...string) (sq.SelectBuilder, func(*sql.Row) (*FailedEvent, error)) {
 	return sq.Select(
 			FailedEventsColumnProjectionName.identifier(),
 			FailedEventsColumnFailedSequence.identifier(),

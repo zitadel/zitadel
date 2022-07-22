@@ -78,7 +78,7 @@ type ProjectRoleSearchQueries struct {
 
 func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
 	if shouldTriggerBulk {
-		projection.ProjectRoleProjection.TriggerBulk(ctx)
+		projection.ProjectRoleProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareProjectRolesQuery()

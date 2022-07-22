@@ -182,7 +182,7 @@ var (
 //IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
 func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string) (*IDP, error) {
 	if shouldTriggerBulk {
-		projection.IDPProjection.TriggerBulk(ctx)
+		projection.IDPProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareIDPByIDQuery()
