@@ -182,8 +182,7 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 		}
 		cancel()
 	}()
-	for {
-		<-h.triggerProjection.C
+	for range h.triggerProjection.C {
 		ids, err := h.Eventstore.InstanceIDs(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AddQuery().ExcludedInstanceID("").Builder())
 		if err != nil {
 			logging.WithFields("projection", h.ProjectionName).WithError(err).Error("instance ids")

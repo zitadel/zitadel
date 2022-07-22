@@ -176,7 +176,7 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 				var err error
 				value, err = json.Marshal(value)
 				if err != nil {
-					logging.New().WithError(err).Warn("unable to marshal search value")
+					logging.WithError(err).Warn("unable to marshal search value")
 					continue
 				}
 			}

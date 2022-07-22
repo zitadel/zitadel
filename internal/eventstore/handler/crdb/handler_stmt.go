@@ -115,7 +115,7 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 //Update implements handler.Update
 func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (index int, err error) {
 	if len(stmts) == 0 {
-		return 0, nil
+		return -1, nil
 	}
 	instanceIDs := make([]string, 0, len(stmts))
 	for _, stmt := range stmts {
@@ -123,13 +123,13 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	}
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
+		return -1, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
 	}
 
 	sequences, err := h.currentSequences(ctx, tx.QueryContext, instanceIDs)
 	if err != nil {
 		tx.Rollback()
-		return 0, err
+		return -1, err
 	}
 
 	//checks for events between create statement and current sequence
@@ -139,7 +139,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
-			return 0, err
+			return -1, err
 		}
 		stmts = append(previousStmts, stmts...)
 	}
@@ -150,12 +150,12 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 		err = h.updateCurrentSequences(tx, sequences)
 		if err != nil {
 			tx.Rollback()
-			return 0, err
+			return -1, err
 		}
 	}
 
 	if err = tx.Commit(); err != nil {
-		return 0, err
+		return -1, err
 	}
 
 	if lastSuccessfulIdx < len(stmts)-1 {

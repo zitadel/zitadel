@@ -82,22 +82,7 @@ func (i *ExternalIDP) EventQuery(instanceIDs ...string) (*es_models.SearchQuery,
 	if err != nil {
 		return nil, err
 	}
-
-	searchQuery := es_models.NewSearchQuery()
-	for _, sequence := range sequences {
-		var seq uint64
-		for _, instanceID := range instanceIDs {
-			if sequence.InstanceID == instanceID {
-				seq = sequence.CurrentSequence
-				break
-			}
-		}
-		searchQuery.AddQuery().
-			AggregateTypeFilter(i.AggregateTypes()...).
-			LatestSequenceFilter(seq).
-			InstanceIDFilter(sequence.InstanceID)
-	}
-	return searchQuery, nil
+	return newSearchQuery(sequences, i.AggregateTypes(), instanceIDs), nil
 }
 
 func (i *ExternalIDP) Reduce(event *es_models.Event) (err error) {

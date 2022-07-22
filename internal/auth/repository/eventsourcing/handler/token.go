@@ -77,21 +77,7 @@ func (t *Token) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error
 	if err != nil {
 		return nil, err
 	}
-	searchQuery := es_models.NewSearchQuery()
-	for _, sequence := range sequences {
-		var seq uint64
-		for _, instanceID := range instanceIDs {
-			if sequence.InstanceID == instanceID {
-				seq = sequence.CurrentSequence
-				break
-			}
-		}
-		searchQuery.AddQuery().
-			AggregateTypeFilter(t.AggregateTypes()...).
-			LatestSequenceFilter(seq).
-			InstanceIDFilter(sequence.InstanceID)
-	}
-	return searchQuery, nil
+	return newSearchQuery(sequences, t.AggregateTypes(), instanceIDs), nil
 }
 
 func (t *Token) Reduce(event *es_models.Event) (err error) {

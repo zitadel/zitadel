@@ -43,7 +43,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 	}()
 	currentSequence, err := handler.CurrentSequence(event.InstanceID)
 	if err != nil {
-		logging.New().WithError(err).Warn("unable to get current sequence")
+		logging.WithError(err).Warn("unable to get current sequence")
 		return
 	}
 
@@ -64,7 +64,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 	for _, unprocessedEvent := range unprocessedEvents {
 		currentSequence, err := handler.CurrentSequence(unprocessedEvent.InstanceID)
 		if err != nil {
-			logging.New().WithError(err).Warn("unable to get current sequence")
+			logging.WithError(err).Warn("unable to get current sequence")
 			return
 		}
 		if unprocessedEvent.Sequence < currentSequence {

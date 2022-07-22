@@ -4,8 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -14,10 +17,10 @@ import (
 
 const (
 	lockStmtFormat = "INSERT INTO %[1]s" +
-		" (locker_id, locked_until, projection_name, instance_id) VALUES ($1, now()+$2::INTERVAL, $3, $4)" +
+		" (locker_id, locked_until, projection_name, instance_id) VALUES %[2]s" +
 		" ON CONFLICT (projection_name, instance_id)" +
 		" DO UPDATE SET locker_id = $1, locked_until = now()+$2::INTERVAL" +
-		" WHERE %[1]s.projection_name = $3 AND %[1]s.instance_id = $4 AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
+		" WHERE %[1]s.projection_name = $3 AND %[1]s.instance_id in ($%[3]d) AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
 )
 
 type Locker interface {
@@ -27,7 +30,7 @@ type Locker interface {
 
 type locker struct {
 	client         *sql.DB
-	lockStmt       string
+	lockStmt       func(values string, instances int) string
 	workerName     string
 	projectionName string
 }
@@ -36,8 +39,10 @@ func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
 	workerName, err := id.SonyFlakeGenerator().Next()
 	logging.OnError(err).Panic("unable to generate lockID")
 	return &locker{
-		client:         client,
-		lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),
+		client: client,
+		lockStmt: func(values string, instances int) string {
+			return fmt.Sprintf(lockStmtFormat, lockTable, values, instances)
+		},
 		workerName:     workerName,
 		projectionName: projectionName,
 	}
@@ -66,26 +71,37 @@ func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration t
 }
 
 func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, instanceIDs ...string) error {
-	for _, instanceID := range instanceIDs {
-		//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
-		res, err := h.client.ExecContext(ctx, h.lockStmt, h.workerName, lockDuration.Seconds(), h.projectionName, instanceID)
-		if err != nil {
-			return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
-		}
-
-		if rows, _ := res.RowsAffected(); rows == 0 {
-			return errors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
-		}
+	lockStmt, values := h.lockStatement(lockDuration, instanceIDs)
+	res, err := h.client.ExecContext(ctx, lockStmt, values...)
+	if err != nil {
+		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
+	}
+	if rows, _ := res.RowsAffected(); rows == 0 {
+		return errors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
 	}
 	return nil
 }
 
 func (h *locker) Unlock(instanceIDs ...string) error {
-	for _, instanceID := range instanceIDs {
-		_, err := h.client.Exec(h.lockStmt, h.workerName, float64(0), h.projectionName, instanceID)
-		if err != nil {
-			return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
-		}
+	lockStmt, values := h.lockStatement(0, instanceIDs)
+	_, err := h.client.Exec(lockStmt, values...)
+	if err != nil {
+		return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
 	}
 	return nil
+}
+
+func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs []string) (string, []interface{}) {
+	valueQueries := make([]string, len(instanceIDs))
+	values := make([]interface{}, len(instanceIDs)+4)
+	values[0] = h.workerName
+	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
+	values[1] = lockDuration.Seconds()
+	values[2] = h.projectionName
+	for i, instanceID := range instanceIDs {
+		valueQueries[i] = "($1, now()+$2::INTERVAL, $3, $" + strconv.Itoa(i+4) + ")"
+		values[i+3] = instanceID
+	}
+	values[len(values)-1] = pq.StringArray(instanceIDs)
+	return h.lockStmt(strings.Join(valueQueries, ", "), len(values)), values
 }

@@ -962,7 +962,7 @@ type unlockMock struct {
 }
 
 func (m *unlockMock) unlock() Unlock {
-	return func(instanceID ...string) error {
+	return func(...string) error {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 		m.callCount++

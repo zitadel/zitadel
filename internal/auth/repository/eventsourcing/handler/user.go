@@ -79,22 +79,7 @@ func (u *User) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error)
 	if err != nil {
 		return nil, err
 	}
-
-	searchQuery := es_models.NewSearchQuery()
-	for _, sequence := range sequences {
-		var seq uint64
-		for _, instanceID := range instanceIDs {
-			if sequence.InstanceID == instanceID {
-				seq = sequence.CurrentSequence
-				break
-			}
-		}
-		searchQuery.AddQuery().
-			AggregateTypeFilter(u.AggregateTypes()...).
-			LatestSequenceFilter(seq).
-			InstanceIDFilter(sequence.InstanceID)
-	}
-	return searchQuery, nil
+	return newSearchQuery(sequences, u.AggregateTypes(), instanceIDs), nil
 }
 
 func (u *User) Reduce(event *es_models.Event) (err error) {
