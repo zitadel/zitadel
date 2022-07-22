@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -59,4 +60,32 @@ func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.Searc
 		return 0, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
 	}
 	return uint64(*sequence), nil
+}
+
+func (db *SQL) InstanceIDs(ctx context.Context, queryFactory *es_models.SearchQueryFactory) ([]string, error) {
+	query, _, values, rowScanner := buildQuery(queryFactory)
+	if query == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "SQL-Sfwg2", "invalid query factory")
+	}
+
+	rows, err := db.client.Query(query, values...)
+	if err != nil {
+		logging.New().WithError(err).Info("query failed")
+		return nil, errors.ThrowInternal(err, "SQL-Sfg3r", "unable to filter instance ids")
+	}
+	defer rows.Close()
+
+	ids := make([]string, 0)
+
+	for rows.Next() {
+		var id string
+		err := rowScanner(rows.Scan, &id)
+		if err != nil {
+			return nil, err
+		}
+
+		ids = append(ids, id)
+	}
+
+	return ids, nil
 }

@@ -23,6 +23,8 @@ const (
 	ColumnsEvent = iota + 1
 	//ColumnsMaxSequence represents the latest sequence of the filtered events
 	ColumnsMaxSequence
+	// ColumnsInstanceIDs represents the instance ids of the filtered events
+	ColumnsInstanceIDs
 
 	columnsCount
 )

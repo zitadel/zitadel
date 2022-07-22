@@ -73,30 +73,26 @@ func (m *Styling) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (m *Styling) EventQuery() (*models.SearchQuery, error) {
-	sequences, err := m.view.GetLatestStylingSequences()
+func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
+	sequences, err := m.view.GetLatestStylingSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	query := models.NewSearchQuery()
-	instances := make([]string, 0)
+	searchQuery := models.NewSearchQuery()
 	for _, sequence := range sequences {
-		for _, instance := range instances {
-			if sequence.InstanceID == instance {
+		var seq uint64
+		for _, instanceID := range instanceIDs {
+			if sequence.InstanceID == instanceID {
+				seq = sequence.CurrentSequence
 				break
 			}
 		}
-		instances = append(instances, sequence.InstanceID)
-		query.AddQuery().
+		searchQuery.AddQuery().
 			AggregateTypeFilter(m.AggregateTypes()...).
-			LatestSequenceFilter(sequence.CurrentSequence).
+			LatestSequenceFilter(seq).
 			InstanceIDFilter(sequence.InstanceID)
 	}
-	return query.AddQuery().
-		AggregateTypeFilter(m.AggregateTypes()...).
-		LatestSequenceFilter(0).
-		ExcludedInstanceIDsFilter(instances...).
-		SearchQuery(), nil
+	return searchQuery, nil
 }
 
 func (m *Styling) Reduce(event *models.Event) (err error) {
@@ -299,7 +295,7 @@ func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {
 	if ok {
 		palette["500"] = cssRGB(color500.RGB255())
 	}
- 
+
 	color600, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.06))
 	if ok {
 		palette["600"] = cssRGB(color600.RGB255())

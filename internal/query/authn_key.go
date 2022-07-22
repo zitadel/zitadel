@@ -124,7 +124,7 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 
 func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (*AuthNKey, error) {
 	if shouldTriggerBulk {
-		projection.AuthNKeyProjection.TriggerBulk(ctx)
+		projection.AuthNKeyProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareAuthNKeyQuery()

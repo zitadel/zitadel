@@ -193,7 +193,7 @@ var (
 
 func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (*UserGrant, error) {
 	if shouldTriggerBulk {
-		projection.UserGrantProjection.TriggerBulk(ctx)
+		projection.UserGrantProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserGrantQuery()

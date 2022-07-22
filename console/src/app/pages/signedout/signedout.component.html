@@ -1,9 +1,9 @@
 <div class="signed-out-wrap">
   <div class="block">
     <div class="signed-out-header">
-      <img alt="zitadel logo" *ngIf="dark; else lighttheme" src="../../../assets/images/zitadel-logo-light.svg" />
+      <img alt="zitadel logo" *ngIf="dark; else lighttheme" src="./assets/images/zitadel-logo-light.svg" />
       <ng-template #lighttheme>
-        <img alt="zitadel logo" src="../../../assets/images/zitadel-logo-dark.svg" />
+        <img alt="zitadel logo" src="./assets/images/zitadel-logo-dark.svg" />
       </ng-template>
       <p class="cnsl-secondary-text">{{ 'USER.SIGNEDOUT' | translate }}</p>
 
