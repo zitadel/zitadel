@@ -25,10 +25,10 @@ describe('permissions', () => {
                     ensureProjectExists(apiCalls, testProjectName).then(projId => {
                         projectId = projId
                         cy.visit(`${Cypress.env('baseUrl')}/ui/console/projects/${projId}?id=roles`)
+                        cy.get('[data-e2e=timestamp]');
                     })
                 })
             })
-
 
             describe('add role', () => {
                 beforeEach(()=> {
