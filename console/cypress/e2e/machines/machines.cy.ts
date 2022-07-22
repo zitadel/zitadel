@@ -23,7 +23,7 @@ describe('machines', () => {
         });
 
         it('should add a machine', () => {
-          cy.get('[data-e2e="create-user-button"]').click();
+          cy.get('[data-e2e="action-key-add"]').parents('[data-e2e="create-user-button"]').click();
           cy.url().should('contain', 'users/create-machine');
           //force needed due to the prefilled username prefix
           cy.get('[formcontrolname="userName"]').type(testMachineUserNameAdd, { force: true });
