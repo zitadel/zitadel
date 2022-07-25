@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 	}()
 
 	if err = initDB(testCRDBClient); err != nil {
-		logging.WithFields("error", err).Fatal("migrations failed")
+		logging.WithFields("error ", err).Fatal("migrations failed")
 	}
 
 	os.Exit(m.Run())
