@@ -25,7 +25,7 @@ However, we recommend you read the guide on [how to access ZITADEL API](../../gu
 You need to add the SDK into Go Modules by:
 
 ```bash
-go get github.com/zitadel/zitadel-go
+go get github.com/zitadel/zitadel-go/v2
 ```
 
 ### Create example client
