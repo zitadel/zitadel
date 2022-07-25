@@ -1,32 +1,33 @@
-<div class="iam-top">
-  <div class="max-width-container">
-    <div class="iam-top-row">
-      <div>
-        <div class="iam-title-row">
-          <h1 class="iam-title">{{ 'IAM.TITLE' | translate }}</h1>
-        </div>
-        <p class="iam-sub cnsl-secondary-text">{{ 'IAM.DESCRIPTION' | translate }}</p>
-      </div>
-      <span class="fill-space"></span>
-      <cnsl-contributors
-        [totalResult]="totalMemberResult"
-        [loading]="loading$ | async"
-        [membersSubject]="membersSubject"
-        title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-        (addClicked)="openAddMember()"
-        (showDetailClicked)="showDetail()"
-        (refreshClicked)="loadMembers()"
-        [disabled]="(['iam.member.write'] | hasRole | async) === false"
-      >
-      </cnsl-contributors>
-    </div>
-  </div>
-</div>
-<div class="max-width-container">
-  <h2 class="org-table-title">{{ 'ORG.LIST.TITLE' | translate }}</h2>
+<cnsl-top-view
+  [hasBackButton]="false"
+  title="{{ 'IAM.TITLE' | translate }}"
+  sub="{{ 'IAM.DESCRIPTION' | translate }}"
+  [isActive]="instance?.state === State.STATE_RUNNING"
+  [isInactive]="instance?.state === State.STATE_STOPPED || instance?.state === State.STATE_STOPPING"
+  [hasContributors]="true"
+  stateTooltip="{{ 'INSTANCE.STATE.' + instance?.state | translate }}"
+>
+  <cnsl-contributors
+    topContributors
+    [totalResult]="totalMemberResult"
+    [loading]="loading$ | async"
+    [membersSubject]="membersSubject"
+    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+    (addClicked)="openAddMember()"
+    (showDetailClicked)="showDetail()"
+    (refreshClicked)="loadMembers()"
+    [disabled]="(['iam.member.write'] | hasRole | async) === false"
+  >
+  </cnsl-contributors>
 
-  <p class="org-table-desc cnsl-secondary-text">{{ 'ORG.LIST.DESCRIPTION' | translate }}</p>
+  <cnsl-info-row topContent *ngIf="instance" [instance]="instance"></cnsl-info-row>
+</cnsl-top-view>
+
+<div class="max-width-container">
+  <h2 class="instance-table-title">{{ 'ORG.LIST.TITLE' | translate }}</h2>
+
+  <p class="instance-table-desc cnsl-secondary-text">{{ 'ORG.LIST.DESCRIPTION' | translate }}</p>
 
   <cnsl-org-table></cnsl-org-table>
 

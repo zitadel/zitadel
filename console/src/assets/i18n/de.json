@@ -106,6 +106,7 @@
     "FINISHED": "Fertig",
     "CHANGE": "Ändern",
     "REACTIVATE": "Aktivieren",
+    "ACTIVATE": "Aktivieren",
     "DEACTIVATE": "Deaktivieren",
     "REFRESH": "Aktualisieren",
     "LOGIN": "Einloggen",
@@ -193,6 +194,8 @@
     }
   },
   "RESOURCEID": "Ressourcen-ID",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "Keine Daten"
   },
@@ -706,6 +709,17 @@
       "TITLE": "Manager",
       "DESCRIPTION": "Diese Manager können instanzweite Einstellungen vornehmen."
     },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Domains"
+    },
+    "STATE": {
+      "0": "Unspezifisch",
+      "1": "Wird erstellt",
+      "2": "Aktiv",
+      "3": "Wird gestoppt",
+      "4": "Gestoppt"
+    },
     "VIEWS": {
       "TITLE": "Views",
       "DESCRIPTION": "Diese Ansicht zeigt die Anzeigen von ZITADEL. Diese können bei Bedarf zurückgesetzt werden.",
@@ -896,11 +910,21 @@
       "PROVIDER": "SMS Anbieter",
       "ADDPROVIDER": "Anbieter hinzufügen",
       "ADDPROVIDERDESCRIPTION": "Wählen Sie einen der verfügbaren Anbieter und geben Sie die erforderlichen Daten ein.",
+      "REMOVEPROVIDER": "Anbieter entfernen",
+      "REMOVEPROVIDER_DESC": "Sie sind im Begriff eine Konfiguration zu löschen. Wollen Sie fortfahren?",
+      "SMSPROVIDERSTATE": {
+        "0": "Unbekannt",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ACTIVATED": "Anbieter aktiviert.",
+      "DEACTIVATED": "Anbieter deaktiviert.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio erfolgreich hinzugefügt.",
+        "REMOVED": "Twilio entfernt",
         "CHANGETOKEN": "Token ändern",
         "SETTOKEN": "Token setzen",
         "TOKENSET": "Token erfolgreich gesetzt."

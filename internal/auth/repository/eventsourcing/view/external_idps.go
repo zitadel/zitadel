@@ -60,8 +60,8 @@ func (v *View) GetLatestExternalIDPSequence(instanceID string) (*global_view.Cur
 	return v.latestSequence(externalIDPTable, instanceID)
 }
 
-func (v *View) GetLatestExternalIDPSequences() ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(externalIDPTable)
+func (v *View) GetLatestExternalIDPSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(externalIDPTable, instanceIDs...)
 }
 
 func (v *View) ProcessedExternalIDPSequence(event *models.Event) error {
