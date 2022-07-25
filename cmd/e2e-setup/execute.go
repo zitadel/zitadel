@@ -18,19 +18,25 @@ import (
 
 func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []userData, instanceID string) error {
 
-	ctx = authz.WithInstanceID(ctx, instanceID)
-	ctx = authz.WithRequestedDomain(ctx, "localhost")
-
-	orgOwner := newHuman(users[0])
-
 	baseUrl, err := url.Parse(cfg.BaseURL)
 	if err != nil {
 		return err
 	}
 
+	host := baseUrl.Host
+	colonIdx := strings.Index(host, ":")
+	if colonIdx > 0 {
+		host = host[0:colonIdx]
+	}
+
+	ctx = authz.WithInstanceID(ctx, instanceID)
+	ctx = authz.WithRequestedDomain(ctx, host)
+
+	orgOwner := newHuman(users[0])
+
 	orgOwnerID, org, err := cmd.SetUpOrg(ctx, &command.OrgSetup{
 		Name:         cfg.Org,
-		CustomDomain: baseUrl.Host,
+		CustomDomain: host,
 		Human:        *orgOwner,
 	})
 	if err != nil {
