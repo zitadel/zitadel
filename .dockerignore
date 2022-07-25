@@ -6,6 +6,7 @@
 **/Dockerfile
 /k8s/
 /docs/
+!/docs/docs/guides/installation/run/docker-compose.yaml
 /console/node_modules/
 /console/src/app/proto/generated/
 /console/tmp/

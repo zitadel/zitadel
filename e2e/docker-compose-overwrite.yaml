@@ -1,12 +1,37 @@
 services:
   zitadel:
     image: 'zitadel:${BUILD_DATE}'
+    environment:
+      # TODO: ugly
+      ZITADEL_EXTERNALDOMAIN: zitadel
+      ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN: zitadel
+      
+  e2e-setup: 
+    command: ./e2e/e2e-setup.sh
+    build:
+      dockerfile: ./build/e2e/Dockerfile
+      context: ..
+    container_name: e2e-setup
+    env_file:
+    - ./compose.env
+    environment:
+      ZITADEL_DATABASE_HOST: db
+    depends_on:
+      zitadel:
+        condition: service_started
+    networks:
+      - 'zitadel'
+#       TODO: See PR #3816
+#       condition: 'service_healthy'
+
   e2e:
     image: cypress/included:10.3.0
     #build: ./e2e
     container_name: cypress
     depends_on:
-      - zitadel
+      e2e-setup:
+        condition: 'service_completed_successfully'
+    command: ./cypress.sh run
     # note: inside e2e container, the network allows accessing
     # "zitadel" host under name "zitadel"
     # so "curl http://web" would return whatever the webserver
@@ -25,5 +50,6 @@ services:
     #     rebuild required).
     working_dir: /e2e
     volumes:
-      - /Users/christianjakob/caos/internal/zitadel/console:/e2e
-#      - ./console/cypress.config.js:/e2e/cypress.config.js
+      - ./console:/e2e
+    networks:
+      - 'zitadel'

@@ -8,7 +8,11 @@ shift
 
 export projectRoot=".."
 
-set -a; source $ENVFILE; set +a
+if [ -z ${ENVFILE:x} ]; then
+    echo "Not sourcing any env file"
+else
+    set -a; source $ENVFILE; set +a
+fi
 
 NPX=""
 if ! command -v cypress &> /dev/null; then

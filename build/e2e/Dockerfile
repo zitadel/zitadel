@@ -1,11 +1,12 @@
-ARG GO_VERSION=1.17
-
 #######################
 ##  run initialize setup step for ZITADEL tests
 #######################
-FROM golang:${GO_VERSION}
-WORKDIR /go/src/github.com/zitadel/zitadel
+FROM zitadel-test-base
+
+# Invalidate caches when only test code changes
+COPY ./docs/docs/guides/installation/run/docker-compose.yaml ./docs/docs/guides/installation/run/docker-compose.yaml
+COPY ./cmd/e2e-setup ./cmd/e2e-setup
+COPY ./e2e ./e2e
 
 # copy setup
-COPY . .
-RUN e2e/e2e-setup-compose.sh
+CMD e2e/e2e-setup.sh

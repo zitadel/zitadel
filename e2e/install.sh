@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: ONLY BUILD HERE AND PRINT BUILT IMAGE TO STDOUT?
+
 set -e
 
 export projectRoot="."

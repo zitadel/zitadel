@@ -4,8 +4,14 @@ set -ex
 
 export projectRoot="."
 
-set -a
-source ./e2e/local.env
-set +a
+ENVFILE=$1
+
+if [ -z ${ENVFILE:x} ]; then
+    echo "Not sourcing any env file"
+else
+    set -a; source $ENVFILE; set +a
+fi
+
+env
 
 go run ./cmd/e2e-setup/*.go "$@"
