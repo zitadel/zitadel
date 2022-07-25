@@ -39,6 +39,8 @@ const (
 	ColumnsEvent Columns = repository.ColumnsEvent
 	// ColumnsMaxSequence represents the latest sequence of the filtered events
 	ColumnsMaxSequence Columns = repository.ColumnsMaxSequence
+	// ColumnsInstanceIDs represents the instance ids of the filtered events
+	ColumnsInstanceIDs Columns = repository.ColumnsInstanceIDs
 )
 
 // AggregateType is the object name
@@ -278,6 +280,9 @@ func (query *SearchQuery) eventTypeFilter() *repository.Filter {
 }
 
 func (query *SearchQuery) aggregateTypeFilter() *repository.Filter {
+	if len(query.aggregateTypes) < 1 {
+		return nil
+	}
 	if len(query.aggregateTypes) == 1 {
 		return repository.NewFilter(repository.FieldAggregateType, repository.AggregateType(query.aggregateTypes[0]), repository.OperationEquals)
 	}

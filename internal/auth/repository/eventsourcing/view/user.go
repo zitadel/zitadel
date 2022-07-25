@@ -143,8 +143,8 @@ func (v *View) GetLatestUserSequence(instanceID string) (*repository.CurrentSequ
 	return v.latestSequence(userTable, instanceID)
 }
 
-func (v *View) GetLatestUserSequences() ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(userTable)
+func (v *View) GetLatestUserSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userTable, instanceIDs...)
 }
 
 func (v *View) ProcessedUserSequence(event *models.Event) error {

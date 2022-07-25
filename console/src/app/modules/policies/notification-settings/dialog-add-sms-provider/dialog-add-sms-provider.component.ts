@@ -1,10 +1,10 @@
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
-  AddSMSProviderTwilioRequest,
-  UpdateSMSProviderTwilioRequest,
-  UpdateSMSProviderTwilioTokenRequest,
+    AddSMSProviderTwilioRequest,
+    UpdateSMSProviderTwilioRequest,
+    UpdateSMSProviderTwilioTokenRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SMSProvider, TwilioConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -41,13 +41,14 @@ export class DialogAddSMSProviderComponent {
   ) {
     this.twilioForm = this.fb.group({
       sid: ['', [Validators.required]],
-      token: ['', [Validators.required]],
       senderNumber: ['', [Validators.required]],
     });
 
     this.smsProviders = data.smsProviders;
     if (!!this.twilio) {
       this.twilioForm.patchValue(this.twilio);
+    } else {
+      this.twilioForm.addControl('token', new FormControl('', Validators.required));
     }
   }
 
@@ -82,14 +83,16 @@ export class DialogAddSMSProviderComponent {
     });
 
     dialogRef.afterClosed().subscribe((token: string) => {
-      if (token) {
+      if (token && this.twilioProvider?.id) {
         const tokenReq = new UpdateSMSProviderTwilioTokenRequest();
         tokenReq.setToken(token);
+        tokenReq.setId(this.twilioProvider.id);
 
         this.service
           .updateSMSProviderTwilioToken(tokenReq)
           .then(() => {
             this.toast.showInfo('SETTING.SMS.TWILIO.TOKENSET', true);
+            this.dialogRef.close();
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -108,6 +111,15 @@ export class DialogAddSMSProviderComponent {
 
   public get sid(): AbstractControl | null {
     return this.twilioForm.get('sid');
+  }
+
+  public get twilioProvider(): SMSProvider.AsObject | undefined {
+    const twilioProvider: SMSProvider.AsObject | undefined = this.smsProviders.find((p) => p.twilio);
+    if (twilioProvider) {
+      return twilioProvider;
+    } else {
+      return undefined;
+    }
   }
 
   public get twilio(): TwilioConfig.AsObject | undefined {

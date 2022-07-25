@@ -142,16 +142,6 @@ Delegate the right to assign roles to another organization
 Customize login and console with your design  
 ![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
 
-## Usage Data
-
-ZITADEL components send errors and usage data to CAOS Ltd., so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-analytics` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `` flag.
-
-We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
-
-Besides from errors that don't clearly come from misconfiguration or cli misusage, we send an initial event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
-
-We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
-
 ## Security
 
 See the policy [here](./SECURITY.md)

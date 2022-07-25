@@ -66,7 +66,8 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 	view := new(TokenView)
 	switch eventstore.EventType(event.Type) {
-	case user_repo.UserTokenAddedType:
+	case user_repo.UserTokenAddedType,
+		user_repo.PersonalAccessTokenAddedType:
 		view.setRootData(event)
 		err = view.setData(event)
 	case user_repo.UserTokenRemovedType:
@@ -94,6 +95,8 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 			t.Deactivated = false
 		}
 		return nil
+	case user_repo.PersonalAccessTokenRemovedType:
+		return t.appendPATRemoved(event)
 	default:
 		return nil
 	}
@@ -163,6 +166,17 @@ func (t *TokenView) appendRefreshTokenRemoved(event *es_models.Event) error {
 		return err
 	}
 	if refreshToken["tokenId"] == t.RefreshTokenID {
+		t.Deactivated = true
+	}
+	return nil
+}
+
+func (t *TokenView) appendPATRemoved(event *es_models.Event) error {
+	pat, err := eventToMap(event)
+	if err != nil {
+		return err
+	}
+	if pat["tokenId"] == t.ID && t.IsPAT {
 		t.Deactivated = true
 	}
 	return nil
