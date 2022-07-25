@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -49,6 +50,7 @@ import { ProjectsComponent } from './projects.component';
     FilterProjectModule,
     ActionKeysModule,
     TableActionsModule,
+    MatButtonToggleModule,
     MatSortModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,

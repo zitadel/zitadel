@@ -4,31 +4,30 @@
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
 
-  .user-table-left-actions {
+  .user-toggle-group {
     display: flex;
-    align-items: center;
+    margin: 0;
 
-    .type-button {
-      border: none;
-      background: none;
-      text-align: left;
-      padding: 0.75rem 0;
-      opacity: 0.6;
-      font-size: 15px;
-      cursor: pointer;
-      color: map-get($foreground, text);
+    .toggle-row {
+      display: flex;
+      align-items: center;
 
-      &:first-child {
-        margin-right: 1rem;
+      i {
+        margin-right: 0.5rem;
       }
 
-      &:hover {
-        opacity: 1;
+      .info-i {
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+        margin-right: 0;
       }
 
-      &.active {
-        font-weight: 600;
-        opacity: 1;
+      .current-dot {
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        background-color: rgb(84, 142, 230);
+        margin-left: 0.5rem;
       }
     }
   }
