@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,9 +23,14 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 
 	orgOwner := newHuman(users[0])
 
+	baseUrl, err := url.Parse(cfg.BaseURL)
+	if err != nil {
+		return err
+	}
+
 	orgOwnerID, org, err := cmd.SetUpOrg(ctx, &command.OrgSetup{
 		Name:         cfg.Org,
-		CustomDomain: "localhost",
+		CustomDomain: baseUrl.Host,
 		Human:        *orgOwner,
 	})
 	if err != nil {
