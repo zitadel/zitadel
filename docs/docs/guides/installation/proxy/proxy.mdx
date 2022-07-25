@@ -1,0 +1,48 @@
+---
+title: Proxy Configuration
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Zcloud from './_zitadel_cloud.mdx'
+import Nginx from './_nginx.mdx'
+import Traefik from './_traefik.mdx'
+import Caddy from './_caddy.mdx'
+import Cftunnel from './_cloudflare_tunnel.mdx'
+import Http2 from './_http2_support.mdx'
+import TlsMode from './_tls_mode.mdx'
+
+# Proxy Configuration
+
+<Tabs
+    groupId="proxy-vendor"
+    default="zcloud"
+    values={[
+        {'label': 'ZITADEL Cloud', 'value': 'zcloud'},
+        {'label': 'NGINX', 'value': 'nginx'},
+        {'label': 'Traefik', 'value': 'traefik'},
+        {'label': 'Caddy', 'value': 'caddy'},
+        {'label': 'Cloudflare Tunnel', 'value': 'cftunnel'}
+    ]}
+>
+    <TabItem value="zcloud">
+        <Http2/>
+        <Zcloud/>
+    </TabItem>
+    <TabItem value="nginx">
+        <Http2/>
+        <Nginx/>
+    </TabItem>
+    <TabItem value="traefik">
+        <Http2/>
+        <Traefik/>
+    </TabItem>
+    <TabItem value="caddy">
+        <Http2/>
+        <Caddy/>
+    </TabItem>
+    <TabItem value="cftunnel">
+        <Http2/>
+        <Cftunnel/>
+    </TabItem>
+</Tabs>

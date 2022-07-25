@@ -1,0 +1,32 @@
+## TLS mode external
+
+```
+localhost:443
+{
+	reverse_proxy h2c://localhost:8080
+	tls internal #only non production
+}
+```
+
+## TLS mode enabled
+
+```
+localhost:443
+{
+	reverse_proxy h2c://localhost:8080
+	tls internal #only non production
+}
+```
+
+## TLS mode disabled
+
+```
+auto_https: off
+localhost:80
+{
+	reverse_proxy h2c://localhost:8080
+	tls internal #only non production
+}
+```
+
+## More information

@@ -1,0 +1,70 @@
+## TLS mode external
+
+```
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent"';
+ 
+    server {
+        listen 443 http2;
+
+        ssl_certificate     ssl/certificate.pem;
+        ssl_certificate_key ssl/key.pem;
+
+        access_log logs/access.log main;
+ 
+        location / {
+            grpc_pass grpc://localhost:8080;
+            proxy_set_header Host $host;
+        }
+    }
+}
+```
+
+## TLS mode enabled
+
+```
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent"';
+ 
+    server {
+        listen 443 http2;
+
+        ssl_certificate     ssl/certificate.pem;
+        ssl_certificate_key ssl/key.pem;
+ 
+        access_log logs/access.log main;
+ 
+        location / {
+            grpc_pass grpcs://localhost:8080;
+            proxy_set_header Host $host;
+        }
+    }
+}
+```
+
+## TLS mode disabled
+
+```
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent"';
+ 
+    server {
+        listen 80 http2;
+
+        access_log logs/access.log main;
+ 
+        location / {
+            grpc_pass grpc://localhost:8080;
+            proxy_set_header Host $host;
+        }
+    }
+}
+```
+
+## More information

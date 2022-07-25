@@ -56,7 +56,7 @@ module.exports = {
         "guides/installation/run/run",
         "guides/installation/configure/configure",
         "guides/installation/custom-domain",
-        "guides/installation/http2-support",
+        "guides/installation/proxy/proxy",
         "guides/installation/loadbalancing-example/loadbalancing-example",
       ],
     },
