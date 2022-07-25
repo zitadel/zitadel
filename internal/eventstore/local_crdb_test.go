@@ -47,6 +47,7 @@ func TestMain(m *testing.M) {
 }
 
 func initDB(db *sql.DB) error {
+	initialise.ReadStmts("cockroach")
 	config := new(database.Config)
 	config.SetConnector(&cockroach.Config{
 		User: cockroach.User{
