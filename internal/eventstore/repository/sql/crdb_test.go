@@ -6,6 +6,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -277,7 +278,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		uniqueCount       int
 		assetCount        int
 		aggType           repository.AggregateType
-		aggID             []string
+		aggID             database.StringArray
 	}
 	type res struct {
 		wantErr   bool
@@ -460,8 +461,8 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 	type eventsRes struct {
 		pushedEventsCount int
-		aggType           []repository.AggregateType
-		aggID             []string
+		aggType           database.StringArray //[]repository.AggregateType
+		aggID             database.StringArray
 	}
 	type res struct {
 		wantErr   bool
@@ -485,7 +486,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 2,
 					aggID:             []string{"100", "101"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -504,7 +505,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 4,
 					aggID:             []string{"102", "103"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -531,7 +532,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 12,
 					aggID:             []string{"106", "107", "108"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -643,8 +644,8 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	}
 	type eventsRes struct {
 		pushedEventsCount int
-		aggTypes          []repository.AggregateType
-		aggIDs            []string
+		aggTypes          database.StringArray
+		aggIDs            database.StringArray
 	}
 	type res struct {
 		errCount  int
@@ -679,7 +680,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"200", "201", "202", "203"},
 					pushedEventsCount: 9,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -716,7 +717,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"204", "205", "206"},
 					pushedEventsCount: 14,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -746,7 +747,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"207", "208"},
 					pushedEventsCount: 11,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -991,10 +992,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		events []*repository.Event
 	}
 	type res struct {
-		resourceOwners []string
+		resourceOwners database.StringArray
 	}
 	type fields struct {
-		aggregateIDs  []string
+		aggregateIDs  database.StringArray
 		aggregateType string
 	}
 	tests := []struct {
