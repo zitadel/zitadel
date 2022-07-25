@@ -52,11 +52,6 @@ func NewCreateStatement(event eventstore.Event, values []handler.Column, opts ..
 func NewUpsertStatement(event eventstore.Event, conflictCols []handler.Column, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 
-	// updates := make([]string, len(values))
-	// for i, col := range cols {
-	// 	updates[i] = col + " = " + params[i]
-	// }
-
 	conflictTarget := make([]string, len(conflictCols))
 	for i, col := range conflictCols {
 		conflictTarget[i] = col.Name
@@ -228,10 +223,7 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	switch value.(type) {
 
 	case []string:
-		arrayType = "STRING"
-		// case pq.Int32Array,
-		// 	pq.Int64Array:
-		// 	arrayType = "INT"
+		arrayType = "TEXT"
 		//TODO: handle more types if necessary
 	}
 	return handler.Column{

@@ -11,6 +11,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -45,14 +46,14 @@ var (
 		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id` +
 		` LEFT JOIN projections.users2_machines ON projections.users2.id = projections.users2_machines.user_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM projections.login_names as login_names` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames` +
+		` FROM projections.login_names AS login_names` +
 		` WHERE login_names.instance_id = $1` +
-		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = projections.users2.id` +
+		` GROUP BY login_names.user_id) AS login_names` +
+		` ON login_names.user_id = projections.users2.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) as preferred_login_name` +
-		` on preferred_login_name.user_id = projections.users2.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
+		` ON preferred_login_name.user_id = projections.users2.id`
 	userCols = []string{
 		"id",
 		"creation_date",
@@ -196,14 +197,14 @@ var (
 		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id` +
 		` LEFT JOIN projections.users2_notifications ON projections.users2.id = projections.users2_notifications.user_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM projections.login_names as login_names` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
+		` FROM projections.login_names AS login_names` +
 		` WHERE login_names.instance_id = $1` +
-		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = projections.users2.id` +
+		` GROUP BY login_names.user_id) AS login_names` +
+		` ON login_names.user_id = projections.users2.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) as preferred_login_name` +
-		` on preferred_login_name.user_id = projections.users2.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
+		` ON preferred_login_name.user_id = projections.users2.id`
 	notifyUserCols = []string{
 		"id",
 		"creation_date",
@@ -262,13 +263,13 @@ var (
 		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id` +
 		` LEFT JOIN projections.users2_machines ON projections.users2.id = projections.users2_machines.user_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM projections.login_names as login_names` +
-		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = projections.users2.id` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
+		` FROM projections.login_names AS login_names` +
+		` GROUP BY login_names.user_id) AS login_names` +
+		` ON login_names.user_id = projections.users2.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
-		` on preferred_login_name.user_id = projections.users2.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names AS preferred_login_name WHERE preferred_login_name.is_primary = $1) AS preferred_login_name` +
+		` ON preferred_login_name.user_id = projections.users2.id`
 	usersCols = []string{
 		"id",
 		"creation_date",
@@ -350,7 +351,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						[]string{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -381,7 +382,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeHuman,
 				Username:           "username",
-				LoginNames:         []string{"login_name1", "login_name2"},
+				LoginNames:         database.StringArray{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				Human: &Human{
 					FirstName:         "first_name",
@@ -416,7 +417,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeMachine,
 						"username",
-						[]string{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						nil,
@@ -447,7 +448,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeMachine,
 				Username:           "username",
-				LoginNames:         []string{"login_name1", "login_name2"},
+				LoginNames:         database.StringArray{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				Machine: &Machine{
 					Name:        "name",
@@ -860,7 +861,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						[]string{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -890,7 +891,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeHuman,
 				Username:           "username",
-				LoginNames:         []string{"login_name1", "login_name2"},
+				LoginNames:         database.StringArray{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				FirstName:          "first_name",
 				LastName:           "last_name",
@@ -924,7 +925,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						[]string{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -1006,7 +1007,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							[]string{"login_name1", "login_name2"},
+							database.StringArray{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -1043,7 +1044,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeHuman,
 						Username:           "username",
-						LoginNames:         []string{"login_name1", "login_name2"},
+						LoginNames:         database.StringArray{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
 							FirstName:         "first_name",
@@ -1079,7 +1080,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							[]string{"login_name1", "login_name2"},
+							database.StringArray{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -1108,7 +1109,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeMachine,
 							"username",
-							[]string{"login_name1", "login_name2"},
+							database.StringArray{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							nil,
@@ -1145,7 +1146,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeHuman,
 						Username:           "username",
-						LoginNames:         []string{"login_name1", "login_name2"},
+						LoginNames:         database.StringArray{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
 							FirstName:         "first_name",
@@ -1170,7 +1171,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeMachine,
 						Username:           "username",
-						LoginNames:         []string{"login_name1", "login_name2"},
+						LoginNames:         database.StringArray{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Machine: &Machine{
 							Name:        "name",

@@ -43,9 +43,9 @@ func TestStatementHandler_handleLock(t *testing.T) {
 			name: "lock fails",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 2, "instanceID"),
-					expectLock(lockTable, workerName, 2, "instanceID"),
-					expectLockErr(lockTable, workerName, 2, "instanceID", errLock),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
+					expectLockErr(lockTable, workerName, 2*time.Second, "instanceID", errLock),
 				},
 			},
 			args: args{
@@ -63,8 +63,8 @@ func TestStatementHandler_handleLock(t *testing.T) {
 			name: "success",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 2, "instanceID"),
-					expectLock(lockTable, workerName, 2, "instanceID"),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
 				},
 			},
 			args: args{
@@ -136,7 +136,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 				},
 			},
 			args: args{
-				lockDuration: 1 * time.Second,
+				lockDuration: time.Duration(1),
 				instanceID:   "instanceID",
 			},
 		},
@@ -151,7 +151,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 				},
 			},
 			args: args{
-				lockDuration: 2 * time.Second,
+				lockDuration: time.Duration(2),
 				instanceID:   "instanceID",
 			},
 		},
@@ -166,7 +166,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 				},
 			},
 			args: args{
-				lockDuration: 3 * time.Second,
+				lockDuration: time.Duration(3),
 				instanceID:   "instanceID",
 			},
 		},

@@ -94,7 +94,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET change_date=$1, sequence=$2, state=$3 WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -125,7 +125,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET change_date=$1, sequence=$2, state=$3 WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -156,7 +156,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET change_date=$1, sequence=$2, granted_role_keys=$3 WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -187,7 +187,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET change_date=$1, sequence=$2, granted_role_keys=$3 WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

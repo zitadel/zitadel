@@ -165,7 +165,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names_users SET user_name=$1 WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								"changed",
 								"agg-id",
@@ -195,7 +195,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names_users SET user_name=$1 WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								"claimed",
 								"agg-id",
@@ -257,7 +257,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names_policies SET must_be_domain=$1 WHERE (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -395,7 +395,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_domains SET (is_primary) = ($1) WHERE (resource_owner = $2) AND (is_primary = $3)",
+							expectedStmt: "UPDATE projections.login_names_domains SET is_primary=$1 WHERE (resource_owner = $2) AND (is_primary = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -403,7 +403,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.login_names_domains SET (is_primary) = ($1) WHERE (name = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.login_names_domains SET is_primary=$1 WHERE (name = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"primary",
@@ -466,7 +466,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names_policies SET must_be_domain=$1 WHERE (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",

@@ -161,7 +161,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled=$1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"appId",
@@ -189,7 +189,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled=$1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"appId",
@@ -264,7 +264,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled=$1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"appId",
@@ -292,7 +292,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled=$1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"appId",

@@ -74,7 +74,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_domains SET (change_date, sequence, validation_type) = ($1, $2, $3) WHERE (domain = $4) AND (org_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.org_domains SET change_date=$1, sequence=$2, validation_type=$3 WHERE (domain = $4) AND (org_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -106,7 +106,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_domains SET (change_date, sequence, is_verified) = ($1, $2, $3) WHERE (domain = $4) AND (org_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.org_domains SET change_date=$1, sequence=$2, is_verified=$3 WHERE (domain = $4) AND (org_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -138,7 +138,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_domains SET (change_date, sequence, is_primary) = ($1, $2, $3) WHERE (org_id = $4) AND (is_primary = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.org_domains SET change_date=$1, sequence=$2, is_primary=$3 WHERE (org_id = $4) AND (is_primary = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -149,7 +149,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.org_domains SET (change_date, sequence, is_primary) = ($1, $2, $3) WHERE (domain = $4) AND (org_id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.org_domains SET change_date=$1, sequence=$2, is_primary=$3 WHERE (domain = $4) AND (org_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

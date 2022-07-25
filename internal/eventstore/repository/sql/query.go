@@ -150,8 +150,6 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 		for _, f := range filter {
 			value := f.Value
 			switch value.(type) {
-			// case []bool, []float64, []int64, []string, []repository.AggregateType, []repository.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]repository.AggregateType, *[]repository.EventType:
-			// 	value = pq.Array(value)
 			case map[string]interface{}:
 				var err error
 				value, err = json.Marshal(value)

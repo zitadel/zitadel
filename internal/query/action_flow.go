@@ -215,8 +215,8 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 			for rows.Next() {
 				var (
 					actionID            sql.NullString
-					actionCreationDate  time.Time
-					actionChangeDate    time.Time
+					actionCreationDate  sql.NullTime
+					actionChangeDate    sql.NullTime
 					actionResourceOwner sql.NullString
 					actionState         sql.NullInt32
 					actionSequence      sql.NullInt64
@@ -250,8 +250,8 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 				}
 				flow.TriggerActions[triggerType] = append(flow.TriggerActions[triggerType], &Action{
 					ID:            actionID.String,
-					CreationDate:  actionCreationDate,
-					ChangeDate:    actionChangeDate,
+					CreationDate:  actionCreationDate.Time,
+					ChangeDate:    actionChangeDate.Time,
 					ResourceOwner: actionResourceOwner.String,
 					State:         domain.ActionState(actionState.Int32),
 					Sequence:      uint64(actionSequence.Int64),

@@ -41,7 +41,7 @@ type LoginPolicy struct {
 
 type SecondFactors struct {
 	SearchResponse
-	Factors []domain.SecondFactorType
+	Factors database.EnumArray[domain.SecondFactorType]
 }
 
 type MultiFactors struct {
@@ -416,6 +416,7 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
+			p.Count = uint64(len(p.Factors))
 			return p, nil
 		}
 }

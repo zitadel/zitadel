@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -101,7 +102,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						uint64(20211202),
 						"user-id",
 						time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						[]string{"openid"},
+						database.StringArray{"openid"},
 					},
 				),
 			},
@@ -113,7 +114,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 				Sequence:      20211202,
 				UserID:        "user-id",
 				Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-				Scopes:        []string{"openid"},
+				Scopes:        database.StringArray{"openid"},
 			},
 		},
 		{
@@ -161,7 +162,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							[]string{"openid"},
+							database.StringArray{"openid"},
 						},
 					},
 				),
@@ -179,7 +180,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        []string{"openid"},
+						Scopes:        database.StringArray{"openid"},
 					},
 				},
 			},
@@ -200,7 +201,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							[]string{"openid"},
+							database.StringArray{"openid"},
 						},
 						{
 							"token-id2",
@@ -210,7 +211,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							[]string{"openid"},
+							database.StringArray{"openid"},
 						},
 					},
 				),
@@ -228,7 +229,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        []string{"openid"},
+						Scopes:        database.StringArray{"openid"},
 					},
 					{
 						ID:            "token-id2",
@@ -238,7 +239,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        []string{"openid"},
+						Scopes:        database.StringArray{"openid"},
 					},
 				},
 			},

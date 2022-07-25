@@ -78,7 +78,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
+							expectedStmt: "UPDATE projections.notification_providers SET change_date=$1, sequence=$2, compact=$3 WHERE (aggregate_id = $4) AND (provider_type = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -176,7 +176,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
+							expectedStmt: "UPDATE projections.notification_providers SET change_date=$1, sequence=$2, compact=$3 WHERE (aggregate_id = $4) AND (provider_type = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

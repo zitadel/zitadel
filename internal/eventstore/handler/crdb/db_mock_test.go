@@ -16,7 +16,7 @@ type mockExpectation func(sqlmock.Sqlmock)
 
 func expectFailureCount(tableName string, projectionName, instanceID string, failedSeq, failureCount uint64) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`WITH failures AS \(SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2\ AND instance_id = \$3\) SELECT IF\(EXISTS\(SELECT failure_count FROM failures\), \(SELECT failure_count FROM failures\), 0\) AS failure_count`).
+		m.ExpectQuery(`WITH failures AS \(SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2 AND instance_id = \$3\) SELECT COALESCE\(\(SELECT failure_count FROM failures\), 0\) AS failure_count`).
 			WithArgs(projectionName, failedSeq, instanceID).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"failure_count"}).
@@ -27,7 +27,7 @@ func expectFailureCount(tableName string, projectionName, instanceID string, fai
 
 func expectUpdateFailureCount(tableName string, projectionName, instanceID string, seq, failureCount uint64) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec(`UPSERT INTO `+tableName+` \(projection_name, failed_sequence, failure_count, error, instance_id\) VALUES \(\$1, \$2, \$3, \$4\, \$5\)`).
+		m.ExpectExec(`INSERT INTO `+tableName+` \(projection_name, failed_sequence, failure_count, error, instance_id\) VALUES \(\$1, \$2, \$3, \$4\, \$5\)`).
 			WithArgs(projectionName, seq, failureCount, sqlmock.AnyArg(), instanceID).WillReturnResult(sqlmock.NewResult(1, 1))
 	}
 }
@@ -289,7 +289,7 @@ func expectLock(lockTable, workerName string, d time.Duration, instanceID string
 			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = \$4 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				float64(d),
+				d,
 				projectionName,
 				instanceID,
 			).
@@ -308,7 +308,7 @@ func expectLockNoRows(lockTable, workerName string, d time.Duration, instanceID 
 			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = \$4 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				float64(d),
+				d,
 				projectionName,
 				instanceID,
 			).
@@ -325,7 +325,7 @@ func expectLockErr(lockTable, workerName string, d time.Duration, instanceID str
 			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = \$4 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				float64(d),
+				d,
 				projectionName,
 				instanceID,
 			).

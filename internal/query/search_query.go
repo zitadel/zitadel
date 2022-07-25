@@ -356,7 +356,7 @@ func (t table) identifier() string {
 	if t.alias == "" {
 		return t.name
 	}
-	return t.name + " as " + t.alias
+	return t.name + " AS " + t.alias
 }
 
 func (t table) isZero() bool {

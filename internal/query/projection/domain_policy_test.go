@@ -85,7 +85,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.domain_policies SET change_date=$1, sequence=$2, user_login_must_be_domain=$3, validate_org_domains=$4, smtp_sender_address_matches_instance_domain=$5 WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -189,7 +189,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.domain_policies SET change_date=$1, sequence=$2, user_login_must_be_domain=$3, validate_org_domains=$4, smtp_sender_address_matches_instance_domain=$5 WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

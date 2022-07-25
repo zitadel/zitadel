@@ -71,10 +71,6 @@ func prepareCondition(filters [][]*es_models.Filter) (clause string, values []in
 		subClauses := make([]string, 0, len(filter))
 		for _, f := range filter {
 			value := f.GetValue()
-			// switch value.(type) {
-			// case []bool, []float64, []int64, []string, []es_models.AggregateType, []es_models.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]es_models.AggregateType, *[]es_models.EventType:
-			// 	value = pq.Array(value)
-			// }
 
 			subClauses = append(subClauses, getCondition(f))
 			if subClauses[len(subClauses)-1] == "" {

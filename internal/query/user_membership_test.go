@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
@@ -36,7 +38,7 @@ var (
 			", NULL::TEXT AS id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.org_members as members" +
+			" FROM projections.org_members AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -49,7 +51,7 @@ var (
 			", members.id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.instance_members as members" +
+			" FROM projections.instance_members AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -62,7 +64,7 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.project_members as members" +
+			" FROM projections.project_members AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -75,7 +77,7 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", members.grant_id" +
-			" FROM projections.project_grant_members as members" +
+			" FROM projections.project_grant_members AS members" +
 			") AS memberships" +
 			" LEFT JOIN projections.projects ON memberships.project_id = projections.projects.id" +
 			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id")
@@ -129,7 +131,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -151,7 +153,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -171,7 +173,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -193,7 +195,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -213,7 +215,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -235,7 +237,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -255,7 +257,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -277,7 +279,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -301,7 +303,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -315,7 +317,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -329,7 +331,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -343,7 +345,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							[]string{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -365,7 +367,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -374,7 +376,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -383,7 +385,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -392,7 +394,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,

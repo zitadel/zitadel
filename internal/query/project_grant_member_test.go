@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
@@ -25,7 +27,7 @@ var (
 		", projections.users2_machines.name" +
 		", projections.users2_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM projections.project_grant_members as members " +
+		"FROM projections.project_grant_members AS members " +
 		"LEFT JOIN projections.users2_humans " +
 		"ON members.user_id = projections.users2_humans.user_id " +
 		"LEFT JOIN projections.users2_machines " +
@@ -92,7 +94,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id",
-							[]string{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
 							"gigi@caos.ch",
 							"first-name",
@@ -115,7 +117,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
 						Email:              "gigi@caos.ch",
 						FirstName:          "first-name",
@@ -140,7 +142,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id",
-							[]string{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
 							nil,
 							nil,
@@ -163,7 +165,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
 						Email:              "",
 						FirstName:          "",
@@ -188,7 +190,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id-1",
-							[]string{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
 							"gigi@caos.ch",
 							"first-name",
@@ -203,7 +205,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id-2",
-							[]string{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
 							nil,
 							nil,
@@ -226,7 +228,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id-1",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
 						Email:              "gigi@caos.ch",
 						FirstName:          "first-name",
@@ -240,7 +242,7 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id-2",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
 						Email:              "",
 						FirstName:          "",

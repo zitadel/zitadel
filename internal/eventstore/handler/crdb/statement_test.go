@@ -447,7 +447,7 @@ func TestNewUpdateStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPDATE my_table SET (col1) = ($1) WHERE (col2 = $2)",
+							query: "UPDATE my_table SET col1=$1 WHERE (col2 = $2)",
 							args:  []interface{}{"val", 1},
 						},
 					},
@@ -768,11 +768,11 @@ func TestNewMultiStatement(t *testing.T) {
 							args:  []interface{}{1},
 						},
 						{
-							query: "UPSERT INTO my_table (col1) VALUES ($1)",
+							query: "INSERT INTO my_table (col1) VALUES ($1) ON CONFLICT (col1) DO UPDATE SET (col1) = ($1)",
 							args:  []interface{}{1},
 						},
 						{
-							query: "UPDATE my_table SET (col1) = ($1) WHERE (col1 = $2)",
+							query: "UPDATE my_table SET col1=$1 WHERE (col1 = $2)",
 							args:  []interface{}{1, 1},
 						},
 					},
@@ -1012,7 +1012,7 @@ func TestNewCopyStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3",
+							query: "INSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3 ON CONFLICT () DO UPDATE SET (state, id, col_a, col_b) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
 							args:  []interface{}{1, 2, 3},
 						},
 					},
@@ -1079,7 +1079,7 @@ func TestNewCopyStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPSERT INTO my_table (state, id, col_c, col_d) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3",
+							query: "INSERT INTO my_table (state, id, col_c, col_d) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3 ON CONFLICT () DO UPDATE SET (state, id, col_c, col_d) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
 							args:  []interface{}{1, 2, 3},
 						},
 					},

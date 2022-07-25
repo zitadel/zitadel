@@ -68,7 +68,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.secret_generators SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10)",
+							expectedStmt: "UPDATE projections.secret_generators SET change_date=$1, sequence=$2, length=$3, expiry=$4, include_lower_letters=$5, include_upper_letters=$6, include_digits=$7, include_symbols=$8 WHERE (aggregate_id = $9) AND (generator_type = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -136,8 +137,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
-						[]domain.SecondFactorType{domain.SecondFactorTypeOTP},
-						[]domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
@@ -163,8 +164,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				AllowUsernamePassword:      true,
 				AllowExternalIDPs:          true,
 				ForceMFA:                   true,
-				SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeOTP},
-				MultiFactors:               []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				SecondFactors:              database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+				MultiFactors:               database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 				PasswordlessType:           domain.PasswordlessTypeAllowed,
 				IsDefault:                  true,
 				HidePasswordReset:          true,
@@ -260,7 +261,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"second_factors",
 					},
 					[]driver.Value{
-						[]domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 					},
 				),
 			},
@@ -268,7 +269,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Factors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+				Factors: database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 			},
 		},
 		{
@@ -282,11 +283,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"second_factors",
 					},
 					[]driver.Value{
-						[]int{},
+						database.EnumArray[domain.SecondFactorType]{},
 					},
 				),
 			},
-			object: &SecondFactors{Factors: []domain.SecondFactorType{}},
+			object: &SecondFactors{Factors: database.EnumArray[domain.SecondFactorType]{}},
 		},
 		{
 			name:    "prepareLoginPolicy2FAsQuery sql err",
@@ -306,7 +307,6 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			},
 			object: nil,
 		},
-
 		{
 			name:    "prepareLoginPolicyMFAsQuery no result",
 			prepare: prepareLoginPolicyMFAsQuery,
@@ -339,7 +339,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"multi_factors",
 					},
 					[]driver.Value{
-						[]domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 					},
 				),
 			},
@@ -347,7 +347,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Factors: []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				Factors: database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 			},
 		},
 		{
@@ -361,11 +361,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"multi_factors",
 					},
 					[]driver.Value{
-						[]int{},
+						database.EnumArray[domain.MultiFactorType]{},
 					},
 				),
 			},
-			object: &MultiFactors{Factors: []domain.MultiFactorType{}},
+			object: &MultiFactors{Factors: database.EnumArray[domain.MultiFactorType]{}},
 		},
 		{
 			name:    "prepareLoginPolicyMFAsQuery sql err",

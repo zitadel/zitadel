@@ -85,7 +85,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.privacy_policies SET change_date=$1, sequence=$2, privacy_link=$3, tos_link=$4, help_link=$5 WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -189,7 +189,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.privacy_policies SET change_date=$1, sequence=$2, privacy_link=$3, tos_link=$4, help_link=$5 WHERE (id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

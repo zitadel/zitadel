@@ -66,7 +66,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.projects SET change_date=$1, sequence=$2, state=$3 WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -96,7 +96,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.projects SET change_date=$1, sequence=$2, state=$3 WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -126,7 +126,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects SET (change_date, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.projects SET change_date=$1, sequence=$2, name=$3, project_role_assertion=$4, project_role_check=$5, has_project_check=$6, private_labeling_setting=$7 WHERE (id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

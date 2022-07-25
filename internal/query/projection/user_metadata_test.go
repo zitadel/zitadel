@@ -41,7 +41,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.user_metadata (user_id, resource_owner, instance_id, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.user_metadata (user_id, resource_owner, instance_id, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, user_id) DO UPDATE SET (user_id, resource_owner, instance_id, creation_date, change_date, sequence, key, value) = ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
