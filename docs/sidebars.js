@@ -50,14 +50,25 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Install ZITADEL",
+      label: "Deploy ZITADEL",
       collapsed: false,
       items: [
-        "guides/installation/run/run",
-        "guides/installation/configure/configure",
-        "guides/installation/custom-domain",
-        "guides/installation/proxy/proxy",
-        "guides/installation/loadbalancing-example/loadbalancing-example",
+        "guides/deploy/options",
+        "guides/deploy/cloud",
+        "guides/deploy/self-hosted/self-hosted",
+      ],
+    },
+    {
+      type: "category",
+      label: "Operate ZITADEL",
+      collapsed: false,
+      items: [
+        "guides/operate/configure/configure",
+        "guides/operate/custom-domain",
+        "guides/operate/tls_modes",
+        "guides/operate/http2",
+        "guides/operate/proxy/proxy",
+        "guides/operate/loadbalancing-example/loadbalancing-example",
       ],
     },
     {

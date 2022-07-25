@@ -12,7 +12,7 @@ cockroach start-single-node --insecure --background --http-addr :9090 --listen-a
 ## Run ZITADEL
 ```bash
 # Download the zitadel binary
-curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.39 | grep "browser_download_url.*zitadel_Linux_$(uname -i).tar.gz" | cut -d '"' -f 4 | xargs wget -qO - | sudo tar --extract --gzip --overwrite --directory /usr/local/bin zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.43 | grep "browser_download_url.*zitadel_Linux_$(uname -i).tar.gz" | cut -d '"' -f 4 | xargs wget -qO - | sudo tar --extract --gzip --overwrite --directory /usr/local/bin zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
 
 # Run the zitadel binary
 ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled

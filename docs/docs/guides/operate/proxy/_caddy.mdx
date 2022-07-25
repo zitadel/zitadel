@@ -1,7 +1,7 @@
 ## TLS mode external
 
 ```
-localhost:443
+:443
 {
 	reverse_proxy h2c://localhost:8080
 	tls internal #only non production
@@ -11,7 +11,7 @@ localhost:443
 ## TLS mode enabled
 
 ```
-localhost:443
+:443
 {
 	reverse_proxy h2c://localhost:8080
 	tls internal #only non production
@@ -22,11 +22,9 @@ localhost:443
 
 ```
 auto_https: off
-localhost:80
+:80
 {
 	reverse_proxy h2c://localhost:8080
 	tls internal #only non production
 }
 ```
-
-## More information

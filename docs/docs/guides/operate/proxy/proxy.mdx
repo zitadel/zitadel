@@ -9,8 +9,8 @@ import Nginx from './_nginx.mdx'
 import Traefik from './_traefik.mdx'
 import Caddy from './_caddy.mdx'
 import Cftunnel from './_cloudflare_tunnel.mdx'
-import Http2 from './_http2_support.mdx'
-import TlsMode from './_tls_mode.mdx'
+import Cloudflare from './_cloudflare.mdx'
+import More from './_more.mdx'
 
 # Proxy Configuration
 
@@ -22,27 +22,32 @@ import TlsMode from './_tls_mode.mdx'
         {'label': 'NGINX', 'value': 'nginx'},
         {'label': 'Traefik', 'value': 'traefik'},
         {'label': 'Caddy', 'value': 'caddy'},
-        {'label': 'Cloudflare Tunnel', 'value': 'cftunnel'}
+        {'label': 'Cloudflare Tunnel', 'value': 'cftunnel'},
+        {'label': 'Cloudflare', 'value': 'cf'}
     ]}
 >
     <TabItem value="zcloud">
-        <Http2/>
         <Zcloud/>
+        <More/>
     </TabItem>
     <TabItem value="nginx">
-        <Http2/>
         <Nginx/>
+        <More/>
     </TabItem>
     <TabItem value="traefik">
-        <Http2/>
         <Traefik/>
+        <More/>
     </TabItem>
     <TabItem value="caddy">
-        <Http2/>
         <Caddy/>
+        <More/>
     </TabItem>
     <TabItem value="cftunnel">
-        <Http2/>
         <Cftunnel/>
+        <More/>
+    </TabItem>
+        <TabItem value="cf">
+        <Cloudflare/>
+        <More/>
     </TabItem>
 </Tabs>

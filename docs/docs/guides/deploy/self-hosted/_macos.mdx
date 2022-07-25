@@ -23,7 +23,7 @@ brew install zitadel/tap/zitadel
 
 ```bash
 export MY_ARCHITECTURE="arm64 or amd64 depeding on your mac"
-curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.39 | grep "browser_download_url.*zitadel_Darwin_${MY_ARCHITECTURE}.tar.gz" | cut -d '"' -f 4 | xargs wget -qO - | sudo tar --extract --gzip --overwrite --directory /usr/local/bin zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.43 | grep "browser_download_url.*zitadel_Darwin_${MY_ARCHITECTURE}.tar.gz" | cut -d '"' -f 4 | xargs wget -qO - | sudo tar --extract --gzip --overwrite --directory /usr/local/bin zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
 ```
 
 Run ZITADEL
