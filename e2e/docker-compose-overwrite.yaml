@@ -16,14 +16,15 @@ services:
     - ./compose.env
     environment:
       ZITADEL_DATABASE_HOST: db
+    networks:
+    - 'zitadel'
+    volumes:
+    - ${PWD}/.keys/e2e.json:/.keys/e2e.json
     depends_on:
       zitadel:
-        condition: service_started
-    networks:
-      - 'zitadel'
 #       TODO: See PR #3816
 #       condition: 'service_healthy'
-
+        condition: service_started
   e2e:
     image: cypress/included:10.3.0
     #build: ./e2e
@@ -31,7 +32,11 @@ services:
     depends_on:
       e2e-setup:
         condition: 'service_completed_successfully'
+    env_file:
+    - ./compose.env
     command: ./cypress.sh run
+    volumes:
+    - ${PWD}/.keys/e2e.json:/.keys/e2e.json
     # note: inside e2e container, the network allows accessing
     # "zitadel" host under name "zitadel"
     # so "curl http://web" would return whatever the webserver
@@ -50,6 +55,6 @@ services:
     #     rebuild required).
     working_dir: /e2e
     volumes:
-      - ./console:/e2e
+    - ./console:/e2e
     networks:
-      - 'zitadel'
+    - 'zitadel'
