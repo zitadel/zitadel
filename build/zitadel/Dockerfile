@@ -5,17 +5,16 @@ ARG GO_VERSION=1.17
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
 FROM golang:${GO_VERSION} as go-dep
-RUN mkdir -p src/github.com/zitadel/zitadel
 WORKDIR /go/src/github.com/zitadel/zitadel
 
 #download modules
-COPY . .
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
 
 # install tools
 COPY tools ./tools
 RUN ./tools/install.sh
-
 
 #######################
 ## generates static files
@@ -47,17 +46,20 @@ COPY internal/api/assets/generator internal/api/assets/generator
 COPY internal/config internal/config
 COPY internal/errors internal/errors
 
-RUN build/zitadel/generate-grpc.sh \
-    && go generate openapi/statik/generate.go \
-    && mkdir -p docs/apis/assets/ \
-    && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
+RUN build/zitadel/generate-grpc.sh && \
+    go generate openapi/statik/generate.go && \
+    mkdir -p docs/apis/assets/ && \
+    go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
 #######################
 ## Go base build
 #######################
 FROM go-stub as go-base
 # copy remaining zitadel files
-COPY . .
+COPY cmd cmd
+COPY internal internal
+COPY pkg pkg
+COPY openapi openapi
 
 #######################
 ## copy for local dev

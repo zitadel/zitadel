@@ -194,6 +194,8 @@
     }
   },
   "RESOURCEID": "Resource Id",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "No data"
   },
@@ -706,6 +708,17 @@
     "MEMBER": {
       "TITLE": "Managers",
       "DESCRIPTION": "These Managers are allowed to make changes in your instance."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Domains"
+    },
+    "STATE": {
+      "0": "Unspecified",
+      "1": "Creating",
+      "2": "Running",
+      "3": "Stopping",
+      "4": "Stopped"
     },
     "VIEWS": {
       "TITLE": "Views",
