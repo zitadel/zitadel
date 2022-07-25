@@ -76,7 +76,7 @@ var (
 
 func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*PasswordAgePolicy, error) {
 	if shouldTriggerBulk {
-		projection.PasswordAgeProjection.TriggerBulk(ctx)
+		projection.PasswordAgeProjection.Trigger(ctx)
 	}
 
 	stmt, scan := preparePasswordAgePolicyQuery()
@@ -106,7 +106,7 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk 
 
 func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBulk bool) (*PasswordAgePolicy, error) {
 	if shouldTriggerBulk {
-		projection.PasswordAgeProjection.TriggerBulk(ctx)
+		projection.PasswordAgeProjection.Trigger(ctx)
 	}
 
 	stmt, scan := preparePasswordAgePolicyQuery()

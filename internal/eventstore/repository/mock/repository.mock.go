@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	repository "github.com/zitadel/zitadel/internal/eventstore/repository"
 	gomock "github.com/golang/mock/gomock"
+	repository "github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 // MockRepository is a mock of Repository interface.
@@ -76,6 +76,21 @@ func (m *MockRepository) Health(arg0 context.Context) error {
 func (mr *MockRepositoryMockRecorder) Health(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockRepository)(nil).Health), arg0)
+}
+
+// InstanceIDs mocks base method.
+func (m *MockRepository) InstanceIDs(arg0 context.Context, arg1 *repository.SearchQuery) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstanceIDs", arg0, arg1)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InstanceIDs indicates an expected call of InstanceIDs.
+func (mr *MockRepositoryMockRecorder) InstanceIDs(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceIDs", reflect.TypeOf((*MockRepository)(nil).InstanceIDs), arg0, arg1)
 }
 
 // LatestSequence mocks base method.

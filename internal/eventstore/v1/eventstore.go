@@ -13,6 +13,7 @@ type Eventstore interface {
 	Health(ctx context.Context) error
 	FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) (events []*models.Event, err error)
 	Subscribe(aggregates ...models.AggregateType) *Subscription
+	InstanceIDs(ctx context.Context, searchQuery *models.SearchQuery) ([]string, error)
 }
 
 var _ Eventstore = (*eventstore)(nil)
@@ -36,4 +37,11 @@ func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.Sear
 
 func (es *eventstore) Health(ctx context.Context) error {
 	return es.repo.Health(ctx)
+}
+
+func (es *eventstore) InstanceIDs(ctx context.Context, searchQuery *models.SearchQuery) ([]string, error) {
+	if err := searchQuery.Validate(); err != nil {
+		return nil, err
+	}
+	return es.repo.InstanceIDs(ctx, models.FactoryFromSearchQuery(searchQuery))
 }

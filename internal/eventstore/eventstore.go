@@ -186,6 +186,15 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 	return es.repo.LatestSequence(ctx, query)
 }
 
+//InstanceIDs returns the instance ids found by the search query
+func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
+	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
+	return es.repo.InstanceIDs(ctx, query)
+}
+
 type QueryReducer interface {
 	reducer
 	//Query returns the SearchQueryFactory for the events needed in reducer

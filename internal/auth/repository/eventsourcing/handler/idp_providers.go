@@ -76,30 +76,13 @@ func (i *IDPProvider) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPProvider) EventQuery() (*models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestIDPProviderSequences()
+func (i *IDPProvider) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestIDPProviderSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	query := es_models.NewSearchQuery()
-	instances := make([]string, 0)
-	for _, sequence := range sequences {
-		for _, instance := range instances {
-			if sequence.InstanceID == instance {
-				break
-			}
-		}
-		instances = append(instances, sequence.InstanceID)
-		query.AddQuery().
-			AggregateTypeFilter(i.AggregateTypes()...).
-			LatestSequenceFilter(sequence.CurrentSequence).
-			InstanceIDFilter(sequence.InstanceID)
-	}
-	return query.AddQuery().
-		AggregateTypeFilter(i.AggregateTypes()...).
-		LatestSequenceFilter(0).
-		ExcludedInstanceIDsFilter(instances...).
-		SearchQuery(), nil
+
+	return newSearchQuery(sequences, i.AggregateTypes(), instanceIDs), nil
 }
 
 func (i *IDPProvider) Reduce(event *models.Event) (err error) {
