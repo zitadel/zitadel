@@ -65,7 +65,7 @@
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/node": "^17.0.42",
-    "@typescript-eslint/eslint-plugin": "5.30.4",
+    "@typescript-eslint/eslint-plugin": "5.30.7",
     "@typescript-eslint/parser": "5.30.4",
     "codelyzer": "^6.0.0",
     "cypress": "^10.1.0",
