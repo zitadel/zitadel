@@ -18,19 +18,64 @@ import Column from '../../../src/components/column';
 
 ## Exercise - Create a new instance
 
+:::note
+This part happens in the [ZITADEL Customer Portal](https://zitadel.cloud)
+:::
+
 The creation and management of an instance takes place in the Customer Portal.
 To manage your existing instances you need login with your Customer Portal user. Be aware that this is not the same user as in the instance itself.
 
 ![New Instance](/img/manuals/portal/customer_portal_new_instance.gif)
 
+## Login to your instance
+
+:::note
+This part happens in the ZITADEL Console
+:::
+
+After you have initialized your first admin user of the new created ZITADEL instance. You can access the Instance Console, to manage all your resources.
+Login with the user you have initialized. You will find the url to access your instance in the initialization email of your user or in the detail of your instance.
+
+The domain is generated and looks something like this: {InstanceName}-{RandomString}.zitadel.cloud
+
+![Console Landing Page](/img/console_dashboard.png)
+
+### Elect Managers
+
+:::note
+This part happens in the ZITADEL Console
+:::
+
+ZITADEL allows you to give other users control over ZITADEL Console itself. This can be restricted to some kind of write and/or read. This can be especially useful for directing administration over several users. You can have managers able to edit project settings and others able to create/add users only.
+Read the [guides](../overview) for more information.
+
+> Note: ZITADEL Managers are always located on the right sidepanel of console.
+
+### Integrating an application
+
+:::note
+This part happens in the ZITADEL Console
+:::
+
+After creating your project you can start integrating your applications.
+After choosing your project add a client application on the top of the page.
+The wizard should provide some guidance what client is the proper for you. If you are still unsure consult our [Guide Project](projects).
 
 ## Update Billing Information
+
+:::note
+This part happens in the [ZITADEL Customer Portal](https://zitadel.cloud)
+:::
 
 You will only need to add billing information when your instance is in the paid tier. There are two options how to add your billing infos.
 1. Go to the billing menu and add a new method. You will be able to choose the added method, when upgrading the instance to a paid tier.
 2. Add the billing information directly in the upgrade process.
 
 ### Upgrade Instance
+
+:::note
+This part happens in the [ZITADEL Customer Portal](https://zitadel.cloud)
+:::
 
 import UpgradeInstanceDescription from '../../manuals/customerportal/_upgrade_instance_description.mdx';
 
