@@ -7,7 +7,6 @@ services:
       ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN: zitadel
       
   e2e-setup: 
-    command: ./e2e/e2e-setup.sh
     build:
       dockerfile: ./build/e2e/Dockerfile
       context: ..
@@ -27,34 +26,21 @@ services:
         condition: service_started
   e2e:
     image: cypress/included:10.3.0
-    #build: ./e2e
     container_name: cypress
     depends_on:
       e2e-setup:
         condition: 'service_completed_successfully'
     env_file:
     - ./compose.env
-    command: ./cypress.sh run
+    working_dir: /e2e
+    entrypoint:
+    - bash
+    - -c
+    command:
+    - ./cypress.sh run
     volumes:
     - ${PWD}/.keys/e2e.json:/.keys/e2e.json
-    # note: inside e2e container, the network allows accessing
-    # "zitadel" host under name "zitadel"
-    # so "curl http://web" would return whatever the webserver
-    # in the "web" container is cooking
-    # see https://docs.docker.com/compose/networking/
-    #environment:
-    #  - CYPRESS_baseUrl=http://web
-    #command: npx cypress run 
-    # mount the host directory e2e/cypress and the file e2e/cypress.config.js as
-    # volumes within the container
-    # this means that:
-    #  1. anything that Cypress writes to these folders (e.g., screenshots,
-    #     videos) appears also on the Docker host's filesystem
-    #  2. any change that the developer applies to Cypress files on the host
-    #     machine immediately takes effect within the e2e container (no docker
-    #     rebuild required).
-    working_dir: /e2e
-    volumes:
-    - ./console:/e2e
+    - ${PWD}/console:/e2e
     networks:
     - 'zitadel'
+

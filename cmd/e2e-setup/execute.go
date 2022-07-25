@@ -5,8 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -26,6 +28,11 @@ func execute(ctx context.Context, cmd *command.Commands, cfg E2EConfig, users []
 		Human:        *orgOwner,
 	})
 	if err != nil {
+		// TODO: Why is this error not typed?
+		if strings.Contains(err.Error(), "Errors.Org.AlreadyExists") {
+			logging.New().Info("Looks like setup is already done")
+			err = nil
+		}
 		return err
 	}
 
