@@ -106,6 +106,7 @@
     "FINISHED": "Close",
     "CHANGE": "Change",
     "REACTIVATE": "Reactivate",
+    "ACTIVATE": "Activate",
     "DEACTIVATE": "Deactivate",
     "REFRESH": "Refresh",
     "LOGIN": "Login",
@@ -193,6 +194,8 @@
     }
   },
   "RESOURCEID": "Resource Id",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "No data"
   },
@@ -706,6 +709,17 @@
       "TITLE": "Managers",
       "DESCRIPTION": "These Managers are allowed to make changes in your instance."
     },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Domains"
+    },
+    "STATE": {
+      "0": "Unspecified",
+      "1": "Creating",
+      "2": "Running",
+      "3": "Stopping",
+      "4": "Stopped"
+    },
     "VIEWS": {
       "TITLE": "Views",
       "DESCRIPTION": "This card shows your ZITADEL views.",
@@ -757,6 +771,8 @@
       "LISTDESCRIPTION": "Choose an organization.",
       "ACTIVE": "Active",
       "CREATE": "Create Organization",
+      "DEACTIVATE": "Deactivate Organization",
+      "REACTIVATE": "Reactivate Organization",
       "NOPERMISSION": "You don't have the permission to access organization settings.",
       "USERSELFACCOUNT": "Use your personal account as organization owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
@@ -821,6 +837,16 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deactivate organization",
+        "DESCRIPTION": "You are about to deactivate your organization. Users won't be able to login afterwards. Are you sure to proceed?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Reactivate organization",
+        "DESCRIPTION": "You are about to reactivate your organization. Users will be able to login again. Are you sure to proceed?"
+      }
     }
   },
   "SETTINGS": {
@@ -862,7 +888,8 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "it": "Italiano",
-      "en": "English"
+      "en": "English",
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -883,11 +910,21 @@
       "PROVIDER": "SMS Provider",
       "ADDPROVIDER": "Add SMS Provider",
       "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "REMOVEPROVIDER": "Remove Provider",
+      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "SMSPROVIDERSTATE": {
+        "0": "Unspecified",
+        "1": "Active",
+        "2": "Inactive"
+      },
+      "ACTIVATED": "Provider activated.",
+      "DEACTIVATED": "Provider deactivated.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully.",
+        "REMOVED": "Twilio removed",
         "CHANGETOKEN": "Change Token",
         "SETTOKEN": "Set Token",
         "TOKENSET": "Token successfully set."

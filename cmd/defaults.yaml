@@ -30,6 +30,11 @@ Database:
         Key: ""
 
 
+# Exposes metrics on /debug/metrics
+Metrics:
+  # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
+  Type: otel
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -100,9 +105,10 @@ Machine:
     #   JPath: "$.compute.vmId"
 
 Projections:
-  RequeueEvery: 10s
+  RequeueEvery: 60s
   RetryFailedAfter: 1s
   MaxFailureCount: 5
+  ConcurrentInstances: 10
   BulkLimit: 200
   MaxIterators: 1
   Customizations:
@@ -113,6 +119,7 @@ Auth:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
+    ConcurrentInstances: 10
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -120,6 +127,7 @@ Admin:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
+    ConcurrentInstances: 10
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -176,6 +184,7 @@ Notification:
   Repository:
     Spooler:
       ConcurrentWorkers: 1
+      ConcurrentInstances: 10
       BulkLimit: 10000
       FailureCountUntilSkip: 5
       Handlers:
@@ -687,6 +696,17 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "project.grant.user.grant.read"
+    - Role: "ORG_SETTINGS_MANAGER"
+      Permissions:
+        - "org.read"
+        - "org.write"
+        - "org.member.read"
+        - "org.idp.read"
+        - "org.idp.write"
+        - "org.idp.delete"
+        - "policy.read"
+        - "policy.write"
+        - "policy.delete"
     - Role: "ORG_USER_PERMISSION_EDITOR"
       Permissions:
         - "org.read"

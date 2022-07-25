@@ -384,12 +384,15 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.RemoveOrgDomainPolicy(tt.args.ctx, tt.args.orgID)
+			got, err := r.RemoveOrgDomainPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
 			}
 		})
 	}

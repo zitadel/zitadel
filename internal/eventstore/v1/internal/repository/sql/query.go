@@ -43,7 +43,7 @@ func buildQuery(queryFactory *es_models.SearchQueryFactory) (query string, limit
 	}
 	query += where
 
-	if searchQuery.Columns != es_models.Columns_Max_Sequence {
+	if searchQuery.Columns == es_models.Columns_Event {
 		query += " ORDER BY event_sequence"
 		if searchQuery.Desc {
 			query += " DESC"
@@ -98,6 +98,19 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 				return nil
 			}
 			return z_errors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
+		}
+	case es_models.Columns_InstanceIDs:
+		return "SELECT DISTINCT instance_id FROM eventstore.events", func(row scan, dest interface{}) (err error) {
+			instanceID, ok := dest.(*string)
+			if !ok {
+				return z_errors.ThrowInvalidArgument(nil, "SQL-Fef5h", "type must be *string]")
+			}
+			err = row(instanceID)
+			if err != nil {
+				logging.New().WithError(err).Warn("unable to scan row")
+				return z_errors.ThrowInternal(err, "SQL-SFef3", "unable to scan row")
+			}
+			return nil
 		}
 	case es_models.Columns_Event:
 		return selectStmt, func(row scan, dest interface{}) (err error) {

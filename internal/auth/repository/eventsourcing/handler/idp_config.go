@@ -62,31 +62,12 @@ func (i *IDPConfig) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPConfig) EventQuery() (*models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestIDPConfigSequences()
+func (i *IDPConfig) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestIDPConfigSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-
-	query := models.NewSearchQuery()
-	instances := make([]string, 0)
-	for _, sequence := range sequences {
-		for _, instance := range instances {
-			if sequence.InstanceID == instance {
-				break
-			}
-		}
-		instances = append(instances, sequence.InstanceID)
-		query.AddQuery().
-			AggregateTypeFilter(i.AggregateTypes()...).
-			LatestSequenceFilter(sequence.CurrentSequence).
-			InstanceIDFilter(sequence.InstanceID)
-	}
-	return query.AddQuery().
-		AggregateTypeFilter(i.AggregateTypes()...).
-		LatestSequenceFilter(0).
-		ExcludedInstanceIDsFilter(instances...).
-		SearchQuery(), nil
+	return newSearchQuery(sequences, i.AggregateTypes(), instanceIDs), nil
 }
 
 func (i *IDPConfig) Reduce(event *models.Event) (err error) {

@@ -33,6 +33,8 @@ func (wm *PolicyDomainWriteModel) Reduce() error {
 			if e.SMTPSenderAddressMatchesInstanceDomain != nil {
 				wm.SMTPSenderAddressMatchesInstanceDomain = *e.SMTPSenderAddressMatchesInstanceDomain
 			}
+		case *policy.DomainPolicyRemovedEvent:
+			wm.State = domain.PolicyStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()

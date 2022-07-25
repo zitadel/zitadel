@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	startedType   = eventstore.EventType("system.migration.started")
-	doneType      = eventstore.EventType("system.migration.done")
-	failedType    = eventstore.EventType("system.migration.failed")
-	aggregateType = eventstore.AggregateType("system")
-	aggregateID   = "SYSTEM"
+	startedType        = eventstore.EventType("system.migration.started")
+	doneType           = eventstore.EventType("system.migration.done")
+	failedType         = eventstore.EventType("system.migration.failed")
+	repeatableDoneType = eventstore.EventType("system.migration.repeatable.done")
+	aggregateType      = eventstore.AggregateType("system")
+	aggregateID        = "SYSTEM"
 )
 
 type Migration interface {
@@ -22,7 +23,15 @@ type Migration interface {
 	Execute(context.Context) error
 }
 
+type RepeatableMigration interface {
+	Migration
+	SetLastExecution(lastRun map[string]interface{})
+	Check() bool
+}
+
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
+	logging.Infof("verify migration %s", migration.String())
+
 	if should, err := shouldExec(ctx, es, migration); !should || err != nil {
 		return err
 	}
@@ -31,6 +40,7 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return err
 	}
 
+	logging.Infof("starting migration %s", migration.String())
 	err = migration.Execute(ctx)
 	logging.OnError(err).Error("migration failed")
 
@@ -48,7 +58,7 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).
-		EventTypes(startedType, doneType, failedType).
+		EventTypes(startedType, doneType, repeatableDoneType, failedType).
 		Builder())
 	if err != nil {
 		return false, err
@@ -68,10 +78,23 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		switch event.Type() {
 		case startedType, failedType:
 			isStarted = !isStarted
-		case doneType:
-			return false, nil
+		case doneType,
+			repeatableDoneType:
+			repeatable, ok := migration.(RepeatableMigration)
+			if !ok {
+				return false, nil
+			}
+			isStarted = false
+			repeatable.SetLastExecution(e.LastRun.(map[string]interface{}))
 		}
 	}
 
-	return !isStarted, nil
+	if isStarted {
+		return false, nil
+	}
+	repeatable, ok := migration.(RepeatableMigration)
+	if !ok {
+		return true, nil
+	}
+	return repeatable.Check(), nil
 }

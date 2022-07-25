@@ -106,6 +106,7 @@
     "FINISHED": "Fermer",
     "CHANGE": "Modifier",
     "REACTIVATE": "Réactiver",
+    "ACTIVATE": "Activer",
     "DEACTIVATE": "Désactiver",
     "REFRESH": "Rafraîchir",
     "LOGIN": "Connexion",
@@ -193,6 +194,8 @@
     }
   },
   "RESOURCEID": "Id de la ressource",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "Pas de données"
   },
@@ -706,6 +709,17 @@
       "TITLE": "Managers",
       "DESCRIPTION": "Ces gestionnaires sont autorisés à effectuer des changements dans votre instance."
     },
+    "PAGES": {
+      "STATE": "Statut",
+      "DOMAINLIST": "Domaines"
+    },
+    "STATE": {
+      "0": "Inconnu",
+      "1": "Créer",
+      "2": "Actif",
+      "3": "Arrêt",
+      "4": "Arrêté"
+    },
     "VIEWS": {
       "TITLE": "Vues",
       "DESCRIPTION": "Cette carte montre vos vues ZITADEL.",
@@ -757,6 +771,8 @@
       "LISTDESCRIPTION": "Choisissez une organisation.",
       "ACTIVE": "Actif",
       "CREATE": "Créer une organisation",
+      "DEACTIVATE": "Désactiver l'organisation",
+      "REACTIVATE": "Réactiver l'organisation",
       "NOPERMISSION": "Vous n'avez pas la permission d'accéder aux paramètres de l'organisation.",
       "USERSELFACCOUNT": "Utilisez votre compte personnel comme propriétaire de l'organisation",
       "ORGDETAIL_TITLE": "Saisissez le nom et le domaine de votre nouvelle organisation.",
@@ -821,6 +837,16 @@
       "MEMBERREMOVED": "Gestionnaire supprimé.",
       "MEMBERCHANGED": "Gestionnaire modifié.",
       "SETPRIMARY": "Domaine primaire défini."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Désactiver l'organisation",
+        "DESCRIPTION": "Vous êtes sur le point de désactiver votre organisation. Les utilisateurs ne peuvent plus se connecter ? Voulez-vous continuer ?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Réactiver l'organisation",
+        "DESCRIPTION": "Vous êtes sur le point de réactiver votre organisation. Les utilisateurs peuvent ensuite se reconnecter ? Voulez-vous continuer ?"
+      }
     }
   },
   "SETTINGS": {
@@ -884,11 +910,21 @@
       "PROVIDER": "Fournisseur de SMS",
       "ADDPROVIDER": "Ajouter un fournisseur de SMS",
       "ADDPROVIDERDESCRIPTION": "Choisissez l'un des fournisseurs disponibles et saisissez les données requises.",
+      "REMOVEPROVIDER": "Supprimer le fournisseur",
+      "REMOVEPROVIDER_DESC": "Vous êtes sur le point de supprimer une configuration de fournisseur. Voulez-vous continuer",
+      "SMSPROVIDERSTATE": {
+        "0": "non spécifié",
+        "1": "Actif",
+        "2": "Inactif"
+      },
+      "ACTIVATED": "Fournisseur actif.",
+      "DEACTIVATED": "Fournisseur inactif.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
         "ADDED": "Twilio a été ajouté avec succès.",
+        "REMOVED": "Twilio a été supprimé avec succès",
         "CHANGETOKEN": "Changer de Token",
         "SETTOKEN": "Définir le jeton",
         "TOKENSET": "Le jeton a été défini avec succès."

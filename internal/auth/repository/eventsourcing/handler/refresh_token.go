@@ -66,30 +66,12 @@ func (t *RefreshToken) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (t *RefreshToken) EventQuery() (*es_models.SearchQuery, error) {
-	sequences, err := t.view.GetLatestRefreshTokenSequences()
+func (t *RefreshToken) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestRefreshTokenSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	query := es_models.NewSearchQuery()
-	instances := make([]string, 0)
-	for _, sequence := range sequences {
-		for _, instance := range instances {
-			if sequence.InstanceID == instance {
-				break
-			}
-		}
-		instances = append(instances, sequence.InstanceID)
-		query.AddQuery().
-			AggregateTypeFilter(t.AggregateTypes()...).
-			LatestSequenceFilter(sequence.CurrentSequence).
-			InstanceIDFilter(sequence.InstanceID)
-	}
-	return query.AddQuery().
-		AggregateTypeFilter(t.AggregateTypes()...).
-		LatestSequenceFilter(0).
-		ExcludedInstanceIDsFilter(instances...).
-		SearchQuery(), nil
+	return newSearchQuery(sequences, t.AggregateTypes(), instanceIDs), nil
 }
 
 func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {

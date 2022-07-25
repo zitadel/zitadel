@@ -47,6 +47,10 @@ func initDB(db *sql.DB) error {
 	config := new(database.Config)
 	config.SetConnector(&cockroach.Config{User: cockroach.User{Username: "zitadel"}, Database: "zitadel"})
 
+	if err := initialise.ReadStmts("cockraoch"); err != nil {
+		return err
+	}
+
 	err := initialise.Init(db,
 		initialise.VerifyUser(config.Username(), ""),
 		initialise.VerifyDatabase(config.Database()),

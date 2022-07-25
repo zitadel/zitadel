@@ -75,7 +75,7 @@ func InitAll(config *Config) {
 func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 	logging.Info("initialization started")
 
-	readStmts(config.Type())
+	ReadStmts(config.Type())
 
 	db, err := database.Connect(config, true)
 	if err != nil {
@@ -96,7 +96,7 @@ func Init(db *sql.DB, steps ...func(*sql.DB) error) error {
 	return nil
 }
 
-func readStmts(typ string) (err error) {
+func ReadStmts(typ string) (err error) {
 	createUserStmt, err = readStmt(typ, "01_user")
 	if err != nil {
 		return err

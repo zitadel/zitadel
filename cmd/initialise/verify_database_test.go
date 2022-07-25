@@ -7,7 +7,7 @@ import (
 )
 
 func Test_verifyDB(t *testing.T) {
-	err := readStmts("cockroach") //TODO: check all dialects
+	err := ReadStmts("cockroach") //TODO: check all dialects
 	if err != nil {
 		t.Errorf("unable to read stmts: %v", err)
 		t.FailNow()

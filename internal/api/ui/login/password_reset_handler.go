@@ -23,7 +23,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
-	user, err := l.query.GetUser(setContext(r.Context(), authReq.UserOrgID), false, loginName)
+	user, err := l.query.GetUser(setContext(r.Context(), authReq.UserOrgID), true, loginName)
 	if err != nil {
 		l.renderPasswordResetDone(w, r, authReq, err)
 		return

@@ -103,7 +103,7 @@ type ProjectGrantSearchQueries struct {
 
 func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string) (*ProjectGrant, error) {
 	if shouldTriggerBulk {
-		projection.ProjectGrantProjection.TriggerBulk(ctx)
+		projection.ProjectGrantProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareProjectGrantQuery()

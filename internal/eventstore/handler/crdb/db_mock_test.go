@@ -9,6 +9,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -123,34 +124,40 @@ func expectSavePointRelease() func(sqlmock.Sqlmock) {
 	}
 }
 
-func expectCurrentSequence(tableName, projection string, seq uint64, aggregateType, instanceID string) func(sqlmock.Sqlmock) {
+func expectCurrentSequence(tableName, projection string, seq uint64, aggregateType string, instanceIDs []string) func(sqlmock.Sqlmock) {
+	rows := sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"})
+	for _, instanceID := range instanceIDs {
+		rows.AddRow(seq, aggregateType, instanceID)
+	}
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM ` + tableName + ` WHERE projection_name = \$1 FOR UPDATE`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
+				database.StringArray(instanceIDs),
 			).
 			WillReturnRows(
-				sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"}).
-					AddRow(seq, aggregateType, instanceID),
+				rows,
 			)
 	}
 }
 
-func expectCurrentSequenceErr(tableName, projection string, err error) func(sqlmock.Sqlmock) {
+func expectCurrentSequenceErr(tableName, projection string, instanceIDs []string, err error) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM ` + tableName + ` WHERE projection_name = \$1 FOR UPDATE`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
+				database.StringArray(instanceIDs),
 			).
 			WillReturnError(err)
 	}
 }
 
-func expectCurrentSequenceNoRows(tableName, projection string) func(sqlmock.Sqlmock) {
+func expectCurrentSequenceNoRows(tableName, projection string, instanceIDs []string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM ` + tableName + ` WHERE projection_name = \$1 FOR UPDATE`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
+				database.StringArray(instanceIDs),
 			).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"}),
@@ -158,11 +165,12 @@ func expectCurrentSequenceNoRows(tableName, projection string) func(sqlmock.Sqlm
 	}
 }
 
-func expectCurrentSequenceScanErr(tableName, projection string) func(sqlmock.Sqlmock) {
+func expectCurrentSequenceScanErr(tableName, projection string, instanceIDs []string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM ` + tableName + ` WHERE projection_name = \$1 FOR UPDATE`).
+		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
+				database.StringArray(instanceIDs),
 			).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"}).
@@ -286,12 +294,34 @@ func expectLock(lockTable, workerName string, d time.Duration, instanceID string
 			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\)`+
 			` ON CONFLICT \(projection_name, instance_id\)`+
 			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
-			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = \$4 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
 				d,
 				projectionName,
 				instanceID,
+				database.StringArray{instanceID},
+			).
+			WillReturnResult(
+				sqlmock.NewResult(1, 1),
+			)
+	}
+}
+
+func expectLockMultipleInstances(lockTable, workerName string, d time.Duration, instanceID1, instanceID2 string) func(sqlmock.Sqlmock) {
+	return func(m sqlmock.Sqlmock) {
+		m.ExpectExec(`INSERT INTO `+lockTable+
+			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\), \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$5\)`+
+			` ON CONFLICT \(projection_name, instance_id\)`+
+			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$6\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			WithArgs(
+				workerName,
+				d,
+				projectionName,
+				instanceID1,
+				instanceID2,
+				database.StringArray{instanceID1, instanceID2},
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -305,12 +335,13 @@ func expectLockNoRows(lockTable, workerName string, d time.Duration, instanceID 
 			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\)`+
 			` ON CONFLICT \(projection_name, instance_id\)`+
 			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
-			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = \$4 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
 				d,
 				projectionName,
 				instanceID,
+				database.StringArray{instanceID},
 			).
 			WillReturnResult(driver.ResultNoRows)
 	}
@@ -322,12 +353,13 @@ func expectLockErr(lockTable, workerName string, d time.Duration, instanceID str
 			` \(locker_id, locked_until, projection_name, instance_id\) VALUES \(\$1, now\(\)\+\$2::INTERVAL, \$3\, \$4\)`+
 			` ON CONFLICT \(projection_name, instance_id\)`+
 			` DO UPDATE SET locker_id = \$1, locked_until = now\(\)\+\$2::INTERVAL`+
-			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = \$4 AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
+			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
 				d,
 				projectionName,
 				instanceID,
+				database.StringArray{instanceID},
 			).
 			WillReturnError(err)
 	}
