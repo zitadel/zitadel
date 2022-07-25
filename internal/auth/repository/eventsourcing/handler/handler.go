@@ -8,8 +8,10 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
 	query2 "github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type Configs map[string]*Config
@@ -74,4 +76,22 @@ func (h *handler) QueryLimit() uint64 {
 
 func withInstanceID(ctx context.Context, instanceID string) context.Context {
 	return authz.WithInstanceID(ctx, instanceID)
+}
+
+func newSearchQuery(sequences []*repository.CurrentSequence, aggregateTypes []models.AggregateType, instanceIDs []string) *models.SearchQuery {
+	searchQuery := models.NewSearchQuery()
+	for _, sequence := range sequences {
+		var seq uint64
+		for _, instanceID := range instanceIDs {
+			if sequence.InstanceID == instanceID {
+				seq = sequence.CurrentSequence
+				break
+			}
+		}
+		searchQuery.AddQuery().
+			AggregateTypeFilter(aggregateTypes...).
+			LatestSequenceFilter(seq).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return searchQuery
 }

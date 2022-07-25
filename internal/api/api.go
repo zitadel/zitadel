@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
@@ -67,7 +66,6 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) erro
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
-	subRouter.Use(sentryhttp.New(sentryhttp.Options{}).Handle)
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
 }
 

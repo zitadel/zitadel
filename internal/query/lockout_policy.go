@@ -77,7 +77,7 @@ var (
 
 func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*LockoutPolicy, error) {
 	if shouldTriggerBulk {
-		projection.LockoutPolicyProjection.TriggerBulk(ctx)
+		projection.LockoutPolicyProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareLockoutPolicyQuery()

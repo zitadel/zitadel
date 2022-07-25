@@ -29,6 +29,16 @@ func (m *MockRepository) ExpectFilterEventsError(err error) *MockRepository {
 	return m
 }
 
+func (m *MockRepository) ExpectInstanceIDs(instanceIDs ...string) *MockRepository {
+	m.EXPECT().InstanceIDs(gomock.Any(), gomock.Any()).Return(instanceIDs, nil)
+	return m
+}
+
+func (m *MockRepository) ExpectInstanceIDsError(err error) *MockRepository {
+	m.EXPECT().InstanceIDs(gomock.Any(), gomock.Any()).Return(nil, err)
+	return m
+}
+
 func (m *MockRepository) ExpectPush(expectedEvents []*repository.Event, expectedUniqueConstraints ...*repository.UniqueConstraint) *MockRepository {
 	m.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
 		func(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {

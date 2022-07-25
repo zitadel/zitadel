@@ -82,7 +82,7 @@ type PersonalAccessTokenSearchQueries struct {
 
 func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (*PersonalAccessToken, error) {
 	if shouldTriggerBulk {
-		projection.PersonalAccessTokenProjection.TriggerBulk(ctx)
+		projection.PersonalAccessTokenProjection.Trigger(ctx)
 	}
 
 	query, scan := preparePersonalAccessTokenQuery()

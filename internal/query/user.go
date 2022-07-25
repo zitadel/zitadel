@@ -294,8 +294,8 @@ var (
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, queries ...SearchQuery) (*User, error) {
 	if shouldTriggerBulk {
-		projection.UserProjection.TriggerBulk(ctx)
-		projection.LoginNameProjection.TriggerBulk(ctx)
+		projection.UserProjection.Trigger(ctx)
+		projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
@@ -317,8 +317,8 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 
 func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (*User, error) {
 	if shouldTriggerBulk {
-		projection.UserProjection.TriggerBulk(ctx)
-		projection.LoginNameProjection.TriggerBulk(ctx)
+		projection.UserProjection.Trigger(ctx)
+		projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
@@ -390,8 +390,8 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 
 func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (*NotifyUser, error) {
 	if shouldTriggered {
-		projection.UserProjection.TriggerBulk(ctx)
-		projection.LoginNameProjection.TriggerBulk(ctx)
+		projection.UserProjection.Trigger(ctx)
+		projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
