@@ -14,6 +14,10 @@ type Config struct {
 	connector dialect.Connector
 }
 
+func (c *Config) SetConnector(connector dialect.Connector) {
+	c.connector = connector
+}
+
 type User struct {
 	Username string
 	Password string

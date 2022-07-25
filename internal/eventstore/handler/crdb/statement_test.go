@@ -178,9 +178,10 @@ func TestNewCreateStatement(t *testing.T) {
 
 func TestNewUpsertStatement(t *testing.T) {
 	type args struct {
-		table  string
-		event  *testEvent
-		values []handler.Column
+		table        string
+		event        *testEvent
+		conflictCols []handler.Column
+		values       []handler.Column
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -257,6 +258,9 @@ func TestNewUpsertStatement(t *testing.T) {
 					sequence:         1,
 					previousSequence: 0,
 				},
+				conflictCols: []handler.Column{
+					handler.NewCol("col1", nil),
+				},
 				values: []handler.Column{
 					{
 						Name:  "col1",
@@ -272,7 +276,7 @@ func TestNewUpsertStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPSERT INTO my_table (col1) VALUES ($1)",
+							query: "INSERT INTO my_table (col1) VALUES ($1) ON CONFLICT (col1) DO UPDATE SET (col1) = ($1)",
 							args:  []interface{}{"val"},
 						},
 					},
@@ -287,7 +291,7 @@ func TestNewUpsertStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewUpsertStatement(tt.args.event, tt.args.values)
+			stmt := NewUpsertStatement(tt.args.event, tt.args.conflictCols, tt.args.values)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
@@ -725,6 +729,9 @@ func TestNewMultiStatement(t *testing.T) {
 						}),
 					AddUpsertStatement(
 						[]handler.Column{
+							handler.NewCol("col1", nil),
+						},
+						[]handler.Column{
 							{
 								Name:  "col1",
 								Value: 1,
@@ -799,11 +806,12 @@ func TestNewMultiStatement(t *testing.T) {
 
 func TestNewCopyStatement(t *testing.T) {
 	type args struct {
-		table string
-		event *testEvent
-		from  []handler.Column
-		to    []handler.Column
-		conds []handler.Condition
+		table           string
+		event           *testEvent
+		conflictingCols []handler.Column
+		from            []handler.Column
+		to              []handler.Column
+		conds           []handler.Condition
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -1086,7 +1094,7 @@ func TestNewCopyStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewCopyStatement(tt.args.event, tt.args.from, tt.args.to, tt.args.conds)
+			stmt := NewCopyStatement(tt.args.event, tt.args.conflictingCols, tt.args.from, tt.args.to, tt.args.conds)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {

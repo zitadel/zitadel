@@ -7,6 +7,12 @@ import (
 )
 
 func Test_verifyUser(t *testing.T) {
+	err := readStmts("cockroach") //TODO: check all dialects
+	if err != nil {
+		t.Errorf("unable to read stmts: %v", err)
+		t.FailNow()
+	}
+
 	type args struct {
 		db       db
 		username string
@@ -18,19 +24,10 @@ func Test_verifyUser(t *testing.T) {
 		targetErr error
 	}{
 		{
-			name: "exists fails",
-			args: args{
-				db:       prepareDB(t, expectQueryErr("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", sql.ErrConnDone, "zitadel-user")),
-				username: "zitadel-user",
-				password: "",
-			},
-			targetErr: sql.ErrConnDone,
-		},
-		{
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
-					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", sql.ErrTxDone, nil),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS zitadel-user", sql.ErrTxDone),
 				),
 				username: "zitadel-user",
 				password: "",
@@ -41,7 +38,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct without password",
 			args: args{
 				db: prepareDB(t,
-					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", nil, nil),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS zitadel-user", nil),
 				),
 				username: "zitadel-user",
 				password: "",
@@ -52,7 +49,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "correct with password",
 			args: args{
 				db: prepareDB(t,
-					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", nil, "password"),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS zitadel-user WITH PASSWORD 'password'", nil),
 				),
 				username: "zitadel-user",
 				password: "password",
@@ -63,7 +60,7 @@ func Test_verifyUser(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
-					expectExec("CREATE USER zitadel-user WITH PASSWORD $1", nil, "password"),
+					expectExec("-- replace zitadel-user with the name of the user\nCREATE USER IF NOT EXISTS zitadel-user WITH PASSWORD 'password'", nil),
 				),
 				username: "zitadel-user",
 				password: "",

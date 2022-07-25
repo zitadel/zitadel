@@ -3,7 +3,6 @@ package initialise
 import (
 	"database/sql"
 	"embed"
-	_ "embed"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
