@@ -382,9 +382,18 @@ is active and the requesting client is part of the token audience.
 
 If `active` is **true**, further information will be provided:
 
-| Property  | Description                                          |
-| --------- | ---------------------------------------------------- |
-| scope     | Space delimited list of scopes granted to the token. |
+| Property   | Description                                                            |
+|------------|------------------------------------------------------------------------|
+| aud        | The audience of the token                                              |
+| client_id  | The client_id of the application the token was issued to               |
+| exp        | Time the token expires (as unix time)                                  |
+| iat        | Time of the token was issued at (as unix time)                         |
+| iss        | Issuer of the token                                                    |
+| jti        | Unique id of the token                                                 |
+| nbf        | Time the token must not be used before (as unix time)                  |
+| scope      | Space delimited list of scopes granted to the token                    |
+| token_type | Type of the inspected token. Value is always `Bearer`                  |
+| username   | ZITADEL's login name of the user.  Consist of `username@primarydomain` |
 
 Additionally and depending on the granted scopes, information about the authorized user is provided. 
 Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
