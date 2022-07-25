@@ -80,8 +80,8 @@ func (v *View) GetLatestTokenSequence(instanceID string) (*repository.CurrentSeq
 	return v.latestSequence(tokenTable, instanceID)
 }
 
-func (v *View) GetLatestTokenSequences() ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(tokenTable)
+func (v *View) GetLatestTokenSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(tokenTable, instanceIDs...)
 }
 
 func (v *View) ProcessedTokenSequence(event *models.Event) error {

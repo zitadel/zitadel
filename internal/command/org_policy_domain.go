@@ -71,21 +71,28 @@ func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner stri
 	return orgWriteModelToDomainPolicy(existingPolicy), nil
 }
 
-func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "Org-3H8fs", "Errors.ResourceOwnerMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3H8fs", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy, err := c.orgDomainPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.DomainPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.DomainPolicy.NotFound")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, org.NewDomainPolicyRemovedEvent(ctx, orgAgg))
-	return err
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewDomainPolicyRemovedEvent(ctx, orgAgg))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingPolicy, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingPolicy.PolicyDomainWriteModel.WriteModel), nil
 }
 
 func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error) {

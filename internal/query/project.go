@@ -96,7 +96,7 @@ type ProjectSearchQueries struct {
 
 func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string) (*Project, error) {
 	if shouldTriggerBulk {
-		projection.ProjectProjection.TriggerBulk(ctx)
+		projection.ProjectProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareProjectQuery()
