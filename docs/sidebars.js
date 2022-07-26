@@ -64,7 +64,27 @@ module.exports = {
       items: [
         "guides/manage/console",
         "guides/manage/cloud",
-        "guides/manage/self-hosted",
+        {
+          type: 'category',
+          label: 'Self-Hosted',
+          items: [
+            "guides/manage/self-hosted/configure/configure",
+            "guides/manage/self-hosted/proxy/proxy",
+            "guides/manage/self-hosted/custom-domain",
+            "guides/manage/self-hosted/http2",
+            "guides/manage/self-hosted/tls_modes",
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Customize',
+          items: [
+            "guides/manage/customize/branding",
+            "guides/manage/customize/texts",
+            "guides/manage/customize/behavior",
+            "guides/manage/customize/user-metadata",
+          ]
+        }
       ],
     },
     {
@@ -72,6 +92,7 @@ module.exports = {
       label: "Integrate",
       collapsed: false,
       items: [
+        "guides/integrate/identity-brokering",
         "guides/integrate/access-zitadel-apis",
         "guides/integrate/authenticated-mongodb-charts",
         "guides/integrate/auth0",
@@ -94,7 +115,6 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/authentication/login-users",
-        "guides/authentication/identity-brokering",
         "guides/authentication/serviceusers",
       ],
     },
@@ -103,17 +123,6 @@ module.exports = {
       label: "Authorization",
       collapsed: false,
       items: ["guides/authorization/oauth-recommended-flows"],
-    },
-    {
-      type: "category",
-      label: "Customization",
-      collapsed: false,
-      items: [
-          "guides/customization/branding",
-          "guides/customization/texts",
-          "guides/customization/behavior",
-          "guides/customization/user-metadata"
-      ],
     },
     {
       type: "category",
