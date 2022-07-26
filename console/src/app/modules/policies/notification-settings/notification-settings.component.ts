@@ -3,12 +3,12 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } fro
 import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs';
 import {
-  AddSMSProviderTwilioRequest,
-  AddSMTPConfigRequest,
-  UpdateSMSProviderTwilioRequest,
-  UpdateSMTPConfigPasswordRequest,
-  UpdateSMTPConfigPasswordResponse,
-  UpdateSMTPConfigRequest,
+    AddSMSProviderTwilioRequest,
+    AddSMTPConfigRequest,
+    UpdateSMSProviderTwilioRequest,
+    UpdateSMTPConfigPasswordRequest,
+    UpdateSMTPConfigPasswordResponse,
+    UpdateSMTPConfigRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -16,6 +16,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
+import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { PasswordDialogComponent } from './password-dialog/password-dialog.component';
@@ -185,11 +186,12 @@ export class NotificationSettingsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((req: AddSMSProviderTwilioRequest | UpdateSMSProviderTwilioRequest) => {
       if (req) {
-        if (this.hasTwilio) {
+        if (!!this.twilio) {
           this.service
             .updateSMSProviderTwilio(req as UpdateSMSProviderTwilioRequest)
             .then(() => {
               this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
+              this.fetchData();
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -199,6 +201,7 @@ export class NotificationSettingsComponent implements OnInit {
             .addSMSProviderTwilio(req as AddSMSProviderTwilioRequest)
             .then(() => {
               this.toast.showInfo('SETTING.SMS.TWILIO.ADDED', true);
+              this.fetchData();
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -234,6 +237,59 @@ export class NotificationSettingsComponent implements OnInit {
     });
   }
 
+  public toggleSMSProviderState(id: string): void {
+    const provider = this.smsProviders.find((p) => p.id === id);
+    if (provider) {
+      if (provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE) {
+        this.service
+          .deactivateSMSProvider(id)
+          .then(() => {
+            this.toast.showInfo('SETTING.SMS.DEACTIVATED', true);
+            this.fetchData();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      } else if (provider.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE) {
+        this.service
+          .activateSMSProvider(id)
+          .then(() => {
+            this.toast.showInfo('SETTING.SMS.ACTIVATED', true);
+            this.fetchData();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    }
+  }
+
+  public removeSMSProvider(id: string): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'SETTING.SMS.REMOVEPROVIDER',
+        descriptionKey: 'SETTING.SMS.REMOVEPROVIDER_DESC',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.service
+          .removeSMSProvider(id)
+          .then(() => {
+            this.toast.showInfo('SETTING.SMS.TWILIO.REMOVED', true);
+            this.fetchData();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
   public get twilio(): SMSProvider.AsObject | undefined {
     return this.smsProviders.find((p) => p.twilio);
   }
@@ -256,14 +312,5 @@ export class NotificationSettingsComponent implements OnInit {
 
   public get host(): AbstractControl | null {
     return this.form.get('host');
-  }
-
-  public get hasTwilio(): boolean {
-    const twilioProvider: SMSProvider.AsObject | undefined = this.smsProviders.find((p) => p.twilio);
-    if (twilioProvider && !!twilioProvider.twilio) {
-      return true;
-    } else {
-      return false;
-    }
   }
 }

@@ -82,7 +82,7 @@ var (
 
 func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*DomainPolicy, error) {
 	if shouldTriggerBulk {
-		projection.DomainPolicyProjection.TriggerBulk(ctx)
+		projection.DomainPolicyProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareDomainPolicyQuery()

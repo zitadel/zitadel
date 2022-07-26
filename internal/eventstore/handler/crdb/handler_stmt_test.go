@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -61,9 +62,13 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 		aggregates     []eventstore.AggregateType
 		bulkLimit      uint64
 	}
+	type args struct {
+		instanceIDs []string
+	}
 	tests := []struct {
 		name   string
 		fields fields
+		args   args
 		want   want
 	}{
 		{
@@ -74,13 +79,16 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"testAgg"},
 				bulkLimit:      5,
 			},
+			args: args{
+				instanceIDs: []string{"instanceID1"},
+			},
 			want: want{
 				limit: 0,
 				isErr: func(err error) bool {
 					return errors.Is(err, sql.ErrTxDone)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequenceErr("my_sequences", "my_projection", sql.ErrTxDone),
+					expectCurrentSequenceErr("my_sequences", "my_projection", []string{"instanceID1"}, sql.ErrTxDone),
 				},
 				SearchQueryBuilder: nil,
 			},
@@ -93,24 +101,56 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"testAgg"},
 				bulkLimit:      5,
 			},
+			args: args{
+				instanceIDs: []string{"instanceID1"},
+			},
 			want: want{
 				limit: 5,
 				isErr: func(err error) bool {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID1"}),
 				},
 				SearchQueryBuilder: eventstore.
 					NewSearchQueryBuilder(eventstore.ColumnsEvent).
 					AddQuery().
 					AggregateTypes("testAgg").
 					SequenceGreater(5).
-					InstanceID("instanceID").
+					InstanceID("instanceID1").
+					Builder().
+					Limit(5),
+			},
+		},
+		{
+			name: "multiple instances",
+			fields: fields{
+				sequenceTable:  "my_sequences",
+				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"testAgg"},
+				bulkLimit:      5,
+			},
+			args: args{
+				instanceIDs: []string{"instanceID1", "instanceID2"},
+			},
+			want: want{
+				limit: 5,
+				isErr: func(err error) bool {
+					return err == nil
+				},
+				expectations: []mockExpectation{
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID1", "instanceID2"}),
+				},
+				SearchQueryBuilder: eventstore.
+					NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AddQuery().
+					AggregateTypes("testAgg").
+					SequenceGreater(5).
+					InstanceID("instanceID1").
 					Or().
 					AggregateTypes("testAgg").
-					SequenceGreater(0).
-					ExcludedInstanceID("instanceID").
+					SequenceGreater(5).
+					InstanceID("instanceID2").
 					Builder().
 					Limit(5),
 			},
@@ -140,7 +180,7 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				expectation(mock)
 			}
 
-			query, limit, err := h.SearchQuery(context.Background())
+			query, limit, err := h.SearchQuery(context.Background(), tt.args.instanceIDs)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
 				return
@@ -211,13 +251,14 @@ func TestStatementHandler_Update(t *testing.T) {
 						aggregateType:    "agg",
 						sequence:         6,
 						previousSequence: 0,
+						instanceID:       "instanceID",
 					}),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequenceErr("my_sequences", "my_projection", sql.ErrTxDone),
+					expectCurrentSequenceErr("my_sequences", "my_projection", []string{"instanceID"}, sql.ErrTxDone),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -241,13 +282,14 @@ func TestStatementHandler_Update(t *testing.T) {
 						aggregateType:    "agg",
 						sequence:         6,
 						previousSequence: 0,
+						instanceID:       "instanceID",
 					}),
 				},
 			},
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectRollback(),
 				},
 				isErr: func(err error) bool {
@@ -272,6 +314,7 @@ func TestStatementHandler_Update(t *testing.T) {
 							aggregateType:    "testAgg",
 							sequence:         7,
 							previousSequence: 6,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -284,7 +327,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
@@ -322,7 +365,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", []string{"instanceID"}),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
@@ -364,7 +407,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "agg", []string{"instanceID"}),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col"}, []string{"$1"}),
 					expectSavePointRelease(),
@@ -399,7 +442,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
@@ -431,7 +474,7 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
@@ -470,13 +513,14 @@ func TestStatementHandler_Update(t *testing.T) {
 			want: want{
 				expectations: []mockExpectation{
 					expectBegin(),
-					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", "instanceID"),
+					expectCurrentSequence("my_sequences", "my_projection", 5, "testAgg", []string{"instanceID"}),
 					expectUpdateCurrentSequence("my_sequences", "my_projection", 7, "testAgg", "instanceID"),
 					expectCommit(),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
 				},
+				stmtsLen: 1,
 			},
 		},
 	}
@@ -488,17 +532,18 @@ func TestStatementHandler_Update(t *testing.T) {
 			}
 			defer client.Close()
 
-			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
-				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
-					ProjectionName: "my_projection",
-					HandlerConfig: handler.HandlerConfig{
+			h := &StatementHandler{
+				ProjectionHandler: &handler.ProjectionHandler{
+					Handler: handler.Handler{
 						Eventstore: tt.fields.eventstore,
 					},
-					RequeueEvery: 0,
+					ProjectionName: "my_projection",
 				},
-				SequenceTable: "my_sequences",
-				Client:        client,
-			})
+				sequenceTable:           "my_sequences",
+				currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, "my_sequences"),
+				updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, "my_sequences"),
+				client:                  client,
+			}
 
 			h.aggregates = tt.fields.aggregates
 
@@ -506,12 +551,12 @@ func TestStatementHandler_Update(t *testing.T) {
 				expectation(mock)
 			}
 
-			stmts, err := h.Update(tt.args.ctx, tt.args.stmts, tt.args.reduce)
+			index, err := h.Update(tt.args.ctx, tt.args.stmts, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("StatementHandler.Update() error = %v", err)
 			}
-			if err == nil && tt.want.stmtsLen != len(stmts) {
-				t.Errorf("wrong stmts length: want: %d got %d", tt.want.stmtsLen, len(stmts))
+			if err == nil && tt.want.stmtsLen != index {
+				t.Errorf("wrong stmts length: want: %d got %d", tt.want.stmtsLen, index)
 			}
 
 			mock.MatchExpectationsInOrder(true)
@@ -696,17 +741,12 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			h := &StatementHandler{
 				aggregates: tt.fields.aggregates,
 			}
-			h.ProjectionHandler = handler.NewProjectionHandler(handler.ProjectionHandlerConfig{
-				HandlerConfig: handler.HandlerConfig{
+			h.ProjectionHandler = &handler.ProjectionHandler{
+				Handler: handler.Handler{
 					Eventstore: tt.fields.eventstore,
 				},
 				ProjectionName: "my_projection",
-				RequeueEvery:   0,
-			},
-				h.reduce,
-				h.Update,
-				h.SearchQuery,
-			)
+			}
 			stmts, err := h.fetchPreviousStmts(tt.args.ctx, nil, tt.args.stmtSeq, "", tt.args.sequences, tt.args.reduce)
 			if !tt.want.isErr(err) {
 				t.Errorf("ProjectionHandler.prepareBulkStmts() error = %v", err)
@@ -1311,7 +1351,8 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 		aggregates     []eventstore.AggregateType
 	}
 	type args struct {
-		stmt handler.Statement
+		stmt        handler.Statement
+		instanceIDs []string
 	}
 	type want struct {
 		expectations []mockExpectation
@@ -1338,7 +1379,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					return errors.Is(err, sql.ErrConnDone)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequenceErr("my_table", "my_projection", sql.ErrConnDone),
+					expectCurrentSequenceErr("my_table", "my_projection", nil, sql.ErrConnDone),
 				},
 			},
 		},
@@ -1350,14 +1391,15 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				stmt: handler.Statement{},
+				stmt:        handler.Statement{},
+				instanceIDs: []string{"instanceID"},
 			},
 			want: want{
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequenceNoRows("my_table", "my_projection"),
+					expectCurrentSequenceNoRows("my_table", "my_projection", []string{"instanceID"}),
 				},
 				sequences: currentSequences{},
 			},
@@ -1370,14 +1412,15 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				stmt: handler.Statement{},
+				stmt:        handler.Statement{},
+				instanceIDs: []string{"instanceID"},
 			},
 			want: want{
 				isErr: func(err error) bool {
 					return errors.Is(err, sql.ErrTxDone)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequenceScanErr("my_table", "my_projection"),
+					expectCurrentSequenceScanErr("my_table", "my_projection", []string{"instanceID"}),
 				},
 				sequences: currentSequences{},
 			},
@@ -1390,14 +1433,15 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				stmt: handler.Statement{},
+				stmt:        handler.Statement{},
+				instanceIDs: []string{"instanceID"},
 			},
 			want: want{
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
 				},
 				expectations: []mockExpectation{
-					expectCurrentSequence("my_table", "my_projection", 5, "agg", "instanceID"),
+					expectCurrentSequence("my_table", "my_projection", 5, "agg", []string{"instanceID"}),
 				},
 				sequences: currentSequences{
 					"agg": []*instanceSequence{
@@ -1409,15 +1453,48 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "multiple found",
+			fields: fields{
+				sequenceTable:  "my_table",
+				projectionName: "my_projection",
+				aggregates:     []eventstore.AggregateType{"agg"},
+			},
+			args: args{
+				stmt:        handler.Statement{},
+				instanceIDs: []string{"instanceID1", "instanceID2"},
+			},
+			want: want{
+				isErr: func(err error) bool {
+					return errors.Is(err, nil)
+				},
+				expectations: []mockExpectation{
+					expectCurrentSequence("my_table", "my_projection", 5, "agg", []string{"instanceID1", "instanceID2"}),
+				},
+				sequences: currentSequences{
+					"agg": []*instanceSequence{
+						{
+							sequence:   5,
+							instanceID: "instanceID1",
+						},
+						{
+							sequence:   5,
+							instanceID: "instanceID2",
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
-				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
+			h := &StatementHandler{
+				ProjectionHandler: &handler.ProjectionHandler{
 					ProjectionName: tt.fields.projectionName,
 				},
-				SequenceTable: tt.fields.sequenceTable,
-			})
+				sequenceTable:       tt.fields.sequenceTable,
+				currentSequenceStmt: fmt.Sprintf(currentSequenceStmtFormat, tt.fields.sequenceTable),
+			}
 
 			h.aggregates = tt.fields.aggregates
 
@@ -1440,7 +1517,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				t.Fatalf("unexpected err in begin: %v", err)
 			}
 
-			seq, err := h.currentSequences(context.Background(), tx.QueryContext)
+			seq, err := h.currentSequences(context.Background(), tx.QueryContext, tt.args.instanceIDs)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -1615,12 +1692,13 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			h := NewStatementHandler(context.Background(), StatementHandlerConfig{
-				ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
+			h := &StatementHandler{
+				ProjectionHandler: &handler.ProjectionHandler{
 					ProjectionName: tt.fields.projectionName,
 				},
-				SequenceTable: tt.fields.sequenceTable,
-			})
+				sequenceTable:           tt.fields.sequenceTable,
+				updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, tt.fields.sequenceTable),
+			}
 
 			h.aggregates = tt.fields.aggregates
 

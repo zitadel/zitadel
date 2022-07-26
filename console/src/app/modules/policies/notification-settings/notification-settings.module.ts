@@ -13,6 +13,7 @@ import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
+import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSettingsComponent } from './notification-settings.component';
 import { PasswordDialogComponent } from './password-dialog/password-dialog.component';
@@ -31,6 +32,7 @@ import { PasswordDialogComponent } from './password-dialog/password-dialog.compo
     InputModule,
     MatIconModule,
     FormFieldModule,
+    WarnDialogModule,
     MatSelectModule,
     MatProgressSpinnerModule,
     MatSelectModule,
