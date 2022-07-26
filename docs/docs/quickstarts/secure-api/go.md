@@ -20,7 +20,7 @@ All that is required, is an API and its key JSON. But for complete
 You need to add the SDK into Go Modules by:
 
 ```bash
-go get github.com/zitadel/zitadel-go
+go get github.com/zitadel/zitadel-go/v2
 ```
 
 ### Create example API
@@ -29,22 +29,28 @@ Create a new go file with the content below. This will create an API with two en
 back `ok` and the current timestamp. On `/protected` it will respond the same but only if a valid access_token is sent. The token
 must not be expired and the API has to be part of the audience (either client_id or project_id).
 
+Make sure to fill the var issuer with your own domain. This is the domain of your instance you can find it on the instance detail in the Customer Portal or in the Console.
 ```go
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"time"
 
-	api_mw "github.com/zitadel/zitadel-go/pkg/api/middleware"
-	http_mw "github.com/zitadel/zitadel-go/pkg/api/middleware/http"
-	"github.com/zitadel/zitadel-go/pkg/client"
-	"github.com/zitadel/zitadel-go/pkg/client/middleware"
+	http_mw "github.com/zitadel/zitadel-go/v2/pkg/api/middleware/http"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
+)
+
+var (
+	issuer = flag.String("issuer", "", "issuer of your ZITADEL instance (in the form: https://<instance>.zitadel.cloud or https://<yourdomain>)")
 )
 
 func main() {
-	introspection, err := http_mw.NewIntrospectionInterceptor(client.Issuer, middleware.OSKeyPath())
+	flag.Parse()
+
+	introspection, err := http_mw.NewIntrospectionInterceptor(*issuer, middleware.OSKeyPath())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,16 +85,6 @@ If you're not able to set it via environment variable, you can also exchange the
 introspection, err := http_mw.NewIntrospectionInterceptor(
 	client.Issuer,
 	"/Users/test/apikey.json",
-)
-```
-
-#### Custom ZITADEL instance
-
-If your client will not use ZITADEL Cloud (zitadel.ch), be sure to provide the correct Issuer:
-```go
-introspection, err := http_mw.NewIntrospectionInterceptor(
-	"https://issuer.custom.ch",
-	middleware.OSKeyPath(), 
 )
 ```
 
