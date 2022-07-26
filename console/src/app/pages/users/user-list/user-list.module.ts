@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,6 +18,7 @@ import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { FilterUserModule } from 'src/app/modules/filter-user/filter-user.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { NavToggleModule } from 'src/app/modules/nav-toggle/nav-toggle.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
@@ -46,11 +46,11 @@ import { UserTableComponent } from './user-table/user-table.component';
     MatTooltipModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
-    MatButtonToggleModule,
     HasRolePipeModule,
     TranslateModule,
     FilterUserModule,
     RouterModule,
+    NavToggleModule,
     RefreshTableModule,
     TableActionsModule,
     ActionKeysModule,

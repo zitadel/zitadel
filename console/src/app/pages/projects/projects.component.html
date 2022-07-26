@@ -9,26 +9,20 @@
     <p class="sub cnsl-secondary-text max-width-description">{{ 'PROJECT.PAGES.LISTDESCRIPTION' | translate }}</p>
 
     <div class="projects-controls">
-      <mat-button-toggle-group
-        leftActions
-        class="project-toggle-group"
-        [(ngModel)]="projectType"
-        name="User Type"
-        aria-label="User Type"
-      >
-        <mat-button-toggle [value]="ProjectType.PROJECTTYPE_OWNED" (click)="setType(ProjectType.PROJECTTYPE_OWNED)">
-          <div class="toggle-row">
-            {{ 'PROJECT.PAGES.TYPE.OWNED' | translate }} ({{ (mgmtService.ownedProjectsCount | async) ?? 0 }})
-            <div *ngIf="(projectType$ | async) === ProjectType.PROJECTTYPE_OWNED" class="current-dot"></div>
-          </div>
-        </mat-button-toggle>
-        <mat-button-toggle [value]="ProjectType.PROJECTTYPE_GRANTED" (click)="setType(ProjectType.PROJECTTYPE_GRANTED)">
-          <div class="toggle-row">
-            {{ 'PROJECT.PAGES.TYPE.GRANTED' | translate }} ({{ (mgmtService.grantedProjectsCount | async) ?? 0 }})
-            <div *ngIf="(projectType$ | async) === ProjectType.PROJECTTYPE_GRANTED" class="current-dot"></div>
-          </div>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
+      <div class="project-toggle-group">
+        <cnsl-nav-toggle
+          label="{{ 'PROJECT.PAGES.TYPE.OWNED' | translate }}"
+          [count]="mgmtService.ownedProjectsCount | async"
+          (clicked)="setType(ProjectType.PROJECTTYPE_OWNED)"
+          [active]="(projectType$ | async) === ProjectType.PROJECTTYPE_OWNED"
+        ></cnsl-nav-toggle>
+        <cnsl-nav-toggle
+          label="{{ 'PROJECT.PAGES.TYPE.GRANTED' | translate }}"
+          [count]="mgmtService.grantedProjectsCount | async"
+          (clicked)="setType(ProjectType.PROJECTTYPE_GRANTED)"
+          [active]="(projectType$ | async) === ProjectType.PROJECTTYPE_GRANTED"
+        ></cnsl-nav-toggle>
+      </div>
 
       <span class="fill-space"></span>
       <button class="grid-btn" (click)="grid = !grid" mat-icon-button [attr.data-e2e]="'toggle-grid'">

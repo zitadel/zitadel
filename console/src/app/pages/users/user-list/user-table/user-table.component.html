@@ -8,20 +8,18 @@
   [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
   [showBorder]="true"
 >
-  <mat-button-toggle-group leftActions class="user-toggle-group" [(ngModel)]="type" name="User Type" aria-label="User Type">
-    <mat-button-toggle [value]="Type.TYPE_HUMAN" (click)="setType(Type.TYPE_HUMAN)">
-      <div class="toggle-row">
-        {{ 'USER.TABLE.TYPES.HUMAN' | translate }}
-        <div *ngIf="type === Type.TYPE_HUMAN" class="current-dot"></div>
-      </div>
-    </mat-button-toggle>
-    <mat-button-toggle [value]="Type.TYPE_MACHINE" (click)="setType(Type.TYPE_MACHINE)">
-      <div class="toggle-row">
-        {{ 'USER.TABLE.TYPES.MACHINE' | translate }}
-        <div *ngIf="type === Type.TYPE_MACHINE" class="current-dot"></div>
-      </div>
-    </mat-button-toggle>
-  </mat-button-toggle-group>
+  <div leftActions class="user-toggle-group">
+    <cnsl-nav-toggle
+      label="{{ 'USER.TABLE.TYPES.HUMAN' | translate }}"
+      (clicked)="setType(Type.TYPE_HUMAN)"
+      [active]="type === Type.TYPE_HUMAN"
+    ></cnsl-nav-toggle>
+    <cnsl-nav-toggle
+      label="{{ 'USER.TABLE.TYPES.MACHINE' | translate }}"
+      (clicked)="setType(Type.TYPE_MACHINE)"
+      [active]="type === Type.TYPE_MACHINE"
+    ></cnsl-nav-toggle>
+  </div>
 
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button

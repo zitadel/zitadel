@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +15,7 @@ import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module
 import { CardModule } from 'src/app/modules/card/card.module';
 import { FilterProjectModule } from 'src/app/modules/filter-project/filter-project.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { NavToggleModule } from 'src/app/modules/nav-toggle/nav-toggle.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
@@ -50,13 +50,13 @@ import { ProjectsComponent } from './projects.component';
     FilterProjectModule,
     ActionKeysModule,
     TableActionsModule,
-    MatButtonToggleModule,
     MatSortModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
     RefreshTableModule,
     MatRippleModule,
+    NavToggleModule,
   ],
 })
 export class ProjectsModule {}
