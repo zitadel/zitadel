@@ -1,3 +1,11 @@
+---
+title: Knative
+---
+
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
+
 ## New Knative environment
 ### Download and run Knative quickstart
 
@@ -27,7 +35,6 @@ start a single-node cockroachdb as statefulset
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/cockroachdb-statefulset-single-node.yaml
 ```
-
 
 ## Start ZITADEL with Knative
 
@@ -71,3 +78,5 @@ If you didn't configure something else, this is the default IAM admin users logi
 * username: zitadel-admin@<span></span>zitadel.zitadel.default.127.0.0.1.sslip.io
 * password: Password1!
 
+<Next components={props.components} />
+<Disclaimer components={props.components} />

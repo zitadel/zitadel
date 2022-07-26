@@ -1,5 +1,5 @@
 module.exports = {
-  quickstarts: [
+  examples: [
     "quickstarts/introduction",
     {
       type: "category",
@@ -38,47 +38,44 @@ module.exports = {
     "guides/overview",
     {
       type: "category",
-      label: "Get to know ZITADEL",
+      label: "Get started",
       collapsed: false,
       items: [
-        "guides/basics/get-started",
-        "guides/basics/instance",
-        "guides/basics/organizations",
-        "guides/basics/projects",
-        "guides/basics/applications",
+        "guides/start/quickstart",
+        "guides/start/glossary",
       ],
     },
     {
       type: "category",
-      label: "Deploy ZITADEL",
+      label: "Deploy",
       collapsed: false,
       items: [
-        "guides/deploy/options",
-        "guides/deploy/cloud",
-        "guides/deploy/self-hosted/self-hosted",
+        "guides/deploy/linux",
+        "guides/deploy/homebrew",
+        "guides/deploy/compose",
+        "guides/deploy/knative",
+        "guides/deploy/helm",
       ],
     },
     {
       type: "category",
-      label: "Operate ZITADEL",
+      label: "Manage",
       collapsed: false,
       items: [
-        "guides/operate/configure/configure",
-        "guides/operate/custom-domain",
-        "guides/operate/tls_modes",
-        "guides/operate/http2",
-        "guides/operate/proxy/proxy",
-        "guides/operate/loadbalancing-example/loadbalancing-example",
+        "guides/manage/console",
+        "guides/manage/cloud",
+        "guides/manage/self-hosted",
       ],
     },
     {
       type: "category",
-      label: "Integrations",
+      label: "Integrate",
       collapsed: false,
       items: [
-        "guides/integrations/authenticated-mongodb-charts",
-        "guides/integrations/auth0",
-        "guides/integrations/gitlab-self-hosted",
+        "guides/integrate/access-zitadel-apis",
+        "guides/integrate/authenticated-mongodb-charts",
+        "guides/integrate/auth0",
+        "guides/integrate/gitlab-self-hosted",
       ],
     },
     {
@@ -106,12 +103,6 @@ module.exports = {
       label: "Authorization",
       collapsed: false,
       items: ["guides/authorization/oauth-recommended-flows"],
-    },
-    {
-      type: "category",
-      label: "API",
-      collapsed: false,
-      items: ["guides/api/access-zitadel-apis"],
     },
     {
       type: "category",

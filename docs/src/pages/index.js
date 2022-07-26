@@ -27,7 +27,7 @@ const features = [
         <Column>
           <div>
             <ListElement
-              link="docs/guides/basics/get-started"
+              link="docs/guides/start/get-started"
               type={ICONTYPE.START}
               title="Get started"
               description=""
@@ -272,7 +272,7 @@ export default function Home() {
                 "button button--outline button--lg get-started",
                 styles.getStarted
               )}
-              to={useBaseUrl("docs/guides/basics/get-started")}
+              to={useBaseUrl("docs/guides/start/get-started")}
             >
               Get Started
             </Link>

@@ -17,7 +17,7 @@ Typical examples for user metadata include:
 
 ### Create a new client
 
-- Create a new [web application](https://docs.zitadel.com/docs/guides/basics/applications#web)
+- Create a new [web application](https://docs.zitadel.com/docs/guides/start/applications#web)
 - Use Code-Flow
 - In this example we will use `http://localhost` as redirect url
 - Make sure to note the client secret

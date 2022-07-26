@@ -1,5 +1,12 @@
+---
+title: Docker Compose
+---
+
 import CodeBlock from '@theme/CodeBlock';
 import DockerComposeSource from '!!raw-loader!./docker-compose.yaml'
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
 
 The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
 
@@ -16,3 +23,7 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/docs/docs/guides
 # Run the database and application containers
 docker compose up --detach
 ```
+
+<DefaultUser components={props.components} />
+<Next components={props.components} />
+<Disclaimer components={props.components} />

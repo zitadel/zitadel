@@ -52,7 +52,7 @@ module.exports = {
         },
         {
           type: "doc",
-          label: "Quickstarts",
+          label: "Examples",
           docId: "quickstarts/introduction",
           position: "left",
         },
