@@ -97,7 +97,7 @@ Payload
 {
     "iss": "100507859606888466",
     "sub": "100507859606888466",
-    "aud": "https://issuer.zitadel.ch",
+    "aud": "{your_domain}.zitadel.cloud",
     "iat": [Current UTC timestamp, e.g. 1605179982, max. 1 hour ago],
     "exp": [UTC timestamp, e.g. 1605183582]
 }
@@ -119,7 +119,7 @@ With the encoded JWT from the prior step, you will need to craft a POST request 
 
 ```bash
 curl --request POST \
-  --url https://api.zitadel.ch/oauth/v2/token \
+  --url https://{your_domain}.zitadel.cloud/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data scope='openid profile email' \
@@ -149,7 +149,7 @@ For this example let's call the userinfo endpoint to verfiy that our access toke
 
 ```bash
 curl --request POST \
-  --url https://api.zitadel.ch/oauth/v2/userinfo \
+  --url https://{your_domain}.zitadel.cloud/oauth/v2/userinfo \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
@@ -162,7 +162,7 @@ Content-Type: application/json
 
 {
   "name": "MyServiceUser",
-  "preferred_username": "service_user@acme.zitadel.ch",
+  "preferred_username": "service_user@{your_domain}.zitadel.cloud",
   "updated_at": 1616417938
 }
 ```

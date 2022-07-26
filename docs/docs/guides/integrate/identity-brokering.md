@@ -109,36 +109,3 @@ You need to create your own auth request with your applications parameters. Plea
 :::
 
 Your user will now be able to choose Google for login instead of username/password or mfa.
-
-## Knowledge Check
-
-* The issuer for your identity provider is <https://issuer.zitadel.ch>
-    - [ ] yes
-    - [ ] no
-* The identity provider has to be oAuth 2.0 compliant
-    - [ ] yes
-    - [ ] no
-
-<details>
-    <summary>
-        Solutions
-    </summary>
-
-* The issuer for your identity provider is https://issuer.zitadel.ch
-    - [ ] yes
-    - [x] no (The issuer is provided by your choosen identity provider. In the case of Google it's https://accounts.google.com)
-* The identity provider has to be oAuth 2.0 compliant
-    - [x] yes
-    - [ ] no
-
-</details>
-
-## Summary
-
-* You can federate identities of all oAuth 2.0 compliant external identity providers
-* Configure the provider in your custom login policy
-
-Where to go from here:
-
-* ZITADEL Projects
-* Service users

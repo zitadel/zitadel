@@ -2,14 +2,16 @@
 title: OAuth 2.0 Proxy
 ---
 
+<!-- //TODO Florian update this to zitadel.cloud-->
+
 [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) is a project which allows services to delegate the authentication flow to a IDP, for example **ZITADEL**
 
-## Configure Zitadel
+## Configure ZITADEL
 
 ### Setup Application and get Keys
 
 Before we can start building our application we have do do a few configuration steps in ZITADEL Console.
-You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your [Project](https://console.zitadel.ch/projects) and add a new application at the top of the page.
+You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your project and add a new application at the top of the page.
 Select Web Application and continue.
 We recommend that you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) for the OAuth 2.0 Proxy.
 
@@ -41,7 +43,7 @@ provider = "oidc"
 user_id_claim = "sub" #uses the subject as ID instead of the email
 provider_display_name = "ZITADEL"
 redirect_url = "http://127.0.0.1:4180/oauth2/callback"
-oidc_issuer_url = "https://issuer.zitadel.ch"
+oidc_issuer_url = "https://{your_domain}.zitadel.cloud"
 upstreams = [
     "https://example.corp.com"
 ]

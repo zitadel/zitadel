@@ -7,7 +7,7 @@ This is useful when you have special business requirements that ZITADEL doesn't 
 
 :::caution
 ZITADEL actions is in an early development stage.
-In the [roadmap](https://zitadel.ch/roadmap), you see how we are planning to expand and improve it.
+In the [roadmap](https://zitadel.com/roadmap), you see how we are planning to expand and improve it.
 Please tell us about your needs and help us prioritize further fixes and features.
 :::
 

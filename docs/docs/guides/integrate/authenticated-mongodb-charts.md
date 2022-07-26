@@ -9,13 +9,13 @@ This integration guide shows how you can embed authenticated MongoDB Charts in y
 Before you can embed an authenticated chart in your application, you have to do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch.
 
-1. Navigate to your [Project](https://console.zitadel.ch/projects)
-1. Add a new application at the top of the page.
-1. Select Web application type and continue.
-1. Use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
-1. Skip the redirect settings and confirm the app creation
-1. Copy the client ID, you will need to tell MongoDB Charts about it.
-1. When you created the app, expand its _OIDC Configuration_ section, change the _Auth Token Type_ to _JWT_ and save the change.
+1. Navigate to your Project
+2. Add a new application at the top of the page.
+3. Select Web application type and continue.
+4. Use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
+5. Skip the redirect settings and confirm the app creation
+6. Copy the client ID, you will need to tell MongoDB Charts about it.
+7. When you created the app, expand its _OIDC Configuration_ section, change the _Auth Token Type_ to _JWT_ and save the change.
 
 Your application configuration should now look similar to this:
 
@@ -28,7 +28,7 @@ Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](htt
 Configure the following values:
 - Signing Algorithm: RS256
 - Signing Key: JWK or JWKS URL
-- JWKS: https://api.zitadel.ch/oauth/v2/keys
+- JWKS: https://{your_domain}.zitadel.cloud/oauth/v2/keys
 - Audience: Your app's client ID which you copied when you created the ZITADEL app
 
 Your configuration should look similar to this:

@@ -65,8 +65,6 @@ This is possible by sending a custom scope for the audience. More about [Custom 
 
 Use the scope `urn:zitadel:iam:org:project:id:{projectid}:aud` to include the project id in your audience
 
-> The scope for zitadel.ch is: `urn:zitadel:iam:org:project:id:69234237810729019:aud`
-
 ```bash
 curl --request POST \
   --url {your_domain}/oauth/v2/token \
