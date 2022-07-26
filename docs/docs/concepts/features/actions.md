@@ -34,5 +34,5 @@ Within the JavaScript code, you can read and manipulate the state.
 
 ## Further reading
 
-- [Assign users a role after they register using an external identity provider](../../guides/customization/behavior)
+- [Assign users a role after they register using an external identity provider](../../guides/manage/customize/behavior)
 - [Actions reference](../../apis/actions)

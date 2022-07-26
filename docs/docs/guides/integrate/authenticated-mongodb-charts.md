@@ -39,7 +39,7 @@ Your configuration should look similar to this:
 
 Embed a chart into your application now, following the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
 
-If you've done the [Angular Quickstart](../../quickstarts/login/angular.md), your code could look something like this:
+If you've done the [Angular Quickstart](../../examples/login/angular.md), your code could look something like this:
 
 ```html
 <!-- chart.component.html -->

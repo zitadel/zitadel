@@ -11,8 +11,9 @@ It covers how to:
 
 Prerequisites:
 
-- existing ZITADEL organization, if not present follow [this guide](../../guides/basics/get-started#trying-out-zitadel-on-zitadelch)
-- existing project, if not present follow the first 3 steps [here](../../guides/basics/projects#exercise---create-a-simple-project)
+- existing ZITADEL Instance, if not present follow [this guide](../../guides/start/quickstart)
+- existing ZITADEL Organization, if not present follow [this guide](../../guides/manage/console/organizations)
+- existing ZITADEL project, if not present follow the first 3 steps [here](../../guides/manage/console/projects)
 - running Gitlab instance see [installation guide](https://docs.gitlab.com/ee/install/)
 
 import CreateApp from "./application/application.mdx";

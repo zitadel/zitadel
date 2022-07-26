@@ -1,36 +1,38 @@
 module.exports = {
   examples: [
-    "quickstarts/introduction",
+    "examples/introduction",
     {
       type: "category",
       label: "Integrate ZITADEL Login in your App",
       items: [
-        "quickstarts/login/angular",
-        "quickstarts/login/react",
-        "quickstarts/login/flutter",
-        "quickstarts/login/nextjs",
+        "examples/login/angular",
+        "examples/login/react",
+        "examples/login/flutter",
+        "examples/login/nextjs",
       ],
       collapsed: false,
     },
     {
       type: "category",
       label: "Secure your API",
-      items: ["quickstarts/secure-api/go", "quickstarts/secure-api/dot-net"],
+      items: [
+        "examples/secure-api/go",
+        "examples/secure-api/dot-net"],
       collapsed: false,
     },
     {
       type: "category",
       label: "Call the ZITADEL API",
       items: [
-        "quickstarts/call-zitadel-api/go",
-        "quickstarts/call-zitadel-api/dot-net",
+        "examples/call-zitadel-api/go",
+        "examples/call-zitadel-api/dot-net",
       ],
       collapsed: false,
     },
     {
       type: "category",
       label: "Identity Aware Proxy",
-      items: ["quickstarts/identity-proxy/oauth2-proxy"],
+      items: ["examples/identity-proxy/oauth2-proxy"],
       collapsed: false,
     },
   ],
@@ -42,7 +44,6 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/start/quickstart",
-        "guides/start/glossary",
       ],
     },
     {
@@ -62,8 +63,13 @@ module.exports = {
       label: "Manage",
       collapsed: false,
       items: [
-        "guides/manage/console",
-        "guides/manage/cloud",
+        {
+          type: 'category',
+          label: 'Cloud',
+          items: [
+            "guides/manage/cloud/instances"
+          ]
+        },
         {
           type: 'category',
           label: 'Self-Hosted',
@@ -73,6 +79,16 @@ module.exports = {
             "guides/manage/self-hosted/custom-domain",
             "guides/manage/self-hosted/http2",
             "guides/manage/self-hosted/tls_modes",
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Console',
+          items: [
+            "guides/manage/console/organizations",
+            "guides/manage/console/projects",
+            "guides/manage/console/applications",
+
           ]
         },
         {

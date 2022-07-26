@@ -53,7 +53,7 @@ module.exports = {
         {
           type: "doc",
           label: "Examples",
-          docId: "quickstarts/introduction",
+          docId: "examples/introduction",
           position: "left",
         },
         {
