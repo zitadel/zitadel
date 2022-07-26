@@ -32,7 +32,7 @@ go get github.com/zitadel/zitadel-go/v2
 
 Create a new go file with the content below. This will create a client for the management api and call its `GetMyOrg` function.
 The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:{projectID}:aud`).
-Make sure to fill the vars issuer, api, projectID and orgID
+Make sure to fill the vars `issuer`, `api`, `projectID `and `orgID`
 
 The issuer and api is the domain of your instance you can find it on the instance detail in the Customer Portal or in the Console
 The projectID you will find in the ZITADEL project in the first organization of your instance and the orgID on the first organization.
