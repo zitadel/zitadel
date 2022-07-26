@@ -29,7 +29,7 @@ Create a new go file with the content below. This will create an API with two en
 back `ok` and the current timestamp. On `/protected` it will respond the same but only if a valid access_token is sent. The token
 must not be expired and the API has to be part of the audience (either client_id or project_id).
 
-Make sure to fill the var issuer with your own domain. This is the domain of your instance you can find it on the instance detail in the Customer Portal or in the Console.
+Make sure to fill the var `issuer` with your own domain. This is the domain of your instance you can find it on the instance detail in the ZITADEL Cloud Customer Portal or in the ZITADEL Console.
 ```go
 package main
 
