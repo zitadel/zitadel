@@ -30,6 +30,9 @@ func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (p
 		return nil, "", caos_errs.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
 	}
 	existingPassword, err := q.passwordWriteModel(ctx, userID, orgID)
+	if err != nil {
+		return nil, "", caos_errs.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
+	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
 		return nil, "", caos_errs.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
 	}

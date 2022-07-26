@@ -2643,7 +2643,7 @@ service AdminService {
             permission: "iam.write";
         };
     }
-    // Imports data into instance and creates different objects
+    // Exports data from instance
     rpc ExportData(ExportDataRequest) returns (ExportDataResponse) {
         option (google.api.http) = {
             post: "/export";
@@ -4647,7 +4647,6 @@ message FailedEvent {
     ];
 }
 
-
 message ImportDataRequest {
     message LocalInput{
         string path = 1;
@@ -4668,7 +4667,7 @@ message ImportDataRequest {
 
     oneof data {
         ImportDataOrg data_orgs = 1;
-         zitadel.v1.v1.ImportDataOrg data_orgsv1 = 2;
+        zitadel.v1.v1.ImportDataOrg data_orgsv1 = 2;
         LocalInput data_orgs_local = 3;
         LocalInput data_orgsv1_local = 4;
         S3Input data_orgs_s3 = 5;
@@ -4695,14 +4694,14 @@ message DataOrg {
 
     repeated zitadel.v1.v1.DataProject projects = 10;
     repeated zitadel.management.v1.AddProjectRoleRequest project_roles = 11;
-    repeated  zitadel.v1.v1.DataAPIApplication api_apps = 12;
-    repeated  zitadel.v1.v1.DataOIDCApplication oidc_apps = 13;
-    repeated  zitadel.v1.v1.DataHumanUser human_users = 14;
-    repeated  zitadel.v1.v1.DataMachineUser machine_users = 15;
-    repeated zitadel.management.v1.SetTriggerActionsRequest  trigger_actions = 16;
-    repeated  zitadel.v1.v1.DataAction actions = 17;
+    repeated zitadel.v1.v1.DataAPIApplication api_apps = 12;
+    repeated zitadel.v1.v1.DataOIDCApplication oidc_apps = 13;
+    repeated zitadel.v1.v1.DataHumanUser human_users = 14;
+    repeated zitadel.v1.v1.DataMachineUser machine_users = 15;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 16;
+    repeated zitadel.v1.v1.DataAction actions = 17;
 
-    repeated  zitadel.v1.v1.DataProjectGrant project_grants = 18;
+    repeated zitadel.v1.v1.DataProjectGrant project_grants = 18;
     repeated zitadel.management.v1.AddUserGrantRequest user_grants = 19;
 
     repeated zitadel.management.v1.AddOrgMemberRequest org_members = 20;
@@ -4731,6 +4730,7 @@ message ImportDataResponse{
     repeated ImportDataError errors = 1;
     ImportDataSuccess success = 2;
 }
+
 message ImportDataError{
     string type = 1;
     string id = 2;
@@ -4763,34 +4763,41 @@ message ImportDataSuccessOrg{
     repeated ImportDataSuccessUserMetadata user_metadata = 19;
     repeated string domains = 20;
 }
+
 message ImportDataSuccessProjectGrant{
     string grant_id = 1;
     string project_id = 2;
     string org_id = 3;
 }
+
 message ImportDataSuccessUserGrant{
     string project_id = 1;
     string user_id = 2;
 }
+
 message ImportDataSuccessProjectMember{
     string project_id = 1;
     string user_id = 2;
 }
+
 message ImportDataSuccessProjectGrantMember{
     string project_id = 1;
     string grant_id = 2;
     string user_id = 3;
 }
+
 message ImportDataSuccessUserLinks {
     string user_id = 1;
     string external_user_id = 2;
     string display_name = 3;
     string idp_id = 4;
 }
+
 message ImportDataSuccessUserMetadata {
     string user_id = 1;
     string key = 2;
 }
+
 message ExportDataRequest {
     message LocalOutput{
         string path = 1;
@@ -4819,6 +4826,7 @@ message ExportDataRequest {
     GCSOutput gcs_output = 8;
     string timeout = 9;
 }
+
 message ExportDataResponse {
     repeated DataOrg orgs = 1;
 }

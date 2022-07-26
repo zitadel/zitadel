@@ -93,22 +93,6 @@ protoc \
 mv ${ZITADEL_PATH}/pkg/grpc/auth/zitadel/* ${ZITADEL_PATH}/pkg/grpc/auth
 rm -r ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
 
-protoc \
-  -I=/proto/include \
-  --grpc-gateway_out ${GOPATH}/src \
-  --grpc-gateway_opt logtostderr=true \
-  --grpc-gateway_opt allow_delete_body=true \
-  --openapiv2_out ${OPENAPI_PATH} \
-  --openapiv2_opt logtostderr=true \
-  --openapiv2_opt allow_delete_body=true \
-  --authoption_out ${GRPC_PATH}/v1 \
-  --validate_out=lang=go:${GOPATH}/src \
-  ${PROTO_PATH}/v1.proto
-
-# authoptions are generated into the wrong folder
-mv ${ZITADEL_PATH}/pkg/grpc/v1/zitadel/* ${ZITADEL_PATH}/pkg/grpc/v1
-rm -r ${ZITADEL_PATH}/pkg/grpc/v1/zitadel
-
 ## generate docs
 protoc \
   -I=/proto/include \
