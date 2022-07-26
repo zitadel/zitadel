@@ -73,6 +73,8 @@ import {
     GetLoginPolicyResponse,
     GetLogNotificationProviderRequest,
     GetLogNotificationProviderResponse,
+    GetMyInstanceRequest,
+    GetMyInstanceResponse,
     GetOIDCSettingsRequest,
     GetOIDCSettingsResponse,
     GetPasswordAgePolicyRequest,
@@ -402,6 +404,11 @@ export class AdminService {
     req.setViewName(viewname);
     req.setFailedSequence(sequence);
     return this.grpcService.admin.removeFailedEvent(req, null).then((resp) => resp.toObject());
+  }
+
+  public getMyInstance(): Promise<GetMyInstanceResponse.AsObject> {
+    const req = new GetMyInstanceRequest();
+    return this.grpcService.admin.getMyInstance(req, null).then((resp) => resp.toObject());
   }
 
   public getPrivacyPolicy(): Promise<GetPrivacyPolicyResponse.AsObject> {

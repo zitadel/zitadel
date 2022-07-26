@@ -15,6 +15,9 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
+import { AuthGuard } from 'src/app/guards/auth.guard';
+import { RoleGuard } from 'src/app/guards/role.guard';
+import { UserGuard } from 'src/app/guards/user.guard';
 import { InfoOverlayModule } from 'src/app/modules/info-overlay/info-overlay.module';
 import { AssetService } from 'src/app/services/asset.service';
 
@@ -120,6 +123,9 @@ const authConfig: AuthConfig = {
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [
+    AuthGuard,
+    RoleGuard,
+    UserGuard,
     ThemeService,
     {
       provide: APP_INITIALIZER,
