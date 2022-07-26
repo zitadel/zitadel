@@ -42,10 +42,9 @@ dotnet add package Zitadel.Api
 Change the program.cs file to the content below. This will create a client for the management api and call its `GetMyUsers` function.
 The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:{projectID}:aud`).
 
-Make sure to fill the const apiUrl and apiProject with your own instance data.
+Make sure to fill the const `apiUrl`, `apiProject` and `personalAccessToken` with your own instance data. The used vars below are from a test instance, to show you how it should look.
 The apiURL is the domain of your instance you can find it on the instance detail in the Customer Portal or in the Console
 The apiProject you will find in the ZITADEL project in the first organization of your instance.
-
 
 ```csharp
 // This file contains two examples:
