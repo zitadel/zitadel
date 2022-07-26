@@ -213,7 +213,7 @@ module.exports = {
       collapsed: false,
       items: [
         "legal/rate-limit-policy",
-        "apis/ratelimits/accounts",
+        "apis/ratelimits/login",
         "apis/ratelimits/api",
       ],
     },

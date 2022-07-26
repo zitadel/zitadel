@@ -2,8 +2,7 @@
 title: Login Rate Limits
 ---
 
-
-## accounts.zitadel.ch
+<!-- //TODO Elio please update according to the current config -->
 
 | Path                | Description                            | Effective Limit           |
 |---------------------|----------------------------------------|---------------------------|
