@@ -31,8 +31,8 @@ type Config struct {
 }
 
 func (c *Config) MatchName(name string) bool {
-	for _, key := range []string{"pg", "postgres", "Postgres"} {
-		if name == key {
+	for _, key := range []string{"pg", "postgres"} {
+		if strings.TrimSpace(strings.ToLower(name)) == key {
 			return true
 		}
 	}
@@ -117,7 +117,6 @@ func (c Config) String(useAdmin bool) string {
 		"host=" + c.Host,
 		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + user.Username,
-		"dbname=" + c.Database,
 		"application_name=zitadel",
 		"sslmode=" + user.SSL.Mode,
 	}
@@ -126,6 +125,9 @@ func (c Config) String(useAdmin bool) string {
 	}
 	if user.Password != "" {
 		fields = append(fields, "password="+user.Password)
+	}
+	if !useAdmin {
+		fields = append(fields, "dbname="+c.Database)
 	}
 	if user.SSL.Mode != sslDisabledMode {
 		fields = append(fields, "sslrootcert="+user.SSL.RootCert)
