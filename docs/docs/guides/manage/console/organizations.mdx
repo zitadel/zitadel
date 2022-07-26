@@ -2,13 +2,6 @@
 title: Organizations
 ---
 
-
-| | |
-| --- | --- |
-| Description | Learn how ZITADEL is structured around Organizations and how to create your organization and verify a domain to use with that new organization. |
-| Learning Outcomes | In this module you will: <ul><li>Learn about organizations</li><li>Create a new organization</li><li>Verify your domain name </li></ul> |
-|Prerequisites|Existing instance|
-
 ## What is an organization?
 
 import OrgDescription from '../../../concepts/structure/_org_description.mdx';
@@ -32,7 +25,6 @@ The customer needs to fill in the form with the organization name and the contac
 
 ![Register new Organization](/img/console_org_register.png)
 
-
 ## How ZITADEL handles usernames
 
 As we mentioned before, each organization has its own pool of usernames, which includes human and service.
@@ -52,7 +44,7 @@ An organization can have multiple domain names, but only one domain can be prima
 
 Please note that domain verification also removes the logonname from all users, who might have used this combination in the global organization (ie. users not belonging to a specific organization). Relating to our example with acme.ch: If a user ‘coyote’ exists in the global organization with the logonname coyote@acme.ch, then after verification of acme.ch, this logonname will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
 
-## Exercise - Verify your domain name
+## Verify your domain name
 
 1. Browse to your organization
 2. Click **Add Domain**
@@ -64,45 +56,4 @@ Please note that domain verification also removes the logonname from all users, 
 
 > **_Please note:_** Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time
 
-## Knowledge Check
-
-* Users exist only within projects or clients
-    - [ ] yes
-    - [ ] no
-* User can only login with `{username}@{domainname}.{zitadeldomain}`
-    - [ ] yes
-    - [ ] no
-* You can delegate access management self-service to another organization
-    - [ ] yes
-    - [ ] no
-
-<details>
-    <summary>
-        Solutions
-    </summary>
-
-* Users exist only within projects or clients
-    - [ ] yes
-    - [x] no (users exist within organizations)
-* User can only login with `{username}@{domainname}.{zitadeldomain}`
-    - [ ] yes
-    - [x] no (You can validate your own domain and login with `{loginname}@{yourdomain.tld}`)
-* You can delegate access management self-service to another organization
-    - [x] yes
-    - [ ] no
-
-</details>
-
-## Summary
-
-* Create your organization and a new user by visiting zitadel.ch
-* Organizations are the top-most vessel for your IAM objects, such as users or projects
-* Verify your domain in the Console to improve user experience; remember to not delete the verification code to allow recheck of ownership
-* You can delegate certain aspects of your IAM to other organizations for self-service
-
-Where to go from here:
-
-* Create a project
-* Setup Passwordless MFA
-* Manage ZITADEL Roles
-* Grant roles to other organizations or users
+<!-- //TODO Add whats next again -->

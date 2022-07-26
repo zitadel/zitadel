@@ -67,7 +67,8 @@ module.exports = {
           type: 'category',
           label: 'Cloud',
           items: [
-            "guides/manage/cloud/instances"
+            "guides/manage/cloud/instances",
+            "guides/manage/cloud/billing",
           ]
         },
         {

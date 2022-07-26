@@ -25,34 +25,49 @@ However, we recommend you read the guide on [how to access ZITADEL API](../../gu
 You need to add the SDK into Go Modules by:
 
 ```bash
-go get github.com/zitadel/zitadel-go
+go get github.com/zitadel/zitadel-go/v2
 ```
 
 ### Create example client
 
 Create a new go file with the content below. This will create a client for the management api and call its `GetMyOrg` function.
-The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
+The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:{projectID}:aud`).
+Make sure to fill the vars `issuer`, `api`, `projectID `and `orgID`
+
+The issuer and api is the domain of your instance you can find it on the instance detail in the ZITADEL Cloud Customer Portal or in the ZITADEL Console.
+The projectID you will find in the ZITADEL project in the first organization of your instance and the orgID on the first organization.
 
 ```go
 package main
 
 import (
-    "context"
-    "log"
-    
-    "github.com/zitadel/oidc/pkg/oidc"
-    
-    "github.com/zitadel/zitadel-go/pkg/client/management"
-    "github.com/zitadel/zitadel-go/pkg/client/middleware"
-    "github.com/zitadel/zitadel-go/pkg/client/zitadel"
-    pb "github.com/zitadel/zitadel-go/pkg/client/zitadel/management"
+	"context"
+	"flag"
+	"log"
+
+	"github.com/zitadel/oidc/pkg/oidc"
+
+	"github.com/zitadel/zitadel-go/v2/pkg/client/management"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
+	"github.com/zitadel/zitadel-go/v2/pkg/client/zitadel"
+	pb "github.com/zitadel/zitadel-go/v2/pkg/client/zitadel/management"
 )
 
+var (
+    issuer    = flag.String("issuer", "", "issuer of your ZITADEL instance (in the form: https://<instance>.zitadel.cloud or https://<yourdomain>)")
+    api       = flag.String("api", "", "gRPC endpoint of your ZITADEL instance (in the form: <instance>.zitadel.cloud:443 or <yourdomain>:443)")
+    projectID = flag.String("projectID", "", "ZITADEL projectID in your instance")
+    orgID     = flag.String("orgID", "", "orgID to set for overwrite example")
+)
 
 func main() {
+    flag.Parse()
+
     client, err := management.NewClient(
-        []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
-    )
+        *issuer,
+        *api,
+        []string{oidc.ScopeOpenID, zitadel.ScopeProjectID(*projectID)}, 
+	)
     if err != nil {
         log.Fatalln("could not create client", err)
     }
@@ -64,12 +79,18 @@ func main() {
     }()
     
     ctx := context.Background()
+    
     resp, err := client.GetMyOrg(ctx, &pb.GetMyOrgRequest{})
     if err != nil {
         log.Fatalln("call failed: ", err)
     }
     log.Printf("%s was created on: %s", resp.Org.Name, resp.Org.Details.CreationDate.AsTime())
-}
+    
+    respOverwrite, err := client.GetMyOrg(middleware.SetOrgID(ctx, *orgID), &pb.GetMyOrgRequest{})
+    if err != nil {
+        log.Fatalln("call failed: ", err)
+    }
+    log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
 ```
 
 #### Key JSON
@@ -88,16 +109,6 @@ If you're not able to set it via environment variable, you can also pass it with
 client, err := management.NewClient(
     []string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
     zitadel.WithKeyPath("/Users/test/servicekey.json"),
-)
-```
-
-#### Custom ZITADEL instance
-
-If your client will not use ZITADEL Cloud (zitadel.ch), be sure to provide the correct values for the ZITADEL ProjectID, Issuer and API options:
-```go
-client, err := management.NewClient(
-    []string{oidc.ScopeOpenID, zitadel.ScopeProjectID("ZITADEL-ProjectID")},
-    zitadel.WithCustomURL("https://issuer.custom.ch", "api.custom.ch:443")
 )
 ```
 

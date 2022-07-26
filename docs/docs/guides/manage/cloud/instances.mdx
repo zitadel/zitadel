@@ -2,13 +2,6 @@
 title: Instance
 ---
 
-
-| | |
-| --- | --- |
-| Description | Learn what an instance in ZITADEL is and what kind of configurations you are able to do. |
-| Learning Outcomes | In this module you will: <ul><li>Learn about the instance</li><li>Create a new instance</li><li>Add a custom domain</li><li>configure some settings</li></ul> |
-|Prerequisites|None|
-
 ## What is an instance?
 
 import InstanceDescription from '../../../concepts/structure/_instance_description.mdx';
@@ -16,14 +9,62 @@ import Column from '../../../../src/components/column';
 
 <InstanceDescription name="InstanceDescription" />
 
-## Exercise - Create a new instance
+## Create a new instance
+
+:::note
+This takes place in the [ZITADEL Cloud Customer Portal](https://zitadel.cloud)
+:::
 
 The creation and management of an instance takes place in the Customer Portal.
 To manage your existing instances you need login with your Customer Portal user. Be aware that this is not the same user as in the instance itself.
 
-![Create new instance](/img/console_org_register.png)
+![New Instance](/img/manuals/portal/customer_portal_new_instance.gif)
 
-## Exercise - Add a custom domain
+## Login to your instance
+
+:::note
+This takes place in the your ZITADEL Cloud Instances Console
+:::
+
+After you have initialized your first admin user of the newly created ZITADEL instance. You can access the instance's Console, to manage all of your resources.
+To login with the user you have initialized. You will find the link to access your instance in the initialization email of your user or in the detail page of your instance in the [ZITADEL Cloud](https://zitadel.cloud).
+
+We generated a unique domain for each ZITADEL Cloud Instance that looks like this: {InstanceName}-{RandomString}.zitadel.cloud
+
+**Customer Portal - Find Instance Domain:**
+![Customer Portal - Instance Domain](/img/manuals/portal/portal_instance_detail_domain.png)
+
+**Console - Landing Page**
+![Console Landing Page](/img/console_dashboard.png)
+
+## Elect New Managers
+
+:::note
+This takes place in the [ZITADEL Cloud Customer Portal](https://zitadel.cloud)
+:::
+
+ZITADEL allows you to give other users control over the ZITADEL Console. The manager role can be restricted to some kind of write and/or read. This is especially useful for direct administration over several users. You can have managers able to edit project settings and others able to create/add users only.
+Read the [guides](../../overview) for more information.
+
+> Note: ZITADEL Managers are located on the right side panel of the ZITADEL Console.
+
+## Upgrade Instance
+
+:::note
+This part happens in the [ZITADEL Cloud Customer Portal](https://zitadel.cloud)
+:::
+
+A free instance can be upgraded to a "pay as you go" instance. By upgrading your authenticated request will no longer be capped and you will be able to choose more options. To upgrade you must enter your billing information.
+
+1. Go to the detail of your instance
+2. Click "Upgrade to paid tier!" in the General Information
+3. Choose the options you need (can be changed later)
+   1. Data Region
+   2. Custom Domain
+   3. Extended SLA
+4. Add a payment method or choose an existing one
+
+## Add a custom domain
 
 1. Browse to your instance
 2. Click **Add custom domain**
@@ -35,7 +76,7 @@ To manage your existing instances you need login with your Customer Portal user.
 
 > **_Please note:_** Do not delete the verification code, as ZITADEL Customer Portal will re-check the ownership of your domain from time to time
 
-## Exercise - Change default settings of the instance
+## Change default settings of the instance
 
 Redirect to your instance and login with your generated user ???
 Go to the settings with the button at the top right of the header.
@@ -47,44 +88,4 @@ Choose modify on the setting "branding".
 You can switch between the light and the dark mode. Upload your logo and define the colors you like to have.
 Make sure to click the button "apply configuration" after you are finish to trigger your settings.
 
-## Knowledge Check
-
-* Instance has to be configured in the Customer Portal
-    - [ ] yes
-    - [ ] no
-* I can use the same user for the Customer Portal as for my created instance
-    - [ ] yes
-    - [ ] no
-* I will find the default settings in the Customer Portal
-    - [ ] yes
-    - [ ] no
-
-<details>
-    <summary>
-        Solutions
-    </summary>
-
-* Users exist only within projects or clients
-    - [x] yes
-    - [ ] no
-* I can use the same user for the Customer Portal as for my created instance
-    - [ ] yes
-    - [x] no (Due to separation of concern you will not be able to use the same user for both)
-* I will find the default settings in the Customer Portal
-    - [ ] yes
-    - [x] no (The default settings are after login to you instance on the settings page)
-
-</details>
-
-## Summary
-
-* Create your instance in the Customer Portal
-* Verify your domain in the Customer Portal to improve user experience; remember to not delete the verification code to allow recheck of ownership
-* You can manage all your default settings in the instance itself
-
-Where to go from here:
-
-* Create an organization
-* Create a project
-* Setup Passwordless MFA
-* Manage ZITADEL Roles
+<!-- //TODO Add whats next again -->
