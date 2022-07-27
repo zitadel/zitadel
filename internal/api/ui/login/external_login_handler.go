@@ -327,10 +327,8 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 
 func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
 
@@ -358,7 +356,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
 		return
 	}
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, user, externalIDP, err)
 		return
