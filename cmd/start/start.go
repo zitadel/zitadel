@@ -23,11 +23,14 @@ import (
 
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
+	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
@@ -168,16 +171,16 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	// adminRepo, err := admin_es.Start(config.Admin, store, dbClient)
-	// if err != nil {
-	// 	return fmt.Errorf("error starting admin repo: %w", err)
-	// }
-	// if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database, config.DefaultInstance)); err != nil {
-	// 	return err
-	// }
-	// if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.Database, commands, queries, adminRepo, config.ExternalSecure, keys.User)); err != nil {
-	// 	return err
-	// }
+	adminRepo, err := admin_es.Start(config.Admin, store, dbClient)
+	if err != nil {
+		return fmt.Errorf("error starting admin repo: %w", err)
+	}
+	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database(), config.DefaultInstance)); err != nil {
+		return err
+	}
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.Database(), commands, queries, adminRepo, config.ExternalSecure, keys.User)); err != nil {
+		return err
+	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure, config.AuditLogRetention)); err != nil {
 		return err
 	}
