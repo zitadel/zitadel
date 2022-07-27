@@ -510,20 +510,19 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 					if isCtxTimeout(ctx) {
 						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
 					}
-					continue
+				} else {
+					count.humanUserCount += 1
+					logging.Debugf("successful user %d: %s", count.humanUserCount, user.GetUserId())
+					successOrg.HumanUserIds = append(successOrg.HumanUserIds, user.GetUserId())
 				}
-				count.humanUserCount += 1
-				logging.Debugf("successful user %d: %s", count.humanUserCount, user.GetUserId())
-				successOrg.HumanUserIds = append(successOrg.HumanUserIds, user.GetUserId())
 
 				if user.User.OtpCode != "" {
 					logging.Debugf("import user otp: %s", user.GetUserId())
-					if err := s.command.ImportHumanOTP(ctx, user.UserId, org.GetOrgId(), user.User.OtpCode); err != nil {
+					if err := s.command.ImportHumanOTP(ctx, user.UserId, "", org.GetOrgId(), user.User.OtpCode); err != nil {
 						errors = append(errors, &admin_pb.ImportDataError{Type: "human_user_otp", Id: user.GetUserId(), Message: err.Error()})
 						if isCtxTimeout(ctx) {
 							return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
 						}
-						continue
 					} else {
 						logging.Debugf("successful user otp: %s", user.GetUserId())
 					}

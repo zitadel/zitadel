@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ImportHumanOTP(ctx context.Context, userID, resourceowner string, key string) error {
+func (c *Commands) ImportHumanOTP(ctx context.Context, userID, userAgentID, resourceowner string, key string) error {
 	encryptedSecret, err := crypto.Encrypt([]byte(key), c.multifactors.OTP.CryptoMFA)
 	if err != nil {
 		return err
@@ -27,7 +27,10 @@ func (c *Commands) ImportHumanOTP(ctx context.Context, userID, resourceowner str
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
 
-	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, encryptedSecret))
+	_, err = c.eventstore.Push(ctx,
+		user.NewHumanOTPAddedEvent(ctx, userAgg, encryptedSecret),
+		user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID),
+	)
 	return err
 }
 
