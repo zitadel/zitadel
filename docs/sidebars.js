@@ -67,8 +67,12 @@ module.exports = {
           type: 'category',
           label: 'Cloud',
           items: [
+            "guides/manage/cloud/overview",
+            "guides/manage/cloud/start",
             "guides/manage/cloud/instances",
             "guides/manage/cloud/billing",
+            "guides/manage/cloud/users",
+            "guides/manage/cloud/support",
           ]
         },
         {
@@ -264,19 +268,6 @@ module.exports = {
     "manuals/introduction",
     "manuals/user-profile",
     "manuals/user-login",
-    {
-      type: "category",
-      label: "Customer Portal",
-      collapsed: true,
-      items: [
-        "manuals/customerportal/overview",
-        "manuals/customerportal/start",
-        "manuals/customerportal/instances",
-        "manuals/customerportal/billing",
-        "manuals/customerportal/users",
-        "manuals/customerportal/support",
-      ],
-    },
     "manuals/troubleshooting",
   ],
   legal: [
