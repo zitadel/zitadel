@@ -43,7 +43,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
 export class UserCreateComponent implements OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en'];
+  public languages: string[] = ['de', 'en', 'it', 'fr'];
   public userForm!: UntypedFormGroup;
   public pwdForm!: UntypedFormGroup;
 
@@ -94,6 +94,10 @@ export class UserCreateComponent implements OnDestroy {
         this.envSuffixLabel = this.envSuffix();
         this.changeDetRef.detectChanges();
       });
+
+    this.mgmtService.getSupportedLanguages().then((lang) => {
+      this.languages = lang.languagesList;
+    });
   }
 
   public close(): void {

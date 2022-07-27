@@ -194,6 +194,8 @@
     }
   },
   "RESOURCEID": "Ressourcen-ID",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "Keine Daten"
   },
@@ -706,6 +708,17 @@
     "MEMBER": {
       "TITLE": "Manager",
       "DESCRIPTION": "Diese Manager können instanzweite Einstellungen vornehmen."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Domains"
+    },
+    "STATE": {
+      "0": "Unspezifisch",
+      "1": "Wird erstellt",
+      "2": "Aktiv",
+      "3": "Wird gestoppt",
+      "4": "Gestoppt"
     },
     "VIEWS": {
       "TITLE": "Views",

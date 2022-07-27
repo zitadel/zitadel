@@ -194,6 +194,8 @@
     }
   },
   "RESOURCEID": "Resource ID",
+  "NAME": "Name",
+  "VERSION": "Versione",
   "TABLE": {
     "NOROWS": "Nessun dato"
   },
@@ -706,6 +708,17 @@
     "MEMBER": {
       "TITLE": "Manager",
       "DESCRIPTION": "Questi manager possono modificare le impostazioni dell'istanza."
+    },
+    "PAGES": {
+      "STATE": "Stato",
+      "DOMAINLIST": "Domini"
+    },
+    "STATE": {
+      "0": "Non specifico",
+      "1": "In fase di creazione",
+      "2": "Attiva",
+      "3": "In fase di arresto",
+      "4": "Arrestata"
     },
     "VIEWS": {
       "TITLE": "Views",

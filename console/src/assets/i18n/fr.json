@@ -194,6 +194,8 @@
     }
   },
   "RESOURCEID": "Id de la ressource",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "Pas de données"
   },
@@ -706,6 +708,17 @@
     "MEMBER": {
       "TITLE": "Managers",
       "DESCRIPTION": "Ces gestionnaires sont autorisés à effectuer des changements dans votre instance."
+    },
+    "PAGES": {
+      "STATE": "Statut",
+      "DOMAINLIST": "Domaines"
+    },
+    "STATE": {
+      "0": "Inconnu",
+      "1": "Créer",
+      "2": "Actif",
+      "3": "Arrêt",
+      "4": "Arrêté"
     },
     "VIEWS": {
       "TITLE": "Vues",
