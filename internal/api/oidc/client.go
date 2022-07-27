@@ -176,6 +176,13 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 			}
 			introspection.SetScopes(token.Scopes)
 			introspection.SetClientID(token.ApplicationID)
+			introspection.SetTokenType(oidc.BearerToken)
+			introspection.SetExpiration(token.Expiration)
+			introspection.SetIssuedAt(token.CreationDate)
+			introspection.SetNotBefore(token.CreationDate)
+			introspection.SetAudience(token.Audience)
+			introspection.SetIssuer(op.IssuerFromContext(ctx))
+			introspection.SetJWTID(token.ID)
 			return nil
 		}
 	}

@@ -1,7 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Buffer } from 'buffer';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -17,7 +19,8 @@ export class MetadataDialogComponent {
   public ts!: Timestamp.AsObject | undefined;
 
   constructor(
-    private service: ManagementService,
+    private managementService: ManagementService,
+    private authService: GrpcAuthService,
     private toast: ToastService,
     public dialogRef: MatDialogRef<MetadataDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -46,17 +49,25 @@ export class MetadataDialogComponent {
   public loadMetadata(): Promise<void> {
     this.loading = true;
     if (this.injData.userId) {
-      return this.service.listUserMetadata(this.injData.userId).then((resp) => {
+      return this.managementService.listUserMetadata(this.injData.userId).then((resp) => {
         this.metadata = resp.resultList.map((md) => {
           return {
             key: md.key,
-            value: atob(md.value as string),
+            value: Buffer.from(md.value as string, 'base64'),
           };
         });
         this.ts = resp.details?.viewTimestamp;
       });
     } else {
-      return Promise.reject();
+      return this.authService.listMyMetadata().then((resp) => {
+        this.metadata = resp.resultList.map((md) => {
+          return {
+            key: md.key,
+            value: Buffer.from(md.value as string, 'base64'),
+          };
+        });
+        this.ts = resp.details?.viewTimestamp;
+      });
     }
   }
 
@@ -93,7 +104,7 @@ export class MetadataDialogComponent {
 
   public setMetadata(key: string, value: string): void {
     if (key && value) {
-      this.service
+      this.managementService
         .setUserMetadata(key, btoa(value), this.injData.userId)
         .then(() => {
           this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
@@ -105,7 +116,7 @@ export class MetadataDialogComponent {
   }
 
   public removeMetadata(key: string): Promise<void> {
-    return this.service
+    return this.managementService
       .removeUserMetadata(key, this.injData.userId)
       .then((resp) => {
         this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
