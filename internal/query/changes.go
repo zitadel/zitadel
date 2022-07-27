@@ -50,6 +50,17 @@ func (q *Queries) ProjectChanges(ctx context.Context, projectID string, lastSequ
 	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
 }
 
+func (q *Queries) ProjectGrantChanges(ctx context.Context, projectID, grantID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+	query := func(query *eventstore.SearchQuery) {
+		query.AggregateTypes(project.AggregateType).
+			AggregateIDs(projectID).
+			EventData(map[string]interface{}{
+				"grantId": grantID,
+			})
+	}
+	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
+}
+
 func (q *Queries) ApplicationChanges(ctx context.Context, projectID, appID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(project.AggregateType).

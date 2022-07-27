@@ -323,7 +323,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 {your_domain}/oauth/v2/introspect
 
-This endpoint enables client to validate an `acccess_token`, either opaque or JWT. Unlike client side JWT validation,
+This endpoint enables clients to validate an `acccess_token`, either opaque or JWT. Unlike client side JWT validation,
 this endpoint will check if the token is not revoked (by client or logout).
 
 | Parameter | Description     |
@@ -499,9 +499,21 @@ curl --request POST \
 
 ## end_session_endpoint
 
-{your_domain}/oidc/v1/endsession
+{your_domain}/oidc/v1/end_session
 
-> The end_session_endpoint is located with the login page, due to the need of accessing the same cookie domain
+The endpoint has to be opened in the user agent (browser) to terminate the user sessions.
+
+No parameters are needed apart from the user agent cookie, but you can provide the following to customize the behaviour: 
+
+| Parameter                | Description                                                                                                                      |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| id_token_hint            | the id_token that was previously issued to the client                                                                            |
+| client_id                | client_id of the application                                                                                                     |
+| post_logout_redirect_uri | Callback uri of the logout where the user (agent) will be redirected to. Must match exactly one of the preregistered in Console. |
+| state                    | Opaque value used to maintain state between the request and the callback                                                         |
+
+The `post_logout_redirect_uri` will be checked against the previously registered uris of the client provided by the `azp` claim of the `id_token_hint` or the `client_id` parameter.
+If both parameters are provided, they must be equal.
 
 ## jwks_uri
 

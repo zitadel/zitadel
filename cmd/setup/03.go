@@ -16,9 +16,8 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-type DefaultInstance struct {
+type FirstInstance struct {
 	InstanceName    string
-	CustomDomain    string
 	DefaultLanguage language.Tag
 	Org             command.OrgSetup
 
@@ -33,9 +32,10 @@ type DefaultInstance struct {
 	externalDomain    string
 	externalSecure    bool
 	externalPort      uint16
+	domain            string
 }
 
-func (mig *DefaultInstance) Execute(ctx context.Context) error {
+func (mig *FirstInstance) Execute(ctx context.Context) error {
 	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
@@ -77,7 +77,7 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 	}
 
 	mig.instanceSetup.InstanceName = mig.InstanceName
-	mig.instanceSetup.CustomDomain = mig.CustomDomain
+	mig.instanceSetup.CustomDomain = mig.externalDomain
 	mig.instanceSetup.DefaultLanguage = mig.DefaultLanguage
 	mig.instanceSetup.Org = mig.Org
 	mig.instanceSetup.Org.Human.Email.Address = strings.TrimSpace(mig.instanceSetup.Org.Human.Email.Address)
@@ -89,7 +89,7 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 	return err
 }
 
-func (mig *DefaultInstance) String() string {
+func (mig *FirstInstance) String() string {
 	return "03_default_instance"
 }
 

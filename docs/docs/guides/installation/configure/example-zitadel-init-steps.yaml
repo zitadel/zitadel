@@ -1,5 +1,5 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/adminn/setup/steps.yaml
-S3DefaultInstance:
+FirstInstance:
   Org:
     Human:
       # use the loginname root@zitadel.localhost
