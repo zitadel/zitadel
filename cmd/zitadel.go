@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"bytes"
 	_ "embed"
 	"errors"
 	"io"
+	"strings"
 
-	"github.com/zitadel/zitadel/internal/config/options"
+	"github.com/spf13/viper"
 
 	"github.com/spf13/cobra"
 	"github.com/zitadel/logging"
@@ -18,6 +20,9 @@ import (
 )
 
 var (
+	//go:embed defaults.yaml
+	DefaultConfig []byte
+
 	configFiles []string
 )
 
@@ -31,7 +36,11 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		},
 	}
 
-	err := options.InitViper()
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("ZITADEL")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.SetConfigType("yaml")
+	err := viper.ReadConfig(bytes.NewBuffer(DefaultConfig))
 	logging.OnError(err).Fatalf("unable initialize config: %s", err)
 
 	cobra.OnInitialize(initConfig)
@@ -50,5 +59,9 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 }
 
 func initConfig() {
-	options.MergeToViper(configFiles...)
+	for _, file := range configFiles {
+		viper.SetConfigFile(file)
+		err := viper.MergeInConfig()
+		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
+	}
 }

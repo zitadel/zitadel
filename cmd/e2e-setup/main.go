@@ -6,15 +6,16 @@ import (
 	_ "embed"
 	"flag"
 	"fmt"
+	"strings"
 	"time"
+
+	"github.com/zitadel/zitadel/cmd"
 
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 
 	"github.com/zitadel/zitadel/internal/id"
 
 	"github.com/spf13/viper"
-
-	"github.com/zitadel/zitadel/internal/config/options"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/database"
@@ -41,7 +42,11 @@ func main() {
 	masterkey := flag.String("materkey", "MasterkeyNeedsToHave32Characters", "the ZITADEL installations masterkey")
 	debug := flag.Bool("debug", false, "print information that is helpful for debugging")
 
-	err := options.InitViper()
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("ZITADEL")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.SetConfigType("yaml")
+	err := viper.ReadConfig(bytes.NewBuffer(cmd.DefaultConfig))
 	logging.OnError(err).Fatalf("unable to initialize zitadel config: %s", err)
 
 	flag.Parse()
