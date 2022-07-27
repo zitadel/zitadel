@@ -6,39 +6,21 @@ import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
 
-## New Knative environment
-### Download and run Knative quickstart
+## Install Knative
 
 Follow the [Knative quickstart guide](https://knative.dev/docs/getting-started/quickstart-install/) to get a local kind/minikube environment with Knative capabilities.
 
-It is basically 4 commands on Mac:
+## Run CockroachDB
 
-```bash
-# Install knative
-brew install knative/client/kn
-
-# Install knative quickstart sandbox
-brew install knative-sandbox/kn-plugins/quickstart
-
-# Install kind
-brew install kind
-
-# Install quickstart cluster
-kn quickstart kind
-```
-That will get you a ready to go knative/kubernetes environment.
-
-
-## Database
-start a single-node cockroachdb as statefulset
+Start a single-node cockroachdb as statefulset
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/cockroachdb-statefulset-single-node.yaml
 ```
 
-## Start ZITADEL with Knative
+## Start ZITADEL
 
-Either use the kn binary...
+### Knative Command
 
 ```bash
 kn service create zitadel \
@@ -52,15 +34,15 @@ kn service create zitadel \
 --arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" 
 ```
 
-... or use the knative service yaml
+### Knavite yaml
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/v2-alpha/deploy/knative/zitadel-knative-service.yaml
 ```
 
-## Get started with ZITADEL
+## Access ZITADEL
 
-Get ZITADEL URL
+### Get the ZITADEL URL
 
 ```bash
 kn services list
