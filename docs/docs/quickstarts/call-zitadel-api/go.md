@@ -67,7 +67,7 @@ func main() {
         *issuer,
         *api,
         []string{oidc.ScopeOpenID, zitadel.ScopeProjectID(*projectID)}, 
-	)
+    )
     if err != nil {
         log.Fatalln("could not create client", err)
     }
@@ -141,7 +141,7 @@ If you've run into any other problem, don't hesitate to contact us or raise an i
 Now you can proceed implementing our APIs by adding more calls or trying to overwrite the organization context:
 
 ```go
-    respOverwrite, err := client.GetMyOrg(middleware.SetOrgID(ctx, "74161146763996133"), &pb.GetMyOrgRequest{})
+    respOverwrite, err := client.GetMyOrg(middleware.SetOrgID(ctx, *orgID), &pb.GetMyOrgRequest{})
     if err != nil {
         log.Fatalln("call failed: ", err)
     }
