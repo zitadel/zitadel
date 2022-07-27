@@ -3,36 +3,33 @@ title: Quickstart
 ---
 
 import Column from "../../../src/components/column";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Zcloud from './_zitadel_cloud.mdx'
+import LocalInstance from './_local_instance.mdx'
+
 
 Most applications need to know the identity of a user allowing to securely store user data in the cloud and provide the same personalised experience across all of the user's devices.
 
 ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users in your application. It supports authentication using passwords and applies additional security with the help of a second factor, for example OTP, to ensure a safe and secure access.
 It additionally leverages industry standards like OAuth 2.0 and OpenID Connect such that it can be easily integrated in your custom backend.
 
-This guide provides a quick start on how to onboard to the ZITADEL Cloud Customer Portal, where you can manage your ZITADEL instances.
-Follow all the guides in the get to know section, to create your first instance, upgrade to a paid tier and connect your first client.
 
-## Try out ZITADEL Cloud
+<Tabs
+    groupId="proxy-vendor"
+    default="zcloud"
+    values={[
+        {'label': 'ZITADEL Cloud', 'value': 'zcloud'},
+        {'label': 'Local Instance', 'value': 'local'},
+    ]}
+>
+    <TabItem value="zcloud">
+        <Zcloud/>
+        <More/>
+    </TabItem>
+    <TabItem value="local">
+        <LocalInstance/>
+        <More/>
+    </TabItem>
+</Tabs>
 
-1. Visit [zitadel.cloud](https://zitadel.cloud/) to create your account. If you already have a ZITADEL instance sign in with your Customer Portal user.
-2. Enter the data to create your organization (First name, Last name, Email, Username and Organization Name)
-3. By clicking "Let's go" we will create a user for you.
-4. You will receive an verification Email to verify the user for the Customer Portal
-5. Use the newly create user to login to the Custom Portal
-
-![Customer Portal Landing Page](/img/manuals/portal/customer_portal_landing_page.png)
-
-## Login to Customer Portal
-
-Use your Customer Portal user to login to the ZITADEL Customer Portal.
-Here you can manage all your different instances, subscriptions and billing data.
-
-1. Go to [zitadel.cloud](https://zitadel.cloud)
-2. Click sign in
-3. Use your ZITADEL Cloud user
-
-Find out more about the Customer Portal [here](/docs/manuals/customerportal/overview).
-
-## Whats next
-
-Follow the next instance guide to continue with your setup.
