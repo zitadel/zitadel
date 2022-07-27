@@ -22,13 +22,8 @@ ExternalPort: 443
 ## Database Initialization Steps Config
 
 ZITADEL creates random subdomains for each instance created.
-However, for the default instance, this is most probably not the desired behavior.
-You can give the default instance a fixed custom domain here.
-
-```yaml
-S3DefaultInstance:
-  CustomDomain: 'zitadel.my.domain'
-```
+However, for the first instance, this is most probably not the desired behavior.
+In this case the `ExternalDomain`-field of the configuration is used.
 
 ## Example
 
