@@ -1417,6 +1417,19 @@ Removes an app key
     DELETE: /projects/{project_id}/apps/{app_id}/keys/{key_id}
 
 
+### ListProjectGrantChanges
+
+> **rpc** ListProjectGrantChanges([ListProjectGrantChangesRequest](#listprojectgrantchangesrequest))
+[ListProjectGrantChangesResponse](#listprojectgrantchangesresponse)
+
+Returns the history of the project grant (each event)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /projects/{project_id}/grants/{grant_id}/changes/_search
+
+
 ### GetProjectGrantByID
 
 > **rpc** GetProjectGrantByID([GetProjectGrantByIDRequest](#getprojectgrantbyidrequest))
@@ -5733,6 +5746,30 @@ This is an empty request
 
 
 ### ListProjectChangesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
+
+
+
+
+### ListProjectGrantChangesRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |  |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ListProjectGrantChangesResponse
 
 
 

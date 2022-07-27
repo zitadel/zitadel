@@ -135,10 +135,8 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 
 func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
 	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
@@ -151,7 +149,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -201,10 +199,8 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 	}
 
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
 	externalIDP, err := l.getExternalIDP(data)
@@ -227,7 +223,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

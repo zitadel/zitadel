@@ -1045,6 +1045,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.read"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -1467,6 +1468,19 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.app.write"
             check_field_name: "ProjectId"
+        };
+    }
+
+    // Returns the history of the project grant (each event)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListProjectGrantChanges(ListProjectGrantChangesRequest) returns (ListProjectGrantChangesResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/grants/{grant_id}/changes/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.read"
+            check_field_name: "GrantId"
         };
     }
 
@@ -4098,6 +4112,20 @@ message RemoveAppKeyRequest {
 
 message RemoveAppKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListProjectGrantChangesRequest {
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ListProjectGrantChangesResponse {
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    repeated zitadel.change.v1.Change result = 2;
 }
 
 message GetProjectGrantByIDRequest {
