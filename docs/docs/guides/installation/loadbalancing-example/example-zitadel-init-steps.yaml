@@ -1,6 +1,5 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/v2-alpha/cmd/adminn/setup/steps.yaml
-S3DefaultInstance:
-  CustomDomain: my.domain
+FirstInstance:
   Org:
     Name: 'My Org'
     Human:

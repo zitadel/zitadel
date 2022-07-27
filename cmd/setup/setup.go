@@ -54,6 +54,8 @@ func Flags(cmd *cobra.Command) {
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
+	logging.Info("setup started")
+
 	dbClient, err := database.Connect(config.Database)
 	logging.OnError(err).Fatal("unable to connect to database")
 
@@ -64,33 +66,37 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}
 	steps.s2AssetsTable = &AssetTable{dbClient: dbClient}
 
-	steps.S3DefaultInstance.instanceSetup = config.DefaultInstance
-	steps.S3DefaultInstance.userEncryptionKey = config.EncryptionKeys.User
-	steps.S3DefaultInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
-	steps.S3DefaultInstance.masterKey = masterKey
-	steps.S3DefaultInstance.db = dbClient
-	steps.S3DefaultInstance.es = eventstoreClient
-	steps.S3DefaultInstance.defaults = config.SystemDefaults
-	steps.S3DefaultInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
-	steps.S3DefaultInstance.externalDomain = config.ExternalDomain
-	steps.S3DefaultInstance.externalSecure = config.ExternalSecure
-	steps.S3DefaultInstance.externalPort = config.ExternalPort
+	steps.FirstInstance.instanceSetup = config.DefaultInstance
+	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
+	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
+	steps.FirstInstance.masterKey = masterKey
+	steps.FirstInstance.db = dbClient
+	steps.FirstInstance.es = eventstoreClient
+	steps.FirstInstance.defaults = config.SystemDefaults
+	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
+	steps.FirstInstance.externalDomain = config.ExternalDomain
+	steps.FirstInstance.externalSecure = config.ExternalSecure
+	steps.FirstInstance.externalPort = config.ExternalPort
+
+	repeatableSteps := []migration.RepeatableMigration{
+		&externalConfigChange{
+			es:             eventstoreClient,
+			ExternalDomain: config.ExternalDomain,
+			ExternalPort:   config.ExternalPort,
+			ExternalSecure: config.ExternalSecure,
+		},
+	}
 
 	ctx := context.Background()
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
 	logging.OnError(err).Fatal("unable to migrate step 1")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
 	logging.OnError(err).Fatal("unable to migrate step 2")
-	err = migration.Migrate(ctx, eventstoreClient, steps.S3DefaultInstance)
+	err = migration.Migrate(ctx, eventstoreClient, steps.FirstInstance)
 	logging.OnError(err).Fatal("unable to migrate step 3")
-}
 
-func initSteps(v *viper.Viper, files ...string) func() {
-	return func() {
-		for _, file := range files {
-			v.SetConfigFile(file)
-			err := v.MergeInConfig()
-			logging.WithFields("file", file).OnError(err).Warn("unable to read setup file")
-		}
+	for _, repeatableStep := range repeatableSteps {
+		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
+		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
 }

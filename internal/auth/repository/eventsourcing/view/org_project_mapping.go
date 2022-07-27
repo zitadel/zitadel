@@ -44,8 +44,8 @@ func (v *View) GetLatestOrgProjectMappingSequence(instanceID string) (*repositor
 	return v.latestSequence(orgPrgojectMappingTable, instanceID)
 }
 
-func (v *View) GetLatestOrgProjectMappingSequences() ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(orgPrgojectMappingTable)
+func (v *View) GetLatestOrgProjectMappingSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(orgPrgojectMappingTable, instanceIDs...)
 }
 
 func (v *View) ProcessedOrgProjectMappingSequence(event *models.Event) error {

@@ -39,7 +39,7 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en'];
+  public languages: string[] = ['de', 'en', 'it', 'fr'];
 
   public ChangeType: any = ChangeType;
   public loading: boolean = true;
@@ -91,6 +91,10 @@ export class UserDetailComponent implements OnInit {
     this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
       this.changeSelection(small.matches);
     };
+
+    this.mgmtUserService.getSupportedLanguages().then((lang) => {
+      this.languages = lang.languagesList;
+    });
   }
 
   private changeSelection(small: boolean): void {

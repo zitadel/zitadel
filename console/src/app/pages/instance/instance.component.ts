@@ -5,6 +5,7 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -17,12 +18,13 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./instance.component.scss'],
 })
 export class InstanceComponent {
+  public instance!: InstanceDetail.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public totalMemberResult: number = 0;
   public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
-
+  public State: any = State;
   constructor(
     public adminService: AdminService,
     private dialog: MatDialog,
@@ -39,6 +41,17 @@ export class InstanceComponent {
     });
 
     breadcrumbService.setBreadcrumb([instanceBread]);
+
+    this.adminService
+      .getMyInstance()
+      .then((instanceResp) => {
+        if (instanceResp.instance) {
+          this.instance = instanceResp.instance;
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public loadMembers(): void {

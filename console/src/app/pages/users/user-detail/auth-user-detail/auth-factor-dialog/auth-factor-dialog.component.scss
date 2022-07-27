@@ -33,6 +33,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .qrcode-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .otp-flex {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ffffff20;
+      border-radius: 0.5rem;
+      padding-left: 0.5rem;
+      justify-content: space-between;
+
+      .overflow-auto {
+        overflow: auto;
+
+        .desc {
+          font-size: 14px;
+        }
+      }
+    }
+  }
 }
 
 .u2f {

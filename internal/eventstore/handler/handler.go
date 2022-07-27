@@ -27,3 +27,10 @@ func (h *Handler) Subscribe(aggregates ...eventstore.AggregateType) {
 func (h *Handler) SubscribeEvents(types map[eventstore.AggregateType][]eventstore.EventType) {
 	h.Sub = eventstore.SubscribeEventTypes(h.EventQueue, types)
 }
+
+func (h *Handler) Unsubscribe() {
+	if h.Sub == nil {
+		return
+	}
+	h.Sub.Unsubscribe()
+}

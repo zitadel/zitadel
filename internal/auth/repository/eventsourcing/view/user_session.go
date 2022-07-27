@@ -60,8 +60,8 @@ func (v *View) GetLatestUserSessionSequence(instanceID string) (*repository.Curr
 	return v.latestSequence(userSessionTable, instanceID)
 }
 
-func (v *View) GetLatestUserSessionSequences() ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(userSessionTable)
+func (v *View) GetLatestUserSessionSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userSessionTable, instanceIDs...)
 }
 
 func (v *View) ProcessedUserSessionSequence(event *models.Event) error {
