@@ -308,7 +308,6 @@ func prepareOrgMember() string {
 		"NULL::STRING AS "+membershipIAMID.name,
 		"NULL::STRING AS "+membershipProjectID.name,
 		"NULL::STRING AS "+membershipGrantID.name,
-		//"NULL::STRING AS "+membershipGrantGrantedOrgID.name,
 	).From(orgMemberTable.identifier()).MustSql()
 	return stmt
 }
