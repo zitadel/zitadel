@@ -326,7 +326,6 @@ func prepareIAMMember() string {
 		InstanceMemberIAMID.identifier(),
 		"NULL::STRING AS "+membershipProjectID.name,
 		"NULL::STRING AS "+membershipGrantID.name,
-		//"NULL::STRING AS "+membershipGrantGrantedOrgID.name,
 	).From(instanceMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -344,7 +343,6 @@ func prepareProjectMember() string {
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
 		"NULL::STRING AS "+membershipGrantID.name,
-		//"NULL::STRING AS "+membershipGrantGrantedOrgID.name,
 	).From(projectMemberTable.identifier()).MustSql()
 
 	return stmt
@@ -363,9 +361,7 @@ func prepareProjectGrantMember() string {
 		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
-		//ProjectGrantColumnGrantedOrgID.identifier(),
 	).From(projectGrantMemberTable.identifier()).
-		//LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID)).
 		MustSql()
 
 	return stmt
