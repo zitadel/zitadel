@@ -67,7 +67,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="docs/guides/deploy/options"
+              link="docs/guides/deploy/overview"
               type={ICONTYPE.SYSTEM}
               title="Installation"
               description=""

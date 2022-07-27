@@ -1,5 +1,5 @@
 ---
-title: Helm (Kubernetes)
+title: Kubernetes
 ---
 
 import Disclaimer from './_disclaimer.mdx'
@@ -10,11 +10,17 @@ Installation and configuration details are described in the [open source ZITADEL
 By default, the chart installs a secure and highly available ZITADEL instance.
 For running an easily testable, insecure, non-HA ZITADEL instance, run the following commands.
 
-```bash
-# Add the helm repository
-helm repo add zitadel https://charts.zitadel.com
+## Helm
 
-# Install an insecure zitadel release that works with localhost
+### Add the helm repository
+
+```bash
+helm repo add zitadel https://charts.zitadel.com
+```
+
+### Install an insecure zitadel release that works with localhost
+
+```bash
 helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalDomain="localhost" \
@@ -23,8 +29,11 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set replicaCount=1 \
   --set cockroachdb.single-node=true \
   --set cockroachdb.statefulset.replicas=1
+```
 
-# Forward the ZITADEL service port to your local machine
+### Forward the ZITADEL service port to your local machine
+
+```bash
 kubectl port-forward svc/my-zitadel 8080:80
 ```
 

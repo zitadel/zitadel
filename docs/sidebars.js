@@ -51,11 +51,12 @@ module.exports = {
       label: "Deploy",
       collapsed: false,
       items: [
+        "guides/deploy/overview",
         "guides/deploy/linux",
-        "guides/deploy/homebrew",
+        "guides/deploy/macos",
         "guides/deploy/compose",
         "guides/deploy/knative",
-        "guides/deploy/helm",
+        "guides/deploy/kubernetes",
       ],
     },
     {
