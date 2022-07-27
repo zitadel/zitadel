@@ -5,7 +5,3 @@ E2E:
   MachineKeyPath: ".keys/e2e.json"
   BaseURL: "http://localhost:8080"
   OrgOwnerPassword: "Password1!"
-  OrgOwnerViewerPassword: "Password1!"
-  OrgProjectCreatorPassword: "Password1!"
-  PasswordComplexityUserPassword: "Password1!"
-  LoginPolicyUserPassword: "Password1!"

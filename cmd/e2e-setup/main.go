@@ -116,20 +116,6 @@ func startE2ESetup(conf *Config, masterkey string) {
 		desc: "org_owner",
 		pw:   conf.E2E.OrgOwnerPassword,
 		role: domain.RoleOrgOwner,
-	}, {
-		desc: "org_owner_viewer",
-		pw:   conf.E2E.OrgOwnerViewerPassword,
-		role: domain.RoleOrgOwner,
-	}, {
-		desc: "org_project_creator",
-		pw:   conf.E2E.OrgProjectCreatorPassword,
-		role: domain.RoleOrgProjectCreator,
-	}, {
-		desc: "login_policy_user",
-		pw:   conf.E2E.LoginPolicyUserPassword,
-	}, {
-		desc: "password_complexity_user",
-		pw:   conf.E2E.PasswordComplexityUserPassword,
 	}}
 
 	err = execute(ctx, commands, *conf.E2E, users, instanceID)
