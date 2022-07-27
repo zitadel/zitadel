@@ -16,6 +16,9 @@ Currently, this doesn't include the following points:
 * Application keys
 
 Which results in that if you want to import, and you have no defined organization-specific custom policies, the experience for your users will not be exactly like in your old instance.
+```suggestion
+
+::note Note that the ressources will be migrated without the event stream. This means that you will not have the audit trail for the imported objects.
 
 *** With this export and import the current audit trail is not included, the resources will be newly created ***
 
