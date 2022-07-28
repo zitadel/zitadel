@@ -140,16 +140,17 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 }
 
 func (s *Server) AddOrgDomain(ctx context.Context, req *mgmt_pb.AddOrgDomainRequest) (*mgmt_pb.AddOrgDomainResponse, error) {
-	domain, err := s.command.AddOrgDomain(ctx, AddOrgDomainRequestToDomain(ctx, req), nil)
+	orgID := authz.GetCtxData(ctx).OrgID
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, req.Domain, orgID)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.AddOrgDomain(ctx, orgID, req.Domain, userIDs)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgDomainResponse{
-		Details: object.AddToDetailsPb(
-			domain.Sequence,
-			domain.ChangeDate,
-			domain.ResourceOwner,
-		),
+		Details: object.DomainToAddDetailsPb(details),
 	}, nil
 }
 

@@ -23,7 +23,7 @@ type CommandVerifier interface {
 }
 
 //AssertValidation checks if the validation works as inteded
-func AssertValidation(t *testing.T, validation preparation.Validation, filter preparation.FilterToQueryReducer, want Want) {
+func AssertValidation(t *testing.T, ctx context.Context, validation preparation.Validation, filter preparation.FilterToQueryReducer, want Want) {
 	t.Helper()
 
 	creates, err := validation()
@@ -34,7 +34,7 @@ func AssertValidation(t *testing.T, validation preparation.Validation, filter pr
 	if err != nil {
 		return
 	}
-	cmds, err := creates(context.Background(), filter)
+	cmds, err := creates(ctx, filter)
 	if !errors.Is(err, want.CreateErr) {
 		t.Errorf("wrong create err = (%[1]T): %[1]v, want (%[2]T): %[2]v", err, want.CreateErr)
 		return

@@ -370,7 +370,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 					Verified: domainR.IsVerified,
 					Primary:  domainR.IsPrimary,
 				}
-				_, err := s.command.AddOrgDomain(ctx, orgDomain, []string{})
+				_, err := s.command.AddOrgDomain(ctx, org.GetOrgId(), domainR.DomainName, []string{})
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
 					if isCtxTimeout(ctx) {
@@ -380,6 +380,17 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				}
 				logging.Debugf("successful domain: %s", domainR.DomainName)
 				successOrg.Domains = append(successOrg.Domains, domainR.DomainName)
+
+				if domainR.IsVerified {
+					if _, err := s.command.VerifyOrgDomain(ctx, org.GetOrgId(), domainR.DomainName); err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "domain_isverified", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+					}
+				}
+				if domainR.IsPrimary {
+					if _, err := s.command.SetPrimaryOrgDomain(ctx, orgDomain); err != nil {
+						errors = append(errors, &admin_pb.ImportDataError{Type: "domain_isprimary", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+					}
+				}
 			}
 		}
 		if org.LabelPolicy != nil {

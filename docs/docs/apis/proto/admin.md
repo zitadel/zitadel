@@ -1510,7 +1510,7 @@ Imports data into instance and creates different objects
 > **rpc** ExportData([ExportDataRequest](#exportdatarequest))
 [ExportDataResponse](#exportdataresponse)
 
-Imports data into instance and creates different objects
+Exports data from instance
 
 
 
