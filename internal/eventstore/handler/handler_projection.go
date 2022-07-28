@@ -168,7 +168,7 @@ func (h *ProjectionHandler) subscribe(ctx context.Context) {
 
 		index, err := h.Process(ctx, events...)
 		if err != nil || index < len(events)-1 {
-			logging.WithFields("projection", h.ProjectionName).WithError(err).Error("unable to process all events from subscription")
+			logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("unable to process all events from subscription")
 		}
 	}
 }

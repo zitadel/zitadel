@@ -100,7 +100,10 @@ module.exports = {
       type: "category",
       label: "API",
       collapsed: false,
-      items: ["guides/api/access-zitadel-apis"],
+      items: [
+          "guides/api/access-zitadel-apis",
+          "guides/api/export-and-import"
+      ],
     },
     {
       type: "category",

@@ -51,7 +51,7 @@ func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userI
 	}
 }
 
-func VerifyOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
+func verifyOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument")
@@ -63,7 +63,7 @@ func VerifyOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
 	}
 }
 
-func SetPrimaryOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
+func setPrimaryOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument")
@@ -99,6 +99,19 @@ func orgDomain(ctx context.Context, filter preparation.FilterToQueryReducer, org
 	}
 
 	return wm, nil
+}
+
+func (c *Commands) VerifyOrgDomain(ctx context.Context, orgID, domain string) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(orgID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, verifyOrgDomain(orgAgg, domain))
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claimedUserIDs []string) (*domain.ObjectDetails, error) {
