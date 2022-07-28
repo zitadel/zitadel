@@ -163,17 +163,17 @@ func getSupportedLanguages() ([]language.Tag, error) {
 }
 
 func fillDefaultOIDCLifetimes(config StorageConfig) StorageConfig {
-	if config.DefaultAccessTokenLifetime == (time.Hour * 0) {
-		config.DefaultAccessTokenLifetime = 12 * time.Hour
+	if config.DefaultAccessTokenLifetime.Duration == 0 {
+		config.DefaultAccessTokenLifetime.Duration = 12 * time.Hour
 	}
-	if config.DefaultIdTokenLifetime == (time.Hour * 0) {
-		config.DefaultIdTokenLifetime = 12 * time.Hour
+	if config.DefaultIdTokenLifetime.Duration == 0 {
+		config.DefaultIdTokenLifetime.Duration = 12 * time.Hour
 	}
-	if config.DefaultRefreshTokenIdleExpiration == (time.Hour * 0) {
-		config.DefaultRefreshTokenIdleExpiration = 720 * time.Hour //30d
+	if config.DefaultRefreshTokenIdleExpiration.Duration == 0 {
+		config.DefaultRefreshTokenIdleExpiration.Duration = 720 * time.Hour //30d
 	}
-	if config.DefaultRefreshTokenExpiration == (time.Hour * 0) {
-		config.DefaultRefreshTokenExpiration = 2160 * time.Hour //90d
+	if config.DefaultRefreshTokenExpiration.Duration == 0 {
+		config.DefaultRefreshTokenExpiration.Duration = 2160 * time.Hour //90d
 	}
 	return config
 }
