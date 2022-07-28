@@ -5176,8 +5176,10 @@ This is an empty response
 | email |  ImportHumanUserRequest.Email | - | message.required: true<br />  |
 | phone |  ImportHumanUserRequest.Phone | - |  |
 | password |  string | - |  |
+| hashed_password |  ImportHumanUserRequest.HashedPassword | - |  |
 | password_change_required |  bool | - |  |
 | request_passwordless_registration |  bool | - |  |
+| otp_code |  string | - |  |
 
 
 
@@ -5190,6 +5192,18 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | email |  string | - | string.email: true<br />  |
 | is_email_verified |  bool | - |  |
+
+
+
+
+### ImportHumanUserRequest.HashedPassword
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| value |  string | - |  |
+| algorithm |  string | - |  |
 
 
 

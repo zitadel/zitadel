@@ -14,7 +14,7 @@ import (
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {
+func AddOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
 		Name:         req.Name,
 		OIDCConfig:   addOIDCIDPRequestToDomainOIDCIDPConfig(req),
@@ -35,7 +35,7 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *mgmt_pb.AddOrgOIDCIDPRequest) *
 	}
 }
 
-func addJWTIDPRequestToDomain(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.IDPConfig {
+func AddJWTIDPRequestToDomain(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
 		Name:         req.Name,
 		JWTConfig:    addJWTIDPRequestToDomainJWTIDPConfig(req),

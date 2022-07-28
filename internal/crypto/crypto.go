@@ -124,3 +124,11 @@ func CompareHash(value *CryptoValue, comparer []byte, alg HashAlgorithm) error {
 	}
 	return alg.CompareHash(value.Crypted, comparer)
 }
+
+func FillHash(value []byte, alg HashAlgorithm) *CryptoValue {
+	return &CryptoValue{
+		CryptoType: TypeHash,
+		Algorithm:  alg.Algorithm(),
+		Crypted:    value,
+	}
+}
