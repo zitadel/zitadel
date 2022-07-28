@@ -180,6 +180,7 @@ func TestAddOIDCApp(t *testing.T) {
 				idGenerator: tt.fields.idGenerator,
 			}
 			AssertValidation(t,
+				context.Background(),
 				c.AddOIDCAppCommand(
 					tt.args.app,
 					tt.args.clientSecretAlg,
