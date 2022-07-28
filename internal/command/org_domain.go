@@ -17,26 +17,34 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
-func AddOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
+func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userIDs []string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if domain = strings.TrimSpace(domain); domain == "" {
+		if addDomain = strings.TrimSpace(addDomain); addDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existing, err := orgDomain(ctx, filter, a.ID, domain)
+			existing, err := orgDomain(ctx, filter, a.ID, addDomain)
 			if err != nil && !errs.Is(err, errors.ThrowNotFound(nil, "", "")) {
 				return nil, err
 			}
-			if existing != nil && existing.Verified {
+			if existing != nil && existing.State == domain.OrgDomainStateActive {
 				return nil, errors.ThrowAlreadyExists(nil, "V2-e1wse", "Errors.Already.Exists")
 			}
 			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
 			}
-			events := []eventstore.Command{org.NewDomainAddedEvent(ctx, &a.Aggregate, domain)}
+			events := []eventstore.Command{org.NewDomainAddedEvent(ctx, &a.Aggregate, addDomain)}
 			if !domainPolicy.ValidateOrgDomains {
-				events = append(events, org.NewDomainVerifiedEvent(ctx, &a.Aggregate, domain))
+				events = append(events, org.NewDomainVerifiedEvent(ctx, &a.Aggregate, addDomain))
+				for _, userID := range userIDs {
+					claimedEvent, err := c.prepareUserDomainClaimed(ctx, filter, userID)
+					if err != nil {
+						logging.WithFields("userid", userID).WithError(err).Error("could not claim user")
+						continue
+					}
+					events = append(events, claimedEvent)
+				}
 			}
 			return events, nil
 		}, nil
@@ -93,25 +101,17 @@ func orgDomain(ctx context.Context, filter preparation.FilterToQueryReducer, org
 	return wm, nil
 }
 
-func (c *Commands) AddOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain, claimedUserIDs []string) (*domain.OrgDomain, error) {
-	if !orgDomain.IsValid() {
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-R24hb", "Errors.Org.InvalidDomain")
-	}
-	domainWriteModel := NewOrgDomainWriteModel(orgDomain.AggregateID, orgDomain.Domain)
-	orgAgg := OrgAggregateFromWriteModel(&domainWriteModel.WriteModel)
-	events, err := c.addOrgDomain(ctx, orgAgg, domainWriteModel, orgDomain, claimedUserIDs)
+func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claimedUserIDs []string) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(orgID)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs))
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(domainWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return orgDomainWriteModelToOrgDomain(domainWriteModel), nil
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) GenerateOrgDomainValidation(ctx context.Context, orgDomain *domain.OrgDomain) (token, url string, err error) {
