@@ -182,6 +182,9 @@ protoc \
   -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,settings.md \
   ${PROTO_PATH}/settings.proto
-
+protoc \
+  -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,v1.md \
+  ${PROTO_PATH}/v1.proto
 
 echo "done generating grpc"

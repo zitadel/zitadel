@@ -9,7 +9,7 @@ import (
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func addLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.LoginPolicy {
+func AddLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
 		AllowUsernamePassword:      p.AllowUsernamePassword,
 		AllowRegister:              p.AllowRegister,
