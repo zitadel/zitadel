@@ -128,6 +128,7 @@ func TestAddAPIConfig(t *testing.T) {
 				idGenerator: tt.fields.idGenerator,
 			}
 			AssertValidation(t,
+				context.Background(),
 				c.AddAPIAppCommand(
 					&addAPIApp{
 						AddApp: AddApp{
