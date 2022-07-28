@@ -119,6 +119,9 @@ module.exports = {
         "guides/integrate/authenticated-mongodb-charts",
         "guides/integrate/auth0",
         "guides/integrate/gitlab-self-hosted",
+        "guides/integrate/login-users",
+        "guides/integrate/serviceusers",
+        "guides/integrate/oauth-recommended-flows",
       ],
     },
     {
@@ -130,21 +133,6 @@ module.exports = {
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
       ],
-    },
-    {
-      type: "category",
-      label: "Authentication",
-      collapsed: false,
-      items: [
-        "guides/authentication/login-users",
-        "guides/authentication/serviceusers",
-      ],
-    },
-    {
-      type: "category",
-      label: "Authorization",
-      collapsed: false,
-      items: ["guides/authorization/oauth-recommended-flows"],
     },
     {
       type: "category",

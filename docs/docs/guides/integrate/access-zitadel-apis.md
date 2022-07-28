@@ -21,8 +21,8 @@ title: Access ZITADEL APIs
         <td>Prerequisites</td>
         <td>
             <ul>
-                <li>Knowledge of <a href="/docs/guides/authorization/oauth-recommended-flows">Recommended Authorization Flows</a></li>
-                <li>Knowledge of <a href="/docs/guides/authentication/serviceusers">Service Users</a></li>
+                <li>Knowledge of <a href="/docs/guides/integrate/oauth-recommended-flows">Recommended Authorization Flows</a></li>
+                <li>Knowledge of <a href="/docs/guides/integrate/serviceusers">Service Users</a></li>
             </ul>
         </td>
     </tr>
@@ -42,7 +42,7 @@ On each level we have some different Roles. Here you can find more about the dif
 
 ## Exercise: Add ORG_OWNER to Service User
 
-Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](../authentication/serviceusers))
+Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](serviceusers.md))
 
 1. Navigate to Organization Detail
 2. Click the **+** button in the right part of console, in the managers part of details
@@ -54,7 +54,7 @@ Make sure you have a Service User with a Key. (For more detailed informations ab
 ## Authenticating a service user
 
 In ZITADEL we use the `private_jwt` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
-This is already described in the [Service User](../authentication/serviceusers), so make sure you follow this guide.
+This is already described in the [Service User](serviceusers.md), so make sure you follow this guide.
 
 ### Request an OAuth token, with audience for ZITADEL
 
