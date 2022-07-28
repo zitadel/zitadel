@@ -57,6 +57,7 @@ module.exports = {
         "guides/deploy/compose",
         "guides/deploy/knative",
         "guides/deploy/kubernetes",
+        "guides/deploy/loadbalancing-example/loadbalancing-example",
       ],
     },
     {

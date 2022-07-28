@@ -27,4 +27,4 @@ In this case the `ExternalDomain`-field of the configuration is used.
 
 ## Example
 
-Go to the [loadbalancing example with Traefik](./loadbalancing-example) for seeing a working example configuration.
+Go to the [loadbalancing example with Traefik](../../deploy/loadbalancing-example) for seeing a working example configuration.
