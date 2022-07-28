@@ -75,7 +75,7 @@ func TestAddDomain(t *testing.T) {
 				claimedUserIDs: []string{"userID1"},
 				idGenerator:    id_mock.ExpectID(t, "newID"),
 				filter: func() func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					i := 0
+					i := 0 //TODO: we should fix this in the future to use some kind of mock struct and expect filter calls
 					return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						if i == 2 {
 							i++
