@@ -7,8 +7,8 @@
     "build": "ng build",
     "prodbuild": "ng build --configuration production --base-href=/ui/console/",
     "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
-    "e2e": "./cypress.sh run ../e2e/local.env",
-    "e2e:open": "./cypress.sh open ../e2e/local.env"
+    "e2e": "./cypress.sh run ../e2e/dev.env",
+    "e2e:open": "./cypress.sh open ../e2e/dev.env"
   },
   "private": true,
   "dependencies": {

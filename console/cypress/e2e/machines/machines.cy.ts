@@ -45,10 +45,11 @@ describe('machines', () => {
 
         it('should delete a machine', () => {
           cy.contains('tr', testMachineUserNameRemove, { timeout: 1000 })
-            .find('button')
-            //force due to angular hidden buttons
-            .click({ force: true });
-          cy.get('[e2e-data="confirm-dialog-input"]').type(username(testMachineUserNameRemove, Cypress.env('org')));
+            // doesn't work, need to force click.
+            // .trigger('mouseover')
+            .find('[e2e-data="enabled-delete-button"]')
+            .click({force: true});
+          cy.get('[e2e-data="confirm-dialog-input"]').click().type(username(testMachineUserNameRemove, Cypress.env('org')));
           cy.get('[e2e-data="confirm-dialog-button"]').click();
           cy.get('.data-e2e-success');
           cy.wait(200);

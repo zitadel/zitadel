@@ -191,6 +191,7 @@
               color="warn"
               (click)="deleteUser(user)"
               [disabled]="!canWrite || !canDelete"
+              [attr.e2e-data]="!canWrite || !canDelete ? 'disabled-delete-button' : 'enabled-delete-button'"
               mat-icon-button
             >
               <i class="las la-trash"></i>
