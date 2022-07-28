@@ -1,0 +1,20 @@
+name: CYPRESS e2e
+
+on:
+#  schedule:
+#    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+
+
+env:
+  WORKING_DIR=./
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Build the docker-compose stack
+        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose --file ${WORKING_DIR}/e2e/docker-compose-workdir.yaml --file ${WORKING_DIR}/docs/docs/guides/installation/run/docker-compose.yaml --file ${WORKING_DIR}/e2e/docker-compose-overwrite.yaml --env-file ${WORKING_DIR}/e2e/compose.env

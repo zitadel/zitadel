@@ -1,35 +1,33 @@
 services:
   zitadel:
-    image: 'zitadel:${BUILD_DATE}'
+    image: 'ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.44-amd64'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
       # TODO: ugly
       ZITADEL_EXTERNALDOMAIN: zitadel
       ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN: zitadel
-      
-  e2e-setup: 
-    build:
-      dockerfile: ./build/e2e/Dockerfile
-      context: ..
-    container_name: e2e-setup
-    env_file:
-    - ./compose.env
-    environment:
-      ZITADEL_DATABASE_HOST: db
-    networks:
-    - 'zitadel'
-    volumes:
-    - ${PWD}/.keys/e2e.json:/.keys/e2e.json
     depends_on:
-      zitadel:
-#       TODO: See PR #3816
-#       condition: 'service_healthy'
-        condition: service_started
+      db-initialize:
+        condition: service_completed_successfully
+
+  db:
+    volumes:
+    - ${PWD}/e2e/dbdump:/cockroach/cockroach-data/extern/dbdump
+
+  db-initialize:
+    networks:
+      - 'zitadel'
+    image: 'cockroachdb/cockroach:v22.1.0'
+    command: "sql --host db --insecure --execute=\'RESTORE FROM \"nodelocal://0/dbdump/\"\'"
+    depends_on:
+      db:
+        condition: service_healthy
+
   e2e:
     image: cypress/included:10.3.0
     container_name: cypress
     depends_on:
-      e2e-setup:
-        condition: 'service_completed_successfully'
+    -  zitadel
     env_file:
     - ./compose.env
     working_dir: /e2e
@@ -43,4 +41,3 @@ services:
     - ${PWD}/console:/e2e
     networks:
     - 'zitadel'
-
