@@ -8,7 +8,7 @@ on:
 
 
 env:
-  WORKING_DIR=./
+  WORKING_DIR: ./
 
 jobs:
   test:
