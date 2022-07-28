@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -47,10 +46,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string)
 		c.AddOrgMemberCommand(orgAgg, userID, roles...),
 	}
 	if o.CustomDomain != "" {
-		validations = append(validations, AddOrgDomain(orgAgg, o.CustomDomain))
-		for _, userID := range userIDs {
-			validations = append(validations, c.prepareUserDomainClaimed(userID))
-		}
+		validations = append(validations, c.prepareAddOrgDomain(orgAgg, o.CustomDomain, userIDs))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
@@ -244,43 +240,6 @@ func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id 
 	}
 
 	return exists, nil
-}
-
-func (c *Commands) setUpOrg(
-	ctx context.Context,
-	organisation *domain.Org,
-	admin *domain.Human,
-	loginPolicy *domain.DomainPolicy,
-	pwPolicy *domain.PasswordComplexityPolicy,
-	initCodeGenerator crypto.Generator,
-	phoneCodeGenerator crypto.Generator,
-	claimedUserIDs []string,
-	selfregistered bool,
-) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.Command, err error) {
-	orgAgg, orgWriteModel, addOrgEvents, err := c.addOrg(ctx, organisation, claimedUserIDs)
-	if err != nil {
-		return nil, nil, nil, nil, nil, err
-	}
-
-	var userEvents []eventstore.Command
-	if selfregistered {
-		userEvents, human, err = c.registerHuman(ctx, orgAgg.ID, admin, nil, loginPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
-	} else {
-		userEvents, human, err = c.addHuman(ctx, orgAgg.ID, admin, loginPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
-	}
-	if err != nil {
-		return nil, nil, nil, nil, nil, err
-	}
-	addOrgEvents = append(addOrgEvents, userEvents...)
-
-	addedMember := NewOrgMemberWriteModel(orgAgg.ID, human.AggregateID)
-	orgMemberAgg := OrgAggregateFromWriteModel(&addedMember.WriteModel)
-	orgMemberEvent, err := c.addOrgMember(ctx, orgMemberAgg, addedMember, domain.NewMember(orgMemberAgg.ID, human.AggregateID, domain.RoleOrgOwner))
-	if err != nil {
-		return nil, nil, nil, nil, nil, err
-	}
-	addOrgEvents = append(addOrgEvents, orgMemberEvent)
-	return orgAgg, orgWriteModel, human, addedMember, addOrgEvents, nil
 }
 
 func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimedUserIDs []string) (_ *eventstore.Aggregate, _ *OrgWriteModel, _ []eventstore.Command, err error) {

@@ -25,9 +25,11 @@ import (
 
 func TestAddDomain(t *testing.T) {
 	type args struct {
-		a      *org.Aggregate
-		domain string
-		filter preparation.FilterToQueryReducer
+		a              *org.Aggregate
+		domain         string
+		claimedUserIDs []string
+		idGenerator    id.Generator
+		filter         preparation.FilterToQueryReducer
 	}
 
 	agg := org.NewAggregate("test")
@@ -50,8 +52,9 @@ func TestAddDomain(t *testing.T) {
 		{
 			name: "correct (should verify domain)",
 			args: args{
-				a:      agg,
-				domain: "domain",
+				a:              agg,
+				domain:         "domain",
+				claimedUserIDs: []string{"userID1"},
 				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
 						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, true, true),
@@ -67,26 +70,52 @@ func TestAddDomain(t *testing.T) {
 		{
 			name: "correct (should not verify domain)",
 			args: args{
-				a:      agg,
-				domain: "domain",
-				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return []eventstore.Event{
-						org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, false, false),
-					}, nil
-				},
+				a:              agg,
+				domain:         "domain",
+				claimedUserIDs: []string{"userID1"},
+				idGenerator:    id_mock.ExpectID(t, "newID"),
+				filter: func() func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					i := 0 //TODO: we should fix this in the future to use some kind of mock struct and expect filter calls
+					return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						if i == 2 {
+							i++
+							return []eventstore.Event{user.NewHumanAddedEvent(
+								ctx,
+								&user.NewAggregate("userID1", "org2").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.Und,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							)}, nil
+						}
+						if i == 3 {
+							i++
+							return []eventstore.Event{org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, false, false, false)}, nil
+						}
+						i++
+						return []eventstore.Event{org.NewDomainPolicyAddedEvent(ctx, &agg.Aggregate, true, false, false)}, nil
+					}
+				}(),
 			},
 			want: Want{
 				Commands: []eventstore.Command{
 					org.NewDomainAddedEvent(context.Background(), &agg.Aggregate, "domain"),
 					org.NewDomainVerifiedEvent(context.Background(), &agg.Aggregate, "domain"),
+					user.NewDomainClaimedEvent(context.Background(), &user.NewAggregate("userID1", "org2").Aggregate, "newID@temporary.domain", "username", false),
 				},
 			},
 		},
 		{
 			name: "already verified",
 			args: args{
-				a:      agg,
-				domain: "domain",
+				a:              agg,
+				domain:         "domain",
+				claimedUserIDs: []string{"userID1"},
 				filter: func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
 						org.NewDomainAddedEvent(ctx, &agg.Aggregate, "domain"),
@@ -102,7 +131,13 @@ func TestAddDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, AddOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
+			AssertValidation(
+				t,
+				authz.WithRequestedDomain(context.Background(), "domain"),
+				(&Commands{idGenerator: tt.args.idGenerator}).prepareAddOrgDomain(tt.args.a, tt.args.domain, tt.args.claimedUserIDs),
+				tt.args.filter,
+				tt.want,
+			)
 		})
 	}
 }
@@ -143,7 +178,7 @@ func TestVerifyDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, VerifyOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+			AssertValidation(t, context.Background(), VerifyOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
 		})
 	}
 }
@@ -238,7 +273,7 @@ func TestSetDomainPrimary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, SetPrimaryOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), SetPrimaryOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
 		})
 	}
 }
@@ -249,11 +284,12 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 	}
 	type args struct {
 		ctx            context.Context
-		domain         *domain.OrgDomain
+		orgID          string
+		domain         string
 		claimedUserIDs []string
 	}
 	type res struct {
-		want *domain.OrgDomain
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -270,8 +306,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				domain: &domain.OrgDomain{},
+				ctx: context.Background(),
 			},
 			res: res{
 				err: errors.IsErrorInvalidArgument,
@@ -299,13 +334,9 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				domain: &domain.OrgDomain{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					Domain: "domain.ch",
-				},
+				ctx:    context.Background(),
+				orgID:  "org1",
+				domain: "domain.ch",
 			},
 			res: res{
 				err: errors.IsErrorAlreadyExists,
@@ -324,6 +355,16 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
@@ -335,21 +376,13 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				domain: &domain.OrgDomain{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "org1",
-					},
-					Domain: "domain.ch",
-				},
+				ctx:    context.Background(),
+				orgID:  "org1",
+				domain: "domain.ch",
 			},
 			res: res{
-				want: &domain.OrgDomain{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					Domain: "domain.ch",
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -359,7 +392,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
+			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.orgID, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
