@@ -45,30 +45,30 @@ HTTP1HostHeader: "host"
 WebAuthNName: ZITADEL
 
 Database:
-  Host: localhost
-  Port: 26257
-  Database: zitadel
-  MaxOpenConns: 20
-  MaxConnLifetime: 30m
-  MaxConnIdleTime: 30m
-  Options: ""
-  User:
-    Username: zitadel
-    Password: ""
-    SSL:
-      Mode: disable
-      RootCert: ""
-      Cert: ""
-      Key: ""
-
-AdminUser:
-  Username: root
-  Password: ""
-  SSL:
-    Mode: disable
-    RootCert: ""
-    Cert: ""
-    Key: ""
+  cockroach:
+    Host: localhost
+    Port: 26257
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: ""
+    User:
+      Username: zitadel
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+    Admin:
+      Username: root
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
 
 Machine:
   # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.

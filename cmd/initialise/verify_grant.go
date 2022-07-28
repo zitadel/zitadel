@@ -28,7 +28,7 @@ Prereqesits:
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.New())
 
-			err := initialise(config, VerifyGrant(config.Database.Database, config.Database.Username))
+			err := initialise(config.Database, VerifyGrant(config.Database.Database(), config.Database.Username()))
 			logging.OnError(err).Fatal("unable to set grant")
 		},
 	}
