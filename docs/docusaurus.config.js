@@ -173,7 +173,7 @@ module.exports = {
           sidebarPath: require.resolve("./sidebars.js"),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
-          editUrl: "https://github.com/zitadel/zitadel/edit/v2-alpha/docs/",
+          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {

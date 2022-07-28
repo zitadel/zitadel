@@ -40,4 +40,4 @@ ZITADEL is available in the following languages
 
 A language is displayed based on your agent's language header. The default language is English.
 
-If you need support for a specific language we highly encourage you to [contribute translation files](https://github.com/zitadel/zitadel/blob/v2-alpha/CONTRIBUTING.md) for the missing language.
+If you need support for a specific language we highly encourage you to [contribute translation files](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md) for the missing language.
