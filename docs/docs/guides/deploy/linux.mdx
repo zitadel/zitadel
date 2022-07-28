@@ -20,7 +20,7 @@ cockroach start-single-node --insecure --background --http-addr :9090 --listen-a
 ## Install ZITADEL
 
 ```bash
-curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0-v2-alpha.43 | grep "browser_download_url.*zitadel_Linux_$(uname -m).tar.gz" | cut -d '"' -f 4 | xargs wget -qO - | sudo tar --extract --gzip --overwrite --directory /usr/local/bin zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0 | grep "browser_download_url.*zitadel_Linux_$(uname -m).tar.gz" | cut -d '"' -f 4 | xargs wget -qO - | sudo tar --extract --gzip --overwrite --directory /usr/local/bin zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
 ```
 
 ## Run ZITADEL
