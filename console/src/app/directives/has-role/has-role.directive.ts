@@ -17,11 +17,6 @@ export class HasRoleDirective {
           this.hasView = false;
         }
       });
-    } else {
-      if (!this.hasView) {
-        this.viewContainerRef.clear();
-        this.viewContainerRef.createEmbeddedView(this.templateRef);
-      }
     }
   }
 
