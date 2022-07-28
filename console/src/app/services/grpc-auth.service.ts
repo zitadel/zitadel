@@ -222,7 +222,9 @@ export class GrpcAuthService {
    */
   public isAllowed(roles: string[] | RegExp[], requiresAll: boolean = false): Observable<boolean> {
     if (roles && roles.length > 0) {
-      return this.zitadelPermissions.pipe(switchMap((zroles) => of(this.hasRoles(zroles, roles, requiresAll))));
+      return this.zitadelPermissions.pipe(
+        map((zroles) => this.hasRoles(zroles, roles, requiresAll))
+      );
     } else {
       return of(false);
     }
