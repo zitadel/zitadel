@@ -1,4 +1,4 @@
-name: CYPRESS e2e
+name: "CYPRESS e2e"
 
 on:
 #  schedule:
