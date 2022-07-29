@@ -125,6 +125,12 @@ func literalsConfigMap(
 		if desired.Proxy != nil {
 			literalsConfigMap["NO_PROXY"] = strings.Join(desired.Proxy.NoProxy, ",")
 		}
+		if desired.OIDCLifetimes != nil {
+			literalsConfigMap["ZITADEL_DEFAULT_ACCESS_TOKEN_LIFETIME"] = desired.OIDCLifetimes.AccessTokenLifetime
+			literalsConfigMap["ZITADEL_DEFAULT_ID_TOKEN_LIFETIME"] = desired.OIDCLifetimes.IdTokenLifeTime
+			literalsConfigMap["ZITADEL_DEFAULT_REFRESH_TOKEN_IDLE_EXPIRATION"] = desired.OIDCLifetimes.RefreshTokenIdleExpiration
+			literalsConfigMap["ZITADEL_DEFAULT_REFRESH_TOKEN_EXPIRATION"] = desired.OIDCLifetimes.RefreshTokenExpiration
+		}
 	}
 
 	sentryEnv, _, doIngest := mntr.Environment()

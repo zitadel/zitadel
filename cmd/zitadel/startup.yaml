@@ -259,10 +259,10 @@ API:
       DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
     StorageConfig:
       DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
-      DefaultAccessTokenLifetime: $ZITADEL_DEFAUTL_ACCESS_TOKEN_LIFETIME
-      DefaultIdTokenLifetime: $ZITADEL_DEFAUTL_ID_TOKEN_LIFETIME
-      DefaultRefreshTokenIdleExpiration: $ZITADEL_DEFAUTL_REFRESH_TOKEN_IDLE_EXPIRATION
-      DefaultRefreshTokenExpiration: $ZITADEL_DEFAUTL_REFRESH_TOKEN_EXPIRATION
+      DefaultAccessTokenLifetime: $ZITADEL_DEFAULT_ACCESS_TOKEN_LIFETIME
+      DefaultIdTokenLifetime: $ZITADEL_DEFAULT_ID_TOKEN_LIFETIME
+      DefaultRefreshTokenIdleExpiration: $ZITADEL_DEFAULT_REFRESH_TOKEN_IDLE_EXPIRATION
+      DefaultRefreshTokenExpiration: $ZITADEL_DEFAULT_REFRESH_TOKEN_EXPIRATION
       SigningKeyAlgorithm: RS256
     UserAgentCookieConfig:
       Name: caos.zitadel.useragent
