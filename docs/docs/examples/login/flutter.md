@@ -268,7 +268,7 @@ Future<void> _authenticate() async {
     );
 
     final userInfoResponse = await get(
-      Uri.parse('https://[your-instance].zitadel.cloud/oauth/v2/userinfo'),
+      Uri.parse('https://[your-instance].zitadel.cloud/oidc/v2/userinfo'),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
         HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'
@@ -333,7 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       final userInfoResponse = await get(
-        Uri.parse('https:/[your-domain]-[random-string].zitadel.cloud/oauth/v2/userinfo'), // replace with your instance
+        Uri.parse('https:/[your-domain]-[random-string].zitadel.cloud/oidc/v2/userinfo'), // replace with your instance
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
           HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'
