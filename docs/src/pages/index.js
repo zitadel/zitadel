@@ -1,14 +1,19 @@
-import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Layout from '@theme/Layout';
-import ThemedImage from '@theme/ThemedImage';
-import clsx from 'clsx';
-import React from 'react';
+import Link from "@docusaurus/Link";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Layout from "@theme/Layout";
+import ThemedImage from "@theme/ThemedImage";
+import clsx from "clsx";
+import React from "react";
 
-import Column from '../components/column';
-import { HomeListWrapper, ICONTYPE, ListElement, ListWrapper } from '../components/list';
-import styles from './styles.module.css';
+import Column from "../components/column";
+import {
+  HomeListWrapper,
+  ICONTYPE,
+  ListElement,
+  ListWrapper,
+} from "../components/list";
+import styles from "./styles.module.css";
 
 const features = [
   {
@@ -120,6 +125,13 @@ const features = [
           lightImageSource="/img/tech/nextjs.svg"
           title="NextJS"
           description="A simple application to log into your user account and query some data from User endpoint."
+        />
+        <QuickstartLink
+          link="/docs/examples/login/vue"
+          imageSource="/img/tech/vue.png"
+          lightImageSource="/img/tech/vue.png"
+          title="Vue"
+          description="A simple application to log into your user account and show some data."
         />
       </div>
     ),

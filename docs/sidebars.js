@@ -9,15 +9,14 @@ module.exports = {
         "examples/login/react",
         "examples/login/flutter",
         "examples/login/nextjs",
+        "examples/login/vue",
       ],
       collapsed: false,
     },
     {
       type: "category",
       label: "Secure your API",
-      items: [
-        "examples/secure-api/go",
-        "examples/secure-api/dot-net"],
+      items: ["examples/secure-api/go", "examples/secure-api/dot-net"],
       collapsed: false,
     },
     {
@@ -42,9 +41,7 @@ module.exports = {
       type: "category",
       label: "Get started",
       collapsed: false,
-      items: [
-        "guides/start/quickstart",
-      ],
+      items: ["guides/start/quickstart"],
     },
     {
       type: "category",
@@ -66,8 +63,8 @@ module.exports = {
       collapsed: false,
       items: [
         {
-          type: 'category',
-          label: 'Cloud',
+          type: "category",
+          label: "Cloud",
           items: [
             "guides/manage/cloud/overview",
             "guides/manage/cloud/start",
@@ -75,39 +72,38 @@ module.exports = {
             "guides/manage/cloud/billing",
             "guides/manage/cloud/users",
             "guides/manage/cloud/support",
-          ]
+          ],
         },
         {
-          type: 'category',
-          label: 'Self-Hosted',
+          type: "category",
+          label: "Self-Hosted",
           items: [
             "guides/manage/self-hosted/configure/configure",
             "guides/manage/self-hosted/proxy/proxy",
             "guides/manage/self-hosted/custom-domain",
             "guides/manage/self-hosted/http2",
             "guides/manage/self-hosted/tls_modes",
-          ]
+          ],
         },
         {
-          type: 'category',
-          label: 'Console',
+          type: "category",
+          label: "Console",
           items: [
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
             "guides/manage/console/applications",
-
-          ]
+          ],
         },
         {
-          type: 'category',
-          label: 'Customize',
+          type: "category",
+          label: "Customize",
           items: [
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
             "guides/manage/customize/user-metadata",
-          ]
-        }
+          ],
+        },
       ],
     },
     {
@@ -123,7 +119,7 @@ module.exports = {
         "guides/integrate/login-users",
         "guides/integrate/serviceusers",
         "guides/integrate/oauth-recommended-flows",
-        "guides/integrate/export-and-import"
+        "guides/integrate/export-and-import",
       ],
     },
     {
@@ -143,7 +139,7 @@ module.exports = {
       items: [
         "guides/trainings/introduction",
         "guides/trainings/application",
-        "guides/trainings/recurring"
+        "guides/trainings/recurring",
       ],
     },
   ],
@@ -187,7 +183,7 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-          "apis/actions"
+        "apis/actions",
       ],
     },
     {
@@ -220,10 +216,7 @@ module.exports = {
       type: "category",
       label: "Eventstore",
       collapsed: false,
-      items: [
-        "concepts/eventstore/overview",
-        "concepts/eventstore/zitadel",
-      ],
+      items: ["concepts/eventstore/overview", "concepts/eventstore/zitadel"],
     },
     "concepts/architecture",
     {
@@ -269,7 +262,11 @@ module.exports = {
       type: "category",
       label: "Service Description",
       collapsed: false,
-      items: ["legal/cloud-service-description", "legal/service-level-description", "legal/support-services"],
+      items: [
+        "legal/cloud-service-description",
+        "legal/service-level-description",
+        "legal/support-services",
+      ],
     },
     {
       type: "category",
