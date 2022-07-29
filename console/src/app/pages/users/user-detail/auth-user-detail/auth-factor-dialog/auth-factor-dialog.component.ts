@@ -20,6 +20,8 @@ export enum AuthFactorType {
 })
 export class AuthFactorDialogComponent {
   public otpurl: string = '';
+  public otpsecret: string = '';
+
   public otpcode: string = '';
 
   public u2fname: string = '';
@@ -29,6 +31,8 @@ export class AuthFactorDialogComponent {
 
   AuthFactorType: any = AuthFactorType;
   selectedType!: AuthFactorType;
+
+  public copied: string = '';
   constructor(
     private authService: GrpcAuthService,
     private toast: ToastService,
@@ -48,6 +52,7 @@ export class AuthFactorDialogComponent {
       this.authService.addMyMultiFactorOTP().then(
         (otpresp) => {
           this.otpurl = otpresp.url;
+          this.otpsecret = otpresp.secret;
         },
         (error) => {
           this.toast.showError(error);

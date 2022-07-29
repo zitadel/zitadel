@@ -75,9 +75,32 @@
           active: twilio?.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
           inactive: twilio?.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
         }"
-      ></span>
+        >{{ 'SETTING.SMS.SMSPROVIDERSTATE.' + twilio?.state | translate }}</span
+      >
 
       <span class="fill-space"></span>
+      <button
+        *ngIf="twilio && twilio.id"
+        [disabled]="(['iam.write'] | hasRole | async) === false"
+        mat-stroked-button
+        (click)="toggleSMSProviderState(twilio.id)"
+      >
+        <span *ngIf="twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE">{{
+          'ACTIONS.DEACTIVATE' | translate
+        }}</span>
+        <span *ngIf="twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE">{{
+          'ACTIONS.ACTIVATE' | translate
+        }}</span>
+      </button>
+      <button
+        *ngIf="twilio && twilio.id"
+        color="warn"
+        [disabled]="(['iam.write'] | hasRole | async) === false"
+        mat-icon-button
+        (click)="removeSMSProvider(twilio.id)"
+      >
+        <i class="las la-trash"></i>
+      </button>
       <button [disabled]="(['iam.write'] | hasRole | async) === false" mat-icon-button (click)="editSMSProvider()">
         <i class="las la-pen"></i>
       </button>

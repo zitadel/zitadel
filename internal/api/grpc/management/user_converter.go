@@ -142,9 +142,14 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 			IsPhoneVerified: req.Phone.IsPhoneVerified,
 		}
 	}
+
 	if req.Password != "" {
-		human.Password = &domain.Password{SecretString: req.Password}
+		human.Password = domain.NewPassword(req.Password)
 		human.Password.ChangeRequired = req.PasswordChangeRequired
+	}
+
+	if req.HashedPassword != nil && req.HashedPassword.Value != "" && req.HashedPassword.Algorithm != "" {
+		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value, req.HashedPassword.Algorithm)
 	}
 
 	return human, req.RequestPasswordlessRegistration

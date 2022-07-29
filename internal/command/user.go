@@ -339,36 +339,31 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 	}, changedUserGrant, nil
 }
 
-func (c *Commands) prepareUserDomainClaimed(userID string) preparation.Validation {
-	return func() (_ preparation.CreateCommands, err error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			userWriteModel, err := userWriteModelByID(ctx, filter, userID, "")
-			if err != nil {
-				return nil, err
-			}
-			if !userWriteModel.UserState.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
-			}
-			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
-			if err != nil {
-				return nil, err
-			}
-			userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
-
-			id, err := c.idGenerator.Next()
-			if err != nil {
-				return nil, err
-			}
-
-			return []eventstore.Command{user.NewDomainClaimedEvent(
-				ctx,
-				userAgg,
-				fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
-				userWriteModel.UserName,
-				domainPolicy.UserLoginMustBeDomain),
-			}, nil
-		}, nil
+func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparation.FilterToQueryReducer, userID string) (*user.DomainClaimedEvent, error) {
+	userWriteModel, err := userWriteModelByID(ctx, filter, userID, "")
+	if err != nil {
+		return nil, err
 	}
+	if !userWriteModel.UserState.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
+	}
+	domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
+
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return user.NewDomainClaimedEvent(
+		ctx,
+		userAgg,
+		fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
+		userWriteModel.UserName,
+		domainPolicy.UserLoginMustBeDomain), nil
 }
 
 func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {

@@ -27,7 +27,7 @@ func (s *Server) GetCustomDomainPolicy(ctx context.Context, req *admin_pb.GetCus
 }
 
 func (s *Server) AddCustomDomainPolicy(ctx context.Context, req *admin_pb.AddCustomDomainPolicyRequest) (*admin_pb.AddCustomDomainPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, req.ValidateOrgDomains, req.SmtpSenderAddressMatchesInstanceDomain))
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, DomainPolicyToDomain(req.UserLoginMustBeDomain, req.ValidateOrgDomains, req.SmtpSenderAddressMatchesInstanceDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -68,15 +68,15 @@ func (s *Server) UpdateCustomDomainPolicy(ctx context.Context, req *admin_pb.Upd
 	}, nil
 }
 
-func (s *Server) ResetCustomDomainPolicyTo(ctx context.Context, req *admin_pb.ResetCustomDomainPolicyToDefaultRequest) (*admin_pb.ResetCustomDomainPolicyToDefaultResponse, error) {
-	err := s.command.RemoveOrgDomainPolicy(ctx, req.OrgId)
+func (s *Server) ResetCustomDomainPolicyToDefault(ctx context.Context, req *admin_pb.ResetCustomDomainPolicyToDefaultRequest) (*admin_pb.ResetCustomDomainPolicyToDefaultResponse, error) {
+	details, err := s.command.RemoveOrgDomainPolicy(ctx, req.OrgId)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil //TOOD: return data
+	return &admin_pb.ResetCustomDomainPolicyToDefaultResponse{Details: object.DomainToChangeDetailsPb(details)}, nil
 }
 
-func domainPolicyToDomain(userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) *domain.DomainPolicy {
+func DomainPolicyToDomain(userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
 		UserLoginMustBeDomain:                  userLoginMustBeDomain,
 		ValidateOrgDomains:                     validateOrgDomains,
@@ -104,7 +104,7 @@ func updateCustomDomainPolicyToDomain(req *admin_pb.UpdateCustomDomainPolicyRequ
 }
 
 func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCustomOrgIAMPolicyRequest) (*admin_pb.AddCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain, true, true))
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, DomainPolicyToDomain(req.UserLoginMustBeDomain, true, true))
 	if err != nil {
 		return nil, err
 	}
@@ -159,6 +159,14 @@ func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCus
 		return nil, err
 	}
 	return &admin_pb.GetCustomOrgIAMPolicyResponse{Policy: policy_grpc.DomainPolicyToOrgIAMPb(policy)}, nil
+}
+
+func (s *Server) ResetCustomOrgIAMPolicyToDefault(ctx context.Context, req *admin_pb.ResetCustomOrgIAMPolicyToDefaultRequest) (*admin_pb.ResetCustomOrgIAMPolicyToDefaultResponse, error) {
+	details, err := s.command.RemoveOrgDomainPolicy(ctx, req.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomOrgIAMPolicyToDefaultResponse{Details: object.DomainToChangeDetailsPb(details)}, nil
 }
 
 func updateOrgIAMPolicyToDomain(req *admin_pb.UpdateOrgIAMPolicyRequest) *domain.DomainPolicy {

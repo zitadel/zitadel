@@ -1,0 +1,11 @@
+## Fronting ZITADEL Cloud
+
+You can use your reverseproxy, content delivery network (CDN) or web application firewall (WAF) to front ZITADEL Cloud.
+However we currently do not recommend this for production settings.
+
+To configure your service that fronts ZITADEL please have a look at the vendors in this page.
+
+## Things to look out for when fronting ZITADEL Cloud
+
+- Cache-control - ZITADEL Cloud uses a CDN to globally distribute data. Please try to avoid overriding this header as it may lead to sideeffects
+- Rate Limits - ZITADEL Cloud uses a combination of static and dynamic rate limits. If you recieve occasional 429 headers you are rate limited.

@@ -19,14 +19,14 @@ module.exports = {
     },
   ],
   themeConfig: {
-    zoomSelector: ".markdown :not(em) > img",
-    announcementBar: {
-      id: 'documentation',
-      content:
-        'This page contains the documentation for ZITADEL version 2, if you are looking for version 1 please visit <a target="_blank" rel="noopener noreferrer" href="https://docs-v1.zitadel.com">https://docs-v1.zitadel.com</a>',
-      backgroundColor: '#fafbfc',
-      textColor: '#091E42',
-      isCloseable: false,
+    zoom: {
+      selector: '.markdown :not(em) > img',
+      background: {
+        light: 'rgb(243, 244, 246)',
+        dark: 'rgb(55, 59, 82)'
+      },
+      // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
+      config: {}
     },
     navbar: {
       // title: 'ZITADEL',
@@ -44,8 +44,8 @@ module.exports = {
         },
         {
           type: "doc",
-          label: "Quickstarts",
-          docId: "quickstarts/introduction",
+          label: "Examples",
+          docId: "examples/introduction",
           position: "left",
         },
         {
@@ -76,6 +76,16 @@ module.exports = {
           href: "https://github.com/zitadel/zitadel",
           label: "GitHub",
           position: "right",
+        },
+        {
+          href: "https://zitadel.com/chat",
+          label: "Chat",
+          position: "right",
+        },
+        {
+          label: "Discussions",
+          position: "right",
+          href: "https://github.com/zitadel/zitadel/discussions",
         },
       ],
     },
@@ -161,7 +171,9 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/zitadel/zitadel/edit/v2-alpha/docs/",
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
+          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {
@@ -170,5 +182,5 @@ module.exports = {
       },
     ],
   ],
-  plugins: [require.resolve("plugin-image-zoom")],
+  plugins: [require.resolve("docusaurus-plugin-image-zoom")],
 };

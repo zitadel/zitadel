@@ -688,10 +688,11 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 }
 
 type testRepo struct {
-	events   []*repository.Event
-	sequence uint64
-	err      error
-	t        *testing.T
+	events    []*repository.Event
+	sequence  uint64
+	instances []string
+	err       error
+	t         *testing.T
 }
 
 func (repo *testRepo) Health(ctx context.Context) error {
@@ -733,6 +734,13 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 		return 0, repo.err
 	}
 	return repo.sequence, nil
+}
+
+func (repo *testRepo) InstanceIDs(ctx context.Context, queryFactory *repository.SearchQuery) ([]string, error) {
+	if repo.err != nil {
+		return nil, repo.err
+	}
+	return repo.instances, nil
 }
 
 func TestEventstore_Push(t *testing.T) {

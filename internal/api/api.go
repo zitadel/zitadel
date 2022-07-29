@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
@@ -17,6 +16,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -66,7 +66,6 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) erro
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
-	subRouter.Use(sentryhttp.New(sentryhttp.Options{}).Handle)
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
 }
 
@@ -132,6 +131,7 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
+	handler.Handle("/metrics", metricsExporter())
 
 	return handler
 }
@@ -174,4 +174,12 @@ func validate(ctx context.Context, validations []ValidationFunction) []error {
 		}
 	}
 	return errs
+}
+
+func metricsExporter() http.Handler {
+	exporter := metrics.GetExporter()
+	if exporter == nil {
+		return http.NotFoundHandler()
+	}
+	return exporter
 }
