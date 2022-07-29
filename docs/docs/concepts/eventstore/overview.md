@@ -2,9 +2,9 @@
 title: Overview
 ---
 
-ZITADEL is built on the [event sourcing pattern](../architecture), where changes are stored as events in an eventstore.
+ZITADEL is built on the [Event Sourcing pattern](../architecture/software), where changes are stored as events in an Event Store.
 
-## What is an eventstore?
+## What is an Event Store?
 
 Traditionally, data is stored in relations as a state
 
@@ -12,7 +12,7 @@ Traditionally, data is stored in relations as a state
 - If a relation changes, the requests need to change as well
 - That is valid for actual, as well as for historical data
 
-An Eventstore on the other hand stores events, meaning every change that happens to any piece of data relates to an event.
+An Event Store on the other hand stores events, meaning every change that happens to any piece of data relates to an event.
 The data is stored as events in an append-only log.
 
 - Think of it as a ledger that gets new entries over time, accumulative
@@ -28,7 +28,7 @@ The data is stored as events in an append-only log.
 
 ## Definitions
 
-Eventsourcing has some specific terms that are often used in our documentation. To understand how ZITADEL works it is important to understand this key definitions.
+Event Sourcing has some specific terms that are often used in our documentation. To understand how ZITADEL works it is important to understand this key definitions.
 
 ### Events
 
@@ -44,9 +44,9 @@ Possible Events:
 ### Aggregate
 
 An aggregate consist of multiple events. All events together from an aggregate will lead to the current state of the aggregate.
-The aggregate can be compared with an object or a resources. An aggregates should be used as transaction boundarie.
+The aggregate can be compared with an object or a resources. An aggregates should be used as transaction boundary.
 
 ### Projections
 
 Projections contain the computed objects, that will be used on the query side for all the requests.
-Think of this as a nomalized view of specific events of one or multiple aggregates.
+Think of this as a normalized view of specific events of one or multiple aggregates.

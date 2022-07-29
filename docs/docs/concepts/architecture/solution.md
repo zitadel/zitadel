@@ -2,7 +2,7 @@
 title: Deployment
 ---
 
-## High availability
+## High Availability
 
 ZITADEL can be run as high available system with ease. 
 Since the storage layer takes the heavy lifting of making sure that data in synched across, server, data centers or regions.
@@ -12,7 +12,7 @@ Consult the [CockroachDB documentation](https://www.cockroachlabs.com/docs/) for
 
 > Soon ZITADEL will also support Postgres as database.
 
-## Scaleability
+## Scalability
 
 ZITADEL can be scaled in a linear fashion in multiple dimensions.
 
@@ -20,8 +20,8 @@ ZITADEL can be scaled in a linear fashion in multiple dimensions.
 - Horizontal in a region
 - Horizontal in multiple regions
 
-Our customers can reuse the same already known binary or container and scale it across multiple server, datacenter and regions.
-To distribut traffic an already existing proxy infrastructure can be reused. 
+Our customers can reuse the same already known binary or container and scale it across multiple server, data center and regions.
+To distribute traffic an already existing proxy infrastructure can be reused. 
 Simply steer traffic by path, hostname, IP address or any other metadata to the ZITADEL of your choice.
 
 > To improve your service quality we recommend steering traffic by path to different ZITADEL deployments
@@ -35,7 +35,7 @@ A ZITADEL Cluster is a highly available IAM system with each component critical 
 As our storage layer (CockroachDB) relies on Raft, it is recommended to operate odd numbers of storage nodes to prevent "split brain" problems.
 Hence our reference design for Kubernetes is to have three application nodes and three storage nodes.
 
-> If you are using a serverless offering like Google Cloud Run you can scale ZTIADEL from 0 to 1000 Pods without the need of deploying the node across multiple availability zones.
+> If you are using a serverless offering like Google Cloud Run you can scale ZITADEL from 0 to 1000 Pods without the need of deploying the node across multiple availability zones.
 
 :::info
 CockroachDB needs to be configured with locality flags to proper distribute data over the zones
