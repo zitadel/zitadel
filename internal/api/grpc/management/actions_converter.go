@@ -9,7 +9,7 @@ import (
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func createActionRequestToDomain(req *mgmt_pb.CreateActionRequest) *domain.Action {
+func CreateActionRequestToDomain(req *mgmt_pb.CreateActionRequest) *domain.Action {
 	return &domain.Action{
 		Name:          req.Name,
 		Script:        req.Script,

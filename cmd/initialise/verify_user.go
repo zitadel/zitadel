@@ -33,7 +33,7 @@ The user provided by flags needs priviledge to
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.New())
 
-			err := initialise(config, VerifyUser(config.Database.Username, config.Database.Password))
+			err := initialise(config.Database, VerifyUser(config.Database.Username(), config.Database.Password()))
 			logging.OnError(err).Fatal("unable to init user")
 		},
 	}
