@@ -33,19 +33,19 @@ const features = [
               description=""
             />
             <ListElement
-              link="docs/guides/authentication/login-users"
+              link="docs/guides/manage/cloud/overview"
               type={ICONTYPE.LOGIN}
-              title="Authentication"
+              title="ZITADEL Cloud"
               description=""
             />
             <ListElement
-              link="docs/guides/authorization/oauth-recommended-flows"
+              link="docs/guides/integrate/login-users"
               type={ICONTYPE.LOGIN}
-              title="Authorization"
+              title="Login Users"
               description=""
             />
             <ListElement
-              link="docs/guides/api/access-zitadel-apis"
+              link="docs/guides/integrate/access-zitadel-apis"
               type={ICONTYPE.APIS}
               title="Access APIs"
               description=""
@@ -61,7 +61,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="docs/guides/customize/branding"
+              link="docs/guides/manage/customize/branding"
               type={ICONTYPE.PRIVATELABELING}
               title="Customization"
               description=""
@@ -69,7 +69,7 @@ const features = [
             <ListElement
               link="docs/guides/deploy/overview"
               type={ICONTYPE.SYSTEM}
-              title="Installation"
+              title="Deploy"
               description=""
             />
             <ListElement
