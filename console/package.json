@@ -20,7 +20,7 @@
     "@angular/forms": "^14.0.4",
     "@angular/material": "^14.0.4",
     "@angular/material-moment-adapter": "^14.0.4",
-    "@angular/platform-browser": "^14.0.4",
+    "@angular/platform-browser": "^14.1.0",
     "@angular/platform-browser-dynamic": "^14.0.4",
     "@angular/router": "^14.0.4",
     "@angular/service-worker": "^14.0.4",
