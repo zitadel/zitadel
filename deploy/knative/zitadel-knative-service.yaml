@@ -18,7 +18,7 @@ spec:
         - --masterkey
         - MasterkeyNeedsToHave32Characters
         env:
-        - name: ZITADEL_DATABASE_HOST
+        - name: ZITADEL_DATABASE_COCKROACH_HOST
           value: cockroachdb
         - name: ZITADEL_EXTERNALSECURE
           value: "false"
