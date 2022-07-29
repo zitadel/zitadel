@@ -7,7 +7,7 @@ spec:
   template:
     metadata:
       annotations:
-        client.knative.dev/user-image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.43-amd64
+        client.knative.dev/user-image: ghcr.io/zitadel/zitadel:v2.0.0-amd64
       creationTimestamp: null
     spec:
       containerConcurrency: 0
