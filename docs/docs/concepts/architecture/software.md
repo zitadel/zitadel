@@ -14,18 +14,18 @@ Each ZITADEL binary contains all components necessary to serve traffic
 From serving the API, rendering GUI's, background processing of events and task.
 This All in One (AiO) approach makes operating ZITADEL simple. 
 
-### Software Structure
+## Software Structure
 
 ZITADELs software architecture is built around multiple components at different levels.
 This chapter should give you an idea of the components as well as the different layers.
 
 ![Software Architecture](/img/zitadel_software_architecture.png)
 
-#### Service Layer
+### Service Layer
 
 The service layer includes all components who are potentially exposed to consumers of ZITADEL.
 
-##### HTTP Server
+#### HTTP Server
 
 The http server is responsible for the following functions:
 
@@ -33,7 +33,7 @@ The http server is responsible for the following functions:
 - serving the static assets
 - rendering server side html (login, password-reset, verification, ...)
 
-##### API Server
+#### API Server
 
 The API layer consist of the multiple APIs provided by ZITADEL. Each serves a dedicated purpose.
 All APIs of ZITADEL are always available as gRCP, gRPC-web and REST service. 
@@ -46,9 +46,9 @@ The only exception is the [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoi
 - [System API](/docs/apis/introduction#system) - allows to create and change new ZITADEL instances
 - [Asset API](/docs/apis/introduction#assets) - is used to upload and download static assets
 
-#### Core Layer
+### Core Layer
 
-##### Commands
+#### Commands
 
 The Command Side has some unique requirements, these include:
 
@@ -57,27 +57,27 @@ The Command Side has some unique requirements, these include:
 
 > When we classify this with the CAP theorem we would choose Consistent and Available but leave Partition Tolerance aside.
 
-**Command Handler**
+##### Command Handler
 
 The command handler receives all operations who alter a resource managed by ZITADEL.
 For example if a user changes his name. The API Layer will pass the instruction received through the API call to the command handler for further processing.
 The command handler is then responsible of creating the necessary commands.
 After creating the commands the command hand them down to the command validation.
 
-**Command Validation**
+##### Command Validation
 
 With the received commands the command validation will execute the business logic to verify if a certain action can take place.
 For example if the user really can change his name is verified in the command validation.
 If this succeeds the command validation will create the events that reflect the changes.
 These events now are being handed down to the storage layer for storage.
 
-##### Events
+#### Events
 
 ZITADEL handles events in two ways. 
 Events that should be processed in near real time are processed by a in memory pub sub system.
 Some events hand be handled in background processing for which the spooler is responsible.
 
-**Pub Sub**
+##### Pub Sub
 
 The pub sub system job is it to keep a query view up-to-date by feeding a constant stream of events to the projections.
 Our pub sub system built into ZITADEL works by placing events into an in memory queue for its subscribers.
@@ -91,7 +91,7 @@ In case of an error an event can be reapplied in two ways:
 > We believe that the toll of operating an additional external service like a MQ system negatively affects the ease of use of ZITADEL as well as its availability guarantees.
 > One of the authors of ZITADEL did his thesis to test this approach against established MQ systems.
 
-**Spooler**
+##### Spooler
 
 The spoolers job is it to keep a query view up-to-date or at least look that it does not have a too big lag behind the Event Store.
 Each query view has its own spooler who is responsible to look for the events who are relevant to generate the query view. It does this by triggering the relevant projection.
@@ -99,14 +99,14 @@ Spoolers are especially necessary where someone can query datasets instead of si
 
 > Each view can have exactly one spooler, but spoolers are dynamically leader elected, so even if a spooler crashes it will be replaced in a short amount of time.
 
-##### Projections
+#### Projections
 
 Projections are responsible of normalizing data for the query side or for analytical purpose.
 They generally work by being invoked either through a scheduled spooler or the pub sub subscription.
 
 When they receive events the will create there normalized object and then store this into the query view and its storage layer.
 
-##### Queries
+#### Queries
 
 The query side is responsible for answering read request on data.
 It has some unique requirements, which include:
@@ -118,7 +118,7 @@ It has some unique requirements, which include:
 
 > When we classify this with the CAP theorem we would choose **Available** and **Performance** but leave **Consistent** aside
 
-**Query Handler**
+##### Query Handler
 
 The query handler receives all read relevant operations. These can either be query or simple `getById` calls.
 When receiving a query it will proceed by passing this to the repository which will call the database and return the dataset.
@@ -127,12 +127,12 @@ This is achieved by triggering the projection to make sure that the last sequenc
 
 > The query side has the option to dynamically check the Event Store for newer events on a certain id to make sure for consistent responses without delay.
 
-**Query View**
+##### Query View
 
 The query view is responsible to query the storage layer with the request from the command handler.
 It is also responsible to execute authorization checks. To check if a request is valid and can be answered.
 
-#### Storage Layer
+### Storage Layer
 
 As ZITADEL itself is built completely stateless only the storage layer is needed for storing things.
 The storage layer of ZITADEL is responsible for multiple things. For example:
