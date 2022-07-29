@@ -67,5 +67,5 @@ If the setting is set to `Ensure Project Resource Owner Setting`, the private la
 The last possibility is to show the private labeling of the project organization and as soon as the user is identitfied the user organization settings will be triggered.
 For this the Allow User Resource Owner Setting should be set.
 :::note
-More about [Private Labeling](../../guides/customization/branding)
+More about [Private Labeling](../../guides/manage/customize/branding)
 :::

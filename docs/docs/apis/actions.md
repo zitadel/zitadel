@@ -11,7 +11,7 @@ Go to the [goja GitHub page](https://github.com/dop251/goja) for detailed refere
 
 Actions do not have access to any libraries yet.
 Also, sending HTTP requests is not supported yet.
-[We plan to add such features in the future](https://zitadel.ch/roadmap).
+[We plan to add such features in the future](https://zitadel.com/roadmap).
 
 ## Flows
 
@@ -35,7 +35,7 @@ function doSomething(ctx, api){
 ```
 
 ZITADEL supports only the external authentication flow at the moment.
-[More flows are coming soon](https://zitadel.ch/roadmap).
+[More flows are coming soon](https://zitadel.com/roadmap).
 
 ### External authentication flow triggers
 
@@ -103,4 +103,4 @@ ZITADEL supports only the external authentication flow at the moment.
 ## Further reading
 
 - [Actions concept](../concepts/features/actions)
-- [Actions guide](../guides/customization/behavior)
+- [Actions guide](../guides/manage/customize/behavior)

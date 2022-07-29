@@ -1,0 +1,34 @@
+---
+title: Linux
+---
+
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
+
+## Install CockroachDB
+
+Download a `cockroach` binary as described [in the CockroachDB docs](https://www.cockroachlabs.com/docs/v22.1/install-cockroachdb).
+ZITADEL is tested against CockroachDB v22.1.0 and Ubuntu 20.04.
+
+## Run CockroachDB
+
+```bash
+cockroach start-single-node --insecure --background --http-addr :9090 --listen-addr=localhost
+```
+
+## Install ZITADEL
+
+```bash
+curl -s https://api.github.com/repos/zitadel/zitadel/releases/tags/v2.0.0 | grep "browser_download_url.*zitadel_Linux_$(uname -m).tar.gz" | cut -d '"' -f 4 | xargs wget -qO - | sudo tar --extract --gzip --overwrite --directory /usr/local/bin zitadel && sudo chown $(id -u):$(id -g) /usr/local/bin/zitadel
+```
+
+## Run ZITADEL
+
+```bash
+ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+```
+
+<DefaultUser components={props.components} />
+<Next components={props.components} />
+<Disclaimer components={props.components} />
