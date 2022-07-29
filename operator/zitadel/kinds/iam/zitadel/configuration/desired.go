@@ -20,6 +20,7 @@ type Configuration struct {
 	ClusterDNS          string         `yaml:"clusterdns"`
 	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
 	Proxy               *Proxy         `yaml:"proxy,omitempty"`
+	OIDCLifetimes       *OIDCLifetimes `yaml:"oidcLifetimes,omitempty"`
 }
 
 func (c *Configuration) Validate() (err error) {
@@ -151,4 +152,11 @@ type Proxy struct {
 	HTTPS         *secret.Secret   `yaml:"https,omitempty"`
 	ExistingHTTP  *secret.Existing `yaml:"existingHTTP,omitempty"`
 	ExistingHTTPS *secret.Existing `yaml:"existingHTTPS,omitempty"`
+}
+
+type OIDCLifetimes struct {
+	AccessTokenLifetime        string `yaml:"accessTokenLifetime,omitempty"`
+	IdTokenLifeTime            string `yaml:"idTokenLifeTime,omitempty"`
+	RefreshTokenIdleExpiration string `yaml:"refreshTokenIdleExpiration,omitempty"`
+	RefreshTokenExpiration     string `yaml:"refreshTokenExpiration,omitempty"`
 }

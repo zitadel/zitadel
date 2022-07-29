@@ -129,6 +129,7 @@ func newStorage(config StorageConfig, command *command.Commands, query *query.Qu
 	if err != nil {
 		return nil, err
 	}
+	config = fillDefaultOIDCLifetimes(config)
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -159,4 +160,20 @@ func getSupportedLanguages() ([]language.Tag, error) {
 		return nil, err
 	}
 	return i18n.SupportedLanguages(statikLoginFS)
+}
+
+func fillDefaultOIDCLifetimes(config StorageConfig) StorageConfig {
+	if config.DefaultAccessTokenLifetime.Duration == 0 {
+		config.DefaultAccessTokenLifetime.Duration = 12 * time.Hour
+	}
+	if config.DefaultIdTokenLifetime.Duration == 0 {
+		config.DefaultIdTokenLifetime.Duration = 12 * time.Hour
+	}
+	if config.DefaultRefreshTokenIdleExpiration.Duration == 0 {
+		config.DefaultRefreshTokenIdleExpiration.Duration = 720 * time.Hour //30d
+	}
+	if config.DefaultRefreshTokenExpiration.Duration == 0 {
+		config.DefaultRefreshTokenExpiration.Duration = 2160 * time.Hour //90d
+	}
+	return config
 }
