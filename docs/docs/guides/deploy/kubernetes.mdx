@@ -25,7 +25,7 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalDomain="localhost" \
   --set zitadel.configmapConfig.ExternalSecure=false \
-  --set zitadel.secretConfig.Database.User.Password="a-zitadel-db-user-password"
+  --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
   --set replicaCount=1 \
   --set cockroachdb.single-node=true \
   --set cockroachdb.statefulset.replicas=1
