@@ -165,7 +165,7 @@ func TestAddMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, (&Commands{zitadelRoles: tt.args.zitadelRoles}).AddOrgMemberCommand(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), (&Commands{zitadelRoles: tt.args.zitadelRoles}).AddOrgMemberCommand(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
 		})
 	}
 }

@@ -87,17 +87,7 @@ const authConfig: AuthConfig = {
     CommonModule,
     BrowserModule,
     HeaderModule,
-    OAuthModule.forRoot({
-      resourceServer: {
-        allowedUrls: [
-          'https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService',
-          'https://test.api.zitadel.caos.ch/oauth/v2/userinfo',
-          'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/',
-          'https://preview.api.zitadel.caos.ch',
-        ],
-        sendAccessToken: true,
-      },
-    }),
+    OAuthModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

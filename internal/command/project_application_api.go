@@ -70,21 +70,70 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp, clientSecretAlg crypto.HashA
 	}
 }
 
-func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
-	if application == nil || application.AggregateID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
-	}
-	project, err := c.getProjectByID(ctx, application.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
-	}
-	addedApplication := NewAPIApplicationWriteModel(application.AggregateID, resourceOwner)
-	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	events, stringPw, err := c.addAPIApplication(ctx, projectAgg, project, application, resourceOwner, appSecretGenerator)
+func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner, appID string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
+	existingAPI, err := c.getAPIAppWriteModel(ctx, apiApp.AggregateID, appID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	addedApplication.AppID = application.AppID
+	if existingAPI.State != domain.AppStateUnspecified {
+		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Application.AlreadyExisting")
+	}
+	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "PROJECT-9fnsa", "Errors.Project.NotFound")
+	}
+
+	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, project, appID, appSecretGenerator)
+}
+
+func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
+	if apiApp == nil || apiApp.AggregateID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
+	}
+	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
+	}
+
+	if !apiApp.IsValid() {
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
+	}
+
+	appID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, project, appID, appSecretGenerator)
+}
+
+func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, project *domain.Project, appID string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
+	apiApp.AppID = appID
+
+	addedApplication := NewAPIApplicationWriteModel(apiApp.AggregateID, resourceOwner)
+	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
+
+	events := []eventstore.Command{
+		project_repo.NewApplicationAddedEvent(ctx, projectAgg, apiApp.AppID, apiApp.AppName),
+	}
+
+	var stringPw string
+	err = domain.SetNewClientID(apiApp, c.idGenerator, project)
+	if err != nil {
+		return nil, err
+	}
+	stringPw, err = domain.SetNewClientSecretIfNeeded(apiApp, appSecretGenerator)
+	if err != nil {
+		return nil, err
+	}
+	events = append(events, project_repo.NewAPIConfigAddedEvent(ctx,
+		projectAgg,
+		apiApp.AppID,
+		apiApp.ClientID,
+		apiApp.ClientSecret,
+		apiApp.AuthMethodType))
+
+	addedApplication.AppID = apiApp.AppID
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
@@ -96,38 +145,6 @@ func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.AP
 	result := apiWriteModelToAPIConfig(addedApplication)
 	result.ClientSecretString = stringPw
 	return result, nil
-}
-
-func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (events []eventstore.Command, stringPW string, err error) {
-	if !apiAppApp.IsValid() {
-		return nil, "", errors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
-	}
-	apiAppApp.AppID, err = c.idGenerator.Next()
-	if err != nil {
-		return nil, "", err
-	}
-
-	events = []eventstore.Command{
-		project_repo.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName),
-	}
-
-	var stringPw string
-	err = domain.SetNewClientID(apiAppApp, c.idGenerator, proj)
-	if err != nil {
-		return nil, "", err
-	}
-	stringPw, err = domain.SetNewClientSecretIfNeeded(apiAppApp, appSecretGenerator)
-	if err != nil {
-		return nil, "", err
-	}
-	events = append(events, project_repo.NewAPIConfigAddedEvent(ctx,
-		projectAgg,
-		apiAppApp.AppID,
-		apiAppApp.ClientID,
-		apiAppApp.ClientSecret,
-		apiAppApp.AuthMethodType))
-
-	return events, stringPw, nil
 }
 
 func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {

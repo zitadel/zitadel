@@ -25,7 +25,7 @@ You should consider to implement [exponential backoff](https://en.wikipedia.org/
 
 ### Login, Register, Reset Limits
 
-For the rate limits of the Login, Register and Reset features please visit [Login Rate Limits](/docs/apis/ratelimits/accounts)
+For the rate limits of the Login, Register and Reset features please visit [Login Rate Limits](/docs/apis/ratelimits/login)
 
 ### API Rate Limits
 
