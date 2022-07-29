@@ -34,7 +34,7 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
 ### Forward the ZITADEL service port to your local machine
 
 ```bash
-kubectl port-forward svc/my-zitadel 8080:80
+kubectl -n zitadel port-forward svc/my-zitadel 8080:8080
 ```
 
 <DefaultUser components={props.components} />
