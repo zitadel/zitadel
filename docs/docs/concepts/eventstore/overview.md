@@ -43,9 +43,10 @@ Possible Events:
 
 ### Aggregate
 
-An aggregate consist of multiple events. All events together in will lead to the current state of the aggregate.
-The aggregate can be compared with an object or a resources. Aggregates define transaction boundaries.
+An aggregate consist of multiple events. All events together from an aggregate will lead to the current state of the aggregate.
+The aggregate can be compared with an object or a resources. An aggregates should be used as transaction boundarie.
 
 ### Projections
 
 Projections contain the computed objects, that will be used on the query side for all the requests.
+Think of this as a nomalized view of specific events of one or multiple aggregates.
