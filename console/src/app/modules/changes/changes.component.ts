@@ -19,6 +19,7 @@ export enum ChangeType {
   USER = 'user',
   ORG = 'org',
   PROJECT = 'project',
+  PROJECT_GRANT= 'project-grant',
   APP = 'app',
 }
 
@@ -93,6 +94,9 @@ export class ChangesComponent implements OnInit, OnDestroy {
       case ChangeType.PROJECT:
         first = this.mgmtUserService.listProjectChanges(this.id, 30, 0);
         break;
+      case ChangeType.PROJECT_GRANT:
+        first = this.mgmtUserService.listProjectGrantChanges(this.id, this.secId, 30, 0);
+        break;
       case ChangeType.ORG:
         first = this.mgmtUserService.listOrgChanges(30, 0);
         break;
@@ -125,6 +129,9 @@ export class ChangesComponent implements OnInit, OnDestroy {
         break;
       case ChangeType.PROJECT:
         more = this.mgmtUserService.listProjectChanges(this.id, 20, cursor);
+        break;
+      case ChangeType.PROJECT_GRANT:
+        more = this.mgmtUserService.listProjectGrantChanges(this.id, this.secId, 20, cursor);
         break;
       case ChangeType.ORG:
         more = this.mgmtUserService.listOrgChanges(20, cursor);

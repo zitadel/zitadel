@@ -95,7 +95,7 @@ func VerifyZitadel(db *sql.DB) error {
 
 func verifyZitadel(config database.Config) error {
 	logging.WithFields("database", config.Database).Info("verify zitadel")
-	db, err := database.Connect(config)
+	db, err := database.Connect(config, false)
 	if err != nil {
 		return err
 	}

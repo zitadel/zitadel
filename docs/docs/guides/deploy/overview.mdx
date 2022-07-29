@@ -1,0 +1,19 @@
+---
+title: Overview
+---
+
+Choose your platform and run ZITADEL with the most minimal configuration possible.
+For an easy self-hosted production setup, we recommend running ZITADEL on [Kubernetes](https://kubernetes.io/docs/home/), using our official [Helm](https://helm.sh/docs/) chart.
+By default, it runs a highly available ZITADEL instance along with a secure and highly available [CockroachDB](https://www.cockroachlabs.com/docs/stable/) instance.
+
+- [Linux](./linux)
+- [MacOS](./macos)
+- [Docker Compose](./compose)
+- [Knative](./knative)
+- [Kubernetes](./kubernetes)
+
+## Prerequisits
+
+- ZITADEL does not need much resource 1 CPU and 512MB memory is more than enough. (With more CPU the password hashing might be faster)
+- A cockroachDB or [🚧 Postgresql coming soon](https://github.com/zitadel/zitadel/pull/3998) as only needed storage
+- If you want to front ZTIADEL with a revers proxy, web application firewall or content delivery network make sure to support [HTTP/2](../manage/self-hosted/http2)
