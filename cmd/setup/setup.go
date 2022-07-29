@@ -56,7 +56,7 @@ func Flags(cmd *cobra.Command) {
 func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.Info("setup started")
 
-	dbClient, err := database.Connect(config.Database)
+	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	eventstoreClient, err := eventstore.Start(dbClient)

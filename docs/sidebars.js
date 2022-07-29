@@ -123,6 +123,7 @@ module.exports = {
         "guides/integrate/login-users",
         "guides/integrate/serviceusers",
         "guides/integrate/oauth-recommended-flows",
+        "guides/integrate/export-and-import"
       ],
     },
     {

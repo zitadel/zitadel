@@ -34,7 +34,7 @@ func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsReques
 }
 
 func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRequest) (*mgmt_pb.AddOrgOIDCIDPResponse, error) {
-	config, err := s.command.AddIDPConfig(ctx, addOIDCIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.AddIDPConfig(ctx, AddOIDCIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRe
 }
 
 func (s *Server) AddOrgJWTIDP(ctx context.Context, req *mgmt_pb.AddOrgJWTIDPRequest) (*mgmt_pb.AddOrgJWTIDPResponse, error) {
-	config, err := s.command.AddIDPConfig(ctx, addJWTIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.AddIDPConfig(ctx, AddJWTIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

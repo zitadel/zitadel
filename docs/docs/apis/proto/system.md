@@ -150,8 +150,8 @@ they represent the delta of the event happend on the objects
 [ClearViewResponse](#clearviewresponse)
 
 Truncates the delta of the change stream
-be carefull with this function because ZITADEL has to 
-recompute the deltas after they got cleared. 
+be carefull with this function because ZITADEL has to
+recompute the deltas after they got cleared.
 Search requests will return wrong results until all deltas are recomputed
 
 
@@ -165,7 +165,7 @@ Search requests will return wrong results until all deltas are recomputed
 [ListFailedEventsResponse](#listfailedeventsresponse)
 
 Returns event descriptions which cannot be processed.
-It's possible that some events need some retries. 
+It's possible that some events need some retries.
 For example if the SMTP-API wasn't able to send an email at the first time
 
 
@@ -180,7 +180,7 @@ For example if the SMTP-API wasn't able to send an email at the first time
 
 Deletes the event from failed events view.
 the event is not removed from the change stream
-This call is usefull if the system was able to process the event later. 
+This call is usefull if the system was able to process the event later.
 e.g. if the second try of sending an email was successful. the first try produced a
 failed event. You can find out if it worked on the `failure_count`
 

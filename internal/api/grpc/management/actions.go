@@ -35,7 +35,7 @@ func (s *Server) GetAction(ctx context.Context, req *mgmt_pb.GetActionRequest) (
 }
 
 func (s *Server) CreateAction(ctx context.Context, req *mgmt_pb.CreateActionRequest) (*mgmt_pb.CreateActionResponse, error) {
-	id, details, err := s.command.AddAction(ctx, createActionRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	id, details, err := s.command.AddAction(ctx, CreateActionRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

@@ -77,35 +77,6 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			},
 		},
 		{
-			name: "org policy global, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								false,
-								true,
-								true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
-					Username: "username",
-					Name:     "name",
-				},
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
 			name: "add machine, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(

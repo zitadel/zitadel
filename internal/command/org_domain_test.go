@@ -178,7 +178,7 @@ func TestVerifyDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, context.Background(), VerifyOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
+			AssertValidation(t, context.Background(), verifyOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
 		})
 	}
 }
@@ -273,7 +273,7 @@ func TestSetDomainPrimary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, context.Background(), SetPrimaryOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), setPrimaryOrgDomain(tt.args.a, tt.args.domain), tt.args.filter, tt.want)
 		})
 	}
 }
