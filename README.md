@@ -46,15 +46,15 @@ With ZITADEL you rely on a battle tested, hardened and extensible turnkey soluti
 The easiest way to get started with ZITADEL is to use our public cloud offering.
 Currently ZITADEL V2 Beta is available, head over to [https://zitadel.cloud](https://zitadel.cloud) and create your first ZITADEL instance for free.
 
-You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing/v2).
+You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
 
 ### Install ZITADEL
 
-- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/installation)
+- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
 ### Quickstarts - Integrate your app
 
-- [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/quickstarts/introduction)
+- [Multiple Quickstarts can be found here](hhttps://docs.zitadel.com/docs/guides/start/quickstart)
 - [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
 
 > If you miss something please feel free to engage with us [here](https://github.com/zitadel/zitadel/discussions/1717)
@@ -62,9 +62,9 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing/v2
 ## Why ZITADEL
 
 - [API-first](https://docs.zitadel.com/docs/apis/introduction)
-- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore)
+- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview)
 - [Actions](https://docs.zitadel.ch/docs/concepts/features/actions) to react on events with custom code
-- [Branding](https://docs.zitadel.com/docs/guides/customization/branding) for a uniform user experience
+- [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience
 - [CockroachDB](https://www.cockroachlabs.com/) is the only dependency
 
 ## Features
@@ -73,16 +73,17 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing/v2
 - Passwordless with FIDO2 support
 - Username / Password
 - Multifactor authentication with OTP, U2F
-- [Identity Brokering](https://docs.zitadel.com/docs/guides/authentication/identity-brokering)
-- [Machine-to-machine (JWT profile)](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
+- [Identity Brokering](https://docs.zitadel.com/docs/guides/integrate/identity-brokering)
+- [Machine-to-machine (JWT profile)](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
 - Personal Access Tokens (PAT)
 - Role Based Access Control (RBAC)
-- [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/basics/projects#what-is-a-granted-project)
+- [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/manage/console/projects)
 - Self-registration including verification
 - User self service
-- [Service Accounts](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
+- [Service Accounts](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
 - [OpenID Connect certified](https://openid.net/certification/#OPs)
 - 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
+- 🚧 [Postgres](https://github.com/zitadel/zitadel/pull/3998)
 
 ## Client libraries
 
@@ -125,7 +126,7 @@ Use our login widget to allow easy and secure access to your applications and en
 - works on all modern platforms, devices, and browsers
 - phishing resistant alternative
 - requires only one gesture by the user
-- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-factors) of the device during registration
+- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-profile) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 
