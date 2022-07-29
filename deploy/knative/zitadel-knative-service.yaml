@@ -28,9 +28,7 @@ spec:
           value: 80
         - name: ZITADEL_EXTERNALDOMAIN
           value: zitadel.default.127.0.0.1.sslip.io
-        - name: ZITADEL_S3DEFAULTINSTANCE_CUSTOMDOMAIN
-          value: zitadel.default.127.0.0.1.sslip.io
-        image: ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.43-amd64
+        image: ghcr.io/zitadel/zitadel:v2.0.0-amd64
         name: user-container
         ports:
         - containerPort: 8080
