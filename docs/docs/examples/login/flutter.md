@@ -268,7 +268,7 @@ Future<void> _authenticate() async {
     );
 
     final userInfoResponse = await get(
-      Uri.parse('https://[your-instance].zitadel.cloud/oidc/v2/userinfo'),
+      Uri.parse('https://[your-instance].zitadel.cloud/oidc/v1/userinfo'),
       headers: {
         HttpHeaders.authorizationHeader: 'Bearer ${result.accessToken}',
         HttpHeaders.acceptHeader: 'application/json; charset=UTF-8'

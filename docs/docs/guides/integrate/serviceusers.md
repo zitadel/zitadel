@@ -149,7 +149,7 @@ For this example let's call the userinfo endpoint to verfiy that our access toke
 
 ```bash
 curl --request POST \
-  --url https://{your_domain}.zitadel.cloud/oidc/v2/userinfo \
+  --url https://{your_domain}.zitadel.cloud/oidc/v1/userinfo \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
