@@ -1,7 +1,6 @@
 name: "CYPRESS e2e"
 
 on:
-on:
   push:
     branches:
       - "isolate-cypress"
