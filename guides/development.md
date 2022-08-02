@@ -21,15 +21,12 @@ If you get the error `Failed to fetch https://repo.goreleaser.com/apt/Packages  
 sudo apt install ca-certificates
 ```
 
-### env variables
-
-You can use the default vars provided in [this .env-file](../build/local/local.env) or create your own and update the paths in the [docker compose file](../build/local/docker-compose-local.yml).
-
 ## Local Build
 
 Simply run goreleaser to build locally. This will generate all the required files, such as angular and grpc automatically.
 
 ```sh
+export DOCKER_BUILDKIT=1
 goreleaser build --snapshot --rm-dist --single-target
 ```
 
