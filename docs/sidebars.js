@@ -119,6 +119,7 @@ module.exports = {
         "guides/integrate/access-zitadel-apis",
         "guides/integrate/authenticated-mongodb-charts",
         "guides/integrate/auth0",
+        "guides/integrate/azuread",
         "guides/integrate/gitlab-self-hosted",
         "guides/integrate/login-users",
         "guides/integrate/serviceusers",
