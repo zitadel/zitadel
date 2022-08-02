@@ -97,7 +97,7 @@ ZITADEL will show a set of identity providers by default. This configuration can
 
 An organization's login settings will be shown 
 
-- as soon as the user has entered the loginname and ZITADEL can identitfy to which organization he belongs; or
+- as soon as the user has entered the loginname and ZITADEL can identify to which organization he belongs; or
 - by sending a primary domain scope.
 To get your own configuration you will have to send the [primary domain scope](../../apis/openidoauth/scopes#reserved-scopes) in your [authorization request](../../guides/integrate/login-users#auth-request) .
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login, also your branding and policies will trigger.
