@@ -37,6 +37,7 @@ type registerData struct {
 	HasNumber                 string
 	HasSymbol                 string
 	ShowUsername              bool
+	ShowUsernameSuffix        bool
 	OrgRegister               bool
 }
 
@@ -148,6 +149,13 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 	data.ShowUsername = orgIAMPolicy.UserLoginMustBeDomain
 	data.OrgRegister = orgIAMPolicy.UserLoginMustBeDomain
+
+	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, formData, err)
+		return
+	}
+	data.ShowUsernameSuffix = !labelPolicy.HideLoginNameSuffix
 
 	funcs := map[string]interface{}{
 		"selectedLanguage": func(l string) bool {

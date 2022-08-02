@@ -18,6 +18,7 @@ import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { FilterUserModule } from 'src/app/modules/filter-user/filter-user.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { NavToggleModule } from 'src/app/modules/nav-toggle/nav-toggle.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
@@ -49,6 +50,7 @@ import { UserTableComponent } from './user-table/user-table.component';
     TranslateModule,
     FilterUserModule,
     RouterModule,
+    NavToggleModule,
     RefreshTableModule,
     TableActionsModule,
     ActionKeysModule,
