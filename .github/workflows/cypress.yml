@@ -11,14 +11,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
-    defaults:
-      run:
-        working-directory: ./e2e
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Build the docker-compose stack
         run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
+        working-directory: ./e2e
       - name: Archive production tests
         if: always()
         uses: actions/upload-artifact@v2
