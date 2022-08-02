@@ -37,8 +37,8 @@ done
 }
 
 
-#install missing packages manually
-#npm install debug jsonwebtoken mochawesome typescript cypress-terminal-report
+#install missing packages manually to ensure everything is ready
+npm install debug jsonwebtoken mochawesome typescript cypress-terminal-report
 
 zitadel-health-check
 
