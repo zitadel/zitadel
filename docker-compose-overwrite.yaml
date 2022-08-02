@@ -1,6 +1,6 @@
 services:
   zitadel:
-    image: 'zitadel-base:local'
+    image: 'ghcr.io/zitadel/zitadel:v2.0.0-amd64'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
       # TODO: ugly
