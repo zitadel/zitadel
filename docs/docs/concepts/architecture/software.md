@@ -104,11 +104,11 @@ Spoolers are especially necessary where someone can query datasets instead of si
 Projections are responsible of normalizing data for the query side or for analytical purpose.
 They generally work by being invoked either through a scheduled spooler or the pub sub subscription.
 
-When they receive events the will create there normalized object and then store this into the query view and its storage layer.
+When they receive events they will create their normalized object and then store this into the query view and its storage layer.
 
 #### Queries
 
-The query side is responsible for answering read request on data.
+The query side is responsible for answering read requests on data.
 It has some unique requirements, which include:
 
 - It needs to be easy to query
