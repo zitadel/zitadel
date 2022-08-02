@@ -23,9 +23,9 @@ helm repo add zitadel https://charts.zitadel.com
 ```bash
 helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
-  --set zitadel.configmapConfig.ExternalDomain="localhost" \
   --set zitadel.configmapConfig.ExternalSecure=false \
-  --set zitadel.secretConfig.Database.User.Password="a-zitadel-db-user-password"
+  --set zitadel.configmapConfig.TLS.Enabled=false \
+  --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
   --set replicaCount=1 \
   --set cockroachdb.single-node=true \
   --set cockroachdb.statefulset.replicas=1
@@ -34,7 +34,7 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
 ### Forward the ZITADEL service port to your local machine
 
 ```bash
-kubectl port-forward svc/my-zitadel 8080:80
+kubectl -n zitadel port-forward svc/my-zitadel 8080:8080
 ```
 
 <DefaultUser components={props.components} />
