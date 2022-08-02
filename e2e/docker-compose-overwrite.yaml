@@ -24,7 +24,7 @@ services:
         condition: service_healthy
 
   e2e:
-    image: cypress/included:10.3.1
+    image: cypress/included:10.4.0
     container_name: cypress
     depends_on:
     -  zitadel
