@@ -51,6 +51,7 @@ type externalNotFoundOptionData struct {
 	ExternalIDPUserID          string
 	ExternalIDPUserDisplayName string
 	ShowUsername               bool
+	ShowUsernameSuffix         bool
 	OrgRegister                bool
 	ExternalEmail              string
 	ExternalEmailVerified      bool
@@ -274,6 +275,19 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		human, externalIDP, _ = l.mapExternalUserToLoginUser(orgIAMPolicy, linkingUser, idpConfig)
 	}
 
+	var resourceOwner string
+	if authReq != nil {
+		resourceOwner = authReq.RequestedOrgID
+	}
+	if resourceOwner == "" {
+		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
+	}
+	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+
 	data := externalNotFoundOptionData{
 		baseData: l.getBaseData(r, authReq, "ExternalNotFoundOption", errID, errMessage),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
@@ -292,6 +306,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		ExternalEmail:              human.EmailAddress,
 		ExternalEmailVerified:      human.IsEmailVerified,
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
+		ShowUsernameSuffix:         !labelPolicy.HideLoginNameSuffix,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
 	}
 	if human.Phone != nil {
