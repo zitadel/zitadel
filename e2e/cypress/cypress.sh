@@ -38,7 +38,7 @@ done
 
 
 #install missing packages manually
-npm install debug jsonwebtoken mochawesome typesript
+npm install debug jsonwebtoken mochawesome typescript
 
 zitadel-health-check
 
