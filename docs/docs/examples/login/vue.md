@@ -2,7 +2,7 @@
 title: Vue
 ---
 
-This is our Zitadel [Vue.js](https://vuejs.org/) template. It shows how to authenticate as a user and show user information.
+This is our ZITADEL [Vue.js](https://vuejs.org/) template. It shows how to authenticate as a user and show user information.
 
 ![Vue Screenshot](/img/vue/app-screen.png)
 
