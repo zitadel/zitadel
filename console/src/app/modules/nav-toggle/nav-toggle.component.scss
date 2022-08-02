@@ -1,0 +1,71 @@
+@use '@angular/material' as mat;
+
+@mixin nav-toggle-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 14px;
+    padding: 0.4rem 12px;
+    color: mat.get-color-from-palette($foreground, text) !important;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border-radius: 50vw;
+    border: none;
+    font-weight: 400;
+    margin: 0.25rem 2px;
+    white-space: nowrap;
+    position: relative;
+    background: none;
+    cursor: pointer;
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    .c_label {
+      display: flex;
+      align-items: center;
+      text-align: center;
+
+      .count {
+        display: none;
+        margin-left: 6px;
+      }
+    }
+
+    &.external-link {
+      padding-right: 2rem;
+
+      i {
+        position: absolute;
+        right: 8px;
+        font-size: 1.2rem;
+      }
+    }
+
+    &:hover {
+      background: if($is-dark-theme, #ffffff40, #00000010);
+    }
+
+    &.active {
+      background-color: $primary-color;
+      color: mat.get-color-from-palette($foreground, toolbar-items) !important;
+
+      .c_label {
+        .count {
+          display: inline-block;
+        }
+      }
+    }
+  }
+}

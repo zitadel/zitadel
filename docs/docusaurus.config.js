@@ -28,14 +28,6 @@ module.exports = {
       // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
       config: {}
     },
-    announcementBar: {
-      id: 'documentation',
-      content:
-        'This page contains the documentation for ZITADEL version 2, if you are looking for version 1 please visit <a target="_blank" rel="noopener noreferrer" href="https://docs-v1.zitadel.com">https://docs-v1.zitadel.com</a>',
-      backgroundColor: '#fafbfc',
-      textColor: '#091E42',
-      isCloseable: false,
-    },
     navbar: {
       // title: 'ZITADEL',
       logo: {
@@ -52,8 +44,8 @@ module.exports = {
         },
         {
           type: "doc",
-          label: "Quickstarts",
-          docId: "quickstarts/introduction",
+          label: "Examples",
+          docId: "examples/introduction",
           position: "left",
         },
         {
@@ -179,7 +171,9 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/zitadel/zitadel/edit/v2-alpha/docs/",
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
+          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {

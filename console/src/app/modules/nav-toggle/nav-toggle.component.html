@@ -1,0 +1,6 @@
+<button class="nav-toggle" [ngClass]="{active}" (click)="clicked.emit()">
+  <div class="c_label">
+    <span> {{ label }} </span>
+    <small *ngIf="count" class="count">({{ count }})</small>
+  </div>
+</button>

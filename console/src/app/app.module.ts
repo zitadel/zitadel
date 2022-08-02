@@ -15,6 +15,9 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
+import { AuthGuard } from 'src/app/guards/auth.guard';
+import { RoleGuard } from 'src/app/guards/role.guard';
+import { UserGuard } from 'src/app/guards/user.guard';
 import { InfoOverlayModule } from 'src/app/modules/info-overlay/info-overlay.module';
 import { AssetService } from 'src/app/services/asset.service';
 
@@ -84,17 +87,7 @@ const authConfig: AuthConfig = {
     CommonModule,
     BrowserModule,
     HeaderModule,
-    OAuthModule.forRoot({
-      resourceServer: {
-        allowedUrls: [
-          'https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService',
-          'https://test.api.zitadel.caos.ch/oauth/v2/userinfo',
-          'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/',
-          'https://preview.api.zitadel.caos.ch',
-        ],
-        sendAccessToken: true,
-      },
-    }),
+    OAuthModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -120,6 +113,9 @@ const authConfig: AuthConfig = {
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [
+    AuthGuard,
+    RoleGuard,
+    UserGuard,
     ThemeService,
     {
       provide: APP_INITIALIZER,

@@ -77,6 +77,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
+			database.DecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")
