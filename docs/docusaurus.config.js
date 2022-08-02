@@ -144,6 +144,10 @@ module.exports = {
             {
               label: "GitHub",
               href: "https://github.com/zitadel",
+            },
+            {
+              label: "Status",
+              href: "https://status.zitadel.com/",
             }
           ],
         },
