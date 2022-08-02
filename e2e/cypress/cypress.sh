@@ -36,10 +36,9 @@ until [ $i -gt 10 ]; do
 done
 }
 
-echo "debug"
-ls -la 
 
-
+#install missing packages manually
+npm install debug jsonwebtoken mochawesome typesript
 
 zitadel-health-check
 
