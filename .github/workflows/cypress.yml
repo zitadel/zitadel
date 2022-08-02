@@ -25,7 +25,7 @@ jobs:
         with:
           name: production-tests
           path: |
-            cypress/results
-            cypress/videos
-            cypress/screenshots
+            e2e/cypress/results
+            e2e/cypress/videos
+            e2e/cypress/screenshots
           retention-days: 30
