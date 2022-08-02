@@ -1,0 +1,62 @@
+{
+  "name": "tcomb",
+  "version": "3.2.29",
+  "description": "Type checking and DDD for JavaScript",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "files": [
+    "index.js",
+    "lib",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "lint": "eslint index.js lib test",
+    "test": "npm run lint && mocha && npm run typescript",
+    "typescript": "tsc --noEmit tcomb-tests.ts",
+    "dist": "webpack",
+    "perf": "node ./perf/perf"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gcanti/tcomb.git"
+  },
+  "author": "Giulio Canti <giulio.canti@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gcanti/tcomb/issues"
+  },
+  "homepage": "https://github.com/gcanti/tcomb",
+  "devDependencies": {
+    "benchmark": "2.1.0",
+    "eslint": "1.10.3",
+    "mocha": "2.3.4",
+    "typescript": "3.1.6",
+    "webpack": "1.12.14"
+  },
+  "tags": [
+    "type",
+    "combinators",
+    "checking",
+    "safety",
+    "model",
+    "domain",
+    "debugging",
+    "immutable",
+    "DDD",
+    "JSON",
+    "store"
+  ],
+  "keywords": [
+    "type",
+    "combinators",
+    "checking",
+    "safety",
+    "model",
+    "domain",
+    "debugging",
+    "immutable",
+    "DDD",
+    "JSON",
+    "store"
+  ]
+}
