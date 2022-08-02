@@ -1,0 +1,33 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine. 
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+jobs:
+  # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
+  test:  
+    # These next lines define a Docker executor: https://circleci.com/docs/2.0/executor-types/
+    # You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/node
+    docker:
+      - image: cypress/base:12
+    parallelism: 2
+    # Then run your tests!
+    # CircleCI will report the results back to your VCS provider.
+    steps:
+      # Checkout the code as the first step.
+      - checkout
+      - run:
+          name: Install
+          command: npm install --only prod && cd test && npm ci
+      - run:
+          name: Test
+          command: cd test && npm run test-ci
+
+workflows:
+  # Below is the definition of your workflow.
+  # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
+  # CircleCI will run this workflow on every commit.
+  # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  sample: 
+    jobs:
+      - test
