@@ -1,2 +1,1 @@
-#!/usr/bin/env node
-require('../lib/tsc.js')
+../typescript/bin/tsc
