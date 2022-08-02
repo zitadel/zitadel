@@ -11,11 +11,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./e2e
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Build the docker-compose stack
-        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
+        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
       - name: Archive production tests
         if: always()
         uses: actions/upload-artifact@v2
@@ -26,10 +29,3 @@ jobs:
             cypress/cypress/videos
             cypress/cypress/screenshots
           retention-days: 30
-#      - name: Google Chat Notification
-#        uses: Co-qn/google-chat-notification@releases/v1
-#        with:
-#          name: cypress-test
-#          url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
-#          status: ${{ job.status }}
-#        if: ${{ failure() }}
