@@ -1,0 +1,103 @@
+{
+  "name": "mochawesome",
+  "version": "7.1.3",
+  "description": "A gorgeous reporter for Mocha.js",
+  "scripts": {
+    "lint": "eslint src test*",
+    "test": "npm run lint && cross-env NODE_ENV=test nyc mocha --config test/.mocharc.json",
+    "test:fn": "mocha test-functional --config test-functional/.mocharc.json",
+    "test:par": "mocha test-parallel --parallel --config test-parallel/.mocharc.json",
+    "test:prog": "node ./test-programmatic",
+    "test:mem": "mocha test-functional/mem-test.js --config test-functional/.mocharc.json",
+    "test:ctx": "mocha test-functional/test-context.js --config test-functional/.mocharc.json",
+    "tdd": "npm run lint && cross-env NODE_ENV=test nyc mocha --config test/.mocharc.json --watch",
+    "prepack": "npm run test"
+  },
+  "author": "Adam Gruber",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adamgruber/mochawesome"
+  },
+  "keywords": [
+    "mocha",
+    "reporter",
+    "json",
+    "html"
+  ],
+  "main": "src/mochawesome.js",
+  "files": [
+    "addContext.js",
+    "register.js",
+    "src"
+  ],
+  "nyc": {
+    "include": [
+      "src/*.js"
+    ],
+    "reporter": [
+      "lcov",
+      "html",
+      "text-summary"
+    ],
+    "cache": false,
+    "check-coverage": true,
+    "lines": 99,
+    "statements": 99,
+    "functions": 100,
+    "branches": 90
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "diff": "^5.0.0",
+    "json-stringify-safe": "^5.0.1",
+    "lodash.isempty": "^4.4.0",
+    "lodash.isfunction": "^3.0.9",
+    "lodash.isobject": "^3.0.2",
+    "lodash.isstring": "^4.0.1",
+    "mochawesome-report-generator": "^6.2.0",
+    "strip-ansi": "^6.0.1",
+    "uuid": "^8.3.2"
+  },
+  "peerDependencies": {
+    "mocha": ">=7"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^7.20.0",
+    "eslint-config-prettier": "^7.2.0",
+    "husky": "^5.0.9",
+    "lint-staged": "^10.5.4",
+    "mocha": "^8.3.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.2.1",
+    "proxyquire": "^2.1.0",
+    "should": "^13.2.3",
+    "sinon": "^9.2.4"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "prettier --write"
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "prettier"
+    ],
+    "env": {
+      "es6": true,
+      "mocha": true,
+      "node": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 9
+    }
+  }
+}

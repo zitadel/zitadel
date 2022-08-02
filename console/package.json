@@ -6,9 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "prodbuild": "ng build --configuration production --base-href=/ui/console/",
-    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
-    "e2e": "./cypress.sh run e2e.env",
-    "e2e:open": "./cypress.sh open e2e.env"
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
   },
   "private": true,
   "dependencies": {
@@ -42,6 +40,7 @@
     "libphonenumber-js": "^1.10.6",
     "material-design-icons-iconfont": "^6.1.1",
     "moment": "^2.29.1",
+    "ng": "^0.0.0",
     "ng-qrcode": "^7.0.0",
     "ngx-color": "^7.2.0",
     "ngx-quicklink": "^0.2.6",
@@ -68,8 +67,6 @@
     "@typescript-eslint/eslint-plugin": "5.30.4",
     "@typescript-eslint/parser": "5.30.4",
     "codelyzer": "^6.0.0",
-    "cypress": "^10.1.0",
-    "cypress-terminal-report": "^4.0.1",
     "eslint": "^8.18.0",
     "jasmine-core": "~4.2.0",
     "jasmine-spec-reporter": "~7.0.0",

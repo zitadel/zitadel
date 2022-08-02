@@ -1,0 +1,28 @@
+name: "CYPRESS e2e"
+
+on:
+#  schedule:
+#    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./e2e
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Build the docker-compose stack
+        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
+      - name: Archive production tests
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-tests
+          path: |
+            cypress/cypress/results
+            cypress/cypress/videos
+            cypress/cypress/screenshots
+          retention-days: 30

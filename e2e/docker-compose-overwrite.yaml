@@ -1,0 +1,45 @@
+services:
+  zitadel:
+    image: 'ghcr.io/zitadel/zitadel:v2.0.0-amd64'
+    #image: 'ghcr.io/zitadel/zitadel:v2.0.0-v2-alpha.44-amd64'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    environment:
+      - 'ZITADEL_DATABASE_COCKROACH_HOST=db'
+      - 'ZITADEL_EXTERNALSECURE=false'
+    depends_on:
+      db-initialize:
+        condition: service_completed_successfully
+
+  db:
+    volumes:
+    - ${PWD}/cypress/dbdump:/cockroach/cockroach-data/extern/dbdump
+
+  # TODO: not needed when admin user is used for initial tasks/tests
+  db-initialize:
+    networks:
+      - 'zitadel'
+    image: 'cockroachdb/cockroach:v22.1.0'
+    command: "sql --host db --insecure --execute=\'RESTORE FROM \"nodelocal://0/dbdump/\"\'"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  e2e:
+    image: cypress/included:10.3.1
+    container_name: cypress
+    depends_on:
+    -  zitadel
+    -  db
+    env_file:
+    - ./compose.env
+    working_dir: /e2e
+    entrypoint:
+    - bash
+    - -c
+    command:
+    - ./cypress.sh run
+    volumes:
+    - ${PWD}/.keys/e2e.json:/.keys/e2e.json
+    - ${PWD}/cypress:/e2e
+    networks:
+    - 'zitadel'
