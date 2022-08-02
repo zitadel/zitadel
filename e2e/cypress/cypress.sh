@@ -36,8 +36,8 @@ until [ $i -gt 10 ]; do
 done
 }
 
-echo "print config file"
-cat /e2e/cypress.config.ts
+echo "debug"
+ls -la 
 
 
 
