@@ -11,9 +11,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
-    defaults:
-      run:
-        working-directory: ./e2e
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
