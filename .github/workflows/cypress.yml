@@ -1,6 +1,9 @@
 name: "CYPRESS e2e"
 
 on:
+  push:
+    branches:
+      - "isolate-cypress"
 #  schedule:
 #    - cron: '*/15 * * * *'
   workflow_dispatch:
