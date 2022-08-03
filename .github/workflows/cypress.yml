@@ -17,7 +17,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: doublecheck release reference variable
-        run: echo githubref:  ${{ GITHUB_REF }} && echo releaseversion:  ${{ github.event.inputs.releaseversion }}
+        run: echo githubref:  ${{ GITHUB_REF }} 
+        run: echo releaseversion:  ${{ github.event.inputs.releaseversion }}
 #      - name: Build the docker-compose stack
 #        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
 #        working-directory: ./e2e
