@@ -44,6 +44,7 @@ type externalRegisterData struct {
 	ExternalIDPUserID          string
 	ExternalIDPUserDisplayName string
 	ShowUsername               bool
+	ShowUsernameSuffix         bool
 	OrgRegister                bool
 	ExternalEmail              string
 	ExternalEmailVerified      bool
@@ -121,13 +122,19 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
+
+	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
 	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
 	if !idpConfig.AutoRegister {
-		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
+		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, labelPolicy.HideLoginNameSuffix, nil)
 		return
 	}
 	l.registerExternalUser(w, r, authReq, user, externalIDP)
@@ -157,7 +164,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idp *domain.UserIDPLink, err error) {
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idp *domain.UserIDPLink, hideLoginNameSuffix bool, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -180,6 +187,7 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		ExternalEmailVerified:      human.IsEmailVerified,
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+		ShowUsernameSuffix:         !hideLoginNameSuffix,
 	}
 	if human.Phone != nil {
 		data.Phone = human.PhoneNumber
