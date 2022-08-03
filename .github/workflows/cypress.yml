@@ -1,11 +1,8 @@
 name: "CYPRESS e2e"
 
 on:
-  push:
-    branches:
-      - "isolate-cypress"
-#  schedule:
-#    - cron: '*/15 * * * *'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       releaseversion:
@@ -19,5 +16,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-#      - name: vars
-#        run: echo "githubref: $GITHUB_REF"
+      - name: Build the docker-compose stack
+        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
+        working-directory: ./e2e
+      - name: Archive production tests
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-tests
+          path: |
+            e2e/cypress/cypress/results
+            e2e/cypress/cypress/videos
+            e2e/cypress/cypress/screenshots
+          retention-days: 30
