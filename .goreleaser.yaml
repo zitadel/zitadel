@@ -52,12 +52,12 @@ dockers:
   - "--platform=linux/arm64"
 
 docker_manifests:
-  id: zitadel-latest
+- id: zitadel-latest
   name_template: ghcr.io/zitadel/zitadel:latest
   image_templates:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
-  id: zitadel-Tag
+- id: zitadel-Tag
   name_template: ghcr.io/zitadel/zitadel:{{ .Tag }}
   image_templates:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
