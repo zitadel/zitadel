@@ -1,14 +1,7 @@
 name: "CYPRESS e2e"
 
 on:
-#  release:
-#    types: [published]
   workflow_dispatch:
-#    inputs:
-#      releaseversion:
-#        description: 'Release version to test'
-#        required: true
-#        default: 'latest'
 
 jobs:
   test:
@@ -17,18 +10,4 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: doublecheck release reference
-        run: echo "githubref: GITHUB_REF"
-#        run: echo releaseversion:  ${{ github.event.inputs.releaseversion }}
-#      - name: Build the docker-compose stack
-#        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
-#        working-directory: ./e2e
-#      - name: Archive production tests
-#        if: always()
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: production-tests
-#          path: |
-#            e2e/cypress/cypress/results
-#            e2e/cypress/cypress/videos
-#            e2e/cypress/cypress/screenshots
-#          retention-days: 30
+        run: echo "githubref: $GITHUB_REF"
