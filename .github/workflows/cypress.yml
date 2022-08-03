@@ -14,5 +14,5 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: vars
-        run: echo "githubref: $GITHUB_REF"
+#      - name: vars
+#        run: echo "githubref: $GITHUB_REF"
