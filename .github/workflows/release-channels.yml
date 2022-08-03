@@ -48,5 +48,5 @@ jobs:
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       - name: copy release to stable
           run: |    
-          skopeo --version
-          skopeo inspect ghcr.io/zitadel/zitadel:latest
+            skopeo --version
+            skopeo inspect ghcr.io/zitadel/zitadel:latest
