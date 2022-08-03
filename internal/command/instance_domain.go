@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"regexp"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -12,6 +13,10 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
+)
+
+var (
+	allowDomainRunes = regexp.MustCompile("^[a-zA-Z0-9\\.\\-]+$")
 )
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
@@ -83,6 +88,9 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
+		}
+		if !allowDomainRunes.MatchString(instanceDomain) {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-S3v3w", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			domainWriteModel, err := getInstanceDomainWriteModel(ctx, filter, instanceDomain)
