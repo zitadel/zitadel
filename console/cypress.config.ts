@@ -1,5 +1,7 @@
 import { defineConfig } from 'cypress';
-import { readFileSync } from 'fs';
+
+let tokensCache = new Map<string,string>()
+let initmfaandpwrequired = true
 
 export default defineConfig({
   reporter: 'mochawesome',
@@ -18,15 +20,31 @@ export default defineConfig({
   e2e: {
     experimentalSessionAndOrigin: true,
     setupNodeEvents(on, config) {
-
       require('cypress-terminal-report/src/installLogsPrinter')(on);
 
-      config.defaultCommandTimeout = 10_000
-      config.env.parsedServiceAccountKey = config.env.serviceAccountKey
-      if (config.env.serviceAccountKeyPath) {
-        config.env.parsedServiceAccountKey = JSON.parse(readFileSync(config.env.serviceAccountKeyPath, 'utf-8'))
-      }
-      return config
+      on('task', {
+        safetoken({key, token}) {
+          tokensCache.set(key,token);
+          return null
+        }
+      })
+      on('task', {
+        loadtoken({key}): string | null {
+          return tokensCache.get(key) || null;
+        }
+      })
+      on('task', {
+        initmfaandpwrequired(){
+          if (config.env.noInitMFAAndPWRequired == 'true'){
+            initmfaandpwrequired = false
+          }
+          if (initmfaandpwrequired){
+            initmfaandpwrequired = false
+            return true
+          }
+          return false
+        }
+      })
     },
   },
 });

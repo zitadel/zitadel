@@ -1,119 +1,128 @@
+import { debug } from "console";
+
 export enum User {
   OrgOwner = 'org_owner',
   OrgOwnerViewer = 'org_owner_viewer',
   OrgProjectCreator = 'org_project_creator',
   LoginPolicyUser = 'login_policy_user',
   PasswordComplexityUser = 'password_complexity_user',
-//  IAMAdminUser = 'zitadel-admin',
+  IAMAdminUser = 'zitadel-admin',
 }
 
 export function login(
   user: User,
   pw?: string,
   force?: boolean,
+  skipMFAChangePW?: boolean,
   onUsernameScreen?: () => void,
   onPasswordScreen?: () => void,
   onAuthenticated?: () => void,
-): void {
+): Cypress.Chainable<string> {
   let creds = credentials(user, pw);
 
-  const baseUrl: string = Cypress.env('baseUrl');
-  const consoleUrl: string = `${baseUrl}/ui/console`;
-  const loginUrl: string = `${baseUrl}/ui/login`;
-  const issuerUrl: string = `${baseUrl}/oauth/v2`;
+  const loginUrl: string = '/ui/login';
+  const issuerUrl: string = '/oauth/v2';
   const otherZitadelIdpInstance: boolean = Cypress.env('otherZitadelIdpInstance');
 
-  cy.session(
+  return cy.session(
     creds.username,
     () => {
       const cookies = new Map<string, string>();
 
-      if (otherZitadelIdpInstance) {
-        cy.intercept(
-          {
-            method: 'GET',
-            url: `${loginUrl}*`,
-            times: 1,
-          },
-          (req) => {
-            req.headers['cookie'] = requestCookies(cookies);
-            req.continue((res) => {
-              updateCookies(res.headers['set-cookie'] as string[], cookies);
-            });
-          },
-        ).as('login');
+      cy.intercept(
+        {
+          method: 'GET',
+          url: `${loginUrl}*`,
+          times: 1,
+        },
+        (req) => {
+          req.headers['cookie'] = requestCookies(cookies);
+          req.continue((res) => {
+            updateCookies(res.headers['set-cookie'] as string[], cookies);
+          });
+        },
+      ).as('login');
 
-        cy.intercept(
-          {
-            method: 'POST',
-            url: `${loginUrl}/loginname*`,
-            times: 1,
-          },
-          (req) => {
-            req.headers['cookie'] = requestCookies(cookies);
-            req.continue((res) => {
-              updateCookies(res.headers['set-cookie'] as string[], cookies);
-            });
-          },
-        ).as('loginName');
+      cy.intercept(
+        {
+          method: 'POST',
+          url: `${loginUrl}/loginname*`,
+          times: 1,
+        },
+        (req) => {
+          req.headers['cookie'] = requestCookies(cookies);
+          req.continue((res) => {
+            updateCookies(res.headers['set-cookie'] as string[], cookies);
+          });
+        },
+      ).as('loginName');
 
-        cy.intercept(
-          {
-            method: 'POST',
-            url: `${loginUrl}/password*`,
-            times: 1,
-          },
-          (req) => {
-            req.headers['cookie'] = requestCookies(cookies);
-            req.continue((res) => {
-              updateCookies(res.headers['set-cookie'] as string[], cookies);
-            });
-          },
-        ).as('password');
+      cy.intercept(
+        {
+          method: 'POST',
+          url: `${loginUrl}/password*`,
+          times: 1,
+        },
+        (req) => {
+          req.headers['cookie'] = requestCookies(cookies);
+          req.continue((res) => {
+            updateCookies(res.headers['set-cookie'] as string[], cookies);
+          });
+        },
+      ).as('password');
 
-        cy.intercept(
-          {
-            method: 'GET',
-            url: `${loginUrl}/success*`,
-            times: 1,
-          },
-          (req) => {
-            req.headers['cookie'] = requestCookies(cookies);
-            req.continue((res) => {
-              updateCookies(res.headers['set-cookie'] as string[], cookies);
-            });
-          },
-        ).as('success');
+      cy.intercept(
+        {
+          method: 'GET',
+          url: `${loginUrl}/success*`,
+          times: 1,
+        },
+        (req) => {
+          req.headers['cookie'] = requestCookies(cookies);
+          req.continue((res) => {
+            updateCookies(res.headers['set-cookie'] as string[], cookies);
+          });
+        },
+      ).as('success');
 
-        cy.intercept(
-          {
-            method: 'GET',
-            url: `${issuerUrl}/authorize/callback*`,
-            times: 1,
-          },
-          (req) => {
-            req.headers['cookie'] = requestCookies(cookies);
-            req.continue((res) => {
-              updateCookies(res.headers['set-cookie'] as string[], cookies);
-            });
-          },
-        ).as('callback');
+      cy.intercept(
+        {
+          method: 'GET',
+          url: `${issuerUrl}/authorize/callback*`,
+          times: 1,
+        },
+        (req) => {
+          req.headers['cookie'] = requestCookies(cookies);
+          req.continue((res) => {
+            updateCookies(res.headers['set-cookie'] as string[], cookies);
+          });
+        },
+      ).as('callback');
 
-        cy.intercept(
-          {
-            method: 'GET',
-            url: `${issuerUrl}/authorize*`,
-            times: 1,
-          },
-          (req) => {
-            req.continue((res) => {
-              updateCookies(res.headers['set-cookie'] as string[], cookies);
-            });
-          },
-        );
-      }
+      cy.intercept(
+        {
+          method: 'GET',
+          url: `${issuerUrl}/authorize*`,
+          times: 1,
+        },
+        (req) => {
+          req.continue((res) => {
+            updateCookies(res.headers['set-cookie'] as string[], cookies);
+          });
+        },
+      );
 
-      cy.visit(`${loginUrl}`, { retryOnNetworkFailure: true });
+      let userToken: string
+      cy.intercept({
+        method: 'POST',
+        url: `${issuerUrl}/token`,
+      }, req => {
+        req.continue(res => {
+          userToken = res.body["access_token"]}
+        )
+      }).as('token')
+
+      cy.visit(loginUrl, { retryOnNetworkFailure: true });
 
       otherZitadelIdpInstance && cy.wait('@login');
       onUsernameScreen ? onUsernameScreen() : null;
@@ -124,6 +133,23 @@ export function login(
       onPasswordScreen ? onPasswordScreen() : null;
       cy.get('#password').type(creds.password);
       cy.get('#submit-button').click();
+
+      cy.wait('@password').then((interception) => {
+        if (interception.response.body.indexOf('Multifactor Setup') === -1){
+          return
+        }
+
+        cy.contains('button', 'skip').click()
+        cy.get('#change-old-password').type(creds.password)
+        cy.get('#change-new-password').type(creds.password)
+        cy.get('#change-password-confirmation').type(creds.password)
+        cy.contains('button', 'next').click()
+        cy.contains('button', 'next').click()
+      })
+
+      cy.wait('@token').then(() => {
+        cy.task('safetoken', {key: creds.username, token: userToken})
+      })
 
       onAuthenticated ? onAuthenticated() : null;
 
@@ -136,21 +162,25 @@ export function login(
         if (force) {
           throw new Error('clear session');
         }
-
-        cy.visit(`${consoleUrl}/users/me`);
       },
     },
-  );
+  ).then(() => {
+    return cy.task('loadtoken', {key: creds.username})
+  });
 }
 
-export function username(withoutDomain: string, org?: string): string {
-  return `${withoutDomain}@${org}.${host(Cypress.env('baseUrl'))}`;
+export function loginname(withoutDomain: string, org?: string): string {
+  return `${withoutDomain}@${org}.${host(Cypress.config('baseUrl'))}`;
 }
 
 function credentials(user: User, pw?: string) {
-//  const isAdmin = user == User.IAMAdminUser;
+
+  // TODO: ugly
+  const woDomain = user == User.IAMAdminUser ? User.IAMAdminUser : `${user}_user_name`
+  const org = Cypress.env('ORGANIZATION') ? Cypress.env('ORGANIZATION') : 'zitadel'
+
   return {
-    username: username(`${user}_user_name`, Cypress.env('org')),
+    username: loginname(woDomain, org),
     password: pw ? pw : Cypress.env(`${user}_password`),
   };
 }

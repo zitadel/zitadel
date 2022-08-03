@@ -14,7 +14,7 @@ namespace Cypress {
 Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, password: string) => {
 
     window.sessionStorage.removeItem("zitadel:access_token")
-    cy.visit(Cypress.env('baseUrl')/ui/console).then(() => {
+    cy.visit(Cypress.config('baseUrl')/ui/console).then(() => {
         // fill the fields and push button
         cy.get('#loginName').type(username, { log: false })
         cy.get('#submit-button').click()

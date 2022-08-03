@@ -4,7 +4,7 @@ import { login, User } from "../../support/login/users";
 
 describe("login policy", ()=> {
 
-    const orgPath = `${Cypress.env('baseUrl')}/ui/console/org`
+    const orgPath = `/ui/console/org`
 
     ;[User.OrgOwner].forEach(user => {
 
