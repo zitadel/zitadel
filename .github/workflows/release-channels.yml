@@ -3,7 +3,7 @@ name: ZITADEL Release
 on:
   push:
     branches:
-      - "release-channels-action"
+      - "main"
     paths:
       - 'release-channels.yaml'
   workflow_dispatch:
