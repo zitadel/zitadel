@@ -1,6 +1,6 @@
 services:
   zitadel:
-    image: "ghcr.io/zitadel/zitadel:$GITHUB_REF"
+    image: "ghcr.io/zitadel/zitadel:${RELEASE_VERSION}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
       - 'ZITADEL_DATABASE_COCKROACH_HOST=db'

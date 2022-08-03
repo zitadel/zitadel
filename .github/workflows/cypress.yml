@@ -16,6 +16,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Set TAG env manual trigger
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "RELEASE_VERSION=${{ github.event.input.releaseversion }}'" >> $GITHUB_ENV
+      - name: Set TAG env on release
+        if: github.event_name == 'release'
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Build the docker-compose stack
         run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose -f docker-compose.yaml -f docker-compose-overwrite.yaml --env-file compose.env run e2e
         working-directory: ./e2e
