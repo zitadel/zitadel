@@ -9,5 +9,5 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: doublecheck release reference
-        run: echo "githubref: $GITHUB_REF"
+#      - name: doublecheck release reference
+#        run: echo "githubref: $GITHUB_REF"
