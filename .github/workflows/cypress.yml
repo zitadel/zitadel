@@ -7,6 +7,11 @@ on:
 #  schedule:
 #    - cron: '*/15 * * * *'
   workflow_dispatch:
+    inputs:
+      releaseversion:
+        description: 'Release version to test'
+        required: true
+        default: 'latest'
 
 jobs:
   test:
