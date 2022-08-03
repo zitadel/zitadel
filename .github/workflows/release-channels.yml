@@ -49,5 +49,4 @@ jobs:
       - name: copy release to stable
         run: |    
           skopeo --version
-          skopeo copy docker://ghcr.io/zitadel/zitadel:$STABLE_RELEASE-amd64 docker://ghcr.io/zitadel/zitadel:stable-amd64
-          skopeo copy docker://ghcr.io/zitadel/zitadel:$STABLE_RELEASE-arm64 docker://ghcr.io/zitadel/zitadel:stable-arm64
+          skopeo copy docker://ghcr.io/zitadel/zitadel:$STABLE_RELEASE docker://ghcr.io/zitadel/zitadel:stable
