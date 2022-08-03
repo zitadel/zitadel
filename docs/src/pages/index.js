@@ -171,13 +171,7 @@ const features = [
           description="Design and engineering principles"
         />
         <ListElement
-          link="./docs/concepts/eventstore"
-          type={ICONTYPE.STORAGE}
-          title="Eventstore"
-          description="Learn how ZITADEL stores data"
-        />
-        <ListElement
-          link="./docs/concepts/architecture"
+          link="./docs/concepts/architecture/software"
           type={ICONTYPE.ARCHITECTURE}
           title="Architecture"
           description="Sotware-, Cluster- and Multi Cluster Architecture"
