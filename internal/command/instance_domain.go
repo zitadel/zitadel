@@ -90,7 +90,7 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 			return nil, errors.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
 		}
 		if !allowDomainRunes.MatchString(instanceDomain) {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-S3v3w", "Errors.Invalid.Argument")
+			return nil, errors.ThrowInvalidArgument(nil, "INST-S3v3w", "Errors.Instance.Domain.InvalidCharacter")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			domainWriteModel, err := getInstanceDomainWriteModel(ctx, filter, instanceDomain)
