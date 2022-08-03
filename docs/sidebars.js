@@ -222,10 +222,18 @@ module.exports = {
       collapsed: false,
       items: [
         "concepts/eventstore/overview",
-        "concepts/eventstore/zitadel",
+        "concepts/eventstore/implementation",
       ],
     },
-    "concepts/architecture",
+    {
+      type: "category",
+      label: "Architecture",
+      collapsed: false,
+      items: [
+        "concepts/architecture/software",
+        "concepts/architecture/solution",
+      ],
+    },
     {
       type: "category",
       label: "Structure",
