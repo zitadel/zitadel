@@ -233,6 +233,7 @@ module.exports = {
       items: [
         "concepts/architecture/software",
         "concepts/architecture/solution",
+        "concepts/architecture/secrets",
       ],
     },
     {
