@@ -57,5 +57,5 @@ fi
 
 if [ "$DO_DEPLOY" -eq "1" ]; then
     # run cockroach and zitadel
-    ./e2e/docker-compose.sh up --build --detach
+    ./e2e/docker-compose.sh up --detach
 fi
