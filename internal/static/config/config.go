@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/static/database"
@@ -11,6 +12,7 @@ import (
 
 type AssetStorageConfig struct {
 	Type   string
+	Cache  middleware.CacheConfig
 	Config map[string]interface{} `mapstructure:",remain"`
 }
 
