@@ -2,7 +2,11 @@
 title: Secrets
 ---
 
-In this chapter you can find information of how ZITADEL processes and stores secrects. 
+In this chapter you can find information of how ZITADEL processes and stores secrets and credentials in a secure fashion. 
+
+:::info
+We use the terms secret and credentials interchangeable to keep this guide lean.
+:::
 
 ## Secrets Principles
 
