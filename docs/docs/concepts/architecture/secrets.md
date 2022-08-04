@@ -24,30 +24,15 @@ ZITADEL uses the following principles when handling Secrets across their lifecyc
 
 ## Secrets Storage
 
-By default ZITADEL stores secrets from its users, clients as well as its generated secrets like signing keys in it database.
+By default ZITADEL stores secrets from its users, clients as well as its generated secrets like signing keys in the database.
 To protect the secrets against extraction from database as well as database dumps they are encrypted with AES256.
 
 :::info
 The key used to encrypt and decrypt the secrets in the ZITADEL database is called `masterkey` and needs to be exactly 32 bytes long.
-:::
-
-:::info
 The only secrets stored outside of the Secrets Storage are the masterkey, the TLS Keys, the initial Admin User (including the password)
 :::
 
 ## Secrets stored in the Secrets Storage
-
-### Passwords / Client Secrets
-
-ZITADEL does handle many different passwords and secrets. These include:
-
-- Validation Secrets
-- User Passwords
-- Client Secrets
-
-:::info
-ZITADEL uses `bcrypt` by default to store all Passwords and Client Secrets in an non reversible way to further reduce the risk of a Secrets Storage breach.
-:::
 
 ### Public Keys
 
@@ -58,33 +43,48 @@ ZITADEL does handle many different public keys. These include:
 - JWT Profile
 - Signing Keys
 
-### Private Keys
-
-The only private keys currently stored by ZITADEL are the signing keys used to sign Tokens.
-Signing Keys are rotated in a default schedule of 6 hours by creating new key pairs each turn.
-
 :::info
-By default ZITADEL uses `RSA256`.
+Due to the inherent nature of a public key being public we safeguard them against malicious key changes with our unique [eventstore concept](../eventstore/overview).
 :::
 
-### Validation Secrets
+### Hashed Secrets
 
-Validation Secrets are used for different purposes, these include:
+ZITADEL does handle many different passwords and secrets. These include:
 
-- Verifying contact information like eMail, Phonenumbers
-- Verifying proof of ownership over domain names (DNS)
-- Resting accounts of users (password, MFA reset, ...)
+- User Authentication
+  - Password
+- Client / Machine Authentication
+  - Client Secrets
 
 :::info
-All validation secrets are protected against reuse and are treated as passwords.
+ZITADEL uses `bcrypt` by default to store all Passwords and Client Secrets in an non reversible way to further reduce the risk of a Secrets Storage breach.
 :::
 
-### Unencrypted Secrets
+### Encrypted Secrets
 
 Some secrets cannot be hashed because they need to be used in their raw form. These include:
 
-- Client Secrets of Identity Providers (IdPs)
-- Personal Access Tokens
+- Federation
+  - Client Secrets of Identity Providers (IdPs)
+- Multi Factor Authentication
+  - TOTP Seed Values
+- Validation Secrets
+  - Verifying contact information like eMail, Phonenumbers
+  - Verifying proof of ownership over domain names (DNS)
+  - Resting accounts of users (password, MFA reset, ...)
+- Private Keys
+  - Token Signing (JWT, ...)
+  - Token Encryption (Opaque Bearer Tokens)
+  - Useragent Cookies (Session Cookies) Encryption
+  - CSRF Cookie Encryption
+- Mail Provider
+  - SMTP Passwords
+- SMS Provider
+  - Twilio API Keys
+
+:::info
+By default ZITADEL uses `RSA256` for signing purposes and `AES256` for encryption
+:::
 
 ## Secrets stored outside the Secrets Storage
 
