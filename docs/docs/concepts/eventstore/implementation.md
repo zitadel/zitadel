@@ -1,5 +1,5 @@
 ---
-title: Implementation in ZITADEL
+title: Implementation
 ---
 
 This documentation gives you an insight into the structure of the ZITADEL database.
