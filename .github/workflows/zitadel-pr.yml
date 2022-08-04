@@ -23,6 +23,9 @@ jobs:
         with:
           install-only: true
           version: v1.10.3
+      - name: Install NPM Modules
+        working-directory: ./console
+        run: npm ci --only=dev
       - name: Test
         run: ./e2e/install.sh
       - name: Publish go coverage

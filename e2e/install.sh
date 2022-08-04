@@ -45,7 +45,7 @@ BUILD_DATE="$(extract_metadata metadata.json '.date')"
 BUILD_DATE="${BUILD_DATE%.*}"
 # Replace colons and plus signs
 export BUILD_DATE="${BUILD_DATE//:/_}"
-
+export ZITADEL_IMAGE="${ZITADEL_IMAGE:-zitadel:${BUILD_DATE}}"
 
 if [ "$DO_BUILD" -eq "1" ]; then
     BUILD_PATH="$(dirname $(extract_metadata artifacts.json '.[0].path'))"
@@ -56,6 +56,7 @@ if [ "$DO_BUILD" -eq "1" ]; then
 fi
 
 if [ "$DO_DEPLOY" -eq "1" ]; then
+    echo "Testing ZITADEL image $ZITADEL_IMAGE"
     # run cockroach and zitadel
     ./e2e/docker-compose.sh run e2e
 fi

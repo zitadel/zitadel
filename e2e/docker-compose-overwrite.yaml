@@ -1,6 +1,6 @@
 services:
   zitadel:
-    image: 'zitadel:${BUILD_DATE}'
+    image: '${ZITADEL_IMAGE}'
     environment:
       # TODO: localhost?
       ZITADEL_EXTERNALDOMAIN: zitadel

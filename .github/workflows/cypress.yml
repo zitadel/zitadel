@@ -5,16 +5,17 @@ on:
 #    - cron: '*/15 * * * *'
   workflow_dispatch:
 
-
-
 env:
-  WORKING_DIR: ./
+  ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:v2.0.1
 
 jobs:
   test:
     runs-on: ubuntu-18.04
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
-      - name: Build the docker-compose stack
-        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose --verbose --file ${WORKING_DIR}/e2e/docker-compose-workdir.yaml --file ${WORKING_DIR}/docs/docs/guides/installation/run/docker-compose.yaml --file ${WORKING_DIR}/e2e/docker-compose-overwrite.yaml --env-file ${WORKING_DIR}/e2e/compose.env
+      - name: Install NPM Modules
+        working-directory: ./console
+        run: npm ci --only=dev
+      - name: Test
+        run: ./e2e/docker-compose.sh run e2e
