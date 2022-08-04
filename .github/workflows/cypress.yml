@@ -1,8 +1,8 @@
 name: "CYPRESS e2e"
 
 on:
-#  schedule:
-#    - cron: '*/15 * * * *'
+  schedule:
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 env:
