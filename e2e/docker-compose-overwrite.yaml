@@ -1,6 +1,9 @@
 services:
   zitadel:
-    image: '${ZITADEL_IMAGE}'
+    image: ${ZITADEL_IMAGE:-zitadel:latest}
+    build:
+      context: ../.artifacts/zitadel
+      dockerfile: ../../build/Dockerfile
     environment:
       # TODO: localhost?
       ZITADEL_EXTERNALDOMAIN: zitadel
@@ -16,6 +19,6 @@ services:
     -  zitadel
     working_dir: /e2e
     volumes:
-    - ${PWD}/console:/e2e
+    - ../console:/e2e
     networks:
     - zitadel

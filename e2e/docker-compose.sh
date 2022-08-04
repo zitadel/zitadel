@@ -1,3 +1,5 @@
 #!/bin/bash
 
-COMPOSE_DOCKER_CLI_BUILD=1 docker compose --file ${projectRoot}/e2e/docker-compose-workdir.yaml --file ${projectRoot}/docs/docs/guides/deploy/docker-compose.yaml --file ${projectRoot}/e2e/docker-compose-overwrite.yaml "$@"
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
+COMPOSE_DOCKER_CLI_BUILD=1 docker compose --file ${SCRIPTPATH}/docker-compose-workdir.yaml --file ${SCRIPTPATH}/../docs/docs/guides/deploy/docker-compose.yaml --file ${SCRIPTPATH}/docker-compose-overwrite.yaml "$@"
