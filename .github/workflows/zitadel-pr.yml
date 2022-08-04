@@ -24,7 +24,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           install-only: true
-          version: v1.10.3
+          version: v1.8.3
       - name: Install NPM Modules
         working-directory: ./console
         run: npm ci
