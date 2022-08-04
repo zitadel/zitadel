@@ -17,3 +17,5 @@ services:
     working_dir: /e2e
     volumes:
     - ${PWD}/console:/e2e
+    networks:
+    - zitadel
