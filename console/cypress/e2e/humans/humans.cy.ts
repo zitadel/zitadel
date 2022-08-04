@@ -1,8 +1,8 @@
 import { apiAuth } from '../../support/api/apiauth';
 import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/users';
-import { login, User, loginname } from '../../support/login/users';
+import { loginname } from '../../support/login/users';
 
-describe('humans', () => {
+describe.skip('humans', () => {
   const humansPath = `/ui/console/users?type=human`;
   const testHumanUserNameAdd = 'e2ehumanusernameadd';
   const testHumanUserNameRemove = 'e2ehumanusernameremove';

@@ -25,7 +25,7 @@ jobs:
           version: v1.10.3
       - name: Install NPM Modules
         working-directory: ./console
-        run: npm ci --only=dev
+        run: npm ci
       - name: Test
         run: ./e2e/install.sh
       - name: Publish go coverage
