@@ -110,7 +110,7 @@ AssetStorage:
   # the assets will also be served with an etag and last-modified header
   Cache:
     MaxAge: 5s
-    SharedMaxAge: 30s
+    SharedMaxAge: 168h #7d
 
 Projections:
   RequeueEvery: 60s
@@ -186,7 +186,7 @@ Console:
     SharedMaxAge: 5m
   LongCache:
     MaxAge: 12h
-    SharedMaxAge: 168h
+    SharedMaxAge: 168h #7d
 
 Notification:
   Repository:

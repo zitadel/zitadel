@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/zitadel/logging"
@@ -96,7 +97,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return true
 		},
 		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
-			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
+			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName + "?v=" + policy.ChangeDate.Format(time.RFC3339)
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
 		},
 		"customLogoResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
