@@ -18,6 +18,11 @@ jobs:
         with:
           driver: docker
           install: true
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          install-only: true
+          version: v1.10.3
       - name: Test
         run: ./e2e/install.sh
       - name: Publish go coverage
