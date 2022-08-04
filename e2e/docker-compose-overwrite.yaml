@@ -11,12 +11,10 @@ services:
 
   e2e:
     image: cypress/included:10.3.0
-    container_name: cypress
     environment:
       CYPRESS_BASE_URL: http://zitadel:8080 
-      CYPRESS_ORGANIZATION: zitadel
     depends_on:
-    -  zitadel
+    - zitadel
     working_dir: /e2e
     volumes:
     - ../console:/e2e

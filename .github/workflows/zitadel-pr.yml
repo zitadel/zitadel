@@ -25,11 +25,6 @@ jobs:
         with:
           install-only: true
           version: v1.8.3
-      - name: Install NPM Dependencies
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: console
-          useRollingCache: true
       - name: Build and Test Binary
         run: GOOS="linux" GOARCH="amd64" goreleaser build --snapshot --single-target --rm-dist --single-target --output .artifacts/zitadel/zitadel
       - name: Publish go coverage

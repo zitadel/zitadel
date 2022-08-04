@@ -25,6 +25,12 @@ RUN build/console/generate-grpc.sh
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated /console/src/app/proto/generated
 
+######################
+## copy node modules
+######################
+FROM scratch as npm-dependencies
+COPY --from=npm-base /console/node_modules/ /
+
 #######################
 ## angular lint workspace and prod build
 #######################
