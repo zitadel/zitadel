@@ -5,17 +5,32 @@ on:
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
-env:
-  ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:v2.0.1
-
 jobs:
   test:
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      - name: Set TAG env manual trigger
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "RELEASE_VERSION=${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
+      - name: Set TAG env on release
+        if: github.event_name == 'release'
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Install NPM Modules
         working-directory: ./console
         run: npm ci --only=dev
       - name: Test
         run: ./e2e/docker-compose.sh run e2e
+        env:
+          ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:${RELEASE_VERSION}
+      - name: Archive production tests
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-tests
+          path: |
+            console/cypress/results
+            console/cypress/videos
+            console/cypress/screenshots
+          retention-days: 30
