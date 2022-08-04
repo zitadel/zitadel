@@ -1,4 +1,4 @@
-name: "CYPRESS e2e"
+name: "ZITADEL e2e Test"
 
 on:
   release:
