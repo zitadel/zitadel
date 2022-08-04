@@ -1,6 +1,8 @@
 import { defineConfig } from 'cypress';
+import { env } from 'process';
 
 let tokensCache = new Map<string,string>()
+let initmfaandpwrequired = true
 
 export default defineConfig({
   reporter: 'mochawesome',
@@ -24,6 +26,7 @@ export default defineConfig({
     baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:8080',
     experimentalSessionAndOrigin: true,
     setupNodeEvents(on, config) {
+      require('cypress-terminal-report/src/installLogsPrinter')(on);
 
       on('task', {
         safetoken({key, token}) {
