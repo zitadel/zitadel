@@ -1,4 +1,4 @@
-name: ZITADEL Release
+name: set ZITADEL stable image
 
 on:
   push:
