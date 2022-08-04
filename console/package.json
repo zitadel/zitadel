@@ -69,7 +69,7 @@
     "@typescript-eslint/parser": "5.30.4",
     "codelyzer": "^6.0.0",
     "cypress": "^10.1.0",
-    "cypress-terminal-report": "^4.0.1",
+    "cypress-terminal-report": "^4.1.1",
     "eslint": "^8.18.0",
     "jasmine-core": "~4.2.0",
     "jasmine-spec-reporter": "~7.0.0",
