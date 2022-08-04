@@ -56,11 +56,6 @@ docker_manifests:
   image_templates:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
-  - id: zitadel-rapid
-  name_template: ghcr.io/zitadel/zitadel:rapid
-  image_templates:
-  - ghcr.io/zitadel/zitadel:v2.0.1-amd64
-  - ghcr.io/zitadel/zitadel:v2.0.1-arm64
 - id: zitadel-Tag
   name_template: ghcr.io/zitadel/zitadel:{{ .Tag }}
   image_templates:
