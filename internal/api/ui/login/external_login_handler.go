@@ -499,7 +499,7 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.DomainPolicy, lin
 	displayName := linkingUser.PreferredUsername
 	switch idpConfig.OIDCIDPDisplayNameMapping {
 	case iam_model.OIDCMappingFieldEmail:
-		if linkingUser.IsEmailVerified && linkingUser.Email != "" {
+		if linkingUser.IsEmailVerified && linkingUser.Email != "" && displayName == "" {
 			displayName = linkingUser.Email
 		}
 	}
