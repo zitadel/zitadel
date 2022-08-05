@@ -62,6 +62,7 @@ docker_manifests:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
 
+
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:
