@@ -31,7 +31,7 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
       - name: Test
         run: docker compose run e2e
-        working-dir: e2e
+        working-directory: e2e
         env:
           ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:${RELEASE_VERSION}
       - name: Archive production tests
@@ -40,7 +40,7 @@ jobs:
         with:
           name: production-tests
           path: |
-            console/cypress/results
-            console/cypress/videos
-            console/cypress/screenshots
+            e2e/cypress/results
+            e2e/cypress/videos
+            e2e/cypress/screenshots
           retention-days: 30
