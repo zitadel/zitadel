@@ -23,7 +23,7 @@ jobs:
         with:
           install-only: true
           version: v1.8.3
-      - name: Build and Test Binary
+      - name: Build and Unit Test Binary
         run: GOOS="linux" GOARCH="amd64" goreleaser build --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
@@ -42,7 +42,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: production-tests
+          name: pull-request-tests
           path: |
             e2e/cypress/results
             e2e/cypress/videos
