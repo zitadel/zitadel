@@ -26,13 +26,16 @@ jobs:
           install-only: true
           version: v1.8.3
       - name: Build and Test Binary
-        run: GOOS="linux" GOARCH="amd64" goreleaser build --snapshot --single-target --rm-dist --single-target --output .artifacts/zitadel/zitadel
+        run: GOOS="linux" GOARCH="amd64" goreleaser build --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:
           file: .artifacts/codecov/profile.cov
           name: go-codecov
       - name: Build Docker Image
-        run: ./e2e/docker-compose.sh build
+        run: docker build -t zitadel:pr --file build/Dockerfile .artifacts/zitadel
       - name: Run E2E Tests
-        run: ./e2e/docker-compose.sh run e2e
+        run: docker compose run e2e
+        working-dir: e2e
+        env:
+          ZITADEL_IMAGE: zitadel:pr

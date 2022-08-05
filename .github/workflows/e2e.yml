@@ -1,9 +1,14 @@
 name: "ZITADEL e2e Tests"
 
 on:
-  schedule:
-    - cron: '*/15 * * * *'
+  release:
+    types: [created]
   workflow_dispatch:
+    inputs:
+      releaseversion:
+        description: 'Release version to test'
+        required: true
+        default: 'latest'
 
 jobs:
   test:
@@ -24,10 +29,9 @@ jobs:
           install: true
       - name: Set up Docker Image Layer Caching
         uses: satackey/action-docker-layer-caching@v0.0.11
-      - name: Install NPM Dependencies
-        run: docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-dependencies -o console/node_modules
       - name: Test
-        run: ./e2e/docker-compose.sh run e2e
+        run: docker compose run e2e
+        working-dir: e2e
         env:
           ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:${RELEASE_VERSION}
       - name: Archive production tests
