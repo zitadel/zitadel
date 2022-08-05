@@ -19,6 +19,7 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/templates"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/renderer"
 	"github.com/zitadel/zitadel/internal/static"
 )
@@ -521,6 +522,22 @@ func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []
 		err := l.renderer.AddMessages(translator, text.Language, msg)
 		logging.Log("HANDLE-GD3g2").OnError(err).Warn("could no add message to translator")
 	}
+}
+
+func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, orgID string) {
+	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), domain.LoginCustomText)
+	if err != nil {
+		return
+	}
+	l.addLoginTranslations(translator, query.CustomTextsToDomain(instanceTexts))
+	if orgID == "" {
+		return
+	}
+	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText)
+	if err != nil {
+		return
+	}
+	l.addLoginTranslations(translator, query.CustomTextsToDomain(orgTexts))
 }
 
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
