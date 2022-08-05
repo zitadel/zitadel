@@ -5,8 +5,6 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-	"github.com/zitadel/zitadel/internal/config/hook"
-
 	"github.com/zitadel/logging"
 
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
@@ -17,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"

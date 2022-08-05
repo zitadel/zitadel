@@ -9,7 +9,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin"
@@ -20,10 +19,10 @@ import (
 )
 
 var (
+	configFiles []string
+
 	//go:embed defaults.yaml
 	defaultConfig []byte
-
-	configFiles []string
 )
 
 func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
@@ -41,7 +40,7 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigType("yaml")
 	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.OnError(err).Fatal("unable initialize config")
+	logging.OnError(err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
