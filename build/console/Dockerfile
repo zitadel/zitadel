@@ -19,12 +19,6 @@ COPY --from=zitadel-base:local /usr/local/bin /usr/local/bin/.
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
-#######################
-## copy for local dev
-#######################
-FROM scratch as npm-copy
-COPY --from=npm-base /console/src/app/proto/generated /console/src/app/proto/generated
-
 ######################
 ## copy node modules
 ######################
