@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"net/mail"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -234,12 +235,14 @@ func userValidateDomain(ctx context.Context, a *user.Aggregate, username string,
 		return nil
 	}
 
-	usernameSplit := strings.Split(username, "@")
-	if len(usernameSplit) != 2 {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
+
+	// If the user was not required to provide an email address and didn't no further checks are required
+	usernameSplit, err := mail.ParseAddress(username)
+	if err != nil {
+		return nil
 	}
 
-	domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit[1])
+	domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit.Address)
 	events, err := filter(ctx, domainCheck.Query())
 	if err != nil {
 		return err
