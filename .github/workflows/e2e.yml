@@ -27,8 +27,6 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Set up Docker Image Layer Caching
-        uses: satackey/action-docker-layer-caching@v0.0.11
       - name: Test
         run: docker compose run e2e
         working-directory: e2e

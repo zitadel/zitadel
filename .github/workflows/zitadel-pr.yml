@@ -18,8 +18,6 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Set up Docker Image Layer Caching
-        uses: satackey/action-docker-layer-caching@v0.0.11
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
@@ -32,6 +30,7 @@ jobs:
         with:
           file: .artifacts/codecov/profile.cov
           name: go-codecov
+      # As goreleaser doesn't build a dockerfile in snapshot mode, we have to build it here
       - name: Build Docker Image
         run: docker build -t zitadel:pr --file build/Dockerfile .artifacts/zitadel
       - name: Run E2E Tests
