@@ -13,15 +13,17 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
+    env:
+      ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Set TAG env manual trigger
         if: github.event_name == 'workflow_dispatch'
-        run: echo "ZITADEL_IMAGE=ghcr.io/zitadel/zitadel:${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
+        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
       - name: Set TAG env on release
         if: github.event_name == 'release'
-        run: echo "ZITADEL_IMAGE=ghcr.io/zitadel/zitadel:${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
