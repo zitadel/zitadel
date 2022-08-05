@@ -19,11 +19,11 @@ COPY --from=zitadel-base:local /usr/local/bin /usr/local/bin/.
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
-######################
-## copy node modules
-######################
-FROM scratch as npm-dependencies
-COPY --from=npm-base /console/node_modules/ /
+#######################
+## copy for local dev
+#######################
+FROM scratch as npm-copy
+COPY --from=npm-base /console/src/app/proto/generated /console/src/app/proto/generated
 
 #######################
 ## angular lint workspace and prod build
