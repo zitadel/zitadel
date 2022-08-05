@@ -1,7 +1,7 @@
 import { apiAuth } from "../../support/api/apiauth";
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from "../../support/api/projects";
 
-describe('permissions', () => {
+describe.skip('permissions', () => {
 
     const testProjectName = 'e2eprojectpermission'
     const testAppName = 'e2eapppermission'

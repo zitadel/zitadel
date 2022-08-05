@@ -1,7 +1,6 @@
 import { defineConfig } from 'cypress';
 
 let tokensCache = new Map<string,string>()
-let initmfaandpwrequired = true
 
 export default defineConfig({
   reporter: 'mochawesome',
@@ -17,10 +16,14 @@ export default defineConfig({
   trashAssetsBeforeRuns: false,
   defaultCommandTimeout: 10000,
 
+  env: {
+    ORGANIZATION: process.env.CYPRESS_ORGANIZATION || 'zitadel'
+  },
+
   e2e: {
+    baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:8080',
     experimentalSessionAndOrigin: true,
     setupNodeEvents(on, config) {
-      require('cypress-terminal-report/src/installLogsPrinter')(on);
 
       on('task', {
         safetoken({key, token}) {
@@ -31,18 +34,6 @@ export default defineConfig({
       on('task', {
         loadtoken({key}): string | null {
           return tokensCache.get(key) || null;
-        }
-      })
-      on('task', {
-        initmfaandpwrequired(){
-          if (config.env.noInitMFAAndPWRequired == 'true'){
-            initmfaandpwrequired = false
-          }
-          if (initmfaandpwrequired){
-            initmfaandpwrequired = false
-            return true
-          }
-          return false
         }
       })
     },

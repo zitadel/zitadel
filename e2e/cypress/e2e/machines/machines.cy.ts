@@ -1,8 +1,8 @@
 import { apiAuth } from '../../support/api/apiauth';
 import { ensureMachineUserExists, ensureUserDoesntExist } from '../../support/api/users';
-import { login, User, loginname } from '../../support/login/users';
+import { loginname } from '../../support/login/users';
 
-describe('machines', () => {
+describe.skip('machines', () => {
   const machinesPath = `/ui/console/users?type=machine`;
   const testMachineUserNameAdd = 'e2emachineusernameadd';
   const testMachineUserNameRemove = 'e2emachineusernameremove';

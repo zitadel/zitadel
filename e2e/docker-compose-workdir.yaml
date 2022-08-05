@@ -1,5 +1,0 @@
-# By using this file as first --file argument to docker compose, compose uses this directory as working directory
-
-version: '3.8'
-
-
