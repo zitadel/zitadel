@@ -1,10 +1,11 @@
 package start
 
 import (
+	"time"
+
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/zitadel/internal/config/hook"
-	"time"
 
 	"github.com/zitadel/logging"
 
@@ -56,18 +57,6 @@ type Config struct {
 	CustomerPortal    string
 }
 
-type encryptionKeyConfig struct {
-	DomainVerification   *crypto.KeyConfig
-	IDPConfig            *crypto.KeyConfig
-	OIDC                 *crypto.KeyConfig
-	OTP                  *crypto.KeyConfig
-	SMS                  *crypto.KeyConfig
-	SMTP                 *crypto.KeyConfig
-	User                 *crypto.KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
-}
-
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 
@@ -92,4 +81,16 @@ func MustNewConfig(v *viper.Viper) *Config {
 	logging.OnError(err).Fatal("unable to set meter")
 
 	return config
+}
+
+type encryptionKeyConfig struct {
+	DomainVerification   *crypto.KeyConfig
+	IDPConfig            *crypto.KeyConfig
+	OIDC                 *crypto.KeyConfig
+	OTP                  *crypto.KeyConfig
+	SMS                  *crypto.KeyConfig
+	SMTP                 *crypto.KeyConfig
+	User                 *crypto.KeyConfig
+	CSRFCookieKeyID      string
+	UserAgentCookieKeyID string
 }

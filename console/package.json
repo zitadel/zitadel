@@ -6,11 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "prodbuild": "ng build --configuration production --base-href=/ui/console/",
-    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
-    "e2e:build": "cd .. && GOOS=linux GOARCH=amd64 goreleaser build --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel && ./e2e/docker-compose.sh build",
-    "e2e:test": "../e2e/docker-compose.sh run e2e",
-    "e2e": "npm run e2e:build && npm run e2e:test",
-    "e2e:open": "npx cypress open"
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
   },
   "private": true,
   "dependencies": {

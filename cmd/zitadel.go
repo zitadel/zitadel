@@ -7,9 +7,9 @@ import (
 	"io"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/spf13/cobra"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin"
@@ -21,7 +21,7 @@ import (
 
 var (
 	//go:embed defaults.yaml
-	DefaultConfig []byte
+	defaultConfig []byte
 
 	configFiles []string
 )
@@ -40,8 +40,8 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	viper.SetEnvPrefix("ZITADEL")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigType("yaml")
-	err := viper.ReadConfig(bytes.NewBuffer(DefaultConfig))
-	logging.OnError(err).Fatalf("unable initialize config: %s", err)
+	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
+	logging.OnError(err).Fatal("unable initialize config")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
