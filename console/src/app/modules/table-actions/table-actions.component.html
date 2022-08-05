@@ -3,7 +3,8 @@
     <ng-content select="[hoverActions]"></ng-content>
     <ng-content select="[actions]"></ng-content>
     <button (click)="$event.stopPropagation()" *ngIf="hasActions" class="table-actions-trigger" mat-icon-button
-      [matMenuTriggerFor]="actions">
+      [matMenuTriggerFor]="actions"
+      [attr.data-e2e]="'table-actions-button'">
       <mat-icon>more_horiz</mat-icon>
     </button>
 
