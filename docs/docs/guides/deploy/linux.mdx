@@ -25,8 +25,9 @@ Download the ZITADEL release according to your architecture from [Github](https:
 move to your download location and unpack the archive
 
 ```bash
-#unpack and set executable
-tar xfv zitadel_* && chmod +x zitadel
+#unpack and copy to /usr/local/bin
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); wget -qO-  https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel_Linux_$(uname -m).tar.gz  | tar -xJ zitadel && sudo mv zitadel /usr/local/bin
+
 ```
 
 ## Run ZITADEL
