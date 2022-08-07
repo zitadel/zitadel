@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"net/mail"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -235,14 +234,14 @@ func userValidateDomain(ctx context.Context, a *user.Aggregate, username string,
 		return nil
 	}
 
-
 	// If the user was not required to provide an email address and didn't no further checks are required
-	usernameSplit, err := mail.ParseAddress(username)
-	if err != nil {
-		return nil
-	}
+    usernameSplit := strings.LastIndex(username, "@")
+    if usernameSplit < 0 {
+        return nil
+    }
 
-	domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit.Address)
+    user_domain := username[usernameSplit+1:]
+	domainCheck := NewOrgDomainVerifiedWriteModel(user_domain)
 	events, err := filter(ctx, domainCheck.Query())
 	if err != nil {
 		return err
@@ -435,12 +434,17 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	if err := human.CheckDomainPolicy(domainPolicy); err != nil {
 		return nil, nil, err
 	}
+
 	if !domainPolicy.UserLoginMustBeDomain {
-		usernameSplit := strings.Split(human.Username, "@")
-		if len(usernameSplit) != 2 {
-			return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
-		}
-		domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit[1])
+    	
+    	usernameSplit := strings.LastIndex(human.Username, "@")
+
+	    if usernameSplit < 0 {
+	    	return nil, nil, nil
+	    }
+
+	    user_domain := human.Username[usernameSplit+1:]
+		domainCheck := NewOrgDomainVerifiedWriteModel(user_domain)
 		if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
 			return nil, nil, err
 		}
