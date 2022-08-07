@@ -1781,7 +1781,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
 					},
-					Username: "username@test.ch",
 				},
 			},
 			res: res{
