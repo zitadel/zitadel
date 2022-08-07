@@ -407,8 +407,9 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 }
 
 func (l *Login) mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
-
-	externalUser := &domain.ExternalUser{
+	isEmailVerified := formData.externalRegisterFormData.ExternalEmailVerified && formData.externalRegisterFormData.Email == formData.externalRegisterFormData.ExternalEmail
+	isPhoneVerified := formData.externalRegisterFormData.ExternalPhoneVerified && formData.externalRegisterFormData.Phone == formData.externalRegisterFormData.ExternalPhone
+	return &domain.ExternalUser{
 		IDPConfigID:       formData.externalRegisterFormData.ExternalIDPConfigID,
 		ExternalUserID:    formData.externalRegisterFormData.ExternalIDPExtUserID,
 		PreferredUsername: formData.externalRegisterFormData.Username,
@@ -416,14 +417,11 @@ func (l *Login) mapExternalNotFoundOptionFormDataToLoginUser(formData *externalN
 		FirstName:         formData.externalRegisterFormData.Firstname,
 		LastName:          formData.externalRegisterFormData.Lastname,
 		NickName:          formData.externalRegisterFormData.Nickname,
-		Email:             formData.externalRegisterFormData.ExternalEmail,
-		IsEmailVerified:   formData.externalRegisterFormData.ExternalEmailVerified,
-		Phone:			   formData.externalRegisterFormData.ExternalPhone,
-		IsPhoneVerified:   formData.externalRegisterFormData.ExternalPhoneVerified,
+		Email:             formData.externalRegisterFormData.Email,
+		IsEmailVerified:   isEmailVerified,
+		Phone:             formData.externalRegisterFormData.Phone,
+		IsPhoneVerified:   isPhoneVerified,
 	}
-
-	return externalUser
-
 }
 
 func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *domain.ExternalUser {
