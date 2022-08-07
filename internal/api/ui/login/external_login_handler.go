@@ -366,7 +366,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
-	if userNotFound == true {
+	if userNotFound {
 		data := new(externalNotFoundOptionFormData)
 		err := l.getParseData(r, data)
 		if err != nil {
@@ -374,7 +374,6 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 			return
 		}
 		linkingUser = l.mapExternalNotFoundOptionFormDataToLoginUser(data)
-
 	} 
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
