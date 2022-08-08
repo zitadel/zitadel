@@ -215,10 +215,13 @@ EncryptionKeys:
 
 SystemAPIUsers:
   # add keys for authentication of the systemAPI here:
+  # you can specify any name for the user, but they will have to match:
   # - superuser:
   #     Path: /path/to/superuser/key.pem
+  #     KeyData: <base64 encoded key>
   # - superuser2:
   #     Path: /path/to/superuser2/key.pem
+  #     KeyData: <base64 encoded key>
 
 #TODO: remove as soon as possible
 SystemDefaults:
