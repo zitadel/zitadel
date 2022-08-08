@@ -46,7 +46,7 @@ or with a base64 encoded value of the key:
 ```yaml
 SystemAPIUsers:
   - system-user-1:
-      KeyData: <base64 encoded value of system-user-1.pem>
+      KeyData: <base64 encoded value of system-user-1.pub>
 ```
 
 ## Generate JWT
