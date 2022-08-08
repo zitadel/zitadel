@@ -12,9 +12,9 @@ export const HOME: KeyboardShortcut = {
 };
 
 export const INSTANCE: KeyboardShortcut = {
-  i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.SYSTEM',
+  i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.INSTANCE',
   link: ['/instance'],
-  keyboardKeys: ['g', 's'],
+  keyboardKeys: ['g', 'i'],
   permissions: ['iam.read'],
 };
 
@@ -66,7 +66,14 @@ export const DOMAINS: KeyboardShortcut = {
   permissions: ['org.read'],
 };
 
-export const SIDEWIDESHORTCUTS = [ME, HOME, INSTANCE, ORG, PROJECTS, USERS, USERGRANTS, ACTIONS, DOMAINS];
+export const ORGSETTINGS: KeyboardShortcut = {
+  i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.ORGSETTINGS',
+  link: ['/org-settings'],
+  keyboardKeys: ['g', 's'],
+  permissions: ['org.read'],
+};
+
+export const SIDEWIDESHORTCUTS = [ME, HOME, INSTANCE, ORG, PROJECTS, USERS, USERGRANTS, ACTIONS, DOMAINS, ORGSETTINGS];
 
 export const ORGSWITCHER: KeyboardShortcut = {
   i18nKey: 'KEYBOARDSHORTCUTS.SHORTCUTS.ORGSWITCHER',
