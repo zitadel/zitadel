@@ -28,6 +28,10 @@ title: Access ZITADEL APIs
     </tr>
 </table>
 
+:::note
+This guide focuses on the Admin, Auth and Management APIs. To access the ZITADEL System API, please checkout [this guide](./access-zitadel-system-api).
+:::
+
 ## ZITADEL Managers
 
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers. 
