@@ -2,38 +2,11 @@
 title: Service Users
 ---
 
-<table class="table-wrapper">
-    <tr>
-        <td>Description</td>
-        <td>Learn the basics about ZITADEL Service Users, how to set them up and authorize with ZITADEL.</td>
-    </tr>
-    <tr>
-        <td>Learning Outcomes</td>
-        <td>
-            In this module you will:
-            <ul>
-                <li>Learn about Service Users</li>
-                <li>Create a Service User in ZITADEL Console</li>
-                <li>Authorize a Service User with JWT signed with your private key</li>
-            </ul>
-        </td>
-    </tr>
-     <tr>
-        <td>Prerequisites</td>
-        <td>
-            <ul>
-                <li>Knowledge of <a href="/docs/guides/integrate/oauth-recommended-flows">Recommended Authorization Flows</a></li>
-            </ul>
-        </td>
-    </tr>
-</table>
-
-
 import UserDescription from '../../concepts/structure/_user_description.mdx';
 
 <UserDescription name="UserDescription" />
 
-## Exercise: Create a Service User
+## Create a Service User
 
 1. Navigate to Service Users
 2. Click on **New**
@@ -53,9 +26,9 @@ You need to follow these steps to authenticate a service user and receive a acce
 
 With this token you can make subsequent requests, just like a human user.
 
-## Exercise: Get an access token
+## Get an access token
 
-In this exercise we will authenticate a service user and receive an access_token to use against a API.
+In this step we will authenticate a service user and receive an access_token to use against a API.
 
 > **Information:** Are you stuck? Don't hesitate to reach out to us on [Github Discussions](https://github.com/zitadel/zitadel/discussions) or [contact us](https://zitadel.com/contact/) privately.
 
@@ -145,7 +118,7 @@ Content-Type: application/json
 
 ### 4. Verify that you have a valid access token
 
-For this example let's call the userinfo endpoint to verfiy that our access token works.
+For this example let's call the userinfo endpoint to verify that our access token works.
 
 ```bash
 curl --request POST \
@@ -166,35 +139,6 @@ Content-Type: application/json
   "updated_at": 1616417938
 }
 ```
-
-## Knowledge Check
-
-* To secure backend APIs you can request an API key via ZITADEL's console
-    - [ ] yes
-    - [ ] no
-* The JWT header must contain a property `kid` with the value of the key ID
-    - [ ] yes
-    - [ ] no
-* After generating a key for your service user, you must download the public key and sign your JWT with the public key
-    - [ ] yes
-    - [ ] no
-
-<details>
-    <summary>
-        Solutions
-    </summary>
-
-* To secure backend APIs you can request an API key via ZITADEL's console
-    - [ ] yes
-    - [x] no (We use **“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523))
-* The JWT header must contain a property `kid` with the value of the key ID
-    - [x] yes
-    - [ ] no
-* After generating a key for your service user, you must download the public key and sign your JWT with the public key
-    - [ ] yes
-    - [x] no (The json file contains the private key. Handle with care.)
-
-</details>
 
 ## Summary
 
