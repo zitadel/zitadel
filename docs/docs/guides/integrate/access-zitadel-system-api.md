@@ -1,42 +1,19 @@
 ---
 title: Access ZITADEL System API
 ---
-
-<table class="table-wrapper">
-    <tr>
-        <td>Description</td>
-        <td>Learn how to authorize to access the System API of your self-hosted ZITADEL</td>
-    </tr>
-    <tr>
-        <td>Learning Outcomes</td>
-        <td>
-            In this module you will:
-            <ul>
-                <li>Configure a System API User for ZITADEL</li>
-                <li>Authorize a System User with JWT signed with your private key</li>
-            </ul>
-        </td>
-    </tr>
-     <tr>
-        <td>Prerequisites</td>
-        <td>
-            <ul>
-                <li>A <a href="/docs/guides/deploy/overview">self-hosted ZITADEL</a></li>
-            </ul>
-        </td>
-    </tr>
-</table>
-
 :::note
-This guide only focus on the System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis). 
+This guide focuses on the ZITADEL System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis). 
+The ZITADEL System API is currently only available for ZITADEL Self-Hosted deployments.
 :::
 
 ## System API User
 
-The System API works superordinate over all instances. Therefore, you need to register separate users to get access to this API.
-You can do so by customizing the [runtime configuration](/docs/guides/manage/self-hosted/configure#runtime-configuration) and authenticate using a self-signed JWT.
+The System API works superordinate over all instances. Therefore, you need to define a separate users to get access to this API.
+You can do so by customizing the [runtime configuration](/docs/guides/manage/self-hosted/configure#runtime-configuration).
 
-You can define any id for your user. For this guide will assume it's `system-user-1`.
+To authenticate the user a self-signed JWT will be created and utilized.
+
+You can define any id for your user. This guide will assume it's `system-user-1`.
 
 ## Generate an RSA keypair
 
@@ -112,7 +89,7 @@ If you want to manually create a JWT for a test, you can also use our [ZITADEL T
 ./key2jwt -audience=https://custom-domain.com -key=system-user-1.pem -issuer=system-user-1
 ```
 
-## Call System API
+## Call the System API
 
 Now that you configured ZITADEL and created a JWT, you can call the System API and authenticate using the token:
 
