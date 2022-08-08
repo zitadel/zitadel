@@ -22,7 +22,7 @@ Which results in that if you want to import, and you have no defined organizatio
 Note that the resources will be migrated without the event stream. This means that you will not have the audit trail for the imported objects.
 :::
 
-### Export from V1 to import into V2 directly 
+### Use the API
 
 To export all necessary data you only have to use one request, as an example:
 
@@ -64,7 +64,7 @@ curl --request POST \
 }'
 ```
 
-## Export from V1 to Import into V2 thorugh GCS
+### Use a Google Cloud Storage
 
 :::note 
 To use this requests you have to have an access token with enough permissions to export and import.
