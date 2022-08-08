@@ -12,19 +12,17 @@ Currently, this doesn't include the following points:
 * Global IDPs
 * Global second/multi factors
 * Machine keys
-* PAT's
+* Personal Access Tokens
 * Application keys
+* Passwordless authentication
 
 Which results in that if you want to import, and you have no defined organization-specific custom policies, the experience for your users will not be exactly like in your old instance.
-```suggestion
 
-::note Note that the ressources will be migrated without the event stream. This means that you will not have the audit trail for the imported objects.
+:::note 
+Note that the resources will be migrated without the event stream. This means that you will not have the audit trail for the imported objects.
+:::
 
-*** With this export and import the current audit trail is not included, the resources will be newly created ***
-
-### Export from V1 to import into V2 directly 
-
-***To use this requests you have to have an access token with enough permissions to export and import.***
+### Use the API
 
 To export all necessary data you only have to use one request, as an example:
 
@@ -37,9 +35,9 @@ curl  --request POST \
     "org_ids": [ "70669144072186707", "70671105999825752" ],
     "excluded_org_ids": [ ],
     "with_passwords": true,
-    "with_otp": true
-	"timeout": "30s",
-	"response_output": true,
+    "with_otp": true,
+    "timeout": "30s",
+    "response_output": true
 }' -o export.json
 ```
 
@@ -50,7 +48,9 @@ curl  --request POST \
 * "timeout": timeout of the call to export the data
 * "response_output": to output the export as response to the call
 
-***To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL V2, with all desired configuration and global resources.***
+:::note 
+To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL V2, with all desired configuration and global resources.
+:::
 
 Then as an example you can use one request for the import:
 
@@ -64,11 +64,12 @@ curl --request POST \
 }'
 ```
 
-## Export from V1 to Import into V2 thorugh GCS
+### Use a Google Cloud Storage
 
-***To use this requests you have to have an access token with enough permissions to export and import.***
-
-***The used serviceaccount has to have at least the role "Storage Object Creator" to create objects on GCS***
+:::note 
+To use this requests you have to have an access token with enough permissions to export and import.
+The used serviceaccount has to have at least the role "Storage Object Creator" to create objects on GCS
+:::
 
 To export all necessary data you only have to use one request which results in a file in your GCS, as an example:
 
@@ -79,15 +80,16 @@ curl  --request POST \
   --header 'Content-Type: application/json' \
   --data '	"{
     "org_ids":  [ "70669144072186707", "70671105999825752" ],
-	"excluded_org_ids": [ ],
-	"with_passwords": true,
-	"with_otp": true,
-	"timeout": "10m",
-	"gcs_output": {
-		"path": "export.json",
-		"bucket": "caos-zitadel-exports",
-		"serviceaccount_json": "XXXX"
-	}' -o export.json
+    "excluded_org_ids": [ ],
+    "with_passwords": true,
+    "with_otp": true,
+    "timeout": "10m",
+    "gcs_output": {
+        "path": "export.json",
+        "bucket": "caos-zitadel-exports",
+        "serviceaccount_json": "XXXX"
+    }
+}'
 ```
 
 * "org_ids": to select which organizations should be exported
@@ -100,9 +102,10 @@ curl  --request POST \
   * "bucket": used bucket for output on GCS
   * "serviceaccount_json": base64-encoded serviceaccount.json used to output the file on GCS
 
-***To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL V2, with all desired configuration and global resources.***
-
-***The used serviceaccount has to have at least the role "Storage Object Viewer" to create objects on GCS***
+:::note
+To import the exported data into you new instance, you have to have an already existing instance on a ZITADEL V2, with all desired configuration and global resources.
+The used serviceaccount has to have at least the role "Storage Object Viewer" to read objects from GCS
+:::
 
 Then as an example you can use one request for the import:
 
@@ -112,12 +115,12 @@ curl --request POST \
     --header 'Authorization: Bearer XXXX' \
     --header 'Content-Type: application/json' \
     --data '{
-	    "timeout": "10m",
-        "data_orgsv1_gcs": {
-		  "path": "export.json",
-		  "bucket": "caos-zitadel-exports",
-		  "serviceaccount_json": "XXXX"
-	}
+    "timeout": "10m",
+    "data_orgsv1_gcs": {
+        "path": "export.json",
+        "bucket": "caos-zitadel-exports",
+        "serviceaccount_json": "XXXX"
+    }
 }'
 ```
 
