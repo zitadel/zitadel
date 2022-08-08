@@ -1,0 +1,44 @@
+name: "ZITADEL e2e Tests"
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      releaseversion:
+        description: 'Release version to test'
+        required: true
+        default: 'latest'
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    env:
+      ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Set TAG env manual trigger
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
+      - name: Set TAG env on release
+        if: github.event_name == 'release'
+        run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver: docker
+          install: true
+      - name: Test
+        run: docker compose run e2e
+        working-directory: e2e
+      - name: Archive production tests
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-tests
+          path: |
+            e2e/cypress/results
+            e2e/cypress/videos
+            e2e/cypress/screenshots
+          retention-days: 30
