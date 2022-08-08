@@ -141,13 +141,20 @@ export class UserGrantCreateComponent implements OnDestroy {
         break;
       case UserGrantContext.USER:
         let grantId: string = '';
+        let grantedProjectId: string = '';
 
         if (this.grantedProject?.grantId) {
           grantId = this.grantedProject.grantId;
+          grantedProjectId = this.grantedProject.projectId;
         }
 
         const promu = this.userIds.map((id) =>
-          this.userService.addUserGrant(id, this.rolesList, (this.project as Project.AsObject).id, grantId),
+          this.userService.addUserGrant(
+            id,
+            this.rolesList,
+            this.project?.id ? this.project.id : grantedProjectId ? grantedProjectId : '',
+            grantId,
+          ),
         );
         Promise.all(promu)
           .then(() => {

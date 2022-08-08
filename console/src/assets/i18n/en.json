@@ -182,8 +182,9 @@
     "SIDEWIDE": "Site-wide shortcuts",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
-      "SYSTEM": "<strong>G</strong>o to <strong>S</strong>ystem",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
       "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
+      "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
       "ORGSWITCHER": "Change Organization",
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",

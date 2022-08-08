@@ -215,10 +215,11 @@ EncryptionKeys:
 
 SystemAPIUsers:
   # add keys for authentication of the systemAPI here:
+  # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
   # - superuser:
-  #     Path: /path/to/superuser/key.pem
+  #     Path: /path/to/superuser/key.pem  # you can provide the key either by reference with the path
   # - superuser2:
-  #     Path: /path/to/superuser2/key.pem
+  #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 
 #TODO: remove as soon as possible
 SystemDefaults:
