@@ -181,16 +181,17 @@
     "UNDERORGCONTEXT": "Dans les pages de l'organisation",
     "SIDEWIDE": "Raccourcis pour l'ensemble du site",
     "SHORTCUTS": {
-      "HOME": "<strong>A</strong>ller à <strong>A</strong>ccueil",
-      "SYSTEM": "<strong>A</strong>ller à <strong>S</strong>ystème",
-      "ORG": "<strong>A</strong>ller à <strong>O</strong>rganisation",
+      "HOME": "Aller à Accueil",
+      "INSTANCE": "Vers l'aperçu des instances",
+      "ORG": "Aller à Organisation",
+      "ORGSETTINGS": "Vers les paramètres de l'organisation",
       "ORGSWITCHER": "Modifier l'organisation",
       "ME": "Aller à son propre profil",
-      "PROJECTS": "<strong>A</strong>ller à <strong>P</strong>rojets",
-      "USERS": "<strong>A</strong>ller à <strong>U</strong>tilisateurs",
-      "USERGRANTS": "<strong>A</strong>ller à<strong>A</strong>utorisations",
-      "ACTIONS": "<strong>A</strong>ller à Actions et <strong>F</strong>lux",
-      "DOMAINS": "<strong>A</strong>ller à <strong>D</strong>omaines"
+      "PROJECTS": "Aller à Projets",
+      "USERS": "Aller à Utilisateurs",
+      "USERGRANTS": "Aller à Autorisations",
+      "ACTIONS": "Aller à Actions et Flux",
+      "DOMAINS": "Aller à Domaines"
     }
   },
   "RESOURCEID": "Id de la ressource",
