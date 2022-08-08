@@ -182,8 +182,9 @@
     "SIDEWIDE": "Seitenübergreifende Tastaturkürzel",
     "SHORTCUTS": {
       "HOME": "Zur Startseite",
-      "SYSTEM": "Zum <strong>S</strong>ystem",
+      "INSTANCE": "Zur <strong>I</strong>nstanz",
       "ORG": "Zur <strong>O</strong>rganisation",
+      "ORGSETTINGS": "Zu den Organisationseinstellungen",
       "ORGSWITCHER": "Organisation wechseln",
       "ME": "Zum eigenen Profil",
       "PROJECTS": "Zu den <strong>P</strong>rojekten",
