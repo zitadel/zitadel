@@ -1,7 +1,7 @@
 import { apiAuth } from '../../support/api/apiauth';
 import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api/projects';
 
-describe.skip('projects', () => {
+describe('projects', () => {
   const testProjectNameCreate = 'e2eprojectcreate';
   const testProjectNameDeleteList = 'e2eprojectdeletelist';
   const testProjectNameDeleteGrid = 'e2eprojectdeletegrid';
@@ -24,7 +24,7 @@ describe.skip('projects', () => {
     });
   });
 
-  describe('remove project', () => {
+  describe.skip('remove project', () => {
     describe('list view', () => {
       beforeEach('ensure it exists', () => {
         apiAuth().then((api) => {
