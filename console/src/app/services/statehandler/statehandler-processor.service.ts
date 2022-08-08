@@ -28,8 +28,7 @@ export class StatehandlerProcessorServiceImpl implements StatehandlerProcessorSe
         return;
       } else {
         sessionStorage.removeItem(state);
-        // window.location.replace(window.location.origin + url);
-        this.router.navigate([url]);
+        this.router.navigateByUrl(url);
       }
     }
   }

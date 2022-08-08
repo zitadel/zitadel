@@ -182,8 +182,9 @@
     "SIDEWIDE": "Tasti rapidi globali",
     "SHORTCUTS": {
       "HOME": "Vai alla panoramica",
-      "SYSTEM": "Vai al pagina di sistema",
+      "INSTANCE": "Vai alla pagina dell' istanza",
       "ORG": "Vai all'organizzazione",
+      "ORGSETTINGS": "Alle impostazioni dell'organizzazione",
       "ORGSWITCHER": "Cambia organizzazione",
       "ME": "Vai al profilo",
       "PROJECTS": "Vai ai progetti",

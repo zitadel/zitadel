@@ -228,7 +228,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 			l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLinking, err)
 			return
 		}
-		l.handleAutoRegister(w, r, authReq)
+		l.handleAutoRegister(w, r, authReq, false)
 		return
 	}
 	if len(externalUser.Metadatas) > 0 {
@@ -337,10 +337,10 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		l.handleLogin(w, r)
 		return
 	}
-	l.handleAutoRegister(w, r, authReq)
+	l.handleAutoRegister(w, r, authReq, true)
 }
 
-func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userNotFound bool) {
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
@@ -364,8 +364,20 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return
 	}
+
 	linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+	if userNotFound {
+		data := new(externalNotFoundOptionFormData)
+		err := l.getParseData(r, data)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
+			return
+		}
+		linkingUser = l.mapExternalNotFoundOptionFormDataToLoginUser(data)
+	} 
+
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
+
 	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, nil, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
@@ -392,6 +404,24 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		return
 	}
 	l.renderNextStep(w, r, authReq)
+}
+
+func (l *Login) mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
+	isEmailVerified := formData.externalRegisterFormData.ExternalEmailVerified && formData.externalRegisterFormData.Email == formData.externalRegisterFormData.ExternalEmail
+	isPhoneVerified := formData.externalRegisterFormData.ExternalPhoneVerified && formData.externalRegisterFormData.Phone == formData.externalRegisterFormData.ExternalPhone
+	return &domain.ExternalUser{
+		IDPConfigID:       formData.externalRegisterFormData.ExternalIDPConfigID,
+		ExternalUserID:    formData.externalRegisterFormData.ExternalIDPExtUserID,
+		PreferredUsername: formData.externalRegisterFormData.Username,
+		DisplayName:       formData.externalRegisterFormData.Email,
+		FirstName:         formData.externalRegisterFormData.Firstname,
+		LastName:          formData.externalRegisterFormData.Lastname,
+		NickName:          formData.externalRegisterFormData.Nickname,
+		Email:             formData.externalRegisterFormData.Email,
+		IsEmailVerified:   isEmailVerified,
+		Phone:             formData.externalRegisterFormData.Phone,
+		IsPhoneVerified:   isPhoneVerified,
+	}
 }
 
 func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) *domain.ExternalUser {
@@ -428,7 +458,7 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.DomainPolicy, lin
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
-		if linkingUser.IsEmailVerified && linkingUser.Email != "" {
+		if linkingUser.IsEmailVerified && linkingUser.Email != "" && username == "" {
 			username = linkingUser.Email
 		}
 	}
@@ -466,7 +496,7 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.DomainPolicy, lin
 	displayName := linkingUser.PreferredUsername
 	switch idpConfig.OIDCIDPDisplayNameMapping {
 	case iam_model.OIDCMappingFieldEmail:
-		if linkingUser.IsEmailVerified && linkingUser.Email != "" {
+		if linkingUser.IsEmailVerified && linkingUser.Email != "" && displayName == "" {
 			displayName = linkingUser.Email
 		}
 	}
