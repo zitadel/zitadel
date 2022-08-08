@@ -227,7 +227,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                         |
 | assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants)               |
-| scope      | [Scopes](Scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`              |
+| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`              |
 
 ```BASH
 curl --request POST \
@@ -250,7 +250,7 @@ curl --request POST \
 ### Refresh Token Grant
 
 To request a new `access_token` without user interaction, you can use the `refresh_token` grant. 
-See [offline_access Scope](Scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
+See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
 
 #### Required request Parameters
 
@@ -258,7 +258,7 @@ See [offline_access Scope](Scopes#standard-scopes) for how to request a `refresh
 | ------------- | -------------------------------------------------------------------------------------------- |
 | grant_type    | Must be `refresh_token`                                                                      |
 | refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request. |
-| scope         | [Scopes](Scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
+| scope         | [Scopes](scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
 
