@@ -1,7 +1,15 @@
 <cnsl-card class="metadata-details" title="{{ 'USER.METADATA.TITLE' | translate }}">
   <div class="metadata-actions">
     <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
-    <button mat-raised-button color="primary" class="edit" (click)="editMetadata()">{{ 'ACTIONS.EDIT' | translate }}</button>
+    <button
+      [disabled]="(['user.write:' + userId, 'user.write'] | hasRole | async) === false"
+      mat-raised-button
+      color="primary"
+      class="edit"
+      (click)="editMetadata()"
+    >
+      {{ 'ACTIONS.EDIT' | translate }}
+    </button>
   </div>
 
   <ng-container *ngIf="metadata?.length; else emptyList">

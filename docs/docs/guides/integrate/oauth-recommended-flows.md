@@ -56,7 +56,7 @@ So what do we want to achieve with delegated authentication?
 
 * Instead of sending around the user’s credentials
   * Clients may access protected resources with an **access token** that is only valid for specific scope and limited lifetime (OAuth 2.x)
-  * Users have to **authorize** applications to access certain [**scopes**](https://docs.zitadel.com/architecture#Scopes) (eg, email address or custom roles). Applications can request [**claims**](https://docs.zitadel.com/architecture#Claims) (key:value pairs, eg email address) for the authorized scopes with the access token or ID token from ZITADEL
+  * Users have to **authorize** applications to access certain [**scopes**](../../apis/openidoauth/scopes) (eg, email address or custom roles). Applications can request [**claims**](../../apis/openidoauth/claims) (key:value pairs, eg email address) for the authorized scopes with the access token or ID token from ZITADEL
   * Access tokens are bearer tokens, meaning that possession of the token provides access to a resource. But the tokens expire frequently and the application must request a new access token via **refresh token** or the user must reauthenticate
 
 ![Overview federated identities](/img/guides/consulting_federated_identities_basics.png)
@@ -115,42 +115,13 @@ If you don’t have any technical limitations, you should favor the flow Authori
 
 We recommend using **“JWT bearer token with private key”** ([RFC7523](https://tools.ietf.org/html/rfc7523)) for Machine-to-Machine clients.
 
-What this means is that you have to send an JWT token, containing the [standard claims for access tokens](https://docs.zitadel.com/architecture#Claims) and that is signed with your private key, to the token endpoint to request the access token. We will see how this works in another module about Service Accounts.
+What this means is that you have to send an JWT token, containing the [standard claims for access tokens](../../apis/openidoauth/claims) and that is signed with your private key, to the token endpoint to request the access token. We will see how this works in another module about Service Accounts.
 
 If you don’t have any technical limitations, you should prefer this method over other methods.
 
 A JWT with a private key can also be used with client profile web to further enhance security.
 
 In case you need alternative flows and their advantages and drawbacks, there will be a module to outline more methods and our recommended fallback strategy per client profile that are available in ZITADEL.
-
-## Knowledge Check (3)
-
-* With federated identities the user sends credentials to the server holding the protected resource
-    - [ ] yes
-    - [ ] no
-* ZITADEL will discover your client profile automatically and set the correct flow
-    - [ ] yes
-    - [ ] no
-* When working with APIs / machine-to-machine communication its recommended to exchange a JWT that is singed with your private key for an access token
-    - [ ] yes
-    - [ ] no
-
-<details>
-    <summary>
-        Solutions
-    </summary>
-
-* With federated identities the user sends credentials to the server holding the protected resource
-    - [ ] yes
-    - [x] no (Users are authenticated against a centralized IDP, only access tokens are send to the requested resources)
-* ZITADEL will discover your client profile automatically and set the correct flow
-    - [ ] yes
-    - [x] no (ZITADEL does not make any assumptions about your application’s requirements)
-* When working with APIs / machine-to-machine communication its recommended to exchange a JWT that is singed with your private key for an access token
-    - [x] yes
-    - [ ] no
-
-</details>
 
 ## Summary (3)
 
@@ -159,7 +130,7 @@ In case you need alternative flows and their advantages and drawbacks, there wil
 * “JWT bearer token with private key” for Machine-to-Machine clients
 * There are alternative flows and fallback strategies supported by ZITADEL, if these flows are technically not possible
 
-Where to go from here
+### Where to go from here
 
 * Applications
 * Service Accounts

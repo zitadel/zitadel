@@ -31,11 +31,14 @@ go get github.com/zitadel/zitadel-go/v2
 ### Create example client
 
 Create a new go file with the content below. This will create a client for the management api and call its `GetMyOrg` function.
-The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:{projectID}:aud`).
-Make sure to fill the vars `issuer`, `api`, `projectID `and `orgID`
+The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:zitadel:aud`).
+Make sure to fill the vars `issuer` and `api`.
 
 The issuer and api is the domain of your instance you can find it on the instance detail in the ZITADEL Cloud Customer Portal or in the ZITADEL Console.
-The projectID you will find in the ZITADEL project in the first organization of your instance and the orgID on the first organization.
+
+:::note
+The issuer will require the protocol (`https://` and `http://`) and you will only have to specify a port if they're not default (443 for https and 80 for http). The API will always require a port, but no protocol. 
+:::
 
 ```go
 package main
@@ -54,43 +57,44 @@ import (
 )
 
 var (
-    issuer    = flag.String("issuer", "", "issuer of your ZITADEL instance (in the form: https://<instance>.zitadel.cloud or https://<yourdomain>)")
-    api       = flag.String("api", "", "gRPC endpoint of your ZITADEL instance (in the form: <instance>.zitadel.cloud:443 or <yourdomain>:443)")
-    projectID = flag.String("projectID", "", "ZITADEL projectID in your instance")
-    orgID     = flag.String("orgID", "", "orgID to set for overwrite example")
+	issuer = flag.String("issuer", "", "issuer of your ZITADEL instance (in the form: https://<instance>.zitadel.cloud or https://<yourdomain>)")
+	api    = flag.String("api", "", "gRPC endpoint of your ZITADEL instance (in the form: <instance>.zitadel.cloud:443 or <yourdomain>:443)")
 )
 
 func main() {
-    flag.Parse()
+	flag.Parse()
 
-    client, err := management.NewClient(
-        *issuer,
-        *api,
-        []string{oidc.ScopeOpenID, zitadel.ScopeProjectID(*projectID)}, 
+	//create a client for the management api providing:
+	//- issuer (e.g. https://acme-dtfhdg.zitadel.cloud)
+	//- api (e.g. acme-dtfhdg.zitadel.cloud:443)
+	//- scopes (including the ZITADEL project ID),
+	//- a JWT Profile token source (e.g. path to your key json), if not provided, the file will be read from the path set in env var ZITADEL_KEY_PATH
+	client, err := management.NewClient(
+		*issuer,
+		*api,
+		[]string{oidc.ScopeOpenID, zitadel.ScopeZitadelAPI()},
 	)
-    if err != nil {
-        log.Fatalln("could not create client", err)
-    }
-    defer func() {
-        err := client.Connection.Close()
-        if err != nil {
-            log.Println("could not close grpc connection", err)
-        }
-    }()
-    
-    ctx := context.Background()
-    
-    resp, err := client.GetMyOrg(ctx, &pb.GetMyOrgRequest{})
-    if err != nil {
-        log.Fatalln("call failed: ", err)
-    }
-    log.Printf("%s was created on: %s", resp.Org.Name, resp.Org.Details.CreationDate.AsTime())
-    
-    respOverwrite, err := client.GetMyOrg(middleware.SetOrgID(ctx, *orgID), &pb.GetMyOrgRequest{})
-    if err != nil {
-        log.Fatalln("call failed: ", err)
-    }
-    log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
+	if err != nil {
+		log.Fatalln("could not create client", err)
+	}
+	defer func() {
+		err := client.Connection.Close()
+		if err != nil {
+			log.Println("could not close grpc connection", err)
+		}
+	}()
+
+	ctx := context.Background()
+
+	//call ZITADEL and print the name and creation date of your organisation
+	//the call was successful if no error occurred
+	resp, err := client.GetMyOrg(ctx, &pb.GetMyOrgRequest{})
+	if err != nil {
+		log.Fatalln("call failed: ", err)
+	}
+	log.Printf("%s was created on: %s", resp.Org.Name, resp.Org.Details.CreationDate.AsTime())
+}
+
 ```
 
 #### Key JSON

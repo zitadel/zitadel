@@ -17,14 +17,14 @@ Typical examples for user metadata include:
 
 ### Create a new client
 
-- Create a new [web application](https://docs.zitadel.com/docs/guides/start/applications#web)
+- Create a new [web application](../console/applications#web)
 - Use Code-Flow
 - In this example we will use `http://localhost` as redirect url
 - Make sure to note the client secret
 
 ### Add metadata to a user
 
-- [Add metadata](https://docs.zitadel.com/docs/manuals/user-profile#metadata) to a user
+- [Add metadata](../../../manuals/user-profile#metadata) to a user
 - Make sure you will use this user to login during later steps
 
 ## Requesting a token
@@ -47,7 +47,7 @@ export ZITADEL_DOMAIN="https://...asd.zitadel.cloud"
 <Tabs>
 <TabItem value="go" label="Go" default>
 
-Grab zitadel-tools to create the [required string](https://docs.zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic) for Basic authentication:
+Grab zitadel-tools to create the [required string](../../../apis/openidoauth/authn-methods#client-secret-basic) for Basic authentication:
 
 ```bash
 git clone git@github.com:zitadel/zitadel-tools.git
@@ -93,7 +93,7 @@ Export the result to the environment variable `BASIC_AUTH`.
 
 <TabItem value="manually" label="Manually">
 
-You need to create a string as described [here](https://docs.zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic).
+You need to create a string as described [here](../../../apis/openidoauth/authn-methods#client-secret-basic).
 
 Use a programming language of your choice or manually create the strings with online tools (don't use these secrets for production) like: 
 
@@ -107,7 +107,7 @@ Export the result to the environment variable `BASIC_AUTH`.
 
 ### Create Auth Request
 
-You need to create a valid auth request, including the reserved scope `urn:zitadel:iam:user:metadata`. Please refer to our API documentation for more information about [reserved scopes](https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes).
+You need to create a valid auth request, including the reserved scope `urn:zitadel:iam:user:metadata`. Please refer to our API documentation for more information about [reserved scopes](../../../apis/openidoauth/scopes#reserved-scopes).
 
 <Tabs>
 

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  zitadel:
+    restart: 'always'
+    networks:
+      - 'zitadel'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    environment:
+      ZITADEL_DATABASE_COCKROACH_HOST: db
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_EXTERNALDOMAIN: zitadel
+      ZITADEL_FIRSTINSTANCE_CUSTOMDOMAIN: zitadel
+
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    ports:
+      - '8080:8080'
+
+  db:
+    restart: 'always'
+    networks:
+      - 'zitadel'
+    image: 'cockroachdb/cockroach:v22.1.0'
+    command: 'start-single-node --insecure'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+    ports:
+      - '9090:8080'
+      - '26257:26257'
+
+  npm-install:
+    image: node:18-alpine3.15
+    working_dir: /e2e
+    volumes:
+    - .:/e2e
+    command: "npm ci"
+
+  e2e:
+    image: cypress/included:10.3.0
+    environment:
+      CYPRESS_BASE_URL: http://zitadel:8080
+    depends_on:
+      zitadel:
+        condition: 'service_started'
+      db:
+        condition: 'service_healthy'
+      npm-install:
+        condition: 'service_completed_successfully'
+    working_dir: /e2e
+    volumes:
+    - .:/e2e
+    networks:
+    - zitadel
+
+networks:
+  zitadel:

@@ -117,6 +117,7 @@ module.exports = {
       items: [
         "guides/integrate/identity-brokering",
         "guides/integrate/access-zitadel-apis",
+        "guides/integrate/access-zitadel-system-api",
         "guides/integrate/authenticated-mongodb-charts",
         "guides/integrate/auth0",
         "guides/integrate/azuread",
