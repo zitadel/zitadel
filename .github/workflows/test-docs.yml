@@ -1,0 +1,15 @@
+name: ZITADEL PR
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'guides/**'
+      - 'tools/**'
+      - '**.md'
+
+jobs:
+  Test:
+    runs-on: ubuntu-20.04
+    steps:
+      - run: 'echo "No tests for docs are implemented, yet"'
