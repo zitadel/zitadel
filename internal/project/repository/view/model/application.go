@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -39,17 +40,17 @@ type ApplicationView struct {
 	IsOIDC                     bool                      `json:"-" gorm:"column:is_oidc"`
 	OIDCVersion                int32                     `json:"oidcVersion" gorm:"column:oidc_version"`
 	OIDCClientID               string                    `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCRedirectUris           []string                  `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
+	OIDCRedirectUris           database.StringArray      `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
 	OIDCResponseTypes          []domain.OIDCResponseType `json:"responseTypes" gorm:"column:oidc_response_types"`
 	OIDCGrantTypes             []domain.OIDCGrantType    `json:"grantTypes" gorm:"column:oidc_grant_types"`
 	OIDCApplicationType        int32                     `json:"applicationType" gorm:"column:oidc_application_type"`
 	OIDCAuthMethodType         int32                     `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
-	OIDCPostLogoutRedirectUris []string                  `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
+	OIDCPostLogoutRedirectUris database.StringArray      `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
 	NoneCompliant              bool                      `json:"-" gorm:"column:none_compliant"`
-	ComplianceProblems         []string                  `json:"-" gorm:"column:compliance_problems"`
+	ComplianceProblems         database.StringArray      `json:"-" gorm:"column:compliance_problems"`
 	DevMode                    bool                      `json:"devMode" gorm:"column:dev_mode"`
-	OriginAllowList            []string                  `json:"-" gorm:"column:origin_allow_list"`
-	AdditionalOrigins          []string                  `json:"additionalOrigins" gorm:"column:additional_origins"`
+	OriginAllowList            database.StringArray      `json:"-" gorm:"column:origin_allow_list"`
+	AdditionalOrigins          database.StringArray      `json:"additionalOrigins" gorm:"column:additional_origins"`
 	AccessTokenType            int32                     `json:"accessTokenType" gorm:"column:access_token_type"`
 	AccessTokenRoleAssertion   bool                      `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
 	IDTokenRoleAssertion       bool                      `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
@@ -168,7 +169,7 @@ func (a *ApplicationView) SetData(event *models.Event) error {
 }
 
 func (a *ApplicationView) setOriginAllowList() error {
-	allowList := make([]string, 0)
+	allowList := make(database.StringArray, 0)
 	for _, redirect := range a.OIDCRedirectUris {
 		origin, err := http_util.GetOriginFromURLString(redirect)
 		if err != nil {

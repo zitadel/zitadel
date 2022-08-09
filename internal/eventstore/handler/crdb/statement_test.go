@@ -447,7 +447,7 @@ func TestNewUpdateStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPDATE my_table SET col1=$1 WHERE (col2 = $2)",
+							query: "UPDATE my_table SET (col1) = ($1) WHERE (col2 = $2)",
 							args:  []interface{}{"val", 1},
 						},
 					},
@@ -772,7 +772,7 @@ func TestNewMultiStatement(t *testing.T) {
 							args:  []interface{}{1},
 						},
 						{
-							query: "UPDATE my_table SET col1=$1 WHERE (col1 = $2)",
+							query: "UPDATE my_table SET (col1) = ($1) WHERE (col1 = $2)",
 							args:  []interface{}{1, 1},
 						},
 					},

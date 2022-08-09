@@ -85,7 +85,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_primary_color=$3, light_background_color=$4, light_warn_color=$5, light_font_color=$6 WHERE (id = $7) AND (state = $8)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (state = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -178,7 +178,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -209,7 +209,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -240,7 +240,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -271,7 +271,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -302,7 +302,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -333,7 +333,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -364,7 +364,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -395,7 +395,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -426,7 +426,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, font_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -457,7 +457,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, font_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -488,7 +488,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_logo_url=$3, light_icon_url=$4, dark_logo_url=$5, dark_icon_url=$6, font_url=$7 WHERE (id = $8) AND (state = $9)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -568,7 +568,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_primary_color=$3, light_background_color=$4, light_warn_color=$5, light_font_color=$6, dark_primary_color=$7, dark_background_color=$8, dark_warn_color=$9, dark_font_color=$10, hide_login_name_suffix=$11, should_error_popup=$12, watermark_disabled=$13 WHERE (id = $14) AND (state = $15)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (id = $14) AND (state = $15)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -641,7 +641,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -672,7 +672,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -703,7 +703,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -734,7 +734,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -765,7 +765,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -796,7 +796,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_logo_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -827,7 +827,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -858,7 +858,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, dark_icon_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -889,7 +889,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, font_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -920,7 +920,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, font_url=$3 WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -951,7 +951,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.label_policies SET change_date=$1, sequence=$2, light_logo_url=$3, light_icon_url=$4, dark_logo_url=$5, dark_icon_url=$6, font_url=$7 WHERE (id = $8) AND (state = $9)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

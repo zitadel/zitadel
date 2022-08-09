@@ -82,7 +82,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.lockout_policies SET change_date=$1, sequence=$2, max_password_attempts=$3, show_failure=$4 WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -182,7 +182,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.lockout_policies SET change_date=$1, sequence=$2, max_password_attempts=$3, show_failure=$4 WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

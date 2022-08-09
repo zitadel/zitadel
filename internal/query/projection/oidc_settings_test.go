@@ -39,7 +39,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.oidc_settings SET change_date=$1, sequence=$2, access_token_lifetime=$3, id_token_lifetime=$4, refresh_token_idle_expiration=$5, refresh_token_expiration=$6 WHERE (aggregate_id = $7)",
+							expectedStmt: "UPDATE projections.oidc_settings SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

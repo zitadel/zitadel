@@ -93,7 +93,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_roles SET change_date=$1, sequence=$2, display_name=$3, group_name=$4 WHERE (role_key = $5) AND (project_id = $6)",
+							expectedStmt: "UPDATE projections.project_roles SET (change_date, sequence, display_name, group_name) = ($1, $2, $3, $4) WHERE (role_key = $5) AND (project_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

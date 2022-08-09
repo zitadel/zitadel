@@ -114,7 +114,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, allow_register=$3, allow_username_password=$4, allow_external_idps=$5, force_mfa=$6, passwordless_type=$7, hide_password_reset=$8, ignore_unknown_usernames=$9, default_redirect_uri=$10, password_check_lifetime=$11, external_login_check_lifetime=$12, mfa_init_skip_lifetime=$13, second_factor_check_lifetime=$14, multi_factor_check_lifetime=$15 WHERE (aggregate_id = $16)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames, default_redirect_uri, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) WHERE (aggregate_id = $16)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -158,7 +158,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, multi_factors=array_append(multi_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -190,7 +190,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, multi_factors=array_remove(multi_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -249,7 +249,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, second_factors=array_append(second_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -281,7 +281,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, second_factors=array_remove(second_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -379,7 +379,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, allow_register=$3, allow_username_password=$4, allow_external_idps=$5, force_mfa=$6, passwordless_type=$7, hide_password_reset=$8, ignore_unknown_usernames=$9, default_redirect_uri=$10 WHERE (aggregate_id = $11)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, ignore_unknown_usernames, default_redirect_uri) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) WHERE (aggregate_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -418,7 +418,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, multi_factors=array_append(multi_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -450,7 +450,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, multi_factors=array_remove(multi_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -482,7 +482,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, second_factors=array_append(second_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -514,7 +514,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_policies SET change_date=$1, sequence=$2, second_factors=array_remove(second_factors, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

@@ -1602,7 +1602,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 			},
 			want: want{
 				isErr: func(err error) bool {
-					return errors.As(err, &errSeqNotUpdated)
+					return errors.Is(err, errSeqNotUpdated)
 				},
 				expectations: []mockExpectation{
 					expectUpdateCurrentSequenceNoRows("my_table", "my_projection", 5, "agg", "instanceID"),

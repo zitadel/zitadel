@@ -77,7 +77,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions SET change_date=$1, sequence=$2, name=$3, script=$4 WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -108,7 +108,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions SET change_date=$1, sequence=$2, action_state=$3 WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -138,7 +138,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions SET change_date=$1, sequence=$2, action_state=$3 WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

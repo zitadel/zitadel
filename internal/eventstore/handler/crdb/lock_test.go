@@ -168,7 +168,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 					expectLockNoRows(lockTable, workerName, 2*time.Second, "instanceID"),
 				},
 				isErr: func(err error) bool {
-					return errors.As(err, &renewNoRowsAffectedErr)
+					return errors.Is(err, renewNoRowsAffectedErr)
 				},
 			},
 			args: args{

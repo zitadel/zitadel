@@ -84,11 +84,6 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	wheres, whereArgs := conditionsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
 
-	updates := make([]string, len(cols))
-	for i, col := range cols {
-		updates[i] = col + "=" + params[i]
-	}
-
 	config := execConfig{
 		args: args,
 	}
@@ -102,7 +97,7 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	}
 
 	q := func(config execConfig) string {
-		return "UPDATE " + config.tableName + " SET " + strings.Join(updates, ", ") + " WHERE " + strings.Join(wheres, " AND ")
+		return "UPDATE " + config.tableName + " SET (" + strings.Join(cols, ", ") + ") = (" + strings.Join(params, ", ") + ") WHERE " + strings.Join(wheres, " AND ")
 	}
 
 	return &handler.Statement{
@@ -235,7 +230,7 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	}
 }
 
-//NewCopyStatement creates a new upsert statement which updates a column from an existing row
+// NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
