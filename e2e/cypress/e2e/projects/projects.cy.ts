@@ -24,7 +24,7 @@ describe('projects', () => {
     });
   });
 
-  describe('remove project', () => {
+  describe.skip('remove project', () => {
     describe('list view', () => {
       beforeEach('ensure it exists', () => {
         apiAuth().then((api) => {
