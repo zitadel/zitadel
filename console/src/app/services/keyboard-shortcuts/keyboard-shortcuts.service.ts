@@ -6,16 +6,17 @@ import { BehaviorSubject, Observable, of, pairwise, Subject, takeUntil } from 'r
 import { KeyboardShortcutsComponent } from '../../modules/keyboard-shortcuts/keyboard-shortcuts.component';
 import { GrpcAuthService } from '../grpc-auth.service';
 import {
-    ACTIONS,
-    DOMAINS,
-    HOME,
-    INSTANCE,
-    KeyboardShortcut,
-    ME,
-    ORG,
-    PROJECTS,
-    USERGRANTS,
-    USERS,
+  ACTIONS,
+  DOMAINS,
+  HOME,
+  INSTANCE,
+  KeyboardShortcut,
+  ME,
+  ORG,
+  ORGSETTINGS,
+  PROJECTS,
+  USERGRANTS,
+  USERS,
 } from './keyboard-shortcuts';
 
 @Injectable({
@@ -58,7 +59,7 @@ export class KeyboardShortcutsService implements OnDestroy {
             this.router.navigate(HOME.link);
           }
         }
-        if (firstKey.code === 'KeyG' && secondKey.code === 'KeyS') {
+        if (firstKey.code === 'KeyG' && secondKey.code === 'KeyI') {
           if (this.hasPermission(INSTANCE)) {
             this.router.navigate(INSTANCE.link);
           }
@@ -96,6 +97,11 @@ export class KeyboardShortcutsService implements OnDestroy {
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyD') {
           if (this.hasPermission(DOMAINS)) {
             this.router.navigate(DOMAINS.link);
+          }
+        }
+        if (firstKey.code === 'KeyG' && secondKey.code === 'KeyS') {
+          if (this.hasPermission(ORGSETTINGS)) {
+            this.router.navigate(ORGSETTINGS.link);
           }
         }
       } else if (secondKey && exclude.indexOf(secondTagname?.toLowerCase()) === -1) {
