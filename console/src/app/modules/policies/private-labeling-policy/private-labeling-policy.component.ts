@@ -4,15 +4,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
-    GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
-    GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
-    UpdateLabelPolicyRequest,
+  GetLabelPolicyResponse as AdminGetLabelPolicyResponse,
+  GetPreviewLabelPolicyResponse as AdminGetPreviewLabelPolicyResponse,
+  UpdateLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    AddCustomLabelPolicyRequest,
-    GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
-    GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
-    UpdateCustomLabelPolicyRequest,
+  AddCustomLabelPolicyRequest,
+  GetLabelPolicyResponse as MgmtGetLabelPolicyResponse,
+  GetPreviewLabelPolicyResponse as MgmtGetPreviewLabelPolicyResponse,
+  UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -111,8 +111,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public onDropLogo(theme: Theme, filelist: FileList): Promise<any> | void {
     const file = filelist.item(0);
     if (file) {
+      console.log(file);
       if (file.size > MAX_ALLOWED_SIZE) {
-        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+        this.toast.showError('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', false, true);
+      } else if (file.type === 'image/svg+xml') {
+        this.toast.showError('POLICY.PRIVATELABELING.NOSVGSUPPORTED', false, true);
       } else {
         const formData = new FormData();
         formData.append('file', file);

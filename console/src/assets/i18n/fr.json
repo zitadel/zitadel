@@ -1003,6 +1003,7 @@
       "MAXSIZE": "La taille maximale est limitée à 524 Ko.",
       "EMAILNOSVG": "Le format de fichier SVG n'est pas supporté dans les emails. Téléchargez donc votre logo en PNG ou dans un autre format pris en charge.",
       "MAXSIZEEXCEEDED": "La taille maximale de 524kB est dépassée.",
+      "NOSVGSUPPORTED": "SVG n'est pas pris en charge",
       "FONTINLOGINONLY": "La police n'est actuellement affichée que dans l'interface de connexion.",
       "VIEWS": {
         "PREVIEW": "Aperçu",
