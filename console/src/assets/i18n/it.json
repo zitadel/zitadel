@@ -540,12 +540,12 @@
       "INVALIDPATTERN": "La password non soddisfa le regole definite.",
       "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail",
       "REQUIRED": "Il campo di input \u00e8 vuoto.",
-      "MINLENGTH": "La password deve essere lunga almeno {{requiredLength}} caratteri.",
+      "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
       "NOEMAIL": "Il nome utente non pu\u00f2 essere un indirizzo e-mail.",
-      "UPPERCASEMISSING": "La password deve includere un carattere maiuscolo.",
-      "LOWERCASEMISSING": "La password deve includere un carattere minuscolo.",
-      "SYMBOLERROR": "La password deve includere un simbolo o un segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra."
+      "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
+      "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
+      "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra."
     },
     "STATE": {
       "0": "Sconosciuto",

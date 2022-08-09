@@ -482,7 +482,7 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
       "NOTEQUAL": "Die Passwörter stimmen nicht überein."
     },
     "ID": "ID",
@@ -542,10 +542,10 @@
       "REQUIRED": "Das Eingabefeld ist leer.",
       "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
       "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
-      "UPPERCASEMISSING": "Passwort muss einen Grossbuchstaben beinhalten.",
-      "LOWERCASEMISSING": "Passwort muss einen Kleinbuchstaben beinhalten.",
-      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten."
+      "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
+      "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
+      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Muss eine Ziffer beinhalten."
     },
     "STATE": {
       "0": "Unbekannt",
@@ -976,9 +976,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
       "DESCRIPTION": "Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-      "SYMBOLANDNUMBERERROR": "Das Passwort muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
-      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten.",
+      "SYMBOLANDNUMBERERROR": "Muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
+      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "PRIVATELABELING": {
