@@ -841,6 +841,18 @@ service ManagementService {
         };
     }
 
+    // Sets the state of my organisation to deactivated
+    // Users of this organisation will not be able login
+    rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
     // Returns all registered domains of my organisation
     // Limit should always be set, there is a default limit set by the service
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
@@ -3550,6 +3562,12 @@ message DeactivateOrgResponse {
 message ReactivateOrgRequest {}
 
 message ReactivateOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveOrgRequest {}
+
+message RemoveOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

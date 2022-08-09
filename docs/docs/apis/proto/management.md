@@ -804,6 +804,19 @@ Sets the state of my organisation to active
     POST: /orgs/me/_reactivate
 
 
+### RemoveOrg
+
+> **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
+[RemoveOrgResponse](#removeorgresponse)
+
+Sets the state of my organisation to deactivated
+Users of this organisation will not be able login
+
+
+
+    DELETE: /orgs/me
+
+
 ### ListOrgDomains
 
 > **rpc** ListOrgDomains([ListOrgDomainsRequest](#listorgdomainsrequest))
@@ -6714,6 +6727,23 @@ This is an empty response
 
 
 ### RemoveOrgMemberResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveOrgRequest
+
+
+
+
+
+### RemoveOrgResponse
 
 
 

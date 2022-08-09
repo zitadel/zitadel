@@ -98,6 +98,15 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 	}, err
 }
 
+func (s *Server) RemoveOrg(ctx context.Context, req *mgmt_pb.RemoveOrgRequest) (*mgmt_pb.RemoveOrgResponse, error) {
+	details, err := s.command.RemoveOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &mgmt_pb.RemoveOrgResponse{Details: object.DomainToChangeDetailsPb(details)}, nil
+}
+
 func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPolicyRequest) (*mgmt_pb.GetDomainPolicyResponse, error) {
 	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {

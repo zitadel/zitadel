@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
@@ -81,7 +80,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string)
 	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
 }
 
-//AddOrgCommand defines the commands to create a new org,
+// AddOrgCommand defines the commands to create a new org,
 // this includes the verified default domain
 func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
@@ -106,7 +105,7 @@ func (c *Commands) getOrg(ctx context.Context, orgID string) (*domain.Org, error
 		return nil, err
 	}
 	if writeModel.State == domain.OrgStateUnspecified || writeModel.State == domain.OrgStateRemoved {
-		return nil, caos_errs.ThrowInternal(err, "COMMAND-4M9sf", "Errors.Org.NotFound")
+		return nil, errors.ThrowInternal(err, "COMMAND-4M9sf", "Errors.Org.NotFound")
 	}
 	return orgWriteModelToOrg(writeModel), nil
 }
@@ -117,7 +116,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 		return err
 	}
 	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Org.NotFound")
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Org.NotFound")
 	}
 	return nil
 }
@@ -128,7 +127,7 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 		return nil, err
 	}
 	if existingOrg.State != domain.OrgStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
+		return nil, errors.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
 	}
 
 	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
@@ -136,12 +135,12 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 
 func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
 	if name == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
 
 	orgID, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
+		return nil, errors.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
 	}
 
 	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
@@ -175,7 +174,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 
 func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
 	if orgID == "" || name == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
 
 	orgWriteModel, err := c.getOrgWriteModelByID(ctx, orgID)
@@ -183,10 +182,10 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 		return nil, err
 	}
 	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
+		return nil, errors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.Name == name {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
+		return nil, errors.ThrowNotFound(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	events := make([]eventstore.Command, 0)
@@ -215,10 +214,10 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, err
 	}
 	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
+		return nil, errors.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
@@ -238,10 +237,10 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, err
 	}
 	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
+		return nil, errors.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
+		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
@@ -253,6 +252,36 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, err
 	}
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
+}
+
+func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg))
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := c.getOrgWriteModelByID(ctx, a.ID)
+			if err != nil {
+				return nil, errors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")
+			}
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}, nil
+		}, nil
+	}
 }
 
 func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
@@ -286,7 +315,7 @@ func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id 
 
 func (c *Commands) addOrgWithID(ctx context.Context, organisation *domain.Org, orgID string, claimedUserIDs []string) (_ *eventstore.Aggregate, _ *OrgWriteModel, _ []eventstore.Command, err error) {
 	if !organisation.IsValid() {
-		return nil, nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMM-deLSk", "Errors.Org.Invalid")
+		return nil, nil, nil, errors.ThrowInvalidArgument(nil, "COMM-deLSk", "Errors.Org.Invalid")
 	}
 
 	organisation.AggregateID = orgID
