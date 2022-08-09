@@ -10,7 +10,7 @@ Scope of the project is agreed on individual basis.
 
 - Check prerequisites and architecture
 - Troubleshoot installation and configuration of ZITADEL
-- Troubleshoot installation and configuration of CockroachDB
+- Troubleshoot and configuration connectivity to the database
 - Functional testing of the ZITADEL instance
 
 ## Out of Scope
@@ -19,7 +19,7 @@ Scope of the project is agreed on individual basis.
 - Integration into internal monitoring and alerting
 - Multi-cluster architecture deployments
 - DNS, Network and Firewall configuration
-- Kubernetes configuration
+- Customer-specific Kubernetes configuration needs
 - Changes for specific environments
 - Performance testing
 - Production deployment
@@ -30,6 +30,6 @@ Scope of the project is agreed on individual basis.
 ## Prerequisites
 
 - Running Kubernetes with possibility to deploy to namespaces
-- Inbound and outbound gRPC-Web traffic possible (for example not natively supported by nginx)
+- Inbound and outbound HTTP/2 traffic possible
 - For being able to send SMS, we need a Twilio sender name, SID and an auth token
 - ZITADEL also needs to connect to an email relay of your choice. We need the SMTP host, user and app key as well as the ZITADEL emails sender address and name.
