@@ -1,0 +1,94 @@
+---
+title: Login Users into your Application
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import AuthMethods from "./authmethods.mdx";
+
+## Overview
+
+This guide will show you how to use ZITADEL to login users into your application (authentication).
+It will guide you step-by-step through the basics and point out on how to customize process.
+
+## OIDC / OAuth Flow
+
+OAuth and therefore OIDC know three different application types:
+
+- Web (Server-side web applications such as java, .net, ...)
+- Native (native, mobile or desktop applications)
+- User Agent (single page applications / SPA, generally JavaScript executed in the browser)
+
+Depending on the app type you're trying to register, there are small differences.
+But regardless of the app type we recommend using Proof Key for Code Exchange (PKCE).
+
+Please read the following guide about the [different-client-profiles](./oauth-recommended-flows#different-client-profiles) and why to use PKCE.
+
+### Code Flow
+
+For a basic understanding of OAuth and its flows, we'll briefly describe the most important flow: **Authorization Code**.
+
+The following diagram demonstrates a basic authorization_code flow:
+
+![Authorization Code Flow](/img/guides/auth_flow.png)
+
+1. When an unauthenticated user visits your application,
+2. you will create an authorization request to the authorization endpoint.
+3. The Authorization Server (ZITADEL) will send an HTTP 302 to the user's browser, which will redirect him to the login UI.
+4. The user will have to authenticate using the demanded auth mechanics.
+5. Your application will be called on the registered callback path (redirect_uri) and be provided an authorization_code.
+6. This authorization_code must then be sent together with you applications authentication (client_id + client_secret) to the token_endpoint
+7. In exchange the Authorization Server (ZITADEL) will return an access_token and if requested a refresh_token and in the case of OIDC an id_token as well
+8. The access_token can then be used to call a Resource Server (API). The token will be sent as Authorization Header.
+
+This flow is the same when using PKCE or JWT with Private Key for authentication.
+
+## Create Application
+
+To create an application, open your project in Console and start by clicking on the "New" button in the Application section.
+
+#### Application type
+
+This will start a wizard asking you for an application name and a type.
+
+<Tabs
+    groupId="app-type"
+    default="web"
+    values={[
+        {'label': 'Web Application', 'value': 'web'},
+        {'label': 'Native Application', 'value': 'native'},
+        {'label': 'Single Page Application', 'value': 'spa'},
+    ]}
+>
+<TabItem value="web">
+
+#### Authentication method
+
+After selecting WEB, you'll next have to choose an authentication method. As mentioned before we recommend using PKCE.
+For even better security you could switch to JWT or just rely on the standard Code Flow. For security reasons we don't
+recommend using POST and will not cover it in this guide.
+
+Please change the authentication method here as well, if you did so in the wizard, so we can better guide you through the process:
+
+<AuthMethods selected="web" />
+</TabItem>
+
+<TabItem value="native">
+
+#### Authentication method
+
+When selecting Native the authentication method always needs to be PKCE.
+
+<AuthMethods selected="native" />
+</TabItem>
+
+<TabItem value="spa">
+
+#### Authentication method
+
+When selecting SPA the recommended authentication method is again PKCE. All common Frameworks like Angular, React, Vue.js and so on
+are able to successfully authenticate with PKCE. Our Managament UI Console for instance uses PKCE as well.
+
+<AuthMethods selected="spa" />
+</TabItem>
+</Tabs>

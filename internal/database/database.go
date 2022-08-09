@@ -7,6 +7,7 @@ import (
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type Config struct {
@@ -40,8 +41,9 @@ func Connect(config Config, useAdmin bool) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if err := client.Ping(); err != nil {
-		return nil, err
+		return nil, errors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
 
 	return client, nil

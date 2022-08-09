@@ -218,7 +218,7 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 	return events, nil
 }
 
-//LatestSequence returns the latest sequence found by the search query
+// LatestSequence returns the latest sequence found by the search query
 func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
 	var seq Sequence
 	err := query(ctx, db, searchQuery, &seq)
@@ -228,7 +228,7 @@ func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.Sear
 	return uint64(seq), nil
 }
 
-//InstanceIDs returns the instance ids found by the search query
+// InstanceIDs returns the instance ids found by the search query
 func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQuery) ([]string, error) {
 	var ids []string
 	err := query(ctx, db, searchQuery, &ids)
@@ -331,7 +331,7 @@ var (
 	placeholder = regexp.MustCompile(`\?`)
 )
 
-//placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
+// placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
 func (db *CRDB) placeholder(query string) string {
 	occurances := placeholder.FindAllStringIndex(query, -1)
 	if len(occurances) == 0 {

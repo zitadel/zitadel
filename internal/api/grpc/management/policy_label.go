@@ -34,7 +34,7 @@ func (s *Server) GetDefaultLabelPolicy(ctx context.Context, req *mgmt_pb.GetDefa
 }
 
 func (s *Server) AddCustomLabelPolicy(ctx context.Context, req *mgmt_pb.AddCustomLabelPolicyRequest) (*mgmt_pb.AddCustomLabelPolicyResponse, error) {
-	policy, err := s.command.AddLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID, addLabelPolicyToDomain(req))
+	policy, err := s.command.AddLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID, AddLabelPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

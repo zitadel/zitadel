@@ -221,6 +221,8 @@ import {
     ListPersonalAccessTokensResponse,
     ListProjectChangesRequest,
     ListProjectChangesResponse,
+    ListProjectGrantChangesRequest,
+    ListProjectGrantChangesResponse,
     ListProjectGrantMemberRolesRequest,
     ListProjectGrantMemberRolesResponse,
     ListProjectGrantMembersRequest,
@@ -1774,6 +1776,28 @@ export class ManagementService {
 
     req.setQuery(query);
     return this.grpcService.mgmt.listProjectChanges(req, null).then((resp) => resp.toObject());
+  }
+
+  public listProjectGrantChanges(
+    projectId: string,
+    grantId: string,
+    limit: number,
+    sequence: number,
+  ): Promise<ListProjectGrantChangesResponse.AsObject> {
+    const req = new ListProjectGrantChangesRequest();
+    req.setProjectId(projectId);
+    req.setGrantId(grantId);
+    const query = new ChangeQuery();
+
+    if (limit) {
+      query.setLimit(limit);
+    }
+    if (sequence) {
+      query.setSequence(sequence);
+    }
+
+    req.setQuery(query);
+    return this.grpcService.mgmt.listProjectGrantChanges(req, null).then((resp) => resp.toObject());
   }
 
   public listUserChanges(userId: string, limit: number, sequence: number): Promise<ListUserChangesResponse.AsObject> {

@@ -39,7 +39,7 @@
             <div class="lgn-suffix-wrapper">
                 <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
                        value="{{ .Username }}" required>
-                {{if .ShowUsername}}
+                {{if .ShowUsernameSuffix}}
                 <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
             </div>

@@ -734,6 +734,39 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceDomainClaimed",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserDomainClaimedType),
+					user.AggregateType,
+					[]byte(`{
+						"username": "id@temporary.domain"
+					}`),
+				), user.DomainClaimedEventMapper),
+			},
+			reduce: (&userProjection{}).reduceDomainClaimed,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users2 SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								"id@temporary.domain",
+								uint64(15),
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceHumanProfileChanged",
 			args: args{
 				event: getEvent(testEvent(

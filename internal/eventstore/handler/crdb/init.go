@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
 
@@ -186,7 +185,7 @@ type ForeignKey struct {
 	RefColumns []string
 }
 
-//Init implements handler.Init
+// Init implements handler.Init
 func (h *StatementHandler) Init(ctx context.Context, checks ...*handler.Check) error {
 	for _, check := range checks {
 		if check == nil || check.IsNoop() {

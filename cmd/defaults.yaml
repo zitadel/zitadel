@@ -3,33 +3,6 @@ Log:
   Formatter:
     Format: text
 
-Database:
-  cockroach:
-    Host: localhost
-    Port: 26257
-    Database: zitadel
-    MaxOpenConns: 20
-    MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
-    Options: ""
-    User:
-      Username: zitadel
-      Password: ""
-      SSL:
-        Mode: disable
-        RootCert: ""
-        Cert: ""
-        Key: ""
-    Admin:
-      Username: root
-      Password: ""
-      SSL:
-        Mode: disable
-        RootCert: ""
-        Cert: ""
-        Key: ""
-
-
 # Exposes metrics on /debug/metrics
 Metrics:
   # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
@@ -70,6 +43,32 @@ HTTP2HostHeader: ":authority"
 HTTP1HostHeader: "host"
 
 WebAuthNName: ZITADEL
+
+Database:
+  cockroach:
+    Host: localhost
+    Port: 26257
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: ""
+    User:
+      Username: zitadel
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
+    Admin:
+      Username: root
+      Password: ""
+      SSL:
+        Mode: disable
+        RootCert: ""
+        Cert: ""
+        Key: ""
 
 Machine:
   # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
@@ -216,10 +215,11 @@ EncryptionKeys:
 
 SystemAPIUsers:
   # add keys for authentication of the systemAPI here:
+  # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
   # - superuser:
-  #     Path: /path/to/superuser/key.pem
+  #     Path: /path/to/superuser/key.pem  # you can provide the key either by reference with the path
   # - superuser2:
-  #     Path: /path/to/superuser2/key.pem
+  #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 
 #TODO: remove as soon as possible
 SystemDefaults:

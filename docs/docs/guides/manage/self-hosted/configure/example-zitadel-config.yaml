@@ -1,0 +1,23 @@
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
+Log:
+  Level: 'info'
+
+# Make ZITADEL accessible over HTTP, not HTTPS
+ExternalSecure: false
+
+# If not using the docker compose example, adjust these values for connecting ZITADEL to your CockroachDB
+Database:
+  cockroach:
+    Host: 'my-cockroach-db'
+    User:
+      SSL:
+        Mode: 'verify-full'
+        RootCert: "/crdb-certs/ca.crt"
+        Cert: "/crdb-certs/client.zitadel_user.crt"
+        Key: "/crdb-certs/client.zitadel_user.key"
+    Admin:
+      SSL:
+        Mode: 'verify-full'
+        RootCert: "/crdb-certs/ca.crt"
+        Cert: "/crdb-certs/client.root.crt"
+        Key: "/crdb-certs/client.root.key"

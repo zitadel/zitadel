@@ -65,7 +65,6 @@ func InitAll(config *Config) {
 		VerifyDatabase(config.Database.Database()),
 		VerifyGrant(config.Database.Database(), config.Database.Username()),
 	)
-
 	logging.OnError(err).Fatal("unable to initialize the database")
 
 	err = verifyZitadel(config.Database)

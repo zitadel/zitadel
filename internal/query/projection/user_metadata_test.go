@@ -77,7 +77,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata WHERE (user_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1) AND (key = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
@@ -105,7 +105,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -132,7 +132,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

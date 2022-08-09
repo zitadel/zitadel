@@ -1,0 +1,58 @@
+---
+title: TLS Modes
+---
+
+To allow ZITADEL to be run on any kind of infrastrucute it allows to configure on how tho handle TLS connections.
+There are three mode of operation:  `external`, `enabled`, `disabled`.
+
+Generally this command is set as argument while starting ZITADEL. For example like this:
+
+```bash
+zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+```
+
+## External 
+
+The mode `external` allows you to configure ZITADEL in such a way that it will instruct its clients to use https.
+However ZITADEL delegates the management of TLS connections to a reverseproxy, web application firewall or a service mesh.
+
+## Enabled
+
+When using the mode `enabled` ZITADEL is setup to await incoming connections in an encrypted fashion. 
+Wether it is from a client directly, a reverseproxy or web application firewall.
+This allows http connections to be secured at the transport level the whole way.
+
+If you use the mode `enabled` you need to configure ZITADEL with the nessecary TLS settings.
+
+```yaml
+TLS:
+  # if enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
+  # you must then also provide a private key and certificate to be used for the connection
+  # either directly or by a path to the corresponding file
+  Enabled: true
+  # Path to the private key of the TLS certificate, it will be loaded into the Key
+  # and overwrite any exising value
+  KeyPath: #/path/to/key/file.pem
+  # Private key of the TLS certificate (KeyPath will this overwrite, if specified)
+  Key: #<bas64 encoded content of a pem file>
+  # Path to the certificate for the TLS connection, it will be loaded into the Cert
+  # and overwrite any exising value
+  CertPath: #/path/to/cert/file.pem
+  # Certificate for the TLS connection (CertPath will this overwrite, if specified)
+  Cert: #<bas64 encoded content of a pem file>
+```
+ 
+## Disabled
+
+With the mode `disabled` ZITADEL is instructed to await all connections with plain http without TLS.
+
+:::caution
+
+Be aware this is not a secure setup and should only be used for test systems!
+
+:::
+
+## HTTP/2
+
+To allow ZITADEL to function properly please make sure that HTTP/2 is enabled. If you are using the mode `external` or `disabled` make sure to verify h2c compatibilty.
+You can read more about how ZITADEL utilizes in our [HTTP/2 docs](/docs/guides/manage/self-hosted/http2).

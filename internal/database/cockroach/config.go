@@ -8,6 +8,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
@@ -17,7 +18,7 @@ const (
 
 type Config struct {
 	Host            string
-	Port            int32
+	Port            uint16
 	Database        string
 	MaxOpenConns    uint32
 	MaxConnLifetime time.Duration
@@ -57,7 +58,16 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
-	return sql.Open("pgx", c.String(useAdmin))
+	client, err := sql.Open("pgx", c.String(useAdmin))
+	if err != nil {
+		return nil, err
+	}
+
+	client.SetMaxOpenConns(int(c.MaxOpenConns))
+	client.SetConnMaxLifetime(c.MaxConnLifetime)
+	client.SetConnMaxIdleTime(c.MaxConnIdleTime)
+
+	return client, nil
 }
 
 func (c *Config) DatabaseName() string {
@@ -117,6 +127,7 @@ func (c Config) String(useAdmin bool) string {
 		"host=" + c.Host,
 		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + user.Username,
+		"dbname=" + c.Database,
 		"application_name=zitadel",
 		"sslmode=" + user.SSL.Mode,
 	}

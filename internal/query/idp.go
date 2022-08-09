@@ -502,3 +502,15 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 			}, nil
 		}
 }
+
+func (q *Queries) GetOIDCIDPClientSecret(ctx context.Context, shouldRealTime bool, resourceowner, idpID string) (string, error) {
+	idp, err := q.IDPByIDAndResourceOwner(ctx, shouldRealTime, idpID, resourceowner)
+	if err != nil {
+		return "", err
+	}
+
+	if idp.ClientSecret != nil && idp.ClientSecret.Crypted != nil {
+		return crypto.DecryptString(idp.ClientSecret, q.idpConfigEncryption)
+	}
+	return "", errors.ThrowNotFound(nil, "QUERY-bsm2o", "Errors.Query.NotFound")
+}

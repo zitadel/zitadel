@@ -201,6 +201,10 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceUserNameChanged,
 				},
 				{
+					Event:  user.UserDomainClaimedType,
+					Reduce: p.reduceDomainClaimed,
+				},
+				{
 					Event:  user.HumanProfileChangedType,
 					Reduce: p.reduceHumanProfileChanged,
 				},
@@ -502,6 +506,26 @@ func (p *userProjection) reduceUserNameChanged(event eventstore.Event) (*handler
 	e, ok := event.(*user.UsernameChangedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QNKyV", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserChangeDateCol, e.CreationDate()),
+			handler.NewCol(UserUsernameCol, e.UserName),
+			handler.NewCol(UserSequenceCol, e.Sequence()),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *userProjection) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.DomainClaimedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
 
 	return crdb.NewUpdateStatement(

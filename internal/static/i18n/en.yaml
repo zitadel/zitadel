@@ -172,6 +172,7 @@ Errors:
     IdpIsNotOIDC: IDP configuration is not of type oidc
     Domain:
       AlreadyExists: Domain already exists
+      InvalidCharacter: Only alphanumeric characters, . and - are allowed for a domain
     IDP:
       InvalidSearchQuery: Invalid search query
     LoginPolicy:

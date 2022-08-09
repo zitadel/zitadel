@@ -311,6 +311,28 @@ func ListComparisonFromMethod(m domain.SearchMethod) ListComparison {
 	}
 }
 
+type or struct {
+	queries []SearchQuery
+}
+
+func Or(queries ...SearchQuery) *or {
+	return &or{
+		queries: queries,
+	}
+}
+
+func (q *or) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *or) comp() sq.Sqlizer {
+	queries := make([]sq.Sqlizer, 0)
+	for _, query := range q.queries {
+		queries = append(queries, query.comp())
+	}
+	return sq.Or(queries)
+}
+
 type BoolQuery struct {
 	Column Column
 	Value  bool

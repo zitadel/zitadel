@@ -57,7 +57,16 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
-	return sql.Open("pgx", c.String(useAdmin))
+	db, err := sql.Open("pgx", c.String(useAdmin))
+	if err != nil {
+		return nil, err
+	}
+
+	db.SetMaxOpenConns(int(c.MaxOpenConns))
+	db.SetConnMaxLifetime(c.MaxConnLifetime)
+	db.SetConnMaxIdleTime(c.MaxConnIdleTime)
+
+	return db, nil
 }
 
 func (c *Config) DatabaseName() string {

@@ -49,7 +49,9 @@ export class ProfilePictureComponent {
           this.data.profilePic = resp.user?.human?.profile?.avatarUrl ?? '';
         });
       })
-      .catch((error) => this.toast.showError(error));
+      .catch((error) => {
+        this.toast.showError(error.error, false);
+      });
   }
 
   public closeDialog(): void {
