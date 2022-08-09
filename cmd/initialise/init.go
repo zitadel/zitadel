@@ -74,7 +74,10 @@ func InitAll(config *Config) {
 func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 	logging.Info("initialization started")
 
-	ReadStmts(config.Type())
+	err := ReadStmts(config.Type())
+	if err != nil {
+		return err
+	}
 
 	db, err := database.Connect(config, true)
 	if err != nil {
