@@ -82,7 +82,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_age_policies SET change_date=$1, sequence=$2, expire_warn_days=$3, max_age_days=$4 WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.password_age_policies SET (change_date, sequence, expire_warn_days, max_age_days) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -182,7 +182,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_age_policies SET change_date=$1, sequence=$2, expire_warn_days=$3, max_age_days=$4 WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.password_age_policies SET (change_date, sequence, expire_warn_days, max_age_days) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

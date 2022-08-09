@@ -79,7 +79,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_members SET roles=$1, change_date=$2, sequence=$3 WHERE (user_id = $4) AND (org_id = $5)",
+							expectedStmt: "UPDATE projections.org_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (org_id = $5)",
 							expectedArgs: []interface{}{
 								[]string{"role", "changed"},
 								anyArg{},

@@ -324,7 +324,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, title=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -360,7 +360,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, pre_header=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, pre_header) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -396,7 +396,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, subject=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, subject) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -432,7 +432,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, greeting=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, greeting) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -468,7 +468,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, text=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -504,7 +504,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, button_text=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, button_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -540,7 +540,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, footer_text=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, footer_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -649,7 +649,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.message_texts SET change_date=$1, sequence=$2, title=$3 WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
+							expectedStmt: "UPDATE projections.message_texts SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

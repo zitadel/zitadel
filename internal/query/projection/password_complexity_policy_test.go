@@ -91,7 +91,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_complexity_policies SET change_date=$1, sequence=$2, min_length=$3, has_lowercase=$4, has_uppercase=$5, has_symbol=$6, has_number=$7 WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -203,7 +203,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_complexity_policies SET change_date=$1, sequence=$2, min_length=$3, has_lowercase=$4, has_uppercase=$5, has_symbol=$6, has_number=$7 WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
