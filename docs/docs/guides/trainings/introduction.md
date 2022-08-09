@@ -10,7 +10,7 @@ Training should be held as block-sessions with the relevant staff from your orga
 
 You receive professional onboarding support from our engineers, who help you to setup and configure ZITADEL on your infrastructure.
 
-Effort required during depends on the complexity of your infrastructure and the overall setup. With a Multi-Zone Setup (excl. Multi-Region). Typically support during this phase requires around 10-25h over 2 weeks. Actual effort is based on time and material.
+[More information](project)
 
 ## Application Support Trainings
 

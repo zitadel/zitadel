@@ -145,7 +145,8 @@ module.exports = {
       items: [
         "guides/trainings/introduction",
         "guides/trainings/application",
-        "guides/trainings/recurring"
+        "guides/trainings/recurring",
+        "guides/trainings/project",
       ],
     },
   ],
