@@ -1,6 +1,6 @@
 {
-  "api": "https://bringmos-jv1jqo.zitadel.app",
-  "issuer": "https://bringmos-jv1jqo.zitadel.app",
-  "clientid": "163706959596355841@zitadel",
-  "customer_portal": "https://zitadel.cloud"
+  "api": "https://bringmos-dev-mfhquc.zitadel.cloud",
+  "issuer": "https://bringmos-dev-mfhquc.zitadel.cloud",
+  "clientid": "168811977588670721@zitadel",
+  "customer_portal": "https://zitadel.cloud/admin/instances"
 }
