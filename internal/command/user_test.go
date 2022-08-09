@@ -8,18 +8,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/repository/member"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
-
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/member"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -59,7 +57,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -76,7 +74,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -93,7 +91,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -111,7 +109,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -144,7 +142,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -177,7 +175,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -221,7 +219,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "test@test.ch",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -338,7 +336,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -355,7 +353,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -392,7 +390,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -492,7 +490,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -509,7 +507,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -541,7 +539,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -645,7 +643,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -662,7 +660,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -699,7 +697,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -799,7 +797,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -816,7 +814,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -848,7 +846,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -955,7 +953,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -972,7 +970,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -1006,7 +1004,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1313,7 +1311,7 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1330,7 +1328,7 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 	}
@@ -1387,7 +1385,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 			},
 			res{
 				nil,
-				caos_errs.IsErrorInvalidArgument,
+				errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1419,7 +1417,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 			},
 			res{
 				nil,
-				caos_errs.IsNotFound,
+				errors.IsNotFound,
 			},
 		},
 		{
@@ -1514,7 +1512,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1531,7 +1529,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{

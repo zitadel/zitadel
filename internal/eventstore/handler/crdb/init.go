@@ -186,7 +186,7 @@ type ForeignKey struct {
 	RefColumns []string
 }
 
-//Init implements handler.Init
+// Init implements handler.Init
 func (h *StatementHandler) Init(ctx context.Context, checks ...*handler.Check) error {
 	for _, check := range checks {
 		if check == nil || check.IsNoop() {
@@ -383,6 +383,5 @@ func columnType(columnType ColumnType) string {
 		return "BYTES"
 	default:
 		panic("unknown column type")
-		return ""
 	}
 }

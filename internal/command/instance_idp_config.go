@@ -4,19 +4,17 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	if config.OIDCConfig == nil && config.JWTConfig == nil {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IDP-s8nn3", "Errors.IDPConfig.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "IDP-s8nn3", "Errors.IDPConfig.Invalid")
 	}
 	idpConfigID, err := c.idGenerator.Next()
 	if err != nil {
@@ -86,13 +84,13 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-m0e3r", "Errors.IDPConfig.NotExisting")
+		return nil, errors.ThrowNotFound(nil, "INSTANCE-m0e3r", "Errors.IDPConfig.NotExisting")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
 	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, instanceAgg, config.IDPConfigID, config.Name, config.StylingType, config.AutoRegister)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-3k0fs", "Errors.IAM.IDPConfig.NotChanged")
+		return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-3k0fs", "Errors.IAM.IDPConfig.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -111,7 +109,7 @@ func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-2n0fs", "Errors.IAM.IDPConfig.NotActive")
+		return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-2n0fs", "Errors.IAM.IDPConfig.NotActive")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewIDPConfigDeactivatedEvent(ctx, instanceAgg, idpID))
@@ -131,7 +129,7 @@ func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
+		return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewIDPConfigReactivatedEvent(ctx, instanceAgg, idpID))
@@ -151,7 +149,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-4M0xy", "Errors.IDPConfig.NotExisting")
+		return nil, errors.ThrowNotFound(nil, "INSTANCE-4M0xy", "Errors.IDPConfig.NotExisting")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -186,7 +184,7 @@ func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, idpID string) (
 		return nil, err
 	}
 	if !config.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-p0pFF", "Errors.IDPConfig.NotExisting")
+		return nil, errors.ThrowNotFound(nil, "INSTANCE-p0pFF", "Errors.IDPConfig.NotExisting")
 	}
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }
