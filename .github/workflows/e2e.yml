@@ -32,7 +32,7 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Test chrome
+      - name: Test ${{ matrix.browser }}
         run: docker compose run e2e --browser ${{ matrix.browser }}
         working-directory: e2e
       - name: Archive production tests ${{ matrix.browser }}
