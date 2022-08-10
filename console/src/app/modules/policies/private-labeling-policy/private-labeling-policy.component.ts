@@ -111,7 +111,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public onDropLogo(theme: Theme, filelist: FileList): Promise<any> | void {
     const file = filelist.item(0);
     if (file) {
-      console.log(file);
       if (file.size > MAX_ALLOWED_SIZE) {
         this.toast.showError('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', false, true);
       } else if (file.type === 'image/svg+xml') {
