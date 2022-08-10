@@ -54,10 +54,10 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
 
 ### Quickstarts - Integrate your app
 
-- [Multiple Quickstarts can be found here](hhttps://docs.zitadel.com/docs/guides/start/quickstart)
+- [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/guides/start/quickstart)
 - [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
 
-> If you miss something please feel free to engage with us [here](https://github.com/zitadel/zitadel/discussions/1717)
+> If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
 
 ## Why ZITADEL
 
