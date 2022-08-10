@@ -1,8 +1,10 @@
 name: "ZITADEL e2e Tests"
 
 on:
-  release:
-    types: [created]
+  workflow_run:
+    workflows: [ZITADEL Release]
+    types:
+      - completed
   workflow_dispatch:
     inputs:
       releaseversion:
