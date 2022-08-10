@@ -1,3 +1,14 @@
+<p align="right">
+    <img src="./docs/static/img/github-header01-dark@2x.png#gh-dark-mode-only" alt="ZITADEL Cloud launched" max-height="200px" width="auto" />
+    <img src="./docs/static/img/github-header01-light@2x.png#gh-light-mode-only" alt="ZITADEL Cloud launched" max-height="200px" width="auto" />
+</p>
+<!-- UPDATE LINKS! -->
+<p align="center">
+    🚨 We are on <a href="https://www.producthunt.com/">ProductHunt</a> and <a href="https://news.ycombinator.com/">HackerNews</a> today! 🚨
+</p>
+
+---
+
 <p align="center">
     <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
     <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
