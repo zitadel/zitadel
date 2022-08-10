@@ -16,6 +16,7 @@
   position: absolute;
   right: 0;
   top: 0;
+  pointer-events: none;
 }
 
 .gigiwrapperrelative {
@@ -36,7 +37,7 @@
   top: 201px;
   right: -50px;
   padding: 1rem 0;
-  background-color: #7e21ce;
+  background-color: var(--gigibannerbackground);
   transform: rotate(45deg);
   transform-origin: top right;
   width: 350px;
