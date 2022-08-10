@@ -12,6 +12,9 @@ on:
 
 jobs:
   test:
+    strategy:
+      matrix:
+        browser: [firefox, chrome]
     runs-on: ubuntu-20.04
     env:
       ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
@@ -29,14 +32,14 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Test
-        run: docker compose run e2e
+      - name: Test ${{ matrix.browser }}
+        run: docker compose run e2e --browser ${{ matrix.browser }}
         working-directory: e2e
-      - name: Archive production tests
+      - name: Archive production tests ${{ matrix.browser }}
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: production-tests
+          name: production-tests-${{ matrix.browser }}
           path: |
             e2e/cypress/results
             e2e/cypress/videos
