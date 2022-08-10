@@ -29,16 +29,32 @@ jobs:
         with:
           driver: docker
           install: true
-      - name: Test
-        run: docker compose run e2e
+      - name: Test chrome
+        run: docker compose run e2e --browser chrome
         working-directory: e2e
-      - name: Archive production tests
+      - name: Archive production tests chrome
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: production-tests
+          name: production-tests-chrome
           path: |
             e2e/cypress/results
             e2e/cypress/videos
             e2e/cypress/screenshots
           retention-days: 30
+      - name: clean test results
+        run: rm -rf e2e/cypress/results/* e2e/cypress/videos/* e2e/cypress/screenshots/*
+      - name: Test firefox
+        run: docker compose run e2e --browser firefox
+        working-directory: e2e
+      - name: Archive production tests firefox
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-tests-firefox
+          path: |
+            e2e/cypress/results
+            e2e/cypress/videos
+            e2e/cypress/screenshots
+          retention-days: 30
+
