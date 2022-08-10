@@ -12,6 +12,9 @@ on:
 
 jobs:
   test:
+    strategy:
+      matrix:
+        browser: [firefox, chrome]
     runs-on: ubuntu-20.04
     env:
       ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
@@ -30,31 +33,15 @@ jobs:
           driver: docker
           install: true
       - name: Test chrome
-        run: docker compose run e2e --browser chrome
+        run: docker compose run e2e --browser ${{ matrix.browser }}
         working-directory: e2e
-      - name: Archive production tests chrome
+      - name: Archive production tests ${{ matrix.browser }}
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: production-tests-chrome
+          name: production-tests-${{ matrix.browser }}
           path: |
             e2e/cypress/results
             e2e/cypress/videos
             e2e/cypress/screenshots
           retention-days: 30
-      - name: clean test results
-        run: rm -rf e2e/cypress/results/* e2e/cypress/videos/* e2e/cypress/screenshots/*
-      - name: Test firefox
-        run: docker compose run e2e --browser firefox
-        working-directory: e2e
-      - name: Archive production tests firefox
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: production-tests-firefox
-          path: |
-            e2e/cypress/results
-            e2e/cypress/videos
-            e2e/cypress/screenshots
-          retention-days: 30
-
