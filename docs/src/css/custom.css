@@ -123,6 +123,7 @@
   --overlaycolor: #6c90b420;
   --ifm-hero-text-color: #ffffff;
   --gigibannerbackground: white;
+  --gigibannerforeground: black;
 }
 
 .get-started {
@@ -287,6 +288,7 @@ h2 {
   --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
   --overlaycolor: #ffffff15;
   --gigibannerbackground: #7e21ce;
+  --gigibannerforeground: white;
 }
 
 .get-started:hover {

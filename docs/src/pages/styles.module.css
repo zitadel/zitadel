@@ -38,6 +38,7 @@
   right: -50px;
   padding: 1rem 0;
   background-color: var(--gigibannerbackground);
+  color: var(--gigibannerforeground);
   transform: rotate(45deg);
   transform-origin: top right;
   width: 350px;
