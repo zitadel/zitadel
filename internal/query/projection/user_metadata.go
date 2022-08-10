@@ -87,6 +87,7 @@ func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 		[]handler.Column{
 			handler.NewCol(UserMetadataColumnInstanceID, nil),
 			handler.NewCol(UserMetadataColumnUserID, nil),
+			handler.NewCol(UserMetadataColumnKey, e.Key),
 		},
 		[]handler.Column{
 			handler.NewCol(UserMetadataColumnUserID, e.Aggregate().ID),

@@ -45,7 +45,6 @@ var (
 	viewStmt = fmt.Sprintf("SELECT"+
 		" user_id"+
 		" , (CASE WHEN %[1]s THEN CONCAT(%[2]s, '@', domain) ELSE %[2]s END) AS login_name"+
-		// " , IF(%[1]s, CONCAT(%[2]s, '@', domain), %[2]s) AS login_name"+
 		" , COALESCE(%[3]s, true) AS %[3]s"+
 		" , %[4]s"+
 		" FROM ("+

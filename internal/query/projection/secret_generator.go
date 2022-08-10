@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SecretGeneratorProjectionTable = "projections.secret_generators"
+	SecretGeneratorProjectionTable = "projections.secret_generators2"
 
 	SecretGeneratorColumnGeneratorType       = "generator_type"
 	SecretGeneratorColumnAggregateID         = "aggregate_id"

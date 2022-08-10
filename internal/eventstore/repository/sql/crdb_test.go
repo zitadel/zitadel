@@ -461,7 +461,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 	type eventsRes struct {
 		pushedEventsCount int
-		aggType           database.StringArray //[]repository.AggregateType
+		aggType           database.StringArray
 		aggID             database.StringArray
 	}
 	type res struct {
