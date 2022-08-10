@@ -33,7 +33,7 @@ We provide a wide range of out of the box features like secure login, self-servi
 
 With ZITADEL you rely on a battle tested, hardened and extensible turnkey solution to solve all of your authentication and authorization needs. With the unique way of how ZITADEL stores data it gives you an unlimited audit trail which provides a peace of mind for even the harshest audit and analytics requirements.
 
-<!-- TODO: insert video here -->
+<!-- TODO: Insert Video here-->
 
 ---
 
