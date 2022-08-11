@@ -1,3 +1,14 @@
+<p align="right">
+    <img src="./docs/static/img/github-header01-dark@2x.png#gh-dark-mode-only" alt="ZITADEL Cloud launched" max-height="200px" width="auto" />
+    <img src="./docs/static/img/github-header01-light@2x.png#gh-light-mode-only" alt="ZITADEL Cloud launched" max-height="200px" width="auto" />
+</p>
+<!-- UPDATE LINKS! -->
+<p align="center">
+    🚨 We are on <a href="https://www.producthunt.com/posts/zitadel">ProductHunt</a> and <a href="https://news.ycombinator.com/">HackerNews</a> today! 🚨
+</p>
+
+---
+
 <p align="center">
     <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
     <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
@@ -54,10 +65,10 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
 
 ### Quickstarts - Integrate your app
 
-- [Multiple Quickstarts can be found here](hhttps://docs.zitadel.com/docs/guides/start/quickstart)
+- [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/guides/start/quickstart)
 - [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
 
-> If you miss something please feel free to engage with us [here](https://github.com/zitadel/zitadel/discussions/1717)
+> If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
 
 ## Why ZITADEL
 
