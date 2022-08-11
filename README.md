@@ -4,7 +4,7 @@
 </p>
 <!-- UPDATE LINKS! -->
 <p align="center">
-    🚨 We are on <a href="https://www.producthunt.com/">ProductHunt</a> and <a href="https://news.ycombinator.com/">HackerNews</a> today! 🚨
+    🚨 We are on <a href="https://www.producthunt.com/posts/zitadel">ProductHunt</a> and <a href="https://news.ycombinator.com/">HackerNews</a> today! 🚨
 </p>
 
 ---
