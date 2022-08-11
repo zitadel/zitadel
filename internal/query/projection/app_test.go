@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -413,19 +414,19 @@ func TestAppProjection_reduces(t *testing.T) {
 								domain.OIDCVersionV1,
 								"client-id",
 								anyArg{},
-								[]string{"redirect.one.ch", "redirect.two.ch"},
-								[]domain.OIDCResponseType{1, 2},
-								[]domain.OIDCGrantType{1, 2},
+								database.StringArray{"redirect.one.ch", "redirect.two.ch"},
+								database.EnumArray[domain.OIDCResponseType]{1, 2},
+								database.EnumArray[domain.OIDCGrantType]{1, 2},
 								domain.OIDCApplicationTypeNative,
 								domain.OIDCAuthMethodTypeNone,
-								[]string{"logout.one.ch", "logout.two.ch"},
+								database.StringArray{"logout.one.ch", "logout.two.ch"},
 								true,
 								domain.OIDCTokenTypeJWT,
 								true,
 								true,
 								true,
 								1 * time.Microsecond,
-								[]string{"origin.one.ch", "origin.two.ch"},
+								database.StringArray{"origin.one.ch", "origin.two.ch"},
 							},
 						},
 						{
@@ -478,19 +479,19 @@ func TestAppProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.apps_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (app_id = $15) AND (instance_id = $16)",
 							expectedArgs: []interface{}{
 								domain.OIDCVersionV1,
-								[]string{"redirect.one.ch", "redirect.two.ch"},
-								[]domain.OIDCResponseType{1, 2},
-								[]domain.OIDCGrantType{1, 2},
+								database.StringArray{"redirect.one.ch", "redirect.two.ch"},
+								database.EnumArray[domain.OIDCResponseType]{1, 2},
+								database.EnumArray[domain.OIDCGrantType]{1, 2},
 								domain.OIDCApplicationTypeNative,
 								domain.OIDCAuthMethodTypeNone,
-								[]string{"logout.one.ch", "logout.two.ch"},
+								database.StringArray{"logout.one.ch", "logout.two.ch"},
 								true,
 								domain.OIDCTokenTypeJWT,
 								true,
 								true,
 								true,
 								1 * time.Microsecond,
-								[]string{"origin.one.ch", "origin.two.ch"},
+								database.StringArray{"origin.one.ch", "origin.two.ch"},
 								"app-id",
 								"instance-id",
 							},

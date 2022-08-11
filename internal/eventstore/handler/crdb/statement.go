@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -249,7 +250,7 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	var arrayType string
 	switch value.(type) {
 
-	case []string:
+	case []string, database.StringArray:
 		arrayType = "TEXT"
 		//TODO: handle more types if necessary
 	}

@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -399,19 +400,19 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
-				handler.NewCol(AppOIDCConfigColumnRedirectUris, e.RedirectUris),
-				handler.NewCol(AppOIDCConfigColumnResponseTypes, e.ResponseTypes),
-				handler.NewCol(AppOIDCConfigColumnGrantTypes, e.GrantTypes),
+				handler.NewCol(AppOIDCConfigColumnRedirectUris, database.StringArray(e.RedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.EnumArray[domain.OIDCResponseType](e.ResponseTypes)),
+				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.EnumArray[domain.OIDCGrantType](e.GrantTypes)),
 				handler.NewCol(AppOIDCConfigColumnApplicationType, e.ApplicationType),
 				handler.NewCol(AppOIDCConfigColumnAuthMethodType, e.AuthMethodType),
-				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, e.PostLogoutRedirectUris),
+				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.StringArray(e.PostLogoutRedirectUris)),
 				handler.NewCol(AppOIDCConfigColumnDevMode, e.DevMode),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenType, e.AccessTokenType),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenRoleAssertion, e.AccessTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenRoleAssertion, e.IDTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenUserinfoAssertion, e.IDTokenUserinfoAssertion),
 				handler.NewCol(AppOIDCConfigColumnClockSkew, e.ClockSkew),
-				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, e.AdditionalOrigins),
+				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(e.AdditionalOrigins)),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -439,13 +440,13 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnVersion, *e.Version))
 	}
 	if e.RedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, *e.RedirectUris))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, database.StringArray(*e.RedirectUris)))
 	}
 	if e.ResponseTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, *e.ResponseTypes))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, database.EnumArray[domain.OIDCResponseType](*e.ResponseTypes)))
 	}
 	if e.GrantTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, *e.GrantTypes))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, database.EnumArray[domain.OIDCGrantType](*e.GrantTypes)))
 	}
 	if e.ApplicationType != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnApplicationType, *e.ApplicationType))
@@ -454,7 +455,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAuthMethodType, *e.AuthMethodType))
 	}
 	if e.PostLogoutRedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, *e.PostLogoutRedirectUris))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.StringArray(*e.PostLogoutRedirectUris)))
 	}
 	if e.DevMode != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnDevMode, *e.DevMode))
@@ -475,7 +476,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnClockSkew, *e.ClockSkew))
 	}
 	if e.AdditionalOrigins != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, *e.AdditionalOrigins))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(*e.AdditionalOrigins)))
 	}
 
 	if len(cols) == 0 {

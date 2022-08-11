@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -372,7 +373,7 @@ func (p *idpProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
-				handler.NewCol(OIDCConfigScopesCol, idpEvent.Scopes),
+				handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)),
 				handler.NewCol(OIDCConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
 				handler.NewCol(OIDCConfigUsernameMappingCol, idpEvent.UserNameMapping),
 				handler.NewCol(OIDCConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
@@ -412,7 +413,7 @@ func (p *idpProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(OIDCConfigTokenEndpointCol, *idpEvent.TokenEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, idpEvent.Scopes))
+		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)))
 	}
 	if idpEvent.IDPDisplayNameMapping != nil {
 		cols = append(cols, handler.NewCol(OIDCConfigDisplayNameMappingCol, *idpEvent.IDPDisplayNameMapping))

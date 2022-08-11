@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -150,14 +151,14 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantUserID, e.UserID),
 			handler.NewCol(UserGrantProjectID, e.ProjectID),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
-			handler.NewCol(UserGrantRoles, e.RoleKeys),
+			handler.NewCol(UserGrantRoles, database.StringArray(e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},
 	), nil
 }
 
 func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
-	var roles []string
+	var roles database.StringArray
 
 	switch e := event.(type) {
 	case *usergrant.UserGrantChangedEvent:
@@ -307,7 +308,7 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			crdb.NewArrayIntersectCol(UserGrantRoles, keys),
+			crdb.NewArrayIntersectCol(UserGrantRoles, database.StringArray(keys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, grantID),

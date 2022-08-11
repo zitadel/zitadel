@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
@@ -55,7 +56,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 	config := reduceMemberConfig{
 		cols: []handler.Column{
 			handler.NewCol(MemberUserIDCol, e.UserID),
-			handler.NewCol(MemberRolesCol, e.Roles),
+			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
 			handler.NewCol(MemberCreationDate, e.CreationDate()),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
@@ -73,7 +74,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		cols: []handler.Column{
-			handler.NewCol(MemberRolesCol, e.Roles),
+			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},

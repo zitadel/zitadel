@@ -3,6 +3,7 @@ package projection
 import (
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -160,7 +161,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								[]string{"admin", "user"},
+								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
 							},
@@ -191,7 +192,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								[]string{"admin", "user"},
+								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
 							},
@@ -229,7 +230,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 								domain.ProjectGrantStateActive,
 								uint64(15),
 								"granted-org-id",
-								[]string{"admin", "user"},
+								database.StringArray{"admin", "user"},
 							},
 						},
 					},

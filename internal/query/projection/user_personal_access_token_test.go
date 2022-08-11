@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -49,7 +50,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 								uint64(15),
 								"agg-id",
 								time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-								[]string{"openid"},
+								database.StringArray{"openid"},
 							},
 						},
 					},
