@@ -1,9 +1,8 @@
 ---
-title: API Endpoint Rate Limits
+title: API Rate Limits
 ---
 
-
-## api.zitadel.ch
+<!-- //TODO Elio please update according to the current config -->
 
 | Path                                                | Description              | Effective Limit            |
 |-----------------------------------------------------|--------------------------|----------------------------|
@@ -13,9 +12,3 @@ title: API Endpoint Rate Limits
 | /caos.zitadel.auth.api.v1.AuthService/*             |                          | none                       |
 | /management/v1/*                                    |                          | 240 request per 1 min      |
 | /caos.zitadel.management.api.v1.ManagementService/* |                          | 240 request per 1 min      |
-
-## issuer.zitadel.ch
-
-| Path | Description                             | Effective Limit |
-|------|-----------------------------------------|-----------------|
-| /*   | Sum of all request to the issuer domain | none            |

@@ -177,8 +177,12 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 
 		if !isIAMAdmin(memberships.Memberships) {
 			ids := make([]string, 0, len(memberships.Memberships))
-			for _, grant := range memberships.Memberships {
-				ids = appendIfNotExists(ids, grant.ResourceOwner)
+			for _, membership := range memberships.Memberships {
+				orgID := membership.ResourceOwner
+				if membership.ProjectGrant != nil && membership.ProjectGrant.GrantedOrgID != "" {
+					orgID = membership.ProjectGrant.GrantedOrgID
+				}
+				ids = appendIfNotExists(ids, orgID)
 			}
 
 			idsQuery, err := query.NewOrgIDsSearchQuery(ids...)

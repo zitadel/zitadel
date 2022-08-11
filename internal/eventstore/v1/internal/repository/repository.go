@@ -11,6 +11,8 @@ type Repository interface {
 
 	// Filter returns all events matching the given search query
 	Filter(ctx context.Context, searchQuery *models.SearchQueryFactory) (events []*models.Event, err error)
-	//LatestSequence returns the latests sequence found by the the search query
+	//LatestSequence returns the latest sequence found by the search query
 	LatestSequence(ctx context.Context, queryFactory *models.SearchQueryFactory) (uint64, error)
+	//InstanceIDs returns the instance ids found by the search query
+	InstanceIDs(ctx context.Context, queryFactory *models.SearchQueryFactory) ([]string, error)
 }

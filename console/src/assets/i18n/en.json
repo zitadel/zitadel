@@ -106,6 +106,7 @@
     "FINISHED": "Close",
     "CHANGE": "Change",
     "REACTIVATE": "Reactivate",
+    "ACTIVATE": "Activate",
     "DEACTIVATE": "Deactivate",
     "REFRESH": "Refresh",
     "LOGIN": "Login",
@@ -181,8 +182,9 @@
     "SIDEWIDE": "Site-wide shortcuts",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
-      "SYSTEM": "<strong>G</strong>o to <strong>S</strong>ystem",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
       "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
+      "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
       "ORGSWITCHER": "Change Organization",
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
@@ -193,6 +195,8 @@
     }
   },
   "RESOURCEID": "Resource Id",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "No data"
   },
@@ -706,6 +710,17 @@
       "TITLE": "Managers",
       "DESCRIPTION": "These Managers are allowed to make changes in your instance."
     },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Domains"
+    },
+    "STATE": {
+      "0": "Unspecified",
+      "1": "Creating",
+      "2": "Running",
+      "3": "Stopping",
+      "4": "Stopped"
+    },
     "VIEWS": {
       "TITLE": "Views",
       "DESCRIPTION": "This card shows your ZITADEL views.",
@@ -874,7 +889,8 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "it": "Italiano",
-      "en": "English"
+      "en": "English",
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -895,11 +911,21 @@
       "PROVIDER": "SMS Provider",
       "ADDPROVIDER": "Add SMS Provider",
       "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "REMOVEPROVIDER": "Remove Provider",
+      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "SMSPROVIDERSTATE": {
+        "0": "Unspecified",
+        "1": "Active",
+        "2": "Inactive"
+      },
+      "ACTIVATED": "Provider activated.",
+      "DEACTIVATED": "Provider deactivated.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully.",
+        "REMOVED": "Twilio removed",
         "CHANGETOKEN": "Change Token",
         "SETTOKEN": "Set Token",
         "TOKENSET": "Token successfully set."

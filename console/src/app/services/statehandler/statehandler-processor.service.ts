@@ -13,7 +13,7 @@ export class StatehandlerProcessorServiceImpl implements StatehandlerProcessorSe
   constructor(private location: Location, private router: Router) {}
 
   public createState(url: string): string {
-    const externalUrl = this.location.prepareExternalUrl(url);
+    const externalUrl = url;
     const urlId = uuidv4();
     sessionStorage.setItem(urlId, externalUrl);
     return urlId;
@@ -28,8 +28,7 @@ export class StatehandlerProcessorServiceImpl implements StatehandlerProcessorSe
         return;
       } else {
         sessionStorage.removeItem(state);
-        // window.location.replace(window.location.origin + url);
-        this.router.navigate([url]);
+        this.router.navigateByUrl(url);
       }
     }
   }

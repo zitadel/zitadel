@@ -101,9 +101,9 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_certificate_ref_keys")),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.encryptionAlgorithm = keyEncryptionAlgorithm
 	p.certEncryptionAlgorithm = certEncryptionAlgorithm
+	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 
 	return p
 }

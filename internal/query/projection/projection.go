@@ -62,15 +62,16 @@ var (
 	NotificationsProjection             interface{}
 )
 
-
 func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
 	projectionConfig := crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery:     config.RequeueEvery,
-			RetryFailedAfter: config.RetryFailedAfter,
+			RequeueEvery:        config.RequeueEvery,
+			RetryFailedAfter:    config.RetryFailedAfter,
+			Retries:             config.MaxFailureCount,
+			ConcurrentInstances: config.ConcurrentInstances,
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,

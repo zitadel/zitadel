@@ -142,7 +142,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
-		logging.WithFields("login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
+		logging.WithFields("login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Info("login hint invalid")
 	}
 	if request.UserID == "" && request.LoginHint == "" && domain.IsPrompt(request.Prompt, domain.PromptNone) {
 		err = repo.tryUsingOnlyUserSession(request)
@@ -643,9 +643,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 			}
 		}
 	}
-	if request.LoginPolicy.IgnoreUnknownUsernames {
+	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
 		if errors.IsNotFound(err) || (user != nil && user.State == int32(domain.UserStateInactive)) {
-			if request.LabelPolicy.HideLoginNameSuffix {
+			if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
 				preferredLoginName = loginName
 			}
 			request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)

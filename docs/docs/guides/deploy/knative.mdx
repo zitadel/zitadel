@@ -1,0 +1,63 @@
+---
+title: Knative
+---
+
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
+
+## Install Knative
+
+Follow the [Knative quickstart guide](https://knative.dev/docs/getting-started/quickstart-install/) to get a local kind/minikube environment with Knative capabilities.
+
+## Run CockroachDB
+
+Start a single-node cockroachdb as statefulset
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/knative/cockroachdb-statefulset-single-node.yaml
+```
+
+## Start ZITADEL
+
+### Knative Command
+
+```bash
+kn service create zitadel \
+--image ghcr.io/zitadel/zitadel:stable \
+--port 8080 \
+--env ZITADEL_DATABASE_COCKROACH_HOST=cockroachdb \
+--env ZITADEL_EXTERNALSECURE=false \
+--env ZITADEL_EXTERNALPORT=80 \
+--env ZITADEL_TLS_ENABLED=false \
+--env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
+--arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" 
+```
+
+### Knavite yaml
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/knative/zitadel-knative-service.yaml
+```
+
+## Access ZITADEL
+
+### Get the ZITADEL URL
+
+```bash
+kn services list
+
+NAME      URL                                         LATEST          AGE   CONDITIONS   READY   REASON
+zitadel   http://zitadel.default.127.0.0.1.sslip.io   zitadel-00001   10m   3 OK / 3     True
+```
+
+Add the console path to the URL and open in browser
+http://zitadel.default.127.0.0.1.sslip.io/ui/console
+
+If you didn't configure something else, this is the default IAM admin users login:
+
+* username: zitadel-admin@<span></span>zitadel.zitadel.default.127.0.0.1.sslip.io
+* password: Password1!
+
+<Next components={props.components} />
+<Disclaimer components={props.components} />

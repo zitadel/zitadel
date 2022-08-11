@@ -1,14 +1,19 @@
-import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Layout from '@theme/Layout';
-import ThemedImage from '@theme/ThemedImage';
-import clsx from 'clsx';
-import React from 'react';
+import Link from "@docusaurus/Link";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Layout from "@theme/Layout";
+import ThemedImage from "@theme/ThemedImage";
+import clsx from "clsx";
+import React from "react";
 
-import Column from '../components/column';
-import { HomeListWrapper, ICONTYPE, ListElement, ListWrapper } from '../components/list';
-import styles from './styles.module.css';
+import Column from "../components/column";
+import {
+  HomeListWrapper,
+  ICONTYPE,
+  ListElement,
+  ListWrapper,
+} from "../components/list";
+import styles from "./styles.module.css";
 
 const features = [
   {
@@ -27,25 +32,25 @@ const features = [
         <Column>
           <div>
             <ListElement
-              link="docs/guides/basics/get-started"
+              link="docs/guides/start/quickstart"
               type={ICONTYPE.START}
               title="Get started"
               description=""
             />
             <ListElement
-              link="docs/guides/authentication/login-users"
+              link="docs/guides/manage/cloud/overview"
               type={ICONTYPE.LOGIN}
-              title="Authentication"
+              title="ZITADEL Cloud"
               description=""
             />
             <ListElement
-              link="docs/guides/authorization/oauth-recommended-flows"
+              link="docs/guides/integrate/login-users"
               type={ICONTYPE.LOGIN}
-              title="Authorization"
+              title="Login Users"
               description=""
             />
             <ListElement
-              link="docs/guides/api/access-zitadel-apis"
+              link="docs/guides/integrate/access-zitadel-apis"
               type={ICONTYPE.APIS}
               title="Access APIs"
               description=""
@@ -61,15 +66,15 @@ const features = [
               description=""
             />
             <ListElement
-              link="docs/guides/customization/branding"
+              link="docs/guides/manage/customize/branding"
               type={ICONTYPE.PRIVATELABELING}
               title="Customization"
               description=""
             />
             <ListElement
-              link="docs/guides/installation/run"
+              link="docs/guides/deploy/overview"
               type={ICONTYPE.SYSTEM}
-              title="Installation"
+              title="Deploy"
               description=""
             />
             <ListElement
@@ -87,7 +92,7 @@ const features = [
     title: "Quickstarts",
     darkImageUrl: "img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
-    link: "docs/quickstarts/introduction",
+    link: "docs/examples/introduction",
     description: (
       <>
         Learn how to integrate your applications and build secure workflows and
@@ -97,25 +102,25 @@ const features = [
     content: (
       <div className={styles.quickstartcontainer}>
         <QuickstartLink
-          link="/docs/quickstarts/login/angular"
+          link="/docs/examples/login/angular"
           imageSource="/img/tech/angular.svg"
           title="Angular"
           description="Add the user login to your application and query some data from the userinfo endpoint"
         />
         <QuickstartLink
-          link="/docs/quickstarts/login/react"
+          link="/docs/examples/login/react"
           imageSource="/img/tech/react.png"
           title="React"
           description="Logs into your application and queries some data from the userinfo endpoint"
         />
         <QuickstartLink
-          link="/docs/quickstarts/login/flutter"
+          link="/docs/examples/login/flutter"
           imageSource="/img/tech/flutter.svg"
           title="Flutter"
           description="Mobile Application working for iOS and Android that authenticates your user."
         />
         <QuickstartLink
-          link="/docs/quickstarts/login/nextjs"
+          link="/docs/examples/login/nextjs"
           imageSource="/img/tech/nextjslight.svg"
           lightImageSource="/img/tech/nextjs.svg"
           title="NextJS"
@@ -171,13 +176,7 @@ const features = [
           description="Design and engineering principles"
         />
         <ListElement
-          link="./docs/concepts/eventstore"
-          type={ICONTYPE.STORAGE}
-          title="Eventstore"
-          description="Learn how ZITADEL stores data"
-        />
-        <ListElement
-          link="./docs/concepts/architecture"
+          link="./docs/concepts/architecture/software"
           type={ICONTYPE.ARCHITECTURE}
           title="Architecture"
           description="Sotware-, Cluster- and Multi Cluster Architecture"
@@ -254,6 +253,17 @@ function Feature({
   );
 }
 
+const Gigi = () => {
+  return (
+    <div className={styles.gigiwrapper}>
+      <div className={styles.gigiwrapperrelative}>
+        <img height="151px" width="256px" src="/img/gigi.svg" />
+        <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
@@ -272,12 +282,13 @@ export default function Home() {
                 "button button--outline button--lg get-started",
                 styles.getStarted
               )}
-              to={useBaseUrl("docs/guides/basics/get-started")}
+              to={useBaseUrl("docs/guides/start/quickstart")}
             >
               Get Started
             </Link>
           </div>
         </div>
+        <Gigi />
       </header>
       <main>
         {features && features.length > 0 && (

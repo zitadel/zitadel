@@ -23,6 +23,7 @@ var (
 			", memberships.id" +
 			", memberships.project_id" +
 			", memberships.grant_id" +
+			", projections.project_grants.granted_org_id" +
 			", projections.projects.name" +
 			", projections.orgs.name" +
 			", COUNT(*) OVER ()" +
@@ -80,7 +81,8 @@ var (
 			" FROM projections.project_grant_members as members" +
 			") AS memberships" +
 			" LEFT JOIN projections.projects ON memberships.project_id = projections.projects.id" +
-			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id")
+			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id" +
+			" LEFT JOIN projections.project_grants ON memberships.grant_id = projections.project_grants.grant_id")
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -92,6 +94,7 @@ var (
 		"instance_id",
 		"project_id",
 		"grant_id",
+		"granted_org_id",
 		"name", //project name
 		"name", //org name
 		"count",
@@ -141,6 +144,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							"org-name",
 						},
 					},
@@ -180,6 +184,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							"ro",
 							nil,
 							"iam-id",
+							nil,
 							nil,
 							nil,
 							nil,
@@ -224,6 +229,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							nil,
+							nil,
 							"project-name",
 							nil,
 						},
@@ -266,6 +272,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							"grant-id",
+							"granted-org-id",
 							"project-name",
 							nil,
 						},
@@ -285,9 +292,10 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						ProjectGrant: &ProjectGrantMembership{
-							GrantID:     "grant-id",
-							ProjectID:   "project-id",
-							ProjectName: "project-name",
+							GrantID:      "grant-id",
+							ProjectID:    "project-id",
+							ProjectName:  "project-name",
+							GrantedOrgID: "granted-org-id",
 						},
 					},
 				},
@@ -313,6 +321,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							"org-name",
 						},
 						{
@@ -328,6 +337,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 						{
 							"user-id",
@@ -339,6 +349,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"project-id",
+							nil,
 							nil,
 							"project-name",
 							nil,
@@ -354,6 +365,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							"grant-id",
+							"granted-org-id",
 							"project-name",
 							nil,
 						},
@@ -400,9 +412,10 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						ProjectGrant: &ProjectGrantMembership{
-							ProjectID:   "project-id",
-							GrantID:     "grant-id",
-							ProjectName: "project-name",
+							ProjectID:    "project-id",
+							GrantID:      "grant-id",
+							ProjectName:  "project-name",
+							GrantedOrgID: "granted-org-id",
 						},
 					},
 				},

@@ -9,12 +9,14 @@ release:
 
 before:
   hooks:
+    # this file would invalidate go source caches
+    - sh -c "rm openapi/statik/statik.go || true"
     - docker build -f build/grpc/Dockerfile -t zitadel-base:local .
     - docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
     - docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client
     - sh -c "cp -r .artifacts/grpc/go-client/* ."
     - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
-    - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console
+    - docker build -f build/console/Dockerfile . -t zitadel-npm-console --target angular-export -o .artifacts/console
     - sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
 
 builds:
@@ -35,9 +37,7 @@ dist: .artifacts/goreleaser
 dockers:
 - image_templates:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
-  - ghcr.io/zitadel/zitadel:{{ .ShortCommit }}-amd64
   - europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel:{{ .Tag }}-amd64
-  - europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel:{{ .ShortCommit }}-amd64
   use: buildx
   dockerfile: build/Dockerfile
   build_flag_templates:
@@ -49,6 +49,19 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/arm64"
+
+docker_manifests:
+- id: zitadel-latest
+  name_template: ghcr.io/zitadel/zitadel:latest
+  image_templates:
+  - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
+  - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
+- id: zitadel-Tag
+  name_template: ghcr.io/zitadel/zitadel:{{ .Tag }}
+  image_templates:
+  - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
+  - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
+
 
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'

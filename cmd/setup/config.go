@@ -36,6 +36,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
+			database.DecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -49,7 +50,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 type Steps struct {
 	s1ProjectionTable *ProjectionTable
 	s2AssetsTable     *AssetTable
-	S3DefaultInstance *DefaultInstance
+	FirstInstance     *FirstInstance
 }
 
 type encryptionKeyConfig struct {

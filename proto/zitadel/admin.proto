@@ -10,6 +10,8 @@ import "zitadel/policy.proto";
 import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
+import "zitadel/management.proto";
+import "zitadel/v1.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -460,7 +462,7 @@ service AdminService {
         };
     }
 
-    //Checks whether an organisation exists by the given parameters 
+    //Checks whether an organisation exists by the given parameters
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
             get: "/orgs/_is_unique";
@@ -553,7 +555,7 @@ service AdminService {
         };
     }
 
-    //Creates a new org and user 
+    //Creates a new org and user
     // and adds the user to the orgs members as ORG_OWNER
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
@@ -1471,7 +1473,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default login policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLoginPolicy(UpdateLoginPolicyRequest) returns (UpdateLoginPolicyResponse) {
@@ -1536,7 +1538,7 @@ service AdminService {
             post: "/policies/login/idps";
             body: "*";
         };
-        
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
@@ -1887,7 +1889,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default password age policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdatePasswordAgePolicy(UpdatePasswordAgePolicyRequest) returns (UpdatePasswordAgePolicyResponse) {
@@ -1945,7 +1947,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default lockout policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLockoutPolicy(UpdateLockoutPolicyRequest) returns (UpdateLockoutPolicyResponse) {
@@ -2362,7 +2364,7 @@ service AdminService {
         };
     }
 
-    //Returns the IAM roles visible for the requested user 
+    //Returns the IAM roles visible for the requested user
     rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
         option (google.api.http) = {
             post: "/members/roles/_search";
@@ -2564,7 +2566,7 @@ service AdminService {
     }
 
     //Returns event descriptions which cannot be processed.
-    // It's possible that some events need some retries. 
+    // It's possible that some events need some retries.
     // For example if the SMTP-API wasn't able to send an email at the first time
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
@@ -2627,6 +2629,29 @@ service AdminService {
                     };
                 };
             };
+        };
+    }
+
+    // Imports data into instance and creates different objects
+    rpc ImportData(ImportDataRequest) returns (ImportDataResponse) {
+        option (google.api.http) = {
+            post: "/import";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+    // Exports data from instance
+    rpc ExportData(ExportDataRequest) returns (ExportDataResponse) {
+        option (google.api.http) = {
+            post: "/export";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
         };
     }
 }
@@ -3070,7 +3095,7 @@ message SetUpOrgRequest {
             ];
             bool is_phone_verified = 2;
         }
-    
+
         string user_name = 1 [
             (validate.rules).string = {min_len: 1, max_len: 200},
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3079,7 +3104,7 @@ message SetUpOrgRequest {
                 example: "\"mr_long_neck\"";
             }
         ];
-        
+
         Profile profile = 2 [(validate.rules).message.required = true];
         Email email = 3 [(validate.rules).message.required = true];
         Phone phone = 4;
@@ -3905,7 +3930,7 @@ message RemoveIDPFromLoginPolicyRequest {
 			required: ["idp_id"]
 		};
 	};
-    
+
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3934,7 +3959,7 @@ message AddSecondFactorToLoginPolicyRequest {
 			required: ["type"]
 		};
 	};
-    
+
     zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -3984,7 +4009,7 @@ message RemoveMultiFactorFromLoginPolicyRequest {
 			required: ["type"]
 		};
 	};
-    
+
     zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -4620,4 +4645,188 @@ message FailedEvent {
             example: "\"ID=EXAMP-ID3ER Message=Example message\"";
         }
     ];
+}
+
+message ImportDataRequest {
+    message LocalInput{
+        string path = 1;
+    }
+    message S3Input{
+        string path = 1;
+        string endpoint = 2;
+        string access_key_id =3;
+        string secret_access_key = 4;
+        bool ssl = 5;
+        string bucket = 6;
+    }
+    message GCSInput{
+        string bucket = 1;
+        string serviceaccount_json = 2;
+        string path = 3;
+    }
+
+    oneof data {
+        ImportDataOrg data_orgs = 1;
+        zitadel.v1.v1.ImportDataOrg data_orgsv1 = 2;
+        LocalInput data_orgs_local = 3;
+        LocalInput data_orgsv1_local = 4;
+        S3Input data_orgs_s3 = 5;
+        S3Input data_orgsv1_s3 = 6;
+        GCSInput data_orgs_gcs = 7;
+        GCSInput data_orgsv1_gcs = 8;
+    }
+    string timeout = 9;
+}
+
+message ImportDataOrg {
+    repeated DataOrg orgs = 1;
+}
+
+message DataOrg {
+    string org_id = 1;
+    zitadel.management.v1.AddOrgRequest org = 3;
+    AddCustomDomainPolicyRequest domain_policy = 4;
+    zitadel.management.v1.AddCustomLabelPolicyRequest label_policy = 5;
+    zitadel.management.v1.AddCustomLockoutPolicyRequest lockout_policy = 6;
+    zitadel.management.v1.AddCustomLoginPolicyRequest login_policy = 7;
+    zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest password_complexity_policy = 8;
+    zitadel.management.v1.AddCustomPrivacyPolicyRequest privacy_policy = 9;
+
+    repeated zitadel.v1.v1.DataProject projects = 10;
+    repeated zitadel.management.v1.AddProjectRoleRequest project_roles = 11;
+    repeated zitadel.v1.v1.DataAPIApplication api_apps = 12;
+    repeated zitadel.v1.v1.DataOIDCApplication oidc_apps = 13;
+    repeated zitadel.v1.v1.DataHumanUser human_users = 14;
+    repeated zitadel.v1.v1.DataMachineUser machine_users = 15;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 16;
+    repeated zitadel.v1.v1.DataAction actions = 17;
+
+    repeated zitadel.v1.v1.DataProjectGrant project_grants = 18;
+    repeated zitadel.management.v1.AddUserGrantRequest user_grants = 19;
+
+    repeated zitadel.management.v1.AddOrgMemberRequest org_members = 20;
+    repeated zitadel.management.v1.AddProjectMemberRequest project_members = 21;
+    repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 22;
+
+    repeated zitadel.management.v1.SetUserMetadataRequest user_metadata = 23;
+
+    repeated zitadel.management.v1.SetCustomLoginTextsRequest login_texts = 24;
+
+    repeated zitadel.management.v1.SetCustomInitMessageTextRequest init_messages = 25;
+    repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest password_reset_messages = 26;
+    repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest verify_email_messages = 27;
+    repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest verify_phone_messages = 28;
+    repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest domain_claimed_messages = 29;
+    repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest passwordless_registration_messages = 30;
+
+    repeated zitadel.v1.v1.DataOIDCIDP oidc_idps = 31;
+    repeated zitadel.v1.v1.DataJWTIDP jwt_idps = 32;
+
+    repeated zitadel.idp.v1.IDPUserLink user_links = 33;
+    repeated zitadel.org.v1.Domain domains = 34;
+}
+
+message ImportDataResponse{
+    repeated ImportDataError errors = 1;
+    ImportDataSuccess success = 2;
+}
+
+message ImportDataError{
+    string type = 1;
+    string id = 2;
+    string message = 3;
+}
+
+message ImportDataSuccess {
+    repeated ImportDataSuccessOrg orgs = 1;
+}
+
+message ImportDataSuccessOrg{
+    string org_id = 1;
+    repeated string project_ids = 2;
+    repeated string project_roles = 3;
+    repeated string oidc_app_ids = 4;
+    repeated string api_app_ids = 5;
+    repeated string human_user_ids = 6;
+    repeated string machine_user_ids = 7;
+    repeated string action_ids = 8;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 9;
+    repeated ImportDataSuccessProjectGrant project_grants = 10;
+    repeated ImportDataSuccessUserGrant user_grants = 11;
+    repeated string org_members = 12;
+    repeated ImportDataSuccessProjectMember project_members = 13;
+    repeated ImportDataSuccessProjectGrantMember project_grant_members = 14;
+    repeated string oidc_ipds = 15;
+    repeated string jwt_idps = 16;
+    repeated string idp_links = 17;
+    repeated ImportDataSuccessUserLinks user_links = 18;
+    repeated ImportDataSuccessUserMetadata user_metadata = 19;
+    repeated string domains = 20;
+}
+
+message ImportDataSuccessProjectGrant{
+    string grant_id = 1;
+    string project_id = 2;
+    string org_id = 3;
+}
+
+message ImportDataSuccessUserGrant{
+    string project_id = 1;
+    string user_id = 2;
+}
+
+message ImportDataSuccessProjectMember{
+    string project_id = 1;
+    string user_id = 2;
+}
+
+message ImportDataSuccessProjectGrantMember{
+    string project_id = 1;
+    string grant_id = 2;
+    string user_id = 3;
+}
+
+message ImportDataSuccessUserLinks {
+    string user_id = 1;
+    string external_user_id = 2;
+    string display_name = 3;
+    string idp_id = 4;
+}
+
+message ImportDataSuccessUserMetadata {
+    string user_id = 1;
+    string key = 2;
+}
+
+message ExportDataRequest {
+    message LocalOutput{
+        string path = 1;
+    }
+    message S3Output{
+        string path = 1;
+        string endpoint = 2;
+        string access_key_id =3;
+        string secret_access_key = 4;
+        bool ssl = 5;
+        string bucket = 6;
+    }
+    message GCSOutput{
+        string bucket = 1;
+        string serviceaccount_json = 2;
+        string path = 3;
+    }
+
+    repeated string org_ids = 1;
+    repeated string excluded_org_ids = 2;
+    bool with_passwords = 3;
+    bool with_otp = 4;
+    bool response_output = 5;
+    LocalOutput local_output = 6;
+    S3Output s3_output = 7;
+    GCSOutput gcs_output = 8;
+    string timeout = 9;
+}
+
+message ExportDataResponse {
+    repeated DataOrg orgs = 1;
 }

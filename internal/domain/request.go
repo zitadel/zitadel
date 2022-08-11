@@ -4,6 +4,7 @@ const (
 	OrgDomainPrimaryScope = "urn:zitadel:iam:org:domain:primary:"
 	OrgDomainPrimaryClaim = "urn:zitadel:iam:org:domain:primary"
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
+	ProjectIDScopeZITADEL = "zitadel"
 	AudSuffix             = ":aud"
 	SelectIDPScope        = "urn:zitadel:iam:org:idp:id:"
 )

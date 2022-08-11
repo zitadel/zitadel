@@ -12,6 +12,18 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
+func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
+	existingMember, err := c.projectGrantWriteModelByID(ctx, grantID, grant.AggregateID, resourceOwner)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if existingMember != nil && existingMember.State != domain.ProjectGrantStateUnspecified {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-2b8fs", "Errors.Project.Grant.AlreadyExisting")
+	}
+
+	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
+}
+
 func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string) (_ *domain.ProjectGrant, err error) {
 	if !grant.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-3b8fs", "Errors.Project.Grant.Invalid")
@@ -20,10 +32,18 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGra
 	if err != nil {
 		return nil, err
 	}
-	grant.GrantID, err = c.idGenerator.Next()
+
+	grantID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
+
+	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
+}
+
+func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
+	grant.GrantID = grantID
+
 	addedGrant := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedGrant.WriteModel)
 	pushedEvents, err := c.eventstore.Push(
