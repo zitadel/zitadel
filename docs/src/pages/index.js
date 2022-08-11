@@ -1,14 +1,19 @@
-import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Layout from '@theme/Layout';
-import ThemedImage from '@theme/ThemedImage';
-import clsx from 'clsx';
-import React from 'react';
+import Link from "@docusaurus/Link";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Layout from "@theme/Layout";
+import ThemedImage from "@theme/ThemedImage";
+import clsx from "clsx";
+import React from "react";
 
-import Column from '../components/column';
-import { HomeListWrapper, ICONTYPE, ListElement, ListWrapper } from '../components/list';
-import styles from './styles.module.css';
+import Column from "../components/column";
+import {
+  HomeListWrapper,
+  ICONTYPE,
+  ListElement,
+  ListWrapper,
+} from "../components/list";
+import styles from "./styles.module.css";
 
 const features = [
   {
@@ -248,6 +253,17 @@ function Feature({
   );
 }
 
+const Gigi = () => {
+  return (
+    <div className={styles.gigiwrapper}>
+      <div className={styles.gigiwrapperrelative}>
+        <img height="151px" width="256px" src="/img/gigi.svg" />
+        <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
@@ -272,6 +288,7 @@ export default function Home() {
             </Link>
           </div>
         </div>
+        <Gigi />
       </header>
       <main>
         {features && features.length > 0 && (
