@@ -47,8 +47,8 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML CA",
-		NotBefore:    &now,
-		NotAfter:     &after,
+		NotBefore:    now,
+		NotAfter:     after,
 		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment | x509.KeyUsageCertSign,
 	})
 	if err != nil {
@@ -78,8 +78,8 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML response",
-		NotBefore:    &now,
-		NotAfter:     &after,
+		NotBefore:    now,
+		NotAfter:     after,
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 	})
@@ -110,8 +110,8 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorith
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML metadata",
-		NotBefore:    &now,
-		NotAfter:     &after,
+		NotBefore:    now,
+		NotAfter:     after,
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 	})

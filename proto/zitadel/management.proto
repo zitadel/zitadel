@@ -3964,8 +3964,8 @@ message AddSAMLAppRequest {
   string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
   oneof metadata {
-      bytes metadata_xml = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-      string metadata_url = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+      string metadata_url = 4 [(validate.rules).string.max_len = 200];
   }
 }
 
@@ -4035,8 +4035,8 @@ message UpdateSAMLAppConfigRequest {
   string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
   oneof metadata {
-      bytes metadata_xml = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-      string metadata_url = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+      string metadata_url = 4 [(validate.rules).string.max_len = 200];
   }
 }
 

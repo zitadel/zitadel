@@ -29,7 +29,7 @@ With this you have defined to connection to ZITADEL as an external IDP, next is 
 connect to an application. The "How to" for that can be
 found [here](https://docs.pingidentity.com/bundle/pingone/page/zqd1616600404402.html).
 
-To add the connection to ZITADEL you have to build the metadata, which should minimalisticly look like this, the necessary information can be found on the External IDPs page under "P1Connection" and "IDP Configuration" :
+To add the connection to ZITADEL you have to build the metadata, which should minimalistic look like this, the necessary information can be found on the External IDPs page under "P1Connection" and "IDP Configuration" :
 ```xml
 ENTITYID="PINGONE (SP) ENTITY ID"
 ACSURL="ACS ENDPOINT"

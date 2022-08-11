@@ -33,8 +33,8 @@ type CertificateInformations struct {
 	SerialNumber *big.Int
 	Organisation []string
 	CommonName   string
-	NotBefore    *time.Time
-	NotAfter     *time.Time
+	NotBefore    time.Time
+	NotAfter     time.Time
 	KeyUsage     x509.KeyUsage
 	ExtKeyUsage  []x509.ExtKeyUsage
 }
@@ -64,58 +64,14 @@ func GenerateEncryptedKeyPairWithCertificate(bits int, alg EncryptionAlgorithm, 
 }
 
 func GenerateCACertificate(bits int, informations *CertificateInformations) (*rsa.PrivateKey, *rsa.PublicKey, []byte, error) {
-	ca := &x509.Certificate{
-		Subject:               pkix.Name{},
-		NotBefore:             time.Now(),
-		IsCA:                  true,
-		BasicConstraintsValid: true,
-	}
-	if informations.SerialNumber != nil {
-		ca.SerialNumber = informations.SerialNumber
-	}
-	if informations.Organisation != nil {
-		ca.Subject.Organization = informations.Organisation
-	}
-	if informations.CommonName != "" {
-		ca.Subject.CommonName = informations.CommonName
-	}
-	if informations.NotBefore != nil {
-		ca.NotBefore = *informations.NotBefore
-	}
-	if informations.NotAfter != nil {
-		ca.NotAfter = *informations.NotAfter
-	}
-	if informations.KeyUsage != 0 {
-		ca.KeyUsage = informations.KeyUsage
-	}
-	if informations.ExtKeyUsage != nil {
-		ca.ExtKeyUsage = informations.ExtKeyUsage
-	}
-
-	caPrivKey, err := rsa.GenerateKey(rand.Reader, bits)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca, &caPrivKey.PublicKey, caPrivKey)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	caCert, err := x509.ParseCertificate(caBytes)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	caCertPem, err := CertificateToBytes(caCert)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	return caPrivKey, &caPrivKey.PublicKey, caCertPem, nil
+	return generateCertificate(bits, nil, nil, informations)
 }
 
 func GenerateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, informations *CertificateInformations) (*rsa.PrivateKey, *rsa.PublicKey, []byte, error) {
+	return generateCertificate(bits, caPrivateKey, ca, informations)
+}
+
+func generateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, informations *CertificateInformations) (*rsa.PrivateKey, *rsa.PublicKey, []byte, error) {
 	cert := &x509.Certificate{
 		Subject:   pkix.Name{},
 		NotBefore: time.Now(),
@@ -129,11 +85,11 @@ func GenerateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, info
 	if informations.CommonName != "" {
 		cert.Subject.CommonName = informations.CommonName
 	}
-	if informations.NotBefore != nil {
-		cert.NotBefore = *informations.NotBefore
+	if informations.NotBefore.IsZero() {
+		cert.NotBefore = informations.NotBefore
 	}
-	if informations.NotAfter != nil {
-		cert.NotAfter = *informations.NotAfter
+	if informations.NotAfter.IsZero() {
+		cert.NotAfter = informations.NotAfter
 	}
 	if informations.KeyUsage != 0 {
 		cert.KeyUsage = informations.KeyUsage
@@ -147,14 +103,25 @@ func GenerateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, info
 		return nil, nil, nil, err
 	}
 
-	caCert, err := x509.ParseCertificate(ca)
-	if err != nil {
-		return nil, nil, nil, err
-	}
+	certBytes := make([]byte, 0)
+	if ca == nil {
+		cert.IsCA = true
+		cert.BasicConstraintsValid = true
 
-	certBytes, err := x509.CreateCertificate(rand.Reader, cert, caCert, &certPrivKey.PublicKey, caPrivateKey)
-	if err != nil {
-		return nil, nil, nil, err
+		certBytes, err = x509.CreateCertificate(rand.Reader, cert, cert, &certPrivKey.PublicKey, certPrivKey)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	} else {
+		caCert, err := x509.ParseCertificate(ca)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		certBytes, err = x509.CreateCertificate(rand.Reader, cert, caCert, &certPrivKey.PublicKey, caPrivateKey)
+		if err != nil {
+			return nil, nil, nil, err
+		}
 	}
 
 	x509Cert, err := x509.ParseCertificate(certBytes)
