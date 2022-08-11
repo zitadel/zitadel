@@ -26,8 +26,8 @@ jobs:
       - name: Set TAG env manual trigger
         if: github.event_name == 'workflow_dispatch'
         run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
-      - name: Set TAG env on release
-        if: github.event_name == 'release'
+      - name: Set TAG env on ZITADEL release
+        if: github.event_name == 'workflow_run'
         run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
