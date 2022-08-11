@@ -44,7 +44,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.project_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.project_members2 (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
 								database.StringArray{"role"},
@@ -81,7 +81,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								database.StringArray{"role", "changed"},
 								anyArg{},
@@ -114,7 +114,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (user_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (user_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"agg-id",
@@ -144,7 +144,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (user_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (user_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"agg-id",
@@ -172,7 +172,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -199,7 +199,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (resource_owner = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -226,7 +226,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (project_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

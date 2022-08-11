@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	InstanceMemberProjectionTable = "projections.instance_members"
+	InstanceMemberProjectionTable = "projections.instance_members2"
 
 	InstanceMemberIAMIDCol = "id"
 )

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants"
+	UserGrantProjectionTable = "projections.user_grants2"
 
 	UserGrantID            = "id"
 	UserGrantCreationDate  = "creation_date"

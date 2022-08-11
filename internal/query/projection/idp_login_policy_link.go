@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links"
+	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links2"
 
 	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
 	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"

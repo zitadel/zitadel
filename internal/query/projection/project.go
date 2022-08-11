@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	ProjectProjectionTable = "projections.projects"
+	ProjectProjectionTable = "projections.projects2"
 
 	ProjectColumnID                     = "id"
 	ProjectColumnCreationDate           = "creation_date"

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	ProjectMemberProjectionTable = "projections.project_members"
+	ProjectMemberProjectionTable = "projections.project_members2"
 	ProjectMemberProjectIDCol    = "project_id"
 )
 

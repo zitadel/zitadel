@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	ProjectGrantProjectionTable = "projections.project_grants"
+	ProjectGrantProjectionTable = "projections.project_grants2"
 
 	ProjectGrantColumnGrantID       = "grant_id"
 	ProjectGrantColumnCreationDate  = "creation_date"

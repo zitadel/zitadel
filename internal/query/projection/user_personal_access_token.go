@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens"
+	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens2"
 
 	PersonalAccessTokenColumnID            = "id"
 	PersonalAccessTokenColumnCreationDate  = "creation_date"

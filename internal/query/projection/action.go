@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	ActionTable            = "projections.actions"
+	ActionTable            = "projections.actions2"
 	ActionIDCol            = "id"
 	ActionCreationDateCol  = "creation_date"
 	ActionChangeDateCol    = "change_date"

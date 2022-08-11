@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_login_policy_links.idp_id,` +
+	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_login_policy_links2.idp_id,` +
 		` projections.idps.name,` +
 		` projections.idps.type,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.idp_login_policy_links` +
-		` LEFT JOIN projections.idps ON projections.idp_login_policy_links.idp_id = projections.idps.id`)
+		` FROM projections.idp_login_policy_links2` +
+		` LEFT JOIN projections.idps ON projections.idp_login_policy_links2.idp_id = projections.idps.id`)
 	loginPolicyIDPLinksCols = []string{
 		"idp_id",
 		"name",

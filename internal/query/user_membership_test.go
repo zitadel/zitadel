@@ -23,8 +23,8 @@ var (
 			", memberships.id" +
 			", memberships.project_id" +
 			", memberships.grant_id" +
-			", projections.project_grants.granted_org_id" +
-			", projections.projects.name" +
+			", projections.project_grants2.granted_org_id" +
+			", projections.projects2.name" +
 			", projections.orgs.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
@@ -39,7 +39,7 @@ var (
 			", NULL::TEXT AS id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.org_members AS members" +
+			" FROM projections.org_members2 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -52,7 +52,7 @@ var (
 			", members.id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.instance_members AS members" +
+			" FROM projections.instance_members2 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -65,7 +65,7 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.project_members AS members" +
+			" FROM projections.project_members2 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -78,11 +78,11 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", members.grant_id" +
-			" FROM projections.project_grant_members AS members" +
+			" FROM projections.project_grant_members2 AS members" +
 			") AS memberships" +
-			" LEFT JOIN projections.projects ON memberships.project_id = projections.projects.id" +
+			" LEFT JOIN projections.projects2 ON memberships.project_id = projections.projects2.id" +
 			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id" +
-			" LEFT JOIN projections.project_grants ON memberships.grant_id = projections.project_grants.grant_id")
+			" LEFT JOIN projections.project_grants2 ON memberships.grant_id = projections.project_grants2.grant_id")
 	membershipCols = []string{
 		"user_id",
 		"roles",

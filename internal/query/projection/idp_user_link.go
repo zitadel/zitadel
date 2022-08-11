@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	IDPUserLinkTable             = "projections.idp_user_links"
+	IDPUserLinkTable             = "projections.idp_user_links2"
 	IDPUserLinkIDPIDCol          = "idp_id"
 	IDPUserLinkUserIDCol         = "user_id"
 	IDPUserLinkExternalUserIDCol = "external_user_id"

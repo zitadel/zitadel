@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	UserMetadataProjectionTable = "projections.user_metadata2"
+	UserMetadataProjectionTable = "projections.user_metadata3"
 
 	UserMetadataColumnUserID        = "user_id"
 	UserMetadataColumnCreationDate  = "creation_date"

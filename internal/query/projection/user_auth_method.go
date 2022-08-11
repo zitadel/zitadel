@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods"
+	UserAuthMethodTable = "projections.user_auth_methods2"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
