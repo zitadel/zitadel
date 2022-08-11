@@ -250,7 +250,7 @@ func TestNewUpsertStatement(t *testing.T) {
 			},
 		},
 		{
-			name: "correct",
+			name: "no update cols",
 			args: args{
 				table: "my_table",
 				event: &testEvent{
@@ -274,10 +274,46 @@ func TestNewUpsertStatement(t *testing.T) {
 				sequence:         1,
 				previousSequence: 1,
 				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, handler.ErrNoValues)
+				},
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conflictCols: []handler.Column{
+					handler.NewCol("col1", nil),
+				},
+				values: []handler.Column{
+					{
+						Name:  "col1",
+						Value: "val",
+					},
+					{
+						Name:  "col2",
+						Value: "val",
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "INSERT INTO my_table (col1) VALUES ($1) ON CONFLICT (col1) DO UPDATE SET (col1) = ($1)",
-							args:  []interface{}{"val"},
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET (col2) = (EXCLUDED.col2)",
+							args:  []interface{}{"val", "val"},
 						},
 					},
 					shouldExecute: true,
@@ -736,6 +772,10 @@ func TestNewMultiStatement(t *testing.T) {
 								Name:  "col1",
 								Value: 1,
 							},
+							{
+								Name:  "col2",
+								Value: 2,
+							},
 						}),
 					AddUpdateStatement(
 						[]handler.Column{
@@ -768,8 +808,8 @@ func TestNewMultiStatement(t *testing.T) {
 							args:  []interface{}{1},
 						},
 						{
-							query: "INSERT INTO my_table (col1) VALUES ($1) ON CONFLICT (col1) DO UPDATE SET (col1) = ($1)",
-							args:  []interface{}{1},
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET (col2) = (EXCLUDED.col2)",
+							args:  []interface{}{1, 2},
 						},
 						{
 							query: "UPDATE my_table SET (col1) = ($1) WHERE (col1 = $2)",

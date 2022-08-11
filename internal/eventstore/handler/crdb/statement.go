@@ -65,9 +65,14 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []handler.Column, v
 		config.err = handler.ErrNoValues
 	}
 
+	updateCols, updateVals := getUpdateCols(cols, conflictTarget)
+	if len(updateCols) == 0 || len(updateVals) == 0 {
+		config.err = handler.ErrNoValues
+	}
+
 	q := func(config execConfig) string {
 		return "INSERT INTO " + config.tableName + " (" + strings.Join(cols, ", ") + ") VALUES (" + strings.Join(params, ", ") + ")" +
-			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO UPDATE SET (" + strings.Join(cols, ", ") + ") = (" + strings.Join(params, ", ") + ")"
+			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO UPDATE SET (" + strings.Join(updateCols, ", ") + ") = (" + strings.Join(updateVals, ", ") + ")"
 	}
 
 	return &handler.Statement{
@@ -77,6 +82,33 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []handler.Column, v
 		InstanceID:       event.Aggregate().InstanceID,
 		Execute:          exec(config, q, opts),
 	}
+}
+
+func getUpdateCols(cols, conflictTarget []string) (updateCols, updateVals []string) {
+	updateCols = make([]string, len(cols))
+	updateVals = make([]string, len(cols))
+
+	copy(updateCols, cols)
+
+	for i := len(updateCols) - 1; i >= 0; i-- {
+		updateVals[i] = "EXCLUDED." + updateCols[i]
+
+		for _, conflict := range conflictTarget {
+			if conflict == updateCols[i] {
+				copy(updateCols[i:], updateCols[i+1:])
+				updateCols[len(updateCols)-1] = ""
+				updateCols = updateCols[:len(updateCols)-1]
+
+				copy(updateVals[i:], updateVals[i+1:])
+				updateVals[len(updateVals)-1] = ""
+				updateVals = updateVals[:len(updateVals)-1]
+
+				break
+			}
+		}
+	}
+
+	return updateCols, updateVals
 }
 
 func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditions []handler.Condition, opts ...execOption) *handler.Statement {

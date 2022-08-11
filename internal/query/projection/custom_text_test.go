@@ -44,7 +44,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.custom_texts (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.custom_texts (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -152,7 +152,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.custom_texts (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.custom_texts (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",

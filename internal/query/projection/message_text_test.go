@@ -45,7 +45,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -85,7 +85,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, pre_header) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, pre_header) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, pre_header) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, pre_header) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.pre_header)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -125,7 +125,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, subject) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, subject) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, subject) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, subject) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.subject)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -165,7 +165,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, greeting) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, greeting) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, greeting) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, greeting) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.greeting)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -205,7 +205,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, text) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -245,7 +245,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, button_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, button_text) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, button_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, button_text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.button_text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -285,7 +285,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, footer_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, footer_text) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, footer_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, footer_text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.footer_text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -610,7 +610,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.message_texts (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
