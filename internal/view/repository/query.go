@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -127,7 +128,7 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method domain.Se
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-Psois", "list contains only possible for strings")
 		}
-		query = query.Where("? <@ "+column, []string{valueText})
+		query = query.Where("? <@ "+column, database.StringArray{valueText})
 	default:
 		return nil, nil
 	}

@@ -37,25 +37,25 @@ type ApplicationView struct {
 	HasProjectCheck        bool                          `json:"hasProjectCheck" gorm:"column:has_project_check"`
 	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting" gorm:"column:private_labeling_setting"`
 
-	IsOIDC                     bool                      `json:"-" gorm:"column:is_oidc"`
-	OIDCVersion                int32                     `json:"oidcVersion" gorm:"column:oidc_version"`
-	OIDCClientID               string                    `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCRedirectUris           database.StringArray      `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
-	OIDCResponseTypes          []domain.OIDCResponseType `json:"responseTypes" gorm:"column:oidc_response_types"`
-	OIDCGrantTypes             []domain.OIDCGrantType    `json:"grantTypes" gorm:"column:oidc_grant_types"`
-	OIDCApplicationType        int32                     `json:"applicationType" gorm:"column:oidc_application_type"`
-	OIDCAuthMethodType         int32                     `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
-	OIDCPostLogoutRedirectUris database.StringArray      `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
-	NoneCompliant              bool                      `json:"-" gorm:"column:none_compliant"`
-	ComplianceProblems         database.StringArray      `json:"-" gorm:"column:compliance_problems"`
-	DevMode                    bool                      `json:"devMode" gorm:"column:dev_mode"`
-	OriginAllowList            database.StringArray      `json:"-" gorm:"column:origin_allow_list"`
-	AdditionalOrigins          database.StringArray      `json:"additionalOrigins" gorm:"column:additional_origins"`
-	AccessTokenType            int32                     `json:"accessTokenType" gorm:"column:access_token_type"`
-	AccessTokenRoleAssertion   bool                      `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
-	IDTokenRoleAssertion       bool                      `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
-	IDTokenUserinfoAssertion   bool                      `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
-	ClockSkew                  time.Duration             `json:"clockSkew" gorm:"column:clock_skew"`
+	IsOIDC                     bool                                        `json:"-" gorm:"column:is_oidc"`
+	OIDCVersion                int32                                       `json:"oidcVersion" gorm:"column:oidc_version"`
+	OIDCClientID               string                                      `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCRedirectUris           database.StringArray                        `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
+	OIDCResponseTypes          database.EnumArray[domain.OIDCResponseType] `json:"responseTypes" gorm:"column:oidc_response_types"`
+	OIDCGrantTypes             database.EnumArray[domain.OIDCGrantType]    `json:"grantTypes" gorm:"column:oidc_grant_types"`
+	OIDCApplicationType        int32                                       `json:"applicationType" gorm:"column:oidc_application_type"`
+	OIDCAuthMethodType         int32                                       `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
+	OIDCPostLogoutRedirectUris database.StringArray                        `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
+	NoneCompliant              bool                                        `json:"-" gorm:"column:none_compliant"`
+	ComplianceProblems         database.StringArray                        `json:"-" gorm:"column:compliance_problems"`
+	DevMode                    bool                                        `json:"devMode" gorm:"column:dev_mode"`
+	OriginAllowList            database.StringArray                        `json:"-" gorm:"column:origin_allow_list"`
+	AdditionalOrigins          database.StringArray                        `json:"additionalOrigins" gorm:"column:additional_origins"`
+	AccessTokenType            int32                                       `json:"accessTokenType" gorm:"column:access_token_type"`
+	AccessTokenRoleAssertion   bool                                        `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
+	IDTokenRoleAssertion       bool                                        `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
+	IDTokenUserinfoAssertion   bool                                        `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
+	ClockSkew                  time.Duration                               `json:"clockSkew" gorm:"column:clock_skew"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
