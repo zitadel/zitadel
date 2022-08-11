@@ -12,6 +12,46 @@
   overflow: hidden;
 }
 
+.gigiwrapper {
+  position: absolute;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.gigiwrapperrelative {
+  position: relative;
+  overflow: hidden;
+  height: 256px;
+  width: 256px;
+}
+
+.gigiwrapperrelative img {
+  top: 50px;
+  position: absolute;
+  right: 0;
+}
+
+.gigibanner {
+  position: absolute;
+  top: 201px;
+  right: -50px;
+  padding: 1rem 0;
+  background-color: var(--gigibannerbackground);
+  color: var(--gigibannerforeground);
+  transform: rotate(45deg);
+  transform-origin: top right;
+  width: 350px;
+  text-align: center;
+  font-weight: 700;
+}
+
+@media screen and (max-width: 800px) {
+  .gigiwrapper {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 966px) {
   .heroBanner {
     padding: 2rem;
@@ -80,7 +120,6 @@
   object-fit: contain;
   background-position: center;
 }
-
 
 @media screen and (max-width: 600px) {
   .quickstartcontainer {
