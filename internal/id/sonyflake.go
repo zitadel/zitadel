@@ -39,6 +39,7 @@ func SonyFlakeGenerator() Generator {
 	if sonyFlakeGenerator == nil {
 		sfg := Generator(&sonyflakeGenerator{
 			sonyflake.NewSonyflake(sonyflake.Settings{
+				MachineID: machineID,
 				StartTime: time.Date(2019, 4, 29, 0, 0, 0, 0, time.UTC),
 			}),
 		})
