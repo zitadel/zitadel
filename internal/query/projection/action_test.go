@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func TestActionProjection_reduces(t *testing.T) {
@@ -170,6 +171,36 @@ func TestActionProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.actions WHERE (id = $1)",
 							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceOrgRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&actionProjection{}).reduceOrgRemoved,
+			want: wantReduce{
+				projection:       ActionTable,
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (resource_owner = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.ActionStateOrgRemoved,
 								"agg-id",
 							},
 						},

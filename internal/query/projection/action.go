@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 const (
@@ -80,6 +81,15 @@ func (p *actionProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  action.RemovedEventType,
 					Reduce: p.reduceActionRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
 				},
 			},
 		},
@@ -160,7 +170,7 @@ func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ReactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hwdqa", "reduce.wrong.event.type% s", action.ReactivatedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hwdqa", "reduce.wrong.event.type %s", action.ReactivatedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -178,12 +188,30 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type% s", action.RemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type %s", action.RemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *actionProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mSmWM", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
+			handler.NewCol(ActionSequenceCol, e.Sequence()),
+			handler.NewCol(ActionStateCol, domain.ActionStateOrgRemoved),
+		},
+		[]handler.Condition{
+			handler.NewCond(ActionResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil
 }
