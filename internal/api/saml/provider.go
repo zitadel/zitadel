@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	HandlerPrefix = "/saml"
+	HandlerPrefix = "/saml/v2"
 )
 
 type Config struct {

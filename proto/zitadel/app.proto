@@ -30,7 +30,7 @@ message App {
     oneof config {
         OIDCConfig oidc_config = 5;
         APIConfig api_config = 6;
-        SAMLConfig saml_config= 7;
+        SAMLConfig saml_config = 7;
     }
 }
 
@@ -201,7 +201,7 @@ enum OIDCTokenType {
 
 message SAMLConfig {
     oneof metadata{
-        string metadata_xml = 1;
+        bytes metadata_xml = 1;
         string metadata_url = 2;
     }
 }

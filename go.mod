@@ -50,7 +50,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.3.3
 	github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.3
-	github.com/zitadel/saml v0.0.3-0.20220512072611-73e2955740e9
+	github.com/zitadel/saml v0.0.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0
 	go.opentelemetry.io/otel v1.2.0
@@ -169,7 +169,6 @@ require (
 	github.com/wcharczuk/go-chart/v2 v2.1.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xrash/smetrics v0.0.0-20200730060457-89a2a8a1fb0b // indirect
-	github.com/zitadel/oidc v1.3.1 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.2.0 // indirect
 	go.opentelemetry.io/otel/internal/metric v0.25.0 // indirect

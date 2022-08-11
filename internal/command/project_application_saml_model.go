@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -12,7 +14,7 @@ type SAMLApplicationWriteModel struct {
 
 	AppID       string
 	AppName     string
-	Metadata    string
+	Metadata    []byte
 	MetadataURL string
 
 	State domain.AppState
@@ -121,10 +123,10 @@ func (wm *SAMLApplicationWriteModel) appendAddSAMLEvent(e *project.SAMLConfigAdd
 
 func (wm *SAMLApplicationWriteModel) appendChangeSAMLEvent(e *project.SAMLConfigChangedEvent) {
 	if e.Metadata != nil {
-		wm.Metadata = *e.Metadata
+		wm.Metadata = e.Metadata
 	}
 	if e.MetadataURL != nil {
-		wm.Metadata = *e.MetadataURL
+		wm.MetadataURL = *e.MetadataURL
 	}
 }
 
@@ -151,12 +153,12 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	appID string,
 	entityID string,
-	metadata string,
+	metadata []byte,
 	metadataURL string,
 ) (*project.SAMLConfigChangedEvent, bool, error) {
 	changes := make([]project.SAMLConfigChanges, 0)
 	var err error
-	if wm.Metadata != metadata {
+	if !reflect.DeepEqual(wm.Metadata, metadata) {
 		changes = append(changes, project.ChangeMetadata(metadata))
 	}
 	if wm.MetadataURL != metadataURL {

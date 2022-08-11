@@ -3,7 +3,9 @@ package command
 import (
 	"context"
 	"fmt"
+
 	"github.com/zitadel/saml/pkg/provider/xml"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -47,7 +49,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		project.NewApplicationAddedEvent(ctx, projectAgg, samlApp.AppID, samlApp.AppName),
 	}
 
-	if samlApp.Metadata == "" && samlApp.MetadataURL == "" {
+	if samlApp.Metadata == nil && samlApp.MetadataURL == "" {
 		return nil, fmt.Errorf("no metadata provided")
 	}
 
@@ -59,7 +61,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		}
 		metadata = data
 	} else {
-		metadata = []byte(samlApp.Metadata)
+		metadata = samlApp.Metadata
 	}
 
 	entity, err := xml.ParseMetadataXmlIntoStruct(metadata)

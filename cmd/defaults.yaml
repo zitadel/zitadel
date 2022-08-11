@@ -170,13 +170,14 @@ SAML:
       SignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
       WantAuthRequestsSigned: true
       Endpoints:
-    Organisation:
-      Name: ZITADEL
-      URL: https://zitadel.ch
-    ContactPerson:
-      ContactType: "technical"
-      Company: ZITADEL
-      EmailAddress: hi@caos.ch
+    #Organisation:
+    #  Name: ZITADEL
+    #  URL: https://zitadel.com
+    #ContactPerson:
+    #  ContactType: "technical"
+    #  Company: ZITADEL
+    #  EmailAddress: hi@zitadel.com
+
 
 
 Login:

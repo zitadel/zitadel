@@ -95,7 +95,7 @@ title: zitadel/app.proto
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  string | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - |  |
 
 

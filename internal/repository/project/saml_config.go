@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -18,7 +19,7 @@ type SAMLConfigAddedEvent struct {
 
 	AppID       string `json:"appId"`
 	EntityID    string `json:"entityId"`
-	Metadata    string `json:"metadata,omitempty"`
+	Metadata    []byte `json:"metadata,omitempty"`
 	MetadataURL string `json:"metadata_url,omitempty"`
 }
 
@@ -35,7 +36,7 @@ func NewSAMLConfigAddedEvent(
 	aggregate *eventstore.Aggregate,
 	appID string,
 	entityID string,
-	metadata string,
+	metadata []byte,
 	metadataURL string,
 ) *SAMLConfigAddedEvent {
 	return &SAMLConfigAddedEvent{
@@ -69,7 +70,7 @@ type SAMLConfigChangedEvent struct {
 
 	AppID       string  `json:"appId"`
 	EntityID    string  `json:"entityId"`
-	Metadata    *string `json:"metadata,omitempty"`
+	Metadata    []byte  `json:"metadata,omitempty"`
 	MetadataURL *string `json:"metadata_url,omitempty"`
 }
 
@@ -109,9 +110,9 @@ func NewSAMLConfigChangedEvent(
 
 type SAMLConfigChanges func(event *SAMLConfigChangedEvent)
 
-func ChangeMetadata(metadata string) func(event *SAMLConfigChangedEvent) {
+func ChangeMetadata(metadata []byte) func(event *SAMLConfigChangedEvent) {
 	return func(e *SAMLConfigChangedEvent) {
-		e.Metadata = &metadata
+		e.Metadata = metadata
 	}
 }
 

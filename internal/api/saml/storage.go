@@ -61,7 +61,7 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 	return serviceprovider.NewServiceProvider(
 		app.ID,
 		&serviceprovider.ServiceProviderConfig{
-			Metadata: metadata,
+			Metadata: string(metadata),
 			URL:      app.SAMLConfig.MetadataURL,
 		},
 		p.defaultLoginURL,

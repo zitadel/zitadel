@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+
 	"github.com/zitadel/logging"
 
 	"github.com/lib/pq"
@@ -15,7 +16,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps2"
+	AppProjectionTable = "projections.apps"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
@@ -601,7 +602,7 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 
 	cols := make([]handler.Column, 0, 15)
 	if e.Metadata != nil {
-		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadata, *e.Metadata))
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata))
 	}
 	if e.MetadataURL != nil {
 		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadataURL, *e.MetadataURL))

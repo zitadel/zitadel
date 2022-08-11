@@ -65,8 +65,8 @@ func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) *domain.SAMLApp {
 			AggregateID: req.ProjectId,
 		},
 		AppName:     req.Name,
-		Metadata:    req.SpConfig.GetMetadataXml(),
-		MetadataURL: req.SpConfig.GetMetadataUrl(),
+		Metadata:    req.GetMetadataXml(),
+		MetadataURL: req.GetMetadataUrl(),
 	}
 }
 
@@ -115,8 +115,8 @@ func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest)
 			AggregateID: app.ProjectId,
 		},
 		AppID:       app.AppId,
-		Metadata:    app.SpConfig.GetMetadataXml(),
-		MetadataURL: app.SpConfig.GetMetadataUrl(),
+		Metadata:    app.GetMetadataXml(),
+		MetadataURL: app.GetMetadataUrl(),
 	}
 }
 

@@ -3690,7 +3690,8 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| sp_config |  zitadel.app.v1.SAMLConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -8316,7 +8317,8 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| sp_config |  zitadel.app.v1.SAMLConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
