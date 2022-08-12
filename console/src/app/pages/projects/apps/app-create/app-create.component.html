@@ -174,9 +174,8 @@
         [ngClass]="{ disabled: !!metadataUrl?.value }"
         *ngIf="
           decodedBase64 &&
-          samlAppRequest.toObject().spConfig &&
-          samlAppRequest.toObject().spConfig?.metadataXml &&
-          !samlAppRequest.toObject().spConfig?.metadataUrl
+          samlAppRequest.toObject().metadataXml &&
+          !samlAppRequest.toObject().metadataUrl
         "
       >
         <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
@@ -315,7 +314,7 @@
             <span *ngIf="metadataUrl?.value">
               {{ metadataUrl?.value }}
             </span>
-            <span *ngIf="samlAppRequest.toObject().spConfig?.metadataXml">
+            <span *ngIf="samlAppRequest.toObject().metadataXml">
               {{ 'APP.SAML.METADATAFROMFILE' | translate }}
             </span>
           </span>
@@ -413,9 +412,8 @@
               [ngClass]="{ disabled: !!formMetadataUrl?.value }"
               *ngIf="
                 decodedBase64 &&
-                samlAppRequest.toObject().spConfig &&
-                samlAppRequest.toObject().spConfig?.metadataXml &&
-                !samlAppRequest.toObject().spConfig?.metadataUrl
+                samlAppRequest.toObject().metadataXml &&
+                !samlAppRequest.toObject().metadataUrl
               "
             >
               <ngx-codemirror

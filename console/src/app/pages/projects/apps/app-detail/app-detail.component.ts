@@ -625,11 +625,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       req.setAppId(this.app.id);
 
       if (this.app.samlConfig) {
-        const spConfig = new SAMLConfig();
-
-        spConfig.setMetadataUrl(this.app.samlConfig?.metadataUrl);
-        spConfig.setMetadataXml(this.app.samlConfig?.metadataXml);
-        req.setSpConfig(spConfig);
+        req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
+        req.setMetadataXml(this.app.samlConfig?.metadataXml);
       }
 
       this.mgmtService
@@ -757,7 +754,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   get decodedBase64(): string {
-    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
+    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && typeof this.app.samlConfig.metadataXml === 'string') {
       return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString();
     } else {
       return '';
@@ -766,7 +763,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   set decodedBase64(xmlString) {
     if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
-      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
+      const base64 = Buffer.from( xmlString, 'ascii').toString('base64');
 
       if (this.app.samlConfig) {
         this.app.samlConfig.metadataXml = base64;

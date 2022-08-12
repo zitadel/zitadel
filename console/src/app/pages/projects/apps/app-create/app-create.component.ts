@@ -216,10 +216,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     });
 
     this.samlConfigForm.valueChanges.subscribe((form) => {
-      if (form.metadataUrl && form.metadataUrl.length) {
-        const spConfig = new SAMLConfig();
-        spConfig.setMetadataUrl(form.metadataUrl.value);
-        this.samlAppRequest.setSpConfig(spConfig);
+      if (form.metadataUrl && form.metadataUrl.length > 0) {
+        this.samlAppRequest.setMetadataUrl(form.metadataUrl);
       }
     });
   }
@@ -263,11 +261,9 @@ export class AppCreateComponent implements OnInit, OnDestroy {
       this.oidcAppRequest.setAuthMethodType(this.authMethodType?.value);
       this.apiAppRequest.setAuthMethodType(this.authMethodType?.value);
 
-      const spConfig = new SAMLConfig();
       if (this.formMetadataUrl?.value) {
-        spConfig.setMetadataUrl(this.formMetadataUrl?.value);
+        this.samlAppRequest.setMetadataUrl(this.formMetadataUrl?.value);
       }
-      this.samlAppRequest.setSpConfig(spConfig);
 
       const oidcAppType = (this.formappType?.value as RadioItemAppType).oidcAppType;
       if (oidcAppType !== undefined) {
@@ -338,10 +334,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
           return (e) => {
             const xmlBase64 = e.target?.result;
             if (xmlBase64 && typeof xmlBase64 === 'string') {
-              const samlConfig = new SAMLConfig();
               const cropped = xmlBase64.replace('data:text/xml;base64,', '');
-              samlConfig.setMetadataXml(cropped);
-              this.samlAppRequest.setSpConfig(samlConfig);
+              this.samlAppRequest.setMetadataXml(cropped);
             }
           };
         })(file);
@@ -505,8 +499,8 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   get decodedBase64(): string {
     const samlReq = this.samlAppRequest.toObject();
-    if (samlReq && samlReq.spConfig && samlReq.spConfig.metadataXml) {
-      return Buffer.from(samlReq.spConfig.metadataXml, 'base64').toString();
+    if (samlReq && samlReq.metadataXml && typeof samlReq.metadataXml === 'string') {
+      return Buffer.from(samlReq.metadataXml, 'base64').toString();
     } else {
       return '';
     }
@@ -515,9 +509,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   set decodedBase64(xmlString) {
     if (this.samlAppRequest) {
       const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
-      const config = new SAMLConfig();
-      config.setMetadataXml(base64);
-      this.samlAppRequest.setSpConfig(config);
+      this.samlAppRequest.setMetadataXml(base64);
     }
   }
 
