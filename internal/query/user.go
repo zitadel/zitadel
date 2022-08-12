@@ -536,10 +536,12 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 		LoginNameInstanceIDCol.identifier() + " = " + UserInstanceIDCol.identifier(),
 		LoginNameUserIDCol.identifier() + " = " + UserIDCol.identifier(),
 	}
-	return NewExistsQuery(
+	return NewInQuery(
 		LoginNameNameCol,
 		value,
 		comparison,
+		UserIDCol,
+		LoginNameUserIDCol,
 		linkingEquals,
 	)
 }

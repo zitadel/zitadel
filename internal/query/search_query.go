@@ -263,6 +263,40 @@ func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	}
 }
 
+func NewInQuery(c Column, value string, compare TextComparison, inColumn, selectedColumn Column, linkingEquals []string) (*InQuery, error) {
+	textQuery, err := NewTextQuery(c, value, compare)
+	if err != nil {
+		return nil, err
+	}
+
+	return &InQuery{
+		InColumn:       inColumn,
+		SelectedColumn: selectedColumn,
+		TextQuery:      textQuery,
+		LinkingEquals:  linkingEquals,
+	}, nil
+}
+
+type InQuery struct {
+	InColumn       Column
+	SelectedColumn Column
+	TextQuery      *TextQuery
+	LinkingEquals  []string
+}
+
+func (q *InQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *InQuery) comp() sq.Sqlizer {
+	exists := sq.Select(q.SelectedColumn.identifier()).Prefix(q.InColumn.identifier() + " IN (").From(q.TextQuery.Column.table.name)
+	exists = q.TextQuery.toQuery(exists)
+	for _, linkingEquals := range q.LinkingEquals {
+		exists = exists.Where(linkingEquals)
+	}
+	return exists.Suffix(")")
+}
+
 func NewExistsQuery(c Column, value string, compare TextComparison, linkingEquals []string) (*ExistQuery, error) {
 	textQuery, err := NewTextQuery(c, value, compare)
 	if err != nil {
@@ -270,14 +304,12 @@ func NewExistsQuery(c Column, value string, compare TextComparison, linkingEqual
 	}
 
 	return &ExistQuery{
-		Table:         c.table.name,
 		TextQuery:     textQuery,
 		LinkingEquals: linkingEquals,
 	}, nil
 }
 
 type ExistQuery struct {
-	Table         string
 	TextQuery     *TextQuery
 	LinkingEquals []string
 }
@@ -287,7 +319,7 @@ func (q *ExistQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *ExistQuery) comp() sq.Sqlizer {
-	exists := sq.Select("1").Prefix("EXISTS (").From(q.Table)
+	exists := sq.Select("1").Prefix("EXISTS (").From(q.TextQuery.Column.table.name)
 	exists = q.TextQuery.toQuery(exists)
 	for _, linkingEquals := range q.LinkingEquals {
 		exists = exists.Where(linkingEquals)
