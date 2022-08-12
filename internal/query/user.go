@@ -531,6 +531,19 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(userLoginNamesListCol, value, TextListContains)
 }
 
+func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	linkingEquals := []string{
+		LoginNameInstanceIDCol.identifier() + " = " + UserInstanceIDCol.identifier(),
+		LoginNameUserIDCol.identifier() + " = " + UserIDCol.identifier(),
+	}
+	return NewExistsQuery(
+		LoginNameNameCol,
+		value,
+		comparison,
+		linkingEquals,
+	)
+}
+
 func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 	loginNamesQuery, loginNamesArgs, err := sq.Select(
 		userLoginNamesUserIDCol.identifier(),

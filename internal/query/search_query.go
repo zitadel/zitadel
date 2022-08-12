@@ -263,6 +263,38 @@ func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	}
 }
 
+func NewExistsQuery(c Column, value string, compare TextComparison, linkingEquals []string) (*ExistQuery, error) {
+	textQuery, err := NewTextQuery(c, value, compare)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ExistQuery{
+		Table:         c.table.name,
+		TextQuery:     textQuery,
+		LinkingEquals: linkingEquals,
+	}, nil
+}
+
+type ExistQuery struct {
+	Table         string
+	TextQuery     *TextQuery
+	LinkingEquals []string
+}
+
+func (q *ExistQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *ExistQuery) comp() sq.Sqlizer {
+	exists := sq.Select("1").Prefix("EXISTS (").From(q.Table)
+	exists = q.TextQuery.toQuery(exists)
+	for _, linkingEquals := range q.LinkingEquals {
+		exists = exists.Where(linkingEquals)
+	}
+	return exists.Suffix(")")
+}
+
 type ListQuery struct {
 	Column  Column
 	List    []interface{}
