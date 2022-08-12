@@ -290,7 +290,7 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <Link to="https://www.producthunt.com/posts/zitadel">
+        <Link to="https://zitadel.com">
           <Gigi />
         </Link>
       </header>
