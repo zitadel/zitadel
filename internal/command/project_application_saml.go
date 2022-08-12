@@ -53,18 +53,15 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		return nil, fmt.Errorf("no metadata provided")
 	}
 
-	var metadata []byte
 	if samlApp.MetadataURL != "" {
 		data, err := xml.ReadMetadataFromURL(samlApp.MetadataURL)
 		if err != nil {
 			return nil, err
 		}
-		metadata = data
-	} else {
-		metadata = samlApp.Metadata
+		samlApp.Metadata = data
 	}
 
-	entity, err := xml.ParseMetadataXmlIntoStruct(metadata)
+	entity, err := xml.ParseMetadataXmlIntoStruct(samlApp.Metadata)
 	if err != nil {
 		return nil, err
 	}
