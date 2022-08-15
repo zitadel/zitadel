@@ -69,6 +69,30 @@ Database:
         RootCert: ""
         Cert: ""
         Key: ""
+  postgres:
+    Host: 
+    Port:
+    Database:
+    MaxOpenConns:
+    MaxConnLifetime:
+    MaxConnIdleTime:
+    Options:
+    User:
+      Username:
+      Password:
+      SSL:
+        Mode:
+        RootCert:
+        Cert:
+        Key:
+    Admin:
+      Username:
+      Password:
+      SSL:
+        Mode:
+        RootCert:
+        Cert:
+        Key:
 
 Machine:
   # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
