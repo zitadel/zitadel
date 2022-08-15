@@ -90,6 +90,9 @@ func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 			handler.NewCol(UserMetadataColumnKey, e.Key),
 		},
 		[]handler.Column{
+			handler.NewCol(UserMetadataColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(UserMetadataColumnUserID, e.Aggregate().ID),
+			handler.NewCol(UserMetadataColumnKey, e.Key),
 			handler.NewCol(UserMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(UserMetadataColumnCreationDate, e.CreationDate()),
 			handler.NewCol(UserMetadataColumnChangeDate, e.CreationDate()),
