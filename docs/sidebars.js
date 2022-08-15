@@ -55,6 +55,7 @@ module.exports = {
         "guides/deploy/linux",
         "guides/deploy/macos",
         "guides/deploy/compose",
+        "guides/deploy/compose-pg",
         "guides/deploy/knative",
         "guides/deploy/kubernetes",
         "guides/deploy/loadbalancing-example/loadbalancing-example",
