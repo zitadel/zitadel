@@ -39,10 +39,10 @@ type ProjectGrantView struct {
 }
 
 type ProjectGrant struct {
-	GrantID      string               `json:"grantId"`
-	GrantedOrgID string               `json:"grantedOrgId"`
-	RoleKeys     database.StringArray `json:"roleKeys"`
-	InstanceID   string               `json:"instanceID"`
+	GrantID      string   `json:"grantId"`
+	GrantedOrgID string   `json:"grantedOrgId"`
+	RoleKeys     []string `json:"roleKeys"`
+	InstanceID   string   `json:"instanceID"`
 }
 
 func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {

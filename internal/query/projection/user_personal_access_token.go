@@ -47,7 +47,7 @@ func newPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 		},
 			crdb.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
 			crdb.WithIndex(crdb.NewIndex("pat_user_idx", []string{PersonalAccessTokenColumnUserID})),
-			crdb.WithIndex(crdb.NewIndex("access_tkn_ro_idx", []string{PersonalAccessTokenColumnResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("pat_ro_idx", []string{PersonalAccessTokenColumnResourceOwner})),
 		),
 	)
 
