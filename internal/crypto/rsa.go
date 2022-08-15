@@ -85,10 +85,10 @@ func generateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, info
 	if informations.CommonName != "" {
 		cert.Subject.CommonName = informations.CommonName
 	}
-	if informations.NotBefore.IsZero() {
+	if !informations.NotBefore.IsZero() {
 		cert.NotBefore = informations.NotBefore
 	}
-	if informations.NotAfter.IsZero() {
+	if !informations.NotAfter.IsZero() {
 		cert.NotAfter = informations.NotAfter
 	}
 	if informations.KeyUsage != 0 {
