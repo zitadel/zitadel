@@ -2,32 +2,6 @@
 title: Identity Brokering
 ---
 
-<table class="table-wrapper">
-    <tr>
-        <td>Description</td>
-        <td>Learn about identity brokering/federation and how to add an external identity provider to authenticate your users.</td>
-    </tr>
-    <tr>
-        <td>Learning Outcomes</td>
-        <td>
-            In this module you will:
-            <ul>
-                <li>Learn about Identity Providers</li>
-                <li>Add a new identity provider</li>
-                <li>Example with Google Login</li>
-            </ul>
-        </td>
-    </tr>
-     <tr>
-        <td>Prerequisites</td>
-        <td>
-            <ul>
-                <li>Knowledge of <a href="/docs/guides/manage/console/organizations">Organizations</a></li>
-            </ul>
-        </td>
-    </tr>
-</table>
-
 ## What is Identity Brokering and Federated Identities?
 
 Federated identity management is an arrangement built upon the trust between two or more domains. Users of these domains are allowed to access applications and services using the same identity.
@@ -43,9 +17,9 @@ Because Google is registered as trusted identity provider the user will be able 
 
 ![Identity Brokering](/img/guides/identity_brokering.png)
 
-## Exercise: Register an external identity provider
+## Register an external identity provider
 
-In this exercise we will add a new Google identity provider to federate identities with ZITADEL.
+In this step we will add a new Google identity provider to federate identities with ZITADEL.
 
 ### 1. Create new OIDC Client
 
@@ -58,7 +32,7 @@ In this exercise we will add a new Google identity provider to federate identiti
 
 Google Example:
 
-1. Go to the Google Gloud Platform and choose youre project: <https://console.cloud.google.com/apis/credentials>
+1. Go to the Google Cloud Platform and choose your project: <https://console.cloud.google.com/apis/credentials>
 2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
 3. Choose Web application as Application type and give a name
 4. Add the redirect uris
@@ -74,7 +48,7 @@ The login policy can be configured on two levels. Once as default on the instanc
 This case describes how to change it on the organization.
 
 1. Go to your organization settings by clicking on "Organization" in the menu
-2. Modify your login policy in the menu "Login Behaviour and Security"
+2. Modify your login policy in the menu "Login Behavior and Security"
 
 ![Add custom login policy](/img/console_org_custom_login_policy.gif)
 
@@ -93,7 +67,7 @@ This case describes how to change it on the organization.
 ![Configure identity provider](/img/console_org_identity_provider.gif)
 
 ### 4. Send the primary domain scope on the authorization request
-ZITADEL will show a set of identity providers by default. This configuration can be changed by users with the [manager role] (https://docs.zitadel.com/docs/concepts/zitadel/objects/managers) `IAM_OWNER`.
+ZITADEL will show a set of identity providers by default. This configuration can be changed by users with the [manager role](../../concepts/structure/managers) `IAM_OWNER`.
 
 An organization's login settings will be shown 
 
@@ -103,9 +77,7 @@ To get your own configuration you will have to send the [primary domain scope](.
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login, also your branding and policies will trigger.
 
 :::note
-
 You need to create your own auth request with your applications parameters. Please see the docs to construct an [Auth Request](../../guides/integrate/login-users#auth-request).
-
 :::
 
 Your user will now be able to choose Google for login instead of username/password or mfa.
