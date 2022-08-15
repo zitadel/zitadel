@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/settings"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -14,7 +15,7 @@ import (
 )
 
 const (
-	DebugNotificationProviderTable = "projections.notification_providers"
+	DebugNotificationProviderTable = "projections.notification_providers2"
 
 	DebugNotificationProviderAggIDCol         = "aggregate_id"
 	DebugNotificationProviderCreationDateCol  = "creation_date"
@@ -25,6 +26,7 @@ const (
 	DebugNotificationProviderStateCol         = "state"
 	DebugNotificationProviderTypeCol          = "provider_type"
 	DebugNotificationProviderCompactCol       = "compact"
+	DebugNotificationProviderOwnerRemovedCol  = "owner_removed"
 )
 
 type debugNotificationProviderProjection struct {
@@ -46,6 +48,7 @@ func newDebugNotificationProviderProjection(ctx context.Context, config crdb.Sta
 			crdb.NewColumn(DebugNotificationProviderStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DebugNotificationProviderTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DebugNotificationProviderCompactCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(DebugNotificationProviderOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(DebugNotificationProviderInstanceIDCol, DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
 		),
@@ -82,6 +85,15 @@ func (p *debugNotificationProviderProjection) reducers() []handler.AggregateRedu
 				{
 					Event:  instance.DebugNotificationProviderLogRemovedEventType,
 					Reduce: p.reduceDebugNotificationProviderRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -166,6 +178,24 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderRem
 		[]handler.Condition{
 			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
+		},
+	), nil
+}
+
+func (p *debugNotificationProviderProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-tMcwo", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(DebugNotificationProviderOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(DebugNotificationProviderInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(DebugNotificationProviderAggIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

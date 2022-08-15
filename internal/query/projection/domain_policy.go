@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	DomainPolicyTable = "projections.domain_policies"
+	DomainPolicyTable = "projections.domain_policies2"
 
 	DomainPolicyIDCol                                     = "id"
 	DomainPolicyCreationDateCol                           = "creation_date"
@@ -27,6 +27,7 @@ const (
 	DomainPolicyIsDefaultCol                              = "is_default"
 	DomainPolicyResourceOwnerCol                          = "resource_owner"
 	DomainPolicyInstanceIDCol                             = "instance_id"
+	DomainPolicyOwnerRemovedCol                           = "owner_removed"
 )
 
 type domainPolicyProjection struct {
@@ -50,6 +51,7 @@ func newDomainPolicyProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(DomainPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(DomainPolicyResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DomainPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DomainPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(DomainPolicyInstanceIDCol, DomainPolicyIDCol),
 		),
@@ -74,6 +76,10 @@ func (p *domainPolicyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.DomainPolicyRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -164,4 +170,22 @@ func (p *domainPolicyProjection) reduceRemoved(event eventstore.Event) (*handler
 		[]handler.Condition{
 			handler.NewCond(DomainPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
+}
+
+func (p *domainPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JYD2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(DomainPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(DomainPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(DomainPolicyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
 }

@@ -9,12 +9,13 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	AuthNKeyTable            = "projections.authn_keys"
+	AuthNKeyTable            = "projections.authn_keys2"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
 	AuthNKeyResourceOwnerCol = "resource_owner"
@@ -27,6 +28,7 @@ const (
 	AuthNKeyPublicKeyCol     = "public_key"
 	AuthNKeyTypeCol          = "type"
 	AuthNKeyEnabledCol       = "enabled"
+	AuthNKeyOwnerRemovedCol  = "owner_removed"
 )
 
 type authNKeyProjection struct {
@@ -51,6 +53,7 @@ func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(AuthNKeyPublicKeyCol, crdb.ColumnTypeBytes),
 			crdb.NewColumn(AuthNKeyEnabledCol, crdb.ColumnTypeBool, crdb.Default(true)),
 			crdb.NewColumn(AuthNKeyTypeCol, crdb.ColumnTypeEnum, crdb.Default(0)),
+			crdb.NewColumn(AuthNKeyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
 			crdb.WithIndex(crdb.NewIndex("enabled_idx", []string{AuthNKeyEnabledCol})),
@@ -106,6 +109,15 @@ func (p *authNKeyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceAuthNKeyRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -207,5 +219,23 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	return crdb.NewDeleteStatement(
 		event,
 		[]handler.Condition{condition},
+	), nil
+}
+
+func (p *authNKeyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(AuthNKeyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(AuthNKeyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(AuthNKeyResourceOwnerCol, e.Aggregate().ID),
+		},
 	), nil
 }

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	ActionTable            = "projections.actions"
+	ActionTable            = "projections.actions2"
 	ActionIDCol            = "id"
 	ActionCreationDateCol  = "creation_date"
 	ActionChangeDateCol    = "change_date"
@@ -25,6 +25,7 @@ const (
 	ActionScriptCol        = "script"
 	ActionTimeoutCol       = "timeout"
 	ActionAllowedToFailCol = "allowed_to_fail"
+	ActionOwnerRemovedCol  = "owner_removed"
 )
 
 type actionProjection struct {
@@ -48,6 +49,7 @@ func newActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 			crdb.NewColumn(ActionScriptCol, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(ActionTimeoutCol, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(ActionAllowedToFailCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(ActionOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ActionInstanceIDCol, ActionIDCol),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ActionResourceOwnerCol})),
@@ -89,7 +91,7 @@ func (p *actionProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRemoved,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -198,7 +200,7 @@ func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler
 	), nil
 }
 
-func (p *actionProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *actionProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mSmWM", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
@@ -206,11 +208,10 @@ func (p *actionProjection) reduceOrgRemoved(event eventstore.Event) (*handler.St
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
-			handler.NewCol(ActionSequenceCol, e.Sequence()),
-			handler.NewCol(ActionStateCol, domain.ActionStateOrgRemoved),
+			handler.NewCol(ActionOwnerRemovedCol, true),
 		},
 		[]handler.Condition{
+			handler.NewCond(ActionInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(ActionResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil

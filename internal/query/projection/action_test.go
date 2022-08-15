@@ -41,7 +41,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.actions (id, creation_date, change_date, resource_owner, instance_id, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.actions2 (id, creation_date, change_date, resource_owner, instance_id, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -78,7 +78,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.actions2 SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -109,7 +109,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions2 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -139,7 +139,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions2 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -169,7 +169,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.actions WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.actions2 WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -179,7 +179,7 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceOrgRemoved",
+			name: "reduceOwnerRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgRemovedEventType),
@@ -187,7 +187,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					nil,
 				), org.OrgRemovedEventMapper),
 			},
-			reduce: (&actionProjection{}).reduceOrgRemoved,
+			reduce: (&actionProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -196,11 +196,10 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (resource_owner = $4)",
+							expectedStmt: "UPDATE projections.actions2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.ActionStateOrgRemoved,
+								true,
+								"instance-id",
 								"agg-id",
 							},
 						},

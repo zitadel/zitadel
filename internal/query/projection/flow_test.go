@@ -39,7 +39,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1) AND (trigger_type = $2) AND (resource_owner = $3)",
+							expectedStmt: "DELETE FROM projections.flow_triggers2 WHERE (flow_type = $1) AND (trigger_type = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
@@ -47,7 +47,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.flows_triggers (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.flow_triggers2 (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"ro-id",
 								"instance-id",
@@ -60,7 +60,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.flows_triggers (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.flow_triggers2 (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"ro-id",
 								"instance-id",
@@ -94,10 +94,39 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.flow_triggers2 WHERE (flow_type = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
 								"ro-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&flowProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				projection:       FlowTriggerTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.flow_triggers2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},

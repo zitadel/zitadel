@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	FlowTriggerTable             = "projections.flows_triggers"
+	FlowTriggerTable             = "projections.flow_triggers2"
 	FlowTypeCol                  = "flow_type"
 	FlowChangeDateCol            = "change_date"
 	FlowSequenceCol              = "sequence"
@@ -20,6 +20,7 @@ const (
 	FlowInstanceIDCol            = "instance_id"
 	FlowActionTriggerSequenceCol = "trigger_sequence"
 	FlowActionIDCol              = "action_id"
+	FlowOwnerRemovedCol          = "owner_removed"
 )
 
 type flowProjection struct {
@@ -40,6 +41,7 @@ func newFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(FlowInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FlowOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
 		),
@@ -60,6 +62,10 @@ func (p *flowProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.FlowClearedEventType,
 					Reduce: p.reduceFlowClearedEventType,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -106,6 +112,24 @@ func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*ha
 		[]handler.Condition{
 			handler.NewCond(FlowTypeCol, e.FlowType),
 			handler.NewCond(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
+		},
+	), nil
+}
+
+func (p *flowProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Yd7WC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(FlowOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(FlowInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(FlowResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil
 }

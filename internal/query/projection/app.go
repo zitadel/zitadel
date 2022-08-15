@@ -10,11 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
-	AppProjectionTable = "projections.apps"
+	AppProjectionTable = "projections.apps2"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 
@@ -27,6 +28,7 @@ const (
 	AppColumnInstanceID    = "instance_id"
 	AppColumnState         = "state"
 	AppColumnSequence      = "sequence"
+	AppColumnOwnerRemoved  = "owner_removed"
 
 	appAPITableSuffix              = "api_configs"
 	AppAPIConfigColumnAppID        = "app_id"
@@ -174,6 +176,15 @@ func (p *appProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.OIDCConfigSecretChangedType,
 					Reduce: p.reduceOIDCConfigSecretChanged,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -534,5 +545,23 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
+	), nil
+}
+
+func (p *appProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(AppColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(AppColumnResourceOwner, e.Aggregate().ID),
+		},
 	), nil
 }
