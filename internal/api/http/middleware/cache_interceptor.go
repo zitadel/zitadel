@@ -23,16 +23,16 @@ type Cacheability string
 
 const (
 	CacheabilityNotSet  Cacheability = ""
-	CacheabilityPublic               = "public"
-	CacheabilityPrivate              = "private"
+	CacheabilityPublic  Cacheability = "public"
+	CacheabilityPrivate Cacheability = "private"
 )
 
 type Revalidation string
 
 const (
 	RevalidationNotSet Revalidation = ""
-	RevalidationMust                = "must-revalidate"
-	RevalidationProxy               = "proxy-revalidate"
+	RevalidationMust   Revalidation = "must-revalidate"
+	RevalidationProxy  Revalidation = "proxy-revalidate"
 )
 
 type CacheConfig struct {
@@ -122,16 +122,16 @@ func (c *Cache) serializeHeaders(w http.ResponseWriter) {
 	expires := time.Now().UTC().Add(maxAge).Format(http.TimeFormat)
 
 	if c.NoCache {
-		control = append(control, fmt.Sprintf("no-cache"))
+		control = append(control, "no-cache")
 		pragma = true
 	}
 
 	if c.NoStore {
-		control = append(control, fmt.Sprintf("no-store"))
+		control = append(control, "no-store")
 		pragma = true
 	}
 	if c.NoTransform {
-		control = append(control, fmt.Sprintf("no-transform"))
+		control = append(control, "no-transform")
 	}
 
 	if c.Revalidation != RevalidationNotSet {
