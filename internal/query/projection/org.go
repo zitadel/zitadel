@@ -76,6 +76,10 @@ func (p *orgProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOrgReactivated,
 				},
 				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
+				},
+				{
 					Event:  org.OrgDomainPrimarySetEventType,
 					Reduce: p.reducePrimaryDomainSet,
 				},
@@ -172,6 +176,24 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
 			handler.NewCol(OrgColumnSequence, e.Sequence()),
 			handler.NewCol(OrgColumnDomain, e.Domain),
+		},
+		[]handler.Condition{
+			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *orgProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
+	}
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
+			handler.NewCol(OrgColumnSequence, e.Sequence()),
+			handler.NewCol(OrgColumnState, domain.OrgStateRemoved),
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
