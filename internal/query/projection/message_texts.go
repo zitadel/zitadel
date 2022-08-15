@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	MessageTextTable = "projections.message_texts"
+	MessageTextTable = "projections.message_texts2"
 
 	MessageTextAggregateIDCol  = "aggregate_id"
 	MessageTextInstanceIDCol   = "instance_id"
@@ -31,6 +31,7 @@ const (
 	MessageTextTextCol         = "text"
 	MessageTextButtonTextCol   = "button_text"
 	MessageTextFooterCol       = "footer_text"
+	MessageTextOwnerRemovedCol = "owner_removed"
 )
 
 type messageTextProjection struct {
@@ -58,6 +59,7 @@ func newMessageTextProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(MessageTextTextCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(MessageTextButtonTextCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(MessageTextFooterCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MessageTextOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(MessageTextInstanceIDCol, MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
 		),
@@ -82,6 +84,10 @@ func (p *messageTextProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -223,6 +229,24 @@ func (p *messageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 			handler.NewCond(MessageTextTypeCol, templateEvent.Template),
 			handler.NewCond(MessageTextLanguageCol, templateEvent.Language.String()),
+		},
+	), nil
+}
+
+func (p *messageTextProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mLsQw", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(MessageTextOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(MessageTextInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(MessageTextAggregateIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

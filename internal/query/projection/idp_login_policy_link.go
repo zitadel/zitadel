@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links"
+	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links2"
 
 	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
 	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
@@ -24,6 +24,7 @@ const (
 	IDPLoginPolicyLinkResourceOwnerCol = "resource_owner"
 	IDPLoginPolicyLinkInstanceIDCol    = "instance_id"
 	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
+	IDPLoginPolicyLinkOwnerRemovedCol  = "owner_removed"
 )
 
 type idpLoginPolicyLinkProjection struct {
@@ -44,6 +45,7 @@ func newIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkProviderTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPLoginPolicyLinkOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(IDPLoginPolicyLinkInstanceIDCol, IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{IDPLoginPolicyLinkResourceOwnerCol})),
@@ -77,6 +79,10 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -202,6 +208,24 @@ func (p *idpLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) 
 	}
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
+			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *idpLoginPolicyLinkProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-YbhOv", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(IDPLoginPolicyLinkOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil

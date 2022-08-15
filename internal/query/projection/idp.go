@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	IDPTable     = "projections.idps"
+	IDPTable     = "projections.idps2"
 	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
 	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
 
@@ -35,6 +35,7 @@ const (
 	IDPOwnerTypeCol     = "owner_type"
 	IDPAutoRegisterCol  = "auto_register"
 	IDPTypeCol          = "type"
+	IDPOwnerRemovedCol  = "owner_removed"
 
 	OIDCConfigIDPIDCol                 = "idp_id"
 	OIDCConfigInstanceIDCol            = "instance_id"
@@ -77,6 +78,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPOwnerTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum, crdb.Nullable()),
+			crdb.NewColumn(IDPOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(IDPIDCol, IDPInstanceIDCol),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol})),
@@ -196,6 +198,10 @@ func (p *idpProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.IDPJWTConfigChangedEventType,
 					Reduce: p.reduceJWTConfigChanged,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -536,5 +542,23 @@ func (p *idpProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler
 			},
 			crdb.WithTableSuffix(IDPJWTSuffix),
 		),
+	), nil
+}
+
+func (p *idpProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-YsbQC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(IDPOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(IDPResourceOwnerCol, e.Aggregate().ID),
+		},
 	), nil
 }

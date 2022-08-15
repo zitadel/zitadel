@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	LockoutPolicyTable = "projections.lockout_policies"
+	LockoutPolicyTable = "projections.lockout_policies2"
 
 	LockoutPolicyIDCol                  = "id"
 	LockoutPolicyCreationDateCol        = "creation_date"
@@ -26,6 +26,7 @@ const (
 	LockoutPolicyInstanceIDCol          = "instance_id"
 	LockoutPolicyMaxPasswordAttemptsCol = "max_password_attempts"
 	LockoutPolicyShowLockOutFailuresCol = "show_failure"
+	LockoutPolicyOwnerRemovedCol        = "owner_removed"
 )
 
 type lockoutPolicyProjection struct {
@@ -48,6 +49,7 @@ func newLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(LockoutPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LockoutPolicyMaxPasswordAttemptsCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LockoutPolicyShowLockOutFailuresCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LockoutPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LockoutPolicyInstanceIDCol, LockoutPolicyIDCol),
 		),
@@ -72,6 +74,10 @@ func (p *lockoutPolicyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LockoutPolicyRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -158,4 +164,22 @@ func (p *lockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LockoutPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
+}
+
+func (p *lockoutPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-IoW0x", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(LockoutPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(LockoutPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(LockoutPolicyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
 }

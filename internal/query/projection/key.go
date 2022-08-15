@@ -10,10 +10,11 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 const (
-	KeyProjectionTable = "projections.keys"
+	KeyProjectionTable = "projections.keys2"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 
@@ -25,6 +26,7 @@ const (
 	KeyColumnSequence      = "sequence"
 	KeyColumnAlgorithm     = "algorithm"
 	KeyColumnUse           = "use"
+	KeyColumnOwnerRemoved  = "owner_removed"
 
 	privateKeyTableSuffix      = "private"
 	KeyPrivateColumnID         = "id"
@@ -58,6 +60,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
+			crdb.NewColumn(KeyColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(KeyColumnID, KeyColumnInstanceID),
 			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{KeyColumnID})),
@@ -97,6 +100,15 @@ func (p *keyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  keypair.AddedEventType,
 					Reduce: p.reduceKeyPairAdded,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -152,4 +164,22 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 		))
 	}
 	return crdb.NewMultiStatement(e, creates...), nil
+}
+
+func (p *keyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-MYkGS", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(KeyColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(KeyColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(KeyColumnResourceOwner, e.Aggregate().ID),
+		},
+	), nil
 }

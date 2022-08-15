@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies"
+	LoginPolicyTable = "projections.login_policies2"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"
@@ -36,6 +36,7 @@ const (
 	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
 	SecondFactorCheckLifetimeCol        = "second_factor_check_lifetime"
 	MultiFactorCheckLifetimeCol         = "multi_factor_check_lifetime"
+	LoginPolicyOwnerRemovedCol          = "owner_removed"
 )
 
 type loginPolicyProjection struct {
@@ -69,6 +70,7 @@ func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LoginPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
 		),
@@ -109,6 +111,10 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -350,6 +356,24 @@ func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *loginPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-B8NZW", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(LoginPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(LoginPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

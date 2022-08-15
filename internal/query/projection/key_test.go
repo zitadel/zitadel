@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func TestKeyProjection_reduces(t *testing.T) {
@@ -43,7 +44,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.keys (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.keys2 (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -56,7 +57,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys2_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -70,7 +71,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys2_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -98,6 +99,35 @@ func TestKeyProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer:         &testExecuter{},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&keyProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				projection:       KeyProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.keys2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
 			},
 		},
 	}
