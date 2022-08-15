@@ -98,22 +98,18 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 	security := middleware.SecurityHeaders(csp(), nil)
 
 	handler := mux.NewRouter()
-	handler.Use(security)
-	handler.Handle(envRequestPath, middleware.TelemetryHandler()(instanceHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		instance := authz.GetInstance(r.Context())
-		if instance.InstanceID() == "" {
-			http.Error(w, "empty instanceID", http.StatusInternalServerError)
-			return
-		}
+
+	handler.Use(security, instanceHandler)
+	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), authz.GetInstance(r.Context()).ConsoleClientID(), customerPortal)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
 		}
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
-	}))))
+	})))
 	handler.SkipClean(true).PathPrefix("").Handler(cache(http.FileServer(&spaHandler{http.FS(fSys)})))
 	return handler, nil
 }
