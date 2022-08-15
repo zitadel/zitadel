@@ -16,6 +16,7 @@ const (
 	AppStateActive
 	AppStateInactive
 	AppStateRemoved
+	AppStateOrgRemoved
 )
 
 func (a AppState) Exists() bool {

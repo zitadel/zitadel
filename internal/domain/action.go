@@ -27,7 +27,6 @@ const (
 	ActionStateActive
 	ActionStateInactive
 	ActionStateRemoved
-	ActionStateOrgRemoved
 	actionStateCount
 )
 
