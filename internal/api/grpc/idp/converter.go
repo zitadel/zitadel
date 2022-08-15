@@ -29,7 +29,7 @@ func ModelIDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 			idp.Sequence,
 			idp.CreationDate,
 			idp.ChangeDate,
-			idp.ID,
+			idp.ResourceOwner,
 		),
 	}
 }
