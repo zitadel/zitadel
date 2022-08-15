@@ -55,7 +55,6 @@ module.exports = {
         "guides/deploy/linux",
         "guides/deploy/macos",
         "guides/deploy/compose",
-        "guides/deploy/compose-pg",
         "guides/deploy/knative",
         "guides/deploy/kubernetes",
         "guides/deploy/loadbalancing-example/loadbalancing-example",
@@ -87,6 +86,7 @@ module.exports = {
             "guides/manage/self-hosted/custom-domain",
             "guides/manage/self-hosted/http2",
             "guides/manage/self-hosted/tls_modes",
+            "guides/manage/self-hosted/database/database",
           ]
         },
         {
@@ -96,7 +96,6 @@ module.exports = {
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
             "guides/manage/console/applications",
-
           ]
         },
         {

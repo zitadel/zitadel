@@ -1,0 +1,36 @@
+## Postgres
+
+:::caution
+Postgres extension is currently in beta. 
+:::
+
+If you want to use a Postgres database instead of CockroachDB you can [overwrite the default configuration](../configure).
+
+Postgres can be configured as follows:
+```yaml
+Database:
+  postgres:
+    Host: 
+    Port:
+    Database:
+    MaxOpenConns:
+    MaxConnLifetime:
+    MaxConnIdleTime:
+    Options:
+    User:
+      Username:
+      Password:
+      SSL:
+        Mode:
+        RootCert:
+        Cert:
+        Key:
+    Admin:
+      Username:
+      Password:
+      SSL:
+        Mode:
+        RootCert:
+        Cert:
+        Key:
+```
