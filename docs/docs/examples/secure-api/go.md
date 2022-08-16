@@ -131,7 +131,7 @@ Content-Length: 21
 ```
 
 Get a valid access_token for the API. You can achieve this by login into an application of the same project or
-by explicitly requesting the project_id for the audience by scope `urn:zitadel:iam:org:project:id:zitadel:aud`.
+by explicitly requesting the project_id for the audience by scope `urn:zitadel:iam:org:project:id:{projectid}:aud`.
 
 If you provide a valid Bearer Token:
 
