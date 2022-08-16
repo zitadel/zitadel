@@ -37,7 +37,7 @@ describe("projects", () => {
       });
 
       it("removes the project", () => {
-        cy.get('[data-e2e="toggle-grid"']).click();
+        cy.get('[data-e2e="toggle-grid"]').click();
         cy.get('[data-e2e="timestamp"]');
         cy.contains("tr", testProjectNameDeleteList, { timeout: 1000 })
           .find('[data-e2e="delete-project-button"]')
