@@ -5,7 +5,7 @@ import {
 } from "../../support/api/users";
 import { loginname } from "../../support/login/users";
 
-describe.skip("machines", () => {
+describe("machines", () => {
   const machinesPath = `/ui/console/users?type=machine`;
   const testMachineUserNameAdd = "e2emachineusernameadd";
   const testMachineUserNameRemove = "e2emachineusernameremove";
