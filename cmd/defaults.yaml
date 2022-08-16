@@ -130,6 +130,15 @@ Machine:
     #   Url: "http://169.254.169.254/metadata/instance?api-version=2021-02-01"
     #   JPath: "$.compute.vmId"
 
+# Storage for assets like user avatar, organization logo, icon, font, ...
+AssetStorage:
+  Type: db
+  # HTTP cache control settings for serving assets in the assets API and login UI
+  # the assets will also be served with an etag and last-modified header
+  Cache:
+    MaxAge: 5s
+    SharedMaxAge: 168h #7d
+
 Projections:
   RequeueEvery: 60s
   RetryFailedAfter: 1s
@@ -204,7 +213,7 @@ Console:
     SharedMaxAge: 5m
   LongCache:
     MaxAge: 12h
-    SharedMaxAge: 168h
+    SharedMaxAge: 168h #7d
 
 Notification:
   Repository:

@@ -210,9 +210,8 @@ module.exports = {
       label: "Rate Limits",
       collapsed: false,
       items: [
+        "apis/ratelimits/ratelimits",
         "legal/rate-limit-policy",
-        "apis/ratelimits/login",
-        "apis/ratelimits/api",
       ],
     },
   ],
