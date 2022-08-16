@@ -10,26 +10,26 @@ Postgres can be configured as follows:
 ```yaml
 Database:
   postgres:
-    Host: 
-    Port:
-    Database:
-    MaxOpenConns:
+    Host: localhost
+    Port: 5432
+    Database: zitadel
+    MaxOpenConns: 25m
     MaxConnLifetime:
-    MaxConnIdleTime:
+    MaxConnIdleTime: 
     Options:
     User:
-      Username:
+      Username: zitadel
       Password:
       SSL:
-        Mode:
+        Mode: disable
         RootCert:
         Cert:
         Key:
     Admin:
-      Username:
-      Password:
+      Username: postgres
+      Password: postgres
       SSL:
-        Mode:
+        Mode: disable
         RootCert:
         Cert:
         Key:
