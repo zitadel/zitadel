@@ -149,7 +149,7 @@
       </div>
       <div class="user-create-btn-container">
         <button
-          [attr.data-e2e]="'create-button'"
+          data-e2e="create-button"
           color="primary"
           [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)"
           type="submit"
