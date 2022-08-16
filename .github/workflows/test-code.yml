@@ -30,7 +30,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           install-only: true
-          version: v1.8.3
+          version: v1.10.3
       - name: Build and Unit Test
         run: GOOS="linux" GOARCH="amd64" goreleaser build --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
       - name: Publish go coverage
