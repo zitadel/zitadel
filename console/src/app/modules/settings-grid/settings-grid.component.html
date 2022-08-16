@@ -14,7 +14,7 @@
           : []
       "
     >
-      <div class="p-item card" @policy [attr.data-e2e]="'policy-card'">
+      <div class="p-item card" @policy data-e2e="policy-card">
         <div class="avatar {{ setting.color }}">
           <mat-icon *ngIf="setting.svgIcon" class="mat-icon" [svgIcon]="setting.svgIcon"></mat-icon>
           <i *ngIf="setting.icon" class="icon {{ setting.icon }}"></i>

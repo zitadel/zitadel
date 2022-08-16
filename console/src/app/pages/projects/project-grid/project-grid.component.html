@@ -47,7 +47,7 @@
       *ngFor="let item of notPinned; index as i"
       (click)="navigateToProject(type, $any(item), $event)"
       [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE }"
-      [attr.data-e2e]="'grid-card'"
+      data-e2e="grid-card"
     >
       <div class="text-part">
         <span *ngIf="item.details && item.details.changeDate" class="top cnsl-secondary-text"
@@ -106,7 +106,7 @@
     (click)="deleteProject($event, key)"
     class="delete-button"
     mat-icon-button
-    [attr.data-e2e]="'delete-project-button'"
+    data-e2e="delete-project-button"
   >
     <i class="las la-trash"></i>
   </button>
