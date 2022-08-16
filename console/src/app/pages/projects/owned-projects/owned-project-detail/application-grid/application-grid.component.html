@@ -12,7 +12,7 @@
 
   <div
     [routerLink]="['/projects', projectId, 'apps', app.id]"
-    [attr.data-e2e]="'app-card'"
+    data-e2e="app-card"
     class="app-wrap"
     *ngFor="let app of appsSubject | async"
     matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
@@ -44,7 +44,7 @@
     <div
       class="app-wrap"
       *ngIf="!disabled"
-      [attr.data-e2e]="'app-card-add'"
+      data-e2e="app-card-add"
       [routerLink]="['/projects', projectId, 'apps', 'create']"
     >
       <cnsl-app-card class="grid-card" matRipple [type]="OIDCAppType.ADD">

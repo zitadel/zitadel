@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -45,6 +46,7 @@ type Config struct {
 	LanguageCookieName string
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
+	AssetCache         middleware.CacheConfig
 }
 
 const (
@@ -66,6 +68,7 @@ func CreateLogin(config Config,
 	issuerInterceptor,
 	oidcInstanceHandler,
 	samlInstanceHandler mux.MiddlewareFunc,
+	assetCache mux.MiddlewareFunc,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
@@ -88,14 +91,8 @@ func CreateLogin(config Config,
 		return nil, fmt.Errorf("unable to create filesystem: %w", err)
 	}
 
-	csrfInterceptor, err := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
-	if err != nil {
-		return nil, fmt.Errorf("unable to create csrfInterceptor: %w", err)
-	}
-	cacheInterceptor, err := middleware.DefaultCacheInterceptor(EndpointResources, config.Cache.MaxAge, config.Cache.SharedMaxAge)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create cacheInterceptor: %w", err)
-	}
+	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
+	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
 	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor)
@@ -112,7 +109,7 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecure bool, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
+func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecure bool, errorHandler http.Handler) func(http.Handler) http.Handler {
 	path := "/"
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -127,7 +124,23 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				csrf.ErrorHandler(errorHandler),
 			)(handler).ServeHTTP(w, r)
 		})
-	}, nil
+	}
+}
+
+func createCacheInterceptor(maxAge, sharedMaxAge time.Duration, assetCache mux.MiddlewareFunc) func(http.Handler) http.Handler {
+	return func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasPrefix(r.URL.Path, EndpointDynamicResources) {
+				assetCache.Middleware(handler).ServeHTTP(w, r)
+				return
+			}
+			if strings.HasPrefix(r.URL.Path, EndpointResources) {
+				middleware.AssetsCacheInterceptor(maxAge, sharedMaxAge).Handler(handler).ServeHTTP(w, r)
+				return
+			}
+			middleware.NoCacheInterceptor().Handler(handler).ServeHTTP(w, r)
+		})
+	}
 }
 
 func (l *Login) Handler() http.Handler {

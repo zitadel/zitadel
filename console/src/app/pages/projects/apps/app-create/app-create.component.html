@@ -50,7 +50,7 @@
             [disabled]="firstFormGroup.invalid"
             color="primary"
             matStepperNext
-            [attr.data-e2e]="'continue-button-nameandtype'"
+            data-e2e="continue-button-nameandtype"
           >
             {{ 'ACTIONS.CONTINUE' | translate }}
           </button>
@@ -85,7 +85,7 @@
             color="primary"
             [disabled]="secondFormGroup.invalid"
             matStepperNext
-            [attr.data-e2e]="'continue-button-authmethod'"
+            data-e2e="continue-button-authmethod"
           >
             {{ 'ACTIONS.CONTINUE' | translate }}
           </button>
@@ -140,7 +140,7 @@
 
       <div class="app-create-actions">
         <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
-        <button mat-raised-button color="primary" matStepperNext [attr.data-e2e]="'continue-button-redirecturis'">
+        <button mat-raised-button color="primary" matStepperNext data-e2e="continue-button-redirecturis">
           {{ 'ACTIONS.CONTINUE' | translate }}
         </button>
       </div>
@@ -323,13 +323,7 @@
 
       <div class="app-create-actions">
         <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
-        <button
-          mat-raised-button
-          class="create-button"
-          color="primary"
-          (click)="createApp()"
-          [attr.data-e2e]="'create-button'"
-        >
+        <button mat-raised-button class="create-button" color="primary" (click)="createApp()" data-e2e="create-button">
           {{ 'ACTIONS.CREATE' | translate }}
         </button>
       </div>
@@ -337,7 +331,7 @@
   </mat-horizontal-stepper>
 
   <div *ngIf="devmode" class="dev">
-    <form [formGroup]="form" (ngSubmit)="createApp()" [attr.data-e2e]="'create-app-wizzard-3'">
+    <form [formGroup]="form" (ngSubmit)="createApp()" data-e2e="create-app-wizzard-3">
       <div class="content">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>

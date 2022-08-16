@@ -155,7 +155,7 @@ module.exports = {
             }
           ],
         },
-        
+
       ],
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
@@ -166,7 +166,7 @@ module.exports = {
       selector: 'div#'
   },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy"],
+      additionalLanguages: ["csharp", "dart", "groovy", "regex"],
     },
   },
   presets: [

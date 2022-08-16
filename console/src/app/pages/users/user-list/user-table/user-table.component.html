@@ -13,13 +13,13 @@
       label="{{ 'USER.TABLE.TYPES.HUMAN' | translate }}"
       (clicked)="setType(Type.TYPE_HUMAN)"
       [active]="type === Type.TYPE_HUMAN"
-      [attr.data-e2e]="'list-humans'"
+      data-e2e="list-humans"
     ></cnsl-nav-toggle>
     <cnsl-nav-toggle
       label="{{ 'USER.TABLE.TYPES.MACHINE' | translate }}"
       (clicked)="setType(Type.TYPE_MACHINE)"
       [active]="type === Type.TYPE_MACHINE"
-      [attr.data-e2e]="'list-machines'"
+      data-e2e="list-machines"
     ></cnsl-nav-toggle>
   </div>
 
@@ -58,7 +58,7 @@
       mat-raised-button
       [disabled]="!canWrite"
       class="cnsl-action-button"
-      [attr.data-e2e]="'create-user-button'"
+      data-e2e="create-user-button"
     >
       <mat-icon class="icon">add</mat-icon>
       <span>{{ 'ACTIONS.NEW' | translate }}</span>
@@ -197,7 +197,7 @@
               color="warn"
               (click)="deleteUser(user)"
               [disabled]="!canWrite || !canDelete"
-              [attr.e2e-data]="!canWrite || !canDelete ? 'disabled-delete-button' : 'enabled-delete-button'"
+              [attr.data-e2e]="!canWrite || !canDelete ? 'disabled-delete-button' : 'enabled-delete-button'"
               mat-icon-button
             >
               <i class="las la-trash"></i>

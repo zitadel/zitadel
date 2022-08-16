@@ -255,12 +255,14 @@ function Feature({
 
 const Gigi = () => {
   return (
-    <div className={styles.gigiwrapper}>
-      <div className={styles.gigiwrapperrelative}>
-        <img height="151px" width="256px" src="/img/gigi.svg" />
-        <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
+    
+      <div className={styles.gigiwrapper}>
+        <div className={styles.gigiwrapperrelative}>
+          <img height="151px" width="256px" src="/img/gigi.svg" />
+          <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
+        </div>
       </div>
-    </div>
+    
   );
 };
 
@@ -288,7 +290,9 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <Gigi />
+        <Link to="https://zitadel.com">
+          <Gigi />
+        </Link>
       </header>
       <main>
         {features && features.length > 0 && (

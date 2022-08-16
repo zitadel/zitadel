@@ -13,7 +13,7 @@ describe('private labeling', () => {
         login(user);
         cy.visit(orgPath);
         // TODO: Why force?
-        cy.contains('[data-e2e=policy-card]', 'Private Labeling').contains('button', 'Modify').click({ force: true }); // TODO: select data-e2e
+        cy.contains('[data-e2e="policy-card"]', 'Private Labeling').contains('button', 'Modify').click({ force: true }); // TODO: select data-e2e
       });
 
       customize('white', user);
@@ -32,12 +32,12 @@ function customize(theme: string, user: User) {
 
     describe.skip('logo', () => {
       beforeEach('expand logo category', () => {
-        cy.contains('[data-e2e=policy-category]', 'Logo').click(); // TODO: select data-e2e
+        cy.contains('[data-e2e="policy-category"]', 'Logo').click(); // TODO: select data-e2e
         cy.fixture('logo.png').as('logo');
       });
 
       it('should update a logo', () => {
-        cy.get('[data-e2e=image-part-logo]')
+        cy.get('[data-e2e="image-part-logo"]')
           .find('input')
           .then(function (el) {
             const blob = Cypress.Blob.base64StringToBlob(this.logo, 'image/png');
@@ -56,10 +56,10 @@ function customize(theme: string, user: User) {
     it('should update an icon');
     it('should delete an icon');
     it.skip('should update the background color', () => {
-      cy.contains('[data-e2e=color]', 'Background Color').find('button').click(); // TODO: select data-e2e
+      cy.contains('[data-e2e="color"]', 'Background Color').find('button').click(); // TODO: select data-e2e
       cy.get('color-editable-input').find('input').clear().type('#ae44dc');
-      cy.get('[data-e2e=save-colors-button]').click();
-      cy.get('[data-e2e=header-user-avatar]').click();
+      cy.get('[data-e2e="save-colors-button"]').click();
+      cy.get('[data-e2e="header-user-avatar"]').click();
       cy.contains('Logout All Users').click(); // TODO: select data-e2e
       login(User.LoginPolicyUser, undefined, true, null, () => {
         cy.pause();
