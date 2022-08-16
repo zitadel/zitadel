@@ -143,12 +143,11 @@ func assetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMa
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			for _, file := range shortCacheFiles {
 				if r.URL.Path == file || isIndexOrSubPath(r.URL.Path) {
-					middleware.AssetsCacheInterceptor(shortMaxAge, shortSharedMaxAge, handler).ServeHTTP(w, r)
+					middleware.AssetsCacheInterceptor(shortMaxAge, shortSharedMaxAge).Handler(handler).ServeHTTP(w, r)
 					return
 				}
 			}
-			middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge, handler).ServeHTTP(w, r)
-			return
+			middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge).Handler(handler).ServeHTTP(w, r)
 		})
 	}
 }

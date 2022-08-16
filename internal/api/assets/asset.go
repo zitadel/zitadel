@@ -76,7 +76,7 @@ func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, code
 	http.Error(w, err.Error(), code)
 }
 
-func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, instanceInterceptor func(handler http.Handler) http.Handler) http.Handler {
+func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, instanceInterceptor, assetCacheInterceptor func(handler http.Handler) http.Handler) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,
@@ -88,7 +88,7 @@ func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authC
 
 	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
-	router.Use(instanceInterceptor)
+	router.Use(instanceInterceptor, assetCacheInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))
@@ -190,6 +190,10 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 }
 
 func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName string, storage static.Storage) error {
+	split := strings.Split(objectName, "?v=")
+	if len(split) == 2 {
+		objectName = split[0]
+	}
 	data, getInfo, err := storage.GetObject(r.Context(), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, objectName)
 	if err != nil {
 		return fmt.Errorf("download failed: %v", err)
@@ -198,14 +202,16 @@ func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName 
 	if err != nil {
 		return fmt.Errorf("download failed: %v", err)
 	}
-	if info.Hash == r.Header.Get(http_util.IfNoneMatch) {
+	if info.Hash == strings.Trim(r.Header.Get(http_util.IfNoneMatch), "\"") {
+		w.Header().Set(http_util.LastModified, info.LastModified.Format(time.RFC1123))
+		w.Header().Set(http_util.Etag, "\""+info.Hash+"\"")
 		w.WriteHeader(304)
 		return nil
 	}
 	w.Header().Set(http_util.ContentLength, strconv.FormatInt(info.Size, 10))
 	w.Header().Set(http_util.ContentType, info.ContentType)
 	w.Header().Set(http_util.LastModified, info.LastModified.Format(time.RFC1123))
-	w.Header().Set(http_util.Etag, info.Hash)
+	w.Header().Set(http_util.Etag, "\""+info.Hash+"\"")
 	_, err = w.Write(data)
 	logging.New().OnError(err).Error("error writing response for asset")
 	return nil

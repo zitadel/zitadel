@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
@@ -24,16 +23,16 @@ type Cacheability string
 
 const (
 	CacheabilityNotSet  Cacheability = ""
-	CacheabilityPublic               = "public"
-	CacheabilityPrivate              = "private"
+	CacheabilityPublic  Cacheability = "public"
+	CacheabilityPrivate Cacheability = "private"
 )
 
 type Revalidation string
 
 const (
 	RevalidationNotSet Revalidation = ""
-	RevalidationMust                = "must-revalidate"
-	RevalidationProxy               = "proxy-revalidate"
+	RevalidationMust   Revalidation = "must-revalidate"
+	RevalidationProxy  Revalidation = "proxy-revalidate"
 )
 
 type CacheConfig struct {
@@ -54,38 +53,40 @@ var (
 	}
 )
 
-func DefaultCacheInterceptor(pattern string, maxAge, sharedMaxAge time.Duration) (func(http.Handler) http.Handler, error) {
-	regex, err := regexp.Compile(pattern)
-	if err != nil {
-		return nil, err
+func NoCacheInterceptor() *cacheInterceptor {
+	return CacheInterceptorOpts(NeverCacheOptions)
+}
+
+func AssetsCacheInterceptor(maxAge, sharedMaxAge time.Duration) *cacheInterceptor {
+	return CacheInterceptorOpts(AssetOptions(maxAge, sharedMaxAge))
+}
+
+func CacheInterceptorOpts(cache *Cache) *cacheInterceptor {
+	return &cacheInterceptor{
+		cache: cache,
 	}
-	return func(handler http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if regex.MatchString(r.URL.Path) {
-				AssetsCacheInterceptor(maxAge, sharedMaxAge, handler).ServeHTTP(w, r)
-				return
-			}
-			NoCacheInterceptor(handler).ServeHTTP(w, r)
-		})
-	}, nil
 }
 
-func NoCacheInterceptor(h http.Handler) http.Handler {
-	return CacheInterceptorOpts(h, NeverCacheOptions)
+type cacheInterceptor struct {
+	cache *Cache
 }
 
-func AssetsCacheInterceptor(maxAge, sharedMaxAge time.Duration, h http.Handler) http.Handler {
-	return CacheInterceptorOpts(h, AssetOptions(maxAge, sharedMaxAge))
-}
-
-func CacheInterceptorOpts(h http.Handler, cache *Cache) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		cachingResponseWriter := &cachingResponseWriter{
+func (c *cacheInterceptor) Handler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(&cachingResponseWriter{
 			ResponseWriter: w,
-			Cache:          cache,
-		}
-		h.ServeHTTP(cachingResponseWriter, req)
+			Cache:          c.cache,
+		}, r)
 	})
+}
+
+func (c *cacheInterceptor) HandlerFunc(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(&cachingResponseWriter{
+			ResponseWriter: w,
+			Cache:          c.cache,
+		}, r)
+	}
 }
 
 type cachingResponseWriter struct {
@@ -121,16 +122,16 @@ func (c *Cache) serializeHeaders(w http.ResponseWriter) {
 	expires := time.Now().UTC().Add(maxAge).Format(http.TimeFormat)
 
 	if c.NoCache {
-		control = append(control, fmt.Sprintf("no-cache"))
+		control = append(control, "no-cache")
 		pragma = true
 	}
 
 	if c.NoStore {
-		control = append(control, fmt.Sprintf("no-store"))
+		control = append(control, "no-store")
 		pragma = true
 	}
 	if c.NoTransform {
-		control = append(control, fmt.Sprintf("no-transform"))
+		control = append(control, "no-transform")
 	}
 
 	if c.Revalidation != RevalidationNotSet {
