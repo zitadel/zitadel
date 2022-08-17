@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	IDPTable     = "projections.idps"
+	IDPTable     = "projections.idps2"
 	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
 	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
 
@@ -77,7 +77,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(IDPIDCol, IDPInstanceIDCol),
+			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
 			crdb.WithIndex(crdb.NewIndex("idp_ro_idx", []string{IDPResourceOwnerCol})),
 			crdb.WithConstraint(crdb.NewConstraint("idp_id_unique", []string{IDPIDCol})),
 		),
@@ -93,7 +93,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(OIDCConfigAuthorizationEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(OIDCConfigTokenEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(OIDCConfigIDPIDCol, OIDCConfigInstanceIDCol),
+			crdb.NewPrimaryKey(OIDCConfigInstanceIDCol, OIDCConfigIDPIDCol),
 			IDPOIDCSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_idp")),
 		),
@@ -105,7 +105,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(JWTConfigEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(JWTConfigIDPIDCol, JWTConfigInstanceIDCol),
+			crdb.NewPrimaryKey(JWTConfigInstanceIDCol, JWTConfigIDPIDCol),
 			IDPJWTSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_jwt_ref_idp")),
 		),

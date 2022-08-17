@@ -15,80 +15,80 @@ import (
 )
 
 var (
-	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps.id,` +
-		` projections.apps.name,` +
-		` projections.apps.project_id,` +
-		` projections.apps.creation_date,` +
-		` projections.apps.change_date,` +
-		` projections.apps.resource_owner,` +
-		` projections.apps.state,` +
-		` projections.apps.sequence,` +
+	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps2.id,` +
+		` projections.apps2.name,` +
+		` projections.apps2.project_id,` +
+		` projections.apps2.creation_date,` +
+		` projections.apps2.change_date,` +
+		` projections.apps2.resource_owner,` +
+		` projections.apps2.state,` +
+		` projections.apps2.sequence,` +
 		// api config
-		` projections.apps_api_configs.app_id,` +
-		` projections.apps_api_configs.client_id,` +
-		` projections.apps_api_configs.auth_method,` +
+		` projections.apps2_api_configs.app_id,` +
+		` projections.apps2_api_configs.client_id,` +
+		` projections.apps2_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps_oidc_configs.app_id,` +
-		` projections.apps_oidc_configs.version,` +
-		` projections.apps_oidc_configs.client_id,` +
-		` projections.apps_oidc_configs.redirect_uris,` +
-		` projections.apps_oidc_configs.response_types,` +
-		` projections.apps_oidc_configs.grant_types,` +
-		` projections.apps_oidc_configs.application_type,` +
-		` projections.apps_oidc_configs.auth_method_type,` +
-		` projections.apps_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps_oidc_configs.is_dev_mode,` +
-		` projections.apps_oidc_configs.access_token_type,` +
-		` projections.apps_oidc_configs.access_token_role_assertion,` +
-		` projections.apps_oidc_configs.id_token_role_assertion,` +
-		` projections.apps_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps_oidc_configs.clock_skew,` +
-		` projections.apps_oidc_configs.additional_origins` +
-		` FROM projections.apps` +
-		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
-	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps.id,` +
-		` projections.apps.name,` +
-		` projections.apps.project_id,` +
-		` projections.apps.creation_date,` +
-		` projections.apps.change_date,` +
-		` projections.apps.resource_owner,` +
-		` projections.apps.state,` +
-		` projections.apps.sequence,` +
+		` projections.apps2_oidc_configs.app_id,` +
+		` projections.apps2_oidc_configs.version,` +
+		` projections.apps2_oidc_configs.client_id,` +
+		` projections.apps2_oidc_configs.redirect_uris,` +
+		` projections.apps2_oidc_configs.response_types,` +
+		` projections.apps2_oidc_configs.grant_types,` +
+		` projections.apps2_oidc_configs.application_type,` +
+		` projections.apps2_oidc_configs.auth_method_type,` +
+		` projections.apps2_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps2_oidc_configs.is_dev_mode,` +
+		` projections.apps2_oidc_configs.access_token_type,` +
+		` projections.apps2_oidc_configs.access_token_role_assertion,` +
+		` projections.apps2_oidc_configs.id_token_role_assertion,` +
+		` projections.apps2_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps2_oidc_configs.clock_skew,` +
+		` projections.apps2_oidc_configs.additional_origins` +
+		` FROM projections.apps2` +
+		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
+		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
+	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps2.id,` +
+		` projections.apps2.name,` +
+		` projections.apps2.project_id,` +
+		` projections.apps2.creation_date,` +
+		` projections.apps2.change_date,` +
+		` projections.apps2.resource_owner,` +
+		` projections.apps2.state,` +
+		` projections.apps2.sequence,` +
 		// api config
-		` projections.apps_api_configs.app_id,` +
-		` projections.apps_api_configs.client_id,` +
-		` projections.apps_api_configs.auth_method,` +
+		` projections.apps2_api_configs.app_id,` +
+		` projections.apps2_api_configs.client_id,` +
+		` projections.apps2_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps_oidc_configs.app_id,` +
-		` projections.apps_oidc_configs.version,` +
-		` projections.apps_oidc_configs.client_id,` +
-		` projections.apps_oidc_configs.redirect_uris,` +
-		` projections.apps_oidc_configs.response_types,` +
-		` projections.apps_oidc_configs.grant_types,` +
-		` projections.apps_oidc_configs.application_type,` +
-		` projections.apps_oidc_configs.auth_method_type,` +
-		` projections.apps_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps_oidc_configs.is_dev_mode,` +
-		` projections.apps_oidc_configs.access_token_type,` +
-		` projections.apps_oidc_configs.access_token_role_assertion,` +
-		` projections.apps_oidc_configs.id_token_role_assertion,` +
-		` projections.apps_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps_oidc_configs.clock_skew,` +
-		` projections.apps_oidc_configs.additional_origins,` +
+		` projections.apps2_oidc_configs.app_id,` +
+		` projections.apps2_oidc_configs.version,` +
+		` projections.apps2_oidc_configs.client_id,` +
+		` projections.apps2_oidc_configs.redirect_uris,` +
+		` projections.apps2_oidc_configs.response_types,` +
+		` projections.apps2_oidc_configs.grant_types,` +
+		` projections.apps2_oidc_configs.application_type,` +
+		` projections.apps2_oidc_configs.auth_method_type,` +
+		` projections.apps2_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps2_oidc_configs.is_dev_mode,` +
+		` projections.apps2_oidc_configs.access_token_type,` +
+		` projections.apps2_oidc_configs.access_token_role_assertion,` +
+		` projections.apps2_oidc_configs.id_token_role_assertion,` +
+		` projections.apps2_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps2_oidc_configs.clock_skew,` +
+		` projections.apps2_oidc_configs.additional_origins,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.apps` +
-		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
-	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps_api_configs.client_id,` +
-		` projections.apps_oidc_configs.client_id` +
-		` FROM projections.apps` +
-		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
-	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps.project_id` +
-		` FROM projections.apps` +
-		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
+		` FROM projections.apps2` +
+		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
+		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
+	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps2_api_configs.client_id,` +
+		` projections.apps2_oidc_configs.client_id` +
+		` FROM projections.apps2` +
+		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
+		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
+	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps2.project_id` +
+		` FROM projections.apps2` +
+		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
+		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects2.id,` +
 		` projections.projects2.creation_date,` +
 		` projections.projects2.change_date,` +
@@ -101,9 +101,9 @@ var (
 		` projections.projects2.has_project_check,` +
 		` projections.projects2.private_labeling_setting` +
 		` FROM projections.projects2` +
-		` JOIN projections.apps ON projections.projects2.id = projections.apps.project_id` +
-		` LEFT JOIN projections.apps_api_configs ON projections.apps.id = projections.apps_api_configs.app_id` +
-		` LEFT JOIN projections.apps_oidc_configs ON projections.apps.id = projections.apps_oidc_configs.app_id`)
+		` JOIN projections.apps2 ON projections.projects2.id = projections.apps2.project_id` +
+		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
+		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
 
 	appCols = database.StringArray{
 		"id",

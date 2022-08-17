@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps"
+	AppProjectionTable = "projections.apps2"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 
@@ -75,8 +75,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(AppColumnID, AppColumnInstanceID),
-			crdb.WithIndex(crdb.NewIndex("project_id_idx", []string{AppColumnProjectID})),
+			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
+			crdb.WithIndex(crdb.NewIndex("app_project_id_idx", []string{AppColumnProjectID})),
 			crdb.WithConstraint(crdb.NewConstraint("app_id_unique", []string{AppColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
@@ -86,7 +86,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(AppAPIConfigColumnAppID, AppAPIConfigColumnInstanceID),
+			crdb.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
 			appAPITableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps")),
 			crdb.WithIndex(crdb.NewIndex("api_client_id_idx", []string{AppAPIConfigColumnClientID})),
@@ -111,7 +111,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID, AppOIDCConfigColumnInstanceID),
+			crdb.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_apps")),
 			crdb.WithIndex(crdb.NewIndex("oidc_client_id_idx", []string{AppOIDCConfigColumnClientID})),

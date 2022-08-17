@@ -30,33 +30,33 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPByIDQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint`+
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					nil,
 					nil,
 				),
@@ -74,33 +74,33 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPByIDQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint`+
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					[]string{
 						"id",
 						"resource_owner",
@@ -188,33 +188,33 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPByIDQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint`+
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					[]string{
 						"id",
 						"resource_owner",
@@ -298,33 +298,33 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPByIDQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint`+
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					[]string{
 						"id",
 						"resource_owner",
@@ -401,33 +401,33 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPByIDQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint`+
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -444,34 +444,34 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint,`+
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					nil,
 					nil,
 				),
@@ -489,34 +489,34 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint,`+
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					[]string{
 						"id",
 						"resource_owner",
@@ -614,34 +614,34 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint,`+
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					[]string{
 						"id",
 						"resource_owner",
@@ -734,34 +734,34 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint,`+
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					[]string{
 						"id",
 						"resource_owner",
@@ -847,34 +847,34 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint,`+
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					[]string{
 						"id",
 						"resource_owner",
@@ -1058,34 +1058,34 @@ func Test_IDPPrepares(t *testing.T) {
 			prepare: prepareIDPsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.idps.id,`+
-						` projections.idps.resource_owner,`+
-						` projections.idps.creation_date,`+
-						` projections.idps.change_date,`+
-						` projections.idps.sequence,`+
-						` projections.idps.state,`+
-						` projections.idps.name,`+
-						` projections.idps.styling_type,`+
-						` projections.idps.owner_type,`+
-						` projections.idps.auto_register,`+
-						` projections.idps_oidc_config.idp_id,`+
-						` projections.idps_oidc_config.client_id,`+
-						` projections.idps_oidc_config.client_secret,`+
-						` projections.idps_oidc_config.issuer,`+
-						` projections.idps_oidc_config.scopes,`+
-						` projections.idps_oidc_config.display_name_mapping,`+
-						` projections.idps_oidc_config.username_mapping,`+
-						` projections.idps_oidc_config.authorization_endpoint,`+
-						` projections.idps_oidc_config.token_endpoint,`+
-						` projections.idps_jwt_config.idp_id,`+
-						` projections.idps_jwt_config.issuer,`+
-						` projections.idps_jwt_config.keys_endpoint,`+
-						` projections.idps_jwt_config.header_name,`+
-						` projections.idps_jwt_config.endpoint,`+
+					regexp.QuoteMeta(`SELECT projections.idps2.id,`+
+						` projections.idps2.resource_owner,`+
+						` projections.idps2.creation_date,`+
+						` projections.idps2.change_date,`+
+						` projections.idps2.sequence,`+
+						` projections.idps2.state,`+
+						` projections.idps2.name,`+
+						` projections.idps2.styling_type,`+
+						` projections.idps2.owner_type,`+
+						` projections.idps2.auto_register,`+
+						` projections.idps2_oidc_config.idp_id,`+
+						` projections.idps2_oidc_config.client_id,`+
+						` projections.idps2_oidc_config.client_secret,`+
+						` projections.idps2_oidc_config.issuer,`+
+						` projections.idps2_oidc_config.scopes,`+
+						` projections.idps2_oidc_config.display_name_mapping,`+
+						` projections.idps2_oidc_config.username_mapping,`+
+						` projections.idps2_oidc_config.authorization_endpoint,`+
+						` projections.idps2_oidc_config.token_endpoint,`+
+						` projections.idps2_jwt_config.idp_id,`+
+						` projections.idps2_jwt_config.issuer,`+
+						` projections.idps2_jwt_config.keys_endpoint,`+
+						` projections.idps2_jwt_config.header_name,`+
+						` projections.idps2_jwt_config.endpoint,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.idps`+
-						` LEFT JOIN projections.idps_oidc_config ON projections.idps.id = projections.idps_oidc_config.idp_id`+
-						` LEFT JOIN projections.idps_jwt_config ON projections.idps.id = projections.idps_jwt_config.idp_id`),
+						` FROM projections.idps2`+
+						` LEFT JOIN projections.idps2_oidc_config ON projections.idps2.id = projections.idps2_oidc_config.idp_id`+
+						` LEFT JOIN projections.idps2_jwt_config ON projections.idps2.id = projections.idps2_jwt_config.idp_id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
