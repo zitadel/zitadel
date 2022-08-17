@@ -77,10 +77,14 @@ function searchSomething(api: apiCallProperties, searchPath: string, find: (enti
 
 function awaitDesired(trials: number, expectEntity: (entity: any) => boolean, initialSequence: number, api: apiCallProperties, searchPath: string, find: (entity: any) => boolean) {
     searchSomething(api, searchPath, find).then(resp => {
-        if (!expectEntity(resp.entity) || resp.sequence <= initialSequence) {
+        const foundExpectedEntity = expectEntity(resp.entity)
+        const foundExpectedSequence = resp.sequence > initialSequence
+
+        if (!foundExpectedEntity || !foundExpectedEntity) {
+            cy.log("didn't find what was expected", "entity was expected:", foundExpectedEntity, "found entity:", resp.entity, "sequence was expected:", foundExpectedSequence, "found sequence:", resp.sequence, "should be greater than:", initialSequence)
             expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
             cy.wait(1000)
             awaitDesired(trials - 1, expectEntity, initialSequence, api, searchPath, find)
-        }            
+        }
     })
 }
