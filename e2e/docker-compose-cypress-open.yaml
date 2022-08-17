@@ -1,0 +1,29 @@
+# run web application and open Cypress Test Runner in a Docker container
+# but send the X11 output to the server running on the host machine
+# so you can see and interact with the tests. Most services are configured
+# in the file docker-compose.yml, this file only overrides variables
+# necessary for "cypress open" to work with X11.
+# We need to use both file names to run:
+#
+#   docker-compose -f docker-compose.yml -f cy-open.yml up --exit-code-from cypress
+#
+services:
+  e2e:
+    # pass custom command to start Cypress otherwise it will use the entrypoint
+    # specified in the Cypress Docker image.
+    # also pass "--project <folder>" so that when Cypress opens
+    # it can find file "cypress.json" and show integration specs
+    # https://on.cypress.io/command-line#cypress-open
+    entrypoint: cypress open --project /e2e
+    environment:
+      # get the IP address of the host machine and allow X11 to accept
+      # incoming connections from that IP address
+      #   IP=$(ipconfig getifaddr en0)
+      #   /usr/X11/bin/xhost + $IP
+      # then pass the environment variable DISPLAY to show Cypress GUI on the host system
+      #   DISPLAY=$IP:0
+      - DISPLAY
+    volumes:
+      # for Cypress to communicate with the X11 server pass this socket file
+      # in addition to any other mapped volumes
+      - /tmp/.X11-unix:/tmp/.X11-unix
