@@ -15,7 +15,7 @@ Given the client_id `78366401571920522@amce` and client_secret `veryweaksecret!`
 
 ## JWT with Private Key
 
-When using `private_key_jwt` for token or introspection endpoints, provide a JWT as assertion generated with the following structure and signed with a downloaded key:
+When using `private_key_jwt` (`urn:ietf:params:oauth:client-assertion-type:jwt-bearer`) for token or introspection endpoints, provide a JWT as assertion generated with the following structure and signed with a downloaded key:
 
 ---
 
@@ -43,13 +43,13 @@ Key JSON
 
 JWT
 
-| Claim | Example                       | Description                                                                                                     |
-|:------|:------------------------------|:----------------------------------------------------------------------------------------------------------------|
-| aud   | `"{your_domain}"`  | String or Array of intended audiences MUST include ZITADEL's issuing domain                                     |
-| exp   | `1605183582`                  | Unix timestamp of the expiry                                                                                    |
-| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                               |
-| iss   | `"78366401571920522@acme"`    | String which represents the requesting party (owner of the key), normally the `clientID` from the json key file |
-| sub   | `"78366401571920522@acme"`    | The subject ID of the application, normally the `clientID` from the json key file                               |
+| Claim | Example                    | Description                                                                                                     |
+|:------|:---------------------------|:----------------------------------------------------------------------------------------------------------------|
+| aud   | `"{your_domain}"`          | String or Array of intended audiences MUST include ZITADEL's issuing domain                                     |
+| exp   | `1605183582`               | Unix timestamp of the expiry                                                                                    |
+| iat   | `1605179982`               | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                               |
+| iss   | `"78366401571920522@acme"` | String which represents the requesting party (owner of the key), normally the `clientID` from the json key file |
+| sub   | `"78366401571920522@acme"` | The subject ID of the application, normally the `clientID` from the json key file                               |
 
 ```JSON
 {

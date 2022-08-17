@@ -9,8 +9,8 @@ import (
 	io "io"
 	reflect "reflect"
 
-	static "github.com/zitadel/zitadel/internal/static"
 	gomock "github.com/golang/mock/gomock"
+	static "github.com/zitadel/zitadel/internal/static"
 )
 
 // MockStorage is a mock of Storage interface.

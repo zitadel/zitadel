@@ -11,7 +11,7 @@ At the end of the guide you should have an API with a protected endpoint.
 
 The client [SDK](https://github.com/zitadel/zitadel-go) will provides an interceptor for both GRPC and HTTP.
 This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [OIDC client library](https://github.com/zitadel/oidc).
-All that is required, is an API and its key JSON. But for complete
+All that is required, is to create your API and download the private key file later called `Key JSON` for the service user.
 
 ## Go Setup
 
