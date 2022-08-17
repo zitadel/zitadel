@@ -46,7 +46,7 @@ services:
     image: cypress/included:10.3.0
     environment:
       CYPRESS_BASE_URL: http://zitadel:8080
-      DEBUG: "cypress:*"
+      DEBUG: "cypress:network:*,cypress:net-stubbing*"
     depends_on:
       zitadel:
         condition: 'service_started'
