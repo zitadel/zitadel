@@ -86,7 +86,7 @@ no additional parameters required
 | Parameter     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. **SHOULD** be provided when using prompt `none`.                                                                                                                                                                                                                                                                                                                                                                       |
-| login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`. Be sure to encode the hint correctly using url encoding (especially when using `+` or alike in the loginname)                                                                                                                                                                                                                                                                         |
+| login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`. Be sure to encode the hint correctly using url encoding (especially when using `+` or alike in the loginname)                                                                                                                                                                                                                                                                       |
 | max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | nonce         | Random string value to associate the client session with the ID Token and for replay attacks mitigation. **MUST** be provided when using **implicit flow**.                                                                                                                                                                                                                                                                                                                                    |
 | prompt        | If the Auth Server prompts the user for (re)authentication. <br />no prompt: the user will have to choose a session if more than one session exists<br />`none`: user must be authenticated without interaction, an error is returned otherwise <br />`login`: user must reauthenticate / provide a user name <br />`select_account`: user is prompted to select one of the existing sessions or create a new one <br />`create`: the registration form will be displayed to the user directly |
@@ -200,10 +200,10 @@ Send your `code_verifier` for us to recompute the `code_challenge` of the author
 
 Send a client assertion as JWT for us to validate the signature against the registered public key.
 
-| Parameter             | Description                                                                                                     |
-| --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Parameter             | Description                                                                                                  |
+| --------------------- |--------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
-| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
+| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
 </TabItem>
 </Tabs>
@@ -223,11 +223,11 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 #### Required request Parameters
 
-| Parameter  | Description                                                                                                                   |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                         |
-| assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants)               |
-| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`              |
+| Parameter  | Description                                                                                                             |
+| ---------- |-------------------------------------------------------------------------------------------------------------------------|
+| grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                   |
+| assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants) |
+| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
 
 ```BASH
 curl --request POST \
@@ -296,10 +296,10 @@ Send your `client_id` as parameter in the body. No authentication is required.
 
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
-| Parameter             | Description                                                                                                     |
-| --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Parameter             | Description                                                                                                  |
+| --------------------- |--------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
-| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                                |
+| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
 </TabItem>
 </Tabs>
@@ -480,10 +480,10 @@ Send your `client_id` as parameters in the body:
 
 Send a `client_assertion` as JWT for ZITADEL to verify the signature against the registered public key.
 
-| Parameter             | Description                                                                                                 |
-| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Parameter             | Description                                                                                                   |
+| --------------------- |---------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
-| client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
+| client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                              |
 
 ```BASH
 curl --request POST \
