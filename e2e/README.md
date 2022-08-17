@@ -19,7 +19,7 @@ brew cask install xquartz
 configure X11 preferences to "allow connections from network clients"
 Install XQuartz as per https://sourabhbajaj.com/blog/2017/02/07/gui-applications-docker-mac/
 
-set IP and DISPLAY variable and alow xhost communication
+set IP and DISPLAY variable and allow xhost communication
 
 ```bash
 IP=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
