@@ -40,7 +40,7 @@ services:
     working_dir: /e2e
     volumes:
     - .:/e2e
-    command: "npm ci"
+    command: "npm ci --omit=dev"
 
   e2e:
     image: cypress/included:10.3.0
