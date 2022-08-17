@@ -4,7 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/http"
+
 	"github.com/zitadel/saml/pkg/provider"
+
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -15,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
-	"net/http"
 )
 
 const (
@@ -57,7 +59,7 @@ func NewProvider(
 		provider.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
-			middleware.NoCacheInterceptor,
+			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
 			http_utils.CopyHeadersToContext,
