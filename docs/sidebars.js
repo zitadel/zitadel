@@ -145,7 +145,8 @@ module.exports = {
       items: [
         "guides/trainings/introduction",
         "guides/trainings/application",
-        "guides/trainings/recurring"
+        "guides/trainings/recurring",
+        "guides/trainings/project",
       ],
     },
   ],
@@ -209,9 +210,8 @@ module.exports = {
       label: "Rate Limits",
       collapsed: false,
       items: [
+        "apis/ratelimits/ratelimits",
         "legal/rate-limit-policy",
-        "apis/ratelimits/login",
-        "apis/ratelimits/api",
       ],
     },
   ],

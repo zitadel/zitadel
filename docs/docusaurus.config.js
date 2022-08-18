@@ -148,10 +148,14 @@ module.exports = {
             {
               label: "Status",
               href: "https://status.zitadel.com/",
+            },
+            {
+              label: "Docs v1 (deprecated)",
+              href: "https://docs-v1.zitadel.com/",
             }
           ],
         },
-        
+
       ],
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
@@ -162,7 +166,7 @@ module.exports = {
       selector: 'div#'
   },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy"],
+      additionalLanguages: ["csharp", "dart", "groovy", "regex"],
     },
   },
   presets: [

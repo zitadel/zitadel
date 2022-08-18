@@ -31,7 +31,7 @@ Make sure you have a Service User with a Key. (For more detailed informations ab
 
 ## Authenticating a service user
 
-In ZITADEL we use the `private_jwt` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
+In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 This is already described in the [Service User](serviceusers.md), so make sure you follow this guide.
 
 ### Request an OAuth token, with audience for ZITADEL
@@ -41,14 +41,14 @@ With the encoded JWT from the prior step, you will need to craft a POST request 
 To access the ZITADEL APIs you need the ZITADEL Project ID in the audience of your token.
 This is possible by sending a custom scope for the audience. More about [Custom Scopes](../../apis/openidoauth/scopes)
 
-Use the scope `urn:zitadel:iam:org:project:id:{projectid}:aud` to include the project id in your audience
+Use the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to include the ZITADEL project id in your audience
 
 ```bash
 curl --request POST \
   --url {your_domain}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data scope='openid profile email urn:zitadel:iam:org:project:id:69234237810729019:aud' \
+  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud' \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
@@ -75,7 +75,7 @@ With this token you are allowed to access the [ZITADEL APIs](../../apis/introduc
 
 * Grant a user for ZITADEL
 * Because there is no interactive logon, you need to use a JWT signed with your private key to authorize the user
-* With a custom scope (`urn:zitadel:iam:org:project:id:{projectid}:aud`) you can access ZITADEL APIs
+* With a custom scope (`urn:zitadel:iam:org:project:id:zitadel:aud`) you can access ZITADEL APIs
 
 Where to go from here:
 

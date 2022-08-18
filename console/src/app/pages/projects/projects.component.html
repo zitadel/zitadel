@@ -25,7 +25,7 @@
       </div>
 
       <span class="fill-space"></span>
-      <button class="grid-btn" (click)="grid = !grid" mat-icon-button [attr.data-e2e]="'toggle-grid'">
+      <button class="grid-btn" (click)="grid = !grid" mat-icon-button data-e2e="toggle-grid">
         <i *ngIf="grid" class="show list view las la-th-list"></i>
         <i *ngIf="!grid" class="las la-border-all"></i>
       </button>
