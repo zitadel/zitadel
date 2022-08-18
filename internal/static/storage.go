@@ -35,3 +35,7 @@ type Asset struct {
 	Location      string
 	ContentType   string
 }
+
+func (a *Asset) VersionedName() string {
+	return a.Name + "?v=" + a.Hash
+}

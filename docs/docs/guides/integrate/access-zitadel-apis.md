@@ -31,7 +31,7 @@ Make sure you have a Service User with a Key. (For more detailed informations ab
 
 ## Authenticating a service user
 
-In ZITADEL we use the `private_jwt` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
+In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 This is already described in the [Service User](serviceusers.md), so make sure you follow this guide.
 
 ### Request an OAuth token, with audience for ZITADEL

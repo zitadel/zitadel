@@ -123,7 +123,7 @@ func createOptions(config Config, externalSecure bool, userAgentCookie, instance
 		op.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
-			middleware.NoCacheInterceptor,
+			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
 			http_utils.CopyHeadersToContext,

@@ -10,7 +10,7 @@
   }}</cnsl-info-section>
   <cnsl-form-field *ngIf="data.confirmation && data.confirmationKey" class="formfield">
     <cnsl-label>{{ data.confirmationKey | translate: { value: data.confirmation } }}</cnsl-label>
-    <input cnslInput [(ngModel)]="confirm" [attr.e2e-data]="'confirm-dialog-input'" />
+    <input cnslInput [(ngModel)]="confirm" data-e2e="confirm-dialog-input" />
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
@@ -24,7 +24,7 @@
     mat-raised-button
     class="ok-button"
     (click)="closeDialogWithSuccess()"
-    [attr.e2e-data]="'confirm-dialog-button'"
+    data-e2e="confirm-dialog-button"
   >
     {{ data.confirmKey | translate }}
   </button>

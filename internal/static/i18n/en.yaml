@@ -265,6 +265,7 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
   IAM:
+    NotFound: Instance not found
     Member:
       RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
