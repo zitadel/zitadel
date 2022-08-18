@@ -1,6 +1,6 @@
 {
-  "api": "https://bringmos-dev-mfhquc.zitadel.cloud",
-  "issuer": "https://bringmos-dev-mfhquc.zitadel.cloud",
-  "clientid": "168811977588670721@zitadel",
+  "api": "http://localhost:8080",
+  "issuer": "http://localhost:8080",
+  "clientid": "165460787010208001@zitadel",
   "customer_portal": "https://zitadel.cloud/admin/instances"
 }
