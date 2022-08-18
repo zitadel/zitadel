@@ -482,7 +482,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "La password deve essere lunga almeno {{valore}} caratteri.",
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
       "NOTEQUAL": "Le password fornite non corrispondono."
     },
     "ID": "ID",
@@ -976,9 +976,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Complessit\u00e0 della password",
       "DESCRIPTION": "Assicura che tutte le password impostate corrispondano a un modello specifico",
-      "SYMBOLANDNUMBERERROR": "La password deve essere composta da una cifra e un simbolo/segno di interpunzione.",
-      "SYMBOLERROR": "La password deve includere un simbolo/segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra.",
+      "SYMBOLANDNUMBERERROR": "Deve essere composta da una cifra e un simbolo/segno di interpunzione.",
+      "SYMBOLERROR": "Deve includere un simbolo/segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra.",
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
     "PRIVATELABELING": {
