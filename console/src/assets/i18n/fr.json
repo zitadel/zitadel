@@ -890,7 +890,8 @@
       "de": "Deutsch",
       "en": "English",
       "it": "Italiano",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "Chinese"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1069,7 +1070,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "Chinese"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1814,7 +1816,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "Chinese"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

@@ -1,6 +1,8 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
+import localeZh from '@angular/common/locales/zh';
+import localeFr from '@angular/common/locales/fr';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -55,6 +57,8 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 
 registerLocaleData(localeDe);
+registerLocaleData(localeZh);
+registerLocaleData(localeFr);
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
