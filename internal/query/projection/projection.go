@@ -20,6 +20,7 @@ const (
 var (
 	projectionConfig                    crdb.StatementHandlerConfig
 	OrgProjection                       *orgProjection
+	OrgMetadataProjection               *orgMetadataProjection
 	ActionProjection                    *actionProjection
 	FlowProjection                      *flowProjection
 	ProjectProjection                   *projectProjection
@@ -82,6 +83,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
+	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))
 	ActionProjection = newActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
 	FlowProjection = newFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	ProjectProjection = newProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))

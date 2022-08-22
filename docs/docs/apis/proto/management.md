@@ -804,6 +804,78 @@ Sets the state of my organisation to active
     POST: /orgs/me/_reactivate
 
 
+### SetOrgMetadata
+
+> **rpc** SetOrgMetadata([SetOrgMetadataRequest](#setorgmetadatarequest))
+[SetOrgMetadataResponse](#setorgmetadataresponse)
+
+Sets a org metadata by key
+
+
+
+    POST: /orgs/{id}/metadata/{key}
+
+
+### BulkSetOrgMetadata
+
+> **rpc** BulkSetOrgMetadata([BulkSetOrgMetadataRequest](#bulksetorgmetadatarequest))
+[BulkSetOrgMetadataResponse](#bulksetorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    POST: /orgs/{id}/metadata/_bulk
+
+
+### ListOrgMetadata
+
+> **rpc** ListOrgMetadata([ListOrgMetadataRequest](#listorgmetadatarequest))
+[ListOrgMetadataResponse](#listorgmetadataresponse)
+
+Returns the org metadata
+
+
+
+    POST: /orgs/{id}/metadata/_search
+
+
+### GetOrgMetadata
+
+> **rpc** GetOrgMetadata([GetOrgMetadataRequest](#getorgmetadatarequest))
+[GetOrgMetadataResponse](#getorgmetadataresponse)
+
+Returns the org metadata by key
+
+
+
+    GET: /orgs/{id}/metadata/{key}
+
+
+### RemoveOrgMetadata
+
+> **rpc** RemoveOrgMetadata([RemoveOrgMetadataRequest](#removeorgmetadatarequest))
+[RemoveOrgMetadataResponse](#removeorgmetadataresponse)
+
+Removes a org metadata by key
+
+
+
+    DELETE: /orgs/{id}/metadata/{key}
+
+
+### BulkRemoveOrgMetadata
+
+> **rpc** BulkRemoveOrgMetadata([BulkRemoveOrgMetadataRequest](#bulkremoveorgmetadatarequest))
+[BulkRemoveOrgMetadataResponse](#bulkremoveorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    DELETE: /orgs/{id}/metadata/_bulk
+
+
 ### ListOrgDomains
 
 > **rpc** ListOrgDomains([ListOrgDomainsRequest](#listorgdomainsrequest))
@@ -3754,6 +3826,29 @@ This is an empty request
 
 
 
+### BulkRemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### BulkRemoveUserGrantRequest
 
 
@@ -3784,6 +3879,41 @@ This is an empty request
 
 
 ### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| metadata | repeated BulkSetOrgMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetOrgMetadataResponse
 
 
 
@@ -4894,6 +5024,29 @@ This is an empty request
 
 
 
+### GetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### GetPasswordAgePolicyRequest
 This is an empty request
 
@@ -5719,6 +5872,31 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | list limitations and ordering |  |
 | result | repeated zitadel.member.v1.Member | criterias the client is looking for |  |
+
+
+
+
+### ListOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -6724,6 +6902,29 @@ This is an empty response
 
 
 
+### RemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemovePersonalAccessTokenRequest
 
 
@@ -7592,6 +7793,31 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 

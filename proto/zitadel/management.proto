@@ -841,6 +841,76 @@ service ManagementService {
         };
     }
 
+    // Sets a org metadata by key
+    rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
+        option (google.api.http) = {
+            post: "/orgs/{id}/metadata/{key}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    // Set a list of org metadata
+    rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
+        option (google.api.http) = {
+            post: "/orgs/{id}/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    // Returns the org metadata
+    rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
+        option (google.api.http) = {
+            post: "/orgs/{id}/metadata/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.read"
+        };
+    }
+
+    // Returns the org metadata by key
+    rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.read"
+        };
+    }
+
+    // Removes a org metadata by key
+    rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{id}/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    // Set a list of org metadata
+    rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{id}/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
     // Returns all registered domains of my organisation
     // Limit should always be set, there is a default limit set by the service
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
@@ -3650,6 +3720,68 @@ message RemoveOrgMemberRequest {
 }
 
 message RemoveOrgMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListOrgMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.v1.ListQuery query = 2;
+    repeated zitadel.metadata.v1.MetadataQuery queries = 3;
+}
+
+message ListOrgMetadataResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.metadata.v1.Metadata result = 2;
+}
+
+message GetOrgMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetOrgMetadataResponse {
+    zitadel.metadata.v1.Metadata metadata = 1;
+}
+
+message SetOrgMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bytes value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetOrgMetadataResponse {
+    string id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message BulkSetOrgMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    message Metadata {
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+    }
+    repeated Metadata metadata = 2;
+}
+
+message BulkSetOrgMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveOrgMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveOrgMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveOrgMetadataRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message BulkRemoveOrgMetadataResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
