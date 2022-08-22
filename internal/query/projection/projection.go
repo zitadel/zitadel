@@ -63,7 +63,7 @@ var (
 )
 
 func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
-	projectionConfig := crdb.StatementHandlerConfig{
+	projectionConfig = crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
