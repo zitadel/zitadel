@@ -129,7 +129,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
 			crdb.NewColumn(AppSAMLConfigColumnEntityID, crdb.ColumnTypeText),
-			crdb.NewColumn(AppSAMLConfigColumnMetadata, crdb.ColumnTypeText),
+			crdb.NewColumn(AppSAMLConfigColumnMetadata, crdb.ColumnTypeBytes),
 			crdb.NewColumn(AppSAMLConfigColumnMetadataURL, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(AppSAMLConfigColumnAppID),

@@ -60,8 +60,8 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 
 	return serviceprovider.NewServiceProvider(
 		app.ID,
-		&serviceprovider.ServiceProviderConfig{
-			Metadata: string(metadata),
+		&serviceprovider.Config{
+			Metadata: metadata,
 			URL:      app.SAMLConfig.MetadataURL,
 		},
 		p.defaultLoginURL,
@@ -73,7 +73,7 @@ func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string,
 	if err != nil {
 		return "", err
 	}
-	metadata, err := xml.ParseMetadataXmlIntoStruct([]byte(app.SAMLConfig.Metadata))
+	metadata, err := xml.ParseMetadataXmlIntoStruct(app.SAMLConfig.Metadata)
 	if err != nil {
 		return "", err
 	}
