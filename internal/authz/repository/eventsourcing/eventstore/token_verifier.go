@@ -136,6 +136,7 @@ func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instan
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
+//getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs
 func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessToken string) (tokenID string, subject string, valid bool) {
 	// accessToken can be either opaque or JWT
 	// let's try opaque first:
