@@ -137,19 +137,22 @@ func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instan
 }
 
 func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessToken string) (tokenID string, subject string, valid bool) {
+	// accessToken can be either opaque or JWT
+	// let's try opaque first:
 	tokenIDSubject, err := repo.decryptAccessToken(accessToken)
-	if err == nil {
-		splitToken := strings.Split(tokenIDSubject, ":")
-		if len(splitToken) != 2 {
+	if err != nil {
+		// if decryption did not work, it might be a JWT
+		accessTokenClaims, err := op.VerifyAccessToken(ctx, accessToken, repo.jwtTokenVerifier(ctx))
+		if err != nil {
 			return "", "", false
 		}
-		return splitToken[0], splitToken[1], true
+		return accessTokenClaims.GetTokenID(), accessTokenClaims.GetSubject(), true
 	}
-	accessTokenClaims, err := op.VerifyAccessToken(ctx, accessToken, repo.jwtTokenVerifier(ctx))
-	if err != nil {
+	splitToken := strings.Split(tokenIDSubject, ":")
+	if len(splitToken) != 2 {
 		return "", "", false
 	}
-	return accessTokenClaims.GetTokenID(), accessTokenClaims.GetSubject(), true
+	return splitToken[0], splitToken[1], true
 }
 
 func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) op.AccessTokenVerifier {
