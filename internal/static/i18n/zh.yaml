@@ -683,7 +683,7 @@ EventTypes:
           removed: 从标签策略删除 Logo
           dark:
             added: 添加 Logo (深色模式) Logo 标签策略
-            removed: 删除Logo (深色模式) Logo 标签策略
+            removed: 删除 Logo (深色模式) Logo 标签策略
         icon:
           added: 添加图标到标签策略
           removed: 从标签策略中删除图标
@@ -696,9 +696,9 @@ EventTypes:
         assets:
           removed: 从标签策略中删除的资产
       privacy:
-        added: 添加隐私策略和 TOS
-        changed: 更改隐私策略和 TOS
-        removed: 删除隐私策略和 TOS
+        added: 添加隐私政策和服务条款
+        changed: 更改隐私政策和服务条款
+        removed: 删除隐私政策和服务条款
     flow:
       trigger_actions:
         set: 设置动作
@@ -897,4 +897,4 @@ Application:
           NotNone: UserAgent 应用应使用 None 身份验证方式。
       GrantType:
         Refresh:
-          NoAuthCode: Refresh Token 仅允许与授权码（Authorization code）模式一起使用。
+          NoAuthCode: Refresh Token 仅允许与授权码（Authorization Code）模式一起使用。

@@ -9,7 +9,7 @@
     "LINKS": {
       "CONTACT": "联系",
       "TOS": "服务条款",
-      "PP": "隐私策略"
+      "PP": "隐私政策"
     },
     "THEME": {
       "DARK": "深色",
@@ -871,7 +871,7 @@
       "DOMAIN": "域名设置",
       "LOGINTEXTS": "登录界面文本",
       "BRANDING": "品牌标识",
-      "PRIVACYPOLICY": "隐私策略",
+      "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
       "SECRETS": "验证码外观"
     },
@@ -1044,10 +1044,10 @@
       "SAVED": "保存成功！"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "隐私策略和服务条款",
-      "DESCRIPTION": "设置您的隐私策略和服务条款链接",
+      "TITLE": "隐私政策和服务条款",
+      "DESCRIPTION": "设置您的隐私政策和服务条款链接",
       "TOSLINK": "链接到服务条款",
-      "POLICYLINK": "链接到隐私策略",
+      "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
