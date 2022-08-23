@@ -57,6 +57,7 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
+	logging.Warn("postgres is currently in beta")
 	db, err := sql.Open("pgx", c.String(useAdmin))
 	if err != nil {
 		return nil, err
