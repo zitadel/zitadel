@@ -3,12 +3,17 @@ package eventstore
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v2/pkg/op"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -27,6 +32,7 @@ type TokenVerifierRepo struct {
 	Eventstore           v1.Eventstore
 	View                 *view.View
 	Query                *query.Queries
+	ExternalSecure       bool
 }
 
 func (repo *TokenVerifierRepo) Health() error {
@@ -52,7 +58,7 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 	}
 
 	if esErr != nil {
-		logging.Log("EVENT-5Nm9s").WithError(viewErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
+		logging.WithError(viewErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
 		return model.TokenViewToModel(token), nil
 	}
 	viewToken := *token
@@ -71,21 +77,13 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	tokenData, err := base64.RawURLEncoding.DecodeString(tokenString)
-	if err != nil {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
-	}
-	tokenIDSubject, err := repo.TokenVerificationKey.DecryptString(tokenData, repo.TokenVerificationKey.EncryptionKeyID())
-	if err != nil {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
-	}
 
-	splittedToken := strings.Split(tokenIDSubject, ":")
-	if len(splittedToken) != 2 {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
+	tokenID, subject, ok := repo.getTokenIDAndSubject(ctx, tokenString)
+	if !ok {
+		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
 	_, tokenSpan := tracing.NewNamedSpan(ctx, "token")
-	token, err := repo.tokenByID(ctx, splittedToken[0], splittedToken[1])
+	token, err := repo.tokenByID(ctx, tokenID, subject)
 	tokenSpan.EndWithError(err)
 	if err != nil {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
@@ -128,12 +126,82 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	return clientID, app.ProjectID, nil
 }
 
-func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) (_ []*models.Event, err error) {
+func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) (_ []*models.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
 	if err != nil {
 		return nil, err
 	}
-	return r.Eventstore.FilterEvents(ctx, query)
+	return repo.Eventstore.FilterEvents(ctx, query)
+}
+
+//getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs
+func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessToken string) (tokenID string, subject string, valid bool) {
+	// accessToken can be either opaque or JWT
+	// let's try opaque first:
+	tokenIDSubject, err := repo.decryptAccessToken(accessToken)
+	if err != nil {
+		// if decryption did not work, it might be a JWT
+		accessTokenClaims, err := op.VerifyAccessToken(ctx, accessToken, repo.jwtTokenVerifier(ctx))
+		if err != nil {
+			return "", "", false
+		}
+		return accessTokenClaims.GetTokenID(), accessTokenClaims.GetSubject(), true
+	}
+	splitToken := strings.Split(tokenIDSubject, ":")
+	if len(splitToken) != 2 {
+		return "", "", false
+	}
+	return splitToken[0], splitToken[1], true
+}
+
+func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) op.AccessTokenVerifier {
+	keySet := &openIDKeySet{repo.Query}
+	issuer := http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), repo.ExternalSecure)
+	return op.NewAccessTokenVerifier(issuer, keySet)
+}
+
+func (repo *TokenVerifierRepo) decryptAccessToken(token string) (string, error) {
+	tokenData, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		return "", caos_errs.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
+	}
+	tokenIDSubject, err := repo.TokenVerificationKey.DecryptString(tokenData, repo.TokenVerificationKey.EncryptionKeyID())
+	if err != nil {
+		return "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
+	}
+	return tokenIDSubject, nil
+}
+
+type openIDKeySet struct {
+	*query.Queries
+}
+
+//VerifySignature implements the oidc.KeySet interface
+//providing an implementation for the keys retrieved directly from Queries
+func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) ([]byte, error) {
+	keySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
+	if err != nil {
+		return nil, fmt.Errorf("error fetching keys: %w", err)
+	}
+	keyID, alg := oidc.GetKeyIDAndAlg(jws)
+	key, err := oidc.FindMatchingKey(keyID, oidc.KeyUseSignature, alg, jsonWebKeys(keySet.Keys)...)
+	if err != nil {
+		return nil, fmt.Errorf("invalid signature: %w", err)
+	}
+	return jws.Verify(&key)
+}
+
+func jsonWebKeys(keys []query.PublicKey) []jose.JSONWebKey {
+	webKeys := make([]jose.JSONWebKey, len(keys))
+	for i, key := range keys {
+		webKeys[i] = jose.JSONWebKey{
+			KeyID:     key.ID(),
+			Algorithm: key.Algorithm(),
+			Use:       key.Use().String(),
+			Key:       key.Key(),
+		}
+	}
+	return webKeys
 }

@@ -9,6 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func Start(queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) (repository.Repository, error) {
-	return eventsourcing.Start(queries, dbClient, keyEncryptionAlgorithm)
+func Start(queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
+	return eventsourcing.Start(queries, dbClient, keyEncryptionAlgorithm, externalSecure)
 }
