@@ -78,7 +78,6 @@ docker_manifests:
   image_templates:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
-  skip_push: auto
 
 
 archives:
