@@ -45,7 +45,7 @@ With ZITADEL you rely on a battle tested, hardened and extensible turnkey soluti
 
 The easiest way to get started with [ZITADEL Cloud](https://zitadel.cloud).
 
-It's free for up to 25'000 authenticated requests. Learn more  the [pay-as-you-go pricing](https://zitadel.com/pricing).
+It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Install ZITADEL
 
