@@ -43,10 +43,9 @@ With ZITADEL you rely on a battle tested, hardened and extensible turnkey soluti
 
 ### ZITADEL Cloud (SaaS)
 
-The easiest way to get started with ZITADEL is to use our public cloud offering.
-Currently ZITADEL V2 Beta is available, head over to [https://zitadel.cloud](https://zitadel.cloud) and create your first ZITADEL instance for free.
+The easiest way to get started with [ZITADEL Cloud](https://zitadel.cloud).
 
-You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
+It's free for up to 25'000 authenticated requests. Learn more  the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Install ZITADEL
 
