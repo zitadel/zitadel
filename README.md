@@ -84,6 +84,8 @@ It's free for up to 25'000 authenticated requests. Learn more  the [pay-as-you-g
 - 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
 - 🚧 [Postgres](https://github.com/zitadel/zitadel/pull/3998)
 
+Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
+
 ## Client libraries
 
 <!-- TODO: check other libraries -->
