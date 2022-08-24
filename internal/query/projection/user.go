@@ -17,9 +17,10 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users"
+	UserTable        = "projections.users2"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
+	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
 
 	UserIDCol            = "id"
 	UserCreationDateCol  = "creation_date"
@@ -58,6 +59,16 @@ const (
 	MachineUserInstanceIDCol = "instance_id"
 	MachineNameCol           = "name"
 	MachineDescriptionCol    = "description"
+
+	// notify
+	UserNotifySuffix       = "notifications"
+	NotifyUserIDCol        = "user_id"
+	NotifyInstanceIDCol    = "instance_id"
+	NotifyLastEmailCol     = "last_email"
+	NotifyVerifiedEmailCol = "verified_email"
+	NotifyLastPhoneCol     = "last_phone"
+	NotifyVerifiedPhoneCol = "verified_phone"
+	NotifyPasswordSetCol   = "password_set"
 )
 
 func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userProjection {
@@ -109,6 +120,19 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewPrimaryKey(MachineUserIDCol, MachineUserInstanceIDCol),
 			UserMachineSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user")),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(NotifyUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(NotifyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(NotifyLastEmailCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(NotifyVerifiedEmailCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(NotifyLastPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(NotifyVerifiedPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(NotifyPasswordSetCol, crdb.ColumnTypeBool, crdb.Default(false)),
+		},
+			crdb.NewPrimaryKey(NotifyUserIDCol, NotifyInstanceIDCol),
+			UserNotifySuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -177,6 +201,10 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceUserNameChanged,
 				},
 				{
+					Event:  user.UserDomainClaimedType,
+					Reduce: p.reduceDomainClaimed,
+				},
+				{
 					Event:  user.HumanProfileChangedType,
 					Reduce: p.reduceHumanProfileChanged,
 				},
@@ -240,6 +268,10 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 					Event:  user.MachineChangedEventType,
 					Reduce: p.reduceMachineChanged,
 				},
+				{
+					Event:  user.HumanPasswordChangedType,
+					Reduce: p.reduceHumanPasswordChanged,
+				},
 			},
 		},
 	}
@@ -280,6 +312,16 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
+				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
+				handler.NewCol(NotifyPasswordSetCol, e.Secret != nil),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 
@@ -317,6 +359,16 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(HumanPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
+				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
+				handler.NewCol(NotifyPasswordSetCol, e.Secret != nil),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
 		),
 	), nil
 }
@@ -470,6 +522,26 @@ func (p *userProjection) reduceUserNameChanged(event eventstore.Event) (*handler
 	), nil
 }
 
+func (p *userProjection) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.DomainClaimedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserChangeDateCol, e.CreationDate()),
+			handler.NewCol(UserUsernameCol, e.UserName),
+			handler.NewCol(UserSequenceCol, e.Sequence()),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
 func (p *userProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanProfileChangedEvent)
 	if !ok {
@@ -552,6 +624,16 @@ func (p *userProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handl
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: e.PhoneNumber, Valid: e.PhoneNumber != ""}),
+			},
+			[]handler.Condition{
+				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 
@@ -584,6 +666,17 @@ func (p *userProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyLastPhoneCol, nil),
+				handler.NewCol(NotifyVerifiedPhoneCol, nil),
+			},
+			[]handler.Condition{
+				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 
@@ -614,6 +707,23 @@ func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
+		),
+		crdb.AddCopyStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, nil),
+				handler.NewCol(NotifyInstanceIDCol, nil),
+				handler.NewCol(NotifyLastPhoneCol, nil),
+			},
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, nil),
+				handler.NewCol(NotifyInstanceIDCol, nil),
+				handler.NewCol(NotifyVerifiedPhoneCol, nil),
+			},
+			[]handler.Condition{
+				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
 		),
 	), nil
 }
@@ -647,6 +757,16 @@ func (p *userProjection) reduceHumanEmailChanged(event eventstore.Event) (*handl
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyLastEmailCol, &sql.NullString{String: e.EmailAddress, Valid: e.EmailAddress != ""}),
+			},
+			[]handler.Condition{
+				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 
@@ -677,6 +797,23 @@ func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
+		),
+		crdb.AddCopyStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, nil),
+				handler.NewCol(NotifyInstanceIDCol, nil),
+				handler.NewCol(NotifyLastEmailCol, nil),
+			},
+			[]handler.Column{
+				handler.NewCol(NotifyUserIDCol, nil),
+				handler.NewCol(NotifyInstanceIDCol, nil),
+				handler.NewCol(NotifyVerifiedEmailCol, nil),
+			},
+			[]handler.Condition{
+				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserNotifySuffix),
 		),
 	), nil
 }
@@ -740,6 +877,25 @@ func (p *userProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*hand
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+	), nil
+}
+
+func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordChangedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(NotifyPasswordSetCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+		},
+		crdb.WithTableSuffix(UserNotifySuffix),
 	), nil
 }
 

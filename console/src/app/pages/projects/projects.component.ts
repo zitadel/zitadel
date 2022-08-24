@@ -13,6 +13,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 export class ProjectsComponent {
   public zitadelProjectId: string = '';
   public projectType$: BehaviorSubject<any> = new BehaviorSubject(ProjectType.PROJECTTYPE_OWNED);
+  public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
   public ProjectType: any = ProjectType;
   public grid: boolean = true;
   constructor(

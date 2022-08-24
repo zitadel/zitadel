@@ -18,6 +18,7 @@ const (
 )
 
 var (
+	projectionConfig                    crdb.StatementHandlerConfig
 	OrgProjection                       *orgProjection
 	ActionProjection                    *actionProjection
 	FlowProjection                      *flowProjection
@@ -58,16 +59,19 @@ var (
 	OIDCSettingsProjection              *oidcSettingsProjection
 	DebugNotificationProviderProjection *debugNotificationProviderProjection
 	KeyProjection                       *keyProjection
+	NotificationsProjection             interface{}
 )
 
 func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
-	projectionConfig := crdb.StatementHandlerConfig{
+	projectionConfig = crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery:     config.RequeueEvery,
-			RetryFailedAfter: config.RetryFailedAfter,
+			RequeueEvery:        config.RequeueEvery,
+			RetryFailedAfter:    config.RetryFailedAfter,
+			Retries:             config.MaxFailureCount,
+			ConcurrentInstances: config.ConcurrentInstances,
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
@@ -118,6 +122,11 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	DebugNotificationProviderProjection = newDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm)
 	return nil
+}
+
+func ApplyCustomConfig(customConfig CustomConfig) crdb.StatementHandlerConfig {
+	return applyCustomConfig(projectionConfig, customConfig)
+
 }
 
 func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomConfig) crdb.StatementHandlerConfig {

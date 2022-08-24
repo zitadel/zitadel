@@ -155,7 +155,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 							eventFromEventPusher(
 								user.NewHumanAvatarAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
-									"avatar",
+									"avatar?v=test",
 								),
 							),
 						},

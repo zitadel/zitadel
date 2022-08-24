@@ -72,7 +72,7 @@ eMail Support | support@zitadel.com
 Chat Support | Private chat channel between CAOS and Customer that is opened when Subscription becomes active
 Phone Support | +41 43 215 27 34
 
-- ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our status page](https://status.zitadel.ch).
+- ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our status page](https://status.zitadel.com).
 - Questions regarding pricing, billing, and invoicing of our services should be addressed to billing@zitadel.com
 - Security related questions and incidents can also be directly addressed to security@zitadel.com
 

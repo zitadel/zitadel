@@ -37,6 +37,7 @@ type registerData struct {
 	HasNumber                 string
 	HasSymbol                 string
 	ShowUsername              bool
+	ShowUsernameSuffix        bool
 	OrgRegister               bool
 }
 
@@ -64,10 +65,8 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != resourceOwner {
-		memberRoles = nil
 		resourceOwner = authRequest.RequestedOrgID
 	}
 	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
@@ -80,7 +79,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, nil, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -150,6 +149,13 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 	data.ShowUsername = orgIAMPolicy.UserLoginMustBeDomain
 	data.OrgRegister = orgIAMPolicy.UserLoginMustBeDomain
+
+	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, formData, err)
+		return
+	}
+	data.ShowUsernameSuffix = !labelPolicy.HideLoginNameSuffix
 
 	funcs := map[string]interface{}{
 		"selectedLanguage": func(l string) bool {

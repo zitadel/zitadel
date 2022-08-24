@@ -35,7 +35,7 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := addOIDCIDPRequestToDomain(tt.args.req)
+			got := AddOIDCIDPRequestToDomain(tt.args.req)
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
 				"OIDCConfig.ClientSecret",

@@ -20,9 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
+	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 	tracing "github.com/zitadel/zitadel/internal/telemetry/tracing/config"
 )
 
@@ -38,6 +38,7 @@ type Config struct {
 	WebAuthNName      string
 	Database          database.Config
 	Tracing           tracing.Config
+	Metrics           metrics.Config
 	Projections       projection.Config
 	Auth              auth_es.Config
 	Admin             admin_es.Config
@@ -45,7 +46,6 @@ type Config struct {
 	OIDC              oidc.Config
 	Login             login.Config
 	Console           console.Config
-	Notification      notification.Config
 	AssetStorage      static_config.AssetStorageConfig
 	InternalAuthZ     internal_authz.Config
 	SystemDefaults    systemdefaults.SystemDefaults
@@ -65,13 +65,19 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
+			database.DecodeHook,
 		)),
 	)
+	logging.OnError(err).Fatal("unable to read config")
+
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 
 	err = config.Tracing.NewTracer()
 	logging.OnError(err).Fatal("unable to set tracer")
+
+	err = config.Metrics.NewMeter()
+	logging.OnError(err).Fatal("unable to set meter")
 
 	return config
 }

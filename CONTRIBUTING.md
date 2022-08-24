@@ -38,12 +38,10 @@ We accept contributions through pull requests. You need a github account for tha
 
 ### Submit a Pull Request (PR)
 
-> :warning: Currently main development is done on branch `v2-alpha`. Make sure you're merging into the correct branch.
-
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
 
-`git checkout -b my-fix-branch v2-alpha`
+`git checkout -b my-fix-branch main`
 
 3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
 
@@ -51,7 +49,7 @@ We accept contributions through pull requests. You need a github account for tha
 
 `git commit --all`
 
-5. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `v2-alpha`-branch
+5. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `main`-branch
 
 6. Push the changes to your branch on Github
 
@@ -59,7 +57,7 @@ We accept contributions through pull requests. You need a github account for tha
 
 7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
 
-8.  On GitHub, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:v2-alpha`. Request review from one of the maintainers.
+8.  On GitHub, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:main`. Request review from one of the maintainers.
 
 ### Reviewing a Pull Request
 
@@ -76,7 +74,7 @@ Make sure you use [semantic release messages format](https://github.com/angular/
 
 #### Type
 
-Must be one of the following: 
+Must be one of the following:
 
 - **feat**: New Feature
 - **fix**: Bug Fix
@@ -124,7 +122,7 @@ Make sure to use the following configurations:
 
 To run console locally, navigate to the console subfolder and run `npm install` and then `npm start` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
 
-Console loads its environment from the [environment.json](https://github.com/zitadel/zitadel/blob/v2-alpha/console/src/assets/environment.json), make sure to change the configuration to your instance project.
+Console loads its environment from the [environment.json](https://github.com/zitadel/zitadel/blob/main/console/src/assets/environment.json), make sure to change the configuration to your instance project.
 When the backend is running locally ensure you are specifying your [localhost](http://localhost:8080/ui/console/assets/environment.json) endpoints.
 
 ### API Definitions
@@ -155,7 +153,7 @@ Scope can be left empty (omit the brackets) or refer to the top navigation secti
 ZITADEL loads translations from four files:
 
 - [Console texts](./console/src/assets/i18n)
-- [Login interface](./internal/api/ui/login/static/i18n) 
+- [Login interface](./internal/api/ui/login/static/i18n)
 - [Email notification](./internal/notification/static/i18n)
 - [Common texts](./internal/static/i18n) for success or error toasts
 

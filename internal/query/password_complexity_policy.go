@@ -33,7 +33,7 @@ type PasswordComplexityPolicy struct {
 
 func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*PasswordComplexityPolicy, error) {
 	if shouldTriggerBulk {
-		projection.PasswordComplexityProjection.TriggerBulk(ctx)
+		projection.PasswordComplexityProjection.Trigger(ctx)
 	}
 
 	stmt, scan := preparePasswordComplexityPolicyQuery()
@@ -63,7 +63,7 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTrigg
 
 func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTriggerBulk bool) (*PasswordComplexityPolicy, error) {
 	if shouldTriggerBulk {
-		projection.PasswordComplexityProjection.TriggerBulk(ctx)
+		projection.PasswordComplexityProjection.Trigger(ctx)
 	}
 
 	stmt, scan := preparePasswordComplexityPolicyQuery()

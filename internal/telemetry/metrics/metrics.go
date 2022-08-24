@@ -26,10 +26,6 @@ type Metrics interface {
 	RegisterValueObserver(name, description string, callbackFunc metric.Int64ObserverFunc) error
 }
 
-type Config interface {
-	NewMetrics() error
-}
-
 var M Metrics
 
 func GetExporter() http.Handler {

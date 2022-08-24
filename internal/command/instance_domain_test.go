@@ -53,6 +53,51 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 			},
 		},
 		{
+			name: "invalid domain ', error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				domain: "hodor's-org.localhost",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "invalid domain umlaut, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				domain: "bücher.ch",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "invalid domain other unicode, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				domain: "🦒.ch",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "domain already exists, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(

@@ -45,8 +45,8 @@ func (v *View) GetLatestIDPConfigSequence(instanceID string) (*global_view.Curre
 	return v.latestSequence(idpConfigTable, instanceID)
 }
 
-func (v *View) GetLatestIDPConfigSequences() ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(idpConfigTable)
+func (v *View) GetLatestIDPConfigSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(idpConfigTable, instanceIDs...)
 }
 
 func (v *View) ProcessedIDPConfigSequence(event *models.Event) error {

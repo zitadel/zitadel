@@ -55,6 +55,17 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	}, nil
 }
 
+func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListProjectGrantChangesRequest) (*mgmt_pb.ListProjectGrantChangesResponse, error) {
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	res, err := s.query.ProjectGrantChanges(ctx, req.ProjectId, req.GrantId, sequence, limit, asc, s.auditLogRetention)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListProjectGrantChangesResponse{
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
+	}, nil
+}
+
 func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrantedProjectsRequest) (*mgmt_pb.ListGrantedProjectsResponse, error) {
 	queries, err := listGrantedProjectsRequestToModel(req)
 	if err != nil {

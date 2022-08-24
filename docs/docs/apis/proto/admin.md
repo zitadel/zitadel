@@ -386,7 +386,7 @@ all queries need to match (AND)
 > **rpc** SetUpOrg([SetUpOrgRequest](#setuporgrequest))
 [SetUpOrgResponse](#setuporgresponse)
 
-Creates a new org and user 
+Creates a new org and user
 and adds the user to the orgs members as ORG_OWNER
 
 
@@ -1469,7 +1469,7 @@ they represent the delta of the event happend on the objects
 [ListFailedEventsResponse](#listfailedeventsresponse)
 
 Returns event descriptions which cannot be processed.
-It's possible that some events need some retries. 
+It's possible that some events need some retries.
 For example if the SMTP-API wasn't able to send an email at the first time
 
 
@@ -1491,6 +1491,30 @@ failed event. You can find out if it worked on the `failure_count`
 
 
     DELETE: /failedevents/{database}/{view_name}/{failed_sequence}
+
+
+### ImportData
+
+> **rpc** ImportData([ImportDataRequest](#importdatarequest))
+[ImportDataResponse](#importdataresponse)
+
+Imports data into instance and creates different objects
+
+
+
+    POST: /import
+
+
+### ExportData
+
+> **rpc** ExportData([ExportDataRequest](#exportdatarequest))
+[ExportDataResponse](#exportdataresponse)
+
+Exports data from instance
+
+
+
+    POST: /export
 
 
 
@@ -1789,6 +1813,49 @@ This is an empty request
 
 
 
+### DataOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| org |  zitadel.management.v1.AddOrgRequest | - |  |
+| domain_policy |  AddCustomDomainPolicyRequest | - |  |
+| label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
+| lockout_policy |  zitadel.management.v1.AddCustomLockoutPolicyRequest | - |  |
+| login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
+| password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
+| privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
+| projects | repeated zitadel.v1.v1.DataProject | - |  |
+| project_roles | repeated zitadel.management.v1.AddProjectRoleRequest | - |  |
+| api_apps | repeated zitadel.v1.v1.DataAPIApplication | - |  |
+| oidc_apps | repeated zitadel.v1.v1.DataOIDCApplication | - |  |
+| human_users | repeated zitadel.v1.v1.DataHumanUser | - |  |
+| machine_users | repeated zitadel.v1.v1.DataMachineUser | - |  |
+| trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
+| actions | repeated zitadel.v1.v1.DataAction | - |  |
+| project_grants | repeated zitadel.v1.v1.DataProjectGrant | - |  |
+| user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
+| org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
+| project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
+| project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+| user_metadata | repeated zitadel.management.v1.SetUserMetadataRequest | - |  |
+| login_texts | repeated zitadel.management.v1.SetCustomLoginTextsRequest | - |  |
+| init_messages | repeated zitadel.management.v1.SetCustomInitMessageTextRequest | - |  |
+| password_reset_messages | repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest | - |  |
+| verify_email_messages | repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest | - |  |
+| verify_phone_messages | repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest | - |  |
+| domain_claimed_messages | repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest | - |  |
+| passwordless_registration_messages | repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest | - |  |
+| oidc_idps | repeated zitadel.v1.v1.DataOIDCIDP | - |  |
+| jwt_idps | repeated zitadel.v1.v1.DataJWTIDP | - |  |
+| user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
+| domains | repeated zitadel.org.v1.Domain | - |  |
+
+
+
+
 ### DeactivateIDPRequest
 
 
@@ -1829,6 +1896,76 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ExportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_ids | repeated string | - |  |
+| excluded_org_ids | repeated string | - |  |
+| with_passwords |  bool | - |  |
+| with_otp |  bool | - |  |
+| response_output |  bool | - |  |
+| local_output |  ExportDataRequest.LocalOutput | - |  |
+| s3_output |  ExportDataRequest.S3Output | - |  |
+| gcs_output |  ExportDataRequest.GCSOutput | - |  |
+| timeout |  string | - |  |
+
+
+
+
+### ExportDataRequest.GCSOutput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| bucket |  string | - |  |
+| serviceaccount_json |  string | - |  |
+| path |  string | - |  |
+
+
+
+
+### ExportDataRequest.LocalOutput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+
+
+
+
+### ExportDataRequest.S3Output
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+| endpoint |  string | - |  |
+| access_key_id |  string | - |  |
+| secret_access_key |  string | - |  |
+| ssl |  bool | - |  |
+| bucket |  string | - |  |
+
+
+
+
+### ExportDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated DataOrg | - |  |
 
 
 
@@ -2599,6 +2736,218 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_id_query |  zitadel.idp.v1.IDPIDQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_name_query |  zitadel.idp.v1.IDPNameQuery | - |  |
+
+
+
+
+### ImportDataError
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  string | - |  |
+| id |  string | - |  |
+| message |  string | - |  |
+
+
+
+
+### ImportDataOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated DataOrg | - |  |
+
+
+
+
+### ImportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs |  ImportDataOrg | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1 |  zitadel.v1.v1.ImportDataOrg | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_local |  ImportDataRequest.LocalInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_local |  ImportDataRequest.LocalInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_s3 |  ImportDataRequest.S3Input | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_s3 |  ImportDataRequest.S3Input | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_gcs |  ImportDataRequest.GCSInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_gcs |  ImportDataRequest.GCSInput | - |  |
+| timeout |  string | - |  |
+
+
+
+
+### ImportDataRequest.GCSInput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| bucket |  string | - |  |
+| serviceaccount_json |  string | - |  |
+| path |  string | - |  |
+
+
+
+
+### ImportDataRequest.LocalInput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+
+
+
+
+### ImportDataRequest.S3Input
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+| endpoint |  string | - |  |
+| access_key_id |  string | - |  |
+| secret_access_key |  string | - |  |
+| ssl |  bool | - |  |
+| bucket |  string | - |  |
+
+
+
+
+### ImportDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| errors | repeated ImportDataError | - |  |
+| success |  ImportDataSuccess | - |  |
+
+
+
+
+### ImportDataSuccess
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated ImportDataSuccessOrg | - |  |
+
+
+
+
+### ImportDataSuccessOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| project_ids | repeated string | - |  |
+| project_roles | repeated string | - |  |
+| oidc_app_ids | repeated string | - |  |
+| api_app_ids | repeated string | - |  |
+| human_user_ids | repeated string | - |  |
+| machine_user_ids | repeated string | - |  |
+| action_ids | repeated string | - |  |
+| trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
+| project_grants | repeated ImportDataSuccessProjectGrant | - |  |
+| user_grants | repeated ImportDataSuccessUserGrant | - |  |
+| org_members | repeated string | - |  |
+| project_members | repeated ImportDataSuccessProjectMember | - |  |
+| project_grant_members | repeated ImportDataSuccessProjectGrantMember | - |  |
+| oidc_ipds | repeated string | - |  |
+| jwt_idps | repeated string | - |  |
+| idp_links | repeated string | - |  |
+| user_links | repeated ImportDataSuccessUserLinks | - |  |
+| user_metadata | repeated ImportDataSuccessUserMetadata | - |  |
+| domains | repeated string | - |  |
+
+
+
+
+### ImportDataSuccessProjectGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| grant_id |  string | - |  |
+| project_id |  string | - |  |
+| org_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessProjectGrantMember
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| grant_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessProjectMember
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserLinks
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| external_user_id |  string | - |  |
+| display_name |  string | - |  |
+| idp_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserMetadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| key |  string | - |  |
 
 
 
@@ -3642,6 +3991,7 @@ this is en empty request
 | ----- | ---- | ----------- | ----------- |
 | org |  SetUpOrgRequest.Org | - | message.required: true<br />  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) user.human |  SetUpOrgRequest.Human | oneof field for the user managing the organisation |  |
+| roles | repeated string | specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty) |  |
 
 
 

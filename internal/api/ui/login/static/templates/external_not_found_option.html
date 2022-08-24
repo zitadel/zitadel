@@ -39,7 +39,7 @@
             <div class="lgn-suffix-wrapper">
                 <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
                        value="{{ .Username }}" required>
-                {{if .ShowUsername}}
+                {{if .ShowUsernameSuffix}}
                 <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
             </div>
@@ -65,6 +65,8 @@
                     <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "ExternalNotFoundOption.English"}}
                     </option>
                     <option value="it" id="it" {{if (selectedLanguage "it")}} selected {{end}}>{{t "ExternalNotFoundOption.Italian"}}
+                    </option>
+                    <option value="fr" id="fr" {{if (selectedLanguage "fr")}} selected {{end}}>{{t "ExternalNotFoundOption.French"}}
                     </option>
                 </select>
             </div>

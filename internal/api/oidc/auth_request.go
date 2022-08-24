@@ -143,12 +143,12 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		logging.Log("OIDC-aGh4q").Error("no user agent id")
+		logging.Error("no user agent id")
 		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
 	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
 	if err != nil {
-		logging.Log("OIDC-Ghgr3").WithError(err).Error("error retrieving user sessions")
+		logging.WithError(err).Error("error retrieving user sessions")
 		return err
 	}
 	if len(userIDs) == 0 {
@@ -158,7 +158,7 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 		UserID: userID,
 	}
 	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, userIDs)
-	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
+	logging.OnError(err).Error("error signing out")
 	return err
 }
 

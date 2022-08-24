@@ -22,16 +22,16 @@
     "DISCLAIMERLINK": "Ulteriori informazioni",
     "DOCUMENTATION": {
       "TITLE": "Documentazione",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "GETSTARTED": {
       "TITLE": "Come iniziare con ZITADEL",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "QUICKSTARTS": {
       "LABEL": "Primi passi",
       "TITLE": "Quickstarts",
-      "DESCRIPTION": "Iniziare rapidamente con ZITADEL."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Scorciatoie",
@@ -106,6 +106,7 @@
     "FINISHED": "Chiudi",
     "CHANGE": "Cambia",
     "REACTIVATE": "Riattiva",
+    "ACTIVATE": "Attiva",
     "DEACTIVATE": "Disattiva",
     "REFRESH": "Aggiorna",
     "LOGIN": "Accedi",
@@ -181,8 +182,9 @@
     "SIDEWIDE": "Tasti rapidi globali",
     "SHORTCUTS": {
       "HOME": "Vai alla panoramica",
-      "SYSTEM": "Vai al pagina di sistema",
+      "INSTANCE": "Vai alla pagina dell' istanza",
       "ORG": "Vai all'organizzazione",
+      "ORGSETTINGS": "Alle impostazioni dell'organizzazione",
       "ORGSWITCHER": "Cambia organizzazione",
       "ME": "Vai al profilo",
       "PROJECTS": "Vai ai progetti",
@@ -193,6 +195,8 @@
     }
   },
   "RESOURCEID": "Resource ID",
+  "NAME": "Name",
+  "VERSION": "Versione",
   "TABLE": {
     "NOROWS": "Nessun dato"
   },
@@ -706,6 +710,17 @@
       "TITLE": "Manager",
       "DESCRIPTION": "Questi manager possono modificare le impostazioni dell'istanza."
     },
+    "PAGES": {
+      "STATE": "Stato",
+      "DOMAINLIST": "Domini"
+    },
+    "STATE": {
+      "0": "Non specifico",
+      "1": "In fase di creazione",
+      "2": "Attiva",
+      "3": "In fase di arresto",
+      "4": "Arrestata"
+    },
     "VIEWS": {
       "TITLE": "Views",
       "DESCRIPTION": "Questa carta mostra i tuoi view ZITADEL.",
@@ -757,6 +772,8 @@
       "LISTDESCRIPTION": "Scegli un'organizzazione.",
       "ACTIVE": "Attivo",
       "CREATE": "Creare un'organizzazione",
+      "DEACTIVATE": "Disattiva organizzazione",
+      "REACTIVATE": "Riattiva organizzazione",
       "NOPERMISSION": "Non hai l'autorizzazione per accedere alle impostazioni dell'organizzazione.",
       "USERSELFACCOUNT": "Usa il tuo account personale come proprietario dell'organizzazione",
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
@@ -821,6 +838,16 @@
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo"
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Disattivare l'organizzazione",
+        "DESCRIPTION": "Stai per disattivate la tua organizzazione. Utenti dell' organizzazione non possono più accedere in seguito. Sei sicuro di procedere?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Riattivare l'organizzazione",
+        "DESCRIPTION": "Stai per riattivare la tua organizzazione. Utenti dell' organizzazione possono accedere nuovamente dopo l'attivazione. Vuoi procedere?"
+      }
     }
   },
   "SETTINGS": {
@@ -861,8 +888,9 @@
     "DEFAULTLANGUAGE": "Lingua standard",
     "LANGUAGE": {
       "de": "Deutsch",
+      "en": "English",
       "it": "Italiano",
-      "en": "English"
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -883,11 +911,21 @@
       "PROVIDER": "Fornitore SMS",
       "ADDPROVIDER": "Aggiungi fornitore SMS",
       "ADDPROVIDERDESCRIPTION": "Scegli uno dei provider disponibili e inserisci i dati richiesti.",
+      "REMOVEPROVIDER": "Elimina configurazione",
+      "REMOVEPROVIDER_DESC": "Stai per eliminare una configurazione. Vuoi continuare?",
+      "SMSPROVIDERSTATE": {
+        "0": "Non specificato",
+        "1": "Attivo",
+        "2": "Inattivo"
+      },
+      "ACTIVATED": "Fornitore attivato.",
+      "DEACTIVATED": "Fornitore disattivato.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio aggiunto con successo.",
+        "REMOVED": "Twilio rimosso con successo.",
         "CHANGETOKEN": "Cambia Token",
         "SETTOKEN": "Cambia Token",
         "TOKENSET": "Token cambiato con successo."
@@ -1028,10 +1066,10 @@
       "UNSAVED_DESCRIPTION": "Hai fatto delle modifiche senza salvare. Vuoi salvare ora?",
       "LOCALE": "Codice locale",
       "LOCALES": {
-        "de": "Tedesco",
-        "en": "Inglese",
+        "de": "Deutsch",
+        "en": "English",
         "it": "Italiano",
-        "fr": "Francese"
+        "fr": "Français"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1773,9 +1811,10 @@
     "3": "Altro"
   },
   "LANGUAGES": {
-    "de": "Tedesco",
+    "de": "Deutsch",
+    "en": "English",
     "it": "Italiano",
-    "en": "Inglese"
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",
