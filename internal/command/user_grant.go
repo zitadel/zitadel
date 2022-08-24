@@ -33,7 +33,7 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 	if !userGrant.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
 	}
-	err = c.checkUserGrantPreCondition(ctx, userGrant)
+	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -91,7 +91,7 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	}
 	userGrant.ProjectID = existingUserGrant.ProjectID
 	userGrant.ProjectGrantID = existingUserGrant.ProjectGrantID
-	err = c.checkUserGrantPreCondition(ctx, userGrant)
+	err = c.checkUserGrantPreCondition(ctx, userGrant, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -285,8 +285,8 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 	return writeModel, nil
 }
 
-func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant) error {
-	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID)
+func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) error {
+	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return err
@@ -294,7 +294,7 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	if !preConditions.UserExists {
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
 	}
-	if !preConditions.ProjectExists {
+	if usergrant.ProjectGrantID == "" && !preConditions.ProjectExists {
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
 	}
 	if usergrant.ProjectGrantID != "" && !preConditions.ProjectGrantExists {
