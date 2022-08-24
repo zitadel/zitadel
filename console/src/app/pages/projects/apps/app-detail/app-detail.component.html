@@ -154,7 +154,7 @@
             </form>
           </cnsl-card>
 
-          <cnsl-card>
+          <cnsl-card *ngIf="samlForm && app?.samlConfig">
             <form [formGroup]="samlForm">
               <cnsl-form-field class="formfield">
                 <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>

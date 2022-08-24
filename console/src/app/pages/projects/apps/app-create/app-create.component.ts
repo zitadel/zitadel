@@ -10,19 +10,19 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import {
-    APIAuthMethodType,
-    OIDCAppType,
-    OIDCAuthMethodType,
-    OIDCGrantType,
-    OIDCResponseType,
-    SAMLConfig,
+  APIAuthMethodType,
+  OIDCAppType,
+  OIDCAuthMethodType,
+  OIDCGrantType,
+  OIDCResponseType,
+  SAMLConfig,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
-    AddAPIAppRequest,
-    AddAPIAppResponse,
-    AddOIDCAppRequest,
-    AddOIDCAppResponse,
-    AddSAMLAppRequest,
+  AddAPIAppRequest,
+  AddAPIAppResponse,
+  AddOIDCAppRequest,
+  AddOIDCAppResponse,
+  AddSAMLAppRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -30,13 +30,13 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
-    BASIC_AUTH_METHOD,
-    CODE_METHOD,
-    getPartialConfigFromAuthMethod,
-    IMPLICIT_METHOD,
-    PK_JWT_METHOD,
-    PKCE_METHOD,
-    POST_METHOD,
+  BASIC_AUTH_METHOD,
+  CODE_METHOD,
+  getPartialConfigFromAuthMethod,
+  IMPLICIT_METHOD,
+  PK_JWT_METHOD,
+  PKCE_METHOD,
+  POST_METHOD,
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
 
@@ -162,7 +162,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
             this.oidcAppRequest.setAppType(oidcAppType);
           }
 
-          switch (this.OIDCAppType) {
+          switch (this.appType?.value.oidcAppType) {
             case OIDCAppType.OIDC_APP_TYPE_NATIVE:
               this.authMethods = [PKCE_METHOD];
 

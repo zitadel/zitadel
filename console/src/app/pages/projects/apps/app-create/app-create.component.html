@@ -2,7 +2,7 @@
   title="{{ 'APP.PAGES.CREATE' | translate }}"
   [createSteps]="
     appType?.value?.createType === AppCreateType.OIDC
-      ? appType?.value !== OIDCAppType.OIDC_APP_TYPE_NATIVE
+      ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
         ? 4
         : 3
       : appType?.value?.createType === AppCreateType.API
@@ -61,7 +61,8 @@
     <!-- skip for native OIDC and SAML applications -->
     <mat-step
       *ngIf="
-        (appType?.value?.createType === AppCreateType.OIDC && appType?.value !== OIDCAppType.OIDC_APP_TYPE_NATIVE) ||
+        (appType?.value?.createType === AppCreateType.OIDC &&
+          appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE) ||
         appType?.value?.createType === AppCreateType.API
       "
       [stepControl]="secondFormGroup"
@@ -98,17 +99,20 @@
       <ng-template matStepLabel>{{ 'APP.OIDC.REDIRECTSECTION' | translate }}</ng-template>
 
       <p class="step-title">{{ 'APP.OIDC.REDIRECTTITLE' | translate }}</p>
-      <p class="step-description cnsl-secondary-text" *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
       </p>
-      <p class="step-description cnsl-secondary-text" *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_WEB">
+      <p class="step-description cnsl-secondary-text" *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB">
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
       </p>
 
       <cnsl-redirect-uris
         class="redirect-section"
         [canWrite]="true"
-        [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
         (changedUris)="oidcAppRequest.setRedirectUrisList($any($event))"
         [urisList]="oidcAppRequest.toObject().redirectUrisList"
         [getValues]="requestRedirectValuesSubject$"
@@ -117,12 +121,18 @@
       </cnsl-redirect-uris>
 
       <p class="step-title">{{ 'APP.OIDC.POSTREDIRECTTITLE' | translate }}</p>
-      <p class="step-description cnsl-secondary-text" *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
       </p>
       <p
         class="step-description cnsl-secondary-text"
-        *ngIf="appType?.value === OIDCAppType.OIDC_APP_TYPE_WEB || appType?.value === OIDCAppType.OIDC_APP_TYPE_USER_AGENT"
+        *ngIf="
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB ||
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
+        "
       >
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
       </p>
@@ -134,7 +144,7 @@
         [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
         title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
         [getValues]="requestRedirectValuesSubject$"
-        [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
       >
       </cnsl-redirect-uris>
 
@@ -172,11 +182,7 @@
       <div
         class="saml-xml"
         [ngClass]="{ disabled: !!metadataUrl?.value }"
-        *ngIf="
-          decodedBase64 &&
-          samlAppRequest.toObject().metadataXml &&
-          !samlAppRequest.toObject().metadataUrl
-        "
+        *ngIf="decodedBase64 && samlAppRequest.toObject().metadataXml && !samlAppRequest.toObject().metadataUrl"
       >
         <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
         <ngx-codemirror
@@ -404,11 +410,7 @@
             <div
               class="saml-xml"
               [ngClass]="{ disabled: !!formMetadataUrl?.value }"
-              *ngIf="
-                decodedBase64 &&
-                samlAppRequest.toObject().metadataXml &&
-                !samlAppRequest.toObject().metadataUrl
-              "
+              *ngIf="decodedBase64 && samlAppRequest.toObject().metadataXml && !samlAppRequest.toObject().metadataUrl"
             >
               <ngx-codemirror
                 [(ngModel)]="decodedBase64"
@@ -432,7 +434,7 @@
             [urisList]="oidcAppRequest.toObject().redirectUrisList"
             title="{{ 'APP.OIDC.REDIRECT' | translate }}"
             [getValues]="requestRedirectValuesSubject$"
-            [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+            [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
           >
           </cnsl-redirect-uris>
 
@@ -443,7 +445,7 @@
             [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
             title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
             [getValues]="requestRedirectValuesSubject$"
-            [isNative]="appType?.value === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+            [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
           >
           </cnsl-redirect-uris>
         </div>
