@@ -120,10 +120,44 @@ Make sure to use the following configurations:
 
 ### Console
 
-To run console locally, navigate to the console subfolder and run `npm install` and then `npm start` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+Change to the console directory
 
-Console loads its environment from the [environment.json](https://github.com/zitadel/zitadel/blob/main/console/src/assets/environment.json), make sure to change the configuration to your instance project.
-When the backend is running locally ensure you are specifying your [localhost](http://localhost:8080/ui/console/assets/environment.json) endpoints.
+```bash
+cd ./console
+```
+
+Run the database and the backend locally
+
+```bash
+docker compose --file ../e2e/docker-compose.yaml up --detach db zitadel
+```
+
+Console loads its environment from the file console/src/assets/environment.json.
+Load it from your local target system.
+
+```bash
+curl -O ./src/assets/environment.json http://localhost:8080/ui/console/assets/environment.json
+```
+
+To generate source files from protos, run the following command
+```
+DOCKER_BUILDKIT=1 docker build -f ../build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o internal/api/ui/console/static
+```
+
+To run the console locally, run `npm install` and then `npm start` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+
+You can now also run end-to-end tests interactively.
+Open a new shell and change to the e2e directory
+
+```bash
+cd ./e2e
+```
+
+Start cypress and point it to your local dev server:
+
+```bash
+CYPRESS_BASE_URL=http://localhost:4200 npm start
+```
 
 ### API Definitions
 
