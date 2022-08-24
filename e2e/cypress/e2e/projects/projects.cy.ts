@@ -14,7 +14,7 @@ describe("projects", () => {
       apiAuth().then((api) => {
         ensureProjectDoesntExist(api, testProjectNameCreate);
       });
-      cy.visit(`/ui/console/projects`);
+      cy.visit(`/projects`);
     });
 
     it("should add a project", () => {
@@ -33,7 +33,7 @@ describe("projects", () => {
         apiAuth().then((api) => {
           ensureProjectExists(api, testProjectNameDeleteList);
         });
-        cy.visit(`/ui/console/projects`);
+        cy.visit(`/projects`);
       });
 
       it("removes the project", () => {
@@ -57,7 +57,7 @@ describe("projects", () => {
         apiAuth().then((api) => {
           ensureProjectExists(api, testProjectNameDeleteGrid);
         });
-        cy.visit(`/ui/console/projects`);
+        cy.visit(`/projects`);
       });
 
       it("removes the project", () => {

@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "prodbuild": "ng build --configuration production --base-href=/ui/console/",
-    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
+    "generate": "DOCKER_BUILDKIT=1 docker build -f ../build/console/Dockerfile .. --target npm-copy -o .."
   },
   "private": true,
   "dependencies": {

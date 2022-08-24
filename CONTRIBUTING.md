@@ -120,43 +120,68 @@ Make sure to use the following configurations:
 
 ### Console
 
-Change to the console directory
+Run the database and the latests backend locally.
+
 
 ```bash
+# Change to the console directory
 cd ./console
-```
 
-Run the database and the backend locally
-
-```bash
+# You just need the db and the zitadel services to develop the console against.
 docker compose --file ../e2e/docker-compose.yaml up --detach db zitadel
 ```
 
-Console loads its environment from the file console/src/assets/environment.json.
-Load it from your local target system.
+When the backend is ready, you have the latest zitadel exposed at http://localhost:8080.
+You can now run a local development server with live code reloading at http://localhost:4200.
+To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
+
+1. Navigate to http://localhost:8080/ui/console/projects.
+2. When propted, login with *zitadel-admin@zitadel.localhost* and *Password1!*.
+3. Select the *ZITADEL* project.
+3. Select the *Console* application.
+4. Select *Redirect Settings*
+5. Add *http://localhost:4200/auth/callback* to the *Redirect URIs*
+6. Add *http://localhost:4200/signedout* to the *Post Logout URIs*
+7. Select the *Save* button
+
+You can run the local console development server now.
 
 ```bash
+# Console loads its target environment from the file console/src/assets/environment.json.
+# Load it from the backend.
 curl -O ./src/assets/environment.json http://localhost:8080/ui/console/assets/environment.json
+
+# Generate source files from Protos
+npm run generate
+
+# Install npm dependencies
+npm install
+
+# Start the server
+npm start
 ```
 
-To generate source files from protos, run the following command
-```
-DOCKER_BUILDKIT=1 docker build -f ../build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o internal/api/ui/console/static
-```
-
-To run the console locally, run `npm install` and then `npm start` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-You can now also run end-to-end tests interactively.
-Open a new shell and change to the e2e directory
+Navigate to http://localhost:4200/.
+Make some changes to the source code and see how the browser is automatically reloaded.
+After making changes to the code, you should run the end-to-end-tests.
+Open another shell.
 
 ```bash
+# Change to the e2e directory
 cd ./e2e
+
+# Install npm dependencies
+npm install
+
+# Run all tests in a headless browser
+npm run e2e:dev
 ```
 
-Start cypress and point it to your local dev server:
+You can also open the test suite interactively for fast success feedback on specific tests.
 
 ```bash
-CYPRESS_BASE_URL=http://localhost:4200 npm start
+# Run all tests in a headless browser
+npm run open:dev
 ```
 
 ### API Definitions
