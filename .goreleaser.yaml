@@ -47,14 +47,6 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/amd64"
-  # Skips the docker push.
-  # Could be useful if you also do draft releases.
-  #
-  # If set to auto, the release will not be pushed to the Docker repository
-  #  in case there is an indicator of a prerelease in the tag, e.g. v1.0.0-rc1.
-  #
-  # Defaults to false.
-  skip_push: auto
 - image_templates:
     - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
     - ghcr.io/zitadel/zitadel:{{ .ShortCommit }}-arm64
@@ -63,7 +55,6 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/arm64"
-  skip_push: auto
 
 docker_manifests:
 - id: zitadel-latest
