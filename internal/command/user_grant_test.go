@@ -181,7 +181,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "org2", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("org2", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
@@ -386,7 +386,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: authz.NewMockContextWithPermissions("", "org2", "user", []string{domain.RoleProjectOwner}),
+				ctx: authz.NewMockContextWithPermissions("org2", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID:         "user1",
 					ProjectID:      "project1",
