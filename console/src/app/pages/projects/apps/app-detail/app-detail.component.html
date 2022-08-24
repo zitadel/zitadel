@@ -170,6 +170,7 @@
                 style="display: none"
                 class="file-input"
                 type="file"
+                accept="text/xml,application/xml"
                 (change)="onDropXML($any($event.target).files)"
               />
               <button mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
