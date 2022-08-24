@@ -341,25 +341,12 @@ jobs:
           docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
           docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
         if: steps.semantic.outputs.new_release_published == 'true'
-      - name: Docker Tag Latest
-        run: |
-          docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:latest
-          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:latest
-        if: steps.semantic.outputs.new_release_published == 'true'
       - name: Docker Push Version
         run: |
           docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
           docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
           docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
         if: steps.semantic.outputs.new_release_published == 'true'
-      - name: Docker Push Latest
-        run: |
-          docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:latest
-          docker push $REGISTRY/$CRDB_IMAGE_NAME:latest
-        if: steps.semantic.outputs.new_release_published == 'true'
-
       - name: Docker Tag Version
         run: |
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
