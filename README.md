@@ -53,8 +53,7 @@ It's free for up to 25'000 authenticated requests. Learn more  the [pay-as-you-g
 
 ### Quickstarts - Integrate your app
 
-- [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/guides/start/quickstart)
-- [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
+[Multiple Examples can be found here](https://docs.zitadel.com/docs/examples/introduction)
 
 > If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
 
