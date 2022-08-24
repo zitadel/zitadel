@@ -18,23 +18,23 @@ import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.com
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
-    APIAuthMethodType,
-    APIConfig,
-    App,
-    AppState,
-    OIDCAppType,
-    OIDCAuthMethodType,
-    OIDCConfig,
-    OIDCGrantType,
-    OIDCResponseType,
-    OIDCTokenType,
-    SAMLConfig,
+  APIAuthMethodType,
+  APIConfig,
+  App,
+  AppState,
+  OIDCAppType,
+  OIDCAuthMethodType,
+  OIDCConfig,
+  OIDCGrantType,
+  OIDCResponseType,
+  OIDCTokenType,
+  SAMLConfig,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
-    GetOIDCInformationResponse,
-    UpdateAPIAppConfigRequest,
-    UpdateOIDCAppConfigRequest,
-    UpdateSAMLAppConfigRequest,
+  GetOIDCInformationResponse,
+  UpdateAPIAppConfigRequest,
+  UpdateOIDCAppConfigRequest,
+  UpdateSAMLAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -43,15 +43,15 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
-    BASIC_AUTH_METHOD,
-    CODE_METHOD,
-    CUSTOM_METHOD,
-    getAuthMethodFromPartialConfig,
-    getPartialConfigFromAuthMethod,
-    IMPLICIT_METHOD,
-    PK_JWT_METHOD,
-    PKCE_METHOD,
-    POST_METHOD,
+  BASIC_AUTH_METHOD,
+  CODE_METHOD,
+  CUSTOM_METHOD,
+  getAuthMethodFromPartialConfig,
+  getPartialConfigFromAuthMethod,
+  IMPLICIT_METHOD,
+  PK_JWT_METHOD,
+  PKCE_METHOD,
+  POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
 
@@ -754,16 +754,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   get decodedBase64(): string {
-    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && typeof this.app.samlConfig.metadataXml === 'string') {
-      return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString();
+    if (
+      this.app &&
+      this.app.samlConfig &&
+      this.app.samlConfig.metadataXml &&
+      typeof this.app.samlConfig.metadataXml === 'string'
+    ) {
+      return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString('ascii');
     } else {
       return '';
     }
   }
 
-  set decodedBase64(xmlString) {
+  set decodedBase64(xmlString: string) {
     if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
-      const base64 = Buffer.from( xmlString, 'ascii').toString('base64');
+      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
 
       if (this.app.samlConfig) {
         this.app.samlConfig.metadataXml = base64;
