@@ -1,5 +1,8 @@
 module.exports = {
-    branches: [{name: '1.87.x', range: '1.87.x', channel: '1.87.x'}],
+    branches: [
+        {name: 'main'},
+        {name: '1.87.x', range: '1.87.x', channel: '1.87.x'},
+    ],
     plugins: [
         "@semantic-release/commit-analyzer",
         "@semantic-release/release-notes-generator",
