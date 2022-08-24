@@ -149,7 +149,7 @@ You can run the local console development server now.
 ```bash
 # Console loads its target environment from the file console/src/assets/environment.json.
 # Load it from the backend.
-curl -O ./src/assets/environment.json http://localhost:8080/ui/console/assets/environment.json
+curl http://localhost:8080/ui/console/assets/environment.json > ./src/assets/environment.json
 
 # Generate source files from Protos
 npm run generate
