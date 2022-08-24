@@ -2,7 +2,7 @@
   title="{{ app?.name }}"
   [hasActions]="isZitadel === false && (['project.app.write:' + projectId, 'project.app.write'] | hasRole | async)"
   docLink="https://docs.zitadel.com/docs/guides/basics/projects"
-  [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : 'API'"
+  [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : (app?.apiConfig ? 'API' : 'SAML')"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE"
   [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
   stateTooltip="{{ 'APP.PAGES.DETAIL.STATE.' + app?.state | translate }}"
