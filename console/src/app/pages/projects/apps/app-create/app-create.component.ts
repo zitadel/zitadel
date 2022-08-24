@@ -500,7 +500,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   get decodedBase64(): string {
     const samlReq = this.samlAppRequest.toObject();
     if (samlReq && samlReq.metadataXml && typeof samlReq.metadataXml === 'string') {
-      return Buffer.from(samlReq.metadataXml, 'base64').toString();
+      return Buffer.from(samlReq.metadataXml, 'base64').toString('ascii');
     } else {
       return '';
     }
