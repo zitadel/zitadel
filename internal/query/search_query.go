@@ -90,6 +90,52 @@ func (q *orQuery) comp() sq.Sqlizer {
 	return or
 }
 
+type ColumnComparisonQuery struct {
+	Column1 Column
+	Compare ColumnComparison
+	Column2 Column
+}
+
+func NewColumnComparisonQuery(col1 Column, col2 Column, compare ColumnComparison) (*ColumnComparisonQuery, error) {
+	if compare < 0 || compare >= columnCompareMax {
+		return nil, ErrInvalidCompare
+	}
+	if col1.isZero() {
+		return nil, ErrMissingColumn
+	}
+	if col2.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &ColumnComparisonQuery{
+		Column1: col1,
+		Column2: col2,
+		Compare: compare,
+	}, nil
+}
+
+func (q *ColumnComparisonQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (s *ColumnComparisonQuery) comp() sq.Sqlizer {
+	switch s.Compare {
+	case ColumnEquals:
+		return sq.Expr(s.Column1.identifier() + " = " + s.Column2.identifier())
+	case ColumnNotEquals:
+		return sq.Expr(s.Column1.identifier() + " != " + s.Column2.identifier())
+	}
+	return nil
+}
+
+type ColumnComparison int
+
+const (
+	ColumnEquals ColumnComparison = iota
+	ColumnNotEquals
+
+	columnCompareMax
+)
+
 type TextQuery struct {
 	Column  Column
 	Text    string
@@ -97,9 +143,10 @@ type TextQuery struct {
 }
 
 var (
-	ErrInvalidCompare = errors.New("invalid compare")
-	ErrMissingColumn  = errors.New("missing column")
-	ErrInvalidNumber  = errors.New("value is no number")
+	ErrNothingSelected = errors.New("nothing selected")
+	ErrInvalidCompare  = errors.New("invalid compare")
+	ErrMissingColumn   = errors.New("missing column")
+	ErrInvalidNumber   = errors.New("value is no number")
 )
 
 func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
@@ -263,77 +310,44 @@ func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	}
 }
 
-func NewInQuery(c Column, value string, compare TextComparison, inColumn, selectedColumn Column, linkingEquals []string) (*InQuery, error) {
-	textQuery, err := NewTextQuery(c, value, compare)
-	if err != nil {
-		return nil, err
+type SubSelect struct {
+	Column  Column
+	Queries []SearchQuery
+}
+
+func NewSubSelect(c Column, queries []SearchQuery) (*SubSelect, error) {
+	if queries == nil || len(queries) == 0 {
+		return nil, ErrNothingSelected
+	}
+	if c.isZero() {
+		return nil, ErrMissingColumn
 	}
 
-	return &InQuery{
-		InColumn:       inColumn,
-		SelectedColumn: selectedColumn,
-		TextQuery:      textQuery,
-		LinkingEquals:  linkingEquals,
+	return &SubSelect{
+		Column:  c,
+		Queries: queries,
 	}, nil
 }
 
-type InQuery struct {
-	InColumn       Column
-	SelectedColumn Column
-	TextQuery      *TextQuery
-	LinkingEquals  []string
-}
-
-func (q *InQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *SubSelect) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *InQuery) comp() sq.Sqlizer {
-	exists := sq.Select(q.SelectedColumn.identifier()).Prefix(q.InColumn.identifier() + " IN (").From(q.TextQuery.Column.table.name)
-	exists = q.TextQuery.toQuery(exists)
-	for _, linkingEquals := range q.LinkingEquals {
-		exists = exists.Where(linkingEquals)
+func (q *SubSelect) comp() sq.Sqlizer {
+	selectQuery := sq.Select(q.Column.identifier()).From(q.Column.table.name)
+	for _, query := range q.Queries {
+		selectQuery = query.toQuery(selectQuery)
 	}
-	return exists.Suffix(")")
-}
-
-func NewExistsQuery(c Column, value string, compare TextComparison, linkingEquals []string) (*ExistQuery, error) {
-	textQuery, err := NewTextQuery(c, value, compare)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ExistQuery{
-		TextQuery:     textQuery,
-		LinkingEquals: linkingEquals,
-	}, nil
-}
-
-type ExistQuery struct {
-	TextQuery     *TextQuery
-	LinkingEquals []string
-}
-
-func (q *ExistQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	return query.Where(q.comp())
-}
-
-func (q *ExistQuery) comp() sq.Sqlizer {
-	exists := sq.Select("1").Prefix("EXISTS (").From(q.TextQuery.Column.table.name)
-	exists = q.TextQuery.toQuery(exists)
-	for _, linkingEquals := range q.LinkingEquals {
-		exists = exists.Where(linkingEquals)
-	}
-	return exists.Suffix(")")
+	return selectQuery
 }
 
 type ListQuery struct {
 	Column  Column
-	List    []interface{}
+	Data    interface{}
 	Compare ListComparison
 }
 
-func NewListQuery(column Column, value []interface{}, compare ListComparison) (*ListQuery, error) {
+func NewListQuery(column Column, value interface{}, compare ListComparison) (*ListQuery, error) {
 	if compare < 0 || compare >= listCompareMax {
 		return nil, ErrInvalidCompare
 	}
@@ -342,7 +356,7 @@ func NewListQuery(column Column, value []interface{}, compare ListComparison) (*
 	}
 	return &ListQuery{
 		Column:  column,
-		List:    value,
+		Data:    value,
 		Compare: compare,
 	}, nil
 }
@@ -354,7 +368,19 @@ func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *ListQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case ListIn:
-		return sq.Eq{s.Column.identifier(): s.List}
+		if subSelect, ok := s.Data.(*SubSelect); ok {
+			subSelect, args, err := subSelect.comp().ToSql()
+			if err != nil {
+				return nil
+			}
+			return sq.Expr(s.Column.identifier()+" IN ( "+subSelect+" )", args...)
+		} else if list, ok := s.Data.([]interface{}); ok {
+			return sq.Eq{s.Column.identifier(): list}
+		} else if list, ok := s.Data.([]string); ok {
+			return sq.Eq{s.Column.identifier(): list}
+		} else if list, ok := s.Data.([]int); ok {
+			return sq.Eq{s.Column.identifier(): list}
+		}
 	}
 	return nil
 }
