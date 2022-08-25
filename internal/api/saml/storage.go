@@ -56,12 +56,10 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 	if err != nil {
 		return nil, err
 	}
-	metadata := app.SAMLConfig.Metadata
-
 	return serviceprovider.NewServiceProvider(
 		app.ID,
 		&serviceprovider.Config{
-			Metadata: metadata,
+			Metadata: app.SAMLConfig.Metadata,
 			URL:      app.SAMLConfig.MetadataURL,
 		},
 		p.defaultLoginURL,
@@ -101,7 +99,7 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
+		return nil, errors.ThrowPreconditionFailed(nil, "SAML-sd436", "no user agent id")
 	}
 
 	authRequest := CreateAuthRequestToBusiness(ctx, req, acsUrl, protocolBinding, applicationID, relayState, userAgentID)
@@ -119,20 +117,9 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
+		return nil, errors.ThrowPreconditionFailed(nil, "SAML-D3g21", "no user agent id")
 	}
 	resp, err := p.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
-	if err != nil {
-		return nil, err
-	}
-	return AuthRequestFromBusiness(resp)
-}
-
-func (p *Storage) AuthRequestByCode(ctx context.Context, code string) (_ models.AuthRequestInt, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	resp, err := p.repo.AuthRequestByCode(ctx, code)
 	if err != nil {
 		return nil, err
 	}
@@ -147,31 +134,7 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, userinfo models.Att
 		return err
 	}
 
-	for _, attribute := range attributes {
-		switch attribute {
-		case provider.AttributeEmail:
-			userinfo.SetEmail(user.Human.Email)
-		case provider.AttributeSurname:
-			userinfo.SetSurname(user.Human.LastName)
-		case provider.AttributeFullName:
-			userinfo.SetFullName(user.Human.DisplayName)
-		case provider.AttributeGivenName:
-			userinfo.SetGivenName(user.Human.FirstName)
-		case provider.AttributeUsername:
-			userinfo.SetUsername(user.PreferredLoginName)
-		case provider.AttributeUserID:
-			userinfo.SetUserID(userID)
-		}
-	}
-	if attributes == nil || len(attributes) == 0 {
-		userinfo.SetEmail(user.Human.Email)
-		userinfo.SetSurname(user.Human.LastName)
-		userinfo.SetGivenName(user.Human.FirstName)
-		userinfo.SetFullName(user.Human.DisplayName)
-		userinfo.SetUsername(user.PreferredLoginName)
-		userinfo.SetUserID(userID)
-	}
-	return nil
+	return setUserinfo(user, userinfo, attributes)
 }
 
 func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.AttributeSetter, loginName string, attributes []int) (err error) {
@@ -187,6 +150,10 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 		return err
 	}
 
+	return setUserinfo(user, userinfo, attributes)
+}
+
+func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes []int) error {
 	for _, attribute := range attributes {
 		switch attribute {
 		case provider.AttributeEmail:

@@ -60,6 +60,7 @@ const (
 
 	appSAMLTableSuffix             = "saml_configs"
 	AppSAMLConfigColumnAppID       = "app_id"
+	AppSAMLConfigColumnInstanceID  = "instance_id"
 	AppSAMLConfigColumnEntityID    = "entity_id"
 	AppSAMLConfigColumnMetadata    = "metadata"
 	AppSAMLConfigColumnMetadataURL = "metadata_url"
@@ -128,11 +129,12 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+			crdb.NewColumn(AppSAMLConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppSAMLConfigColumnEntityID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppSAMLConfigColumnMetadata, crdb.ColumnTypeBytes),
 			crdb.NewColumn(AppSAMLConfigColumnMetadataURL, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(AppSAMLConfigColumnAppID),
+			crdb.NewPrimaryKey(AppSAMLConfigColumnAppID, AppSAMLConfigColumnInstanceID),
 			appSAMLTableSuffix,
 			crdb.WithIndex(crdb.NewIndex("entity_id_idx", []string{AppSAMLConfigColumnEntityID})),
 		),
@@ -567,7 +569,6 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.SAMLConfigAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-nlDOv", "seq", event.Sequence(), "expectedType", project.SAMLConfigAddedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
 	}
 	return crdb.NewMultiStatement(
@@ -575,6 +576,7 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppSAMLConfigColumnAppID, e.AppID),
+				handler.NewCol(AppSAMLConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppSAMLConfigColumnEntityID, e.EntityID),
 				handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata),
 				handler.NewCol(AppSAMLConfigColumnMetadataURL, e.MetadataURL),
@@ -588,6 +590,7 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil
@@ -607,6 +610,9 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 	if e.MetadataURL != nil {
 		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadataURL, *e.MetadataURL))
 	}
+	if e.EntityID != nil {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnEntityID, *e.EntityID))
+	}
 
 	if len(cols) == 0 {
 		return crdb.NewNoOpStatement(e), nil
@@ -618,6 +624,7 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 			cols,
 			[]handler.Condition{
 				handler.NewCond(AppSAMLConfigColumnAppID, e.AppID),
+				handler.NewCond(AppSAMLConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(appSAMLTableSuffix),
 		),
@@ -628,6 +635,7 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
 	), nil

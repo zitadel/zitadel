@@ -249,8 +249,13 @@ Errors:
       NotInactive: L'application n'est pas inactive
       OIDCConfigInvalid: La configuration de l'OIDC n'est pas valide
       APIConfigInvalid: La configuration de l'API n'est pas valide
-      IsNotOIDC: L'application n'est pas de type oidc
+      SAMLConfigInvalid: La configuration de l'SAML n'est pas valide
+      IsNotOIDC: L'application n'est pas de type OIDC
       IsNotAPI: L'application n'est pas de type API
+      IsNotSAML: L'application n'est pas de type SAML
+      SAMLMetadataMissing: Les métadonnées SAML sont manquantes
+      SAMLMetadataFormat: Erreur de format des métadonnées SAML
+      SAMLEntityIDAlreadyExisting: SAML EntityID déjà existant
       OIDCAuthMethodNoSecret: La méthode d'authentification OIDC choisie ne nécessite pas de secret.
       APIAuthMethodNoSecret: La méthode d'authentification API choisie ne nécessite pas de secret.
       AuthMethodNoPrivateKeyJWT: La méthode d'authentification choisie ne nécessite pas de clé.

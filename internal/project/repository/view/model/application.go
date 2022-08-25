@@ -58,7 +58,7 @@ type ApplicationView struct {
 	ClockSkew                  time.Duration  `json:"clockSkew" gorm:"column:clock_skew"`
 
 	IsSAML      bool   `json:"-" gorm:"column:is_saml"`
-	Metadata    string `json:"metadata" gorm:"column:metadata"`
+	Metadata    []byte `json:"metadata" gorm:"column:metadata"`
 	MetadataURL string `json:"metadata_url" gorm:"column:metadata_url"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`

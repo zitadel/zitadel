@@ -2,12 +2,14 @@ package saml
 
 import (
 	"context"
+	"time"
+
 	"github.com/zitadel/saml/pkg/provider/models"
 	"github.com/zitadel/saml/pkg/provider/xml/samlp"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"time"
 )
 
 var _ models.AuthRequestInt = &AuthRequest{}
@@ -72,7 +74,7 @@ func (a *AuthRequest) Done() bool {
 
 func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ models.AuthRequestInt, err error) {
 	if _, ok := authReq.Request.(*domain.AuthRequestSAML); !ok {
-		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Hbz7A", "auth request is not of type saml")
+		return nil, errors.ThrowInvalidArgument(nil, "SAML-Hbz7A", "auth request is not of type saml")
 	}
 	return &AuthRequest{authReq}, nil
 }

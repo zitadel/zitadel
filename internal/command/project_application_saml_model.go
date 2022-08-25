@@ -14,6 +14,7 @@ type SAMLApplicationWriteModel struct {
 
 	AppID       string
 	AppName     string
+	EntityID    string
 	Metadata    []byte
 	MetadataURL string
 
@@ -119,6 +120,7 @@ func (wm *SAMLApplicationWriteModel) appendAddSAMLEvent(e *project.SAMLConfigAdd
 	wm.saml = true
 	wm.Metadata = e.Metadata
 	wm.MetadataURL = e.MetadataURL
+	wm.EntityID = e.EntityID
 }
 
 func (wm *SAMLApplicationWriteModel) appendChangeSAMLEvent(e *project.SAMLConfigChangedEvent) {
@@ -127,6 +129,9 @@ func (wm *SAMLApplicationWriteModel) appendChangeSAMLEvent(e *project.SAMLConfig
 	}
 	if e.MetadataURL != nil {
 		wm.MetadataURL = *e.MetadataURL
+	}
+	if e.EntityID != nil {
+		wm.EntityID = *e.EntityID
 	}
 }
 
@@ -164,11 +169,14 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 	if wm.MetadataURL != metadataURL {
 		changes = append(changes, project.ChangeMetadataURL(metadataURL))
 	}
+	if wm.EntityID != entityID {
+		changes = append(changes, project.ChangeEntityID(entityID))
+	}
 
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewSAMLConfigChangedEvent(ctx, aggregate, appID, entityID, changes)
+	changeEvent, err := project.NewSAMLConfigChangedEvent(ctx, aggregate, appID, changes)
 	if err != nil {
 		return nil, false, err
 	}

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 const (
@@ -54,11 +55,15 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 }
 
 func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	callback := ""
-	if _, ok := authReq.Request.(*domain.AuthRequestOIDC); ok {
+	var callback string
+	switch authReq.Request.(type) {
+	case *domain.AuthRequestOIDC:
 		callback = l.oidcAuthCallbackURL(r.Context(), authReq.ID)
-	} else if _, ok := authReq.Request.(*domain.AuthRequestSAML); ok {
+	case *domain.AuthRequestSAML:
 		callback = l.samlAuthCallbackURL(r.Context(), authReq.ID)
+	default:
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "LOGIN-rhjQF", "Errors.AuthRequest.RequestTypeNotSupported"))
+		return
 	}
 	http.Redirect(w, r, callback, http.StatusFound)
 }

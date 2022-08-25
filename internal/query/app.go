@@ -62,6 +62,7 @@ type OIDCApp struct {
 type SAMLApp struct {
 	Metadata    []byte
 	MetadataURL string
+	EntityID    string
 }
 
 type APIApp struct {
@@ -803,6 +804,7 @@ func (c sqlSAMLConfig) set(app *App) {
 	app.SAMLConfig = &SAMLApp{
 		MetadataURL: c.metadataURL.String,
 		Metadata:    c.metadata,
+		EntityID:    c.entityID.String,
 	}
 }
 

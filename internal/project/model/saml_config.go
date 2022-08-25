@@ -7,10 +7,10 @@ import (
 type SAMLConfig struct {
 	es_models.ObjectRoot
 	AppID       string
-	Metadata    string
+	Metadata    []byte
 	MetadataURL string
 }
 
 func (c *SAMLConfig) IsValid() bool {
-	return true
+	return !(c.Metadata == nil && c.MetadataURL == "")
 }

@@ -65,6 +65,7 @@ func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.S
 		State:       writeModel.State,
 		Metadata:    writeModel.Metadata,
 		MetadataURL: writeModel.MetadataURL,
+		EntityID:    writeModel.EntityID,
 	}
 }
 

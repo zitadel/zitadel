@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	UniqueEntityIDType    = "entity_ids"
 	SAMLConfigAddedType   = applicationEventTypePrefix + "config.saml.added"
 	SAMLConfigChangedType = applicationEventTypePrefix + "config.saml.changed"
 )
@@ -27,8 +28,15 @@ func (e *SAMLConfigAddedEvent) Data() interface{} {
 	return e
 }
 
+func NewAddSAMLConfigEntityIDUniqueConstraint(entityID, resourceOwner string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		UniqueEntityIDType,
+		entityID+":"+resourceOwner,
+		"Errors.Project.App.SAMLEntityIDAlreadyExists")
+}
+
 func (e *SAMLConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID, e.Aggregate().ResourceOwner)}
 }
 
 func NewSAMLConfigAddedEvent(
@@ -69,7 +77,7 @@ type SAMLConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AppID       string  `json:"appId"`
-	EntityID    string  `json:"entityId"`
+	EntityID    *string `json:"entityId"`
 	Metadata    []byte  `json:"metadata,omitempty"`
 	MetadataURL *string `json:"metadata_url,omitempty"`
 }
@@ -86,7 +94,6 @@ func NewSAMLConfigChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	entityID string,
 	changes []SAMLConfigChanges,
 ) (*SAMLConfigChangedEvent, error) {
 	if len(changes) == 0 {
@@ -99,8 +106,7 @@ func NewSAMLConfigChangedEvent(
 			aggregate,
 			SAMLConfigChangedType,
 		),
-		AppID:    appID,
-		EntityID: entityID,
+		AppID: appID,
 	}
 	for _, change := range changes {
 		change(changeEvent)
@@ -119,6 +125,12 @@ func ChangeMetadata(metadata []byte) func(event *SAMLConfigChangedEvent) {
 func ChangeMetadataURL(metadataURL string) func(event *SAMLConfigChangedEvent) {
 	return func(e *SAMLConfigChangedEvent) {
 		e.MetadataURL = &metadataURL
+	}
+}
+
+func ChangeEntityID(entityID string) func(event *SAMLConfigChangedEvent) {
+	return func(e *SAMLConfigChangedEvent) {
+		e.EntityID = &entityID
 	}
 }
 
