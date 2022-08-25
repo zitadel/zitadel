@@ -120,8 +120,19 @@ Make sure to use the following configurations:
 
 ### Console
 
-Run the database and the latests backend locally.
+By executing the commands of this section, you run everything you need to develop the console locally.
+The CockroachDB and the latest released ZITADEL binary are run in Docker containers on your local machine.
+You use the ZITADEL container as backend for your console.
+The console is run in your node environment using the angular development server, so you have fast feedback about your changes.
+Also, you learn how to run end-to-end tests and tear everything down, once you are happy with your changes.
 
+The commands are tested against the following software versions:
+- Docker version 20.10.17
+- Node version v16.16.0
+- npm version 8.11.0
+- curl version 7.58.0
+
+Run the database and the latests backend locally.
 
 ```bash
 # Change to the console directory
@@ -162,7 +173,7 @@ npm start
 ```
 
 Navigate to http://localhost:4200/.
-Make some changes to the source code and see how the browser is automatically reloaded.
+Make some changes to the source code and see how the browser is automatically updated.
 After making changes to the code, you should run the end-to-end-tests.
 Open another shell.
 
@@ -182,6 +193,13 @@ You can also open the test suite interactively for fast success feedback on spec
 ```bash
 # Run all tests in a headless browser
 npm run open:dev
+```
+
+When you are happy with your changes, you can cleanup your environment
+
+```bash
+# Stop and remove the docker containers for zitadel and the database
+docker compose down
 ```
 
 ### API Definitions
