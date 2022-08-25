@@ -7,11 +7,15 @@ services:
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
       ZITADEL_EXTERNALSECURE: false
+      ZITADEL_DATABASE_COCKROACH_HOST: db
 
     depends_on:
       db:
         condition: 'service_healthy'
-    network_mode: "host"
+    ports:
+      - '8080:8080'
+    networks:
+      - zitadel
 
   db:
     restart: 'always'
@@ -23,7 +27,11 @@ services:
       timeout: '30s'
       retries: 5
       start_period: '20s'
-    network_mode: "host"
+    ports:
+      - '9090:8080'
+      - '26257:26257'
+    networks:
+      - zitadel
 
   npm-install:
     image: node:18-alpine3.15
@@ -44,7 +52,7 @@ services:
     working_dir: /e2e
     volumes:
     - .:/e2e
-    network_mode: "host"
+    network_mode: host
 
 networks:
   zitadel:
