@@ -21,3 +21,7 @@
 	  includeSubDomains;
 	  preload'''
     
+[[redirects]]
+  from = "/docs/quickstarts/introduction"
+  to = "/docs/examples/introduction"
+  status = 301

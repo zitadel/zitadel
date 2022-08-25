@@ -1,14 +1,3 @@
-<p align="right">
-    <img src="./docs/static/img/github-header01-dark@2x.png#gh-dark-mode-only" alt="ZITADEL Cloud launched" max-height="200px" width="auto" />
-    <img src="./docs/static/img/github-header01-light@2x.png#gh-light-mode-only" alt="ZITADEL Cloud launched" max-height="200px" width="auto" />
-</p>
-
-<p align="center">
-    We are live on <a href="https://www.producthunt.com/posts/zitadel">ProductHunt</a>. <br> Thank you for the support and feedback.
-</p>
-
----
-
 <p align="center">
     <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
     <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" max-height="200px" width="auto" />
@@ -48,16 +37,15 @@ With ZITADEL you rely on a battle tested, hardened and extensible turnkey soluti
 
 ---
 
-**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://docs.zitadel.ch/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
+**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://docs.zitadel.com/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
 
 ## Get started
 
 ### ZITADEL Cloud (SaaS)
 
-The easiest way to get started with ZITADEL is to use our public cloud offering.
-Currently ZITADEL V2 Beta is available, head over to [https://zitadel.cloud](https://zitadel.cloud) and create your first ZITADEL instance for free.
+The easiest way to get started with [ZITADEL Cloud](https://zitadel.cloud).
 
-You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
+It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Install ZITADEL
 
@@ -65,8 +53,7 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
 
 ### Quickstarts - Integrate your app
 
-- [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/guides/start/quickstart)
-- [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
+[Multiple Examples can be found here](https://docs.zitadel.com/docs/examples/introduction)
 
 > If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
 
@@ -74,7 +61,7 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
 
 - [API-first](https://docs.zitadel.com/docs/apis/introduction)
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview)
-- [Actions](https://docs.zitadel.ch/docs/concepts/features/actions) to react on events with custom code
+- [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code
 - [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience
 - [CockroachDB](https://www.cockroachlabs.com/) is the only dependency
 
@@ -95,6 +82,8 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing).
 - [OpenID Connect certified](https://openid.net/certification/#OPs)
 - 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
 - 🚧 [Postgres](https://github.com/zitadel/zitadel/pull/3998)
+
+Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
 ## Client libraries
 
