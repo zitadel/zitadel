@@ -110,27 +110,85 @@ We add the label "good first issue" for problems we think are a good starting po
 
 ### Backend / Login
 
-To keep the code clean and understandable we use [golangci-lint](https://golangci-lint.run). We recommend to format the code with this linter while working on ZITADEL to simplify the review process. The configuration is located [here](./.golangci.yaml).
+<!-- TODO: Add links -->
 
-To start the backend with a debugger run the [`main.go`-file](./main.go) located in the root of ZITADEL and provide the arguments and env-variables from below. Ensure that the database is running by running `docker compose -f ./build/local/docker-compose.yml up db`. For additional information please use the documentation of your IDE.
+By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
+Using Docker Compose, you run a CockroachDB on your local machine.
+With [goreleaser](https://opencollective.com/goreleaser), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
+Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
+Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
-Make sure to use the following configurations:
+The commands in this section are tested against the following software versions:
+<!-- TODO: complete, link and update -->
+- Docker version 20.10.17
+- Goreleaser version v1.8.3
+- Go version 1.17.5
+- Delve 1.9.1
 
-<!-- TODO: document workflow -->
+<!-- TODO: Describe linting (@adlerhurst) -->
+
+Make some changes to the source code, then run the database locally.
+
+```bash
+# You just need the db service to develop the backend against.
+docker compose --file ./e2e/docker-compose.yaml up --detach db
+```
+
+Build the binary. This takes some minutes, but you can speed up rebuilds.
+
+```bash
+# You just need goreleasers build part (--snapshot) and you just need to target your current platform (--single-target)
+goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+```
+
+> Note: With this command, several steps are executed.
+> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
+> Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
+> Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
+> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel-npm-console --target angular-export -o internal/api/ui/console/static/`  
+> Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`  
+
+You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
+You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
+Also, you can verify the data by running `cockroach sql --database zitadel --insecure` and running SQL queries.
+
+As soon as you are ready to battle test your changes, run the end-to-end tests.
+
+```bash
+# Build the production binary (unit tests are executed, too)
+goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+
+# Pack the binary into a docker image
+DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
+
+# Run the tests
+ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run e2e
+```
+
+When you are happy with your changes, you can cleanup your environment.
+
+```bash
+# Stop and remove the docker containers for zitadel and the database
+docker compose --file ./e2e/docker-compose.yaml down
+```
 
 ### Console
 
-By executing the commands of this section, you run everything you need to develop the console locally.
-The CockroachDB and the latest released ZITADEL binary are run in Docker containers on your local machine.
+<!-- TODO: Add links -->
+
+By executing the commands from this section, you run everything you need to develop the console locally.
+Using Docker Compose, you run CockroachDB and the latest released ZITADEL binary on your local machine.
 You use the ZITADEL container as backend for your console.
 The console is run in your node environment using the angular development server, so you have fast feedback about your changes.
-Also, you learn how to run end-to-end tests and tear everything down, once you are happy with your changes.
+Once you are happy with your changes, you run end-to-end tests and tear everything down, .
 
-The commands are tested against the following software versions:
+The commands in this section are tested against the following software versions:
+<!-- TODO: complete, link and update -->
 - Docker version 20.10.17
 - Node version v16.16.0
 - npm version 8.11.0
 - curl version 7.58.0
+- https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies
 
 Run the database and the latests backend locally.
 
@@ -147,12 +205,12 @@ You can now run a local development server with live code reloading at http://lo
 To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
 
 1. Navigate to http://localhost:8080/ui/console/projects.
-2. When propted, login with *zitadel-admin@zitadel.localhost* and *Password1!*.
+2. When propted, login with *zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost* and *Password1!*.
 3. Select the *ZITADEL* project.
 3. Select the *Console* application.
 4. Select *Redirect Settings*
-5. Add *http://localhost:4200/auth/callback* to the *Redirect URIs*
-6. Add *http://localhost:4200/signedout* to the *Post Logout URIs*
+5. Add *http://<span because="breaks the link"></span>localhost:4200/auth/callback* to the *Redirect URIs*
+6. Add *http://<span because="breaks the link"></span>localhost:4200/signedout* to the *Post Logout URIs*
 7. Select the *Save* button
 
 You can run the local console development server now.
@@ -201,21 +259,6 @@ When you are happy with your changes, you can cleanup your environment
 # Stop and remove the docker containers for zitadel and the database
 docker compose down
 ```
-
-### API Definitions
-
-Ensure the provided code meets the [official style guide](https://developers.google.com/protocol-buffers/docs/style).
-
-The following docker command builds the grpc stub into the correct folders:
-
-```bash
-docker build -f build/grpc/Dockerfile -t zitadel-base:local . \
-    && docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .
-```
-
-### Testing
-
-<!-- TODO: how to run E2E tests -->
 
 ## Contribute Docs
 
