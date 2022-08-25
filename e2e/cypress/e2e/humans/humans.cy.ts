@@ -26,14 +26,22 @@ describe("humans", () => {
         .parents('[data-e2e="create-user-button"]')
         .click();
       cy.url().should("contain", "users/create");
-      cy.get('[formcontrolname="email"]').type(loginname("e2ehuman"));
+      cy.get('[formcontrolname="email"]')
+        .focus()
+        .type(loginname("e2ehuman", Cypress.env("ORGANIZATION")));
       //force needed due to the prefilled username prefix
-      cy.get('[formcontrolname="userName"]').type(testHumanUserNameAdd, {
-        force: true,
-      });
-      cy.get('[formcontrolname="firstName"]').type("e2ehumanfirstname");
-      cy.get('[formcontrolname="lastName"]').type("e2ehumanlastname");
-      cy.get('[formcontrolname="phone"]').type("+41 123456789");
+      cy.get('[formcontrolname="userName"]')
+        .focus()
+        .type(testHumanUserNameAdd);
+      cy.get('[formcontrolname="firstName"]')
+        .focus()
+        .type("e2ehumanfirstname");
+      cy.get('[formcontrolname="lastName"]')
+        .focus()
+        .type("e2ehumanlastname");
+      cy.get('[formcontrolname="phone"]')
+        .focus()
+        .type("+41 123456789");
       cy.get('[data-e2e="create-button"]').click();
       cy.get(".data-e2e-success");
       cy.wait(200);
@@ -55,10 +63,10 @@ describe("humans", () => {
         // doesn't work, need to force click.
         // .trigger('mouseover')
         .find('[data-e2e="enabled-delete-button"]')
-        .click({ force: true });
+        .click({force: true});
       cy.get('[data-e2e="confirm-dialog-input"]')
-        .click()
-        .type(loginname(testHumanUserNameRemove, Cypress.env("org")));
+        .focus()
+        .type(loginname(testHumanUserNameRemove, Cypress.env("ORGANIZATION")));
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get(".data-e2e-success");
       cy.wait(200);

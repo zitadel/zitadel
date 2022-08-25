@@ -27,11 +27,15 @@ describe("machines", () => {
         .click();
       cy.url().should("contain", "users/create-machine");
       //force needed due to the prefilled username prefix
-      cy.get('[formcontrolname="userName"]').type(testMachineUserNameAdd, {
-        force: true,
-      });
-      cy.get('[formcontrolname="name"]').type("e2emachinename");
-      cy.get('[formcontrolname="description"]').type("e2emachinedescription");
+      cy.get('[formcontrolname="userName"]')
+        .focus()
+        .type(testMachineUserNameAdd);
+      cy.get('[formcontrolname="name"]')
+      .focus()
+      .type("e2emachinename");
+      cy.get('[formcontrolname="description"]')
+      .focus()
+      .type("e2emachinedescription");
       cy.get('[data-e2e="create-button"]').click();
       cy.get(".data-e2e-success");
       cy.wait(200);
@@ -53,10 +57,10 @@ describe("machines", () => {
         // doesn't work, need to force click.
         // .trigger('mouseover')
         .find('[data-e2e="enabled-delete-button"]')
-        .click({ force: true });
+        .click({force: true});
       cy.get('[data-e2e="confirm-dialog-input"]')
-        .click()
-        .type(loginname(testMachineUserNameRemove, Cypress.env("org")));
+        .focus()
+        .type(loginname(testMachineUserNameRemove, Cypress.env("ORGANIZATION")));
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get(".data-e2e-success");
       cy.wait(200);
