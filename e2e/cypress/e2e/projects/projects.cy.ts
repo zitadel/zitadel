@@ -42,7 +42,7 @@ describe("projects", () => {
         cy.contains("tr", testProjectNameDeleteList, { timeout: 1000 })
           .find('[data-e2e="delete-project-button"]')
           .click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').type(
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(
           testProjectNameDeleteList
         );
         cy.get('[data-e2e="confirm-dialog-button"]').click();
@@ -65,7 +65,7 @@ describe("projects", () => {
           .find('[data-e2e="delete-project-button"]')
           .trigger("mouseover")
           .click();
-        cy.get('[data-e2e="confirm-dialog-input"]').type(
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(
           testProjectNameDeleteGrid
         );
         cy.get('[data-e2e="confirm-dialog-button"]').click();
