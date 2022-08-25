@@ -664,6 +664,8 @@
       "3": "Post Creation"
     },
     "ADDTRIGGER": "Trigger hinzufügen",
+    "FLOWCHANGED": "Der Ablauf wurde geändert",
+    "FLOWCLEARED": "Der Ablauf wurde zurückgesetzt",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in Sekunden",
     "ALLOWEDTOFAIL": "Allowed To Fail",
