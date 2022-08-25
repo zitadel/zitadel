@@ -103,7 +103,7 @@ func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 		},
 			crdb.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
-			crdb.WithIndex(crdb.NewIndex("ln_ro_idx", []string{LoginNameUserResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{LoginNameUserResourceOwnerCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
