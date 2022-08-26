@@ -545,7 +545,7 @@
       "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
       "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
       "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
-      "NUMBERERROR": "Must include a digit."
+      "NUMBERERROR": "Doit inclure un chiffre."
     },
     "STATE": {
       "0": "Inconnu",
