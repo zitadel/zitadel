@@ -664,6 +664,8 @@
       "3": "Post Creation"
     },
     "ADDTRIGGER": "Add trigger",
+    "FLOWCHANGED": "The flow was changed successfully",
+    "FLOWCLEARED": "The flow was reset successfully",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
