@@ -7,4 +7,4 @@ RUN npm ci --omit=dev
 
 ENTRYPOINT [ "bash", "-c" ]
 
-CMD [ "cp -R /dependencies/node_modules/ . && cypress run" ]
+CMD [ "cp -R /dependencies/node_modules/ . && cypress run --help" ]
