@@ -28,3 +28,10 @@ func (l *Login) getLoginPolicy(r *http.Request, orgID string) (*query.LoginPolic
 	}
 	return l.query.LoginPolicyByID(r.Context(), false, orgID)
 }
+
+func (l *Login) getLabelPolicy(r *http.Request, orgID string) (*query.LabelPolicy, error) {
+	if orgID == "" {
+		return l.query.DefaultActiveLabelPolicy(r.Context())
+	}
+	return l.query.ActiveLabelPolicyByOrg(r.Context(), orgID)
+}

@@ -11,14 +11,33 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
+func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action, resourceOwner, actionID string) (_ string, _ *domain.ObjectDetails, err error) {
+	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
+	if err != nil {
+		return "", nil, err
+	}
+	if existingAction.State != domain.ActionStateUnspecified {
+		return "", nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-nau2k", "Errors.Action.AlreadyExisting")
+	}
+
+	return c.addActionWithID(ctx, addAction, resourceOwner, actionID)
+}
+
 func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
 	if !addAction.IsValid() {
 		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
 	}
-	addAction.AggregateID, err = c.idGenerator.Next()
+
+	actionID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
+
+	return c.addActionWithID(ctx, addAction, resourceOwner, actionID)
+}
+
+func (c *Commands) addActionWithID(ctx context.Context, addAction *domain.Action, resourceOwner, actionID string) (_ string, _ *domain.ObjectDetails, err error) {
+	addAction.AggregateID = actionID
 	actionModel := NewActionWriteModel(addAction.AggregateID, resourceOwner)
 	actionAgg := ActionAggregateFromWriteModel(&actionModel.WriteModel)
 

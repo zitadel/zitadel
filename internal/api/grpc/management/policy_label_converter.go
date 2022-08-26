@@ -5,7 +5,7 @@ import (
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func addLabelPolicyToDomain(p *mgmt_pb.AddCustomLabelPolicyRequest) *domain.LabelPolicy {
+func AddLabelPolicyToDomain(p *mgmt_pb.AddCustomLabelPolicyRequest) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
 		PrimaryColor:        p.PrimaryColor,
 		BackgroundColor:     p.BackgroundColor,

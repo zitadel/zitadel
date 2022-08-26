@@ -106,6 +106,7 @@
     "FINISHED": "Fertig",
     "CHANGE": "Ändern",
     "REACTIVATE": "Aktivieren",
+    "ACTIVATE": "Aktivieren",
     "DEACTIVATE": "Deaktivieren",
     "REFRESH": "Aktualisieren",
     "LOGIN": "Einloggen",
@@ -181,8 +182,9 @@
     "SIDEWIDE": "Seitenübergreifende Tastaturkürzel",
     "SHORTCUTS": {
       "HOME": "Zur Startseite",
-      "SYSTEM": "Zum <strong>S</strong>ystem",
+      "INSTANCE": "Zur <strong>I</strong>nstanz",
       "ORG": "Zur <strong>O</strong>rganisation",
+      "ORGSETTINGS": "Zu den Organisationseinstellungen",
       "ORGSWITCHER": "Organisation wechseln",
       "ME": "Zum eigenen Profil",
       "PROJECTS": "Zu den <strong>P</strong>rojekten",
@@ -193,6 +195,8 @@
     }
   },
   "RESOURCEID": "Ressourcen-ID",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "Keine Daten"
   },
@@ -478,7 +482,7 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
       "NOTEQUAL": "Die Passwörter stimmen nicht überein."
     },
     "ID": "ID",
@@ -538,10 +542,10 @@
       "REQUIRED": "Das Eingabefeld ist leer.",
       "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
       "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
-      "UPPERCASEMISSING": "Passwort muss einen Grossbuchstaben beinhalten.",
-      "LOWERCASEMISSING": "Passwort muss einen Kleinbuchstaben beinhalten.",
-      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten."
+      "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
+      "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
+      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Muss eine Ziffer beinhalten."
     },
     "STATE": {
       "0": "Unbekannt",
@@ -660,6 +664,8 @@
       "3": "Post Creation"
     },
     "ADDTRIGGER": "Trigger hinzufügen",
+    "FLOWCHANGED": "Der Ablauf wurde geändert",
+    "FLOWCLEARED": "Der Ablauf wurde zurückgesetzt",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in Sekunden",
     "ALLOWEDTOFAIL": "Allowed To Fail",
@@ -705,6 +711,17 @@
     "MEMBER": {
       "TITLE": "Manager",
       "DESCRIPTION": "Diese Manager können instanzweite Einstellungen vornehmen."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Domains"
+    },
+    "STATE": {
+      "0": "Unspezifisch",
+      "1": "Wird erstellt",
+      "2": "Aktiv",
+      "3": "Wird gestoppt",
+      "4": "Gestoppt"
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -757,6 +774,8 @@
       "LISTDESCRIPTION": "Wähle eine Organisation aus.",
       "ACTIVE": "Aktiv",
       "CREATE": "Organisation erstellen",
+      "DEACTIVATE": "Organisation deaktivieren",
+      "REACTIVATE": "Organisation reaktivieren",
       "NOPERMISSION": "Sie haben keine Berechtigung, auf Einstellungen der Organisation zuzugreifen.",
       "USERSELFACCOUNT": "Verwenden Sie Ihr persönliches Konto als Organisationsinhaber",
       "ORGDETAIL_TITLE": "Gebe den Namen und die Domain für die neue Organisation ein.",
@@ -821,6 +840,16 @@
       "MEMBERREMOVED": "Manager entfernt.",
       "MEMBERCHANGED": "Manager geändert.",
       "SETPRIMARY": "Primäre Domain gesetzt."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Organisation deaktivieren",
+        "DESCRIPTION": "Sie sind im Begriff Ihre Organisation zu deaktivieren. User können Sich danach nicht mehr anmelden? Wollen Sie fortfahren?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Organisation reaktivieren",
+        "DESCRIPTION": "Sie sind im Begriff Ihre Organisation zu reaktivieren. User können Sich danach wieder anmelden? Wollen Sie fortfahren?"
+      }
     }
   },
   "SETTINGS": {
@@ -861,8 +890,9 @@
     "DEFAULTLANGUAGE": "Standardsprache",
     "LANGUAGE": {
       "de": "Deutsch",
+      "en": "English",
       "it": "Italiano",
-      "en": "English"
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -883,11 +913,21 @@
       "PROVIDER": "SMS Anbieter",
       "ADDPROVIDER": "Anbieter hinzufügen",
       "ADDPROVIDERDESCRIPTION": "Wählen Sie einen der verfügbaren Anbieter und geben Sie die erforderlichen Daten ein.",
+      "REMOVEPROVIDER": "Anbieter entfernen",
+      "REMOVEPROVIDER_DESC": "Sie sind im Begriff eine Konfiguration zu löschen. Wollen Sie fortfahren?",
+      "SMSPROVIDERSTATE": {
+        "0": "Unbekannt",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ACTIVATED": "Anbieter aktiviert.",
+      "DEACTIVATED": "Anbieter deaktiviert.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio erfolgreich hinzugefügt.",
+        "REMOVED": "Twilio entfernt",
         "CHANGETOKEN": "Token ändern",
         "SETTOKEN": "Token setzen",
         "TOKENSET": "Token erfolgreich gesetzt."
@@ -938,9 +978,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
       "DESCRIPTION": "Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-      "SYMBOLANDNUMBERERROR": "Das Passwort muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
-      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten.",
+      "SYMBOLANDNUMBERERROR": "Muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
+      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "PRIVATELABELING": {
@@ -965,6 +1005,7 @@
       "MAXSIZE": "Die maximale Grösse von Uploads ist mit 524kB begrenzt",
       "EMAILNOSVG": "Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
+      "NOSVGSUPPORTED": "SVG werden nicht unterstützt!",
       "FONTINLOGINONLY": "Die Schriftart wird momentan nur im Login interface angezeigt.",
       "VIEWS": {
         "PREVIEW": "Vorschau",
@@ -1028,10 +1069,10 @@
       "UNSAVED_DESCRIPTION": "Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
       "LOCALE": "Sprachcode",
       "LOCALES": {
-        "de": "German",
+        "de": "Deutsch",
         "en": "English",
-        "it": "Italian",
-        "fr": "French"
+        "it": "Italiano",
+        "fr": "Français"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1774,8 +1815,9 @@
   },
   "LANGUAGES": {
     "de": "Deutsch",
-    "it": "Italienisch",
-    "en": "Englisch"
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

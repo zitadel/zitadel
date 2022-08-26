@@ -70,7 +70,7 @@ Errors:
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
-      Invalid: Profildata invalid
+      Invalid: Profile data invalid
     Email:
       NotFound: Email not found
       Invalid: Email is invalid
@@ -94,7 +94,7 @@ Errors:
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
       AlreadyExists:  Username already taken
-      Reservied: Username is already taken
+      Reserved: Username is already taken
     Code:
       Empty: Code is empty
       NotFound: Code not found
@@ -156,7 +156,7 @@ Errors:
     DomainNotVerified: Domain is not verified
     DomainAlreadyVerified: Domain is already verified
     DomainVerificationTypeInvalid: Domain verification type is invalid
-    DomainVerificationMissing: Domain verification not yet startet
+    DomainVerificationMissing: Domain verification not yet started
     DomainVerificationFailed: Domain verification failed
     PrimaryDomainNotDeletable: Primary domain must not be deleted
     DomainNotFound: Domain not found
@@ -172,8 +172,9 @@ Errors:
     IdpIsNotOIDC: IDP configuration is not of type oidc
     Domain:
       AlreadyExists: Domain already exists
+      InvalidCharacter: Only alphanumeric characters, . and - are allowed for a domain
     IDP:
-      InvalidSearchQuery: Ungültiger Suchparameter
+      InvalidSearchQuery: Invalid search query
     LoginPolicy:
       NotFound: Login Policy not found
       Invalid: Login Policy is invalid
@@ -263,10 +264,10 @@ Errors:
       HasNotExistingRole: One role doesn't exist on project
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
-    UserIDMisisng: User ID missing
   IAM:
+    NotFound: Instance not found
     Member:
-      RolesNotChanged: Roles habe not been changed
+      RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
     MemberAlreadyExisting: Member already exists
     MemberNotExisting: Member does not exist
@@ -786,7 +787,7 @@ EventTypes:
       changed: ZITADEL member changed
       removed: ZITADEL member removed
       cascade:
-        removeD: ZITADEL member cascade removed
+        removed: ZITADEL member cascade removed
     idp:
       config:
         added: IDP configuration added
@@ -802,6 +803,9 @@ EventTypes:
         config:
           added: SAML IDP configuration added
           changed: SAML IDP configuration changed
+    customtext:
+      set: Text was set
+      removed: Text was removed
     policy:
       login:
         added: Default Login Policy added
@@ -882,7 +886,7 @@ Application:
       Implicit:
         RedirectUris:
           CustomNotAllowed: Grant type implicit doesn't allow custom redirect uris
-          HttpNotAllowed: Grant tpye implicit doesn't allow http redirect uris
+          HttpNotAllowed: Grant type implicit doesn't allow http redirect uris
           HttpLocalhostOnlyForNative: Http://localhost redirect uri is only allowed for native applications.
       Native:
         AuthMethodType:

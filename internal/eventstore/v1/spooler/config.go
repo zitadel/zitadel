@@ -11,10 +11,11 @@ import (
 )
 
 type Config struct {
-	Eventstore        v1.Eventstore
-	Locker            Locker
-	ViewHandlers      []query.Handler
-	ConcurrentWorkers int
+	Eventstore          v1.Eventstore
+	Locker              Locker
+	ViewHandlers        []query.Handler
+	ConcurrentWorkers   int
+	ConcurrentInstances int
 }
 
 func (c *Config) New() *Spooler {
@@ -27,11 +28,12 @@ func (c *Config) New() *Spooler {
 	})
 
 	return &Spooler{
-		handlers:   c.ViewHandlers,
-		lockID:     lockID,
-		eventstore: c.Eventstore,
-		locker:     c.Locker,
-		queue:      make(chan *spooledHandler, len(c.ViewHandlers)),
-		workers:    c.ConcurrentWorkers,
+		handlers:            c.ViewHandlers,
+		lockID:              lockID,
+		eventstore:          c.Eventstore,
+		locker:              c.Locker,
+		queue:               make(chan *spooledHandler, len(c.ViewHandlers)),
+		workers:             c.ConcurrentWorkers,
+		concurrentInstances: c.ConcurrentInstances,
 	}
 }

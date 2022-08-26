@@ -37,34 +37,32 @@ With ZITADEL you rely on a battle tested, hardened and extensible turnkey soluti
 
 ---
 
-**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://docs.zitadel.ch/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
+**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://docs.zitadel.com/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
 
 ## Get started
 
-### ZITADEL Cloud
+### ZITADEL Cloud (SaaS)
 
-The easiest way to get started with ZITADEL is to use our public cloud offering.
-Currently ZITADEL V2 Beta is available, head over to [https://zitadel.cloud](https://zitadel.cloud) and create your first ZITADEL instance for free.
+The easiest way to get started with [ZITADEL Cloud](https://zitadel.cloud).
 
-You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing/v2).
+It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Install ZITADEL
 
-- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/installation)
+- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
 ### Quickstarts - Integrate your app
 
-- [Multiple Quickstarts can be found here](https://docs.zitadel.com/docs/quickstarts/introduction)
-- [And even more examples are located under zitadel/zitadel-examples](https://github.com/zitadel/zitadel-examples)
+[Multiple Examples can be found here](https://docs.zitadel.com/docs/examples/introduction)
 
-> If you miss something please feel free to engage with us [here](https://github.com/zitadel/zitadel/discussions/1717)
+> If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
 
 ## Why ZITADEL
 
 - [API-first](https://docs.zitadel.com/docs/apis/introduction)
-- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore)
-- [Actions](https://docs.zitadel.ch/docs/concepts/features/actions) to react on events with custom code
-- [Branding](https://docs.zitadel.com/docs/guides/customization/branding) for a uniform user experience
+- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview)
+- [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code
+- [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience
 - [CockroachDB](https://www.cockroachlabs.com/) is the only dependency
 
 ## Features
@@ -73,16 +71,19 @@ You can also discover our pay-as-you-go [pricing](https://zitadel.com/pricing/v2
 - Passwordless with FIDO2 support
 - Username / Password
 - Multifactor authentication with OTP, U2F
-- [Identity Brokering](https://docs.zitadel.com/docs/guides/authentication/identity-brokering)
-- [Machine-to-machine (JWT profile)](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
+- [Identity Brokering](https://docs.zitadel.com/docs/guides/integrate/identity-brokering)
+- [Machine-to-machine (JWT profile)](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
 - Personal Access Tokens (PAT)
 - Role Based Access Control (RBAC)
-- [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/basics/projects#what-is-a-granted-project)
+- [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/manage/console/projects)
 - Self-registration including verification
 - User self service
-- [Service Accounts](https://docs.zitadel.com/docs/guides/authentication/serviceusers)
+- [Service Accounts](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
 - [OpenID Connect certified](https://openid.net/certification/#OPs)
 - 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
+- 🚧 [Postgres](https://github.com/zitadel/zitadel/pull/3998)
+
+Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
 ## Client libraries
 
@@ -125,7 +126,7 @@ Use our login widget to allow easy and secure access to your applications and en
 - works on all modern platforms, devices, and browsers
 - phishing resistant alternative
 - requires only one gesture by the user
-- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-factors) of the device during registration
+- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-profile) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 
@@ -142,16 +143,6 @@ Delegate the right to assign roles to another organization
 Customize login and console with your design  
 ![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
 
-## Usage Data
-
-ZITADEL components send errors and usage data to CAOS Ltd., so that we are able to identify code improvement potential. If you don't want to send this data or don't have an internet connection, pass the global flag `--disable-analytics` when using zitadelctl. For disabling ingestion for already-running components, execute the takeoff command again with the `` flag.
-
-We try to distinguishing the environments from which events come from. As environment identifier, we enrich the events by the domain you have configured in zitadel.yml, as soon as it's available. When it's not available and you passed the --gitops flag, we defer the environment identifier from your git repository URL.
-
-Besides from errors that don't clearly come from misconfiguration or cli misusage, we send an initial event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
-
-We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
-
 ## Security
 
 See the policy [here](./SECURITY.md)
@@ -161,3 +152,4 @@ See the policy [here](./SECURITY.md)
 See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+

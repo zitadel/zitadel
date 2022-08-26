@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	UserMetadataProjectionTable = "projections.user_metadata"
+	UserMetadataProjectionTable = "projections.user_metadata2"
 
 	UserMetadataColumnUserID        = "user_id"
 	UserMetadataColumnCreationDate  = "creation_date"
@@ -42,7 +42,7 @@ func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
 			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID),
+			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
 		),
 	)

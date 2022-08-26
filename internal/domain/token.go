@@ -1,9 +1,11 @@
 package domain
 
 import (
+	"context"
 	"strings"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -20,11 +22,16 @@ type Token struct {
 	PreferredLanguage string
 }
 
-func AddAudScopeToAudience(audience, scopes []string) []string {
+func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []string {
 	for _, scope := range scopes {
-		if strings.HasPrefix(scope, ProjectIDScope) && strings.HasSuffix(scope, AudSuffix) {
-			audience = append(audience, strings.TrimSuffix(strings.TrimPrefix(scope, ProjectIDScope), AudSuffix))
+		if !(strings.HasPrefix(scope, ProjectIDScope) && strings.HasSuffix(scope, AudSuffix)) {
+			continue
 		}
+		projectID := strings.TrimSuffix(strings.TrimPrefix(scope, ProjectIDScope), AudSuffix)
+		if projectID == ProjectIDScopeZITADEL {
+			projectID = authz.GetInstance(ctx).ProjectID()
+		}
+		audience = append(audience, projectID)
 	}
 	return audience
 }

@@ -159,7 +159,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 
 func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (*Instance, error) {
 	if shouldTriggerBulk {
-		projection.InstanceProjection.TriggerBulk(ctx)
+		projection.InstanceProjection.Trigger(ctx)
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(authz.GetInstance(ctx).RequestedDomain())
@@ -400,9 +400,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					&sequence,
 				)
 				if err != nil {
-					if errs.Is(err, sql.ErrNoRows) {
-						return nil, errors.ThrowNotFound(err, "QUERY-n0wng", "Errors.IAM.NotFound")
-					}
 					return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 				}
 				if !domain.Valid {
@@ -417,6 +414,9 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					IsGenerated:  isGenerated.Bool,
 					InstanceID:   instance.ID,
 				})
+			}
+			if instance.ID == "" {
+				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {

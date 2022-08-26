@@ -15,7 +15,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 | Refresh Token                                         | yes                 |
 | Resource Owner Password Credentials                   | no                  |
 | Security Assertion Markup Language (SAML) 2.0 Profile | no                  |
-| Token Exchange                                        | work in progress    |
+| Token Exchange                                        | no    |
 
 ## Authorization Code
 

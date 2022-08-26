@@ -33,6 +33,8 @@ func (wm *OrgWriteModel) Reduce() error {
 			wm.State = domain.OrgStateInactive
 		case *org.OrgReactivatedEvent:
 			wm.State = domain.OrgStateActive
+		case *org.OrgRemovedEvent:
+			wm.State = domain.OrgStateRemoved
 		case *org.OrgChangedEvent:
 			wm.Name = e.Name
 		case *org.DomainPrimarySetEvent:
@@ -51,6 +53,9 @@ func (wm *OrgWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.OrgAddedEventType,
 			org.OrgChangedEventType,
+			org.OrgDeactivatedEventType,
+			org.OrgReactivatedEventType,
+			org.OrgRemovedEventType,
 			org.OrgDomainPrimarySetEventType).
 		Builder()
 }

@@ -22,11 +22,11 @@
     "DISCLAIMERLINK": "Further information",
     "DOCUMENTATION": {
       "TITLE": "Documentation",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Get started with ZITADEL quickly."
     },
     "GETSTARTED": {
       "TITLE": "Get started with ZITADEL",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Get started with ZITADEL quickly."
     },
     "QUICKSTARTS": {
       "LABEL": "First Steps",
@@ -106,6 +106,7 @@
     "FINISHED": "Close",
     "CHANGE": "Change",
     "REACTIVATE": "Reactivate",
+    "ACTIVATE": "Activate",
     "DEACTIVATE": "Deactivate",
     "REFRESH": "Refresh",
     "LOGIN": "Login",
@@ -154,7 +155,7 @@
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
     },
     "NAV": {
-      "TEXT": "This navigation changes based on your selected oranization above or your instance"
+      "TEXT": "This navigation changes based on your selected organization above or your instance"
     },
     "CONTEXTCHANGED": {
       "TEXT": "Attention! The organization context has changed."
@@ -181,8 +182,9 @@
     "SIDEWIDE": "Site-wide shortcuts",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
-      "SYSTEM": "<strong>G</strong>o to <strong>S</strong>ystem",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
       "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
+      "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
       "ORGSWITCHER": "Change Organization",
       "ME": "Go To own profile",
       "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
@@ -193,6 +195,8 @@
     }
   },
   "RESOURCEID": "Resource Id",
+  "NAME": "Name",
+  "VERSION": "Version",
   "TABLE": {
     "NOROWS": "No data"
   },
@@ -227,7 +231,7 @@
       "DETAIL": "Detail",
       "CREATE": "Create",
       "MY": "My Information",
-      "LOGINNAMES": "Loginnames",
+      "LOGINNAMES": "Login names",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
       "REACTIVATE": "Reactivate",
@@ -478,7 +482,7 @@
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "The password has to be at least {{value}} characters long.",
+      "MINLENGTHERROR": "Has to be at least {{value}} characters long.",
       "NOTEQUAL": "The passwords provided do not match."
     },
     "ID": "ID",
@@ -538,10 +542,10 @@
       "REQUIRED": "The input field is empty.",
       "MINLENGTH": "The password has to be at least {{requiredLength}} characters long.",
       "NOEMAIL": "The user name cannot be an e-mail address.",
-      "UPPERCASEMISSING": "The password must include an uppercase character.",
-      "LOWERCASEMISSING": "The password must include a lowercase character.",
-      "SYMBOLERROR": "The password must include a symbol or punctuation mark.",
-      "NUMBERERROR": "The password must include a digit."
+      "UPPERCASEMISSING": "Must include an uppercase character.",
+      "LOWERCASEMISSING": "Must include a lowercase character.",
+      "SYMBOLERROR": "Must include a symbol or punctuation mark.",
+      "NUMBERERROR": "Must include a digit."
     },
     "STATE": {
       "0": "Unknown",
@@ -660,6 +664,8 @@
       "3": "Post Creation"
     },
     "ADDTRIGGER": "Add trigger",
+    "FLOWCHANGED": "The flow was changed successfully",
+    "FLOWCLEARED": "The flow was reset successfully",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
@@ -705,6 +711,17 @@
     "MEMBER": {
       "TITLE": "Managers",
       "DESCRIPTION": "These Managers are allowed to make changes in your instance."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Domains"
+    },
+    "STATE": {
+      "0": "Unspecified",
+      "1": "Creating",
+      "2": "Running",
+      "3": "Stopping",
+      "4": "Stopped"
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -757,6 +774,8 @@
       "LISTDESCRIPTION": "Choose an organization.",
       "ACTIVE": "Active",
       "CREATE": "Create Organization",
+      "DEACTIVATE": "Deactivate Organization",
+      "REACTIVATE": "Reactivate Organization",
       "NOPERMISSION": "You don't have the permission to access organization settings.",
       "USERSELFACCOUNT": "Use your personal account as organization owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
@@ -821,6 +840,16 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deactivate organization",
+        "DESCRIPTION": "You are about to deactivate your organization. Users won't be able to login afterwards. Are you sure to proceed?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Reactivate organization",
+        "DESCRIPTION": "You are about to reactivate your organization. Users will be able to login again. Are you sure to proceed?"
+      }
     }
   },
   "SETTINGS": {
@@ -862,7 +891,8 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "it": "Italiano",
-      "en": "English"
+      "en": "English",
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -883,11 +913,21 @@
       "PROVIDER": "SMS Provider",
       "ADDPROVIDER": "Add SMS Provider",
       "ADDPROVIDERDESCRIPTION": "Choose one of the available providers and enter the required data.",
+      "REMOVEPROVIDER": "Remove Provider",
+      "REMOVEPROVIDER_DESC": "You are about to delete a provider configuration. Do you want to continue?",
+      "SMSPROVIDERSTATE": {
+        "0": "Unspecified",
+        "1": "Active",
+        "2": "Inactive"
+      },
+      "ACTIVATED": "Provider activated.",
+      "DEACTIVATED": "Provider deactivated.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully.",
+        "REMOVED": "Twilio removed",
         "CHANGETOKEN": "Change Token",
         "SETTOKEN": "Set Token",
         "TOKENSET": "Token successfully set."
@@ -927,7 +967,7 @@
       "RESET": {
         "DEFAULTTITLE": "Reset Setting",
         "DEFAULTDESCRIPTION": "You are about to reset your settings to the default configuration of your instance. Are you sure you want to continue?",
-        "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identiy Provider settings will be reset to the instance setting too."
+        "LOGINPOLICY_DESCRIPTION": "Warning: If your continue, Identity Provider settings will be reset to the instance setting too."
       }
     }
   },
@@ -938,9 +978,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Password Complexity",
       "DESCRIPTION": "Ensures that all set passwords correspond to a specific pattern",
-      "SYMBOLANDNUMBERERROR": "The password must consist of a digit and a symbol/punctuation mark.",
-      "SYMBOLERROR": "The password must include a symbol/punctuation mark.",
-      "NUMBERERROR": "The password must include a digit.",
+      "SYMBOLANDNUMBERERROR": "Must consist of a digit and a symbol/punctuation mark.",
+      "SYMBOLERROR": "Must include a symbol/punctuation mark.",
+      "NUMBERERROR": "Must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
     },
     "PRIVATELABELING": {
@@ -965,6 +1005,7 @@
       "MAXSIZE": "The maximum size is limited to 524kB",
       "EMAILNOSVG": "The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
+      "NOSVGSUPPORTED": "SVG are not supported!",
       "FONTINLOGINONLY": "The font is currently only displayed in the login interface.",
       "VIEWS": {
         "PREVIEW": "Preview",
@@ -1028,10 +1069,10 @@
       "UNSAVED_DESCRIPTION": "Your have made changes without saving. Do you want to save now?",
       "LOCALE": "Locale Code",
       "LOCALES": {
-        "de": "German",
+        "de": "Deutsch",
         "en": "English",
-        "it": "Italian",
-        "fr": "French"
+        "it": "Italiano",
+        "fr": "Français"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1471,7 +1512,7 @@
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
     "CLIENTSECRET": "Client Secret",
-    "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
+    "IDPDISPLAYNAMMAPPING": "IDP Display Name Mapping",
     "USERNAMEMAPPING": "Username Mapping",
     "DATES": "Dates",
     "CREATIONDATE": "Created At",
@@ -1773,9 +1814,10 @@
     "3": "Other"
   },
   "LANGUAGES": {
-    "de": "German",
-    "it": "Italian",
-    "en": "English"
+    "de": "Deutsch",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/zitadel/logging"
@@ -84,19 +85,13 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
 		},
 		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
-			if policy != nil {
-				return true
-			}
-			return false
+			return policy != nil
 		},
 		"hasWatermark": func(policy *domain.LabelPolicy) bool {
-			if policy != nil && policy.DisableWatermark {
-				return false
-			}
-			return true
+			return policy == nil || !policy.DisableWatermark
 		},
 		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
-			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
+			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName + "?v=" + policy.ChangeDate.Format(time.RFC3339)
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
 		},
 		"customLogoResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
@@ -380,7 +375,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 }
 
 func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
-	translator, _ := l.renderer.NewTranslator(ctx)
+	translator, err := l.renderer.NewTranslator(ctx)
+	logging.OnError(err).Warn("cannot load translator")
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
 		l.addLoginTranslations(translator, authReq.OrgTranslations)
