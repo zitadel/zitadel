@@ -158,9 +158,6 @@ goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifa
 # Pack the binary into a docker image
 DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
 
-# Build the e2e image
-docker compose --file ./e2e/docker-compose.yaml build
-
 # Run the tests
 ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run e2e
 ```
@@ -213,7 +210,7 @@ You can now run a local development server with live code reloading at http://lo
 To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
 
 1. Navigate to http://localhost:8080/ui/console/projects.
-2. When prompted, login with *zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost* and *Password1!*
+2. When prompted, login with *zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost* and *Password1!*.
 3. Select the *ZITADEL* project.
 3. Select the *Console* application.
 4. Select *Redirect Settings*
