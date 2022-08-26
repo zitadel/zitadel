@@ -148,6 +148,12 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 		}
 	}
 	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		user, err := l.query.GetUserByID(r.Context(), false, userID)
+		if err == nil {
+			l.customTexts(r.Context(), translator, user.ResourceOwner)
+		}
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 
