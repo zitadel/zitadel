@@ -9,6 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CreateLayoutModule } from 'src/app/modules/create-layout/create-layout.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -23,6 +24,7 @@ import { OrgCreateComponent } from './org-create.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    InfoSectionModule,
     InputModule,
     MatButtonModule,
     MatIconModule,

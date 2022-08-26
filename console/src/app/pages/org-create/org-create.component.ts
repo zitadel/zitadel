@@ -10,6 +10,7 @@ import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -69,7 +70,16 @@ export class OrgCreateComponent {
     private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
     private authService: GrpcAuthService,
+    private breadcrumbService: BreadcrumbService,
   ) {
+    const instanceBread = new Breadcrumb({
+      type: BreadcrumbType.INSTANCE,
+      name: 'Instance',
+      routerLink: ['/instance'],
+    });
+
+    breadcrumbService.setBreadcrumb([instanceBread]);
+
     this.authService
       .isAllowed(['iam.write'])
       .pipe(take(1))
@@ -96,7 +106,9 @@ export class OrgCreateComponent {
     createOrgRequest.setDomain(this.domain?.value);
 
     const humanRequest: SetUpOrgRequest.Human = new SetUpOrgRequest.Human();
-    humanRequest.setEmail(new SetUpOrgRequest.Human.Email().setEmail(this.email?.value));
+    humanRequest.setEmail(
+      new SetUpOrgRequest.Human.Email().setEmail(this.email?.value).setIsEmailVerified(this.isVerified?.value),
+    );
     humanRequest.setUserName(this.userName?.value);
 
     const profile: SetUpOrgRequest.Human.Profile = new SetUpOrgRequest.Human.Profile();
@@ -143,6 +155,7 @@ export class OrgCreateComponent {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required]],
+      isVerified: [false, []],
       gender: [''],
       nickName: [''],
       preferredLanguage: [''],
@@ -241,6 +254,10 @@ export class OrgCreateComponent {
 
   public get email(): AbstractControl | null {
     return this.userForm.get('email');
+  }
+
+  public get isVerified(): AbstractControl | null {
+    return this.userForm.get('isVerified');
   }
 
   public get nickName(): AbstractControl | null {
