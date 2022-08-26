@@ -38,10 +38,14 @@ linters:
     - exhaustive
     # Gci controls golang package import order and makes it always deterministic. [fast: true, auto-fix: false]
     - gci
+    # Provides diagnostics that check for bugs, performance and style issues. [fast: false, auto-fix: false]
+    - gocritic
     # Linter for Go source code that specializes in simplifying a code [fast: false, auto-fix: false]
     - gosimple
     # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string [fast: false, auto-fix: false]
-    - govet 
+    - govet
+    # In addition to fixing imports, goimports also formats your code in the same style as gofmt. [fast: true, auto-fix: true]
+    - goimports
     # Detects when assignments to existing variables are not used [fast: true, auto-fix: false]
     - ineffassign
     # Staticcheck is a go vet on steroids, applying a ton of static analysis checks [fast: false, auto-fix: false]
@@ -121,42 +125,52 @@ linters:
     # Tool for detection of long functions [fast: true, auto-fix: false]
     # not used because it ignores complexity
     - funlen
-
     # check that no global variables exist [fast: true, auto-fix: false]
+    # We use some global variables which is ok IMO
     - gochecknoglobals
     # Checks that no init functions are present in Go code [fast: true, auto-fix: false]
+    # we use inits for the database abstraction
     - gochecknoinits
     # Finds repeated strings that could be replaced by a constant [fast: true, auto-fix: false]
+    # FUTURE: might be cool to check
     - goconst
-    # Provides diagnostics that check for bugs, performance and style issues. [fast: false, auto-fix: false]
-    - gocritic
     # Computes and checks the cyclomatic complexity of functions [fast: true, auto-fix: false]
     # not used because cyclop also checks complexity of package
     - gocyclo
     # Check if comments end in a period [fast: true, auto-fix: true]
+    # FUTURE: checks if comments are written as specified
     - godot
     # Tool for detection of FIXME, TODO and other comment keywords [fast: true, auto-fix: false]
+    # FUTURE: maybe makes sense later. IMO some view todos are ok for later tasks.
     - godox
     # Golang linter to check the errors handling expressions [fast: false, auto-fix: false]
+    # Not used in favore of errorlint
     - goerr113
     # Gofmt checks whether code was gofmt-ed. By default this tool runs with -s option to check for code simplification [fast: true, auto-fix: true]
+    # ignored in favor of goimports
     - gofmt
     # Gofumpt checks whether code was gofumpt-ed. [fast: true, auto-fix: true]
+    # ignored in favor of goimports
     - gofumpt
     # Checks is file header matches to pattern [fast: true, auto-fix: false]
+    # ignored because we don't write licenses as headers
     - goheader
-    # In addition to fixing imports, goimports also formats your code in the same style as gofmt. [fast: true, auto-fix: true]
-    - goimports
     #deprecated]: Golint differs from gofmt. Gofmt reformats Go source code, whereas golint prints out style mistakes [fast: false, auto-fix: false]
+    # ignored in favor of goimports
     - golint
     # An analyzer to detect magic numbers. [fast: true, auto-fix: false]
+    # FUTURE: not that critical at the moment
     - gomnd
     # Manage the use of 'replace', 'retract', and 'excludes' directives in go.mod. [fast: true, auto-fix: false]
+    # FUTURE: not a problem at the moment
     - gomoddirectives
     # Allow and block list linter for direct Go module dependencies. This is different from depguard where there are different block types for example version constraints and module recommendations. [fast: true, auto-fix: false]
+    # FUTURE: maybe interesting because of licenses
     - gomodguard
     # Checks that printf-like functions are named with `f` at the end [fast: true, auto-fix: false]
+    # FUTURE: not a problem at the moment
     - goprintffuncname
+    
     # Inspects source code for security problems [fast: false, auto-fix: false]
     - gosec
     # An analyzer to analyze expression groups. [fast: true, auto-fix: false]
