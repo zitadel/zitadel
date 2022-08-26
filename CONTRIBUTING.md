@@ -110,20 +110,17 @@ We add the label "good first issue" for problems we think are a good starting po
 
 ### Backend / Login
 
-<!-- TODO: Add links -->
-
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
-Using Docker Compose, you run a CockroachDB on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/v22.1/start-a-local-cluster-in-docker-mac.html) on your local machine.
 With [goreleaser](https://opencollective.com/goreleaser), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
 The commands in this section are tested against the following software versions:
-<!-- TODO: complete, link and update -->
-- Docker version 20.10.17
-- Goreleaser version v1.8.3
-- Go version 1.17.5
-- Delve 1.9.1
+- [Docker version 20.10.17](https://docs.docker.com/engine/install/)
+- [Goreleaser version v1.8.3](https://goreleaser.com/install/)
+- [Go version 1.19](https://go.dev/doc/install)
+- [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
 
 <!-- TODO: Describe linting (@adlerhurst) -->
 
@@ -174,23 +171,31 @@ docker compose --file ./e2e/docker-compose.yaml down
 
 ### Console
 
-<!-- TODO: Add links -->
-
 By executing the commands from this section, you run everything you need to develop the console locally.
-Using Docker Compose, you run CockroachDB and the latest released ZITADEL binary on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](https://www.cockroachlabs.com/docs/v22.1/start-a-local-cluster-in-docker-mac.html) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
 You use the ZITADEL container as backend for your console.
-The console is run in your node environment using the angular development server, so you have fast feedback about your changes.
-Once you are happy with your changes, you run end-to-end tests and tear everything down, .
+The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
+Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
 The commands in this section are tested against the following software versions:
-<!-- TODO: complete, link and update -->
-- Docker version 20.10.17
-- Node version v16.16.0
-- npm version 8.11.0
-- curl version 7.58.0
-- https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies
 
-Run the database and the latests backend locally.
+- [Docker version 20.10.17](https://docs.docker.com/engine/install/)
+- [Node version v16.17.0](https://nodejs.org/en/download/)
+- [npm version 8.18.0](https://docs.npmjs.com/try-the-latest-stable-version-of-npm)
+- [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)
+- [curl version 7.58.0](https://curl.se/download.html)
+
+<details>
+  <summary>Note for WSL2 on Windows 10</summary>
+  Following the suggestions <a href="https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10">here </a> subsequently <a href="https://github.com/microsoft/WSL/issues/4106">here </a> may  need to XLaunch and configure your DISPLAY variable. Use at your own risk.
+
+  1. Install `VcXsrv Windows X Server`
+  2. Set the target of your shortcut to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
+  3. In WSL2 run `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` to set your DISPLAY variable
+  4. When starting XLaunch, make sure to disable access control
+</details>
+
+Run the database and the latest backend locally.
 
 ```bash
 # Change to the console directory
@@ -252,16 +257,6 @@ You can also open the test suite interactively for fast success feedback on spec
 # Run all tests in a headless browser
 npm run open:dev
 ```
-
-<details>
-  <summary>Note for WSL2 on Windows 10</summary>
-  Following the suggestions <a href="https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10">here </a> subsequently <a href="https://github.com/microsoft/WSL/issues/4106">here </a> may  need to XLaunch and configure your DISPLAY variable. Use at your own risk.
-
-  1. Install `VcXsrv Windows X Server`
-  2. Set the target of your shortcut to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
-  3. In WSL2 run `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` to set your DISPLAY variable
-  4. When starting XLaunch, make sure to disable access control
-</details>
 
 When you are happy with your changes, you can cleanup your environment
 
