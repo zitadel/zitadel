@@ -33,25 +33,15 @@ services:
     networks:
       - zitadel
 
-  npm-install:
-    image: node:18-alpine3.15
-    working_dir: /e2e
-    user: "$UID"
-    volumes:
-    - .:/e2e
-    command: "npm ci --omit=dev"
-
   e2e:
-    image: cypress/included:10.3.0
+    build:
+      context: .
     depends_on:
       zitadel:
         condition: 'service_started'
       db:
         condition: 'service_healthy'
-      npm-install:
-        condition: 'service_completed_successfully'
     working_dir: /e2e
-    user: "$UID"
     volumes:
     - .:/e2e
     network_mode: host

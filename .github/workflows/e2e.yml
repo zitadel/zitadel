@@ -34,6 +34,9 @@ jobs:
         with:
           driver: docker
           install: true
+      - name: Build e2e image
+        run: docker compose build
+        working-directory: e2e
       - name: Test ${{ matrix.browser }}
         run: docker compose run e2e --browser ${{ matrix.browser }}
         working-directory: e2e
