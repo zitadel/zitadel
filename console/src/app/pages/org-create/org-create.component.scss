@@ -58,6 +58,16 @@ h1 {
           flex: 1 0 33%;
           margin: 0 0.5rem;
         }
+
+        .email-is-verified {
+          flex-basis: 100%;
+          margin: 1.5rem 0.5rem 0 0.5rem;
+
+          .block-checkbox {
+            display: block;
+            margin: 0.25rem 0;
+          }
+        }
       }
 
       .pwd-form {
@@ -107,11 +117,6 @@ h1 {
       display: block;
       padding: 0.5rem 4rem;
     }
-  }
-
-  .checkbox {
-    flex-basis: 100%;
-    margin: 0.5rem;
   }
 
   .complexity-view {
