@@ -253,6 +253,16 @@ You can also open the test suite interactively for fast success feedback on spec
 npm run open:dev
 ```
 
+<details>
+  <summary>Note for WSL2 on Windows 10</summary>
+  Following the suggestions <a href="https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10">here </a> subsequently <a href="https://github.com/microsoft/WSL/issues/4106">here </a> may  need to XLaunch and configure your DISPLAY variable. Use at your own risk.
+
+  1. Install `VcXsrv Windows X Server`
+  2. Set the target of your shortcut to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
+  3. In WSL2 run `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` to set your DISPLAY variable
+  4. When starting XLaunch, make sure to disable access control
+</details>
+
 When you are happy with your changes, you can cleanup your environment
 
 ```bash
