@@ -70,6 +70,7 @@ export class ActionsComponent {
         this.mgmtService
           .clearFlow(this.flowType)
           .then((resp) => {
+            this.toast.showInfo('FLOWS.FLOWCLEARED', true);
             this.loadFlow();
           })
           .catch((error: any) => {
@@ -94,6 +95,7 @@ export class ActionsComponent {
         this.mgmtService
           .setTriggerActions(req.getActionIdsList(), req.getFlowType(), req.getTriggerType())
           .then((resp) => {
+            this.toast.showInfo('FLOWS.FLOWCHANGED', true);
             this.loadFlow();
           })
           .catch((error: any) => {

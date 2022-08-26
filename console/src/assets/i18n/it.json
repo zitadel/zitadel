@@ -664,6 +664,8 @@
       "3": "Post creazione"
     },
     "ADDTRIGGER": "Aggiungi trigger",
+    "FLOWCHANGED": "Il processo è stato modificato con successo.",
+    "FLOWCLEARED": "Il processo è stato eliminato con successo.",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
@@ -685,8 +687,8 @@
         "DELETE_SUCCESS": "Azione rimossa con successo."
       },
       "CLEAR": {
-        "TITLE": "Flow zurücksetzen?",
-        "DESCRIPTION": "Stai per cancellare un'azione. Questa azione non può essere annullata. Vuoi continuare?"
+        "TITLE": "Elimina processo",
+        "DESCRIPTION": "Stai per eliminare un processo. Questa azione non può essere annullata. Vuoi continuare?"
       }
     },
     "TOAST": {

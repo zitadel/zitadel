@@ -664,6 +664,8 @@
       "3": "Post création"
     },
     "ADDTRIGGER": "Ajouter un déclencheur",
+    "FLOWCHANGED": "Le processus a été modifié",
+    "FLOWCLEARED": "Le processus a été supprimé avec succès",
     "TIMEOUT": "Délai d'attente",
     "TIMEOUTINSEC": "Délai en secondes",
     "ALLOWEDTOFAIL": "Autorisé à échouer",
