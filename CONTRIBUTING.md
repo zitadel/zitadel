@@ -242,7 +242,7 @@ Open another shell.
 
 ```bash
 # Change to the e2e directory
-cd ./e2e
+cd .. && cd e2e/
 
 # Install npm dependencies
 npm install
