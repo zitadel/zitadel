@@ -416,7 +416,10 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 }
 
 func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
-	if human != nil && human.Username == "" {
+	if human == nil {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-JKefw", "Errors.User.Invalid")
+	}
+	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
 		human.Username = human.EmailAddress
 	}
 	if orgID == "" || !human.IsValid() || link == nil && (human.Password == nil || human.Password.SecretString == "") {
@@ -432,6 +435,8 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	if err := human.CheckDomainPolicy(domainPolicy); err != nil {
 		return nil, nil, err
 	}
+	human.Username = strings.TrimSpace(human.Username)
+	human.EmailAddress = strings.TrimSpace(human.EmailAddress)
 	if !domainPolicy.UserLoginMustBeDomain {
 		usernameSplit := strings.Split(human.Username, "@")
 		if len(usernameSplit) != 2 {
