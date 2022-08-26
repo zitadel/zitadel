@@ -77,30 +77,12 @@ func (i *ExternalIDP) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *ExternalIDP) EventQuery() (*es_models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestExternalIDPSequences()
+func (i *ExternalIDP) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestExternalIDPSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	query := es_models.NewSearchQuery()
-	instances := make([]string, 0)
-	for _, sequence := range sequences {
-		for _, instance := range instances {
-			if sequence.InstanceID == instance {
-				break
-			}
-		}
-		instances = append(instances, sequence.InstanceID)
-		query.AddQuery().
-			AggregateTypeFilter(i.AggregateTypes()...).
-			LatestSequenceFilter(sequence.CurrentSequence).
-			InstanceIDFilter(sequence.InstanceID)
-	}
-	return query.AddQuery().
-		AggregateTypeFilter(i.AggregateTypes()...).
-		LatestSequenceFilter(0).
-		ExcludedInstanceIDsFilter(instances...).
-		SearchQuery(), nil
+	return newSearchQuery(sequences, i.AggregateTypes(), instanceIDs), nil
 }
 
 func (i *ExternalIDP) Reduce(event *es_models.Event) (err error) {
@@ -127,7 +109,7 @@ func (i *ExternalIDP) processUser(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, externalIDP.InstanceID, event)
+		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event.InstanceID, event)
 	case user.UserRemovedType:
 		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event.InstanceID, event)
 	default:
@@ -143,13 +125,16 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 	switch eventstore.EventType(event.Type) {
 	case instance.IDPConfigChangedEventType, org.IDPConfigChangedEventType:
 		configView := new(iam_view_model.IDPConfigView)
-		config := new(query2.IDP)
+		var config *query2.IDP
 		if eventstore.EventType(event.Type) == instance.IDPConfigChangedEventType {
-			configView.AppendEvent(iam_model.IDPProviderTypeSystem, event)
+			err = configView.AppendEvent(iam_model.IDPProviderTypeSystem, event)
 		} else {
-			configView.AppendEvent(iam_model.IDPProviderTypeOrg, event)
+			err = configView.AppendEvent(iam_model.IDPProviderTypeOrg, event)
 		}
-		exterinalIDPs, err := i.view.ExternalIDPsByIDPConfigID(configView.IDPConfigID, configView.InstanceID)
+		if err != nil {
+			return err
+		}
+		exterinalIDPs, err := i.view.ExternalIDPsByIDPConfigID(configView.IDPConfigID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -168,7 +153,6 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 	default:
 		return i.view.ProcessedExternalIDPSequence(event)
 	}
-	return nil
 }
 
 func (i *ExternalIDP) fillData(externalIDP *usr_view_model.ExternalIDPView) error {

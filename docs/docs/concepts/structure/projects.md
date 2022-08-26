@@ -10,7 +10,7 @@ import ProjectDescription from './_project_description.mdx';
 
 ## Project Settings
 
-On default the login screen will be shown in the private labeling settings of the system (e.g zitadel.ch).
+On default the login screen will be shown in the private labeling settings of the system.
 With the [primary domain scope](../../apis/openidoauth/scopes#reserves-scopes) it is possible to trigger the setting of the given organization. 
 But this will also restrict, the login to user of the given organization.  
 
@@ -18,7 +18,7 @@ With the private labeling setting it is possible to choose which settings should
 
 | Setting | Description |
 | --- | --- |
-| Unspecified | If nothing is specified the default will trigger. (System settings zitadel.ch) |
+| Unspecified | If nothing is specified the default will trigger. (System settings) |
 | Enforce project resource owner policy | This setting will enforce the private labeling of the organization (resource owner) of the project through the whole login process. |
 | Allow Login User resource owner policy | With this setting first the private labeling of the organization (resource owner) of the project will trigger. As soon as the user and its organization (resource owner) is identified by ZITADEL, the settings will change to the organization of the user. |
 

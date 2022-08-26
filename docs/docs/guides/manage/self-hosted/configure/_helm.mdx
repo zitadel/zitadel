@@ -1,0 +1,33 @@
+import CodeBlock from '@theme/CodeBlock';
+import ExampleZITADELValuesSource from '!!raw-loader!./example-zitadel-values.yaml'
+import ExampleZITADELValuesSecretsSource from '!!raw-loader!./example-zitadel-values-secrets.yaml'
+
+By default, the chart installs a secure ZITADEL and CockroachDB.
+The example files makes an insecure ZITADEL accessible by port forwarding the ZITADEL service to localhost.
+For more configuration options, [go to the chart repo descriptions](https://github.com/zitadel/zitadel-charts).
+For a secure installation with Docker Compose, [go to the loadbalancing example](../../deploy/loadbalancing-example)
+
+By executing the commands below, you will download the following files:
+
+<details><summary>example-zitadel-values.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELValuesSource}</CodeBlock>
+</details>
+<details><summary>example-zitadel-values-secrets.yaml</summary>
+    <CodeBlock language="yaml">{ExampleZITADELValuesSecretsSource}</CodeBlock>
+</details>
+
+```bash
+# Download and adjust the example configuration file containing standard configuration
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/guides/manage/self-hosted/configure/example-zitadel-values.yaml
+
+# Download and adjust the example configuration file containing secret configuration
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/guides/manage/self-hosted/configure/example-zitadel-values-secrets.yaml
+
+# Install an insecure zitadel release that works with localhost
+helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
+  --values ./example-zitadel-values.yaml \
+  --values ./example-zitadel-values-secrets.yaml
+
+# Forward the ZITADEL service port to your local machine
+kubectl --namespace zitadel port-forward svc/my-zitadel 8080:80
+```

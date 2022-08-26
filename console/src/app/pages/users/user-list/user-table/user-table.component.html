@@ -8,13 +8,19 @@
   [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
   [showBorder]="true"
 >
-  <div leftActions class="user-table-left-actions">
-    <button class="type-button" [ngClass]="{ active: type === Type.TYPE_HUMAN }" (click)="setType(Type.TYPE_HUMAN)">
-      {{ 'USER.TABLE.TYPES.HUMAN' | translate }}
-    </button>
-    <button class="type-button" [ngClass]="{ active: type === Type.TYPE_MACHINE }" (click)="setType(Type.TYPE_MACHINE)">
-      {{ 'USER.TABLE.TYPES.MACHINE' | translate }}
-    </button>
+  <div leftActions class="user-toggle-group">
+    <cnsl-nav-toggle
+      label="{{ 'USER.TABLE.TYPES.HUMAN' | translate }}"
+      (clicked)="setType(Type.TYPE_HUMAN)"
+      [active]="type === Type.TYPE_HUMAN"
+      data-e2e="list-humans"
+    ></cnsl-nav-toggle>
+    <cnsl-nav-toggle
+      label="{{ 'USER.TABLE.TYPES.MACHINE' | translate }}"
+      (clicked)="setType(Type.TYPE_MACHINE)"
+      [active]="type === Type.TYPE_MACHINE"
+      data-e2e="list-machines"
+    ></cnsl-nav-toggle>
   </div>
 
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
@@ -52,6 +58,7 @@
       mat-raised-button
       [disabled]="!canWrite"
       class="cnsl-action-button"
+      data-e2e="create-user-button"
     >
       <mat-icon class="icon">add</mat-icon>
       <span>{{ 'ACTIONS.NEW' | translate }}</span>
@@ -190,6 +197,7 @@
               color="warn"
               (click)="deleteUser(user)"
               [disabled]="!canWrite || !canDelete"
+              [attr.data-e2e]="!canWrite || !canDelete ? 'disabled-delete-button' : 'enabled-delete-button'"
               mat-icon-button
             >
               <i class="las la-trash"></i>

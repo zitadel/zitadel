@@ -7,9 +7,10 @@
     display: flex;
     align-items: center;
     padding-bottom: 0.5rem;
+    box-sizing: border-box;
 
     &.border-bottom {
-      padding-bottom: 0.5rem;
+      padding-bottom: 1rem;
       margin-bottom: 1rem;
       border-bottom: 1px solid map-get($foreground, divider);
     }

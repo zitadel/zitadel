@@ -11,9 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -90,6 +88,31 @@ type Phone struct {
 type Machine struct {
 	Name        string
 	Description string
+}
+
+type NotifyUser struct {
+	ID                 string
+	CreationDate       time.Time
+	ChangeDate         time.Time
+	ResourceOwner      string
+	Sequence           uint64
+	State              domain.UserState
+	Type               domain.UserType
+	Username           string
+	LoginNames         []string
+	PreferredLoginName string
+	FirstName          string
+	LastName           string
+	NickName           string
+	DisplayName        string
+	AvatarKey          string
+	PreferredLanguage  language.Tag
+	Gender             domain.Gender
+	LastEmail          string
+	VerifiedEmail      string
+	LastPhone          string
+	VerifiedPhone      string
+	PasswordSet        bool
 }
 
 type UserSearchQueries struct {
@@ -237,9 +260,42 @@ var (
 	}
 )
 
-func (q *Queries) GetUserByID(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (*User, error) {
-	if shouldTriggered {
-		projection.UserProjection.TriggerBulk(ctx)
+var (
+	notifyTable = table{
+		name: projection.UserNotifyTable,
+	}
+	NotifyUserIDCol = Column{
+		name:  projection.NotifyUserIDCol,
+		table: notifyTable,
+	}
+	NotifyEmailCol = Column{
+		name:           projection.NotifyLastEmailCol,
+		table:          notifyTable,
+		isOrderByLower: true,
+	}
+	NotifyVerifiedEmailCol = Column{
+		name:           projection.NotifyVerifiedEmailCol,
+		table:          notifyTable,
+		isOrderByLower: true,
+	}
+	NotifyPhoneCol = Column{
+		name:  projection.NotifyLastPhoneCol,
+		table: notifyTable,
+	}
+	NotifyVerifiedPhoneCol = Column{
+		name:  projection.NotifyVerifiedPhoneCol,
+		table: notifyTable,
+	}
+	NotifyPasswordSetCol = Column{
+		name:  projection.NotifyPasswordSetCol,
+		table: notifyTable,
+	}
+)
+
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, queries ...SearchQuery) (*User, error) {
+	if shouldTriggerBulk {
+		projection.UserProjection.Trigger(ctx)
+		projection.LoginNameProjection.Trigger(ctx)
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
@@ -259,7 +315,12 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggered bool, userID 
 	return scan(row)
 }
 
-func (q *Queries) GetUser(ctx context.Context, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (*User, error) {
+	if shouldTriggerBulk {
+		projection.UserProjection.Trigger(ctx)
+		projection.LoginNameProjection.Trigger(ctx)
+	}
+
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	query, scan := prepareUserQuery(instanceID)
 	for _, q := range queries {
@@ -321,6 +382,29 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (*NotifyUser, error) {
+	if shouldTriggered {
+		projection.UserProjection.Trigger(ctx)
+		projection.LoginNameProjection.Trigger(ctx)
+	}
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	query, scan := prepareNotifyUserQuery(instanceID)
+	for _, q := range queries {
+		query = q.toQuery(query)
+	}
+	stmt, args, err := query.Where(sq.Eq{
+		UserIDCol.identifier():         userID,
+		UserInstanceIDCol.identifier(): instanceID,
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
@@ -745,6 +829,143 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 			e.IsVerified = isPhoneVerified.Bool
 
 			return e, nil
+		}
+}
+
+func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
+	loginNamesQuery, loginNamesArgs, err := sq.Select(
+		userLoginNamesUserIDCol.identifier(),
+		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+") as "+userLoginNamesListCol.name).
+		From(userLoginNamesTable.identifier()).
+		GroupBy(userLoginNamesUserIDCol.identifier()).
+		Where(sq.Eq{
+			userLoginNamesInstanceIDCol.identifier(): instanceID,
+		}).ToSql()
+	if err != nil {
+		return sq.SelectBuilder{}, nil
+	}
+	preferredLoginNameQuery, preferredLoginNameArgs, err := sq.Select(
+		userPreferredLoginNameUserIDCol.identifier(),
+		userPreferredLoginNameCol.identifier()).
+		From(userPreferredLoginNameTable.identifier()).
+		Where(sq.Eq{
+			userPreferredLoginNameIsPrimaryCol.identifier():  true,
+			userPreferredLoginNameInstanceIDCol.identifier(): instanceID,
+		}).ToSql()
+	if err != nil {
+		return sq.SelectBuilder{}, nil
+	}
+	return sq.Select(
+			UserIDCol.identifier(),
+			UserCreationDateCol.identifier(),
+			UserChangeDateCol.identifier(),
+			UserResourceOwnerCol.identifier(),
+			UserSequenceCol.identifier(),
+			UserStateCol.identifier(),
+			UserTypeCol.identifier(),
+			UserUsernameCol.identifier(),
+			userLoginNamesListCol.identifier(),
+			userPreferredLoginNameCol.identifier(),
+			HumanUserIDCol.identifier(),
+			HumanFirstNameCol.identifier(),
+			HumanLastNameCol.identifier(),
+			HumanNickNameCol.identifier(),
+			HumanDisplayNameCol.identifier(),
+			HumanPreferredLanguageCol.identifier(),
+			HumanGenderCol.identifier(),
+			HumanAvatarURLCol.identifier(),
+			NotifyUserIDCol.identifier(),
+			NotifyEmailCol.identifier(),
+			NotifyVerifiedEmailCol.identifier(),
+			NotifyPhoneCol.identifier(),
+			NotifyVerifiedPhoneCol.identifier(),
+			NotifyPasswordSetCol.identifier(),
+		).
+			From(userTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			LeftJoin(join(NotifyUserIDCol, UserIDCol)).
+			LeftJoin("("+loginNamesQuery+") as "+userLoginNamesTable.alias+" on "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier(), loginNamesArgs...).
+			LeftJoin("("+preferredLoginNameQuery+") as "+userPreferredLoginNameTable.alias+" on "+userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier(), preferredLoginNameArgs...).
+			PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*NotifyUser, error) {
+			u := new(NotifyUser)
+			loginNames := pq.StringArray{}
+			preferredLoginName := sql.NullString{}
+
+			humanID := sql.NullString{}
+			firstName := sql.NullString{}
+			lastName := sql.NullString{}
+			nickName := sql.NullString{}
+			displayName := sql.NullString{}
+			preferredLanguage := sql.NullString{}
+			gender := sql.NullInt32{}
+			avatarKey := sql.NullString{}
+
+			notifyUserID := sql.NullString{}
+			notifyEmail := sql.NullString{}
+			notifyVerifiedEmail := sql.NullString{}
+			notifyPhone := sql.NullString{}
+			notifyVerifiedPhone := sql.NullString{}
+			notifyPasswordSet := sql.NullBool{}
+
+			err := row.Scan(
+				&u.ID,
+				&u.CreationDate,
+				&u.ChangeDate,
+				&u.ResourceOwner,
+				&u.Sequence,
+				&u.State,
+				&u.Type,
+				&u.Username,
+				&loginNames,
+				&preferredLoginName,
+				&humanID,
+				&firstName,
+				&lastName,
+				&nickName,
+				&displayName,
+				&preferredLanguage,
+				&gender,
+				&avatarKey,
+				&notifyUserID,
+				&notifyEmail,
+				&notifyVerifiedEmail,
+				&notifyPhone,
+				&notifyVerifiedPhone,
+				&notifyPasswordSet,
+			)
+
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-Dgqd2", "Errors.User.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-Dbwsg", "Errors.Internal")
+			}
+
+			if !notifyUserID.Valid {
+				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-Sfw3f", "Errors.User.NotFound")
+			}
+
+			u.LoginNames = loginNames
+			if preferredLoginName.Valid {
+				u.PreferredLoginName = preferredLoginName.String
+			}
+			if humanID.Valid {
+				u.FirstName = firstName.String
+				u.LastName = lastName.String
+				u.NickName = nickName.String
+				u.DisplayName = displayName.String
+				u.AvatarKey = avatarKey.String
+				u.PreferredLanguage = language.Make(preferredLanguage.String)
+				u.Gender = domain.Gender(gender.Int32)
+			}
+			u.LastEmail = notifyEmail.String
+			u.VerifiedEmail = notifyVerifiedEmail.String
+			u.LastPhone = notifyPhone.String
+			u.VerifiedPhone = notifyVerifiedPhone.String
+			u.PasswordSet = notifyPasswordSet.Bool
+
+			return u, nil
 		}
 }
 

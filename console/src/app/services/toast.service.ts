@@ -33,15 +33,26 @@ export class ToastService {
     }
   }
 
-  public showError(grpcError: any): void {
-    const { message, code, metadata } = grpcError;
-    if (code !== 16) {
+  public showError(error: any | string, isGrpc: boolean = true, i18nKey: boolean = false): void {
+    if (isGrpc) {
+      const { message, code, metadata } = error;
+      if (code !== 16) {
+        this.translate
+          .get('ACTIONS.CLOSE')
+          .pipe(take(1))
+          .subscribe((value) => {
+            this.showMessage(decodeURI(message), value, false);
+          });
+      }
+    } else if (i18nKey) {
       this.translate
-        .get('ACTIONS.CLOSE')
+        .get(error)
         .pipe(take(1))
         .subscribe((value) => {
-          this.showMessage(decodeURI(message), value, false);
+          this.showMessage(value, '', false);
         });
+    } else {
+      this.showMessage(error as string, '', false);
     }
   }
 

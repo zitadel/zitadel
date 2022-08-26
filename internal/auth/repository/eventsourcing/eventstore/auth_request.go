@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -142,11 +143,11 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	}
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
-		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
+		logging.WithFields("login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Info("login hint invalid")
 	}
 	if request.UserID == "" && request.LoginHint == "" && domain.IsPrompt(request.Prompt, domain.PromptNone) {
 		err = repo.tryUsingOnlyUserSession(request)
-		logging.LogWithFields("EVENT-SDf3g", "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("unable to select only user session")
+		logging.WithFields("id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("unable to select only user session")
 	}
 
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
@@ -361,7 +362,7 @@ func (repo *AuthRequestRepo) BeginMFAU2FLogin(ctx context.Context, userID, resou
 	if err != nil {
 		return nil, err
 	}
-	return repo.Command.HumanBeginU2FLogin(ctx, userID, resourceOwner, request, true)
+	return repo.Command.HumanBeginU2FLogin(ctx, userID, resourceOwner, request)
 }
 
 func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
@@ -371,7 +372,7 @@ func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceO
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanFinishU2FLogin(ctx, userID, resourceOwner, credentialData, request, true)
+	return repo.Command.HumanFinishU2FLogin(ctx, userID, resourceOwner, credentialData, request)
 }
 
 func (repo *AuthRequestRepo) BeginPasswordlessSetup(ctx context.Context, userID, resourceOwner string, authenticatorPlatform domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
@@ -415,7 +416,7 @@ func (repo *AuthRequestRepo) BeginPasswordlessLogin(ctx context.Context, userID,
 	if err != nil {
 		return nil, err
 	}
-	return repo.Command.HumanBeginPasswordlessLogin(ctx, userID, resourceOwner, request, true)
+	return repo.Command.HumanBeginPasswordlessLogin(ctx, userID, resourceOwner, request)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, resourceOwner, authRequestID, userAgentID string, credentialData []byte, info *domain.BrowserInfo) (err error) {
@@ -425,7 +426,7 @@ func (repo *AuthRequestRepo) VerifyPasswordless(ctx context.Context, userID, res
 	if err != nil {
 		return err
 	}
-	return repo.Command.HumanFinishPasswordlessLogin(ctx, userID, resourceOwner, credentialData, request, true)
+	return repo.Command.HumanFinishPasswordlessLogin(ctx, userID, resourceOwner, credentialData, request)
 }
 
 func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, userAgentID string, info *domain.BrowserInfo) (err error) {
@@ -627,7 +628,8 @@ func (repo *AuthRequestRepo) tryUsingOnlyUserSession(request *domain.AuthRequest
 }
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginName string) (err error) {
-	user := new(user_view_model.UserView)
+	var user *user_view_model.UserView
+	loginName = strings.TrimSpace(loginName)
 	preferredLoginName := loginName
 	if request.RequestedOrgID != "" {
 		if request.RequestedOrgID != "" {
@@ -643,9 +645,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 			}
 		}
 	}
-	if request.LoginPolicy.IgnoreUnknownUsernames {
+	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
 		if errors.IsNotFound(err) || (user != nil && user.State == int32(domain.UserStateInactive)) {
-			if request.LabelPolicy.HideLoginNameSuffix {
+			if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
 				preferredLoginName = loginName
 			}
 			request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)
@@ -662,7 +664,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	return nil
 }
 
-func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) error {
+func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) error {
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, user.ResourceOwner)
 	if err != nil {
 		return err
@@ -719,7 +721,7 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
-	externalIDP := new(user_view_model.ExternalIDPView)
+	var externalIDP *user_view_model.ExternalIDPView
 	if request.RequestedOrgID != "" {
 		externalIDP, err = repo.View.ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(externalUserID, idpConfigID, request.RequestedOrgID, request.InstanceID)
 	} else {
@@ -1116,7 +1118,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	}
 	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
 	if err != nil {
-		logging.Log("EVENT-Hse6s").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
+		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
 	}
 	sessionCopy := *session
@@ -1141,7 +1143,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			user_repo.HumanU2FTokenCheckFailedType:
 			eventData, err := user_view_model.UserSessionFromEvent(event)
 			if err != nil {
-				logging.Log("EVENT-sdgT3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error getting event data")
+				logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error getting event data")
 				return user_view_model.UserSessionToModel(session), nil
 			}
 			if eventData.UserAgentID != agentID {
@@ -1151,7 +1153,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
 		err := sessionCopy.AppendEvent(event)
-		logging.Log("EVENT-qbhj3").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("error appending event")
+		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("error appending event")
 	}
 	return user_view_model.UserSessionToModel(&sessionCopy), nil
 }
@@ -1197,7 +1199,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	}
 	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
 	if err != nil {
-		logging.Log("EVENT-dfg42").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
+		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil
 	}
 	if len(events) == 0 {

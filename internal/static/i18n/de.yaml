@@ -94,7 +94,7 @@ Errors:
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Username:
       AlreadyExists: Benutzername ist bereits vergeben
-      Reservied: Benutzername ist bereits vergeben
+      Reserved: Benutzername ist bereits vergeben
     Code:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden
@@ -172,6 +172,7 @@ Errors:
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     Domain:
       AlreadyExists: Domäne existiert bereits
+      InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
@@ -263,8 +264,8 @@ Errors:
       HasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
-    UserIDMisisng: User ID fehlt
   IAM:
+    NotFound: Instanz nicht gefunden
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
@@ -870,6 +871,7 @@ EventTypes:
     deactivated: Aktion deaktiviert
     reactivated: Aktion reaktiviert
     removed: Aktion gelöscht
+
 Application:
   OIDC:
     UnsupportedVersion: Deine OIDC Version wird nicht unterstützt

@@ -1,36 +1,38 @@
 module.exports = {
-  quickstarts: [
-    "quickstarts/introduction",
+  examples: [
+    "examples/introduction",
     {
       type: "category",
       label: "Integrate ZITADEL Login in your App",
       items: [
-        "quickstarts/login/angular",
-        "quickstarts/login/react",
-        "quickstarts/login/flutter",
-        "quickstarts/login/nextjs",
+        "examples/login/angular",
+        "examples/login/react",
+        "examples/login/flutter",
+        "examples/login/nextjs",
       ],
       collapsed: false,
     },
     {
       type: "category",
       label: "Secure your API",
-      items: ["quickstarts/secure-api/go", "quickstarts/secure-api/dot-net"],
+      items: [
+        "examples/secure-api/go",
+        "examples/secure-api/dot-net"],
       collapsed: false,
     },
     {
       type: "category",
       label: "Call the ZITADEL API",
       items: [
-        "quickstarts/call-zitadel-api/go",
-        "quickstarts/call-zitadel-api/dot-net",
+        "examples/call-zitadel-api/go",
+        "examples/call-zitadel-api/dot-net",
       ],
       collapsed: false,
     },
     {
       type: "category",
       label: "Identity Aware Proxy",
-      items: ["quickstarts/identity-proxy/oauth2-proxy"],
+      items: ["examples/identity-proxy/oauth2-proxy"],
       collapsed: false,
     },
   ],
@@ -38,36 +40,92 @@ module.exports = {
     "guides/overview",
     {
       type: "category",
-      label: "Get to know ZITADEL",
+      label: "Get started",
       collapsed: false,
       items: [
-        "guides/basics/get-started",
-        "guides/basics/instance",
-        "guides/basics/organizations",
-        "guides/basics/projects",
-        "guides/basics/applications",
+        "guides/start/quickstart",
       ],
     },
     {
       type: "category",
-      label: "Install ZITADEL",
+      label: "Deploy",
       collapsed: false,
       items: [
-        "guides/installation/run/run",
-        "guides/installation/configure/configure",
-        "guides/installation/custom-domain",
-        "guides/installation/http2-support",
-        "guides/installation/loadbalancing-example/loadbalancing-example",
+        "guides/deploy/overview",
+        "guides/deploy/linux",
+        "guides/deploy/macos",
+        "guides/deploy/compose",
+        "guides/deploy/knative",
+        "guides/deploy/kubernetes",
+        "guides/deploy/loadbalancing-example/loadbalancing-example",
       ],
     },
     {
       type: "category",
-      label: "Integrations",
+      label: "Manage",
       collapsed: false,
       items: [
-        "guides/integrations/authenticated-mongodb-charts",
-        "guides/integrations/auth0",
-        "guides/integrations/gitlab-self-hosted",
+        {
+          type: 'category',
+          label: 'Cloud',
+          items: [
+            "guides/manage/cloud/overview",
+            "guides/manage/cloud/start",
+            "guides/manage/cloud/instances",
+            "guides/manage/cloud/billing",
+            "guides/manage/cloud/users",
+            "guides/manage/cloud/support",
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Self-Hosted',
+          items: [
+            "guides/manage/self-hosted/configure/configure",
+            "guides/manage/self-hosted/proxy/proxy",
+            "guides/manage/self-hosted/custom-domain",
+            "guides/manage/self-hosted/http2",
+            "guides/manage/self-hosted/tls_modes",
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Console',
+          items: [
+            "guides/manage/console/organizations",
+            "guides/manage/console/projects",
+            "guides/manage/console/applications",
+
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Customize',
+          items: [
+            "guides/manage/customize/branding",
+            "guides/manage/customize/texts",
+            "guides/manage/customize/behavior",
+            "guides/manage/customize/user-metadata",
+          ]
+        }
+      ],
+    },
+    {
+      type: "category",
+      label: "Integrate",
+      collapsed: false,
+      items: [
+        "guides/integrate/identity-brokering",
+        "guides/integrate/access-zitadel-apis",
+        "guides/integrate/access-zitadel-system-api",
+        "guides/integrate/authenticated-mongodb-charts",
+        "guides/integrate/auth0",
+        "guides/integrate/azuread",
+        "guides/integrate/gitlab-self-hosted",
+        "guides/integrate/login-users",
+        "guides/integrate/serviceusers",
+        "guides/integrate/oauth-recommended-flows",
+        "guides/integrate/export-and-import"
       ],
     },
     {
@@ -82,45 +140,13 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Authentication",
-      collapsed: false,
-      items: [
-        "guides/authentication/login-users",
-        "guides/authentication/identity-brokering",
-        "guides/authentication/serviceusers",
-      ],
-    },
-    {
-      type: "category",
-      label: "Authorization",
-      collapsed: false,
-      items: ["guides/authorization/oauth-recommended-flows"],
-    },
-    {
-      type: "category",
-      label: "API",
-      collapsed: false,
-      items: ["guides/api/access-zitadel-apis"],
-    },
-    {
-      type: "category",
-      label: "Customization",
-      collapsed: false,
-      items: [
-          "guides/customization/branding",
-          "guides/customization/texts",
-          "guides/customization/behavior",
-          "guides/customization/user-metadata"
-      ],
-    },
-    {
-      type: "category",
       label: "Trainings",
       collapsed: true,
       items: [
         "guides/trainings/introduction",
         "guides/trainings/application",
-        "guides/trainings/recurring"
+        "guides/trainings/recurring",
+        "guides/trainings/project",
       ],
     },
   ],
@@ -184,17 +210,33 @@ module.exports = {
       label: "Rate Limits",
       collapsed: false,
       items: [
+        "apis/ratelimits/ratelimits",
         "legal/rate-limit-policy",
-        "apis/ratelimits/accounts",
-        "apis/ratelimits/api",
       ],
     },
   ],
   concepts: [
     "concepts/introduction",
     "concepts/principles",
-    "concepts/eventstore",
-    "concepts/architecture",
+    {
+      type: "category",
+      label: "Eventstore",
+      collapsed: false,
+      items: [
+        "concepts/eventstore/overview",
+        "concepts/eventstore/implementation",
+      ],
+    },
+    {
+      type: "category",
+      label: "Architecture",
+      collapsed: false,
+      items: [
+        "concepts/architecture/software",
+        "concepts/architecture/solution",
+        "concepts/architecture/secrets",
+      ],
+    },
     {
       type: "category",
       label: "Structure",
@@ -228,19 +270,6 @@ module.exports = {
     "manuals/introduction",
     "manuals/user-profile",
     "manuals/user-login",
-    {
-      type: "category",
-      label: "Customer Portal",
-      collapsed: true,
-      items: [
-        "manuals/customerportal/overview",
-        "manuals/customerportal/start",
-        "manuals/customerportal/instances",
-        "manuals/customerportal/billing",
-        "manuals/customerportal/users",
-        "manuals/customerportal/support",
-      ],
-    },
     "manuals/troubleshooting",
   ],
   legal: [

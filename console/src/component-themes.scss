@@ -12,6 +12,7 @@
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/modules/contributors/contributors.component';
 @import 'src/app/modules/nav/nav.component';
+@import 'src/app/modules/nav-toggle/nav-toggle.component';
 @import './styles/toast.scss';
 @import 'src/app/modules/table-actions/table-actions.component';
 @import 'src/app/modules/org-context/org-context.component.scss';
@@ -62,6 +63,7 @@
   @include main-theme($theme);
   @include avatar-theme($theme);
   @include nav-theme($theme);
+  @include nav-toggle-theme($theme);
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
   @include projects-theme($theme);

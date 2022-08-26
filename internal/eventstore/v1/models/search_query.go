@@ -41,6 +41,7 @@ type Columns int32
 const (
 	Columns_Event = iota
 	Columns_Max_Sequence
+	Columns_InstanceIDs
 	//insert new columns-types before this columnsCount because count is needed for validation
 	columnsCount
 )
@@ -48,7 +49,7 @@ const (
 //FactoryFromSearchQuery is deprecated because it's for migration purposes. use NewSearchQueryFactory
 func FactoryFromSearchQuery(q *SearchQuery) *SearchQueryFactory {
 	factory := &SearchQueryFactory{
-		columns: Columns_Event,
+		columns: q.Columns,
 		desc:    q.Desc,
 		limit:   q.Limit,
 		queries: make([]*query, len(q.Queries)),
@@ -232,6 +233,9 @@ func (q *query) eventTypeFilter() *Filter {
 }
 
 func (q *query) aggregateTypeFilter() *Filter {
+	if len(q.aggregateTypes) < 1 {
+		return nil
+	}
 	if len(q.aggregateTypes) == 1 {
 		return NewFilter(Field_AggregateType, q.aggregateTypes[0], Operation_Equals)
 	}

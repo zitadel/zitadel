@@ -148,6 +148,10 @@ func NewActionStateSearchQuery(value domain.ActionState) (SearchQuery, error) {
 	return NewNumberQuery(ActionColumnState, int(value), NumberEquals)
 }
 
+func NewActionIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(ActionColumnID, id, TextEquals)
+}
+
 func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),

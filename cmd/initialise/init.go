@@ -39,10 +39,10 @@ The user provided by flags needs privileges to
 
 func InitAll(config *Config) {
 	id.Configure(config.Machine)
-	err := initialise(config,
-		VerifyUser(config.Database.Username, config.Database.Password),
-		VerifyDatabase(config.Database.Database),
-		VerifyGrant(config.Database.Database, config.Database.Username),
+	err := initialise(config.Database,
+		VerifyUser(config.Database.Username(), config.Database.Password()),
+		VerifyDatabase(config.Database.Database()),
+		VerifyGrant(config.Database.Database(), config.Database.Username()),
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 
@@ -50,10 +50,10 @@ func InitAll(config *Config) {
 	logging.OnError(err).Fatal("unable to initialize ZITADEL")
 }
 
-func initialise(config *Config, steps ...func(*sql.DB) error) error {
+func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 	logging.Info("initialization started")
 
-	db, err := database.Connect(adminConfig(config))
+	db, err := database.Connect(config, true)
 	if err != nil {
 		return err
 	}

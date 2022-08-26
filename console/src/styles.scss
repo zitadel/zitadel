@@ -446,9 +446,18 @@ $custom-typography: mat.define-typography-config(
     }
   }
 
-  .mat-button-toggle-button {
+  .mat-button-toggle-group-appearance-standard {
+    border-color: map-get($foreground, divider);
+  }
+
+  .mat-button-toggle {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    &.mat-button-toggle-checked {
+      background-color: #00000010;
+    }
   }
 
   .main-container,
@@ -509,9 +518,18 @@ $custom-typography: mat.define-typography-config(
     }
   }
 
-  .mat-button-toggle-button {
+  .mat-button-toggle-group-appearance-standard {
+    border-color: map-get($foreground, divider);
+  }
+
+  .mat-button-toggle {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    &.mat-button-toggle-checked {
+      background-color: mat.get-color-from-palette($background, background);
+    }
   }
 
   .main-container,
@@ -600,4 +618,16 @@ i {
 
 .mat-checkbox-inner-container.mat-checkbox-inner-container-no-side-margin {
   margin-right: 0.5rem !important;
+}
+
+.mat-button-toggle-button {
+  display: flex;
+  height: 36px;
+  line-height: 36px !important;
+  align-items: center;
+  font-size: 14px !important;
+}
+
+.mat-button-toggle-label-content {
+  line-height: 36px;
 }

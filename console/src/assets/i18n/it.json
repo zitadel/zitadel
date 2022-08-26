@@ -22,16 +22,16 @@
     "DISCLAIMERLINK": "Ulteriori informazioni",
     "DOCUMENTATION": {
       "TITLE": "Documentazione",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "GETSTARTED": {
       "TITLE": "Come iniziare con ZITADEL",
-      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "QUICKSTARTS": {
       "LABEL": "Primi passi",
       "TITLE": "Quickstarts",
-      "DESCRIPTION": "Iniziare rapidamente con ZITADEL."
+      "DESCRIPTION": "Inizia con ZITADEL."
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Scorciatoie",
@@ -106,6 +106,7 @@
     "FINISHED": "Chiudi",
     "CHANGE": "Cambia",
     "REACTIVATE": "Riattiva",
+    "ACTIVATE": "Attiva",
     "DEACTIVATE": "Disattiva",
     "REFRESH": "Aggiorna",
     "LOGIN": "Accedi",
@@ -181,8 +182,9 @@
     "SIDEWIDE": "Tasti rapidi globali",
     "SHORTCUTS": {
       "HOME": "Vai alla panoramica",
-      "SYSTEM": "Vai al pagina di sistema",
+      "INSTANCE": "Vai alla pagina dell' istanza",
       "ORG": "Vai all'organizzazione",
+      "ORGSETTINGS": "Alle impostazioni dell'organizzazione",
       "ORGSWITCHER": "Cambia organizzazione",
       "ME": "Vai al profilo",
       "PROJECTS": "Vai ai progetti",
@@ -193,6 +195,8 @@
     }
   },
   "RESOURCEID": "Resource ID",
+  "NAME": "Name",
+  "VERSION": "Versione",
   "TABLE": {
     "NOROWS": "Nessun dato"
   },
@@ -478,7 +482,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "La password deve essere lunga almeno {{valore}} caratteri.",
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
       "NOTEQUAL": "Le password fornite non corrispondono."
     },
     "ID": "ID",
@@ -536,12 +540,12 @@
       "INVALIDPATTERN": "La password non soddisfa le regole definite.",
       "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail",
       "REQUIRED": "Il campo di input \u00e8 vuoto.",
-      "MINLENGTH": "La password deve essere lunga almeno {{requiredLength}} caratteri.",
+      "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
       "NOEMAIL": "Il nome utente non pu\u00f2 essere un indirizzo e-mail.",
-      "UPPERCASEMISSING": "La password deve includere un carattere maiuscolo.",
-      "LOWERCASEMISSING": "La password deve includere un carattere minuscolo.",
-      "SYMBOLERROR": "La password deve includere un simbolo o un segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra."
+      "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
+      "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
+      "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra."
     },
     "STATE": {
       "0": "Sconosciuto",
@@ -660,6 +664,8 @@
       "3": "Post creazione"
     },
     "ADDTRIGGER": "Aggiungi trigger",
+    "FLOWCHANGED": "Il processo è stato modificato con successo.",
+    "FLOWCLEARED": "Il processo è stato eliminato con successo.",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
@@ -681,8 +687,8 @@
         "DELETE_SUCCESS": "Azione rimossa con successo."
       },
       "CLEAR": {
-        "TITLE": "Flow zurücksetzen?",
-        "DESCRIPTION": "Stai per cancellare un'azione. Questa azione non può essere annullata. Vuoi continuare?"
+        "TITLE": "Elimina processo",
+        "DESCRIPTION": "Stai per eliminare un processo. Questa azione non può essere annullata. Vuoi continuare?"
       }
     },
     "TOAST": {
@@ -705,6 +711,17 @@
     "MEMBER": {
       "TITLE": "Manager",
       "DESCRIPTION": "Questi manager possono modificare le impostazioni dell'istanza."
+    },
+    "PAGES": {
+      "STATE": "Stato",
+      "DOMAINLIST": "Domini"
+    },
+    "STATE": {
+      "0": "Non specifico",
+      "1": "In fase di creazione",
+      "2": "Attiva",
+      "3": "In fase di arresto",
+      "4": "Arrestata"
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -757,6 +774,8 @@
       "LISTDESCRIPTION": "Scegli un'organizzazione.",
       "ACTIVE": "Attivo",
       "CREATE": "Creare un'organizzazione",
+      "DEACTIVATE": "Disattiva organizzazione",
+      "REACTIVATE": "Riattiva organizzazione",
       "NOPERMISSION": "Non hai l'autorizzazione per accedere alle impostazioni dell'organizzazione.",
       "USERSELFACCOUNT": "Usa il tuo account personale come proprietario dell'organizzazione",
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
@@ -821,6 +840,16 @@
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo"
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Disattivare l'organizzazione",
+        "DESCRIPTION": "Stai per disattivate la tua organizzazione. Utenti dell' organizzazione non possono più accedere in seguito. Sei sicuro di procedere?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Riattivare l'organizzazione",
+        "DESCRIPTION": "Stai per riattivare la tua organizzazione. Utenti dell' organizzazione possono accedere nuovamente dopo l'attivazione. Vuoi procedere?"
+      }
     }
   },
   "SETTINGS": {
@@ -861,8 +890,9 @@
     "DEFAULTLANGUAGE": "Lingua standard",
     "LANGUAGE": {
       "de": "Deutsch",
+      "en": "English",
       "it": "Italiano",
-      "en": "English"
+      "fr": "Français"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -883,11 +913,21 @@
       "PROVIDER": "Fornitore SMS",
       "ADDPROVIDER": "Aggiungi fornitore SMS",
       "ADDPROVIDERDESCRIPTION": "Scegli uno dei provider disponibili e inserisci i dati richiesti.",
+      "REMOVEPROVIDER": "Elimina configurazione",
+      "REMOVEPROVIDER_DESC": "Stai per eliminare una configurazione. Vuoi continuare?",
+      "SMSPROVIDERSTATE": {
+        "0": "Non specificato",
+        "1": "Attivo",
+        "2": "Inattivo"
+      },
+      "ACTIVATED": "Fornitore attivato.",
+      "DEACTIVATED": "Fornitore disattivato.",
       "TWILIO": {
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio aggiunto con successo.",
+        "REMOVED": "Twilio rimosso con successo.",
         "CHANGETOKEN": "Cambia Token",
         "SETTOKEN": "Cambia Token",
         "TOKENSET": "Token cambiato con successo."
@@ -938,9 +978,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Complessit\u00e0 della password",
       "DESCRIPTION": "Assicura che tutte le password impostate corrispondano a un modello specifico",
-      "SYMBOLANDNUMBERERROR": "La password deve essere composta da una cifra e un simbolo/segno di interpunzione.",
-      "SYMBOLERROR": "La password deve includere un simbolo/segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra.",
+      "SYMBOLANDNUMBERERROR": "Deve essere composta da una cifra e un simbolo/segno di interpunzione.",
+      "SYMBOLERROR": "Deve includere un simbolo/segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra.",
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
     "PRIVATELABELING": {
@@ -965,6 +1005,7 @@
       "MAXSIZE": "La dimensione massima \u00e8 limitata a 524kB",
       "EMAILNOSVG": "Il formato di file SVG non \u00e8 supportato nelle email. Perci\u00f2 carica il tuo logo in PNG o in un altro formato supportato.",
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
+      "NOSVGSUPPORTED": "SVG non sono supportati",
       "FONTINLOGINONLY": "Il carattere \u00e8 attualmente visualizzato solo nell'interfaccia di accesso.",
       "VIEWS": {
         "PREVIEW": "Anteprima",
@@ -1028,10 +1069,10 @@
       "UNSAVED_DESCRIPTION": "Hai fatto delle modifiche senza salvare. Vuoi salvare ora?",
       "LOCALE": "Codice locale",
       "LOCALES": {
-        "de": "Tedesco",
-        "en": "Inglese",
+        "de": "Deutsch",
+        "en": "English",
         "it": "Italiano",
-        "fr": "Francese"
+        "fr": "Français"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1773,9 +1814,10 @@
     "3": "Altro"
   },
   "LANGUAGES": {
-    "de": "Tedesco",
+    "de": "Deutsch",
+    "en": "English",
     "it": "Italiano",
-    "en": "Inglese"
+    "fr": "Français"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

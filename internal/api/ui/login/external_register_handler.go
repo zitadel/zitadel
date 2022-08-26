@@ -44,6 +44,7 @@ type externalRegisterData struct {
 	ExternalIDPUserID          string
 	ExternalIDPUserDisplayName string
 	ShowUsername               bool
+	ShowUsernameSuffix         bool
 	OrgRegister                bool
 	ExternalEmail              string
 	ExternalEmailVerified      bool
@@ -121,13 +122,19 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
+
+	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
 	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
 	if !idpConfig.AutoRegister {
-		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, nil)
+		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, labelPolicy.HideLoginNameSuffix, nil)
 		return
 	}
 	l.registerExternalUser(w, r, authReq, user, externalIDP)
@@ -135,10 +142,8 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 
 func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
 	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
@@ -151,7 +156,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -159,7 +164,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idp *domain.UserIDPLink, err error) {
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idp *domain.UserIDPLink, hideLoginNameSuffix bool, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -182,6 +187,7 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		ExternalEmailVerified:      human.IsEmailVerified,
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+		ShowUsernameSuffix:         !hideLoginNameSuffix,
 	}
 	if human.Phone != nil {
 		data.Phone = human.PhoneNumber
@@ -201,10 +207,8 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 	}
 
 	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
 	externalIDP, err := l.getExternalIDP(data)
@@ -227,7 +231,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

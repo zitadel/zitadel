@@ -44,17 +44,17 @@
   --zitadel-color-input-border-hover: #1a1b1b;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
-  --zitadel-color-font-50: rgb(0, 0, 0);
-  --zitadel-color-font-100: rgb(0, 0, 0);
-  --zitadel-color-font-200: rgb(0, 0, 0);
-  --zitadel-color-font-300: rgb(0, 0, 0);
-  --zitadel-color-font-400: rgb(0, 0, 0);
-  --zitadel-color-font-500: rgb(0, 0, 0);
-  --zitadel-color-font-600: rgb(0, 0, 0);
-  --zitadel-color-font-700: rgb(0, 0, 0);
-  --zitadel-color-font-800: rgb(0, 0, 0);
-  --zitadel-color-font-900: rgb(0, 0, 0);
-  --zitadel-color-font-contrast: rgb(255, 255, 255);
+  --zitadel-color-text-50: rgb(0, 0, 0);
+  --zitadel-color-text-100: rgb(0, 0, 0);
+  --zitadel-color-text-200: rgb(0, 0, 0);
+  --zitadel-color-text-300: rgb(0, 0, 0);
+  --zitadel-color-text-400: rgb(0, 0, 0);
+  --zitadel-color-text-500: rgb(0, 0, 0);
+  --zitadel-color-text-600: rgb(0, 0, 0);
+  --zitadel-color-text-700: rgb(0, 0, 0);
+  --zitadel-color-text-800: rgb(0, 0, 0);
+  --zitadel-color-text-900: rgb(0, 0, 0);
+  --zitadel-color-text-contrast: rgb(255, 255, 255);
   --zitadel-color-label: #0000008a;
   --zitadel-color-account-selector-hover: rgba(0, 0, 0, 0.02);
   --zitadel-color-account-selector-active: rgba(0, 0, 0, 0.05);
@@ -2819,7 +2819,7 @@ footer {
   }
 }
 footer a {
-  color: var(--zitadel-color-font-500);
+  color: var(--zitadel-color-text-500);
 }
 footer .lgn-logo-watermark {
   background: var(--zitadel-logo-powered-by) no-repeat;

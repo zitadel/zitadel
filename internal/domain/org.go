@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"strings"
+
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -15,7 +17,11 @@ type Org struct {
 }
 
 func (o *Org) IsValid() bool {
-	return o != nil && o.Name != ""
+	if o == nil {
+		return false
+	}
+	o.Name = strings.TrimSpace(o.Name)
+	return o.Name != ""
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {
