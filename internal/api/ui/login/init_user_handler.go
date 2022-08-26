@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/zitadel/zitadel/internal/domain"
-
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -138,6 +137,12 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 		}
 	}
 	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		user, err := l.query.GetUserByID(r.Context(), false, userID)
+		if err == nil {
+			l.customTexts(r.Context(), translator, user.ResourceOwner)
+		}
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitUser], data, nil)
 }
 

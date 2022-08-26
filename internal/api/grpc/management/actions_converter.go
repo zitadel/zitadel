@@ -4,6 +4,7 @@ import (
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -59,6 +60,8 @@ func ActionQueryToQuery(query interface{}) (query.SearchQuery, error) {
 		return action_grpc.ActionNameQuery(q.ActionNameQuery)
 	case *mgmt_pb.ActionQuery_ActionStateQuery:
 		return action_grpc.ActionStateQuery(q.ActionStateQuery)
+	case *mgmt_pb.ActionQuery_ActionIdQuery:
+		return action_grpc.ActionIDQuery(q.ActionIdQuery)
 	}
-	return nil, nil
+	return nil, errors.ThrowInvalidArgument(nil, "MGMT-dsg3z", "Errors.Query.InvalidRequest")
 }

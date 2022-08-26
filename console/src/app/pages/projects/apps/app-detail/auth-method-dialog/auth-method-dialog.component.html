@@ -1,7 +1,6 @@
 <h1 mat-dialog-title>
-  <span>{{ 'USER.CODEDIALOG.TITLE' | translate }} {{ data?.number }}</span>
+  <span>{{ 'APP.PAGES.DIALOG.CONFIG.TITLE' | translate }} {{ data?.number }}</span>
 </h1>
-<p class="desc cnsl-secondary-text">{{ 'USER.CODEDIALOG.DESCRIPTION' | translate }}</p>
 <div mat-dialog-content>
   <cnsl-auth-method-radio
     [authMethods]="data.authMethods"
