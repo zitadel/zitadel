@@ -4,7 +4,7 @@ import { login, User } from "../../support/login/users";
 
 describe("login policy", ()=> {
 
-    const orgPath = `/ui/console/org`
+    const orgPath = `/org`
 
     ;[User.OrgOwner].forEach(user => {
 

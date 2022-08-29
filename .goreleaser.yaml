@@ -5,6 +5,10 @@ release:
     owner: zitadel
     name: zitadel
   draft: false
+  # If set to auto, will mark the release as not ready for production
+  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  # If set to true, will mark the release as not ready for production.
+  # Default is false.
   prerelease: auto
 
 before:
@@ -20,7 +24,8 @@ before:
     - sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
 
 builds:
-  - env:
+  - id: prod
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -31,7 +36,13 @@ builds:
       - arm64
     ldflags:
       -s -w -X github.com/zitadel/zitadel/cmd/build.version={{.Version}} -X github.com/zitadel/zitadel/cmd/build.commit={{.Commit}} -X github.com/zitadel/zitadel/cmd/build.date={{.Date}}
-      
+  - id: dev
+    env:
+      - CGO_ENABLED=0
+    binary: zitadel-debug
+    gcflags: all=-N -l
+    ldflags: ""
+
 dist: .artifacts/goreleaser
 
 dockers:
@@ -43,6 +54,8 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/amd64"
+  ids:
+  - prod
 - image_templates:
     - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
     - ghcr.io/zitadel/zitadel:{{ .ShortCommit }}-arm64
@@ -51,6 +64,8 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/arm64"
+  ids:
+  - prod
 
 docker_manifests:
 - id: zitadel-latest
@@ -58,6 +73,8 @@ docker_manifests:
   image_templates:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
+  # Skips can and shall be set for individual manifests same as in dockers
+  skip_push: auto
 - id: zitadel-Tag
   name_template: ghcr.io/zitadel/zitadel:{{ .Tag }}
   image_templates:
@@ -67,6 +84,8 @@ docker_manifests:
 
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    builds:
+    - prod
     replacements:
       darwin: Darwin
       linux: Linux
@@ -111,6 +130,10 @@ brews:
     - name: git
     install: |-
       bin.install "zitadel"
+    # If set to auto, the release will not be uploaded to the homebrew tap
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Default is false.
+    skip_upload: auto
 
 announce:
   discord:

@@ -2,7 +2,7 @@ import { login, User } from "../../support/login/users";
 
 describe("password complexity", ()=> {
 
-    const orgPath = `/ui/console/org`
+    const orgPath = `/org`
     const testProjectName = 'e2eproject'
 
     ;[User.OrgOwner].forEach(user => {

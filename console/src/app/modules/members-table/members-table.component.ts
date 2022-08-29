@@ -6,9 +6,7 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { InstanceMembersDataSource } from 'src/app/pages/instance/instance-members/instance-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
-import {
-    ProjectGrantMembersDataSource,
-} from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
+import { ProjectGrantMembersDataSource } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { getMembershipColor } from 'src/app/utils/color';
 
@@ -86,7 +84,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
         const newRoles = Object.assign([], member.rolesList);
         const index = newRoles.findIndex((r) => r === role);
         if (index > -1) {
-          newRoles.splice(index);
+          newRoles.splice(index, 1);
           member.rolesList = newRoles;
           this.updateRoles.emit({ member: member, change: newRoles });
         }

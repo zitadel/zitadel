@@ -6,7 +6,7 @@ import {
 import { loginname } from "../../support/login/users";
 
 describe("machines", () => {
-  const machinesPath = `/ui/console/users?type=machine`;
+  const machinesPath = `/users?type=machine`;
   const testMachineUserNameAdd = "e2emachineusernameadd";
   const testMachineUserNameRemove = "e2emachineusernameremove";
 
