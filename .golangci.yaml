@@ -170,15 +170,24 @@ linters:
     # Checks that printf-like functions are named with `f` at the end [fast: true, auto-fix: false]
     # FUTURE: not a problem at the moment
     - goprintffuncname
-    
     # Inspects source code for security problems [fast: false, auto-fix: false]
+    # TODO: I think it would be more interesting to integrate into gh code scanning: https://github.com/securego/gosec#integrating-with-code-scanning
     - gosec
     # An analyzer to analyze expression groups. [fast: true, auto-fix: false]
+    # I think the groups (vars, consts, imports, ...) we have atm are ok
     - grouper
     # Checks that your code uses short syntax for if-statements whenever possible [fast: true, auto-fix: false]
+    # Dont't use its deprecated
     - ifshort
     # Enforces consistent import aliases [fast: false, auto-fix: false]
+    # FUTURE: aliasing of imports is more or less consistent
     - importas
+    # A linter that checks the number of methods inside an interface.
+    # No need at the moment, repository abstraction was removed
+    - interfacebloat
+    # A linter that suggests interface types
+    # Don't use it's archived
+    - interfacer
     # Accept Interfaces, Return Concrete Types [fast: false, auto-fix: false]
     - ireturn
     # Reports long lines [fast: true, auto-fix: false]
