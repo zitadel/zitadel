@@ -36,6 +36,7 @@ func NewProvider(
 	query *query.Queries,
 	repo repository.Repository,
 	encAlg crypto.EncryptionAlgorithm,
+	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	projections *sql.DB,
 	instanceHandler,
@@ -48,6 +49,7 @@ func NewProvider(
 		query,
 		repo,
 		encAlg,
+		certEncAlg,
 		es,
 		projections,
 	)
@@ -83,11 +85,13 @@ func newStorage(
 	query *query.Queries,
 	repo repository.Repository,
 	encAlg crypto.EncryptionAlgorithm,
+	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	projections *sql.DB,
 ) (*Storage, error) {
 	return &Storage{
 		encAlg:          encAlg,
+		certEncAlg:      certEncAlg,
 		locker:          crdb.NewLocker(projections, locksTable, signingKey),
 		eventstore:      es,
 		repo:            repo,

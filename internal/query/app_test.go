@@ -926,7 +926,7 @@ func Test_AppsPrepare(t *testing.T) {
 			},
 			object: &Apps{
 				SearchResponse: SearchResponse{
-					Count: 2,
+					Count: 3,
 				},
 				Apps: []*App{
 					{

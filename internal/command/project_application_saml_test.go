@@ -19,8 +19,8 @@ import (
 )
 
 func TestCommandSide_AddSAMLApplication(t *testing.T) {
-	port := "8080"
-	path := "/metadata"
+	port := "8081"
+	path := "/metadataadd"
 
 	type fields struct {
 		eventstore  *eventstore.Eventstore
@@ -177,6 +177,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
+						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata", "org1")),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
@@ -242,6 +243,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
+						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata", "org1")),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
@@ -355,8 +357,8 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
-	port := "8080"
-	path := "/metadata"
+	port := "8082"
+	path := "/metadatachange"
 
 	type fields struct {
 		eventstore *eventstore.Eventstore

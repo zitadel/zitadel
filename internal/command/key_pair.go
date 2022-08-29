@@ -26,7 +26,6 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 
 	privateKeyExp := time.Now().UTC().Add(c.privateKeyLifetime)
 	publicKeyExp := time.Now().UTC().Add(c.publicKeyLifetime)
-	certificateExp := time.Now().UTC().Add(c.publicKeyLifetime)
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
@@ -35,15 +34,15 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 		keyAgg,
 		domain.KeyUsageSigning,
 		algorithm,
-		privateCrypto, publicCrypto, nil,
-		privateKeyExp, publicKeyExp, certificateExp))
+		privateCrypto, publicCrypto,
+		privateKeyExp, publicKeyExp))
 	return err
 }
 
-func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
+func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm string) error {
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
-	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCACertificate(c.certKeySize, c.certificateAlgorithm, &crypto.CertificateInformations{
+	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCACertificate(c.certKeySize, c.keyAlgorithm, c.certificateAlgorithm, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML CA",
@@ -61,20 +60,31 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
-		ctx,
-		keyAgg,
-		domain.KeyUsageSAMLCA,
-		"", //TODO do we need this information for SAML?
-		privateCrypto, publicCrypto, certificateCrypto,
-		after, after, after))
+	_, err = c.eventstore.Push(ctx,
+		keypair.NewAddedEvent(
+			ctx,
+			keyAgg,
+			domain.KeyUsageSAMLCA,
+			algorithm,
+			privateCrypto, publicCrypto,
+			after, after,
+		),
+		keypair.NewAddedCertificateEvent(
+			ctx,
+			keyAgg,
+			domain.KeyUsageSAMLCA,
+			algorithm,
+			certificateCrypto,
+			after,
+		),
+	)
 	return err
 }
 
 func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
-	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.certificateAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
+	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, c.certificateAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML response",
@@ -93,20 +103,31 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
-		ctx,
-		keyAgg,
-		domain.KeyUsageSAMLResponseSinging,
-		algorithm,
-		privateCrypto, publicCrypto, certificateCrypto,
-		after, after, after))
+	_, err = c.eventstore.Push(ctx,
+		keypair.NewAddedEvent(
+			ctx,
+			keyAgg,
+			domain.KeyUsageSAMLResponseSinging,
+			algorithm,
+			privateCrypto, publicCrypto,
+			after, after,
+		),
+		keypair.NewAddedCertificateEvent(
+			ctx,
+			keyAgg,
+			domain.KeyUsageSAMLCA,
+			algorithm,
+			certificateCrypto,
+			after,
+		),
+	)
 	return err
 }
 
 func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
-	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.certificateAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
+	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, c.certificateAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML metadata",
@@ -125,12 +146,22 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorith
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
-		ctx,
-		keyAgg,
-		domain.KeyUsageSAMLMetadataSigning,
-		algorithm,
-		privateCrypto, publicCrypto, certificateCrypto,
-		after, after, after))
+	_, err = c.eventstore.Push(ctx,
+		keypair.NewAddedEvent(
+			ctx,
+			keyAgg,
+			domain.KeyUsageSAMLMetadataSigning,
+			algorithm,
+			privateCrypto, publicCrypto,
+			after, after),
+		keypair.NewAddedCertificateEvent(
+			ctx,
+			keyAgg,
+			domain.KeyUsageSAMLCA,
+			algorithm,
+			certificateCrypto,
+			after,
+		),
+	)
 	return err
 }

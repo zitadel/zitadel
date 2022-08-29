@@ -4,8 +4,12 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
+	"time"
+
 	"github.com/zitadel/logging"
 	"github.com/zitadel/saml/pkg/provider/key"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -13,8 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
-	"gopkg.in/square/go-jose.v2"
-	"time"
 )
 
 const (
@@ -153,7 +155,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 			return fmt.Errorf("unknown usage")
 		}
 	case domain.KeyUsageSAMLCA:
-		return p.command.GenerateSAMLCACertificate(setSAMLCtx(ctx))
+		return p.command.GenerateSAMLCACertificate(setSAMLCtx(ctx), p.certificateAlgorithm)
 	default:
 		return fmt.Errorf("unknown certificate usage")
 	}
@@ -203,7 +205,7 @@ func (p *Storage) certificateToCertificateAndKey(certificate query.Certificate) 
 		return nil, err
 	}
 
-	certData, err := crypto.Decrypt(certificate.Certificate(), p.encAlg)
+	certData, err := crypto.Decrypt(certificate.Certificate(), p.certEncAlg)
 	if err != nil {
 		return nil, err
 	}

@@ -42,6 +42,7 @@ type Storage struct {
 	locker               crdb.Locker
 	certificateAlgorithm string
 	encAlg               crypto.EncryptionAlgorithm
+	certEncAlg           crypto.EncryptionAlgorithm
 
 	eventstore *eventstore.Eventstore
 	repo       repository.Repository

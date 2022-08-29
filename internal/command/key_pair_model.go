@@ -9,10 +9,11 @@ import (
 type KeyPairWriteModel struct {
 	eventstore.WriteModel
 
-	Usage      domain.KeyUsage
-	Algorithm  string
-	PrivateKey *domain.Key
-	PublicKey  *domain.Key
+	Usage       domain.KeyUsage
+	Algorithm   string
+	PrivateKey  *domain.Key
+	PublicKey   *domain.Key
+	Certificate *domain.Key
 }
 
 func NewKeyPairWriteModel(aggregateID, resourceOwner string) *KeyPairWriteModel {
@@ -42,6 +43,13 @@ func (wm *KeyPairWriteModel) Reduce() error {
 				Key:    e.PublicKey.Key,
 				Expiry: e.PublicKey.Expiry,
 			}
+		case *keypair.AddedCertificateEvent:
+			wm.Usage = e.Usage
+			wm.Algorithm = e.Algorithm
+			wm.Certificate = &domain.Key{
+				Key:    e.Certificate.Key,
+				Expiry: e.Certificate.Expiry,
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -53,11 +61,10 @@ func (wm *KeyPairWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(keypair.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(keypair.AddedEventType).
+		EventTypes(keypair.AddedEventType, keypair.AddedCertificateEventType).
 		Builder()
 }
 
 func KeyPairAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, keypair.AggregateType, keypair.AggregateVersion)
-
 }

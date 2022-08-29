@@ -39,24 +39,24 @@ type CertificateInformations struct {
 	ExtKeyUsage  []x509.ExtKeyUsage
 }
 
-func GenerateEncryptedKeyPairWithCACertificate(bits int, alg EncryptionAlgorithm, informations *CertificateInformations) (*CryptoValue, *CryptoValue, *CryptoValue, error) {
+func GenerateEncryptedKeyPairWithCACertificate(bits int, keyAlg, certAlg EncryptionAlgorithm, informations *CertificateInformations) (*CryptoValue, *CryptoValue, *CryptoValue, error) {
 	privateKey, publicKey, cert, err := GenerateCACertificate(bits, informations)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	encryptPriv, encryptPub, encryptCaCert, err := EncryptKeysAndCert(privateKey, publicKey, cert, alg)
+	encryptPriv, encryptPub, encryptCaCert, err := EncryptKeysAndCert(privateKey, publicKey, cert, keyAlg, certAlg)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	return encryptPriv, encryptPub, encryptCaCert, nil
 }
 
-func GenerateEncryptedKeyPairWithCertificate(bits int, alg EncryptionAlgorithm, caPrivateKey *rsa.PrivateKey, caCertificate []byte, informations *CertificateInformations) (*CryptoValue, *CryptoValue, *CryptoValue, error) {
+func GenerateEncryptedKeyPairWithCertificate(bits int, keyAlg, certAlg EncryptionAlgorithm, caPrivateKey *rsa.PrivateKey, caCertificate []byte, informations *CertificateInformations) (*CryptoValue, *CryptoValue, *CryptoValue, error) {
 	privateKey, publicKey, cert, err := GenerateCertificate(bits, caPrivateKey, caCertificate, informations)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	encryptPriv, encryptPub, encryptCaCert, err := EncryptKeysAndCert(privateKey, publicKey, cert, alg)
+	encryptPriv, encryptPub, encryptCaCert, err := EncryptKeysAndCert(privateKey, publicKey, cert, keyAlg, certAlg)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -72,30 +72,20 @@ func GenerateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, info
 }
 
 func generateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, informations *CertificateInformations) (*rsa.PrivateKey, *rsa.PublicKey, []byte, error) {
-	cert := &x509.Certificate{
-		Subject:   pkix.Name{},
-		NotBefore: time.Now(),
-	}
-	if informations.SerialNumber != nil {
-		cert.SerialNumber = informations.SerialNumber
-	}
-	if informations.Organisation != nil {
-		cert.Subject.Organization = informations.Organisation
-	}
-	if informations.CommonName != "" {
-		cert.Subject.CommonName = informations.CommonName
-	}
+	notBefore := time.Now()
 	if !informations.NotBefore.IsZero() {
-		cert.NotBefore = informations.NotBefore
+		notBefore = informations.NotBefore
 	}
-	if !informations.NotAfter.IsZero() {
-		cert.NotAfter = informations.NotAfter
-	}
-	if informations.KeyUsage != 0 {
-		cert.KeyUsage = informations.KeyUsage
-	}
-	if informations.ExtKeyUsage != nil {
-		cert.ExtKeyUsage = informations.ExtKeyUsage
+	cert := &x509.Certificate{
+		SerialNumber: informations.SerialNumber,
+		Subject: pkix.Name{
+			CommonName:   informations.CommonName,
+			Organization: informations.Organisation,
+		},
+		NotBefore:   notBefore,
+		NotAfter:    informations.NotAfter,
+		KeyUsage:    informations.KeyUsage,
+		ExtKeyUsage: informations.ExtKeyUsage,
 	}
 
 	certPrivKey, err := rsa.GenerateKey(rand.Reader, bits)
@@ -234,12 +224,12 @@ func BytesToCertificate(data []byte) ([]byte, error) {
 	return block.Bytes, nil
 }
 
-func EncryptKeysAndCert(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey, cert []byte, alg EncryptionAlgorithm) (*CryptoValue, *CryptoValue, *CryptoValue, error) {
-	encryptedPrivateKey, encryptedPublicKey, err := EncryptKeys(privateKey, publicKey, alg)
+func EncryptKeysAndCert(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey, cert []byte, keyAlg, certAlg EncryptionAlgorithm) (*CryptoValue, *CryptoValue, *CryptoValue, error) {
+	encryptedPrivateKey, encryptedPublicKey, err := EncryptKeys(privateKey, publicKey, keyAlg)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	encryptedCertificate, err := Encrypt(cert, alg)
+	encryptedCertificate, err := Encrypt(cert, certAlg)
 	if err != nil {
 		return nil, nil, nil, err
 	}

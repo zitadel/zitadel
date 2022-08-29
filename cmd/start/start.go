@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/zitadel/saml/pkg/provider"
+
 	"github.com/zitadel/zitadel/internal/api/saml"
 
 	"github.com/gorilla/mux"
@@ -212,7 +213,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 
-	samlProvider, err := saml.NewProvider(ctx, config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor)
+	samlProvider, err := saml.NewProvider(ctx, config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start saml provider: %w", err)
 	}
