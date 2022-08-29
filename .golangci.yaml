@@ -48,6 +48,10 @@ linters:
     - goimports
     # Detects when assignments to existing variables are not used [fast: true, auto-fix: false]
     - ineffassign
+    # Finds commonly misspelled English words in comments [fast: true, auto-fix: true]
+    - misspell
+    # Finds naked returns in functions greater than a specified function length [fast: true, auto-fix: false]
+    - nakedret
     # Staticcheck is a go vet on steroids, applying a ton of static analysis checks [fast: false, auto-fix: false]
     - staticcheck 
     # Finds unused struct fields [fast: false, auto-fix: false]
@@ -64,7 +68,10 @@ linters:
     - cyclop
     # check declaration order and count of types, constants, variables and functions
     - decorder
-    - 
+    # Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: false]
+    - nolintlint
+    # Checks for misuse of Sprintf to construct a host with port in a URL.
+    - nosprintfhostport
     - 
     - 
     - 
@@ -203,27 +210,32 @@ linters:
     # Finds slice declarations with non-zero initial length [fast: false, auto-fix: false]
     # I would prefer to use https://github.com/alexkohler/prealloc
     - makezero
-    # Finds commonly misspelled English words in comments [fast: true, auto-fix: true]
-    
-    - misspell
-    # Finds naked returns in functions greater than a specified function length [fast: true, auto-fix: false]
-    - nakedret
     # Reports deeply nested if statements [fast: true, auto-fix: false]
     # focus only on if's
     - nestif
     # Finds the code that returns nil even if it checks that the error is not nil. [fast: false, auto-fix: false]
+    # FUTURE: check if it is allowed to return nil partially in error catch
     - nilerr
     # Checks that there is no simultaneous return of `nil` error and an invalid value. [fast: false, auto-fix: false]
+    # FUTURE: would reduce checks and panics
     - nilnil
     # nlreturn checks for a new line before return and branch statements to increase code clarity [fast: true, auto-fix: false]
+    # DISCUSS: IMO the readability of does not always increase using more empty lines
     - nlreturn
     # noctx finds sending http request without context.Context [fast: false, auto-fix: false]
+    # only interesting if using http
     - noctx
-    # Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: false]
-    - nolintlint
+    # Reports all names returns
+    # Named returns are not allowed which IMO reduces readability of code
+    - nonamedreturns
+    # detects snake case of variable naming and function name.
+    # has not been a problem in our code and deprecated
+    - nosnakecase
     # paralleltest detects missing usage of t.Parallel() method in your Go test [fast: true, auto-fix: false]
+    # FUTURE: will break all of our tests
     - paralleltest
     # Finds slice declarations that could potentially be preallocated [fast: true, auto-fix: false]
+    
     - prealloc
     # find code that shadows one of Go's predeclared identifiers [fast: true, auto-fix: false]
     - predeclared
