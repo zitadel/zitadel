@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
@@ -92,6 +93,10 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID))
 		case *project.ApplicationChangedEvent:
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID))
+		case *project.SAMLConfigAddedEvent:
+			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID))
+		case *project.SAMLConfigChangedEvent:
+			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(e.EntityID))
 		case *project.ApplicationRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.AppID, project.UniqueAppNameType)
 		case *project.GrantAddedEvent:

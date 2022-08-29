@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
 	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -136,6 +134,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppSAMLConfigColumnAppID, AppSAMLConfigColumnInstanceID),
 			appSAMLTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_saml_ref_apps")),
 			crdb.WithIndex(crdb.NewIndex("entity_id_idx", []string{AppSAMLConfigColumnEntityID})),
 		),
 	)
@@ -599,8 +598,7 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.SAMLConfigChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-nlDOv", "seq", event.Sequence(), "expectedType", project.SAMLConfigChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU2", "reduce.wrong.event.type")
 	}
 
 	cols := make([]handler.Column, 0, 15)

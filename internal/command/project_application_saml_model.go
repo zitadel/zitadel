@@ -124,6 +124,7 @@ func (wm *SAMLApplicationWriteModel) appendAddSAMLEvent(e *project.SAMLConfigAdd
 }
 
 func (wm *SAMLApplicationWriteModel) appendChangeSAMLEvent(e *project.SAMLConfigChangedEvent) {
+	wm.saml = true
 	if e.Metadata != nil {
 		wm.Metadata = e.Metadata
 	}
@@ -176,7 +177,7 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewSAMLConfigChangedEvent(ctx, aggregate, appID, changes)
+	changeEvent, err := project.NewSAMLConfigChangedEvent(ctx, aggregate, appID, wm.EntityID, changes)
 	if err != nil {
 		return nil, false, err
 	}
@@ -185,4 +186,94 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 
 func (wm *SAMLApplicationWriteModel) IsSAML() bool {
 	return wm.saml
+}
+
+type AppIDToEntityID struct {
+	AppID    string
+	EntityID *string
+}
+
+type SAMLEntityIDsWriteModel struct {
+	eventstore.WriteModel
+
+	EntityIDs []*AppIDToEntityID
+}
+
+func NewSAMLEntityIDsWriteModel(projectID, resourceOwner string) *SAMLEntityIDsWriteModel {
+	return &SAMLEntityIDsWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   projectID,
+			ResourceOwner: resourceOwner,
+		},
+		EntityIDs: []*AppIDToEntityID{},
+	}
+}
+
+func (wm *SAMLEntityIDsWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			project.ApplicationRemovedType,
+			project.SAMLConfigAddedType,
+			project.SAMLConfigChangedType).
+		Builder()
+}
+
+func (wm *SAMLEntityIDsWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *project.ApplicationRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
+		case *project.SAMLConfigAddedEvent:
+			wm.WriteModel.AppendEvents(e)
+		case *project.SAMLConfigChangedEvent:
+			if e.EntityID != nil && *e.EntityID != "" {
+				wm.WriteModel.AppendEvents(e)
+			}
+		}
+	}
+}
+
+func (wm *SAMLEntityIDsWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *project.ApplicationRemovedEvent:
+			removeItem(wm.EntityIDs, e.AppID)
+		case *project.SAMLConfigAddedEvent:
+			wm.EntityIDs = append(wm.EntityIDs, &AppIDToEntityID{AppID: e.AppID, EntityID: toStrPtr(e.EntityID)})
+		case *project.SAMLConfigChangedEvent:
+			for i := range wm.EntityIDs {
+				item := wm.EntityIDs[i]
+				if item.AppID == e.AppID && e.EntityID != nil && *e.EntityID != "" {
+					item.EntityID = e.EntityID
+				}
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func toStrPtr(str string) *string {
+	str2 := str
+	return &str2
+}
+
+func removeItem(items []*AppIDToEntityID, appID string) []*AppIDToEntityID {
+	i := 0 // output index
+	for _, item := range items {
+		if item.AppID != appID {
+			// copy and increment index
+			items[i] = item
+			i++
+		}
+	}
+	// Prevent memory leak by erasing truncated values
+	// (not needed if values don't contain pointers, directly or indirectly)
+	for j := i; j < len(items); j++ {
+		items[j] = nil
+	}
+	return items[:i]
 }

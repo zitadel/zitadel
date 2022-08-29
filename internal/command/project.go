@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -276,9 +277,22 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
+
+	samlEntityIDsAgg, err := c.getSAMLEntityIdsWriteModelByProjectID(ctx, projectID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
+	uniqueConstraints := make([]*eventstore.EventUniqueConstraint, len(samlEntityIDsAgg.EntityIDs))
+	i := 0
+	for _, entityID := range samlEntityIDsAgg.EntityIDs {
+		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
+		i++
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	events := []eventstore.Command{
-		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name),
+		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name, uniqueConstraints),
 	}
 
 	for _, grantID := range cascadingUserGrantIDs {
@@ -308,4 +322,13 @@ func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, reso
 		return nil, err
 	}
 	return projectWriteModel, nil
+}
+
+func (c *Commands) getSAMLEntityIdsWriteModelByProjectID(ctx context.Context, projectID, resourceOwner string) (*SAMLEntityIDsWriteModel, error) {
+	samlEntityIDsAgg := NewSAMLEntityIDsWriteModel(projectID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, samlEntityIDsAgg)
+	if err != nil {
+		return nil, err
+	}
+	return samlEntityIDsAgg, nil
 }

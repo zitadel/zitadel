@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -16,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
-	"golang.org/x/text/language"
 )
 
 func TestCommandSide_AddUserGrant(t *testing.T) {
@@ -132,6 +133,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							project.NewProjectRemovedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"projectname1",
+								nil,
 							),
 						),
 					),
@@ -716,6 +718,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 							project.NewProjectRemovedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"projectname1",
+								nil,
 							),
 						),
 					),

@@ -177,7 +177,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata", "org1")),
+						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
@@ -243,7 +243,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata", "org1")),
+						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
@@ -584,9 +584,12 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								newSAMLAppChangedEventMetadataURL(context.Background(),
 									"app1",
 									"project1",
-									"org1"),
+									"org1",
+									"https://test.com/saml/metadata"),
 							),
 						},
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test.com/saml/metadata"))),
+						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
 					),
 				),
 			},
@@ -649,9 +652,12 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								newSAMLAppChangedEventMetadata(context.Background(),
 									"app1",
 									"project1",
-									"org1"),
+									"org1",
+									"https://test.com/saml/metadata"),
 							),
 						},
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test.com/saml/metadata"))),
+						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
 					),
 				),
 			},
@@ -729,7 +735,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 	}
 }
 
-func newSAMLAppChangedEventMetadata(ctx context.Context, appID, projectID, resourceOwner string) *project.SAMLConfigChangedEvent {
+func newSAMLAppChangedEventMetadata(ctx context.Context, appID, projectID, resourceOwner, entityID string) *project.SAMLConfigChangedEvent {
 	changes := []project.SAMLConfigChanges{
 		project.ChangeEntityID("https://test2.com/saml/metadata"),
 		project.ChangeMetadata([]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
@@ -737,12 +743,13 @@ func newSAMLAppChangedEventMetadata(ctx context.Context, appID, projectID, resou
 	event, _ := project.NewSAMLConfigChangedEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,
 		appID,
+		entityID,
 		changes,
 	)
 	return event
 }
 
-func newSAMLAppChangedEventMetadataURL(ctx context.Context, appID, projectID, resourceOwner string) *project.SAMLConfigChangedEvent {
+func newSAMLAppChangedEventMetadataURL(ctx context.Context, appID, projectID, resourceOwner, entityID string) *project.SAMLConfigChangedEvent {
 	changes := []project.SAMLConfigChanges{
 		project.ChangeEntityID("https://test2.com/saml/metadata"),
 		project.ChangeMetadata([]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
@@ -750,6 +757,7 @@ func newSAMLAppChangedEventMetadataURL(ctx context.Context, appID, projectID, re
 	event, _ := project.NewSAMLConfigChangedEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,
 		appID,
+		entityID,
 		changes,
 	)
 	return event

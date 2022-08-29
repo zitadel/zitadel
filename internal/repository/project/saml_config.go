@@ -28,15 +28,21 @@ func (e *SAMLConfigAddedEvent) Data() interface{} {
 	return e
 }
 
-func NewAddSAMLConfigEntityIDUniqueConstraint(entityID, resourceOwner string) *eventstore.EventUniqueConstraint {
+func NewAddSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueEntityIDType,
-		entityID+":"+resourceOwner,
+		entityID,
 		"Errors.Project.App.SAMLEntityIDAlreadyExists")
 }
 
+func NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID *string) *eventstore.EventUniqueConstraint {
+	return eventstore.NewRemoveEventUniqueConstraint(
+		UniqueEntityIDType,
+		*entityID)
+}
+
 func (e *SAMLConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID, e.Aggregate().ResourceOwner)}
+	return []*eventstore.EventUniqueConstraint{NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID)}
 }
 
 func NewSAMLConfigAddedEvent(
@@ -80,6 +86,7 @@ type SAMLConfigChangedEvent struct {
 	EntityID    *string `json:"entityId"`
 	Metadata    []byte  `json:"metadata,omitempty"`
 	MetadataURL *string `json:"metadata_url,omitempty"`
+	oldEntityID string
 }
 
 func (e *SAMLConfigChangedEvent) Data() interface{} {
@@ -87,13 +94,17 @@ func (e *SAMLConfigChangedEvent) Data() interface{} {
 }
 
 func (e *SAMLConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{
+		NewRemoveSAMLConfigEntityIDUniqueConstraint(&e.oldEntityID),
+		NewAddSAMLConfigEntityIDUniqueConstraint(*e.EntityID),
+	}
 }
 
 func NewSAMLConfigChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
+	oldEntityID string,
 	changes []SAMLConfigChanges,
 ) (*SAMLConfigChangedEvent, error) {
 	if len(changes) == 0 {
@@ -106,7 +117,8 @@ func NewSAMLConfigChangedEvent(
 			aggregate,
 			SAMLConfigChangedType,
 		),
-		AppID: appID,
+		AppID:       appID,
+		oldEntityID: oldEntityID,
 	}
 	for _, change := range changes {
 		change(changeEvent)

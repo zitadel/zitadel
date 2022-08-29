@@ -60,7 +60,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 
 	entity, err := xml.ParseMetadataXmlIntoStruct(samlApp.Metadata)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "SAML-bquso", "Errors.Project.App.SAMLMetadataFormat")
+		return nil, caos_errs.ThrowInvalidArgument(err, "SAML-bquso", "Errors.Project.App.SAMLMetadataFormat")
 	}
 
 	samlApp.AppID, err = c.idGenerator.Next()
@@ -100,14 +100,14 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 	if samlApp.MetadataURL != "" {
 		data, err := xml.ReadMetadataFromURL(samlApp.MetadataURL)
 		if err != nil {
-			return nil, err
+			return nil, caos_errs.ThrowInvalidArgument(err, "SAML-J3kg3", "Errors.Project.App.SAMLMetadataMissing")
 		}
 		samlApp.Metadata = data
 	}
 
 	entity, err := xml.ParseMetadataXmlIntoStruct(samlApp.Metadata)
 	if err != nil {
-		return nil, err
+		return nil, caos_errs.ThrowInvalidArgument(err, "SAML-3fk2b", "Errors.Project.App.SAMLMetadataFormat")
 	}
 
 	changedEvent, hasChanged, err := existingSAML.NewChangedEvent(

@@ -217,8 +217,9 @@ func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.Even
 type ApplicationRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID string `json:"appId,omitempty"`
-	name  string
+	AppID    string `json:"appId,omitempty"`
+	name     string
+	entityID string
 }
 
 func (e *ApplicationRemovedEvent) Data() interface{} {
@@ -226,7 +227,11 @@ func (e *ApplicationRemovedEvent) Data() interface{} {
 }
 
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
+	remove := []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
+	if e.entityID != "" {
+		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(&e.entityID))
+	}
+	return remove
 }
 
 func NewApplicationRemovedEvent(
@@ -234,6 +239,7 @@ func NewApplicationRemovedEvent(
 	aggregate *eventstore.Aggregate,
 	appID,
 	name string,
+	entityID string,
 ) *ApplicationRemovedEvent {
 	return &ApplicationRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -241,8 +247,9 @@ func NewApplicationRemovedEvent(
 			aggregate,
 			ApplicationRemovedType,
 		),
-		AppID: appID,
-		name:  name,
+		AppID:    appID,
+		name:     name,
+		entityID: entityID,
 	}
 }
 
