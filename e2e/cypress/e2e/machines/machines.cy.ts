@@ -49,7 +49,7 @@ describe("machines", () => {
     });
 
     it("should delete a machine", () => {
-      cy.contains("tr", testMachineUserNameRemove, { timeout: 1000 })
+      cy.contains("tr", testMachineUserNameRemove)
         // doesn't work, need to force click.
         // .trigger('mouseover')
         .find('[data-e2e="enabled-delete-button"]')
