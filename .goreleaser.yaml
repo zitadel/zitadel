@@ -10,6 +10,8 @@ release:
   # If set to true, will mark the release as not ready for production.
   # Default is false.
   prerelease: auto
+  ids:
+    - prod
 
 before:
   hooks:
@@ -83,7 +85,8 @@ docker_manifests:
 
 
 archives:
-  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  - id: prod
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     builds:
     - prod
     replacements:
