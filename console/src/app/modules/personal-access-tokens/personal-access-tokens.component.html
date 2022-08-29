@@ -82,8 +82,8 @@
     <cnsl-paginator
       #paginator
       class="paginator"
-      [timestamp]="keyResult.details?.viewTimestamp"
-      [length]="keyResult.details?.totalResult || 0"
+      [timestamp]="keyResult?.details?.viewTimestamp"
+      [length]="keyResult?.details?.totalResult || 0"
       [pageSize]="10"
       [pageSizeOptions]="[5, 10, 20]"
       (page)="changePage($event)"

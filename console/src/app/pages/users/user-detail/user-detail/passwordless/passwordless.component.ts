@@ -89,7 +89,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
     this.service
       .sendPasswordlessRegistration(this.user.id)
       .then(() => {
-        this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT');
+        this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT', true);
       })
       .catch((error) => {
         this.toast.showError(error);

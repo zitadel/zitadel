@@ -12,7 +12,7 @@
     [hideRefresh]="true"
     [loading]="loading$ | async"
     (refreshed)="getMFAs()"
-    [dataSize]="dataSource?.data?.length ?? 0"
+    [dataSize]="dataSource.data.length"
   >
     <table class="table" mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="type">
