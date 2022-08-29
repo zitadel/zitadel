@@ -32,7 +32,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatTable) public table!: MatTable<WebAuthNToken.AsObject>;
   @ViewChild(MatSort) public sort!: MatSort;
-  public dataSource!: MatTableDataSource<WebAuthNToken.AsObject>;
+  public dataSource: MatTableDataSource<WebAuthNToken.AsObject> = new MatTableDataSource<WebAuthNToken.AsObject>([]);
 
   public AuthFactorState: any = AuthFactorState;
   public error: string = '';
