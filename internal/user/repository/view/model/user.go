@@ -313,7 +313,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID, "eventID", event.ID).Warn("u is nil")
 		}
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID, "eventID", event.ID, "userID", u.ID).Warn("u.HumanView is nil")
+			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID, "eventID", event.ID, "userId", u.ID).Warn("u.HumanView is nil")
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
