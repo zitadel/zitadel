@@ -22,25 +22,19 @@ describe("humans", () => {
     });
 
     it("should add a user", () => {
-      cy.get('[data-e2e="action-key-add"]')
-        .parents('[data-e2e="create-user-button"]')
+      cy.get('[data-e2e="create-user-button"]')
         .click();
       cy.url().should("contain", "users/create");
       cy.get('[formcontrolname="email"]')
-        .focus()
         .type(loginname("e2ehuman", Cypress.env("ORGANIZATION")));
       //force needed due to the prefilled username prefix
       cy.get('[formcontrolname="userName"]')
-        .focus()
         .type(testHumanUserNameAdd);
       cy.get('[formcontrolname="firstName"]')
-        .focus()
         .type("e2ehumanfirstname");
       cy.get('[formcontrolname="lastName"]')
-        .focus()
         .type("e2ehumanlastname");
       cy.get('[formcontrolname="phone"]')
-        .focus()
         .type("+41 123456789");
       cy.get('[data-e2e="create-button"]').click();
       cy.get(".data-e2e-success");

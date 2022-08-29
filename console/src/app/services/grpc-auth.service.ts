@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, filter, finalize, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, finalize, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
 
 import {
     AddMyAuthFactorOTPRequest,
@@ -244,7 +244,10 @@ export class GrpcAuthService {
    */
   public isAllowed(roles: string[] | RegExp[], requiresAll: boolean = false): Observable<boolean> {
     if (roles && roles.length > 0) {
-      return this.zitadelPermissions.pipe(switchMap((zroles) => of(this.hasRoles(zroles, roles, requiresAll))));
+      return this.zitadelPermissions.pipe(
+        switchMap((zroles) => of(this.hasRoles(zroles, roles, requiresAll))),
+        distinctUntilChanged()
+      );
     } else {
       return of(false);
     }
@@ -357,7 +360,7 @@ export class GrpcAuthService {
   }
 
   public get zitadelPermissionsChanged(): Observable<string[]> {
-    return this.zitadelPermissions;
+    return this.zitadelPermissions.pipe(distinctUntilChanged());
   }
 
   public listMyUserSessions(): Promise<ListMyUserSessionsResponse.AsObject> {
