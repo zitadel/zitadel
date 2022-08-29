@@ -189,15 +189,22 @@ linters:
     # Don't use it's archived
     - interfacer
     # Accept Interfaces, Return Concrete Types [fast: false, auto-fix: false]
+    # FUTURE: check if no interface is returned
     - ireturn
     # Reports long lines [fast: true, auto-fix: false]
+    # FUTURE: would make code more readable
     - lll
+    # Check for logr arguments
+    # Don't use: deprecated
+    - logrlint
     # maintidx measures the maintainability index of each function. [fast: true, auto-fix: false]
     # not used because volume of halstead complexity feels strange as measurement https://en.wikipedia.org/wiki/Halstead_complexity_measures
     - maintidx
     # Finds slice declarations with non-zero initial length [fast: false, auto-fix: false]
+    # I would prefer to use https://github.com/alexkohler/prealloc
     - makezero
     # Finds commonly misspelled English words in comments [fast: true, auto-fix: true]
+    
     - misspell
     # Finds naked returns in functions greater than a specified function length [fast: true, auto-fix: false]
     - nakedret
