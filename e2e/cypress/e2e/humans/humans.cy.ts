@@ -6,7 +6,7 @@ import {
 import { loginname } from "../../support/login/users";
 
 describe.skip("humans", () => {
-  const humansPath = `/ui/console/users?type=human`;
+  const humansPath = `/users?type=human`;
   const testHumanUserNameAdd = "e2ehumanusernameadd";
   const testHumanUserNameRemove = "e2ehumanusernameremove";
 

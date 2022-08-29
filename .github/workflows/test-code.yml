@@ -32,7 +32,7 @@ jobs:
           install-only: true
           version: v1.10.3
       - name: Build and Unit Test
-        run: GOOS="linux" GOARCH="amd64" goreleaser build --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+        run: GOOS="linux" GOARCH="amd64" goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:

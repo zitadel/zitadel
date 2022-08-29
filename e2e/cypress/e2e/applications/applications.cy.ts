@@ -10,7 +10,7 @@ describe('applications', () => {
         apiAuth().then(api => {
             ensureProjectExists(api, testProjectName).then(projectID => {
                 ensureProjectResourceDoesntExist(api, projectID, Apps, testAppName).then(() => {
-                    cy.visit(`/ui/console/projects/${projectID}`)
+                    cy.visit(`/projects/${projectID}`)
                 })
             })
         })
