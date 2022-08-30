@@ -632,8 +632,14 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	loginName = strings.TrimSpace(loginName)
 	preferredLoginName := loginName
 	if request.RequestedOrgID != "" {
-		if request.RequestedOrgID != "" {
-			preferredLoginName += "@" + request.RequestedPrimaryDomain
+		if request.RequestedOrgDomain {
+			domainPolicy, err := repo.getDomainPolicy(ctx, request.RequestedOrgID)
+			if err != nil {
+				return err
+			}
+			if domainPolicy.UserLoginMustBeDomain {
+				preferredLoginName += "@" + request.RequestedPrimaryDomain
+			}
 		}
 		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID, request.InstanceID)
 	} else {
@@ -1055,7 +1061,23 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
 }
 
+func (repo *AuthRequestRepo) getDomainPolicy(ctx context.Context, orgID string) (*query.DomainPolicy, error) {
+	return repo.Query.DomainPolicyByOrg(ctx, false, orgID)
+}
+
 func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
+	orgID := request.GetScopeOrgID()
+	if orgID != "" {
+		org, err := orgViewProvider.OrgByID(ctx, false, orgID)
+		if err != nil {
+			return err
+		}
+		request.RequestedOrgID = org.ID
+		request.RequestedOrgName = org.Name
+		request.RequestedPrimaryDomain = org.Domain
+		return nil
+	}
+
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
 		return nil
@@ -1068,6 +1090,7 @@ func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *dom
 	request.RequestedOrgID = org.ID
 	request.RequestedOrgName = org.Name
 	request.RequestedPrimaryDomain = primaryDomain
+	request.RequestedOrgDomain = true
 	return nil
 }
 

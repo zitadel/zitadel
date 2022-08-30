@@ -507,7 +507,7 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	if authReq == nil {
 		return false
 	}
-	if authReq.RequestedOrgID == "" {
+	if authReq.RequestedOrgID == "" || !authReq.RequestedOrgDomain {
 		return false
 	}
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
