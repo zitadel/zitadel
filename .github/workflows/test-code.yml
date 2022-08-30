@@ -19,7 +19,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.49.0
-          args: --new-from-rev=HEAD~
+          args:--new-from-rev=HEAD~
 
   Test:
     runs-on: ubuntu-20.04
