@@ -22,95 +22,20 @@ export function login(
 
   const loginUrl: string = '/ui/login';
   const issuerUrl: string = '/oauth/v2';
-  const otherZitadelIdpInstance: boolean = Cypress.env('otherZitadelIdpInstance');
 
   return cy.session(
     creds.username,
     () => {
       const cookies = new Map<string, string>();
 
-      cy.intercept(
-        {
-          method: 'GET',
-          url: `${loginUrl}*`,
-          times: 1,
-        },
-        (req) => {
-          req.headers['cookie'] = requestCookies(cookies);
-          req.continue((res) => {
-            updateCookies(res.headers['set-cookie'] as string[], cookies);
-          });
-        },
-      ).as('login');
-
-      cy.intercept(
-        {
-          method: 'POST',
-          url: `${loginUrl}/loginname*`,
-          times: 1,
-        },
-        (req) => {
-          req.headers['cookie'] = requestCookies(cookies);
-          req.continue((res) => {
-            updateCookies(res.headers['set-cookie'] as string[], cookies);
-          });
-        },
-      ).as('loginName');
-
-      cy.intercept(
-        {
-          method: 'POST',
-          url: `${loginUrl}/password*`,
-          times: 1,
-        },
-        (req) => {
-          req.headers['cookie'] = requestCookies(cookies);
-          req.continue((res) => {
-            updateCookies(res.headers['set-cookie'] as string[], cookies);
-          });
-        },
-      ).as('password');
-
-      cy.intercept(
-        {
-          method: 'GET',
-          url: `${loginUrl}/success*`,
-          times: 1,
-        },
-        (req) => {
-          req.headers['cookie'] = requestCookies(cookies);
-          req.continue((res) => {
-            updateCookies(res.headers['set-cookie'] as string[], cookies);
-          });
-        },
-      ).as('success');
-
-      cy.intercept(
-        {
-          method: 'GET',
-          url: `${issuerUrl}/authorize/callback*`,
-          times: 1,
-        },
-        (req) => {
-          req.headers['cookie'] = requestCookies(cookies);
-          req.continue((res) => {
-            updateCookies(res.headers['set-cookie'] as string[], cookies);
-          });
-        },
-      ).as('callback');
-
-      cy.intercept(
-        {
-          method: 'GET',
-          url: `${issuerUrl}/authorize*`,
-          times: 1,
-        },
-        (req) => {
-          req.continue((res) => {
-            updateCookies(res.headers['set-cookie'] as string[], cookies);
-          });
-        },
-      );
+      cy.intercept({
+        times: 6
+      }, req => {
+        req.headers['cookie'] = requestCookies(cookies);
+        req.continue((res) => {
+          updateCookies(res.headers['set-cookie'] as string[], cookies);
+        });
+      })
 
       let userToken: string
       cy.intercept({
@@ -122,14 +47,18 @@ export function login(
         )
       }).as('token')
 
+      cy.intercept({
+          method: 'POST',
+          url: `${loginUrl}/password*`,
+          times: 1,
+      }).as('password');
+
       cy.visit(loginUrl, { retryOnNetworkFailure: true });
 
-      otherZitadelIdpInstance && cy.wait('@login');
       onUsernameScreen ? onUsernameScreen() : null;
       cy.get('#loginName').type(creds.username);
       cy.get('#submit-button').click();
 
-      otherZitadelIdpInstance && cy.wait('@loginName');
       onPasswordScreen ? onPasswordScreen() : null;
       cy.get('#password').type(creds.password);
       cy.get('#submit-button').click();
@@ -153,9 +82,7 @@ export function login(
 
       onAuthenticated ? onAuthenticated() : null;
 
-      otherZitadelIdpInstance && cy.wait('@callback');
-
-      cy.location('pathname', { timeout: 5 * 1000 }).should('eq', '/ui/console/');
+      cy.get("[data-e2e=authenticated-welcome]");
     },
     {
       validate: () => {

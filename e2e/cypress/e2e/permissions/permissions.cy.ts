@@ -24,7 +24,7 @@ describe.skip('permissions', () => {
         beforeEach(()=> {
             apiAuth().then((api)=> {
                 ensureProjectResourceDoesntExist(api, projectId, Roles, testRoleName)
-                cy.visit(`/ui/console/projects/${projectId}?id=roles`)
+                cy.visit(`/projects/${projectId}?id=roles`)
             })
         })
 
