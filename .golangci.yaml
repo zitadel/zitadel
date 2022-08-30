@@ -72,6 +72,10 @@ linters:
     - nolintlint
     # Checks for misuse of Sprintf to construct a host with port in a URL.
     - nosprintfhostport
+    # checks whether Err of rows is checked successfully in `sql.Rows` [fast: false, auto-fix: false]
+    - rowserrcheck
+    # Checks that sql.Rows and sql.Stmt are closed. [fast: false, auto-fix: false]
+    - sqlclosecheck
     - 
     - 
     - 
@@ -235,23 +239,32 @@ linters:
     # FUTURE: will break all of our tests
     - paralleltest
     # Finds slice declarations that could potentially be preallocated [fast: true, auto-fix: false]
-    
+    # FUTURE: would improve performance
     - prealloc
     # find code that shadows one of Go's predeclared identifiers [fast: true, auto-fix: false]
+    # FUTURE: checks for overwrites
     - predeclared
     # Check Prometheus metrics naming via promlint [fast: true, auto-fix: false]
+    # Not interesting at the moment
     - promlinter
+    # Checks that package variables are not reassigned
+    # FUTURE: checks if vars like Err's are reassigned which might break code
+    - reassign
     # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. [fast: false, auto-fix: false]
+    # Linter aggregator, would allow to use less other linters
     - revive
-    # checks whether Err of rows is checked successfully [fast: false, auto-fix: false]
-    - rowserrcheck
-    # Checks that sql.Rows and sql.Stmt are closed. [fast: false, auto-fix: false]
-    - sqlclosecheck
+    # checks for unpinned variables in go programs
+    # deprecated
+    - scopelint
+
     # Stylecheck is a replacement for golint [fast: false, auto-fix: false]
+    # we use goimports
     - stylecheck
     # Checks the struct tags. [fast: true, auto-fix: false]
+    # FUTURE: would help for new structs
     - tagliatelle
     # tenv is analyzer that detects using os.Setenv instead of t.Setenv since Go1.17 [fast: false, auto-fix: false]
+    # FUTURE: currently are no env vars set
     - tenv
     # linter that makes you use a separate _test package [fast: true, auto-fix: false]
     - testpackage
