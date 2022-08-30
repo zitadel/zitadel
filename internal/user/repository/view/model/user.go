@@ -311,14 +311,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		user.HumanMFAOTPAddedType:
 		if u.HumanView == nil {
 			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
-			break
+			return nil
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
 		if u.HumanView == nil {
 			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
-			break
+			return nil
 		}
 		u.OTPState = int32(model.MFAStateReady)
 		u.MFAInitSkipped = time.Time{}
