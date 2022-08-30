@@ -1,5 +1,7 @@
 run:
   concurency: 2
+  timeout: 10m
+  go: '1.19'
   skip-dirs:
     - .artifacts
     - .backups
@@ -18,7 +20,6 @@ run:
     - proto
     - tools
 linters:
-  disable-all: true
   enable:
     # Simple linter to check that your code does not contain non-ASCII identifiers [fast: true, auto-fix: false]
     - asciicheck
@@ -54,20 +55,10 @@ linters:
     - nakedret
     # Staticcheck is a go vet on steroids, applying a ton of static analysis checks [fast: false, auto-fix: false]
     - staticcheck 
-    # Finds unused struct fields [fast: false, auto-fix: false]
-    - structcheck
     # Like the front-end of a Go compiler, parses and type-checks Go code [fast: false, auto-fix: false]
     - typecheck
-    # Finds unused global variables and constants [fast: false, auto-fix: false]
-    - varcheck
     # Simple linter to check that your code does not contain non-ASCII identifiers
     - asciicheck
-    # Checks for dangerous unicode character sequences
-    - bidichk
-    # checks function and package cyclomatic complexity
-    - cyclop
-    # check declaration order and count of types, constants, variables and functions
-    - decorder
     # Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: false]
     - nolintlint
     # Checks for misuse of Sprintf to construct a host with port in a URL.
@@ -76,11 +67,8 @@ linters:
     - rowserrcheck
     # Checks that sql.Rows and sql.Stmt are closed. [fast: false, auto-fix: false]
     - sqlclosecheck
-    - 
-    - 
-    - 
-    - 
-    - 
+    # Remove unnecessary type conversions [fast: false, auto-fix: false]
+    - unconvert
   disable:
     # Checks for dangerous unicode character sequences [fast: true, auto-fix: false]
     # not needed because github does that out of the box
@@ -256,7 +244,9 @@ linters:
     # checks for unpinned variables in go programs
     # deprecated
     - scopelint
-
+    # Finds unused struct fields [fast: false, auto-fix: false]
+    # deprecated, replaced by unused
+    - structcheck
     # Stylecheck is a replacement for golint [fast: false, auto-fix: false]
     # we use goimports
     - stylecheck
@@ -267,33 +257,35 @@ linters:
     # FUTURE: currently are no env vars set
     - tenv
     # linter that makes you use a separate _test package [fast: true, auto-fix: false]
+    # don't use because we test some unexported functions
     - testpackage
     # thelper detects golang test helpers without t.Helper() call and checks the consistency of test helpers [fast: false, auto-fix: false]
+    # FUTURE: nice to improve test quality
     - thelper
     # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes [fast: false, auto-fix: false]
+    # FUTURE: nice to improve test quality
     - tparallel
-    # Remove unnecessary type conversions [fast: false, auto-fix: false]
-    - unconvert
     # Reports unused function parameters [fast: false, auto-fix: false]
+    # DISCUSS: nice idea and would improve code quality, but how to handle false positives?
     - unparam
+    # A linter that detect the possibility to use variables/constants from the Go standard library.
+    # FUTURE: improves code quality
+    - usestdlibvars
+    # Finds unused global variables and constants [fast: false, auto-fix: false]
+    # deprecated, replaced by unused
+    - varcheck
     # checks that the length of a variable's name matches its scope [fast: false, auto-fix: false]
+    # I would not use it because it more or less checks if var lenght matches
     - varnamelen
     # wastedassign finds wasted assignment statements. [fast: false, auto-fix: false]
+    # FUTURE: would improve code quality (maybe already checked by vet?)
     - wastedassign
     # Tool for detection of leading and trailing whitespace [fast: true, auto-fix: true]
+    # Not sure if it improves code readability
     - whitespace
     # Checks that errors returned from external packages are wrapped [fast: false, auto-fix: false]
+    # FUTURE: improves UX because all the errors will be ZITADEL errors
     - wrapcheck
     # Whitespace Linter - Forces you to use empty lines! [fast: true, auto-fix: false]
+    # FUTURE: improves code quality by allowing and blocking line breaks
     - wsl
-output:
-  format: colored-line-number
-# All available settings of specific linters.
-# linters-settings:
-# linters:
-issues:
-  # See the dedicated "issues" documentation section.
-  option: value
-severity:
-  # See the dedicated "severity" documentation section.
-  option: value
