@@ -128,7 +128,7 @@ export class DialogPasswordlessComponent {
     this.service
       .sendMyPasswordlessLink()
       .then(() => {
-        this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT');
+        this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT', true);
         this.showSent = true;
       })
       .catch((error) => {

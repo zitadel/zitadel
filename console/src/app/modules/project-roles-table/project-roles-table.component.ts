@@ -24,9 +24,9 @@ export class ProjectRolesTableComponent implements OnInit {
   @Input() public actionsVisible: boolean = false;
   @Input() public selectedKeys: string[] = [];
   @Input() public showSelectionActionButton: boolean = true;
-  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild(MatTable) public table!: MatTable<Role.AsObject>;
-  public dataSource!: ProjectRolesDataSource;
+  @ViewChild(PaginatorComponent) public paginator?: PaginatorComponent;
+  @ViewChild(MatTable) public table?: MatTable<Role.AsObject>;
+  public dataSource: ProjectRolesDataSource = new ProjectRolesDataSource(this.mgmtService);
   public selection: SelectionModel<Role.AsObject> = new SelectionModel<Role.AsObject>(true, []);
   @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
   @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'changeDate', 'actions'];
@@ -36,9 +36,7 @@ export class ProjectRolesTableComponent implements OnInit {
     private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
-  ) {
-    this.dataSource = new ProjectRolesDataSource(this.mgmtService);
-  }
+  ) {}
 
   public gotoRouterLink(rL: any) {
     this.router.navigate(rL);
@@ -63,7 +61,7 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   private loadRolesPage(): void {
-    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator.pageIndex, this.paginator.pageSize);
+    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator?.pageIndex ?? 0, this.paginator?.pageSize ?? 25);
   }
 
   public changePage(): void {
@@ -134,7 +132,7 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator.pageIndex, this.paginator.pageSize);
+    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator?.pageIndex ?? 0, this.paginator?.pageSize ?? 25);
   }
 
   public get selectionAllowed(): boolean {
