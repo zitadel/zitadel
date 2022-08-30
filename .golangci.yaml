@@ -1,5 +1,6 @@
 run:
   concurency: 2
+  timeout: 10m
   go: '1.19'
   skip-dirs:
     - .artifacts
