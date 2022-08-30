@@ -10,8 +10,6 @@ release:
   # If set to true, will mark the release as not ready for production.
   # Default is false.
   prerelease: auto
-  ids:
-    - prod
 
 before:
   hooks:
@@ -26,8 +24,7 @@ before:
     - sh -c "cp -r .artifacts/console/* internal/api/ui/console/static/"
 
 builds:
-  - id: prod
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -38,13 +35,7 @@ builds:
       - arm64
     ldflags:
       -s -w -X github.com/zitadel/zitadel/cmd/build.version={{.Version}} -X github.com/zitadel/zitadel/cmd/build.commit={{.Commit}} -X github.com/zitadel/zitadel/cmd/build.date={{.Date}}
-  - id: dev
-    env:
-      - CGO_ENABLED=0
-    binary: zitadel-debug
-    gcflags: all=-N -l
-    ldflags: ""
-
+      
 dist: .artifacts/goreleaser
 
 dockers:
@@ -56,8 +47,6 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/amd64"
-  ids:
-  - prod
 - image_templates:
     - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
     - ghcr.io/zitadel/zitadel:{{ .ShortCommit }}-arm64
@@ -66,8 +55,6 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/arm64"
-  ids:
-  - prod
 
 docker_manifests:
 - id: zitadel-latest
@@ -85,10 +72,7 @@ docker_manifests:
 
 
 archives:
-  - id: prod
-    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    builds:
-    - prod
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:
       darwin: Darwin
       linux: Linux

@@ -9,7 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
@@ -311,14 +311,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		user.HumanMFAOTPAddedType:
 		if u.HumanView == nil {
 			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
-			return nil
+			return errors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
 		if u.HumanView == nil {
 			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
-			return nil
+			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateReady)
 		u.MFAInitSkipped = time.Time{}
@@ -368,7 +368,7 @@ func (u *UserView) setRootData(event *models.Event) {
 func (u *UserView) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
 		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
+		return errors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
 	return nil
 }
@@ -377,7 +377,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 	password := new(es_model.Password)
 	if err := json.Unmarshal(event.Data, password); err != nil {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil
 	u.PasswordInitRequired = !u.PasswordSet
@@ -483,7 +483,7 @@ func webAuthNViewFromEvent(event *models.Event) (*WebAuthNView, error) {
 	token := new(WebAuthNView)
 	err := json.Unmarshal(event.Data, token)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
+		return nil, errors.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
 	}
 	return token, err
 }
