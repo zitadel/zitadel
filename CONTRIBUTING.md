@@ -135,7 +135,7 @@ Build the binary. This takes some minutes, but you can speed up rebuilds.
 
 ```bash
 # You just need goreleasers build part (--snapshot) and you just need to target your current platform (--single-target)
-goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+goreleaser build --config ./.goreleaser-dev.yaml --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
 ```
 
 > Note: With this command, several steps are executed.
@@ -143,7 +143,7 @@ goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifac
 > Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
 > Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
 > Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel-npm-console --target angular-export -o internal/api/ui/console/static/`  
-> Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`  
+> Build the binary: `goreleaser build --config ./.goreleaser-dev.yaml --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
@@ -153,7 +153,7 @@ As soon as you are ready to battle test your changes, run the end-to-end tests.
 
 ```bash
 # Build the production binary (unit tests are executed, too)
-goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
+goreleaser build --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
 
 # Pack the binary into a docker image
 DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
