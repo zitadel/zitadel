@@ -334,7 +334,7 @@ DefaultInstance:
   DomainPolicy:
     UserLoginMustBeDomain: true
     ValidateOrgDomains: true
-    SMTPSenderAddressMatchesInstanceDomain: true
+    SMTPSenderAddressMatchesInstanceDomain: false
   LoginPolicy:
     AllowUsernamePassword: true
     AllowRegister: true
