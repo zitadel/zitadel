@@ -45,6 +45,7 @@ HTTP1HostHeader: "host"
 WebAuthNName: ZITADEL
 
 Database:
+  # CockroachDB is the default datbase of ZITADEL
   cockroach:
     Host: localhost
     Port: 26257
@@ -69,6 +70,32 @@ Database:
         RootCert: ""
         Cert: ""
         Key: ""
+  # Postgres is used as soon as a value is set
+  # The values describe the possible fields to set values
+  postgres:
+    Host: 
+    Port:
+    Database:
+    MaxOpenConns:
+    MaxConnLifetime:
+    MaxConnIdleTime:
+    Options:
+    User:
+      Username:
+      Password:
+      SSL:
+        Mode:
+        RootCert:
+        Cert:
+        Key:
+    Admin:
+      Username:
+      Password:
+      SSL:
+        Mode:
+        RootCert:
+        Cert:
+        Key:
 
 Machine:
   # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.

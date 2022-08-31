@@ -31,7 +31,7 @@ func Renew(dbClient *sql.DB, lockTable, lockerID, viewModel, instanceID string, 
 	return crdb.ExecuteTx(context.Background(), dbClient, nil, func(tx *sql.Tx) error {
 		insert := fmt.Sprintf(insertStmtFormat, lockTable)
 		result, err := tx.Exec(insert,
-			lockerID, waitTime.Milliseconds()/millisecondsAsSeconds, viewModel, instanceID)
+			lockerID, waitTime, viewModel, instanceID)
 
 		if err != nil {
 			tx.Rollback()

@@ -4,8 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -51,10 +50,13 @@ func NewCreateStatement(event eventstore.Event, values []handler.Column, opts ..
 	}
 }
 
-func NewUpsertStatement(event eventstore.Event, values []handler.Column, opts ...execOption) *handler.Statement {
+func NewUpsertStatement(event eventstore.Event, conflictCols []handler.Column, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
-	columnNames := strings.Join(cols, ", ")
-	valuesPlaceholder := strings.Join(params, ", ")
+
+	conflictTarget := make([]string, len(conflictCols))
+	for i, col := range conflictCols {
+		conflictTarget[i] = col.Name
+	}
 
 	config := execConfig{
 		args: args,
@@ -64,8 +66,14 @@ func NewUpsertStatement(event eventstore.Event, values []handler.Column, opts ..
 		config.err = handler.ErrNoValues
 	}
 
+	updateCols, updateVals := getUpdateCols(cols, conflictTarget)
+	if len(updateCols) == 0 || len(updateVals) == 0 {
+		config.err = handler.ErrNoValues
+	}
+
 	q := func(config execConfig) string {
-		return "UPSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
+		return "INSERT INTO " + config.tableName + " (" + strings.Join(cols, ", ") + ") VALUES (" + strings.Join(params, ", ") + ")" +
+			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO UPDATE SET (" + strings.Join(updateCols, ", ") + ") = (" + strings.Join(updateVals, ", ") + ")"
 	}
 
 	return &handler.Statement{
@@ -77,14 +85,37 @@ func NewUpsertStatement(event eventstore.Event, values []handler.Column, opts ..
 	}
 }
 
+func getUpdateCols(cols, conflictTarget []string) (updateCols, updateVals []string) {
+	updateCols = make([]string, len(cols))
+	updateVals = make([]string, len(cols))
+
+	copy(updateCols, cols)
+
+	for i := len(updateCols) - 1; i >= 0; i-- {
+		updateVals[i] = "EXCLUDED." + updateCols[i]
+
+		for _, conflict := range conflictTarget {
+			if conflict == updateCols[i] {
+				copy(updateCols[i:], updateCols[i+1:])
+				updateCols[len(updateCols)-1] = ""
+				updateCols = updateCols[:len(updateCols)-1]
+
+				copy(updateVals[i:], updateVals[i+1:])
+				updateVals[len(updateVals)-1] = ""
+				updateVals = updateVals[:len(updateVals)-1]
+
+				break
+			}
+		}
+	}
+
+	return updateCols, updateVals
+}
+
 func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := conditionsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
-
-	columnNames := strings.Join(cols, ", ")
-	valuesPlaceholder := strings.Join(params, ", ")
-	wheresPlaceholders := strings.Join(wheres, " AND ")
 
 	config := execConfig{
 		args: args,
@@ -99,7 +130,7 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	}
 
 	q := func(config execConfig) string {
-		return "UPDATE " + config.tableName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
+		return "UPDATE " + config.tableName + " SET (" + strings.Join(cols, ", ") + ") = (" + strings.Join(params, ", ") + ") WHERE " + strings.Join(wheres, " AND ")
 	}
 
 	return &handler.Statement{
@@ -171,9 +202,9 @@ func AddCreateStatement(columns []handler.Column, opts ...execOption) func(event
 	}
 }
 
-func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.Event) Exec {
+func AddUpsertStatement(indexCols []handler.Column, values []handler.Column, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
-		return NewUpsertStatement(event, values, opts...).Execute
+		return NewUpsertStatement(event, indexCols, values, opts...).Execute
 	}
 }
 
@@ -189,9 +220,9 @@ func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func
 	}
 }
 
-func AddCopyStatement(from, to []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.Event) Exec {
+func AddCopyStatement(conflict, from, to []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
-		return NewCopyStatement(event, from, to, conditions, opts...).Execute
+		return NewCopyStatement(event, conflict, from, to, conditions, opts...).Execute
 	}
 }
 
@@ -218,11 +249,9 @@ func NewArrayRemoveCol(column string, value interface{}) handler.Column {
 func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	var arrayType string
 	switch value.(type) {
-	case pq.StringArray:
-		arrayType = "STRING"
-	case pq.Int32Array,
-		pq.Int64Array:
-		arrayType = "INT"
+
+	case []string, database.StringArray:
+		arrayType = "TEXT"
 		//TODO: handle more types if necessary
 	}
 	return handler.Column{
@@ -234,25 +263,29 @@ func NewArrayIntersectCol(column string, value interface{}) handler.Column {
 	}
 }
 
-//NewCopyStatement creates a new upsert statement which updates a column from an existing row
+// NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.Event, from, to []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
+func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
 	columnNames := make([]string, len(to))
 	selectColumns := make([]string, len(from))
+	updateColumns := make([]string, len(columnNames))
 	argCounter := 0
 	args := []interface{}{}
 
-	for i := range from {
+	for i, col := range from {
 		columnNames[i] = to[i].Name
 		selectColumns[i] = from[i].Name
-		if from[i].Value != nil {
+		updateColumns[i] = "EXCLUDED." + col.Name
+		if col.Value != nil {
 			argCounter++
 			selectColumns[i] = "$" + strconv.Itoa(argCounter)
-			args = append(args, from[i].Value)
+			updateColumns[i] = selectColumns[i]
+			args = append(args, col.Value)
 		}
+
 	}
 
 	wheres := make([]string, len(conds))
@@ -260,6 +293,11 @@ func NewCopyStatement(event eventstore.Event, from, to []handler.Column, conds [
 		argCounter++
 		wheres[i] = "copy_table." + cond.Name + " = $" + strconv.Itoa(argCounter)
 		args = append(args, cond.Value)
+	}
+
+	conflictTargets := make([]string, len(conflictCols))
+	for i, conflictCol := range conflictCols {
+		conflictTargets[i] = conflictCol.Name
 	}
 
 	config := execConfig{
@@ -275,7 +313,7 @@ func NewCopyStatement(event eventstore.Event, from, to []handler.Column, conds [
 	}
 
 	q := func(config execConfig) string {
-		return "UPSERT INTO " +
+		return "INSERT INTO " +
 			config.tableName +
 			" (" +
 			strings.Join(columnNames, ", ") +
@@ -283,7 +321,14 @@ func NewCopyStatement(event eventstore.Event, from, to []handler.Column, conds [
 			strings.Join(selectColumns, ", ") +
 			" FROM " +
 			config.tableName + " AS copy_table WHERE " +
-			strings.Join(wheres, " AND ")
+			strings.Join(wheres, " AND ") +
+			" ON CONFLICT (" +
+			strings.Join(conflictTargets, ", ") +
+			") DO UPDATE SET (" +
+			strings.Join(columnNames, ", ") +
+			") = (" +
+			strings.Join(updateColumns, ", ") +
+			")"
 	}
 
 	return &handler.Statement{

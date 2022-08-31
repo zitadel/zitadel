@@ -51,6 +51,7 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		setup.New(),
 		start.New(),
 		start.NewStartFromInit(),
+		start.NewStartFromSetup(),
 		key.New(),
 	)
 

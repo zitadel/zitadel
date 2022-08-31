@@ -6,9 +6,6 @@ import (
 	"strings"
 	"time"
 
-	//sql import
-	_ "github.com/lib/pq"
-
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
@@ -61,13 +58,15 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
-	client, err := sql.Open("postgres", c.String(useAdmin))
+	client, err := sql.Open("pgx", c.String(useAdmin))
 	if err != nil {
 		return nil, err
 	}
+
 	client.SetMaxOpenConns(int(c.MaxOpenConns))
 	client.SetConnMaxLifetime(c.MaxConnLifetime)
 	client.SetConnMaxIdleTime(c.MaxConnIdleTime)
+
 	return client, nil
 }
 

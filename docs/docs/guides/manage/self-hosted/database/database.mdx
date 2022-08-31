@@ -1,0 +1,28 @@
+---
+title: Database
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Cockroach from './_cockroachdb.mdx'
+import Postgres from './_postgres.mdx'
+
+# Database Configuration
+
+<Tabs
+    groupId="database-vendor"
+    default="cockroach"
+    values={[
+        {'label': 'Cockroach', 'value': 'crdb'},
+        {'label': 'Postgres', 'value': 'pg'},
+    ]}
+>
+    <TabItem value="crdb">
+        <Cockroach/>
+        <More/>
+    </TabItem>
+    <TabItem value="pg">
+        <Postgres/>
+        <More/>
+    </TabItem>
+</Tabs>
