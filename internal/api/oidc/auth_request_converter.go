@@ -18,6 +18,7 @@ import (
 )
 
 const (
+	// DEPRECATED: use `amrPWD` instead
 	amrPassword     = "password"
 	amrPWD          = "pwd"
 	amrMFA          = "mfa"
