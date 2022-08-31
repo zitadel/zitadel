@@ -31,16 +31,18 @@ Prereqesits:
 - cockroachdb with user and database
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := new(Config)
-			if err := viper.Unmarshal(config); err != nil {
-				return err
-			}
+			config := MustNewConfig(viper.GetViper())
 			return verifyZitadel(config.Database)
 		},
 	}
 }
 
 func VerifyZitadel(db *sql.DB, config database.Config) error {
+	err := ReadStmts(config.Type())
+	if err != nil {
+		return err
+	}
+
 	if err := exec(db, fmt.Sprintf(createSystemStmt, config.Username()), nil); err != nil {
 		return err
 	}
@@ -73,10 +75,12 @@ func VerifyZitadel(db *sql.DB, config database.Config) error {
 
 func verifyZitadel(config database.Config) error {
 	logging.WithFields("database", config.Database()).Info("verify zitadel")
+
 	db, err := database.Connect(config, false)
 	if err != nil {
 		return err
 	}
+
 	if err := VerifyZitadel(db, config); err != nil {
 		return nil
 	}
