@@ -13,13 +13,13 @@ Database:
     Host: localhost
     Port: 5432
     Database: zitadel
-    MaxOpenConns: 25m
-    MaxConnLifetime:
-    MaxConnIdleTime: 
+    MaxOpenConns: 25
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
     Options:
     User:
       Username: zitadel
-      Password:
+      Password: zitadel
       SSL:
         Mode: disable
         RootCert:
