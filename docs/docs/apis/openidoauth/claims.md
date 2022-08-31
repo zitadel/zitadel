@@ -43,7 +43,7 @@ Please check below the matrix for an overview where which scope is asserted.
 |:-------------------|:-----------------------------------------|-----------------------------------------------------------------------------------------------|
 | acr                | TBA                                      | TBA                                                                                           |
 | address            | `Teufener Strasse 19, 9000 St. Gallen`   | TBA                                                                                           |
-| amr                | `pwd mfa`                                | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) <br/> Password value is deprecated, please check pwd |
+| amr                | `pwd mfa`                                | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) <br/> `password` value is deprecated, please check `pwd` |
 | aud                | `69234237810729019`                      | The audience of the token, by default all client id's and the project id are included         |
 | auth_time          | `1311280969`                             | Unix time of the authentication                                                               |
 | azp                | `69234237810729234`                      | Client id of the client who requested the token                                               |
