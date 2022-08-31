@@ -38,7 +38,12 @@ func ReduceEvent(handler Handler, event *models.Event) {
 
 		if err != nil {
 			handler.Subscription().Unsubscribe()
-			logging.WithFields("cause", err, "stack", string(debug.Stack())).Error("reduce panicked")
+			logging.WithFields(
+				"cause", err,
+				"stack", string(debug.Stack()),
+				"sequence", event.Sequence,
+				"instnace", event.InstanceID,
+			).Error("reduce panicked")
 		}
 	}()
 	currentSequence, err := handler.CurrentSequence(event.InstanceID)

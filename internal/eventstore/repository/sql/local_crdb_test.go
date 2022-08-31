@@ -9,6 +9,8 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/initialise"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/cockroach"
 )
 
 var (
@@ -42,15 +44,22 @@ func TestMain(m *testing.M) {
 }
 
 func initDB(db *sql.DB) error {
-	username := "zitadel"
-	database := "zitadel"
-	err := initialise.Initialise(db, initialise.VerifyUser(username, ""),
-		initialise.VerifyDatabase(database),
-		initialise.VerifyGrant(database, username))
+	config := new(database.Config)
+	config.SetConnector(&cockroach.Config{User: cockroach.User{Username: "zitadel"}, Database: "zitadel"})
+
+	if err := initialise.ReadStmts("cockroach"); err != nil {
+		return err
+	}
+
+	err := initialise.Init(db,
+		initialise.VerifyUser(config.Username(), ""),
+		initialise.VerifyDatabase(config.Database()),
+		initialise.VerifyGrant(config.Database(), config.Username()))
 	if err != nil {
 		return err
 	}
-	return initialise.VerifyZitadel(db)
+
+	return initialise.VerifyZitadel(db, *config)
 }
 
 func fillUniqueData(unique_type, field, instanceID string) error {

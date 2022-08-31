@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	UserMetadataProjectionTable = "projections.user_metadata2"
+	UserMetadataProjectionTable = "projections.user_metadata3"
 
 	UserMetadataColumnUserID        = "user_id"
 	UserMetadataColumnCreationDate  = "creation_date"
@@ -43,7 +43,7 @@ func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("usr_md_ro_idx", []string{UserGrantResourceOwner})),
 		),
 	)
 
@@ -85,13 +85,18 @@ func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 	return crdb.NewUpsertStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(UserMetadataColumnUserID, e.Aggregate().ID),
-			handler.NewCol(UserMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(UserMetadataColumnInstanceID, nil),
+			handler.NewCol(UserMetadataColumnUserID, nil),
+			handler.NewCol(UserMetadataColumnKey, e.Key),
+		},
+		[]handler.Column{
 			handler.NewCol(UserMetadataColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(UserMetadataColumnUserID, e.Aggregate().ID),
+			handler.NewCol(UserMetadataColumnKey, e.Key),
+			handler.NewCol(UserMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(UserMetadataColumnCreationDate, e.CreationDate()),
 			handler.NewCol(UserMetadataColumnChangeDate, e.CreationDate()),
 			handler.NewCol(UserMetadataColumnSequence, e.Sequence()),
-			handler.NewCol(UserMetadataColumnKey, e.Key),
 			handler.NewCol(UserMetadataColumnValue, e.Value),
 		},
 	), nil

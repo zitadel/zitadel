@@ -7,6 +7,12 @@ import (
 )
 
 func Test_verifyDB(t *testing.T) {
+	err := ReadStmts("cockroach") //TODO: check all dialects
+	if err != nil {
+		t.Errorf("unable to read stmts: %v", err)
+		t.FailNow()
+	}
+
 	type args struct {
 		db       db
 		database string
@@ -17,19 +23,10 @@ func Test_verifyDB(t *testing.T) {
 		targetErr error
 	}{
 		{
-			name: "exists fails",
-			args: args{
-				db:       prepareDB(t, expectQueryErr("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", sql.ErrConnDone, "zitadel")),
-				database: "zitadel",
-			},
-			targetErr: sql.ErrConnDone,
-		},
-		{
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", false, "zitadel"),
-					expectExec("CREATE DATABASE zitadel", sql.ErrTxDone),
+					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS zitadel", sql.ErrTxDone),
 				),
 				database: "zitadel",
 			},
@@ -39,8 +36,7 @@ func Test_verifyDB(t *testing.T) {
 			name: "doesn't exists, create successful",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", false, "zitadel"),
-					expectExec("CREATE DATABASE zitadel", nil),
+					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS zitadel", nil),
 				),
 				database: "zitadel",
 			},
@@ -50,7 +46,7 @@ func Test_verifyDB(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", true, "zitadel"),
+					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS zitadel", nil),
 				),
 				database: "zitadel",
 			},

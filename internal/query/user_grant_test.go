@@ -8,42 +8,41 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 var (
 	userGrantStmt = regexp.QuoteMeta(
-		"SELECT projections.user_grants.id" +
-			", projections.user_grants.creation_date" +
-			", projections.user_grants.change_date" +
-			", projections.user_grants.sequence" +
-			", projections.user_grants.grant_id" +
-			", projections.user_grants.roles" +
-			", projections.user_grants.state" +
-			", projections.user_grants.user_id" +
-			", projections.users2.username" +
-			", projections.users2.type" +
-			", projections.users2.resource_owner" +
-			", projections.users2_humans.first_name" +
-			", projections.users2_humans.last_name" +
-			", projections.users2_humans.email" +
-			", projections.users2_humans.display_name" +
-			", projections.users2_humans.avatar_key" +
+		"SELECT projections.user_grants2.id" +
+			", projections.user_grants2.creation_date" +
+			", projections.user_grants2.change_date" +
+			", projections.user_grants2.sequence" +
+			", projections.user_grants2.grant_id" +
+			", projections.user_grants2.roles" +
+			", projections.user_grants2.state" +
+			", projections.user_grants2.user_id" +
+			", projections.users3.username" +
+			", projections.users3.type" +
+			", projections.users3.resource_owner" +
+			", projections.users3_humans.first_name" +
+			", projections.users3_humans.last_name" +
+			", projections.users3_humans.email" +
+			", projections.users3_humans.display_name" +
+			", projections.users3_humans.avatar_key" +
 			", projections.login_names.login_name" +
-			", projections.user_grants.resource_owner" +
+			", projections.user_grants2.resource_owner" +
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
-			", projections.user_grants.project_id" +
-			", projections.projects.name" +
-			" FROM projections.user_grants" +
-			" LEFT JOIN projections.users2 ON projections.user_grants.user_id = projections.users2.id" +
-			" LEFT JOIN projections.users2_humans ON projections.user_grants.user_id = projections.users2_humans.user_id" +
-			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
-			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id" +
-			" LEFT JOIN projections.login_names ON projections.user_grants.user_id = projections.login_names.user_id" +
+			", projections.user_grants2.project_id" +
+			", projections.projects2.name" +
+			" FROM projections.user_grants2" +
+			" LEFT JOIN projections.users3 ON projections.user_grants2.user_id = projections.users3.id" +
+			" LEFT JOIN projections.users3_humans ON projections.user_grants2.user_id = projections.users3_humans.user_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants2.resource_owner = projections.orgs.id" +
+			" LEFT JOIN projections.projects2 ON projections.user_grants2.project_id = projections.projects2.id" +
+			" LEFT JOIN projections.login_names ON projections.user_grants2.user_id = projections.login_names.user_id" +
 			" WHERE projections.login_names.is_primary = $1")
 	userGrantCols = []string{
 		"id",
@@ -70,35 +69,35 @@ var (
 		"name", //project name
 	}
 	userGrantsStmt = regexp.QuoteMeta(
-		"SELECT projections.user_grants.id" +
-			", projections.user_grants.creation_date" +
-			", projections.user_grants.change_date" +
-			", projections.user_grants.sequence" +
-			", projections.user_grants.grant_id" +
-			", projections.user_grants.roles" +
-			", projections.user_grants.state" +
-			", projections.user_grants.user_id" +
-			", projections.users2.username" +
-			", projections.users2.type" +
-			", projections.users2.resource_owner" +
-			", projections.users2_humans.first_name" +
-			", projections.users2_humans.last_name" +
-			", projections.users2_humans.email" +
-			", projections.users2_humans.display_name" +
-			", projections.users2_humans.avatar_key" +
+		"SELECT projections.user_grants2.id" +
+			", projections.user_grants2.creation_date" +
+			", projections.user_grants2.change_date" +
+			", projections.user_grants2.sequence" +
+			", projections.user_grants2.grant_id" +
+			", projections.user_grants2.roles" +
+			", projections.user_grants2.state" +
+			", projections.user_grants2.user_id" +
+			", projections.users3.username" +
+			", projections.users3.type" +
+			", projections.users3.resource_owner" +
+			", projections.users3_humans.first_name" +
+			", projections.users3_humans.last_name" +
+			", projections.users3_humans.email" +
+			", projections.users3_humans.display_name" +
+			", projections.users3_humans.avatar_key" +
 			", projections.login_names.login_name" +
-			", projections.user_grants.resource_owner" +
+			", projections.user_grants2.resource_owner" +
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
-			", projections.user_grants.project_id" +
-			", projections.projects.name" +
+			", projections.user_grants2.project_id" +
+			", projections.projects2.name" +
 			", COUNT(*) OVER ()" +
-			" FROM projections.user_grants" +
-			" LEFT JOIN projections.users2 ON projections.user_grants.user_id = projections.users2.id" +
-			" LEFT JOIN projections.users2_humans ON projections.user_grants.user_id = projections.users2_humans.user_id" +
-			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
-			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id" +
-			" LEFT JOIN projections.login_names ON projections.user_grants.user_id = projections.login_names.user_id" +
+			" FROM projections.user_grants2" +
+			" LEFT JOIN projections.users3 ON projections.user_grants2.user_id = projections.users3.id" +
+			" LEFT JOIN projections.users3_humans ON projections.user_grants2.user_id = projections.users3_humans.user_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants2.resource_owner = projections.orgs.id" +
+			" LEFT JOIN projections.projects2 ON projections.user_grants2.project_id = projections.projects2.id" +
+			" LEFT JOIN projections.login_names ON projections.user_grants2.user_id = projections.login_names.user_id" +
 			" WHERE projections.login_names.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
@@ -148,7 +147,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						testNow,
 						20211111,
 						"grant-id",
-						pq.StringArray{"role-key"},
+						database.StringArray{"role-key"},
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -173,7 +172,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				CreationDate:       testNow,
 				ChangeDate:         testNow,
 				Sequence:           20211111,
-				Roles:              []string{"role-key"},
+				Roles:              database.StringArray{"role-key"},
 				GrantID:            "grant-id",
 				State:              domain.UserGrantStateActive,
 				UserID:             "user-id",
@@ -206,7 +205,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						testNow,
 						20211111,
 						"grant-id",
-						pq.StringArray{"role-key"},
+						database.StringArray{"role-key"},
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -231,7 +230,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				CreationDate:       testNow,
 				ChangeDate:         testNow,
 				Sequence:           20211111,
-				Roles:              []string{"role-key"},
+				Roles:              database.StringArray{"role-key"},
 				GrantID:            "grant-id",
 				State:              domain.UserGrantStateActive,
 				UserID:             "user-id",
@@ -264,7 +263,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						testNow,
 						20211111,
 						"grant-id",
-						pq.StringArray{"role-key"},
+						database.StringArray{"role-key"},
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -289,7 +288,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				CreationDate:       testNow,
 				ChangeDate:         testNow,
 				Sequence:           20211111,
-				Roles:              []string{"role-key"},
+				Roles:              database.StringArray{"role-key"},
 				GrantID:            "grant-id",
 				State:              domain.UserGrantStateActive,
 				UserID:             "user-id",
@@ -322,7 +321,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						testNow,
 						20211111,
 						"grant-id",
-						pq.StringArray{"role-key"},
+						database.StringArray{"role-key"},
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -347,7 +346,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				CreationDate:       testNow,
 				ChangeDate:         testNow,
 				Sequence:           20211111,
-				Roles:              []string{"role-key"},
+				Roles:              database.StringArray{"role-key"},
 				GrantID:            "grant-id",
 				State:              domain.UserGrantStateActive,
 				UserID:             "user-id",
@@ -380,7 +379,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						testNow,
 						20211111,
 						"grant-id",
-						pq.StringArray{"role-key"},
+						database.StringArray{"role-key"},
 						domain.UserGrantStateActive,
 						"user-id",
 						"username",
@@ -405,7 +404,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 				CreationDate:       testNow,
 				ChangeDate:         testNow,
 				Sequence:           20211111,
-				Roles:              []string{"role-key"},
+				Roles:              database.StringArray{"role-key"},
 				GrantID:            "grant-id",
 				State:              domain.UserGrantStateActive,
 				UserID:             "user-id",
@@ -468,7 +467,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							testNow,
 							20211111,
 							"grant-id",
-							pq.StringArray{"role-key"},
+							database.StringArray{"role-key"},
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -499,7 +498,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
 						Sequence:           20211111,
-						Roles:              []string{"role-key"},
+						Roles:              database.StringArray{"role-key"},
 						GrantID:            "grant-id",
 						State:              domain.UserGrantStateActive,
 						UserID:             "user-id",
@@ -535,7 +534,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							testNow,
 							20211111,
 							"grant-id",
-							pq.StringArray{"role-key"},
+							database.StringArray{"role-key"},
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -566,7 +565,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
 						Sequence:           20211111,
-						Roles:              []string{"role-key"},
+						Roles:              database.StringArray{"role-key"},
 						GrantID:            "grant-id",
 						State:              domain.UserGrantStateActive,
 						UserID:             "user-id",
@@ -602,7 +601,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							testNow,
 							20211111,
 							"grant-id",
-							pq.StringArray{"role-key"},
+							database.StringArray{"role-key"},
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -633,7 +632,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
 						Sequence:           20211111,
-						Roles:              []string{"role-key"},
+						Roles:              database.StringArray{"role-key"},
 						GrantID:            "grant-id",
 						State:              domain.UserGrantStateActive,
 						UserID:             "user-id",
@@ -669,7 +668,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							testNow,
 							20211111,
 							"grant-id",
-							pq.StringArray{"role-key"},
+							database.StringArray{"role-key"},
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -700,7 +699,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
 						Sequence:           20211111,
-						Roles:              []string{"role-key"},
+						Roles:              database.StringArray{"role-key"},
 						GrantID:            "grant-id",
 						State:              domain.UserGrantStateActive,
 						UserID:             "user-id",
@@ -736,7 +735,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							testNow,
 							20211111,
 							"grant-id",
-							pq.StringArray{"role-key"},
+							database.StringArray{"role-key"},
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -767,7 +766,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
 						Sequence:           20211111,
-						Roles:              []string{"role-key"},
+						Roles:              database.StringArray{"role-key"},
 						GrantID:            "grant-id",
 						State:              domain.UserGrantStateActive,
 						UserID:             "user-id",
@@ -803,7 +802,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							testNow,
 							20211111,
 							"grant-id",
-							pq.StringArray{"role-key"},
+							database.StringArray{"role-key"},
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -827,7 +826,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 							testNow,
 							20211111,
 							"grant-id",
-							pq.StringArray{"role-key"},
+							database.StringArray{"role-key"},
 							domain.UserGrantStateActive,
 							"user-id",
 							"username",
@@ -858,7 +857,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
 						Sequence:           20211111,
-						Roles:              []string{"role-key"},
+						Roles:              database.StringArray{"role-key"},
 						GrantID:            "grant-id",
 						State:              domain.UserGrantStateActive,
 						UserID:             "user-id",
@@ -882,7 +881,7 @@ func Test_UserGrantPrepares(t *testing.T) {
 						CreationDate:       testNow,
 						ChangeDate:         testNow,
 						Sequence:           20211111,
-						Roles:              []string{"role-key"},
+						Roles:              database.StringArray{"role-key"},
 						GrantID:            "grant-id",
 						State:              domain.UserGrantStateActive,
 						UserID:             "user-id",
