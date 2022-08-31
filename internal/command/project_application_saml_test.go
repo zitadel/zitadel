@@ -1,12 +1,13 @@
 package command
 
 import (
+	"bytes"
 	"context"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/saml/pkg/provider/xml"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -25,7 +26,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
-		httpStatus  int
+		httpClient  *http.Client
 	}
 	type args struct {
 		ctx           context.Context
@@ -112,7 +113,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
-			name: "create oidc app basic, metadata not parsable",
+			name: "create saml app basic, metadata not parsable",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -145,7 +146,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
-			name: "create oidc app basic, ok",
+			name: "create saml app basic, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -211,7 +212,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
-			name: "create oidc app metadataURL, ok",
+			name: "create saml app metadataURL, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -247,6 +248,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
+				httpClient:  newTestClient(200, []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -256,7 +258,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					},
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    nil,
 					MetadataURL: "http://localhost:" + port + path,
 				},
 				resourceOwner: "org1",
@@ -277,7 +279,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
-			name: "create oidc app metadataURL, http error",
+			name: "create saml app metadataURL, http error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -291,7 +293,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
-				httpStatus:  http.StatusNotFound,
+				httpClient:  newTestClient(http.StatusNotFound, nil),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -301,7 +303,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					},
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    nil,
 					MetadataURL: "http://localhost:" + port + path,
 				},
 				resourceOwner: "org1",
@@ -311,35 +313,13 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 	}
-	metadata := []byte("")
-	httpStatus := 0
-	http.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
-		if httpStatus != 0 {
-			http.Error(w, "error", httpStatus)
-			return
-		}
-		if err := xml.Write(w, metadata); err != nil {
-			t.Error("ReadMetadataFromURL() failed to write metadata")
-			return
-		}
-	})
-	go func() {
-		if err := http.ListenAndServe(":"+port, nil); err != nil {
-			t.Error("ReadMetadataFromURL() failed to ListenAndServe")
-			return
-		}
-	}()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.args.samlApp.MetadataURL != "" {
-				metadata = tt.args.samlApp.Metadata
-				httpStatus = tt.fields.httpStatus
-				tt.args.samlApp.Metadata = []byte("")
-			}
-
 			r := &Commands{
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
+				httpClient:  tt.fields.httpClient,
 			}
 
 			got, err := r.AddSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
@@ -362,7 +342,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 
 	type fields struct {
 		eventstore *eventstore.Eventstore
-		httpStatus int
+		httpClient *http.Client
 	}
 	type args struct {
 		ctx           context.Context
@@ -491,6 +471,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						),
 					),
 				),
+				httpClient: newTestClient(http.StatusOK, []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -502,7 +483,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					AppID:       "app1",
 					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    nil,
 					MetadataURL: "http://localhost:" + port + path,
 				},
 				resourceOwner: "org1",
@@ -535,6 +516,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						),
 					),
 				),
+				httpClient: nil,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -592,6 +574,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
 					),
 				),
+				httpClient: newTestClient(http.StatusOK, []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -603,7 +586,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					AppName:     "app",
 					EntityID:    "https://test2.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    nil,
 					MetadataURL: "http://localhost:" + port + path,
 				},
 				resourceOwner: "org1",
@@ -660,6 +643,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
 					),
 				),
+				httpClient: nil,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -692,34 +676,12 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 			},
 		},
 	}
-	metadata := []byte("")
-	httpStatus := 0
-	http.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
-		if httpStatus != 0 {
-			http.Error(w, "error", httpStatus)
-			return
-		}
-		if err := xml.Write(w, metadata); err != nil {
-			t.Error("ReadMetadataFromURL() failed to write metadata")
-			return
-		}
-	})
-	go func() {
-		if err := http.ListenAndServe(":"+port, nil); err != nil {
-			t.Error("ReadMetadataFromURL() failed to ListenAndServe")
-			return
-		}
-	}()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.args.samlApp.MetadataURL != "" {
-				metadata = tt.args.samlApp.Metadata
-				httpStatus = tt.fields.httpStatus
-				tt.args.samlApp.Metadata = []byte("")
-			}
-
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				httpClient: tt.fields.httpClient,
 			}
 			got, err := r.ChangeSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -761,4 +723,25 @@ func newSAMLAppChangedEventMetadataURL(ctx context.Context, appID, projectID, re
 		changes,
 	)
 	return event
+}
+
+type roundTripperFunc func(*http.Request) *http.Response
+
+// RoundTrip implements the http.RoundTripper interface.
+func (fn roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return fn(req), nil
+}
+
+// NewTestClient returns *http.Client with Transport replaced to avoid making real calls
+func newTestClient(httpStatus int, metadata []byte) *http.Client {
+	fn := roundTripperFunc(func(req *http.Request) *http.Response {
+		return &http.Response{
+			StatusCode: httpStatus,
+			Body:       ioutil.NopCloser(bytes.NewBuffer(metadata)),
+			Header:     make(http.Header), //must be non-nil value
+		}
+	})
+	return &http.Client{
+		Transport: fn,
+	}
 }

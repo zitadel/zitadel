@@ -51,7 +51,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 	}
 
 	if samlApp.MetadataURL != "" {
-		data, err := xml.ReadMetadataFromURL(samlApp.MetadataURL)
+		data, err := xml.ReadMetadataFromURL(c.httpClient, samlApp.MetadataURL)
 		if err != nil {
 			return nil, caos_errs.ThrowInvalidArgument(err, "SAML-wmqlo1", "Errors.Project.App.SAMLMetadataMissing")
 		}
@@ -98,7 +98,7 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 	projectAgg := ProjectAggregateFromWriteModel(&existingSAML.WriteModel)
 
 	if samlApp.MetadataURL != "" {
-		data, err := xml.ReadMetadataFromURL(samlApp.MetadataURL)
+		data, err := xml.ReadMetadataFromURL(c.httpClient, samlApp.MetadataURL)
 		if err != nil {
 			return nil, caos_errs.ThrowInvalidArgument(err, "SAML-J3kg3", "Errors.Project.App.SAMLMetadataMissing")
 		}

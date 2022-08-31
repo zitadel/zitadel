@@ -887,6 +887,8 @@ github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.5 h1:dP+6SheVtpF4T/oql6mJoqou8j
 github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.5/go.mod h1:uoJw5Xc6HXfnQbNZiLbld9dED0/8UMu0M4gOipTRZBA=
 github.com/zitadel/saml v0.0.4 h1:xz97KyKD3mrQcIEKi0aUPyNX834xm3p1ToO9HK/vVeY=
 github.com/zitadel/saml v0.0.4/go.mod h1:DIy/ln32rNYv/bIBA8uOB6Y2JmxjZldDYBeMNn7YyeQ=
+github.com/zitadel/saml v0.0.5 h1:ufLE0MeWe2SLGGkSWbY3J20xxYtAL57IddeDsyMqCuM=
+github.com/zitadel/saml v0.0.5/go.mod h1:DIy/ln32rNYv/bIBA8uOB6Y2JmxjZldDYBeMNn7YyeQ=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738/go.mod h1:dnLIgRNXwCJa5e+c6mIZCrds/GIG4ncV9HhK5PX7jPg=
 go.etcd.io/etcd/api/v3 v3.5.1/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=

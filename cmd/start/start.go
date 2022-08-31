@@ -139,6 +139,7 @@ func startZitadel(config *Config, masterKey string) error {
 		keys.DomainVerification,
 		keys.OIDC,
 		keys.SAML,
+		&http.Client{},
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)

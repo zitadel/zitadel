@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/saml/pkg/provider/key"
 	"github.com/zitadel/saml/pkg/provider/models"
 	"github.com/zitadel/saml/pkg/provider/serviceprovider"
-	"github.com/zitadel/saml/pkg/provider/xml"
 	"github.com/zitadel/saml/pkg/provider/xml/samlp"
 
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -61,7 +60,6 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 		app.ID,
 		&serviceprovider.Config{
 			Metadata: app.SAMLConfig.Metadata,
-			URL:      app.SAMLConfig.MetadataURL,
 		},
 		p.defaultLoginURL,
 	)
@@ -72,11 +70,7 @@ func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string,
 	if err != nil {
 		return "", err
 	}
-	metadata, err := xml.ParseMetadataXmlIntoStruct(app.SAMLConfig.Metadata)
-	if err != nil {
-		return "", err
-	}
-	return string(metadata.EntityID), nil
+	return app.SAMLConfig.EntityID, nil
 }
 
 func (p *Storage) Health(context.Context) error {
@@ -135,7 +129,8 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, userinfo models.Att
 		return err
 	}
 
-	return setUserinfo(user, userinfo, attributes)
+	setUserinfo(user, userinfo, attributes)
+	return nil
 }
 
 func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.AttributeSetter, loginName string, attributes []int) (err error) {
@@ -151,33 +146,45 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 		return err
 	}
 
-	return setUserinfo(user, userinfo, attributes)
+	setUserinfo(user, userinfo, attributes)
+	return nil
 }
 
-func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes []int) error {
+func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes []int) {
+	if len(attributes) == 0 {
+		userinfo.SetUsername(user.PreferredLoginName)
+		userinfo.SetUserID(user.ID)
+		if user.Human == nil {
+			return
+		}
+		userinfo.SetEmail(user.Human.Email)
+		userinfo.SetSurname(user.Human.LastName)
+		userinfo.SetGivenName(user.Human.FirstName)
+		userinfo.SetFullName(user.Human.DisplayName)
+		return
+	}
 	for _, attribute := range attributes {
 		switch attribute {
 		case provider.AttributeEmail:
-			userinfo.SetEmail(user.Human.Email)
+			if user.Human != nil {
+				userinfo.SetEmail(user.Human.Email)
+			}
 		case provider.AttributeSurname:
-			userinfo.SetSurname(user.Human.LastName)
+			if user.Human != nil {
+				userinfo.SetSurname(user.Human.LastName)
+			}
 		case provider.AttributeFullName:
-			userinfo.SetFullName(user.Human.DisplayName)
+			if user.Human != nil {
+				userinfo.SetFullName(user.Human.DisplayName)
+			}
 		case provider.AttributeGivenName:
-			userinfo.SetGivenName(user.Human.FirstName)
+			if user.Human != nil {
+				userinfo.SetGivenName(user.Human.FirstName)
+			}
 		case provider.AttributeUsername:
 			userinfo.SetUsername(user.PreferredLoginName)
 		case provider.AttributeUserID:
 			userinfo.SetUserID(user.ID)
 		}
 	}
-	if attributes == nil || len(attributes) == 0 {
-		userinfo.SetEmail(user.Human.Email)
-		userinfo.SetSurname(user.Human.LastName)
-		userinfo.SetGivenName(user.Human.FirstName)
-		userinfo.SetFullName(user.Human.DisplayName)
-		userinfo.SetUsername(user.PreferredLoginName)
-		userinfo.SetUserID(user.ID)
-	}
-	return nil
 }
