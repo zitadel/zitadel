@@ -42,8 +42,9 @@ func (c *Config) MatchName(name string) bool {
 
 func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		DecodeHook: mapstructure.StringToTimeDurationHookFunc(),
-		Result:     c,
+		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
+		WeaklyTypedInput: true,
+		Result:           c,
 	})
 	if err != nil {
 		return nil, err
