@@ -25,6 +25,17 @@ const (
 	ObjectTypeStyling
 )
 
+func (o *ObjectType) String() string {
+	switch *o {
+	case ObjectTypeUserAvatar:
+		return "0"
+	case ObjectTypeStyling:
+		return "1"
+	default:
+		return "unspecified"
+	}
+}
+
 type Asset struct {
 	InstanceID    string
 	ResourceOwner string
