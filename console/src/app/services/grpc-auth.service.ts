@@ -128,14 +128,14 @@ export class GrpcAuthService {
         }),
         tap(console.log),
         finalize(() => {
-          this.fetchedZitadelPermissions.next(true);
+          this.fetchedZitadelPermissions.next();
           console.log('trigger');
         }),
       ),
     ),
   );
   private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
-  public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+  public readonly fetchedZitadelPermissions: Subject<void> = new Subject();
 
   private cachedOrgs: Org.AsObject[] = [];
 
@@ -265,7 +265,8 @@ export class GrpcAuthService {
   public isAllowed(roles: string[] | RegExp[], requiresAll: boolean = false): Observable<boolean> {
     console.log('isallowed', roles, requiresAll);
     if (roles && roles.length > 0) {
-      return this.zitadelPermissions.pipe(
+      return this.fetchedZitadelPermissions.pipe(
+        switchMap((_) => this.zitadelPermissions),
         map((zroles) => {
           const what = this.hasRoles(zroles, roles, requiresAll);
           console.log(roles, zroles.length, what);
