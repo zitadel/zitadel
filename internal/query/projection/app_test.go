@@ -351,7 +351,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps2_api_configs SET (client_secret) = ($1) WHERE (app_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.apps2_api_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"app-id",
@@ -552,7 +552,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps2_oidc_configs SET (client_secret) = ($1) WHERE (app_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.apps2_oidc_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"app-id",
