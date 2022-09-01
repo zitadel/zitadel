@@ -359,7 +359,7 @@ DefaultInstance:
     ExpireWarnDays: 0
     MaxAgeDays: 0
   DomainPolicy:
-    UserLoginMustBeDomain: true
+    UserLoginMustBeDomain: false
     ValidateOrgDomains: true
     SMTPSenderAddressMatchesInstanceDomain: true
   LoginPolicy:
