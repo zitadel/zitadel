@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods2"
+	UserAuthMethodTable = "projections.user_auth_methods3"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -37,7 +37,7 @@ func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(UserAuthMethodUserIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(UserAuthMethodTokenIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(UserAuthMethodChangeDateCol, crdb.ColumnTypeTimestamp),
