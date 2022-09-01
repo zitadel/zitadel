@@ -122,6 +122,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     locale: new UntypedFormControl('en'),
   });
 
+  public isDefault: boolean = false;
+
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
       ? 'iam.policy.write'
@@ -220,6 +222,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
       .then((policy) => {
         this.loading = false;
         if (policy) {
+          this.isDefault = policy.isDefault ?? false;
+
           this.totalCustomPolicy = policy;
           this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
         }
@@ -291,6 +295,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
           .setCustomLoginText(this.updateRequest)
           .then(() => {
             this.updateCurrentPolicyDate();
+            this.isDefault = false;
             this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
             setTimeout(() => {
               this.patchSingleCurrentMap();
@@ -302,6 +307,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
           .setCustomLoginText(this.updateRequest)
           .then(() => {
             this.updateCurrentPolicyDate();
+            this.isDefault = false;
             this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
           })
           .catch((error) => this.toast.showError(error));
@@ -346,6 +352,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
             .resetCustomLoginTextToDefault(this.locale)
             .then(() => {
               this.updateCurrentPolicyDate();
+              this.isDefault = true;
               setTimeout(() => {
                 this.loadData();
               }, 1000);

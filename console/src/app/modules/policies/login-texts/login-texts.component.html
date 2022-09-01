@@ -64,7 +64,7 @@
 <div class="actions">
   <button
     class="reset-button"
-    [disabled]="(canWrite$ | async) === false"
+    [disabled]="(canWrite$ | async) === false || isDefault"
     (click)="resetDefault()"
     color="warn"
     type="submit"
