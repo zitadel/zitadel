@@ -72,8 +72,17 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []handler.Column, v
 	}
 
 	q := func(config execConfig) string {
+		var updateStmt string
+		// the postgres standard does not allow to update a single column using a multi-column update
+		// discussion: https://www.postgresql.org/message-id/17451.1509381766%40sss.pgh.pa.us
+		// see Compatibility in https://www.postgresql.org/docs/current/sql-update.html
+		if len(updateCols) == 1 && !strings.HasPrefix(updateVals[0], "SELECT") {
+			updateStmt = "UPDATE SET " + updateCols[0] + " = " + updateVals[0]
+		} else {
+			updateStmt = "UPDATE SET (" + strings.Join(updateCols, ", ") + ") = (" + strings.Join(updateVals, ", ") + ")"
+		}
 		return "INSERT INTO " + config.tableName + " (" + strings.Join(cols, ", ") + ") VALUES (" + strings.Join(params, ", ") + ")" +
-			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO UPDATE SET (" + strings.Join(updateCols, ", ") + ") = (" + strings.Join(updateVals, ", ") + ")"
+			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO " + updateStmt
 	}
 
 	return &handler.Statement{
@@ -130,6 +139,12 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	}
 
 	q := func(config execConfig) string {
+		// the postgres standard does not allow to update a single column using a multi-column update
+		// discussion: https://www.postgresql.org/message-id/17451.1509381766%40sss.pgh.pa.us
+		// see Compatibility in https://www.postgresql.org/docs/current/sql-update.html
+		if len(cols) == 1 && !strings.HasPrefix(params[0], "SELECT") {
+			return "UPDATE " + config.tableName + " SET " + cols[0] + " = " + params[0] + " WHERE " + strings.Join(wheres, " AND ")
+		}
 		return "UPDATE " + config.tableName + " SET (" + strings.Join(cols, ", ") + ") = (" + strings.Join(params, ", ") + ") WHERE " + strings.Join(wheres, " AND ")
 	}
 

@@ -342,7 +342,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (roles) = (array_remove(roles, $1)) WHERE (project_id = $2)",
+							expectedStmt: "UPDATE projections.user_grants2 SET roles = array_remove(roles, $1) WHERE (project_id = $2)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
