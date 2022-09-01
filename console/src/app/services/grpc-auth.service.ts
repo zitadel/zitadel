@@ -115,7 +115,7 @@ export class GrpcAuthService {
   public user!: Observable<User.AsObject | undefined>;
   public userSubject: BehaviorSubject<User.AsObject | undefined> = new BehaviorSubject<User.AsObject | undefined>(undefined);
   private triggerPermissionsRefresh: Subject<void> = new Subject();
-  private zitadelPermissions$: Observable<string[]> = this.triggerPermissionsRefresh.pipe(
+  public zitadelPermissions$: Observable<string[]> = this.triggerPermissionsRefresh.pipe(
     switchMap(() =>
       from(this.listMyZitadelPermissions()).pipe(
         map((rolesResp) => rolesResp.resultList),
@@ -263,9 +263,14 @@ export class GrpcAuthService {
    * @param roles roles of the user
    */
   public isAllowed(roles: string[] | RegExp[], requiresAll: boolean = false): Observable<boolean> {
+    console.log('isallowed', roles, requiresAll);
     if (roles && roles.length > 0) {
       return this.zitadelPermissions.pipe(
-        switchMap((zroles) => of(this.hasRoles(zroles, roles, requiresAll))),
+        map((zroles) => {
+          const what = this.hasRoles(zroles, roles, requiresAll);
+          console.log(roles, zroles.length, what);
+          return what;
+        }),
         distinctUntilChanged(),
       );
     } else {
@@ -377,10 +382,6 @@ export class GrpcAuthService {
       req.setPreferredLanguage(preferredLanguage);
     }
     return this.grpcService.auth.updateMyProfile(req, null).then((resp) => resp.toObject());
-  }
-
-  public get zitadelPermissionsChanged(): Observable<string[]> {
-    return this.zitadelPermissions;
   }
 
   public listMyUserSessions(): Promise<ListMyUserSessionsResponse.AsObject> {
