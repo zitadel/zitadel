@@ -2,91 +2,102 @@ import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, distinctUntilChanged, filter, finalize, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
+import {
+  catchError,
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  mergeMap,
+  switchMap,
+  take,
+  tap,
+  timeout,
+} from 'rxjs/operators';
 
 import {
-    AddMyAuthFactorOTPRequest,
-    AddMyAuthFactorOTPResponse,
-    AddMyAuthFactorU2FRequest,
-    AddMyAuthFactorU2FResponse,
-    AddMyPasswordlessLinkRequest,
-    AddMyPasswordlessLinkResponse,
-    AddMyPasswordlessRequest,
-    AddMyPasswordlessResponse,
-    GetMyEmailRequest,
-    GetMyEmailResponse,
-    GetMyLabelPolicyRequest,
-    GetMyLabelPolicyResponse,
-    GetMyPasswordComplexityPolicyRequest,
-    GetMyPasswordComplexityPolicyResponse,
-    GetMyPhoneRequest,
-    GetMyPhoneResponse,
-    GetMyPrivacyPolicyRequest,
-    GetMyPrivacyPolicyResponse,
-    GetMyProfileRequest,
-    GetMyProfileResponse,
-    GetMyUserRequest,
-    GetMyUserResponse,
-    GetSupportedLanguagesRequest,
-    GetSupportedLanguagesResponse,
-    ListMyAuthFactorsRequest,
-    ListMyAuthFactorsResponse,
-    ListMyLinkedIDPsRequest,
-    ListMyLinkedIDPsResponse,
-    ListMyMembershipsRequest,
-    ListMyMembershipsResponse,
-    ListMyMetadataRequest,
-    ListMyMetadataResponse,
-    ListMyPasswordlessRequest,
-    ListMyPasswordlessResponse,
-    ListMyProjectOrgsRequest,
-    ListMyProjectOrgsResponse,
-    ListMyUserChangesRequest,
-    ListMyUserChangesResponse,
-    ListMyUserGrantsRequest,
-    ListMyUserGrantsResponse,
-    ListMyUserSessionsRequest,
-    ListMyUserSessionsResponse,
-    ListMyZitadelPermissionsRequest,
-    ListMyZitadelPermissionsResponse,
-    RemoveMyAuthFactorOTPRequest,
-    RemoveMyAuthFactorOTPResponse,
-    RemoveMyAuthFactorU2FRequest,
-    RemoveMyAuthFactorU2FResponse,
-    RemoveMyAvatarRequest,
-    RemoveMyAvatarResponse,
-    RemoveMyLinkedIDPRequest,
-    RemoveMyLinkedIDPResponse,
-    RemoveMyPasswordlessRequest,
-    RemoveMyPasswordlessResponse,
-    RemoveMyPhoneRequest,
-    RemoveMyPhoneResponse,
-    RemoveMyUserRequest,
-    RemoveMyUserResponse,
-    ResendMyEmailVerificationRequest,
-    ResendMyEmailVerificationResponse,
-    ResendMyPhoneVerificationRequest,
-    ResendMyPhoneVerificationResponse,
-    SendMyPasswordlessLinkRequest,
-    SendMyPasswordlessLinkResponse,
-    SetMyEmailRequest,
-    SetMyEmailResponse,
-    SetMyPhoneRequest,
-    SetMyPhoneResponse,
-    UpdateMyPasswordRequest,
-    UpdateMyPasswordResponse,
-    UpdateMyProfileRequest,
-    UpdateMyProfileResponse,
-    UpdateMyUserNameRequest,
-    UpdateMyUserNameResponse,
-    VerifyMyAuthFactorOTPRequest,
-    VerifyMyAuthFactorOTPResponse,
-    VerifyMyAuthFactorU2FRequest,
-    VerifyMyAuthFactorU2FResponse,
-    VerifyMyPasswordlessRequest,
-    VerifyMyPasswordlessResponse,
-    VerifyMyPhoneRequest,
-    VerifyMyPhoneResponse,
+  AddMyAuthFactorOTPRequest,
+  AddMyAuthFactorOTPResponse,
+  AddMyAuthFactorU2FRequest,
+  AddMyAuthFactorU2FResponse,
+  AddMyPasswordlessLinkRequest,
+  AddMyPasswordlessLinkResponse,
+  AddMyPasswordlessRequest,
+  AddMyPasswordlessResponse,
+  GetMyEmailRequest,
+  GetMyEmailResponse,
+  GetMyLabelPolicyRequest,
+  GetMyLabelPolicyResponse,
+  GetMyPasswordComplexityPolicyRequest,
+  GetMyPasswordComplexityPolicyResponse,
+  GetMyPhoneRequest,
+  GetMyPhoneResponse,
+  GetMyPrivacyPolicyRequest,
+  GetMyPrivacyPolicyResponse,
+  GetMyProfileRequest,
+  GetMyProfileResponse,
+  GetMyUserRequest,
+  GetMyUserResponse,
+  GetSupportedLanguagesRequest,
+  GetSupportedLanguagesResponse,
+  ListMyAuthFactorsRequest,
+  ListMyAuthFactorsResponse,
+  ListMyLinkedIDPsRequest,
+  ListMyLinkedIDPsResponse,
+  ListMyMembershipsRequest,
+  ListMyMembershipsResponse,
+  ListMyMetadataRequest,
+  ListMyMetadataResponse,
+  ListMyPasswordlessRequest,
+  ListMyPasswordlessResponse,
+  ListMyProjectOrgsRequest,
+  ListMyProjectOrgsResponse,
+  ListMyUserChangesRequest,
+  ListMyUserChangesResponse,
+  ListMyUserGrantsRequest,
+  ListMyUserGrantsResponse,
+  ListMyUserSessionsRequest,
+  ListMyUserSessionsResponse,
+  ListMyZitadelPermissionsRequest,
+  ListMyZitadelPermissionsResponse,
+  RemoveMyAuthFactorOTPRequest,
+  RemoveMyAuthFactorOTPResponse,
+  RemoveMyAuthFactorU2FRequest,
+  RemoveMyAuthFactorU2FResponse,
+  RemoveMyAvatarRequest,
+  RemoveMyAvatarResponse,
+  RemoveMyLinkedIDPRequest,
+  RemoveMyLinkedIDPResponse,
+  RemoveMyPasswordlessRequest,
+  RemoveMyPasswordlessResponse,
+  RemoveMyPhoneRequest,
+  RemoveMyPhoneResponse,
+  RemoveMyUserRequest,
+  RemoveMyUserResponse,
+  ResendMyEmailVerificationRequest,
+  ResendMyEmailVerificationResponse,
+  ResendMyPhoneVerificationRequest,
+  ResendMyPhoneVerificationResponse,
+  SendMyPasswordlessLinkRequest,
+  SendMyPasswordlessLinkResponse,
+  SetMyEmailRequest,
+  SetMyEmailResponse,
+  SetMyPhoneRequest,
+  SetMyPhoneResponse,
+  UpdateMyPasswordRequest,
+  UpdateMyPasswordResponse,
+  UpdateMyProfileRequest,
+  UpdateMyProfileResponse,
+  UpdateMyUserNameRequest,
+  UpdateMyUserNameResponse,
+  VerifyMyAuthFactorOTPRequest,
+  VerifyMyAuthFactorOTPResponse,
+  VerifyMyAuthFactorU2FRequest,
+  VerifyMyAuthFactorU2FResponse,
+  VerifyMyPasswordlessRequest,
+  VerifyMyPasswordlessResponse,
+  VerifyMyPhoneRequest,
+  VerifyMyPhoneResponse,
 } from '../proto/generated/zitadel/auth_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
@@ -103,8 +114,27 @@ export class GrpcAuthService {
   private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
   public user!: Observable<User.AsObject | undefined>;
   public userSubject: BehaviorSubject<User.AsObject | undefined> = new BehaviorSubject<User.AsObject | undefined>(undefined);
+  private triggerPermissionsRefresh: Subject<void> = new Subject();
+  private zitadelPermissions$: Observable<string[]> = this.triggerPermissionsRefresh.pipe(
+    switchMap(() =>
+      from(this.listMyZitadelPermissions()).pipe(
+        map((rolesResp) => rolesResp.resultList),
+        filter((roles) => !!roles.length),
+        catchError((_) => {
+          return of([]);
+        }),
+        distinctUntilChanged((a, b) => {
+          return JSON.stringify(a.sort()) === JSON.stringify(b.sort());
+        }),
+        tap(console.log),
+        finalize(() => {
+          this.fetchedZitadelPermissions.next(true);
+          console.log('trigger');
+        }),
+      ),
+    ),
+  );
   private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
-
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
 
   private cachedOrgs: Org.AsObject[] = [];
@@ -114,6 +144,8 @@ export class GrpcAuthService {
     private oauthService: OAuthService,
     private storage: StorageService,
   ) {
+    this.zitadelPermissions$.subscribe(this.zitadelPermissions);
+
     this.user = merge(
       of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
       this.oauthService.events.pipe(
@@ -223,19 +255,7 @@ export class GrpcAuthService {
   }
 
   private loadPermissions(): void {
-    from(this.listMyZitadelPermissions())
-      .pipe(
-        map((rolesResp) => rolesResp.resultList),
-        catchError((_) => {
-          return of([]);
-        }),
-        finalize(() => {
-          this.fetchedZitadelPermissions.next(true);
-        }),
-      )
-      .subscribe((roles) => {
-        this.zitadelPermissions.next(roles);
-      });
+    this.triggerPermissionsRefresh.next();
   }
 
   /**
@@ -246,7 +266,7 @@ export class GrpcAuthService {
     if (roles && roles.length > 0) {
       return this.zitadelPermissions.pipe(
         switchMap((zroles) => of(this.hasRoles(zroles, roles, requiresAll))),
-        distinctUntilChanged()
+        distinctUntilChanged(),
       );
     } else {
       return of(false);
@@ -360,7 +380,7 @@ export class GrpcAuthService {
   }
 
   public get zitadelPermissionsChanged(): Observable<string[]> {
-    return this.zitadelPermissions.pipe(distinctUntilChanged());
+    return this.zitadelPermissions;
   }
 
   public listMyUserSessions(): Promise<ListMyUserSessionsResponse.AsObject> {
