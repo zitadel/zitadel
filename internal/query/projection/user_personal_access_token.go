@@ -9,11 +9,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens"
+	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens2"
 
 	PersonalAccessTokenColumnID            = "id"
 	PersonalAccessTokenColumnCreationDate  = "creation_date"
@@ -24,6 +25,7 @@ const (
 	PersonalAccessTokenColumnUserID        = "user_id"
 	PersonalAccessTokenColumnExpiration    = "expiration"
 	PersonalAccessTokenColumnScopes        = "scopes"
+	PersonalAccessTokenColumnOwnerRemoved  = "owner_removed"
 )
 
 type personalAccessTokenProjection struct {
@@ -45,6 +47,7 @@ func newPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 			crdb.NewColumn(PersonalAccessTokenColumnUserID, crdb.ColumnTypeText),
 			crdb.NewColumn(PersonalAccessTokenColumnExpiration, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(PersonalAccessTokenColumnScopes, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(PersonalAccessTokenColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
 			crdb.WithIndex(crdb.NewIndex("user_idx", []string{PersonalAccessTokenColumnUserID})),
@@ -72,6 +75,15 @@ func (p *personalAccessTokenProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -121,6 +133,24 @@ func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event
 		e,
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *personalAccessTokenProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-zQVhl", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(PersonalAccessTokenColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(PersonalAccessTokenColumnResourceOwner, e.Aggregate().ID),
 		},
 	), nil
 }

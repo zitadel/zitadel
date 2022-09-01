@@ -10,13 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants"
+	UserGrantProjectionTable = "projections.user_grants2"
 
 	UserGrantID            = "id"
 	UserGrantCreationDate  = "creation_date"
@@ -29,6 +30,7 @@ const (
 	UserGrantProjectID     = "project_id"
 	UserGrantGrantID       = "grant_id"
 	UserGrantRoles         = "roles"
+	UserGrantOwnerRemoved  = "owner_removed"
 )
 
 type userGrantProjection struct {
@@ -52,6 +54,7 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(UserGrantOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			crdb.WithIndex(crdb.NewIndex("user_idx", []string{UserGrantUserID})),
@@ -129,6 +132,15 @@ func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.GrantCascadeChangedType,
 					Reduce: p.reduceProjectGrantChanged,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -313,6 +325,24 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, grantID),
+		},
+	), nil
+}
+
+func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-jpIvp", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserGrantOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(UserGrantResourceOwner, e.Aggregate().ID),
 		},
 	), nil
 }

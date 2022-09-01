@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -41,7 +42,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.user_metadata2 (user_id, resource_owner, instance_id, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "UPSERT INTO projections.user_metadata3 (user_id, resource_owner, instance_id, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
@@ -77,7 +78,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (user_id = $1) AND (key = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
@@ -105,7 +106,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -132,8 +133,37 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&userMetadataProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserMetadataProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.user_metadata3 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"instance-id",
 								"agg-id",
 							},
 						},

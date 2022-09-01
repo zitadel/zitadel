@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	PrivacyPolicyTable = "projections.privacy_policies"
+	PrivacyPolicyTable = "projections.privacy_policies2"
 
 	PrivacyPolicyIDCol            = "id"
 	PrivacyPolicyCreationDateCol  = "creation_date"
@@ -27,6 +27,7 @@ const (
 	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
 	PrivacyPolicyTOSLinkCol       = "tos_link"
 	PrivacyPolicyHelpLinkCol      = "help_link"
+	PrivacyPolicyOwnerRemovedCol  = "owner_removed"
 )
 
 type privacyPolicyProjection struct {
@@ -50,6 +51,7 @@ func newPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyHelpLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
 		),
@@ -74,6 +76,10 @@ func (p *privacyPolicyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.PrivacyPolicyRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -164,4 +170,22 @@ func (p *privacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(PrivacyPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
+}
+
+func (p *privacyPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-bxJCY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(PrivacyPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(PrivacyPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(PrivacyPolicyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
 }

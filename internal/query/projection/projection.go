@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -144,21 +143,4 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	}
 
 	return config
-}
-
-func iteratorPool(workerCount int) chan func() {
-	if workerCount <= 0 {
-		return nil
-	}
-
-	queue := make(chan func())
-	for i := 0; i < workerCount; i++ {
-		go func() {
-			for iteration := range queue {
-				iteration()
-				time.Sleep(2 * time.Second)
-			}
-		}()
-	}
-	return queue
 }

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	PasswordAgeTable = "projections.password_age_policies"
+	PasswordAgeTable = "projections.password_age_policies2"
 
 	AgePolicyIDCol             = "id"
 	AgePolicyCreationDateCol   = "creation_date"
@@ -26,6 +26,7 @@ const (
 	AgePolicyInstanceIDCol     = "instance_id"
 	AgePolicyExpireWarnDaysCol = "expire_warn_days"
 	AgePolicyMaxAgeDaysCol     = "max_age_days"
+	AgePolicyOwnerRemovedCol   = "owner_removed"
 )
 
 type passwordAgeProjection struct {
@@ -48,6 +49,7 @@ func newPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(AgePolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AgePolicyExpireWarnDaysCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(AgePolicyMaxAgeDaysCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(AgePolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AgePolicyInstanceIDCol, AgePolicyIDCol),
 		),
@@ -72,6 +74,10 @@ func (p *passwordAgeProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.PasswordAgePolicyRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -158,4 +164,22 @@ func (p *passwordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.
 		[]handler.Condition{
 			handler.NewCond(AgePolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
+}
+
+func (p *passwordAgeProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-edLs2", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(AgePolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(AgePolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(AgePolicyResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
 }

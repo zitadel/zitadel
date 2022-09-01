@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -17,7 +18,7 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users2"
+	UserTable        = "projections.users3"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -31,6 +32,7 @@ const (
 	UserInstanceIDCol    = "instance_id"
 	UserUsernameCol      = "username"
 	UserTypeCol          = "type"
+	UserOwnerRemovedCol  = "owner_removed"
 
 	UserHumanSuffix        = "humans"
 	HumanUserIDCol         = "user_id"
@@ -86,6 +88,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserUsernameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(UserOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserIDCol, UserInstanceIDCol),
 			crdb.WithIndex(crdb.NewIndex("username_idx", []string{UserUsernameCol})),
@@ -271,6 +274,15 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reduceHumanPasswordChanged,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -969,5 +981,24 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 			},
 			crdb.WithTableSuffix(UserMachineSuffix),
 		),
+	), nil
+
+}
+
+func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-NCsdV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserResourceOwnerCol, e.Aggregate().ID),
+		},
 	), nil
 }

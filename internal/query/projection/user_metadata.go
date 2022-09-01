@@ -7,11 +7,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	UserMetadataProjectionTable = "projections.user_metadata2"
+	UserMetadataProjectionTable = "projections.user_metadata3"
 
 	UserMetadataColumnUserID        = "user_id"
 	UserMetadataColumnCreationDate  = "creation_date"
@@ -21,6 +22,7 @@ const (
 	UserMetadataColumnInstanceID    = "instance_id"
 	UserMetadataColumnKey           = "key"
 	UserMetadataColumnValue         = "value"
+	UserMetadataColumnOwnerRemoved  = "owner_removed"
 )
 
 type userMetadataProjection struct {
@@ -41,6 +43,7 @@ func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(UserMetadataColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
 			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
+			crdb.NewColumn(UserMetadataColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
@@ -71,6 +74,15 @@ func (p *userMetadataProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceMetadataRemovedAll,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -123,6 +135,24 @@ func (p *userMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnUserID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *userMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-oqwul", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserMetadataColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserMetadataColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(UserMetadataColumnResourceOwner, e.Aggregate().ID),
 		},
 	), nil
 }

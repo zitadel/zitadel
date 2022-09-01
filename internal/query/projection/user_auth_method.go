@@ -8,11 +8,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods"
+	UserAuthMethodTable = "projections.user_auth_methods2"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -24,6 +25,7 @@ const (
 	UserAuthMethodInstanceIDCol    = "instance_id"
 	UserAuthMethodStateCol         = "state"
 	UserAuthMethodNameCol          = "name"
+	UserAuthMethodOwnerRemovedCol  = "owner_removed"
 )
 
 type userAuthMethodProjection struct {
@@ -46,6 +48,7 @@ func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(UserAuthMethodResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserAuthMethodResourceOwnerCol})),
@@ -95,6 +98,15 @@ func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanMFAOTPRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -199,5 +211,23 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 	return crdb.NewDeleteStatement(
 		event,
 		conditions,
+	), nil
+}
+
+func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-FwDZ8", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserAuthMethodResourceOwnerCol, e.Aggregate().ID),
+		},
 	), nil
 }

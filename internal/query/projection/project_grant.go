@@ -10,11 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
-	ProjectGrantProjectionTable = "projections.project_grants"
+	ProjectGrantProjectionTable = "projections.project_grants2"
 
 	ProjectGrantColumnGrantID       = "grant_id"
 	ProjectGrantColumnCreationDate  = "creation_date"
@@ -26,6 +27,7 @@ const (
 	ProjectGrantColumnProjectID     = "project_id"
 	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
 	ProjectGrantColumnRoleKeys      = "granted_role_keys"
+	ProjectGrantColumnOwnerRemoved  = "owner_removed"
 )
 
 type projectGrantProjection struct {
@@ -48,6 +50,7 @@ func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(ProjectGrantColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
 			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ProjectGrantColumnResourceOwner})),
@@ -90,6 +93,15 @@ func (p *projectGrantProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.ProjectRemovedType,
 					Reduce: p.reduceProjectRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -217,6 +229,24 @@ func (p *projectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *projectGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-HDgW3", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(ProjectGrantColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(ProjectGrantColumnResourceOwner, e.Aggregate().ID),
 		},
 	), nil
 }
