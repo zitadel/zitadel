@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/jackc/pgconn"
 	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
@@ -30,7 +31,7 @@ const (
 		" SELECT MAX(event_sequence) seq, 1 join_me" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2" +
-		" AND (CASE WHEN $9::STRING IS NULL THEN instance_id is null else instance_id = $9::STRING END)" +
+		" AND (CASE WHEN $9::TEXT IS NULL THEN instance_id is null else instance_id = $9::TEXT END)" +
 		") AS agg_type " +
 		// combined with
 		"LEFT JOIN " +
@@ -39,7 +40,7 @@ const (
 		" SELECT event_sequence seq, resource_owner ro, 1 join_me" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2 AND aggregate_id = $3" +
-		" AND (CASE WHEN $9::STRING IS NULL THEN instance_id is null else instance_id = $9::STRING END)" +
+		" AND (CASE WHEN $9::TEXT IS NULL THEN instance_id is null else instance_id = $9::TEXT END)" +
 		" ORDER BY event_sequence DESC" +
 		" LIMIT 1" +
 		") AS agg USING(join_me)" +
@@ -69,9 +70,9 @@ const (
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
-		" IFNULL((resource_owner), $8::VARCHAR) AS resource_owner," +
+		" COALESCE((resource_owner), $8::VARCHAR) AS resource_owner," +
 		" $9::VARCHAR AS instance_id," +
-		" NEXTVAL(CONCAT('eventstore.', IF($9 <> '', CONCAT('i_', $9), 'system'), '_seq'))," +
+		" NEXTVAL(CONCAT('eventstore.', (CASE WHEN $9 <> '' THEN CONCAT('i_', $9) ELSE 'system' END), '_seq'))," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +
@@ -156,7 +157,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
 
 func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	row := db.client.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1, '_seq')", instanceID)
+	row := db.client.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
 	if row.Err() != nil {
 		return caos_errs.ThrowInvalidArgument(row.Err(), "SQL-7gtFA", "Errors.InvalidArgument")
 	}
@@ -218,7 +219,7 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 	return events, nil
 }
 
-//LatestSequence returns the latest sequence found by the search query
+// LatestSequence returns the latest sequence found by the search query
 func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
 	var seq Sequence
 	err := query(ctx, db, searchQuery, &seq)
@@ -228,7 +229,7 @@ func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.Sear
 	return uint64(seq), nil
 }
 
-//InstanceIDs returns the instance ids found by the search query
+// InstanceIDs returns the instance ids found by the search query
 func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQuery) ([]string, error) {
 	var ids []string
 	err := query(ctx, db, searchQuery, &ids)
@@ -331,7 +332,7 @@ var (
 	placeholder = regexp.MustCompile(`\?`)
 )
 
-//placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
+// placeholder replaces all "?" with postgres placeholders ($<NUMBER>)
 func (db *CRDB) placeholder(query string) string {
 	occurances := placeholder.FindAllStringIndex(query, -1)
 	if len(occurances) == 0 {
@@ -352,6 +353,11 @@ func (db *CRDB) placeholder(query string) string {
 func (db *CRDB) isUniqueViolationError(err error) bool {
 	if pqErr, ok := err.(*pq.Error); ok {
 		if pqErr.Code == "23505" {
+			return true
+		}
+	}
+	if pgxErr, ok := err.(*pgconn.PgError); ok {
+		if pgxErr.Code == "23505" {
 			return true
 		}
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
-var dbList = []string{"auth", "adminapi", "notification"}
+var dbList = []string{"auth", "adminapi"}
 
 type AdministratorRepo struct {
 	View *view.View

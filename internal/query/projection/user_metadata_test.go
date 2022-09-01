@@ -41,15 +41,15 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.user_metadata2 (user_id, resource_owner, instance_id, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.user_metadata3 (instance_id, user_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, user_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
-								"agg-id",
-								"ro-id",
 								"instance-id",
+								"agg-id",
+								"key",
+								"ro-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
-								"key",
 								[]byte("value"),
 							},
 						},
@@ -77,7 +77,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (user_id = $1) AND (key = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
@@ -105,7 +105,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -132,7 +132,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

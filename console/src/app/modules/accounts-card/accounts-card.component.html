@@ -1,13 +1,13 @@
 <div class="accounts-card">
   <cnsl-avatar
     (click)="editUserProfile()"
-    *ngIf="user.human?.profile && user.human?.profile?.displayName"
+    *ngIf="user && user.human?.profile && user.human?.profile?.displayName"
     class="avatar"
     [ngClass]="{ 'iam-user': iamuser }"
     [forColor]="user.preferredLoginName"
     [avatarUrl]="user.human?.profile?.avatarUrl || ''"
     [name]="
-      user.human && user.human.profile && user.human.profile?.displayName
+      user.human && user.human.profile && user.human.profile.displayName
         ? user.human.profile.displayName
         : user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
     "
@@ -15,8 +15,8 @@
   >
   </cnsl-avatar>
 
-  <span class="u-name">{{ user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A' }}</span>
-  <span class="u-email" *ngIf="user.preferredLoginName">{{ user.preferredLoginName }}</span>
+  <span class="u-name">{{ user?.human?.profile?.displayName ? user?.human?.profile?.displayName : 'A' }}</span>
+  <span class="u-email" *ngIf="user?.preferredLoginName">{{ user?.preferredLoginName }}</span>
 
   <button (click)="editUserProfile()" mat-stroked-button>{{ 'USER.EDITACCOUNT' | translate }}</button>
   <div class="l-accounts">

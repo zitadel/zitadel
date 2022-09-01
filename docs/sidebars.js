@@ -86,6 +86,7 @@ module.exports = {
             "guides/manage/self-hosted/custom-domain",
             "guides/manage/self-hosted/http2",
             "guides/manage/self-hosted/tls_modes",
+            "guides/manage/self-hosted/database/database",
           ]
         },
         {
@@ -95,7 +96,6 @@ module.exports = {
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
             "guides/manage/console/applications",
-
           ]
         },
         {

@@ -10,13 +10,6 @@ import (
 	"github.com/zitadel/logging"
 )
 
-var (
-	searchDatabase = "SELECT database_name FROM [show databases] WHERE database_name = $1"
-
-	//go:embed sql/02_database.sql
-	databaseStmt string
-)
-
 func newDatabase() *cobra.Command {
 	return &cobra.Command{
 		Use:   "database",
@@ -40,11 +33,10 @@ The user provided by flags needs priviledge to
 	}
 }
 
-func VerifyDatabase(database string) func(*sql.DB) error {
+func VerifyDatabase(databaseName string) func(*sql.DB) error {
 	return func(db *sql.DB) error {
-		return verify(db,
-			exists(searchDatabase, database),
-			exec(fmt.Sprintf(databaseStmt, database)),
-		)
+		logging.WithFields("database", databaseName).Info("verify database")
+
+		return exec(db, fmt.Sprintf(string(databaseStmt), databaseName), []string{dbAlreadyExistsCode})
 	}
 }

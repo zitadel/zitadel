@@ -72,10 +72,10 @@
         *ngIf="twilio"
         class="state"
         [ngClass]="{
-          active: twilio?.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
-          inactive: twilio?.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
+          active: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
+          inactive: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
         }"
-        >{{ 'SETTING.SMS.SMSPROVIDERSTATE.' + twilio?.state | translate }}</span
+        >{{ 'SETTING.SMS.SMSPROVIDERSTATE.' + twilio.state | translate }}</span
       >
 
       <span class="fill-space"></span>

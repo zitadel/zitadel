@@ -11,8 +11,6 @@ var (
 	createAdminViews string
 	//go:embed 01_sql/auth.sql
 	createAuthViews string
-	//go:embed 01_sql/notification.sql
-	createNotificationViews string
 	//go:embed 01_sql/projections.sql
 	createProjections string
 )
@@ -22,7 +20,7 @@ type ProjectionTable struct {
 }
 
 func (mig *ProjectionTable) Execute(ctx context.Context) error {
-	stmt := createAdminViews + createAuthViews + createNotificationViews + createProjections
+	stmt := createAdminViews + createAuthViews + createProjections
 	_, err := mig.dbClient.ExecContext(ctx, stmt)
 	return err
 }

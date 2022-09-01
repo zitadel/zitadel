@@ -12,7 +12,7 @@
         "
         class="avatar"
         [name]="user.human.profile.displayName"
-        [avatarUrl]="user.human.profile?.avatarUrl || ''"
+        [avatarUrl]="user.human.profile.avatarUrl || ''"
         [forColor]="user.preferredLoginName"
         [size]="32"
       >
@@ -23,7 +23,7 @@
     </div>
 
     <div class="user-name-column" *ngIf="user.human">
-      <span>{{ user.human?.profile?.displayName }}</span>
+      <span>{{ user.human.profile?.displayName }}</span>
       <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
     </div>
     <div class="user-name-column" *ngIf="user.machine">
@@ -85,7 +85,7 @@
                   "
                   class="avatar"
                   [name]="user.human.profile.displayName"
-                  [avatarUrl]="user.human.profile?.avatarUrl || ''"
+                  [avatarUrl]="user.human.profile.avatarUrl || ''"
                   [forColor]="user.preferredLoginName"
                   [size]="32"
                 >

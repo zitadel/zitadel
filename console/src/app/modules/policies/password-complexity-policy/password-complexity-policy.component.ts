@@ -1,11 +1,7 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import {
-    GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse,
-} from 'src/app/proto/generated/zitadel/admin_pb';
-import {
-    GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse,
-} from 'src/app/proto/generated/zitadel/management_pb';
+import { GetPasswordComplexityPolicyResponse as AdminGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import { GetPasswordComplexityPolicyResponse as MgmtGetPasswordComplexityPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -24,7 +20,7 @@ export class PasswordComplexityPolicyComponent implements OnInit {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
-  public complexityData!: PasswordComplexityPolicy.AsObject;
+  public complexityData?: PasswordComplexityPolicy.AsObject;
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
@@ -110,11 +106,44 @@ export class PasswordComplexityPolicyComponent implements OnInit {
   }
 
   public savePolicy(): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        if ((this.complexityData as PasswordComplexityPolicy.AsObject).isDefault) {
-          (this.service as ManagementService)
-            .addCustomPasswordComplexityPolicy(
+    if (this.complexityData) {
+      switch (this.serviceType) {
+        case PolicyComponentServiceType.MGMT:
+          if ((this.complexityData as PasswordComplexityPolicy.AsObject).isDefault) {
+            (this.service as ManagementService)
+              .addCustomPasswordComplexityPolicy(
+                this.complexityData.hasLowercase,
+                this.complexityData.hasUppercase,
+                this.complexityData.hasNumber,
+                this.complexityData.hasSymbol,
+                this.complexityData.minLength,
+              )
+              .then(() => {
+                this.toast.showInfo('POLICY.TOAST.SET', true);
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
+          } else {
+            (this.service as ManagementService)
+              .updateCustomPasswordComplexityPolicy(
+                this.complexityData.hasLowercase,
+                this.complexityData.hasUppercase,
+                this.complexityData.hasNumber,
+                this.complexityData.hasSymbol,
+                this.complexityData.minLength,
+              )
+              .then(() => {
+                this.toast.showInfo('POLICY.TOAST.SET', true);
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
+          }
+          break;
+        case PolicyComponentServiceType.ADMIN:
+          (this.service as AdminService)
+            .updatePasswordComplexityPolicy(
               this.complexityData.hasLowercase,
               this.complexityData.hasUppercase,
               this.complexityData.hasNumber,
@@ -127,39 +156,8 @@ export class PasswordComplexityPolicyComponent implements OnInit {
             .catch((error) => {
               this.toast.showError(error);
             });
-        } else {
-          (this.service as ManagementService)
-            .updateCustomPasswordComplexityPolicy(
-              this.complexityData.hasLowercase,
-              this.complexityData.hasUppercase,
-              this.complexityData.hasNumber,
-              this.complexityData.hasSymbol,
-              this.complexityData.minLength,
-            )
-            .then(() => {
-              this.toast.showInfo('POLICY.TOAST.SET', true);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-        break;
-      case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService)
-          .updatePasswordComplexityPolicy(
-            this.complexityData.hasLowercase,
-            this.complexityData.hasUppercase,
-            this.complexityData.hasNumber,
-            this.complexityData.hasSymbol,
-            this.complexityData.minLength,
-          )
-          .then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-        break;
+          break;
+      }
     }
   }
 

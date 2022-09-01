@@ -23,16 +23,12 @@ import { ToastService } from 'src/app/services/toast.service';
 export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   public projectId: string = '';
   public grantId: string = '';
-  public project!: GrantedProject.AsObject;
-
+  public project?: GrantedProject.AsObject;
   public ProjectGrantState: any = ProjectGrantState;
   public ChangeType: any = ChangeType;
-
-  private subscription?: Subscription;
-
   public isZitadel: boolean = false;
-
-  UserGrantContext: any = UserGrantContext;
+  public UserGrantContext: any = UserGrantContext;
+  private subscription: Subscription = new Subscription();
 
   // members
   public totalMemberResult: number = 0;
@@ -56,7 +52,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
   private async getData({ id, grantId }: Params): Promise<void> {
@@ -155,6 +151,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   public showDetail(): void {
-    this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
+    if (this.project) {
+      this.router.navigate(['granted-projects', this.project.projectId, 'grant', this.grantId, 'members']);
+    }
   }
 }

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 
@@ -216,8 +215,8 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 			for rows.Next() {
 				var (
 					actionID            sql.NullString
-					actionCreationDate  pq.NullTime
-					actionChangeDate    pq.NullTime
+					actionCreationDate  sql.NullTime
+					actionChangeDate    sql.NullTime
 					actionResourceOwner sql.NullString
 					actionState         sql.NullInt32
 					actionSequence      sql.NullInt64

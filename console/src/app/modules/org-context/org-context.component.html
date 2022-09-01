@@ -20,7 +20,7 @@
       class="org-button-with-pin"
       mat-button
       [ngClass]="{
-        active: pinnedorg.id === org?.id,
+        active: pinnedorg.id === org.id,
         'border-bottom': pinned.selected.length && i === pinned.selected.length - 1
       }"
       [disabled]="!pinnedorg.id"
@@ -37,7 +37,7 @@
         *ngIf="!pinned.isSelected(temporg)"
         class="org-button-with-pin"
         mat-button
-        [ngClass]="{ active: temporg.id === org?.id }"
+        [ngClass]="{ active: temporg.id === org.id }"
         [disabled]="!temporg.id"
         (click)="setActiveOrg(temporg)"
       >

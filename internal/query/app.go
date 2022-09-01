@@ -7,12 +7,10 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -39,23 +37,23 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs           []string
-	ResponseTypes          []domain.OIDCResponseType
-	GrantTypes             []domain.OIDCGrantType
+	RedirectURIs           database.StringArray
+	ResponseTypes          database.EnumArray[domain.OIDCResponseType]
+	GrantTypes             database.EnumArray[domain.OIDCGrantType]
 	AppType                domain.OIDCApplicationType
 	ClientID               string
 	AuthMethodType         domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs []string
+	PostLogoutRedirectURIs database.StringArray
 	Version                domain.OIDCVersion
-	ComplianceProblems     []string
+	ComplianceProblems     database.StringArray
 	IsDevMode              bool
 	AccessTokenType        domain.OIDCTokenType
 	AssertAccessTokenRole  bool
 	AssertIDTokenRole      bool
 	AssertIDTokenUserinfo  bool
 	ClockSkew              time.Duration
-	AdditionalOrigins      []string
-	AllowedOrigins         []string
+	AdditionalOrigins      database.StringArray
+	AllowedOrigins         database.StringArray
 }
 
 type APIApp struct {
@@ -613,7 +611,7 @@ func prepareClientIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
-			ids := []string{}
+			ids := database.StringArray{}
 
 			for rows.Next() {
 				var apiID sql.NullString
@@ -639,19 +637,19 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	redirectUris             pq.StringArray
+	redirectUris             database.StringArray
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   pq.StringArray
+	postLogoutRedirectUris   database.StringArray
 	devMode                  sql.NullBool
 	accessTokenType          sql.NullInt16
 	accessTokenRoleAssertion sql.NullBool
 	iDTokenRoleAssertion     sql.NullBool
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
-	additionalOrigins        pq.StringArray
-	responseTypes            pq.Int32Array
-	grantTypes               pq.Int32Array
+	additionalOrigins        database.StringArray
+	responseTypes            database.EnumArray[domain.OIDCResponseType]
+	grantTypes               database.EnumArray[domain.OIDCGrantType]
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -672,8 +670,8 @@ func (c sqlOIDCConfig) set(app *App) {
 		AssertIDTokenUserinfo:  c.iDTokenUserinfoAssertion.Bool,
 		ClockSkew:              time.Duration(c.clockSkew.Int64),
 		AdditionalOrigins:      c.additionalOrigins,
-		ResponseTypes:          oidcResponseTypesToDomain(c.responseTypes),
-		GrantTypes:             oidcGrantTypesToDomain(c.grantTypes),
+		ResponseTypes:          c.responseTypes,
+		GrantTypes:             c.grantTypes,
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems
@@ -697,20 +695,4 @@ func (c sqlAPIConfig) set(app *App) {
 		ClientID:       c.clientID.String,
 		AuthMethodType: domain.APIAuthMethodType(c.authMethod.Int16),
 	}
-}
-
-func oidcResponseTypesToDomain(t pq.Int32Array) []domain.OIDCResponseType {
-	types := make([]domain.OIDCResponseType, len(t))
-	for i, typ := range t {
-		types[i] = domain.OIDCResponseType(typ)
-	}
-	return types
-}
-
-func oidcGrantTypesToDomain(t pq.Int32Array) []domain.OIDCGrantType {
-	types := make([]domain.OIDCGrantType, len(t))
-	for i, typ := range t {
-		types[i] = domain.OIDCGrantType(typ)
-	}
-	return types
 }

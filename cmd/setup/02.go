@@ -13,8 +13,8 @@ CREATE TABLE system.assets (
     resource_owner TEXT,
     name TEXT,
     content_type TEXT,
-    hash TEXT AS (md5(data)) STORED,
-    data BYTES,
+    hash TEXT GENERATED ALWAYS AS (md5(data)) STORED,
+    data BYTEA,
     updated_at TIMESTAMPTZ,
 
     PRIMARY KEY (instance_id, resource_owner, name)
