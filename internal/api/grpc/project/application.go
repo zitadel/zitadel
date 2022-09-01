@@ -130,7 +130,7 @@ func OIDCGrantTypesFromModel(grantTypes []domain.OIDCGrantType) []app_pb.OIDCGra
 }
 
 func OIDCGrantTypesToDomain(grantTypes []app_pb.OIDCGrantType) []domain.OIDCGrantType {
-	if grantTypes == nil || len(grantTypes) == 0 {
+	if len(grantTypes) == 0 {
 		return []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode}
 	}
 	oidcGrantTypes := make([]domain.OIDCGrantType, len(grantTypes))

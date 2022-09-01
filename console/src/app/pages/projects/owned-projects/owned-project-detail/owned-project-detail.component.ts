@@ -8,9 +8,7 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map, take } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
-import {
-    ProjectPrivateLabelingDialogComponent,
-} from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
+import { ProjectPrivateLabelingDialogComponent } from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -39,7 +37,7 @@ const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'MENU.GRANTS' };
 })
 export class OwnedProjectDetailComponent implements OnInit {
   public projectId: string = '';
-  public project!: Project.AsObject;
+  public project?: Project.AsObject;
 
   public pageSizeApps: number = 10;
   public appsDataSource: MatTableDataSource<App.AsObject> = new MatTableDataSource<App.AsObject>();
@@ -95,7 +93,7 @@ export class OwnedProjectDetailComponent implements OnInit {
   public openNameDialog(): void {
     const dialogRef = this.dialog.open(NameDialogComponent, {
       data: {
-        name: this.project.name,
+        name: this.project?.name,
         titleKey: 'PROJECT.NAMEDIALOG.TITLE',
         descKey: 'PROJECT.NAMEDIALOG.DESCRIPTION',
         labelKey: 'PROJECT.NAMEDIALOG.NAME',
@@ -105,7 +103,7 @@ export class OwnedProjectDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((name) => {
       if (name) {
-        this.project.name = name;
+        this.project!.name = name;
         this.updateName();
       }
     });
@@ -114,14 +112,14 @@ export class OwnedProjectDetailComponent implements OnInit {
   public openPrivateLabelingDialog(): void {
     const dialogRef = this.dialog.open(ProjectPrivateLabelingDialogComponent, {
       data: {
-        setting: this.project.privateLabelingSetting,
+        setting: this.project?.privateLabelingSetting,
       },
       width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((resp: PrivateLabelingSetting) => {
       if (resp !== undefined) {
-        this.project.privateLabelingSetting = resp;
+        this.project!.privateLabelingSetting = resp;
       }
     });
   }
@@ -143,7 +141,7 @@ export class OwnedProjectDetailComponent implements OnInit {
               }),
               new Breadcrumb({
                 type: BreadcrumbType.PROJECT,
-                name: this.project.name,
+                name: this.project?.name,
                 param: { key: ROUTEPARAM, value: projectId },
                 routerLink: ['/projects', projectId],
                 isZitadel: this.isZitadel,
@@ -198,7 +196,7 @@ export class OwnedProjectDetailComponent implements OnInit {
             .reactivateProject(this.projectId)
             .then(() => {
               this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
-              this.project.state = ProjectState.PROJECT_STATE_ACTIVE;
+              this.project!.state = ProjectState.PROJECT_STATE_ACTIVE;
               this.refreshChanges$.emit();
             })
             .catch((error) => {
@@ -222,7 +220,7 @@ export class OwnedProjectDetailComponent implements OnInit {
             .deactivateProject(this.projectId)
             .then(() => {
               this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
-              this.project.state = ProjectState.PROJECT_STATE_INACTIVE;
+              this.project!.state = ProjectState.PROJECT_STATE_INACTIVE;
               this.refreshChanges$.emit();
             })
             .catch((error) => {
@@ -262,23 +260,25 @@ export class OwnedProjectDetailComponent implements OnInit {
   }
 
   public saveProject(): void {
-    const req = new UpdateProjectRequest();
-    req.setId(this.project.id);
-    req.setName(this.project.name);
-    req.setProjectRoleAssertion(this.project.projectRoleAssertion);
-    req.setProjectRoleCheck(this.project.projectRoleCheck);
-    req.setHasProjectCheck(this.project.hasProjectCheck);
-    req.setPrivateLabelingSetting(this.project.privateLabelingSetting);
+    if (this.project) {
+      const req = new UpdateProjectRequest();
+      req.setId(this.project.id);
+      req.setName(this.project.name);
+      req.setProjectRoleAssertion(this.project.projectRoleAssertion);
+      req.setProjectRoleCheck(this.project.projectRoleCheck);
+      req.setHasProjectCheck(this.project.hasProjectCheck);
+      req.setPrivateLabelingSetting(this.project.privateLabelingSetting);
 
-    this.mgmtService
-      .updateProject(req)
-      .then(() => {
-        this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
-        this.refreshChanges$.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+      this.mgmtService
+        .updateProject(req)
+        .then(() => {
+          this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
+          this.refreshChanges$.emit();
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
   }
 
   public navigateBack(): void {
@@ -293,7 +293,7 @@ export class OwnedProjectDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(MemberCreateDialogComponent, {
       data: {
         creationType: CreationType.PROJECT_OWNED,
-        projectId: this.project.id,
+        projectId: this.project?.id,
       },
       width: '400px',
     });
@@ -323,6 +323,8 @@ export class OwnedProjectDetailComponent implements OnInit {
   }
 
   public showDetail(): void {
-    this.router.navigate(['projects', this.project.id, 'members']);
+    if (this.project) {
+      this.router.navigate(['projects', this.project.id, 'members']);
+    }
   }
 }

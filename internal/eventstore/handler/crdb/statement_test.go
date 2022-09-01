@@ -178,9 +178,10 @@ func TestNewCreateStatement(t *testing.T) {
 
 func TestNewUpsertStatement(t *testing.T) {
 	type args struct {
-		table  string
-		event  *testEvent
-		values []handler.Column
+		table        string
+		event        *testEvent
+		conflictCols []handler.Column
+		values       []handler.Column
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -249,13 +250,16 @@ func TestNewUpsertStatement(t *testing.T) {
 			},
 		},
 		{
-			name: "correct",
+			name: "no update cols",
 			args: args{
 				table: "my_table",
 				event: &testEvent{
 					aggregateType:    "agg",
 					sequence:         1,
 					previousSequence: 0,
+				},
+				conflictCols: []handler.Column{
+					handler.NewCol("col1", nil),
 				},
 				values: []handler.Column{
 					{
@@ -270,10 +274,92 @@ func TestNewUpsertStatement(t *testing.T) {
 				sequence:         1,
 				previousSequence: 1,
 				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, handler.ErrNoValues)
+				},
+			},
+		},
+		{
+			name: "correct UPDATE multi col",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conflictCols: []handler.Column{
+					handler.NewCol("col1", nil),
+				},
+				values: []handler.Column{
+					{
+						Name:  "col1",
+						Value: "val",
+					},
+					{
+						Name:  "col2",
+						Value: "val",
+					},
+					{
+						Name:  "col3",
+						Value: "val",
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPSERT INTO my_table (col1) VALUES ($1)",
-							args:  []interface{}{"val"},
+							query: "INSERT INTO my_table (col1, col2, col3) VALUES ($1, $2, $3) ON CONFLICT (col1) DO UPDATE SET (col2, col3) = (EXCLUDED.col2, EXCLUDED.col3)",
+							args:  []interface{}{"val", "val", "val"},
+						},
+					},
+					shouldExecute: true,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
+		{
+			name: "correct UPDATE single col",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conflictCols: []handler.Column{
+					handler.NewCol("col1", nil),
+				},
+				values: []handler.Column{
+					{
+						Name:  "col1",
+						Value: "val",
+					},
+					{
+						Name:  "col2",
+						Value: "val",
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					params: []params{
+						{
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = EXCLUDED.col2",
+							args:  []interface{}{"val", "val"},
 						},
 					},
 					shouldExecute: true,
@@ -287,7 +373,7 @@ func TestNewUpsertStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewUpsertStatement(tt.args.event, tt.args.values)
+			stmt := NewUpsertStatement(tt.args.event, tt.args.conflictCols, tt.args.values)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
@@ -414,7 +500,7 @@ func TestNewUpdateStatement(t *testing.T) {
 			},
 		},
 		{
-			name: "correct",
+			name: "correct single column",
 			args: args{
 				table: "my_table",
 				event: &testEvent{
@@ -443,8 +529,53 @@ func TestNewUpdateStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPDATE my_table SET (col1) = ($1) WHERE (col2 = $2)",
+							query: "UPDATE my_table SET col1 = $1 WHERE (col2 = $2)",
 							args:  []interface{}{"val", 1},
+						},
+					},
+					shouldExecute: true,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
+		{
+			name: "correct multi column",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				values: []handler.Column{
+					{
+						Name:  "col1",
+						Value: "val",
+					},
+					{
+						Name:  "col3",
+						Value: "val5",
+					},
+				},
+				conditions: []handler.Condition{
+					{
+						Name:  "col2",
+						Value: 1,
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					params: []params{
+						{
+							query: "UPDATE my_table SET (col1, col3) = ($1, $2) WHERE (col2 = $3)",
+							args:  []interface{}{"val", "val5", 1},
 						},
 					},
 					shouldExecute: true,
@@ -725,9 +856,16 @@ func TestNewMultiStatement(t *testing.T) {
 						}),
 					AddUpsertStatement(
 						[]handler.Column{
+							handler.NewCol("col1", nil),
+						},
+						[]handler.Column{
 							{
 								Name:  "col1",
 								Value: 1,
+							},
+							{
+								Name:  "col2",
+								Value: 2,
 							},
 						}),
 					AddUpdateStatement(
@@ -761,11 +899,11 @@ func TestNewMultiStatement(t *testing.T) {
 							args:  []interface{}{1},
 						},
 						{
-							query: "UPSERT INTO my_table (col1) VALUES ($1)",
-							args:  []interface{}{1},
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = EXCLUDED.col2",
+							args:  []interface{}{1, 2},
 						},
 						{
-							query: "UPDATE my_table SET (col1) = ($1) WHERE (col1 = $2)",
+							query: "UPDATE my_table SET col1 = $1 WHERE (col1 = $2)",
 							args:  []interface{}{1, 1},
 						},
 					},
@@ -799,11 +937,12 @@ func TestNewMultiStatement(t *testing.T) {
 
 func TestNewCopyStatement(t *testing.T) {
 	type args struct {
-		table string
-		event *testEvent
-		from  []handler.Column
-		to    []handler.Column
-		conds []handler.Condition
+		table           string
+		event           *testEvent
+		conflictingCols []handler.Column
+		from            []handler.Column
+		to              []handler.Column
+		conds           []handler.Condition
 	}
 	type want struct {
 		aggregateType    eventstore.AggregateType
@@ -1004,7 +1143,7 @@ func TestNewCopyStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3",
+							query: "INSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3 ON CONFLICT () DO UPDATE SET (state, id, col_a, col_b) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
 							args:  []interface{}{1, 2, 3},
 						},
 					},
@@ -1071,7 +1210,7 @@ func TestNewCopyStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "UPSERT INTO my_table (state, id, col_c, col_d) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3",
+							query: "INSERT INTO my_table (state, id, col_c, col_d) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3 ON CONFLICT () DO UPDATE SET (state, id, col_c, col_d) = ($1, EXCLUDED.id, EXCLUDED.col_a, EXCLUDED.col_b)",
 							args:  []interface{}{1, 2, 3},
 						},
 					},
@@ -1086,7 +1225,7 @@ func TestNewCopyStatement(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.want.executer.t = t
-			stmt := NewCopyStatement(tt.args.event, tt.args.from, tt.args.to, tt.args.conds)
+			stmt := NewCopyStatement(tt.args.event, tt.args.conflictingCols, tt.args.from, tt.args.to, tt.args.conds)
 
 			err := stmt.Execute(tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {

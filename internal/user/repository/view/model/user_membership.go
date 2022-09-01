@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -34,14 +34,14 @@ type UserMembershipView struct {
 	AggregateID string `json:"-" gorm:"column:aggregate_id;primary_key"`
 	ObjectID    string `json:"-" gorm:"column:object_id;primary_key"`
 
-	Roles             pq.StringArray `json:"-" gorm:"column:roles"`
-	DisplayName       string         `json:"-" gorm:"column:display_name"`
-	CreationDate      time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate        time.Time      `json:"-" gorm:"column:change_date"`
-	ResourceOwner     string         `json:"-" gorm:"column:resource_owner"`
-	ResourceOwnerName string         `json:"-" gorm:"column:resource_owner_name"`
-	Sequence          uint64         `json:"-" gorm:"column:sequence"`
-	InstanceID        string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	Roles             database.StringArray `json:"-" gorm:"column:roles"`
+	DisplayName       string               `json:"-" gorm:"column:display_name"`
+	CreationDate      time.Time            `json:"-" gorm:"column:creation_date"`
+	ChangeDate        time.Time            `json:"-" gorm:"column:change_date"`
+	ResourceOwner     string               `json:"-" gorm:"column:resource_owner"`
+	ResourceOwnerName string               `json:"-" gorm:"column:resource_owner_name"`
+	Sequence          uint64               `json:"-" gorm:"column:sequence"`
+	InstanceID        string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {

@@ -176,10 +176,10 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 }
 
 func (w *Config) serverFromContext(ctx context.Context) (*webauthn.WebAuthn, error) {
-	host := authz.GetInstance(ctx).RequestedDomain()
+	instance := authz.GetInstance(ctx)
 	return webauthn.New(&webauthn.Config{
 		RPDisplayName: w.DisplayName,
-		RPID:          host,
-		RPOrigin:      http.BuildOrigin(host, w.ExternalSecure),
+		RPID:          instance.RequestedDomain(),
+		RPOrigin:      http.BuildOrigin(instance.RequestedHost(), w.ExternalSecure),
 	})
 }

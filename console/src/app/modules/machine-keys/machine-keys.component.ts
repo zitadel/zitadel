@@ -22,12 +22,12 @@ import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
   styleUrls: ['./machine-keys.component.scss'],
 })
 export class MachineKeysComponent implements OnInit {
-  @Input() userId!: string;
+  @Input() userId?: string;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public dataSource: MatTableDataSource<Key.AsObject> = new MatTableDataSource<Key.AsObject>();
   public selection: SelectionModel<Key.AsObject> = new SelectionModel<Key.AsObject>(true, []);
-  public keyResult!: ListMachineKeysResponse.AsObject;
+  public keyResult?: ListMachineKeysResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   @Input() public displayedColumns: string[] = ['id', 'type', 'creationDate', 'expirationDate', 'actions'];
@@ -64,29 +64,32 @@ export class MachineKeysComponent implements OnInit {
   }
 
   public deleteKey(key: Key.AsObject): void {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'USER.MACHINE.DIALOG.DELETE_KEY.TITLE',
-        descriptionKey: 'USER.MACHINE.DIALOG.DELETE_KEY.DESCRIPTION',
-      },
-      width: '400px',
-    });
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.mgmtService
-          .removeMachineKey(key.id, this.userId)
-          .then(() => {
-            this.selection.clear();
-            this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
-            this.changePage();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    });
+    if (this.userId) {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.DELETE',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'USER.MACHINE.DIALOG.DELETE_KEY.TITLE',
+          descriptionKey: 'USER.MACHINE.DIALOG.DELETE_KEY.DESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp && this.userId) {
+          this.mgmtService
+            .removeMachineKey(key.id, this.userId)
+            .then(() => {
+              this.selection.clear();
+              this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
+              this.changePage();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
+    }
   }
 
   public openAddKey(): void {
@@ -111,7 +114,7 @@ export class MachineKeysComponent implements OnInit {
           date = ts;
         }
 
-        if (type) {
+        if (type && this.userId) {
           this.mgmtService
             .addMachineKey(this.userId, type, date)
             .then((response) => {

@@ -38,10 +38,10 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() context: UserGrantContext = UserGrantContext.NONE;
   @Input() refreshOnPreviousRoutes: string[] = [];
 
-  public dataSource!: UserGrantsDataSource;
+  public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.userService);
   public selection: SelectionModel<UserGrant.AsObject> = new SelectionModel<UserGrant.AsObject>(true, []);
-  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild(MatTable) public table!: MatTable<UserGrant.AsObject>;
+  @ViewChild(PaginatorComponent) public paginator?: PaginatorComponent;
+  @ViewChild(MatTable) public table?: MatTable<UserGrant.AsObject>;
 
   @Input() disableWrite: boolean = false;
   @Input() disableDelete: boolean = false;
@@ -85,8 +85,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   ];
 
   ngOnInit(): void {
-    this.dataSource = new UserGrantsDataSource(this.userService);
-
     switch (this.context) {
       case UserGrantContext.OWNED_PROJECT:
         if (this.projectId) {
@@ -113,7 +111,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    this.paginator.page.pipe(tap(() => this.loadGrantsPage(this.type))).subscribe();
+    this.paginator?.page.pipe(tap(() => this.loadGrantsPage(this.type))).subscribe();
   }
 
   public setType(type: Type | undefined): void {
@@ -271,8 +269,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public changePage(event?: PageEvent): void {
     this.dataSource.loadGrants(
       this.context,
-      event?.pageIndex ?? this.paginator.pageIndex,
-      event?.pageSize ?? this.paginator.pageSize,
+      event?.pageIndex ?? this.paginator?.pageIndex ?? 0,
+      event?.pageSize ?? this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
       {
         projectId: this.projectId,
         grantId: this.grantId,

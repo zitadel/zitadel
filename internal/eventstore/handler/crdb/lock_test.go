@@ -10,6 +10,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	"github.com/zitadel/zitadel/internal/database"
 	z_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -43,9 +44,9 @@ func TestStatementHandler_handleLock(t *testing.T) {
 			name: "lock fails",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 2, "instanceID"),
-					expectLock(lockTable, workerName, 2, "instanceID"),
-					expectLockErr(lockTable, workerName, 2, "instanceID", errLock),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
+					expectLockErr(lockTable, workerName, 2*time.Second, "instanceID", errLock),
 				},
 			},
 			args: args{
@@ -63,8 +64,8 @@ func TestStatementHandler_handleLock(t *testing.T) {
 			name: "success",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 2, "instanceID"),
-					expectLock(lockTable, workerName, 2, "instanceID"),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
+					expectLock(lockTable, workerName, 2*time.Second, "instanceID"),
 				},
 			},
 			args: args{
@@ -81,8 +82,8 @@ func TestStatementHandler_handleLock(t *testing.T) {
 			name: "success with multiple",
 			want: want{
 				expectations: []mockExpectation{
-					expectLockMultipleInstances(lockTable, workerName, 2, "instanceID1", "instanceID2"),
-					expectLockMultipleInstances(lockTable, workerName, 2, "instanceID1", "instanceID2"),
+					expectLockMultipleInstances(lockTable, workerName, 2*time.Second, "instanceID1", "instanceID2"),
+					expectLockMultipleInstances(lockTable, workerName, 2*time.Second, "instanceID1", "instanceID2"),
 				},
 			},
 			args: args{
@@ -149,7 +150,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			name: "lock fails",
 			want: want{
 				expectations: []mockExpectation{
-					expectLockErr(lockTable, workerName, 1, "instanceID", sql.ErrTxDone),
+					expectLockErr(lockTable, workerName, 1*time.Second, "instanceID", sql.ErrTxDone),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, sql.ErrTxDone)
@@ -157,29 +158,29 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 1 * time.Second,
-				instanceIDs:  []string{"instanceID"},
+				instanceIDs:  database.StringArray{"instanceID"},
 			},
 		},
 		{
 			name: "lock no rows",
 			want: want{
 				expectations: []mockExpectation{
-					expectLockNoRows(lockTable, workerName, 2, "instanceID"),
+					expectLockNoRows(lockTable, workerName, 2*time.Second, "instanceID"),
 				},
 				isErr: func(err error) bool {
-					return errors.As(err, &renewNoRowsAffectedErr)
+					return errors.Is(err, renewNoRowsAffectedErr)
 				},
 			},
 			args: args{
 				lockDuration: 2 * time.Second,
-				instanceIDs:  []string{"instanceID"},
+				instanceIDs:  database.StringArray{"instanceID"},
 			},
 		},
 		{
 			name: "success",
 			want: want{
 				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 3, "instanceID"),
+					expectLock(lockTable, workerName, 3*time.Second, "instanceID"),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
@@ -187,14 +188,14 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			},
 			args: args{
 				lockDuration: 3 * time.Second,
-				instanceIDs:  []string{"instanceID"},
+				instanceIDs:  database.StringArray{"instanceID"},
 			},
 		},
 		{
 			name: "success with multiple",
 			want: want{
 				expectations: []mockExpectation{
-					expectLockMultipleInstances(lockTable, workerName, 3, "instanceID1", "instanceID2"),
+					expectLockMultipleInstances(lockTable, workerName, 3*time.Second, "instanceID1", "instanceID2"),
 				},
 				isErr: func(err error) bool {
 					return errors.Is(err, nil)
