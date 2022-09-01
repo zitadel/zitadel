@@ -110,7 +110,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 					certificateAddedEventData(domain.KeyUsageSAMLMetadataSigning, time.Now().Add(time.Hour)),
 				), keypair.AddedCertificateEventMapper),
 			},
-			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceCertificateAdded,
+			reduce: (&keyProjection{certEncryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceCertificateAdded,
 			want: wantReduce{
 				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),

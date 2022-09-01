@@ -188,7 +188,7 @@ func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler
 		return crdb.NewNoOpStatement(e), nil
 	}
 
-	certificate, err := crypto.Decrypt(e.Certificate.Key, p.encryptionAlgorithm)
+	certificate, err := crypto.Decrypt(e.Certificate.Key, p.certEncryptionAlgorithm)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "HANDL-Dajwig2f", "cannot decrypt certificate")
 	}
