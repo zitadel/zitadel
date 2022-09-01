@@ -39,11 +39,11 @@ const (
 	KeyPublicColumnExpiry     = "expiry"
 	KeyPublicColumnKey        = "key"
 
-	certificateTableSuffix      = "certificate"
-	CertificateColumnID         = "id"
-	CertificateColumnInstanceID = "instance_id"
-	CertificateColumnExpiry     = "expiry"
-	CertificateColumnKey        = "key"
+	certificateTableSuffix       = "certificate"
+	CertificateColumnID          = "id"
+	CertificateColumnInstanceID  = "instance_id"
+	CertificateColumnExpiry      = "expiry"
+	CertificateColumnCertificate = "certificate"
 )
 
 type keyProjection struct {
@@ -94,7 +94,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(CertificateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
 			crdb.NewColumn(CertificateColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(CertificateColumnExpiry, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(CertificateColumnKey, crdb.ColumnTypeBytes),
+			crdb.NewColumn(CertificateColumnCertificate, crdb.ColumnTypeBytes),
 		},
 			crdb.NewPrimaryKey(CertificateColumnID, CertificateColumnInstanceID),
 			certificateTableSuffix,
@@ -187,12 +187,18 @@ func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler
 	if e.Certificate.Expiry.Before(time.Now()) {
 		return crdb.NewNoOpStatement(e), nil
 	}
+
+	certificate, err := crypto.Decrypt(e.Certificate.Key, p.encryptionAlgorithm)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "HANDL-Dajwig2f", "cannot decrypt certificate")
+	}
+
 	creates := []func(eventstore.Event) crdb.Exec{crdb.AddCreateStatement(
 		[]handler.Column{
 			handler.NewCol(CertificateColumnID, e.Aggregate().ID),
 			handler.NewCol(CertificateColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(CertificateColumnExpiry, e.Certificate.Expiry),
-			handler.NewCol(CertificateColumnKey, e.Certificate.Key),
+			handler.NewCol(CertificateColumnCertificate, certificate),
 		},
 		crdb.WithTableSuffix(certificateTableSuffix),
 	)}

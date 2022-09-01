@@ -44,8 +44,6 @@ func (wm *KeyPairWriteModel) Reduce() error {
 				Expiry: e.PublicKey.Expiry,
 			}
 		case *keypair.AddedCertificateEvent:
-			wm.Usage = e.Usage
-			wm.Algorithm = e.Algorithm
 			wm.Certificate = &domain.Key{
 				Key:    e.Certificate.Key,
 				Expiry: e.Certificate.Expiry,

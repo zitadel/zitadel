@@ -284,10 +284,8 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	}
 
 	uniqueConstraints := make([]*eventstore.EventUniqueConstraint, len(samlEntityIDsAgg.EntityIDs))
-	i := 0
-	for _, entityID := range samlEntityIDsAgg.EntityIDs {
+	for i, entityID := range samlEntityIDsAgg.EntityIDs {
 		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
-		i++
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)

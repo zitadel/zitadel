@@ -993,12 +993,12 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 									&project.NewAggregate("project1", "org1").Aggregate,
 									"project",
 									[]*eventstore.EventUniqueConstraint{
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint(func() *string { str := "https://test.com/saml/metadata"; return &str }()),
+										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata"),
 									}),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test.com/saml/metadata"))),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
 					),
 				),
 			},
@@ -1077,16 +1077,16 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 									&project.NewAggregate("project1", "org1").Aggregate,
 									"project",
 									[]*eventstore.EventUniqueConstraint{
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test1.com/saml/metadata")),
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test2.com/saml/metadata")),
-										project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test3.com/saml/metadata")),
+										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test1.com/saml/metadata"),
+										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata"),
+										project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test3.com/saml/metadata"),
 									}),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectNameUniqueConstraint("project", "org1")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test1.com/saml/metadata"))),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test2.com/saml/metadata"))),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test3.com/saml/metadata"))),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test1.com/saml/metadata")),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test3.com/saml/metadata")),
 					),
 				),
 			},
@@ -1321,5 +1321,3 @@ func TestAddProject(t *testing.T) {
 // 		})
 // 	}
 // }
-
-func toStrPointer(str string) *string { return &str }

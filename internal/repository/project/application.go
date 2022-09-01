@@ -229,7 +229,7 @@ func (e *ApplicationRemovedEvent) Data() interface{} {
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	remove := []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
 	if e.entityID != "" {
-		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(&e.entityID))
+		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID))
 	}
 	return remove
 }

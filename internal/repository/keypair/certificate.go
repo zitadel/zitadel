@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -19,9 +18,7 @@ const (
 type AddedCertificateEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Usage       domain.KeyUsage `json:"usage"`
-	Algorithm   string          `json:"algorithm"`
-	Certificate *Key            `json:"certificate"`
+	Certificate *Key `json:"certificate"`
 }
 
 func (e *AddedCertificateEvent) Data() interface{} {
@@ -35,8 +32,6 @@ func (e *AddedCertificateEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 func NewAddedCertificateEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usage domain.KeyUsage,
-	algorithm string,
 	certificateCrypto *crypto.CryptoValue,
 	certificateExpiration time.Time) *AddedCertificateEvent {
 	return &AddedCertificateEvent{
@@ -45,8 +40,6 @@ func NewAddedCertificateEvent(
 			aggregate,
 			AddedCertificateEventType,
 		),
-		Usage:     usage,
-		Algorithm: algorithm,
 		Certificate: &Key{
 			Key:    certificateCrypto,
 			Expiry: certificateExpiration,

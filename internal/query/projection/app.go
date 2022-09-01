@@ -608,8 +608,8 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 	if e.MetadataURL != nil {
 		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadataURL, *e.MetadataURL))
 	}
-	if e.EntityID != nil {
-		cols = append(cols, handler.NewCol(AppSAMLConfigColumnEntityID, *e.EntityID))
+	if e.EntityID != "" {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnEntityID, e.EntityID))
 	}
 
 	if len(cols) == 0 {

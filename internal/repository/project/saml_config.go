@@ -35,10 +35,10 @@ func NewAddSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.Event
 		"Errors.Project.App.SAMLEntityIDAlreadyExists")
 }
 
-func NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID *string) *eventstore.EventUniqueConstraint {
+func NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
 		UniqueEntityIDType,
-		*entityID)
+		entityID)
 }
 
 func (e *SAMLConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
@@ -83,7 +83,7 @@ type SAMLConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AppID       string  `json:"appId"`
-	EntityID    *string `json:"entityId"`
+	EntityID    string  `json:"entityId"`
 	Metadata    []byte  `json:"metadata,omitempty"`
 	MetadataURL *string `json:"metadata_url,omitempty"`
 	oldEntityID string
@@ -94,10 +94,13 @@ func (e *SAMLConfigChangedEvent) Data() interface{} {
 }
 
 func (e *SAMLConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
-		NewRemoveSAMLConfigEntityIDUniqueConstraint(&e.oldEntityID),
-		NewAddSAMLConfigEntityIDUniqueConstraint(*e.EntityID),
+	if e.EntityID != "" {
+		return []*eventstore.EventUniqueConstraint{
+			NewRemoveSAMLConfigEntityIDUniqueConstraint(e.oldEntityID),
+			NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID),
+		}
 	}
+	return nil
 }
 
 func NewSAMLConfigChangedEvent(
@@ -142,7 +145,7 @@ func ChangeMetadataURL(metadataURL string) func(event *SAMLConfigChangedEvent) {
 
 func ChangeEntityID(entityID string) func(event *SAMLConfigChangedEvent) {
 	return func(e *SAMLConfigChangedEvent) {
-		e.EntityID = &entityID
+		e.EntityID = entityID
 	}
 }
 

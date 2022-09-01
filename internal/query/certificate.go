@@ -18,7 +18,7 @@ type Certificate interface {
 	Key
 	Expiry() time.Time
 	Key() *crypto.CryptoValue
-	Certificate() *crypto.CryptoValue
+	Certificate() []byte
 }
 
 type Certificates struct {
@@ -30,7 +30,7 @@ type rsaCertificate struct {
 	key
 	expiry      time.Time
 	privateKey  *crypto.CryptoValue
-	certificate *crypto.CryptoValue
+	certificate []byte
 }
 
 func (c *rsaCertificate) Expiry() time.Time {
@@ -41,7 +41,7 @@ func (c *rsaCertificate) Key() *crypto.CryptoValue {
 	return c.privateKey
 }
 
-func (c *rsaCertificate) Certificate() *crypto.CryptoValue {
+func (c *rsaCertificate) Certificate() []byte {
 	return c.certificate
 }
 
@@ -57,8 +57,8 @@ var (
 		name:  projection.CertificateColumnExpiry,
 		table: certificateTable,
 	}
-	CertificateColKey = Column{
-		name:  projection.CertificateColumnKey,
+	CertificateColCertificate = Column{
+		name:  projection.CertificateColumnCertificate,
 		table: certificateTable,
 	}
 )
@@ -110,7 +110,7 @@ func prepareCertificateQuery() (sq.SelectBuilder, func(*sql.Rows) (*Certificates
 			KeyColAlgorithm.identifier(),
 			KeyColUse.identifier(),
 			CertificateColExpiry.identifier(),
-			CertificateColKey.identifier(),
+			CertificateColCertificate.identifier(),
 			KeyPrivateColKey.identifier(),
 			countColumn.identifier(),
 		).From(keyTable.identifier()).

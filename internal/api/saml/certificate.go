@@ -90,13 +90,6 @@ func (p *Storage) refreshCertificate(
 	usage domain.KeyUsage,
 	sequence uint64,
 ) error {
-	current := p.getCurrent(usage)
-	currentCert := *current
-
-	if currentCert != nil && currentCert.Expiry().Before(time.Now().UTC()) {
-		logging.Log("SAML-ADg26").Info("unset current signing key")
-		return fmt.Errorf("unset current signing key")
-	}
 	ok, err := p.ensureIsLatestCertificate(ctx, sequence)
 	if err != nil {
 		logging.Log("SAML-sdz53").WithError(err).Error("could not ensure latest key")
@@ -171,30 +164,6 @@ func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	)
 }
 
-func (p *Storage) getCurrent(usage domain.KeyUsage) *query.Certificate {
-	switch usage {
-	case domain.KeyUsageSAMLResponseSinging:
-		return &p.currentResponseCertificate
-	case domain.KeyUsageSAMLMetadataSigning:
-		return &p.currentMetadataCertificate
-	case domain.KeyUsageSAMLCA:
-		return &p.currentCACertificate
-	}
-
-	return nil
-}
-
-func (p *Storage) setCurrent(usage domain.KeyUsage, current *query.Certificate) {
-	switch usage {
-	case domain.KeyUsageSAMLResponseSinging:
-		p.currentResponseCertificate = *current
-	case domain.KeyUsageSAMLMetadataSigning:
-		p.currentMetadataCertificate = *current
-	case domain.KeyUsageSAMLCA:
-		p.currentCACertificate = *current
-	}
-}
-
 func (p *Storage) certificateToCertificateAndKey(certificate query.Certificate) (_ *key.CertificateAndKey, err error) {
 	keyData, err := crypto.Decrypt(certificate.Key(), p.encAlg)
 	if err != nil {
@@ -205,11 +174,7 @@ func (p *Storage) certificateToCertificateAndKey(certificate query.Certificate) 
 		return nil, err
 	}
 
-	certData, err := crypto.Decrypt(certificate.Certificate(), p.certEncAlg)
-	if err != nil {
-		return nil, err
-	}
-	cert, err := crypto.BytesToCertificate(certData)
+	cert, err := crypto.BytesToCertificate(certificate.Certificate())
 	if err != nil {
 		return nil, err
 	}

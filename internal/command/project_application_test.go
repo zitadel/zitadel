@@ -615,9 +615,9 @@ func TestCommandSide_RemoveApplication(t *testing.T) {
 								"app",
 								"https://test.com/saml/metadata",
 							)),
-						},
+						}, /**/
 						uniqueConstraintsFromEventConstraint(project.NewRemoveApplicationUniqueConstraint("app", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint(toStrPointer("https://test.com/saml/metadata"))),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
 					),
 				),
 			},

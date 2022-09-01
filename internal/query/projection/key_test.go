@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -31,7 +32,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(keypair.AddedEventType),
 					keypair.AggregateType,
-					keypairAddedEventData(time.Now().Add(time.Hour)),
+					keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(time.Hour)),
 				), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
@@ -88,7 +89,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(keypair.AddedEventType),
 					keypair.AggregateType,
-					keypairAddedEventData(time.Now().Add(-time.Hour)),
+					keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(-time.Hour)),
 				), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{}).reduceKeyPairAdded,
@@ -98,6 +99,36 @@ func TestKeyProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer:         &testExecuter{},
+			},
+		},
+		{
+			name: "reduceCertificateAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(keypair.AddedCertificateEventType),
+					keypair.AggregateType,
+					certificateAddedEventData(domain.KeyUsageSAMLMetadataSigning, time.Now().Add(time.Hour)),
+				), keypair.AddedCertificateEventMapper),
+			},
+			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceCertificateAdded,
+			want: wantReduce{
+				projection:       KeyProjectionTable,
+				aggregateType:    eventstore.AggregateType("key_pair"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.keys_certificate (id, instance_id, expiry, certificate) VALUES ($1, $2, $3, $4)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+								anyArg{},
+								[]byte("privateKey"),
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -116,6 +147,10 @@ func TestKeyProjection_reduces(t *testing.T) {
 	}
 }
 
-func keypairAddedEventData(t time.Time) []byte {
-	return []byte(`{"algorithm": "algorithm", "usage": 0, "privateKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}, "publicKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHVibGljS2V5"}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
+func keypairAddedEventData(usage domain.KeyUsage, t time.Time) []byte {
+	return []byte(`{"algorithm": "algorithm", "usage": ` + fmt.Sprintf("%d", usage) + `, "privateKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}, "publicKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHVibGljS2V5"}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
+}
+
+func certificateAddedEventData(usage domain.KeyUsage, t time.Time) []byte {
+	return []byte(`{"algorithm": "algorithm", "usage": ` + fmt.Sprintf("%d", usage) + `, "certificate": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
 }

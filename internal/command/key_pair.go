@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"math/big"
-	"math/rand"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -42,8 +42,13 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm string) error {
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
+	randInt, err := rand.Int(rand.Reader, big.NewInt(1000))
+	if err != nil {
+		return err
+	}
+
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCACertificate(c.certKeySize, c.keyAlgorithm, c.certificateAlgorithm, &crypto.CertificateInformations{
-		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
+		SerialNumber: randInt,
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML CA",
 		NotBefore:    now,
@@ -72,8 +77,6 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm stri
 		keypair.NewAddedCertificateEvent(
 			ctx,
 			keyAgg,
-			domain.KeyUsageSAMLCA,
-			algorithm,
 			certificateCrypto,
 			after,
 		),
@@ -84,8 +87,13 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm stri
 func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
+	randInt, err := rand.Int(rand.Reader, big.NewInt(1000))
+	if err != nil {
+		return err
+	}
+
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, c.certificateAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
-		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
+		SerialNumber: randInt,
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML response",
 		NotBefore:    now,
@@ -115,8 +123,6 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 		keypair.NewAddedCertificateEvent(
 			ctx,
 			keyAgg,
-			domain.KeyUsageSAMLCA,
-			algorithm,
 			certificateCrypto,
 			after,
 		),
@@ -127,8 +133,12 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	now := time.Now().UTC()
 	after := now.Add(c.certificateLifetime)
+	randInt, err := rand.Int(rand.Reader, big.NewInt(1000))
+	if err != nil {
+		return err
+	}
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, c.certificateAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
-		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
+		SerialNumber: randInt,
 		Organisation: []string{"ZITADEL"},
 		CommonName:   "ZITADEL SAML metadata",
 		NotBefore:    now,
@@ -157,8 +167,6 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorith
 		keypair.NewAddedCertificateEvent(
 			ctx,
 			keyAgg,
-			domain.KeyUsageSAMLCA,
-			algorithm,
 			certificateCrypto,
 			after,
 		),

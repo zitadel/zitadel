@@ -131,8 +131,8 @@ func (wm *SAMLApplicationWriteModel) appendChangeSAMLEvent(e *project.SAMLConfig
 	if e.MetadataURL != nil {
 		wm.MetadataURL = *e.MetadataURL
 	}
-	if e.EntityID != nil {
-		wm.EntityID = *e.EntityID
+	if e.EntityID != "" {
+		wm.EntityID = e.EntityID
 	}
 }
 
@@ -190,7 +190,7 @@ func (wm *SAMLApplicationWriteModel) IsSAML() bool {
 
 type AppIDToEntityID struct {
 	AppID    string
-	EntityID *string
+	EntityID string
 }
 
 type SAMLEntityIDsWriteModel struct {
@@ -230,7 +230,7 @@ func (wm *SAMLEntityIDsWriteModel) AppendEvents(events ...eventstore.Event) {
 		case *project.SAMLConfigAddedEvent:
 			wm.WriteModel.AppendEvents(e)
 		case *project.SAMLConfigChangedEvent:
-			if e.EntityID != nil && *e.EntityID != "" {
+			if e.EntityID != "" {
 				wm.WriteModel.AppendEvents(e)
 			}
 		}
@@ -241,13 +241,13 @@ func (wm *SAMLEntityIDsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ApplicationRemovedEvent:
-			removeItem(wm.EntityIDs, e.AppID)
+			removeAppIDFromEntityIDs(wm.EntityIDs, e.AppID)
 		case *project.SAMLConfigAddedEvent:
-			wm.EntityIDs = append(wm.EntityIDs, &AppIDToEntityID{AppID: e.AppID, EntityID: toStrPtr(e.EntityID)})
+			wm.EntityIDs = append(wm.EntityIDs, &AppIDToEntityID{AppID: e.AppID, EntityID: e.EntityID})
 		case *project.SAMLConfigChangedEvent:
 			for i := range wm.EntityIDs {
 				item := wm.EntityIDs[i]
-				if item.AppID == e.AppID && e.EntityID != nil && *e.EntityID != "" {
+				if e.EntityID != "" {
 					item.EntityID = e.EntityID
 				}
 			}
@@ -256,24 +256,13 @@ func (wm *SAMLEntityIDsWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func toStrPtr(str string) *string {
-	str2 := str
-	return &str2
-}
-
-func removeItem(items []*AppIDToEntityID, appID string) []*AppIDToEntityID {
-	i := 0 // output index
-	for _, item := range items {
-		if item.AppID != appID {
-			// copy and increment index
-			items[i] = item
-			i++
+func removeAppIDFromEntityIDs(items []*AppIDToEntityID, appID string) []*AppIDToEntityID {
+	for i := len(items) - 1; i >= 0; i-- {
+		if items[i].AppID == appID {
+			items[i] = items[len(items)-1]
+			items[len(items)-1] = nil
+			items = items[:len(items)-1]
 		}
 	}
-	// Prevent memory leak by erasing truncated values
-	// (not needed if values don't contain pointers, directly or indirectly)
-	for j := i; j < len(items); j++ {
-		items[j] = nil
-	}
-	return items[:i]
+	return items
 }
