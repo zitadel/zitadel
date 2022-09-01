@@ -62,7 +62,6 @@
 </div>
 
 <div class="actions">
-  <!-- *ngIf="totalCustomPolicy && totalCustomPolicy.isDefault === false" -->
   <button
     class="reset-button"
     [disabled]="(canWrite$ | async) === false"
@@ -76,7 +75,7 @@
   <button
     class="save-button"
     [disabled]="(canWrite$ | async) === false"
-    (click)="saveCurrentMessage()"
+    (click)="saveCurrentTexts()"
     color="primary"
     type="submit"
     mat-raised-button
