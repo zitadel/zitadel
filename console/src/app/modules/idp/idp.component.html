@@ -1,5 +1,5 @@
 <cnsl-top-view
-  title="{{ idp?.name ? idp.name : ('IDP.DETAIL.TITLE' | translate) }}"
+  title="{{ idp?.name ? idp?.name : ('IDP.DETAIL.TITLE' | translate) }}"
   [sub]="idp?.oidcConfig ? ('IDP.TYPES.1' | translate) : idp?.jwtConfig ? ('IDP.TYPES.3' | translate) : ''"
   [isActive]="idp?.state === IDPState.IDP_STATE_ACTIVE"
   [isInactive]="idp?.state === IDPState.IDP_STATE_INACTIVE"

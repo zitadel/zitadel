@@ -26,13 +26,14 @@ export class PersonalAccessTokensComponent implements OnInit {
   @Input() userId!: string;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  public dataSource: MatTableDataSource<PersonalAccessToken.AsObject> =
-    new MatTableDataSource<PersonalAccessToken.AsObject>();
+  public dataSource: MatTableDataSource<PersonalAccessToken.AsObject> = new MatTableDataSource<PersonalAccessToken.AsObject>(
+    [],
+  );
   public selection: SelectionModel<PersonalAccessToken.AsObject> = new SelectionModel<PersonalAccessToken.AsObject>(
     true,
     [],
   );
-  public keyResult!: ListPersonalAccessTokensResponse.AsObject;
+  public keyResult: ListPersonalAccessTokensResponse.AsObject | undefined = undefined;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   @Input() public displayedColumns: string[] = ['id', 'creationDate', 'expirationDate', 'actions'];

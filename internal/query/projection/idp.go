@@ -3,8 +3,7 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -16,7 +15,7 @@ import (
 )
 
 const (
-	IDPTable     = "projections.idps"
+	IDPTable     = "projections.idps2"
 	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
 	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
 
@@ -78,9 +77,9 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(IDPIDCol, IDPInstanceIDCol),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol})),
-			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{IDPIDCol})),
+			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
+			crdb.WithIndex(crdb.NewIndex("idp_ro_idx", []string{IDPResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("idp_id_unique", []string{IDPIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText),
@@ -94,7 +93,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(OIDCConfigAuthorizationEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(OIDCConfigTokenEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(OIDCConfigIDPIDCol, OIDCConfigInstanceIDCol),
+			crdb.NewPrimaryKey(OIDCConfigInstanceIDCol, OIDCConfigIDPIDCol),
 			IDPOIDCSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_idp")),
 		),
@@ -106,7 +105,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(JWTConfigEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(JWTConfigIDPIDCol, JWTConfigInstanceIDCol),
+			crdb.NewPrimaryKey(JWTConfigInstanceIDCol, JWTConfigIDPIDCol),
 			IDPJWTSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_jwt_ref_idp")),
 		),
@@ -374,7 +373,7 @@ func (p *idpProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
-				handler.NewCol(OIDCConfigScopesCol, pq.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)),
 				handler.NewCol(OIDCConfigDisplayNameMappingCol, idpEvent.IDPDisplayNameMapping),
 				handler.NewCol(OIDCConfigUsernameMappingCol, idpEvent.UserNameMapping),
 				handler.NewCol(OIDCConfigAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
@@ -414,7 +413,7 @@ func (p *idpProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(OIDCConfigTokenEndpointCol, *idpEvent.TokenEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, pq.StringArray(idpEvent.Scopes)))
+		cols = append(cols, handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)))
 	}
 	if idpEvent.IDPDisplayNameMapping != nil {
 		cols = append(cols, handler.NewCol(OIDCConfigDisplayNameMappingCol, *idpEvent.IDPDisplayNameMapping))

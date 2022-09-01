@@ -32,7 +32,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   @Input() public canWrite: boolean | null = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
-  @Input() public dataSource!: MemberDatasource;
+  @Input() public dataSource?: MemberDatasource;
   public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
   @Input() public memberRoleOptions: string[] = [];
   @Input() public factoryLoadFunc!: Function;
@@ -112,14 +112,14 @@ export class MembersTableComponent implements OnInit, OnDestroy {
 
   public isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.membersSubject.value.length;
+    const numRows = this.dataSource?.membersSubject.value.length;
     return numSelected === numRows;
   }
 
   public masterToggle(): void {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.dataSource.membersSubject.value.forEach((row: Member.AsObject) => this.selection.select(row));
+      : this.dataSource?.membersSubject.value.forEach((row: Member.AsObject) => this.selection.select(row));
   }
 
   public changePage(event?: PageEvent): any {
