@@ -24,6 +24,8 @@ import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
 
+const MIN_INTERVAL_SECONDS = 10; // if the difference of a newer version to the current exceeds this time, a refresh button is shown.
+
 /* eslint-disable */
 const KeyNamesArray = [
   'emailVerificationDoneText',
@@ -343,6 +345,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
           (this.service as ManagementService)
             .resetCustomLoginTextToDefault(this.locale)
             .then(() => {
+              this.updateCurrentPolicyDate();
               setTimeout(() => {
                 this.loadData();
               }, 1000);
@@ -354,6 +357,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
           (this.service as AdminService)
             .resetCustomLoginTextToDefault(this.locale)
             .then(() => {
+              this.updateCurrentPolicyDate();
               setTimeout(() => {
                 this.loadData();
               }, 1000);
@@ -379,7 +383,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     if (this.newerPolicyChangeDate && this.currentPolicyChangeDate) {
       const ms = toDate(this.newerPolicyChangeDate).getTime() - toDate(this.currentPolicyChangeDate).getTime();
       // show button if changes are newer than 10s
-      return ms / 1000 > 10;
+      return ms / 1000 > MIN_INTERVAL_SECONDS;
     } else {
       return false;
     }
