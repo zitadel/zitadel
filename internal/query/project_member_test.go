@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/lib/pq"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
@@ -20,18 +20,18 @@ var (
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names.login_name" +
-		", projections.users2_humans.email" +
-		", projections.users2_humans.first_name" +
-		", projections.users2_humans.last_name" +
-		", projections.users2_humans.display_name" +
-		", projections.users2_machines.name" +
-		", projections.users2_humans.avatar_key" +
+		", projections.users3_humans.email" +
+		", projections.users3_humans.first_name" +
+		", projections.users3_humans.last_name" +
+		", projections.users3_humans.display_name" +
+		", projections.users3_machines.name" +
+		", projections.users3_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM projections.project_members as members " +
-		"LEFT JOIN projections.users2_humans " +
-		"ON members.user_id = projections.users2_humans.user_id " +
-		"LEFT JOIN projections.users2_machines " +
-		"ON members.user_id = projections.users2_machines.user_id " +
+		"FROM projections.project_members2 AS members " +
+		"LEFT JOIN projections.users3_humans " +
+		"ON members.user_id = projections.users3_humans.user_id " +
+		"LEFT JOIN projections.users3_machines " +
+		"ON members.user_id = projections.users3_machines.user_id " +
 		"LEFT JOIN projections.login_names " +
 		"ON members.user_id = projections.login_names.user_id " +
 		"WHERE projections.login_names.is_primary = $1")
@@ -92,7 +92,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id",
-							pq.StringArray{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
 							"gigi@caos.ch",
 							"first-name",
@@ -115,7 +115,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
 						Email:              "gigi@caos.ch",
 						FirstName:          "first-name",
@@ -140,7 +140,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id",
-							pq.StringArray{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
 							nil,
 							nil,
@@ -163,7 +163,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
 						Email:              "",
 						FirstName:          "",
@@ -188,7 +188,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id-1",
-							pq.StringArray{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
 							"gigi@caos.ch",
 							"first-name",
@@ -203,7 +203,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 							uint64(20211206),
 							"ro",
 							"user-id-2",
-							pq.StringArray{"role-1", "role-2"},
+							database.StringArray{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
 							nil,
 							nil,
@@ -226,7 +226,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id-1",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
 						Email:              "gigi@caos.ch",
 						FirstName:          "first-name",
@@ -240,7 +240,7 @@ func Test_ProjectMemberPrepares(t *testing.T) {
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
 						UserID:             "user-id-2",
-						Roles:              []string{"role-1", "role-2"},
+						Roles:              database.StringArray{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
 						Email:              "",
 						FirstName:          "",

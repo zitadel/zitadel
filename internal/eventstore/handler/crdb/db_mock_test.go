@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/lib/pq"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -17,7 +17,7 @@ type mockExpectation func(sqlmock.Sqlmock)
 
 func expectFailureCount(tableName string, projectionName, instanceID string, failedSeq, failureCount uint64) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(`WITH failures AS \(SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2\ AND instance_id = \$3\) SELECT IF\(EXISTS\(SELECT failure_count FROM failures\), \(SELECT failure_count FROM failures\), 0\) AS failure_count`).
+		m.ExpectQuery(`WITH failures AS \(SELECT failure_count FROM `+tableName+` WHERE projection_name = \$1 AND failed_sequence = \$2 AND instance_id = \$3\) SELECT COALESCE\(\(SELECT failure_count FROM failures\), 0\) AS failure_count`).
 			WithArgs(projectionName, failedSeq, instanceID).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"failure_count"}).
@@ -28,7 +28,7 @@ func expectFailureCount(tableName string, projectionName, instanceID string, fai
 
 func expectUpdateFailureCount(tableName string, projectionName, instanceID string, seq, failureCount uint64) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec(`UPSERT INTO `+tableName+` \(projection_name, failed_sequence, failure_count, error, instance_id\) VALUES \(\$1, \$2, \$3, \$4\, \$5\)`).
+		m.ExpectExec(`INSERT INTO `+tableName+` \(projection_name, failed_sequence, failure_count, error, instance_id\) VALUES \(\$1, \$2, \$3, \$4\, \$5\) ON CONFLICT \(projection_name, failed_sequence, instance_id\) DO UPDATE SET failure_count = EXCLUDED\.failure_count, error = EXCLUDED\.error`).
 			WithArgs(projectionName, seq, failureCount, sqlmock.AnyArg(), instanceID).WillReturnResult(sqlmock.NewResult(1, 1))
 	}
 }
@@ -133,7 +133,7 @@ func expectCurrentSequence(tableName, projection string, seq uint64, aggregateTy
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				pq.StringArray(instanceIDs),
+				database.StringArray(instanceIDs),
 			).
 			WillReturnRows(
 				rows,
@@ -146,7 +146,7 @@ func expectCurrentSequenceErr(tableName, projection string, instanceIDs []string
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				pq.StringArray(instanceIDs),
+				database.StringArray(instanceIDs),
 			).
 			WillReturnError(err)
 	}
@@ -157,7 +157,7 @@ func expectCurrentSequenceNoRows(tableName, projection string, instanceIDs []str
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				pq.StringArray(instanceIDs),
+				database.StringArray(instanceIDs),
 			).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"}),
@@ -170,7 +170,7 @@ func expectCurrentSequenceScanErr(tableName, projection string, instanceIDs []st
 		m.ExpectQuery(`SELECT current_sequence, aggregate_type, instance_id FROM `+tableName+` WHERE projection_name = \$1 AND instance_id = ANY \(\$2\) FOR UPDATE`).
 			WithArgs(
 				projection,
-				pq.StringArray(instanceIDs),
+				database.StringArray(instanceIDs),
 			).
 			WillReturnRows(
 				sqlmock.NewRows([]string{"current_sequence", "aggregate_type", "instance_id"}).
@@ -182,7 +182,7 @@ func expectCurrentSequenceScanErr(tableName, projection string, instanceIDs []st
 
 func expectUpdateCurrentSequence(tableName, projection string, seq uint64, aggregateType, instanceID string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO "+tableName+` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\)`).
+		m.ExpectExec("INSERT INTO "+tableName+` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\) ON CONFLICT \(projection_name, aggregate_type, instance_id\) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`).
 			WithArgs(
 				projection,
 				aggregateType,
@@ -213,7 +213,7 @@ func expectUpdateThreeCurrentSequence(t *testing.T, tableName, projection string
 		matchers[i] = matcher
 	}
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO " + tableName + ` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\), \(\$5, \$6, \$7, \$8, NOW\(\)\), \(\$9, \$10, \$11, \$12, NOW\(\)\)`).
+		m.ExpectExec("INSERT INTO " + tableName + ` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\), \(\$5, \$6, \$7, \$8, NOW\(\)\), \(\$9, \$10, \$11, \$12, NOW\(\)\) ON CONFLICT \(projection_name, aggregate_type, instance_id\) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`).
 			WithArgs(
 				matchers...,
 			).
@@ -262,7 +262,7 @@ func (m *currentSequenceMatcher) Match(value driver.Value) bool {
 
 func expectUpdateCurrentSequenceErr(tableName, projection string, seq uint64, err error, aggregateType, instanceID string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO "+tableName+` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\)`).
+		m.ExpectExec("INSERT INTO "+tableName+` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\) ON CONFLICT \(projection_name, aggregate_type, instance_id\) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`).
 			WithArgs(
 				projection,
 				aggregateType,
@@ -275,7 +275,7 @@ func expectUpdateCurrentSequenceErr(tableName, projection string, seq uint64, er
 
 func expectUpdateCurrentSequenceNoRows(tableName, projection string, seq uint64, aggregateType, instanceID string) func(sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectExec("UPSERT INTO "+tableName+` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\)`).
+		m.ExpectExec("INSERT INTO "+tableName+` \(projection_name, aggregate_type, current_sequence, instance_id, timestamp\) VALUES \(\$1, \$2, \$3, \$4, NOW\(\)\) ON CONFLICT \(projection_name, aggregate_type, instance_id\) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`).
 			WithArgs(
 				projection,
 				aggregateType,
@@ -297,10 +297,10 @@ func expectLock(lockTable, workerName string, d time.Duration, instanceID string
 			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				float64(d),
+				d,
 				projectionName,
 				instanceID,
-				pq.StringArray{instanceID},
+				database.StringArray{instanceID},
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -317,11 +317,11 @@ func expectLockMultipleInstances(lockTable, workerName string, d time.Duration, 
 			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$6\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				float64(d),
+				d,
 				projectionName,
 				instanceID1,
 				instanceID2,
-				pq.StringArray{instanceID1, instanceID2},
+				database.StringArray{instanceID1, instanceID2},
 			).
 			WillReturnResult(
 				sqlmock.NewResult(1, 1),
@@ -338,10 +338,10 @@ func expectLockNoRows(lockTable, workerName string, d time.Duration, instanceID 
 			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				float64(d),
+				d,
 				projectionName,
 				instanceID,
-				pq.StringArray{instanceID},
+				database.StringArray{instanceID},
 			).
 			WillReturnResult(driver.ResultNoRows)
 	}
@@ -356,10 +356,10 @@ func expectLockErr(lockTable, workerName string, d time.Duration, instanceID str
 			` WHERE `+lockTable+`\.projection_name = \$3 AND `+lockTable+`\.instance_id = ANY \(\$5\) AND \(`+lockTable+`\.locker_id = \$1 OR `+lockTable+`\.locked_until < now\(\)\)`).
 			WithArgs(
 				workerName,
-				float64(d),
+				d,
 				projectionName,
 				instanceID,
-				pq.StringArray{instanceID},
+				database.StringArray{instanceID},
 			).
 			WillReturnError(err)
 	}

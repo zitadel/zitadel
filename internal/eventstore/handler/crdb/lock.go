@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/id"
 )
@@ -91,17 +91,17 @@ func (h *locker) Unlock(instanceIDs ...string) error {
 	return nil
 }
 
-func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs []string) (string, []interface{}) {
+func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs database.StringArray) (string, []interface{}) {
 	valueQueries := make([]string, len(instanceIDs))
 	values := make([]interface{}, len(instanceIDs)+4)
 	values[0] = h.workerName
 	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
-	values[1] = lockDuration.Seconds()
+	values[1] = lockDuration
 	values[2] = h.projectionName
 	for i, instanceID := range instanceIDs {
 		valueQueries[i] = "($1, now()+$2::INTERVAL, $3, $" + strconv.Itoa(i+4) + ")"
 		values[i+3] = instanceID
 	}
-	values[len(values)-1] = pq.StringArray(instanceIDs)
+	values[len(values)-1] = instanceIDs
 	return h.lockStmt(strings.Join(valueQueries, ", "), len(values)), values
 }

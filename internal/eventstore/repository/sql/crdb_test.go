@@ -6,8 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
@@ -279,7 +278,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 		uniqueCount       int
 		assetCount        int
 		aggType           repository.AggregateType
-		aggID             []string
+		aggID             database.StringArray
 	}
 	type res struct {
 		wantErr   bool
@@ -430,7 +429,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, pq.Array(tt.res.eventsRes.aggID))
+			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
 			var eventCount int
 			err := countEventRow.Scan(&eventCount)
 			if err != nil {
@@ -462,8 +461,8 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 	type eventsRes struct {
 		pushedEventsCount int
-		aggType           []repository.AggregateType
-		aggID             []string
+		aggType           database.StringArray
+		aggID             database.StringArray
 	}
 	type res struct {
 		wantErr   bool
@@ -487,7 +486,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 2,
 					aggID:             []string{"100", "101"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -506,7 +505,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 4,
 					aggID:             []string{"102", "103"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -533,7 +532,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 12,
 					aggID:             []string{"106", "107", "108"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -547,7 +546,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", pq.Array(tt.res.eventsRes.aggType), pq.Array(tt.res.eventsRes.aggID))
+			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
 			var count int
 			err := countRow.Scan(&count)
 			if err != nil {
@@ -645,8 +644,8 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	}
 	type eventsRes struct {
 		pushedEventsCount int
-		aggTypes          []repository.AggregateType
-		aggIDs            []string
+		aggTypes          database.StringArray
+		aggIDs            database.StringArray
 	}
 	type res struct {
 		errCount  int
@@ -681,7 +680,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"200", "201", "202", "203"},
 					pushedEventsCount: 9,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -718,7 +717,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"204", "205", "206"},
 					pushedEventsCount: 14,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -748,7 +747,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"207", "208"},
 					pushedEventsCount: 11,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -781,7 +780,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				t.Errorf("CRDB.Push() error count = %d, wanted err count %d, errs: %v", len(errs), tt.res.errCount, errs)
 			}
 
-			rows, err := testCRDBClient.Query("SELECT event_data FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2) order by event_sequence", pq.Array(tt.res.eventsRes.aggTypes), pq.Array(tt.res.eventsRes.aggIDs))
+			rows, err := testCRDBClient.Query("SELECT event_data FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2) order by event_sequence", tt.res.eventsRes.aggTypes, tt.res.eventsRes.aggIDs)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return
@@ -993,10 +992,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		events []*repository.Event
 	}
 	type res struct {
-		resourceOwners []string
+		resourceOwners database.StringArray
 	}
 	type fields struct {
-		aggregateIDs  []string
+		aggregateIDs  database.StringArray
 		aggregateType string
 	}
 	tests := []struct {
@@ -1128,7 +1127,7 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 				}
 			}
 
-			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY event_sequence", tt.fields.aggregateType, pq.Array(tt.fields.aggregateIDs))
+			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY event_sequence", tt.fields.aggregateType, tt.fields.aggregateIDs)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return
