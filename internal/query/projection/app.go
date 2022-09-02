@@ -601,7 +601,7 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU2", "reduce.wrong.event.type")
 	}
 
-	cols := make([]handler.Column, 0, 15)
+	cols := make([]handler.Column, 0, 3)
 	if e.Metadata != nil {
 		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata))
 	}

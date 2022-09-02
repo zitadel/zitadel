@@ -247,7 +247,7 @@ func (wm *SAMLEntityIDsWriteModel) Reduce() error {
 		case *project.SAMLConfigChangedEvent:
 			for i := range wm.EntityIDs {
 				item := wm.EntityIDs[i]
-				if e.EntityID != "" {
+				if e.AppID == item.AppID && e.EntityID != "" {
 					item.EntityID = e.EntityID
 				}
 			}

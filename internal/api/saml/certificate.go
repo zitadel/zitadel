@@ -2,7 +2,6 @@ package saml
 
 import (
 	"context"
-	"crypto/rsa"
 	"fmt"
 	"time"
 
@@ -133,17 +132,15 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 		if err != nil {
 			return fmt.Errorf("error while reading ca certificate: %w", err)
 		}
-		if certAndKey.Key.Key == nil || certAndKey.Certificate.Key == nil {
+		if certAndKey.Key == nil || certAndKey.Certificate == nil {
 			return fmt.Errorf("has no ca certificate")
 		}
-		certWebKey := certAndKey.Certificate.Key.(jose.JSONWebKey)
-		keyWebKey := certAndKey.Key.Key.(jose.JSONWebKey)
 
 		switch usage {
 		case domain.KeyUsageSAMLMetadataSigning:
-			return p.command.GenerateSAMLMetadataCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, keyWebKey.Key.(*rsa.PrivateKey), certWebKey.Key.([]byte))
+			return p.command.GenerateSAMLMetadataCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, certAndKey.Key, certAndKey.Certificate)
 		case domain.KeyUsageSAMLResponseSinging:
-			return p.command.GenerateSAMLResponseCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, keyWebKey.Key.(*rsa.PrivateKey), certWebKey.Key.([]byte))
+			return p.command.GenerateSAMLResponseCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, certAndKey.Key, certAndKey.Certificate)
 		default:
 			return fmt.Errorf("unknown usage")
 		}
@@ -180,20 +177,8 @@ func (p *Storage) certificateToCertificateAndKey(certificate query.Certificate) 
 	}
 
 	return &key.CertificateAndKey{
-		Key: &jose.SigningKey{
-			Algorithm: jose.SignatureAlgorithm(p.certificateAlgorithm),
-			Key: jose.JSONWebKey{
-				KeyID: certificate.ID(),
-				Key:   privateKey,
-			},
-		},
-		Certificate: &jose.SigningKey{
-			Algorithm: jose.SignatureAlgorithm(p.certificateAlgorithm),
-			Key: jose.JSONWebKey{
-				KeyID: certificate.ID(),
-				Key:   cert,
-			},
-		},
+		Key:         privateKey,
+		Certificate: cert,
 	}, nil
 }
 
@@ -207,11 +192,11 @@ func setSAMLCtx(ctx context.Context) context.Context {
 
 func retry(retryable func() error) (err error) {
 	for i := 0; i < retryCount; i++ {
-		time.Sleep(retryBackoff)
 		err = retryable()
 		if err == nil {
 			return nil
 		}
+		time.Sleep(retryBackoff)
 	}
 	return err
 }

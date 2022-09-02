@@ -19,10 +19,36 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
-func TestCommandSide_AddSAMLApplication(t *testing.T) {
-	port := "8081"
-	path := "/metadataadd"
+var testMetadata = []byte(`<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+                     validUntil="2022-08-26T14:08:16Z"
+                     cacheDuration="PT604800S"
+                     entityID="https://test.com/saml/metadata">
+    <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                                     Location="https://test.com/saml/acs"
+                                     index="1" />
+        
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>
+`)
+var testMetadataChangedEntityID = []byte(`<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+                     validUntil="2022-08-26T14:08:16Z"
+                     cacheDuration="PT604800S"
+                     entityID="https://test2.com/saml/metadata">
+    <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                                     Location="https://test.com/saml/acs"
+                                     index="1" />
+        
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>
+`)
 
+func TestCommandSide_AddSAMLApplication(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
@@ -172,7 +198,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 									&project.NewAggregate("project1", "org1").Aggregate,
 									"app1",
 									"https://test.com/saml/metadata",
-									[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+									testMetadata,
 									"",
 								),
 							),
@@ -191,7 +217,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					},
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    testMetadata,
 					MetadataURL: "",
 				},
 				resourceOwner: "org1",
@@ -205,7 +231,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    testMetadata,
 					MetadataURL: "",
 					State:       domain.AppStateActive,
 				},
@@ -238,8 +264,8 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 									&project.NewAggregate("project1", "org1").Aggregate,
 									"app1",
 									"https://test.com/saml/metadata",
-									[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-									"http://localhost:"+port+path,
+									testMetadata,
+									"http://localhost:8080/saml/metadata",
 								),
 							),
 						},
@@ -248,7 +274,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
-				httpClient:  newTestClient(200, []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
+				httpClient:  newTestClient(200, testMetadata),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -259,7 +285,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:" + port + path,
+					MetadataURL: "http://localhost:8080/saml/metadata",
 				},
 				resourceOwner: "org1",
 			},
@@ -272,8 +298,8 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-					MetadataURL: "http://localhost:" + port + path,
+					Metadata:    testMetadata,
+					MetadataURL: "http://localhost:8080/saml/metadata",
 					State:       domain.AppStateActive,
 				},
 			},
@@ -304,7 +330,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:" + port + path,
+					MetadataURL: "http://localhost:8080/saml/metadata",
 				},
 				resourceOwner: "org1",
 			},
@@ -337,9 +363,6 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
-	port := "8082"
-	path := "/metadatachange"
-
 	type fields struct {
 		eventstore *eventstore.Eventstore
 		httpClient *http.Client
@@ -465,13 +488,13 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"https://test.com/saml/metadata",
-								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-								"http://localhost:"+port+path,
+								testMetadata,
+								"http://localhost:8080/saml/metadata",
 							),
 						),
 					),
 				),
-				httpClient: newTestClient(http.StatusOK, []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
+				httpClient: newTestClient(http.StatusOK, testMetadata),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -484,7 +507,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					EntityID:    "https://test.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:" + port + path,
+					MetadataURL: "http://localhost:8080/saml/metadata",
 				},
 				resourceOwner: "org1",
 			},
@@ -510,7 +533,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"https://test.com/saml/metadata",
-								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+								testMetadata,
 								"",
 							),
 						),
@@ -528,7 +551,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					AppID:       "app1",
 					EntityID:    "https://test.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    testMetadata,
 					MetadataURL: "",
 				},
 				resourceOwner: "org1",
@@ -555,8 +578,8 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"https://test.com/saml/metadata",
-								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-								"http://localhost:"+port+path,
+								testMetadata,
+								"http://localhost:8080/saml/metadata",
 							),
 						),
 					),
@@ -567,14 +590,17 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 									"app1",
 									"project1",
 									"org1",
-									"https://test.com/saml/metadata"),
+									"https://test.com/saml/metadata",
+									"https://test2.com/saml/metadata",
+									testMetadataChangedEntityID,
+								),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
 						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
 					),
 				),
-				httpClient: newTestClient(http.StatusOK, []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
+				httpClient: newTestClient(http.StatusOK, testMetadataChangedEntityID),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -587,7 +613,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppName:     "app",
 					EntityID:    "https://test2.com/saml/metadata",
 					Metadata:    nil,
-					MetadataURL: "http://localhost:" + port + path,
+					MetadataURL: "http://localhost:8080/saml/metadata",
 				},
 				resourceOwner: "org1",
 			},
@@ -600,8 +626,8 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					AppName:     "app",
 					EntityID:    "https://test2.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
-					MetadataURL: "http://localhost:" + port + path,
+					Metadata:    testMetadataChangedEntityID,
+					MetadataURL: "http://localhost:8080/saml/metadata",
 					State:       domain.AppStateActive,
 				},
 			},
@@ -624,7 +650,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"https://test.com/saml/metadata",
-								[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+								testMetadata,
 								"",
 							),
 						),
@@ -636,7 +662,10 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 									"app1",
 									"project1",
 									"org1",
-									"https://test.com/saml/metadata"),
+									"https://test.com/saml/metadata",
+									"https://test2.com/saml/metadata",
+									testMetadataChangedEntityID,
+								),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
@@ -655,7 +684,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					AppName:     "app",
 					EntityID:    "https://test2.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    testMetadataChangedEntityID,
 					MetadataURL: "",
 				},
 				resourceOwner: "org1",
@@ -669,7 +698,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 					AppID:       "app1",
 					AppName:     "app",
 					EntityID:    "https://test2.com/saml/metadata",
-					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					Metadata:    testMetadataChangedEntityID,
 					MetadataURL: "",
 					State:       domain.AppStateActive,
 				},
@@ -697,29 +726,29 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 	}
 }
 
-func newSAMLAppChangedEventMetadata(ctx context.Context, appID, projectID, resourceOwner, entityID string) *project.SAMLConfigChangedEvent {
+func newSAMLAppChangedEventMetadata(ctx context.Context, appID, projectID, resourceOwner, oldEntityID, entityID string, metadata []byte) *project.SAMLConfigChangedEvent {
 	changes := []project.SAMLConfigChanges{
-		project.ChangeEntityID("https://test2.com/saml/metadata"),
-		project.ChangeMetadata([]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
+		project.ChangeEntityID(entityID),
+		project.ChangeMetadata(metadata),
 	}
 	event, _ := project.NewSAMLConfigChangedEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,
 		appID,
-		entityID,
+		oldEntityID,
 		changes,
 	)
 	return event
 }
 
-func newSAMLAppChangedEventMetadataURL(ctx context.Context, appID, projectID, resourceOwner, entityID string) *project.SAMLConfigChangedEvent {
+func newSAMLAppChangedEventMetadataURL(ctx context.Context, appID, projectID, resourceOwner, oldEntityID, entityID string, metadata []byte) *project.SAMLConfigChangedEvent {
 	changes := []project.SAMLConfigChanges{
-		project.ChangeEntityID("https://test2.com/saml/metadata"),
-		project.ChangeMetadata([]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-09-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test2.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>")),
+		project.ChangeEntityID(entityID),
+		project.ChangeMetadata(metadata),
 	}
 	event, _ := project.NewSAMLConfigChangedEvent(ctx,
 		&project.NewAggregate(projectID, resourceOwner).Aggregate,
 		appID,
-		entityID,
+		oldEntityID,
 		changes,
 	)
 	return event
