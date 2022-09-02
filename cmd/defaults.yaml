@@ -143,7 +143,7 @@ Projections:
   RequeueEvery: 60s
   RetryFailedAfter: 1s
   MaxFailureCount: 5
-  ConcurrentInstances: 10
+  ConcurrentInstances: 1
   BulkLimit: 200
   MaxIterators: 1
   Customizations:
