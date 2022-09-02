@@ -1,7 +1,7 @@
 import { apiAuth } from "../../support/api/apiauth";
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from "../../support/api/projects";
 
-describe.skip('permissions', () => {
+describe('permissions', () => {
 
     const testProjectName = 'e2eprojectpermission'
     const testAppName = 'e2eapppermission'
@@ -28,12 +28,16 @@ describe.skip('permissions', () => {
             })
         })
 
-        it('should add a role', () => {
+        it('should add a role',  () => {
             cy.get('[data-e2e="add-new-role"]').click()
-            cy.get('[formcontrolname="key"]').type(testRoleName)
-            cy.get('[formcontrolname="displayName"]').type(testRoleDisplay)
-            cy.get('[formcontrolname="group"]').type(testRoleGroup)
-            cy.get('[data-e2e="save-button"]').click()
+            cy.get('[formcontrolname="key"]')
+                .type(testRoleName)
+            cy.get('[formcontrolname="displayName"]')
+                .type(testRoleDisplay)
+            cy.get('[formcontrolname="group"]')
+                .type(testRoleGroup)
+            cy.get('[data-e2e="save-button"]')
+                .click()
             cy.get('.data-e2e-success')
             cy.wait(200)
             cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
