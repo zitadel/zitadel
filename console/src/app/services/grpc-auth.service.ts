@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, combineLatest, forkJoin, from, merge, Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
 import {
   catchError,
   distinctUntilChanged,
   filter,
   finalize,
   map,
-  mergeAll,
   mergeMap,
   switchMap,
   take,
-  tap,
   timeout,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -128,10 +126,8 @@ export class GrpcAuthService {
         distinctUntilChanged((a, b) => {
           return JSON.stringify(a.sort()) === JSON.stringify(b.sort());
         }),
-        tap(console.log),
         finalize(() => {
           this.fetchedZitadelPermissions.next(true);
-          console.log('loaded');
         }),
       ),
     ),
@@ -147,9 +143,6 @@ export class GrpcAuthService {
     private storage: StorageService,
   ) {
     this.zitadelPermissions$.subscribe(this.zitadelPermissions);
-
-    this.zitadelPermissions.subscribe((p) => console.log('permissions', p.length));
-    this.fetchedZitadelPermissions.subscribe((p) => console.log('loaded', p));
 
     this.user = merge(
       of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
@@ -260,7 +253,6 @@ export class GrpcAuthService {
   }
 
   private loadPermissions(): void {
-    console.log('trigger');
     this.triggerPermissionsRefresh.next();
   }
 
@@ -275,7 +267,7 @@ export class GrpcAuthService {
         filter(([hL, p]) => {
           return hL === true && !!p.length;
         }),
-        map(([hL, zroles]) => {
+        map(([_, zroles]) => {
           const what = this.hasRoles(zroles, roles, requiresAll);
           return what;
         }),
