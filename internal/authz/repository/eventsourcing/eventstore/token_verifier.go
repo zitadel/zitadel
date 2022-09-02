@@ -42,7 +42,15 @@ func (repo *TokenVerifierRepo) Health() error {
 func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (_ *usr_model.TokenView, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	token, viewErr := repo.View.TokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	sequence, err := repo.View.GetLatestTokenSequence(instanceID)
+	logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID").
+		OnError(err).
+		Errorf("could not get current sequence for token check")
+
+	token, viewErr := repo.View.TokenByID(tokenID, instanceID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
@@ -50,9 +58,12 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		token = new(model.TokenView)
 		token.ID = tokenID
 		token.UserID = userID
+		if sequence != nil {
+			token.Sequence = sequence.CurrentSequence
+		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
