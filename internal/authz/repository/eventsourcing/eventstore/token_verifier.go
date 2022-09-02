@@ -44,7 +44,6 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 	defer func() { span.EndWithError(err) }()
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-
 	sequence, err := repo.View.GetLatestTokenSequence(instanceID)
 	logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID").
 		OnError(err).
