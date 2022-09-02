@@ -5,14 +5,14 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
-    GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
-    GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
-    SetCustomLoginTextsRequest as AdminSetCustomLoginTextsRequest,
+  GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
+  GetDefaultLoginTextsRequest as AdminGetDefaultLoginTextsRequest,
+  SetCustomLoginTextsRequest as AdminSetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    GetCustomLoginTextsRequest,
-    GetDefaultLoginTextsRequest,
-    SetCustomLoginTextsRequest,
+  GetCustomLoginTextsRequest,
+  GetDefaultLoginTextsRequest,
+  SetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -23,6 +23,8 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
+
+const MIN_INTERVAL_SECONDS = 10; // if the difference of a newer version to the current exceeds this time, a refresh button is shown.
 
 /* eslint-disable */
 const KeyNamesArray = [
@@ -120,6 +122,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     locale: new UntypedFormControl('en'),
   });
 
+  public isDefault: boolean = false;
+
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
       ? 'iam.policy.write'
@@ -138,7 +142,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
       .subscribe((pair) => {
         this.checkForUnsaved(pair[0].currentSubMap).then((wantsToSave) => {
           if (wantsToSave) {
-            this.saveCurrentMessage()
+            this.saveCurrentTexts()
               .then(() => {
                 this.loadData();
               })
@@ -200,7 +204,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     return (this.service as ManagementService).getCustomLoginTexts(req).then((res) => {
       if (res.customText) {
         this.currentPolicyChangeDate = res.customText.details?.changeDate;
-        // delete res.customText.details;
         return Object.assign({}, res.customText);
       } else {
         return {};
@@ -219,6 +222,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
       .then((policy) => {
         this.loading = false;
         if (policy) {
+          this.isDefault = policy.isDefault ?? false;
+
           this.totalCustomPolicy = policy;
           this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
         }
@@ -280,7 +285,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public saveCurrentMessage(): Promise<any> {
+  public saveCurrentTexts(): Promise<any> {
     const entirePayload = this.updateRequest.toObject();
     this.getCustomInitMessageTextMap$.next((entirePayload as any)[this.currentSubMap]);
 
@@ -289,6 +294,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
         return (this.service as ManagementService)
           .setCustomLoginText(this.updateRequest)
           .then(() => {
+            this.updateCurrentPolicyDate();
+            this.isDefault = false;
             this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
             setTimeout(() => {
               this.patchSingleCurrentMap();
@@ -299,9 +306,30 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
         return (this.service as AdminService)
           .setCustomLoginText(this.updateRequest)
           .then(() => {
+            this.updateCurrentPolicyDate();
+            this.isDefault = false;
             this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
           })
           .catch((error) => this.toast.showError(error));
+    }
+  }
+
+  private updateCurrentPolicyDate(): void {
+    const ts = new Timestamp();
+    const milliseconds = new Date().getTime();
+    const seconds = Math.abs(milliseconds / 1000);
+    const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;
+    ts.setSeconds(seconds);
+    ts.setNanos(nanos);
+
+    if (this.currentPolicyChangeDate) {
+      const oldDate = new Date(
+        this.currentPolicyChangeDate.seconds * 1000 + this.currentPolicyChangeDate.nanos / 1000 / 1000,
+      );
+      const newDate = ts.toDate();
+      if (newDate.getTime() > oldDate.getTime()) {
+        this.currentPolicyChangeDate = ts.toObject();
+      }
     }
   }
 
@@ -323,6 +351,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
           (this.service as ManagementService)
             .resetCustomLoginTextToDefault(this.locale)
             .then(() => {
+              this.updateCurrentPolicyDate();
+              this.isDefault = true;
               setTimeout(() => {
                 this.loadData();
               }, 1000);
@@ -334,6 +364,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
           (this.service as AdminService)
             .resetCustomLoginTextToDefault(this.locale)
             .then(() => {
+              this.updateCurrentPolicyDate();
               setTimeout(() => {
                 this.loadData();
               }, 1000);
@@ -359,7 +390,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     if (this.newerPolicyChangeDate && this.currentPolicyChangeDate) {
       const ms = toDate(this.newerPolicyChangeDate).getTime() - toDate(this.currentPolicyChangeDate).getTime();
       // show button if changes are newer than 10s
-      return ms / 1000 > 10;
+      return ms / 1000 > MIN_INTERVAL_SECONDS;
     } else {
       return false;
     }
