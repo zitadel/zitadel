@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, forkJoin, from, merge, Observable, of, Subject } from 'rxjs';
 import {
   catchError,
   distinctUntilChanged,
   filter,
   finalize,
   map,
+  mergeAll,
   mergeMap,
   switchMap,
   take,
   tap,
   timeout,
+  withLatestFrom,
 } from 'rxjs/operators';
 
 import {
@@ -128,14 +130,14 @@ export class GrpcAuthService {
         }),
         tap(console.log),
         finalize(() => {
-          this.fetchedZitadelPermissions.next();
-          console.log('trigger');
+          this.fetchedZitadelPermissions.next(true);
+          console.log('loaded');
         }),
       ),
     ),
   );
-  private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
-  public readonly fetchedZitadelPermissions: Subject<void> = new Subject();
+  private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private cachedOrgs: Org.AsObject[] = [];
 
@@ -145,6 +147,9 @@ export class GrpcAuthService {
     private storage: StorageService,
   ) {
     this.zitadelPermissions$.subscribe(this.zitadelPermissions);
+
+    this.zitadelPermissions.subscribe((p) => console.log('permissions', p.length));
+    this.fetchedZitadelPermissions.subscribe((p) => console.log('loaded', p));
 
     this.user = merge(
       of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
@@ -255,6 +260,7 @@ export class GrpcAuthService {
   }
 
   private loadPermissions(): void {
+    console.log('trigger');
     this.triggerPermissionsRefresh.next();
   }
 
@@ -263,13 +269,14 @@ export class GrpcAuthService {
    * @param roles roles of the user
    */
   public isAllowed(roles: string[] | RegExp[], requiresAll: boolean = false): Observable<boolean> {
-    console.log('isallowed', roles, requiresAll);
     if (roles && roles.length > 0) {
       return this.fetchedZitadelPermissions.pipe(
-        switchMap((_) => this.zitadelPermissions),
-        map((zroles) => {
+        withLatestFrom(this.zitadelPermissions),
+        filter(([hL, p]) => {
+          return hL === true && !!p.length;
+        }),
+        map(([hL, zroles]) => {
           const what = this.hasRoles(zroles, roles, requiresAll);
-          console.log(roles, zroles.length, what);
           return what;
         }),
         distinctUntilChanged(),
