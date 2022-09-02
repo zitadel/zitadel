@@ -10,12 +10,6 @@ import (
 	"github.com/zitadel/logging"
 )
 
-var (
-	searchUser = "SELECT username FROM [show roles] WHERE username = $1"
-	//go:embed sql/01_user.sql
-	createUserStmt string
-)
-
 func newUser() *cobra.Command {
 	return &cobra.Command{
 		Use:   "user",
@@ -42,9 +36,11 @@ The user provided by flags needs priviledge to
 func VerifyUser(username, password string) func(*sql.DB) error {
 	return func(db *sql.DB) error {
 		logging.WithFields("username", username).Info("verify user")
-		return verify(db,
-			exists(searchUser, username),
-			exec(fmt.Sprintf(createUserStmt, username), &sql.NullString{String: password, Valid: password != ""}),
-		)
+
+		if password != "" {
+			createUserStmt += " WITH PASSWORD '" + password + "'"
+		}
+
+		return exec(db, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
 	}
 }

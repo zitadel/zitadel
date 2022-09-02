@@ -3,6 +3,7 @@ package query
 import (
 	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 
 	sq "github.com/Masterminds/squirrel"
@@ -52,7 +53,7 @@ type Member struct {
 	ResourceOwner string
 
 	UserID             string
-	Roles              []string
+	Roles              database.StringArray
 	PreferredLoginName string
 	Email              string
 	FirstName          string

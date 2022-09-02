@@ -1,21 +1,12 @@
 <cnsl-refresh-table
-  [loading]="dataSource?.loading$ | async"
+  [loading]="dataSource.loading$ | async"
   (refreshed)="changePage()"
   [hideRefresh]="true"
   [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
-  [timestamp]="dataSource?.viewTimestamp"
-  [dataSize]="dataSource?.totalResult ?? 0"
+  [timestamp]="dataSource.viewTimestamp"
+  [dataSize]="dataSource.totalResult"
   [selection]="selection"
 >
-  <!-- <div leftActions class="user-grants-table-left-actions">
-    <button class="user-grant-type-button" [ngClass]="{'active': type === undefined}"
-      (click)="setType(undefined)">{{'PROJECT.GRANT.ALL' | translate}}</button>
-    <button class="user-grant-type-button" [ngClass]="{'active': type === Type.TYPE_HUMAN}"
-      (click)="setType(Type.TYPE_HUMAN)">{{'USER.TABLE.TYPES.HUMAN' | translate}}</button>
-    <button class="user-grant-type-button" [ngClass]="{'active': type === Type.TYPE_MACHINE}"
-      (click)="setType(Type.TYPE_MACHINE)">{{'USER.TABLE.TYPES.MACHINE' | translate}}</button>
-  </div> -->
-
   <button
     color="warn"
     matTooltip="{{ 'GRANTS.DELETE' | translate }}"
@@ -193,7 +184,7 @@
   <cnsl-paginator
     class="paginator"
     #paginator
-    [timestamp]="dataSource?.viewTimestamp"
+    [timestamp]="dataSource.viewTimestamp"
     [length]="dataSource.totalResult"
     [pageSize]="INITIAL_PAGE_SIZE"
     [length]="dataSource.totalResult"

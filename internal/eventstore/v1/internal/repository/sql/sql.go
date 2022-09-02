@@ -3,9 +3,6 @@ package sql
 import (
 	"context"
 	"database/sql"
-
-	//sql import
-	_ "github.com/lib/pq"
 )
 
 type SQL struct {

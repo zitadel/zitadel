@@ -18,7 +18,7 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./instance.component.scss'],
 })
 export class InstanceComponent {
-  public instance!: InstanceDetail.AsObject;
+  public instance?: InstanceDetail.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();

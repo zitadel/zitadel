@@ -9,22 +9,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 var (
 	personalAccessTokenStmt = regexp.QuoteMeta(
-		"SELECT projections.personal_access_tokens.id," +
-			" projections.personal_access_tokens.creation_date," +
-			" projections.personal_access_tokens.change_date," +
-			" projections.personal_access_tokens.resource_owner," +
-			" projections.personal_access_tokens.sequence," +
-			" projections.personal_access_tokens.user_id," +
-			" projections.personal_access_tokens.expiration," +
-			" projections.personal_access_tokens.scopes" +
-			" FROM projections.personal_access_tokens")
+		"SELECT projections.personal_access_tokens2.id," +
+			" projections.personal_access_tokens2.creation_date," +
+			" projections.personal_access_tokens2.change_date," +
+			" projections.personal_access_tokens2.resource_owner," +
+			" projections.personal_access_tokens2.sequence," +
+			" projections.personal_access_tokens2.user_id," +
+			" projections.personal_access_tokens2.expiration," +
+			" projections.personal_access_tokens2.scopes" +
+			" FROM projections.personal_access_tokens2")
 	personalAccessTokenCols = []string{
 		"id",
 		"creation_date",
@@ -36,16 +35,16 @@ var (
 		"scopes",
 	}
 	personalAccessTokensStmt = regexp.QuoteMeta(
-		"SELECT projections.personal_access_tokens.id," +
-			" projections.personal_access_tokens.creation_date," +
-			" projections.personal_access_tokens.change_date," +
-			" projections.personal_access_tokens.resource_owner," +
-			" projections.personal_access_tokens.sequence," +
-			" projections.personal_access_tokens.user_id," +
-			" projections.personal_access_tokens.expiration," +
-			" projections.personal_access_tokens.scopes," +
+		"SELECT projections.personal_access_tokens2.id," +
+			" projections.personal_access_tokens2.creation_date," +
+			" projections.personal_access_tokens2.change_date," +
+			" projections.personal_access_tokens2.resource_owner," +
+			" projections.personal_access_tokens2.sequence," +
+			" projections.personal_access_tokens2.user_id," +
+			" projections.personal_access_tokens2.expiration," +
+			" projections.personal_access_tokens2.scopes," +
 			" COUNT(*) OVER ()" +
-			" FROM projections.personal_access_tokens")
+			" FROM projections.personal_access_tokens2")
 	personalAccessTokensCols = []string{
 		"id",
 		"creation_date",
@@ -103,7 +102,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						uint64(20211202),
 						"user-id",
 						time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						pq.StringArray{"openid"},
+						database.StringArray{"openid"},
 					},
 				),
 			},
@@ -115,7 +114,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 				Sequence:      20211202,
 				UserID:        "user-id",
 				Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-				Scopes:        []string{"openid"},
+				Scopes:        database.StringArray{"openid"},
 			},
 		},
 		{
@@ -163,7 +162,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							pq.StringArray{"openid"},
+							database.StringArray{"openid"},
 						},
 					},
 				),
@@ -181,7 +180,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        []string{"openid"},
+						Scopes:        database.StringArray{"openid"},
 					},
 				},
 			},
@@ -202,7 +201,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							pq.StringArray{"openid"},
+							database.StringArray{"openid"},
 						},
 						{
 							"token-id2",
@@ -212,7 +211,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							pq.StringArray{"openid"},
+							database.StringArray{"openid"},
 						},
 					},
 				),
@@ -230,7 +229,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        []string{"openid"},
+						Scopes:        database.StringArray{"openid"},
 					},
 					{
 						ID:            "token-id2",
@@ -240,7 +239,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        []string{"openid"},
+						Scopes:        database.StringArray{"openid"},
 					},
 				},
 			},

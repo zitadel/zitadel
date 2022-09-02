@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 
@@ -133,7 +132,6 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 
 			for rows.Next() {
 				member := new(Member)
-				roles := pq.StringArray{}
 
 				var (
 					preferredLoginName = sql.NullString{}
@@ -151,7 +149,7 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 					&member.Sequence,
 					&member.ResourceOwner,
 					&member.UserID,
-					&roles,
+					&member.Roles,
 					&preferredLoginName,
 					&email,
 					&firstName,
@@ -167,7 +165,6 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 					return nil, err
 				}
 
-				member.Roles = roles
 				member.PreferredLoginName = preferredLoginName.String
 				member.Email = email.String
 				member.FirstName = firstName.String
