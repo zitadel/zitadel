@@ -17,7 +17,7 @@ func newUser() *cobra.Command {
 		Long: `Sets up the ZITADEL database user.
 
 Prereqesits:
-- cockroachdb
+- cockroachDB or postreSQL
 
 The user provided by flags needs priviledge to 
 - create the database if it does not exist
