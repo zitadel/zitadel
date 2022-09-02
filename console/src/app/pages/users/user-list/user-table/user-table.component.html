@@ -52,12 +52,12 @@
       (filterOpen)="filterOpen = $event"
     ></cnsl-filter-user>
     <a
-      *ngIf="!selection.hasValue()"
       [routerLink]="['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine']"
       color="primary"
       mat-raised-button
       [disabled]="!canWrite"
       class="cnsl-action-button"
+      *ngIf="!selection.hasValue()"
       data-e2e="create-user-button"
     >
       <mat-icon class="icon">add</mat-icon>
