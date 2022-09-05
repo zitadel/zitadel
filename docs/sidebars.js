@@ -107,6 +107,13 @@ module.exports = {
             "guides/manage/customize/behavior",
             "guides/manage/customize/user-metadata",
           ]
+        },
+        {
+          type: 'category',
+          label: 'Terraform',
+          items: [
+            "guides/manage/terraform/basics",
+          ]
         }
       ],
     },
