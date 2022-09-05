@@ -12,8 +12,6 @@ export class RoleGuard implements CanActivate {
   constructor(private authService: GrpcAuthService) {}
 
   public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    return this.authService.fetchedZitadelPermissions
-      .pipe(filter((permissionsFetched) => !!permissionsFetched))
-      .pipe(switchMap((_) => this.authService.isAllowed(route.data['roles'], route.data['requiresAll'])));
+    return this.authService.isAllowed(route.data['roles'], route.data['requiresAll']);
   }
 }

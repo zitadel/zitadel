@@ -57,7 +57,10 @@
 </cnsl-top-view>
 
 <div class="max-width-container">
-  <div class="compliance" *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
+  <div
+    class="compliance"
+    *ngIf="app && app.oidcConfig && app.oidcConfig.complianceProblemsList && app.oidcConfig.complianceProblemsList?.length"
+  >
     <h2 class="compliance-title">{{ 'APP.COMPLIANCE' | translate }}</h2>
     <cnsl-info-section class="problem" [type]="InfoSectionType.ALERT">
       <ul style="margin: 0">
@@ -409,7 +412,7 @@
 
         <ng-container *ngIf="currentSetting === 'configuration'">
           <cnsl-card
-            *ngIf="initialAuthMethod === 'PK_JWT' && projectId && app?.id"
+            *ngIf="initialAuthMethod === 'PK_JWT' && projectId && app && app.id"
             title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
             description="{{ 'USER.MACHINE.KEYSDESC' | translate }}"
           >

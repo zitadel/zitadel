@@ -48,7 +48,7 @@ const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
   styleUrls: ['./app-create.component.scss'],
 })
 export class AppCreateComponent implements OnInit, OnDestroy {
-  private subscription?: Subscription;
+  private subscription: Subscription = new Subscription();
   private destroyed$: Subject<void> = new Subject();
   public devmode: boolean = false;
   public projectId: string = '';

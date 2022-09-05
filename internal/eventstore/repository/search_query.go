@@ -85,6 +85,8 @@ const (
 	FieldEventType
 	//FieldEventData represents the event data field
 	FieldEventData
+	//FieldCreationDate represents the creation date field
+	FieldCreationDate
 
 	fieldCount
 )

@@ -3,12 +3,14 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } fro
 import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs';
 import {
-    AddSMSProviderTwilioRequest,
-    AddSMTPConfigRequest,
-    UpdateSMSProviderTwilioRequest,
-    UpdateSMTPConfigPasswordRequest,
-    UpdateSMTPConfigPasswordResponse,
-    UpdateSMTPConfigRequest,
+  AddSMSProviderTwilioRequest,
+  AddSMTPConfigRequest,
+  AddSMTPConfigResponse,
+  UpdateSMSProviderTwilioRequest,
+  UpdateSMTPConfigPasswordRequest,
+  UpdateSMTPConfigPasswordResponse,
+  UpdateSMTPConfigRequest,
+  UpdateSMTPConfigResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { DebugNotificationProvider, SMSProvider, SMSProviderConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -134,7 +136,7 @@ export class NotificationSettingsComponent implements OnInit {
       });
   }
 
-  private updateData(): Promise<UpdateSMTPConfigPasswordResponse.AsObject> | any {
+  private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
     if (this.hasSMTPConfig) {
       const req = new UpdateSMTPConfigRequest();
       req.setHost(this.host?.value ?? '');
@@ -143,9 +145,7 @@ export class NotificationSettingsComponent implements OnInit {
       req.setTls(this.tls?.value ?? false);
       req.setUser(this.user?.value ?? '');
 
-      return this.service.updateSMTPConfig(req).catch((error) => {
-        this.toast.showError(error);
-      });
+      return this.service.updateSMTPConfig(req);
     } else {
       const req = new AddSMTPConfigRequest();
       req.setHost(this.host?.value ?? '');
@@ -154,26 +154,21 @@ export class NotificationSettingsComponent implements OnInit {
       req.setTls(this.tls?.value ?? false);
       req.setUser(this.user?.value ?? '');
 
-      return this.service.addSMTPConfig(req).catch((error) => {
-        this.toast.showError(error);
-      });
+      return this.service.addSMTPConfig(req);
     }
   }
 
   public savePolicy(): void {
-    const prom = this.updateData();
-    if (prom) {
-      prom
-        .then(() => {
-          this.toast.showInfo('SETTING.SMTP.SAVED', true);
-          setTimeout(() => {
-            this.fetchData();
-          }, 2000);
-        })
-        .catch((error: unknown) => {
-          this.toast.showError(error);
-        });
-    }
+    this.updateData()
+      .then(() => {
+        this.toast.showInfo('SETTING.SMTP.SAVED', true);
+        setTimeout(() => {
+          this.fetchData();
+        }, 2000);
+      })
+      .catch((error: unknown) => {
+        this.toast.showError(error);
+      });
   }
 
   public editSMSProvider(): void {

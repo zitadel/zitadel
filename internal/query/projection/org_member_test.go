@@ -3,8 +3,7 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -44,10 +43,10 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_members2 (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
-								pq.StringArray{"role"},
+								database.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -81,9 +80,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (org_id = $5)",
+							expectedStmt: "UPDATE projections.org_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (org_id = $5)",
 							expectedArgs: []interface{}{
-								pq.StringArray{"role", "changed"},
+								database.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
 								"user-id",
@@ -114,7 +113,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members WHERE (user_id = $1) AND (org_id = $2)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1) AND (org_id = $2)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"agg-id",
@@ -144,7 +143,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members WHERE (user_id = $1) AND (org_id = $2)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1) AND (org_id = $2)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"agg-id",
@@ -172,7 +171,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -199,7 +198,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (org_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

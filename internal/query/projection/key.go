@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	KeyProjectionTable = "projections.keys"
+	KeyProjectionTable = "projections.keys2"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 	CertificateTable   = KeyProjectionTable + "_" + certificateTableSuffix
@@ -67,8 +67,8 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
-			crdb.NewPrimaryKey(KeyColumnID, KeyColumnInstanceID),
-			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{KeyColumnID})),
+			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
+			crdb.WithConstraint(crdb.NewConstraint("key_id_unique", []string{KeyColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText),
@@ -76,7 +76,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
 		},
-			crdb.NewPrimaryKey(KeyPrivateColumnID, KeyPrivateColumnInstanceID),
+			crdb.NewPrimaryKey(KeyPrivateColumnInstanceID, KeyPrivateColumnID),
 			privateKeyTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_private_ref_keys")),
 		),
@@ -86,7 +86,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
 		},
-			crdb.NewPrimaryKey(KeyPublicColumnID, KeyPublicColumnInstanceID),
+			crdb.NewPrimaryKey(KeyPublicColumnInstanceID, KeyPublicColumnID),
 			publicKeyTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_public_ref_keys")),
 		),

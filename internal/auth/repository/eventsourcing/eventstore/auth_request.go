@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -628,6 +629,7 @@ func (repo *AuthRequestRepo) tryUsingOnlyUserSession(request *domain.AuthRequest
 
 func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginName string) (err error) {
 	var user *user_view_model.UserView
+	loginName = strings.TrimSpace(loginName)
 	preferredLoginName := loginName
 	if request.RequestedOrgID != "" {
 		if request.RequestedOrgID != "" {
@@ -662,7 +664,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	return nil
 }
 
-func (repo AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) error {
+func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) error {
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, user.ResourceOwner)
 	if err != nil {
 		return err

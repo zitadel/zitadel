@@ -1,4 +1,6 @@
-CREATE TABLE eventstore.events (
+SET experimental_enable_hash_sharded_indexes = on;
+
+CREATE TABLE IF NOT EXISTS eventstore.events (
 	id UUID DEFAULT gen_random_uuid()
 	, event_type TEXT NOT NULL
 	, aggregate_type TEXT NOT NULL
@@ -22,4 +24,4 @@ CREATE TABLE eventstore.events (
 	, INDEX max_sequence (aggregate_type, aggregate_id, event_sequence DESC, instance_id)
 	, CONSTRAINT previous_sequence_unique UNIQUE (previous_aggregate_sequence DESC, instance_id)
 	, CONSTRAINT prev_agg_type_seq_unique UNIQUE(previous_aggregate_type_sequence, instance_id)
-)
+);

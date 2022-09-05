@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -37,25 +37,25 @@ type ApplicationView struct {
 	HasProjectCheck        bool                          `json:"hasProjectCheck" gorm:"column:has_project_check"`
 	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting" gorm:"column:private_labeling_setting"`
 
-	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
-	OIDCVersion                int32          `json:"oidcVersion" gorm:"column:oidc_version"`
-	OIDCClientID               string         `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCRedirectUris           pq.StringArray `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
-	OIDCResponseTypes          pq.Int64Array  `json:"responseTypes" gorm:"column:oidc_response_types"`
-	OIDCGrantTypes             pq.Int64Array  `json:"grantTypes" gorm:"column:oidc_grant_types"`
-	OIDCApplicationType        int32          `json:"applicationType" gorm:"column:oidc_application_type"`
-	OIDCAuthMethodType         int32          `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
-	OIDCPostLogoutRedirectUris pq.StringArray `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
-	NoneCompliant              bool           `json:"-" gorm:"column:none_compliant"`
-	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
-	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
-	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
-	AdditionalOrigins          pq.StringArray `json:"additionalOrigins" gorm:"column:additional_origins"`
-	AccessTokenType            int32          `json:"accessTokenType" gorm:"column:access_token_type"`
-	AccessTokenRoleAssertion   bool           `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
-	IDTokenRoleAssertion       bool           `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
-	IDTokenUserinfoAssertion   bool           `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
-	ClockSkew                  time.Duration  `json:"clockSkew" gorm:"column:clock_skew"`
+	IsOIDC                     bool                                        `json:"-" gorm:"column:is_oidc"`
+	OIDCVersion                int32                                       `json:"oidcVersion" gorm:"column:oidc_version"`
+	OIDCClientID               string                                      `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCRedirectUris           database.StringArray                        `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
+	OIDCResponseTypes          database.EnumArray[domain.OIDCResponseType] `json:"responseTypes" gorm:"column:oidc_response_types"`
+	OIDCGrantTypes             database.EnumArray[domain.OIDCGrantType]    `json:"grantTypes" gorm:"column:oidc_grant_types"`
+	OIDCApplicationType        int32                                       `json:"applicationType" gorm:"column:oidc_application_type"`
+	OIDCAuthMethodType         int32                                       `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
+	OIDCPostLogoutRedirectUris database.StringArray                        `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
+	NoneCompliant              bool                                        `json:"-" gorm:"column:none_compliant"`
+	ComplianceProblems         database.StringArray                        `json:"-" gorm:"column:compliance_problems"`
+	DevMode                    bool                                        `json:"devMode" gorm:"column:dev_mode"`
+	OriginAllowList            database.StringArray                        `json:"-" gorm:"column:origin_allow_list"`
+	AdditionalOrigins          database.StringArray                        `json:"additionalOrigins" gorm:"column:additional_origins"`
+	AccessTokenType            int32                                       `json:"accessTokenType" gorm:"column:access_token_type"`
+	AccessTokenRoleAssertion   bool                                        `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
+	IDTokenRoleAssertion       bool                                        `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
+	IDTokenUserinfoAssertion   bool                                        `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
+	ClockSkew                  time.Duration                               `json:"clockSkew" gorm:"column:clock_skew"`
 
 	IsSAML      bool   `json:"-" gorm:"column:is_saml"`
 	Metadata    []byte `json:"metadata" gorm:"column:metadata"`
@@ -64,7 +64,7 @@ type ApplicationView struct {
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
 
-func OIDCResponseTypesToModel(oidctypes []int64) []model.OIDCResponseType {
+func OIDCResponseTypesToModel(oidctypes []domain.OIDCResponseType) []model.OIDCResponseType {
 	result := make([]model.OIDCResponseType, len(oidctypes))
 	for i, t := range oidctypes {
 		result[i] = model.OIDCResponseType(t)
@@ -72,7 +72,7 @@ func OIDCResponseTypesToModel(oidctypes []int64) []model.OIDCResponseType {
 	return result
 }
 
-func OIDCGrantTypesToModel(granttypes []int64) []model.OIDCGrantType {
+func OIDCGrantTypesToModel(granttypes []domain.OIDCGrantType) []model.OIDCGrantType {
 	result := make([]model.OIDCGrantType, len(granttypes))
 	for i, t := range granttypes {
 		result[i] = model.OIDCGrantType(t)
@@ -180,7 +180,7 @@ func (a *ApplicationView) SetData(event *models.Event) error {
 }
 
 func (a *ApplicationView) setOriginAllowList() error {
-	allowList := make([]string, 0)
+	allowList := make(database.StringArray, 0)
 	for _, redirect := range a.OIDCRedirectUris {
 		origin, err := http_util.GetOriginFromURLString(redirect)
 		if err != nil {

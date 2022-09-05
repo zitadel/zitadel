@@ -18,6 +18,15 @@ const routes: Routes = [
     loadChildren: () => import('./pages/signedout/signedout.module').then((m) => m.SignedoutModule),
   },
   {
+    path: 'orgs/create',
+    component: OrgCreateComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['(org.create)?(iam.write)?'],
+    },
+    loadChildren: () => import('./pages/org-create/org-create.module').then((m) => m.OrgCreateModule),
+  },
+  {
     path: 'orgs',
     loadChildren: () => import('./pages/org-list/org-list.module').then((m) => m.OrgListModule),
     canActivate: [AuthGuard],
@@ -51,15 +60,6 @@ const routes: Routes = [
     data: {
       roles: ['iam.read', 'iam.write'],
     },
-  },
-  {
-    path: 'org/create',
-    component: OrgCreateComponent,
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['(org.create)?(iam.write)?'],
-    },
-    loadChildren: () => import('./pages/org-create/org-create.module').then((m) => m.OrgCreateModule),
   },
   {
     path: 'org',

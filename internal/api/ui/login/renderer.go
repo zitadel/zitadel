@@ -19,6 +19,7 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/templates"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/renderer"
 	"github.com/zitadel/zitadel/internal/static"
 )
@@ -519,8 +520,27 @@ func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []
 			Text: text.Text,
 		}
 		err := l.renderer.AddMessages(translator, text.Language, msg)
-		logging.Log("HANDLE-GD3g2").OnError(err).Warn("could no add message to translator")
+		logging.OnError(err).Warn("could no add message to translator")
 	}
+}
+
+func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, orgID string) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, instanceID, domain.LoginCustomText)
+	if err != nil {
+		logging.WithFields("instanceID", instanceID).Warn("unable to load custom texts for instance")
+		return
+	}
+	l.addLoginTranslations(translator, query.CustomTextsToDomain(instanceTexts))
+	if orgID == "" {
+		return
+	}
+	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText)
+	if err != nil {
+		logging.WithFields("instanceID", instanceID, "org", orgID).Warn("unable to load custom texts for org")
+		return
+	}
+	l.addLoginTranslations(translator, query.CustomTextsToDomain(orgTexts))
 }
 
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {

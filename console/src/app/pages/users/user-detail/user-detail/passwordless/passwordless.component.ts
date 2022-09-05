@@ -32,7 +32,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatTable) public table!: MatTable<WebAuthNToken.AsObject>;
   @ViewChild(MatSort) public sort!: MatSort;
-  public dataSource!: MatTableDataSource<WebAuthNToken.AsObject>;
+  public dataSource: MatTableDataSource<WebAuthNToken.AsObject> = new MatTableDataSource<WebAuthNToken.AsObject>([]);
 
   public AuthFactorState: any = AuthFactorState;
   public error: string = '';
@@ -89,7 +89,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
     this.service
       .sendPasswordlessRegistration(this.user.id)
       .then(() => {
-        this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT');
+        this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT', true);
       })
       .catch((error) => {
         this.toast.showError(error);

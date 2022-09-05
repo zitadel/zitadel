@@ -3,8 +3,7 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,7 +13,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps"
+	AppProjectionTable = "projections.apps2"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
@@ -84,9 +83,9 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(AppColumnID, AppColumnInstanceID),
-			crdb.WithIndex(crdb.NewIndex("project_id_idx", []string{AppColumnProjectID})),
-			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{AppColumnID})),
+			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
+			crdb.WithIndex(crdb.NewIndex("app_project_id_idx", []string{AppColumnProjectID})),
+			crdb.WithConstraint(crdb.NewConstraint("app_id_unique", []string{AppColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText),
@@ -95,15 +94,15 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(AppAPIConfigColumnAppID, AppAPIConfigColumnInstanceID),
+			crdb.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
 			appAPITableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps")),
-			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID})),
+			crdb.WithIndex(crdb.NewIndex("api_client_id_idx", []string{AppAPIConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
@@ -120,10 +119,10 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID, AppOIDCConfigColumnInstanceID),
+			crdb.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_apps")),
-			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppOIDCConfigColumnClientID})),
+			crdb.WithIndex(crdb.NewIndex("oidc_client_id_idx", []string{AppOIDCConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
@@ -429,19 +428,19 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
-				handler.NewCol(AppOIDCConfigColumnRedirectUris, pq.StringArray(e.RedirectUris)),
-				handler.NewCol(AppOIDCConfigColumnResponseTypes, pq.Array(e.ResponseTypes)),
-				handler.NewCol(AppOIDCConfigColumnGrantTypes, pq.Array(e.GrantTypes)),
+				handler.NewCol(AppOIDCConfigColumnRedirectUris, database.StringArray(e.RedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.EnumArray[domain.OIDCResponseType](e.ResponseTypes)),
+				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.EnumArray[domain.OIDCGrantType](e.GrantTypes)),
 				handler.NewCol(AppOIDCConfigColumnApplicationType, e.ApplicationType),
 				handler.NewCol(AppOIDCConfigColumnAuthMethodType, e.AuthMethodType),
-				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(e.PostLogoutRedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.StringArray(e.PostLogoutRedirectUris)),
 				handler.NewCol(AppOIDCConfigColumnDevMode, e.DevMode),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenType, e.AccessTokenType),
 				handler.NewCol(AppOIDCConfigColumnAccessTokenRoleAssertion, e.AccessTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenRoleAssertion, e.IDTokenRoleAssertion),
 				handler.NewCol(AppOIDCConfigColumnIDTokenUserinfoAssertion, e.IDTokenUserinfoAssertion),
 				handler.NewCol(AppOIDCConfigColumnClockSkew, e.ClockSkew),
-				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, pq.StringArray(e.AdditionalOrigins)),
+				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(e.AdditionalOrigins)),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -469,13 +468,13 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnVersion, *e.Version))
 	}
 	if e.RedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, pq.StringArray(*e.RedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, database.StringArray(*e.RedirectUris)))
 	}
 	if e.ResponseTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, pq.Array(*e.ResponseTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, database.EnumArray[domain.OIDCResponseType](*e.ResponseTypes)))
 	}
 	if e.GrantTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, pq.Array(*e.GrantTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, database.EnumArray[domain.OIDCGrantType](*e.GrantTypes)))
 	}
 	if e.ApplicationType != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnApplicationType, *e.ApplicationType))
@@ -484,7 +483,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAuthMethodType, *e.AuthMethodType))
 	}
 	if e.PostLogoutRedirectUris != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(*e.PostLogoutRedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.StringArray(*e.PostLogoutRedirectUris)))
 	}
 	if e.DevMode != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnDevMode, *e.DevMode))
@@ -505,7 +504,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnClockSkew, *e.ClockSkew))
 	}
 	if e.AdditionalOrigins != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, pq.StringArray(*e.AdditionalOrigins)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.StringArray(*e.AdditionalOrigins)))
 	}
 
 	if len(cols) == 0 {

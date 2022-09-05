@@ -6,6 +6,8 @@ import (
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
+	_ "github.com/zitadel/zitadel/internal/database/postgres"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type Config struct {
@@ -17,23 +19,6 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 	c.connector = connector
 }
 
-type User struct {
-	Username string
-	Password string
-	SSL      SSL
-}
-
-type SSL struct {
-	// type of connection security
-	Mode string
-	// RootCert Path to the CA certificate
-	RootCert string
-	// Cert Path to the client certificate
-	Cert string
-	// Key Path to the client private key
-	Key string
-}
-
 func Connect(config Config, useAdmin bool) (*sql.DB, error) {
 	client, err := config.connector.Connect(useAdmin)
 	if err != nil {
@@ -41,7 +26,7 @@ func Connect(config Config, useAdmin bool) (*sql.DB, error) {
 	}
 
 	if err := client.Ping(); err != nil {
-		return nil, err
+		return nil, errors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
 
 	return client, nil

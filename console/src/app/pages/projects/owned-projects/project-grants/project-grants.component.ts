@@ -32,12 +32,12 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   @Input() public projectId: string = '';
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
-  public dataSource!: ProjectGrantsDataSource;
+  public dataSource: ProjectGrantsDataSource = new ProjectGrantsDataSource(this.mgmtService, this.toast);
   public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
   public memberRoleOptions: Role.AsObject[] = [];
   public displayedColumns: string[] = ['grantedOrgName', 'state', 'creationDate', 'changeDate', 'roleNamesList', 'actions'];
 
-  ProjectGrantState: any = ProjectGrantState;
+  public ProjectGrantState: any = ProjectGrantState;
 
   constructor(
     private mgmtService: ManagementService,
@@ -51,7 +51,6 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public ngOnInit(): void {
-    this.dataSource = new ProjectGrantsDataSource(this.mgmtService, this.toast);
     this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
     this.getRoleOptions(this.projectId);
   }

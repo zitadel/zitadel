@@ -57,7 +57,7 @@
     (typeRemoved)="removeFactor($event)"
     (typeAdded)="addFactor($event)"
     [disabled]="
-      loginData?.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
+      loginData.passwordlessType === PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED ||
       ([
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'

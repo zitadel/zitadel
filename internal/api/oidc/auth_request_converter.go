@@ -18,7 +18,9 @@ import (
 )
 
 const (
+	// DEPRECATED: use `amrPWD` instead
 	amrPassword     = "password"
+	amrPWD          = "pwd"
 	amrMFA          = "mfa"
 	amrOTP          = "otp"
 	amrUserPresence = "user"
@@ -40,7 +42,7 @@ func (a *AuthRequest) GetACR() string {
 func (a *AuthRequest) GetAMR() []string {
 	amr := make([]string, 0)
 	if a.PasswordVerified {
-		amr = append(amr, amrPassword)
+		amr = append(amr, amrPassword, amrPWD)
 	}
 	if len(a.MFAsVerified) > 0 {
 		amr = append(amr, amrMFA)

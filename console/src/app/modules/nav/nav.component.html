@@ -28,7 +28,7 @@
 
                 <a
                   class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: true }"
+                  [routerLinkActiveOptions]="{ exact: false }"
                   [routerLinkActive]="['active']"
                   [routerLink]="['/orgs']"
                 >
@@ -125,8 +125,8 @@
                         *ngIf="(mgmtService?.ownedProjectsCount | async) && (mgmtService?.grantedProjectsCount | async)"
                         class="count"
                         >({{
-                          ((mgmtService?.ownedProjectsCount | async) ?? 0) +
-                            ((mgmtService?.grantedProjectsCount | async) ?? 0)
+                          ((mgmtService.ownedProjectsCount | async) ?? 0) +
+                            ((mgmtService.grantedProjectsCount | async) ?? 0)
                         }})</small
                       >
                     </div>

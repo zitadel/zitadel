@@ -482,7 +482,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "La password deve essere lunga almeno {{valore}} caratteri.",
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
       "NOTEQUAL": "Le password fornite non corrispondono."
     },
     "ID": "ID",
@@ -540,12 +540,12 @@
       "INVALIDPATTERN": "La password non soddisfa le regole definite.",
       "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail",
       "REQUIRED": "Il campo di input \u00e8 vuoto.",
-      "MINLENGTH": "La password deve essere lunga almeno {{requiredLength}} caratteri.",
+      "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
       "NOEMAIL": "Il nome utente non pu\u00f2 essere un indirizzo e-mail.",
-      "UPPERCASEMISSING": "La password deve includere un carattere maiuscolo.",
-      "LOWERCASEMISSING": "La password deve includere un carattere minuscolo.",
-      "SYMBOLERROR": "La password deve includere un simbolo o un segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra."
+      "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
+      "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
+      "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra."
     },
     "STATE": {
       "0": "Sconosciuto",
@@ -664,6 +664,8 @@
       "3": "Post creazione"
     },
     "ADDTRIGGER": "Aggiungi trigger",
+    "FLOWCHANGED": "Il processo è stato modificato con successo.",
+    "FLOWCLEARED": "Il processo è stato eliminato con successo.",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
@@ -685,8 +687,8 @@
         "DELETE_SUCCESS": "Azione rimossa con successo."
       },
       "CLEAR": {
-        "TITLE": "Flow zurücksetzen?",
-        "DESCRIPTION": "Stai per cancellare un'azione. Questa azione non può essere annullata. Vuoi continuare?"
+        "TITLE": "Elimina processo",
+        "DESCRIPTION": "Stai per eliminare un processo. Questa azione non può essere annullata. Vuoi continuare?"
       }
     },
     "TOAST": {
@@ -976,9 +978,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Complessit\u00e0 della password",
       "DESCRIPTION": "Assicura che tutte le password impostate corrispondano a un modello specifico",
-      "SYMBOLANDNUMBERERROR": "La password deve essere composta da una cifra e un simbolo/segno di interpunzione.",
-      "SYMBOLERROR": "La password deve includere un simbolo/segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra.",
+      "SYMBOLANDNUMBERERROR": "Deve essere composta da una cifra e un simbolo/segno di interpunzione.",
+      "SYMBOLERROR": "Deve includere un simbolo/segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra.",
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
     "PRIVATELABELING": {
@@ -1003,6 +1005,7 @@
       "MAXSIZE": "La dimensione massima \u00e8 limitata a 524kB",
       "EMAILNOSVG": "Il formato di file SVG non \u00e8 supportato nelle email. Perci\u00f2 carica il tuo logo in PNG o in un altro formato supportato.",
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
+      "NOSVGSUPPORTED": "SVG non sono supportati",
       "FONTINLOGINONLY": "Il carattere \u00e8 attualmente visualizzato solo nell'interfaccia di accesso.",
       "VIEWS": {
         "PREVIEW": "Anteprima",
