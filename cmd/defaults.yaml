@@ -42,6 +42,21 @@ HTTP2HostHeader: ":authority"
 # Header name of HTTP1 calls from which the instance will be matched
 HTTP1HostHeader: "host"
 
+# ZITADEL will use the proxy config for outgoing HTTP(S) connections
+# for more see also https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config
+HTTPProxy:
+  # Proxy used for HTTP requests
+  HTTP: # e.g. http://proxy:8080
+  # Proxy used for HTTPS requests
+  HTTPS: # e.g. https://user:password@proxy:8443
+  # Hosts which will be excluded from proxying
+  # allowed values:
+  # - IP address prefix (1.2.3.4), also with port possible (1.2.3.4:80)
+  # - IP address prefix in CIDR notation (1.2.3.4/8)
+  # - domain name, also with port possible (domain.com:443)
+  # ...
+  NoProxy:
+
 WebAuthNName: ZITADEL
 
 Database:

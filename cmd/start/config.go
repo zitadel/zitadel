@@ -9,6 +9,7 @@ import (
 
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
@@ -35,6 +36,7 @@ type Config struct {
 	TLS               network.TLS
 	HTTP2HostHeader   string
 	HTTP1HostHeader   string
+	HTTPProxy         *http.ProxyConfig
 	WebAuthNName      string
 	Database          database.Config
 	Tracing           tracing.Config

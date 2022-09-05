@@ -118,6 +118,7 @@ func startZitadel(config *Config, masterKey string) error {
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
+	httpClient := http_util.ClientWithProxy(*config.HTTPProxy)
 	commands, err := command.StartCommands(
 		eventstoreClient,
 		config.SystemDefaults,
@@ -134,6 +135,7 @@ func startZitadel(config *Config, masterKey string) error {
 		keys.User,
 		keys.DomainVerification,
 		keys.OIDC,
+		httpClient,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
