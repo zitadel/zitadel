@@ -44,7 +44,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.keys2 (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.keys3 (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -57,7 +57,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys2_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys3_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -71,7 +71,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys2_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys3_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -119,7 +119,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.keys_certificate (id, instance_id, expiry, certificate) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys3_certificate (id, instance_id, expiry, certificate) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
