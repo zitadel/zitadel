@@ -1,33 +1,54 @@
 ---
-title: Use ZITADEL in Ping Identity as IDP
+title: Connect with Ping Identity through SAML
 ---
+
+This guide shows how to enable login with ZITADEL on Auth0.
+
+It covers how to:
+
+- create and configure the application in your project
+- create and configure the connection in your Auth0 tenant
+
+Prerequisites:
+
+- existing ZITADEL Instance, if not present follow [this guide](../../guides/start/quickstart)
+- existing ZITADEL Organization, if not present follow [this guide](../../guides/manage/console/organizations)
+- existing ZITADEL project, if not present follow the first 3 steps [here](../../guides/manage/console/projects)
+- existing Pingidentity environment [here](https://docs.pingidentity.com/bundle/pingone/page/wqe1564020490538.html)
+
+
+> We have to switch between ZITADEL and Ping Identity. If the headings begin with "ZITADEL" switch to the ZITADEL Console and
+> if the headings start with "Ping" please switch to the PingIdentity GUI.
+
+## **Ping**: Create a new external identity provider
 
 To add an additional [external identity provider](https://docs.pingidentity.com/bundle/pingone/page/jvz1567784210191.html), you
 can follow the instructions [here](https://docs.pingidentity.com/bundle/pingone/page/ovy1567784211297.html)
 
-As described you have to create a new provider, with a unique identifier:
-
-![Create IDP Profile](images/ping_create_idp_profile.png)
+1. As described you have to create a new provider, with a unique identifier:
+![Create IDP Profile](/img/saml/pingidentity/create_idp_profile.png)
 
 We recommend activating signing the auth request whenever possible:
+![Configure PingOne Connection](/img/saml/pingidentity/conf_connection.png)
 
-![Configure PingOne Connection](images/ping_conf_connection.png)
-
-Manually enter the necessary information:
+2. Manually enter the necessary information:
 
 - SSO Endpoint, for example https://accounts.example.com/saml/SSO
 - IDP EntityID, for example https://accounts.example.com/saml/metadata
 - Binding, which is a decision which you can take yourself, we recommend HTTP POST as it has fewer restrictions
 - Import certificate, provided from the certificate endpoint
-
-![Configure IDP Connection](images/ping_conf_idp_connection.png)
+![Configure IDP Connection](/img/saml/pingidentity/conf_idp_connection.png)
 
 Everything you need to know about the attribute mapping you can find
 in [Ping Identity's documentation](https://docs.pingidentity.com/bundle/pingone/page/pwv1567784207915.html)
 
-With this you have defined to connection to ZITADEL as an external IDP, next is the policy to use ZITADEL as an IDP to
+3. With this you have defined to connection to ZITADEL as an external IDP, next is the policy to use ZITADEL as an IDP to
 connect to an application. The "How to" for that can be
 found [here](https://docs.pingidentity.com/bundle/pingone/page/zqd1616600404402.html).
+
+## **ZITADEL**: Create the application
+
+WIP 
 
 To add the connection to ZITADEL you have to build the metadata, which should minimalistic look like this, the necessary information can be found on the External IDPs page under "P1Connection" and "IDP Configuration" :
 ```xml
@@ -41,5 +62,5 @@ ACSURL="ACS ENDPOINT"
 </md:EntityDescriptor>
 ```
 
-![Identity Providers P1 Connection](images/ping_idp_p1_connection.png)
-![Identity Providers IDP Configuration](images/ping_idp_idp_configuration.png)
+![Identity Providers P1 Connection](/img/saml/pingidentity/idp_p1_connection.png)
+![Identity Providers IDP Configuration](/img/saml/pingidentity/idp_idp_configuration.png)
