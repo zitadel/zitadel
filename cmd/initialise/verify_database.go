@@ -17,7 +17,7 @@ func newDatabase() *cobra.Command {
 		Long: `Sets up the ZITADEL database.
 
 Prereqesits:
-- cockroachdb
+- cockroachDB or postgreSQL
 
 The user provided by flags needs priviledge to 
 - create the database if it does not exist

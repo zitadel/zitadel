@@ -17,7 +17,7 @@ func newGrant() *cobra.Command {
 		Long: `Sets ALL grant to the database user.
 
 Prereqesits:
-- cockroachdb
+- cockroachDB or postgreSQL
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.New())

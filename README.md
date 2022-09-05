@@ -81,7 +81,7 @@ It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-
 - [Service Accounts](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
 - [OpenID Connect certified](https://openid.net/certification/#OPs)
 - 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
-- [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach)
+- [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
