@@ -260,6 +260,13 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			}
 			if strings.HasPrefix(scope, domain.OrgIDScope) {
 				userInfo.AppendClaims(domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+				resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+				if err != nil {
+					return err
+				}
+				for claim, value := range resourceOwnerClaims {
+					userInfo.AppendClaims(claim, value)
+				}
 			}
 		}
 	}
@@ -302,6 +309,16 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 			claims = appendClaim(claims, domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			claims = appendClaim(claims, domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			for claim, value := range resourceOwnerClaims {
+				claims = appendClaim(claims, claim, value)
+			}
 		}
 	}
 	if len(roles) == 0 || clientID == "" {
