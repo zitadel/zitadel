@@ -27,9 +27,6 @@ var _ provider.IdentityProviderStorage = &Storage{}
 var _ provider.AuthStorage = &Storage{}
 var _ provider.UserStorage = &Storage{}
 
-type StorageConfig struct {
-}
-
 type Storage struct {
 	certChan                   <-chan interface{}
 	defaultCertificateLifetime time.Duration

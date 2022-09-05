@@ -91,15 +91,15 @@ func (p *Storage) refreshCertificate(
 ) error {
 	ok, err := p.ensureIsLatestCertificate(ctx, sequence)
 	if err != nil {
-		logging.Log("SAML-sdz53").WithError(err).Error("could not ensure latest key")
+		logging.WithError(err).Error("could not ensure latest key")
 		return err
 	}
 	if !ok {
-		logging.Log("EVENT-GBD13").Warn("view not up to date, retrying later")
+		logging.Warn("view not up to date, retrying later")
 		return err
 	}
 	err = p.lockAndGenerateCertificateAndKey(ctx, usage, sequence)
-	logging.Log("EVENT-B3d21").OnError(err).Warn("could not create signing key")
+	logging.OnError(err).Warn("could not create signing key")
 	return nil
 }
 

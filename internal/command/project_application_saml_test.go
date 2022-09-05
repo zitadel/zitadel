@@ -139,7 +139,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
-			name: "create saml app basic, metadata not parsable",
+			name: "create saml app, metadata not parsable",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -172,7 +172,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 			},
 		},
 		{
-			name: "create saml app basic, ok",
+			name: "create saml app, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
