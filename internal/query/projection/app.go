@@ -125,16 +125,16 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.WithIndex(crdb.NewIndex("oidc_client_id_idx", []string{AppOIDCConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppSAMLConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppSAMLConfigColumnEntityID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppSAMLConfigColumnMetadata, crdb.ColumnTypeBytes),
 			crdb.NewColumn(AppSAMLConfigColumnMetadataURL, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(AppSAMLConfigColumnAppID, AppSAMLConfigColumnInstanceID),
+			crdb.NewPrimaryKey(AppSAMLConfigColumnInstanceID, AppSAMLConfigColumnAppID),
 			appSAMLTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_saml_ref_apps")),
-			crdb.WithIndex(crdb.NewIndex("entity_id_idx", []string{AppSAMLConfigColumnEntityID})),
+			crdb.WithIndex(crdb.NewIndex("saml_entity_id_idx", []string{AppSAMLConfigColumnEntityID})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
