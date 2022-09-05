@@ -2,7 +2,7 @@
   title="{{ app?.name }}"
   [hasActions]="isZitadel === false && (['project.app.write:' + projectId, 'project.app.write'] | hasRole | async)"
   docLink="https://docs.zitadel.com/docs/guides/basics/projects"
-  [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : (app?.apiConfig ? 'API' : 'SAML')"
+  [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : app?.apiConfig ? 'API' : 'SAML'"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE"
   [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
   stateTooltip="{{ 'APP.PAGES.DETAIL.STATE.' + app?.state | translate }}"
@@ -184,7 +184,7 @@
             <div
               class="saml-xml"
               [ngClass]="{ disabled: !!metadataUrl?.value }"
-              *ngIf="decodedBase64 && app.samlConfig && !app.samlConfig.metadataUrl"
+              *ngIf="decodedBase64 && app && app.samlConfig && !app.samlConfig.metadataUrl"
             >
               <ngx-codemirror
                 [(ngModel)]="decodedBase64"

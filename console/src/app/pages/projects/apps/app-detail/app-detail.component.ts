@@ -395,7 +395,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         reader.onload = ((aXML) => {
           return (e) => {
             const xmlBase64 = e.target?.result;
-            if (xmlBase64 && typeof xmlBase64 === 'string' && this.app.samlConfig) {
+            if (xmlBase64 && typeof xmlBase64 === 'string' && this.app?.samlConfig) {
               const samlConfig = new SAMLConfig();
               const cropped = xmlBase64.replace('data:text/xml;base64,', '');
               samlConfig.setMetadataXml(cropped);
@@ -620,7 +620,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public saveSAMLApp(): void {
-    if (this.samlForm.valid && this.app.samlConfig) {
+    if (this.samlForm.valid && this.app?.samlConfig) {
       const req = new UpdateSAMLAppConfigRequest();
       req.setProjectId(this.projectId);
       req.setAppId(this.app.id);
