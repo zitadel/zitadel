@@ -33,13 +33,13 @@ services:
     networks:
       - zitadel
 
-  npm-install:
+  prepare:
     image: node:18-alpine3.15
     working_dir: /e2e
     user: "$UID"
     volumes:
     - .:/e2e
-    command: "npm ci --omit=dev"
+    command: "npm ci --omit=dev && npx run wait-on http://localhost:8080"
 
   e2e:
     image: cypress/included:10.3.0
@@ -48,7 +48,7 @@ services:
         condition: 'service_started'
       db:
         condition: 'service_healthy'
-      npm-install:
+      prepare:
         condition: 'service_completed_successfully'
     working_dir: /e2e
     user: "$UID"
