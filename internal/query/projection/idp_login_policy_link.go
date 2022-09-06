@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links2"
+	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links3"
 
 	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
 	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
@@ -43,7 +43,7 @@ func newIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(IDPLoginPolicyLinkSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPLoginPolicyLinkProviderTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPLoginPolicyLinkProviderTypeCol, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(IDPLoginPolicyLinkInstanceIDCol, IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
 			crdb.WithIndex(crdb.NewIndex("link_ro_idx", []string{IDPLoginPolicyLinkResourceOwnerCol})),
