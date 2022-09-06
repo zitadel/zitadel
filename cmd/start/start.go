@@ -118,7 +118,7 @@ func startZitadel(config *Config, masterKey string) error {
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
-	httpClient := http_util.ClientWithProxy(*config.HTTPProxy)
+	httpClient := http_util.ClientWithProxy(config.HTTPProxy)
 	commands, err := command.StartCommands(
 		eventstoreClient,
 		config.SystemDefaults,

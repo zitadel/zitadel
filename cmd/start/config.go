@@ -36,7 +36,7 @@ type Config struct {
 	TLS               network.TLS
 	HTTP2HostHeader   string
 	HTTP1HostHeader   string
-	HTTPProxy         *http.ProxyConfig
+	HTTPProxy         http.ProxyConfig
 	WebAuthNName      string
 	Database          database.Config
 	Tracing           tracing.Config
