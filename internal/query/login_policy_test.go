@@ -50,14 +50,14 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
 						` projections.login_policies.multi_factor_check_lifetime,`+
-						` projections.idp_login_policy_links2.idp_id,`+
+						` projections.idp_login_policy_links3.idp_id,`+
 						` projections.idps2.name,`+
 						` projections.idps2.type`+
 						` FROM projections.login_policies`+
-						` LEFT JOIN projections.idp_login_policy_links2 ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links2.aggregate_id`+
+						` LEFT JOIN projections.idp_login_policy_links3 ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
 						` LEFT JOIN projections.idps2 ON`+
-						` projections.idp_login_policy_links2.idp_id = projections.idps2.id`),
+						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					nil,
 					nil,
 				),
@@ -95,14 +95,14 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
 						` projections.login_policies.multi_factor_check_lifetime,`+
-						` projections.idp_login_policy_links2.idp_id,`+
+						` projections.idp_login_policy_links3.idp_id,`+
 						` projections.idps2.name,`+
 						` projections.idps2.type`+
 						` FROM projections.login_policies`+
-						` LEFT JOIN projections.idp_login_policy_links2 ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links2.aggregate_id`+
+						` LEFT JOIN projections.idp_login_policy_links3 ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
 						` LEFT JOIN projections.idps2 ON`+
-						` projections.idp_login_policy_links2.idp_id = projections.idps2.id`),
+						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					[]string{
 						"aggregate_id",
 						"creation_date",
@@ -210,14 +210,14 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
 						` projections.login_policies.multi_factor_check_lifetime,`+
-						` projections.idp_login_policy_links2.idp_id,`+
+						` projections.idp_login_policy_links3.idp_id,`+
 						` projections.idps2.name,`+
 						` projections.idps2.type`+
 						` FROM projections.login_policies`+
-						` LEFT JOIN projections.idp_login_policy_links2 ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links2.aggregate_id`+
+						` LEFT JOIN projections.idp_login_policy_links3 ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
 						` LEFT JOIN projections.idps2 ON`+
-						` projections.idp_login_policy_links2.idp_id = projections.idps2.id`),
+						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
