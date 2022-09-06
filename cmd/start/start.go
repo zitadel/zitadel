@@ -148,14 +148,26 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys)
+	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, httpClient)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port, tlsConfig)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys) error {
+func startAPIs(
+	ctx context.Context,
+	router *mux.Router,
+	commands *command.Commands,
+	queries *query.Queries,
+	eventstore *eventstore.Eventstore,
+	dbClient *sql.DB,
+	config *Config,
+	store static.Storage,
+	authZRepo authz_repo.Repository,
+	keys *encryptionKeys,
+	httpClient *http.Client,
+) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -216,7 +228,24 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(
+		config.Login,
+		commands,
+		queries,
+		authRepo,
+		store,
+		httpClient,
+		console.HandlerPrefix+"/",
+		op.AuthCallbackURL(oidcProvider),
+		config.ExternalSecure,
+		userAgentInterceptor,
+		op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler,
+		instanceInterceptor.Handler,
+		assetsCache.Handler,
+		keys.User,
+		keys.IDPConfig,
+		keys.CSRFCookieKey,
+	)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

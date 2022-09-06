@@ -39,6 +39,7 @@ type Login struct {
 	oidcAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
+	httpClient          *http.Client
 }
 
 type Config struct {
@@ -59,6 +60,7 @@ func CreateLogin(config Config,
 	query *query.Queries,
 	authRepo *eventsourcing.EsRepository,
 	staticStorage static.Storage,
+	httpClient *http.Client,
 	consolePath string,
 	oidcAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
@@ -81,6 +83,7 @@ func CreateLogin(config Config,
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
+		httpClient:          httpClient,
 	}
 	statikFS, err := fs.NewWithNamespace("login")
 	if err != nil {

@@ -175,7 +175,15 @@ func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigV
 		return nil, err
 	}
 	if idpConfig.OIDCIssuer != "" {
-		return rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL(ctx)+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
+		return rp.NewRelyingPartyOIDC(
+			idpConfig.OIDCIssuer,
+			idpConfig.OIDCClientID,
+			oidcClientSecret,
+			l.baseURL(ctx)+callbackEndpoint,
+			idpConfig.OIDCScopes,
+			rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)),
+			rp.WithHTTPClient(l.httpClient),
+		)
 	}
 	if idpConfig.OAuthAuthorizationEndpoint == "" || idpConfig.OAuthTokenEndpoint == "" {
 		return nil, caos_errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig")
@@ -374,7 +382,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 			return
 		}
 		linkingUser = l.mapExternalNotFoundOptionFormDataToLoginUser(data)
-	} 
+	}
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
 
