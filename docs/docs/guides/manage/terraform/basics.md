@@ -8,9 +8,9 @@ It covers how to:
 
 Prerequisites:
 
-- existing ZITADEL Instance, if not present follow [this guide](../../guides/start/quickstart)
+- existing ZITADEL Instance, if not present follow [this guide](../../start/quickstart)
 - existing user with enough authorization to manage the desired resources, if not present
-  follow [this guide](../../guides/integrate/serviceusers)
+  follow [this guide](../../integrate/serviceusers)
 - installed Terraform, if not present follow [this guide](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 # Manage ZITADEL resources through terraform
