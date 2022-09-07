@@ -40,6 +40,7 @@ func Run(ctx *Context, api *API, script, name string, timeout time.Duration, all
 		t.Stop()
 	}()
 	errCh := make(chan error)
+	defer close(errCh)
 	go func() {
 		defer func() {
 			r := recover()
@@ -69,11 +70,11 @@ func newRuntime() *goja.Runtime {
 	vm := goja.New()
 
 	printer := console.PrinterFunc(func(s string) {
-		logging.Log("ACTIONS-dfgg2").Debug(s)
+		logging.Debug(s)
 	})
 	registry := new(require.Registry)
 	registry.Enable(vm)
-	registry.RegisterNativeModule("console", console.RequireWithPrinter(printer))
+	registry.RegisterNativeModule(console.ModuleName, console.RequireWithPrinter(printer))
 	console.Enable(vm)
 
 	return vm
