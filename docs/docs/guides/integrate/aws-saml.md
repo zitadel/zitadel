@@ -17,7 +17,8 @@ Prerequisites:
 - prerequisites on AWS side [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/prereqs.html).
 - enabled AWS SSO [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/step1.html?icmpid=docs_sso_console)
 
-> We have to switch between ZITADEL and a AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Console and if the headings start with "AWS" please switch to the AWS GUI.
+> We have to switch between ZITADEL and a AWS. If the headings begin with "ZITADEL" switch to the ZITADEL Console and if
+> the headings start with "AWS" please switch to the AWS GUI.
 
 ## **AWS**: Change to external identity provider ZITADEL
 
@@ -55,9 +56,23 @@ for example [here](https://docs.aws.amazon.com/singlesignon/latest/userguide/use
 
 ## **ZITADEL**: Create the application
 
-WIP
+The metadata used in this part is from "Change to external identity provider ZITADEL" step 2.
+
+In your existing project:
+
+1. Press the "+"-button to add an application
+   ![Project](/img/saml/zitadel/project.png)
+2. Fill in a name for the application and chose the SAML type, then click "Continue".
+   ![New Application](/img/saml/zitadel/application_saml.png)
+3. Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "
+   Continue".
+   ![Add Metadata to Application](/img/saml/zitadel/application_saml_metadata.png)
+4. Check your application, if everything is correct, press "Create".
+   ![Create Application](/img/saml/zitadel/application_saml_create.png)
+
+Everything on the side of ZITADEL is done if the application is correctly created.
 
 ## **AWS**: Test the connection
 
 The result, you can now login to you AWS account through your ZITADEL-login with the AWS SSO Sign-in URL, which you
-should have saved in a step before.
+should have saved in "Change to external identity provider ZITADEL" step 2.

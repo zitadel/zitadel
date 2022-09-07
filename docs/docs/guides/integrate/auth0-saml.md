@@ -51,9 +51,21 @@ So that ZITADEL also recognises the now created SAML
 connection, [here](https://auth0.com/docs/authenticate/protocols/saml/saml-identity-provider-configuration-settings) are
 all necessary information to correctly fill out the metadata or download the metadata-file directly under the
 URL https://YOUR_DOMAIN/samlp/metadata?connection=YOUR_CONNECTION_NAME, which in this example would
-be https://example.auth0.com/samlp/metadata?connection=SAML-ZITADEL .
+be https://example.auth0.com/samlp/metadata?connection=SAML-ZITADEL.
 
-WIP - create SAML application on you instance with the metadata from auth0
+In your existing project:
+
+1. Press the "+"-button to add an application
+   ![Project](/img/saml/zitadel/project.png)
+2. Fill in a name for the application and chose the SAML type, then click "Continue".
+   ![New Application](/img/saml/zitadel/application_saml.png)
+3. Either fill in the URL where ZITADEL can read the metadata from, or upload the metadata XML directly, then click "
+   Continue".
+   ![Add Metadata to Application](/img/saml/zitadel/application_saml_metadata.png)
+4. Check your application, if everything is correct, press "Create".
+   ![Create Application](/img/saml/zitadel/application_saml_create.png)
+
+Everything on the side of ZITADEL is done if the application is correctly created.
 
 ## **Auth0**: Try the connection
 
