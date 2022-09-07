@@ -21,12 +21,12 @@ type Storage interface {
 type ObjectType int32
 
 const (
-	ObjectTypeUserAvatar = iota
+	ObjectTypeUserAvatar ObjectType = iota
 	ObjectTypeStyling
 )
 
-func (o *ObjectType) String() string {
-	switch *o {
+func (o ObjectType) String() string {
+	switch o {
 	case ObjectTypeUserAvatar:
 		return "0"
 	case ObjectTypeStyling:
