@@ -25,7 +25,7 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.GetViper())
 
 			err := initialise(config.Database, VerifyDatabase(config.Database.Database()))
 			logging.OnError(err).Fatal("unable to initialize the database")
