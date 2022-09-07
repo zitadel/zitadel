@@ -123,6 +123,33 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(AgePolicyInstanceIDCol),
+			want: wantReduce{
+				projection:       PasswordAgeTable,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.password_age_policies WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:   "instance.reduceAdded",
 			reduce: (&passwordAgeProjection{}).reduceAdded,
 			args: args{

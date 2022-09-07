@@ -190,6 +190,33 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
+			want: wantReduce{
+				projection:       IDPLoginPolicyLinkTable,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "org.reduceCascadeRemoved",
 			args: args{
 				event: getEvent(testEvent(

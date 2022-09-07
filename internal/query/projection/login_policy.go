@@ -139,6 +139,10 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(LoginPolicyInstanceIDCol),
+				},
 			},
 		},
 	}

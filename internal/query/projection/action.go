@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 const (
@@ -80,6 +81,15 @@ func (p *actionProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  action.RemovedEventType,
 					Reduce: p.reduceActionRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ActionInstanceIDCol),
 				},
 			},
 		},
@@ -178,7 +188,7 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type% s", action.RemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type %s", action.RemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

@@ -339,6 +339,33 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MessageTextInstanceIDCol),
+			want: wantReduce{
+				projection:       MessageTextTable,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.message_texts WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "org.reduceRemoved.PreHeader",
 			args: args{
 				event: getEvent(testEvent(

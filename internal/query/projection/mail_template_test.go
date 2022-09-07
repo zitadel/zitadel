@@ -118,6 +118,33 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MailTemplateInstanceIDCol),
+			want: wantReduce{
+				projection:       MailTemplateTable,
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.mail_templates WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:   "instance.reduceAdded",
 			reduce: (&mailTemplateProjection{}).reduceAdded,
 			args: args{
