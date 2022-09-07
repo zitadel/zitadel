@@ -32,7 +32,7 @@ func (o ObjectType) String() string {
 	case ObjectTypeStyling:
 		return "1"
 	default:
-		return "unspecified"
+		return ""
 	}
 }
 
