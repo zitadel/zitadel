@@ -70,7 +70,7 @@ Payload
 {
     "iss": "100507859606888466",
     "sub": "100507859606888466",
-    "aud": "{your_domain}.zitadel.cloud",
+    "aud": "https://{your_domain}.zitadel.cloud",
     "iat": [Current UTC timestamp, e.g. 1605179982, max. 1 hour ago],
     "exp": [UTC timestamp, e.g. 1605183582]
 }
