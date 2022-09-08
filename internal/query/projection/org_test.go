@@ -33,7 +33,6 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
-				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -63,7 +62,6 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgReactivated,
 			want: wantReduce{
-				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -93,7 +91,6 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgDeactivated,
 			want: wantReduce{
-				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -123,7 +120,6 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
-				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -153,7 +149,6 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
-				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -171,7 +166,6 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgProjection{}).reduceOrgAdded,
 			want: wantReduce{
-				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -205,7 +199,6 @@ func TestOrgProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(OrgColumnInstanceID),
 			want: wantReduce{
-				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -214,7 +207,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.orgs WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -232,7 +225,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, OrgProjectionTable, tt.want)
 		})
 	}
 }

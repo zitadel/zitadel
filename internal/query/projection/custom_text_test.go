@@ -40,7 +40,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -80,7 +79,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -114,7 +112,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -140,7 +137,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(CustomTextInstanceIDCol),
 			want: wantReduce{
-				projection:       CustomTextTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -149,7 +145,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.custom_texts WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -175,7 +171,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -215,7 +210,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -249,7 +243,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -275,7 +268,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, CustomTextTable, tt.want)
 		})
 	}
 }

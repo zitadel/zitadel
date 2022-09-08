@@ -31,7 +31,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceInstanceAdded,
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -62,7 +61,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(InstanceColumnID),
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -71,7 +69,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.instances WHERE (id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -89,7 +87,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultOrgSet,
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -119,7 +116,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -149,7 +145,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -179,7 +174,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, InstanceProjectionTable, tt.want)
 		})
 	}
 }

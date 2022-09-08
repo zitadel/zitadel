@@ -36,7 +36,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -81,7 +80,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -115,7 +113,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -139,7 +136,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
 			want: wantReduce{
-				projection:       LabelPolicyTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -148,7 +144,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.label_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -169,7 +165,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -201,7 +196,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -232,7 +226,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -263,7 +256,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -294,7 +286,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -325,7 +316,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -356,7 +346,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -387,7 +376,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -418,7 +406,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -449,7 +436,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -480,7 +466,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -511,7 +496,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -546,7 +530,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -591,7 +574,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -632,7 +614,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -664,7 +645,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -695,7 +675,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -726,7 +705,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -757,7 +735,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -788,7 +765,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -819,7 +795,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -850,7 +825,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -881,7 +855,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -912,7 +885,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -943,7 +915,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -974,7 +945,6 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LabelPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -1006,7 +976,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, LabelPolicyTable, tt.want)
 		})
 	}
 }

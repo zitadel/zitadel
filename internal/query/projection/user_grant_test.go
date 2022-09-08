@@ -43,7 +43,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -82,7 +81,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -114,7 +112,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -144,7 +141,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -168,7 +164,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),
 			want: wantReduce{
-				projection:       UserGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -177,7 +172,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -198,7 +193,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -225,7 +219,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -255,7 +248,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -285,7 +277,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -312,7 +303,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -339,7 +329,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -366,7 +355,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -394,7 +382,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -419,7 +406,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, UserGrantProjectionTable, tt.want)
 		})
 	}
 }

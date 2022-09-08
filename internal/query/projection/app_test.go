@@ -41,7 +41,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -79,7 +78,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -112,7 +110,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -145,7 +142,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -178,7 +174,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -206,7 +201,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -231,7 +225,6 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
 			want: wantReduce{
-				projection:       AppProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -240,7 +233,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.apps2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -266,7 +259,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -311,7 +303,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -352,7 +343,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -375,7 +365,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -431,7 +420,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -500,7 +488,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -553,7 +540,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -576,7 +562,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -611,7 +596,7 @@ func TestAppProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, AppProjectionTable, tt.want)
 		})
 	}
 }

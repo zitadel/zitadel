@@ -34,7 +34,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionAdded,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -71,7 +70,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionChanged,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -102,7 +100,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionDeactivated,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -132,7 +129,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionReactivated,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -162,7 +158,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionRemoved,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -189,7 +184,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(ActionInstanceIDCol),
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -198,7 +192,7 @@ func TestActionProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.actions2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -216,7 +210,7 @@ func TestActionProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ActionTable, tt.want)
 		})
 	}
 }

@@ -33,7 +33,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -60,7 +59,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectColumnInstanceID),
 			want: wantReduce{
-				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -69,7 +67,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.projects2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -87,7 +85,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectProjection{}).reduceProjectReactivated,
 			want: wantReduce{
-				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -117,7 +114,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectProjection{}).reduceProjectDeactivated,
 			want: wantReduce{
-				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -147,7 +143,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectProjection{}).reduceProjectChanged,
 			want: wantReduce{
-				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -181,7 +176,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectProjection{}).reduceProjectChanged,
 			want: wantReduce{
-				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -199,7 +193,6 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectProjection{}).reduceProjectAdded,
 			want: wantReduce{
-				projection:       ProjectProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -237,7 +230,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectProjectionTable, tt.want)
 		})
 	}
 }

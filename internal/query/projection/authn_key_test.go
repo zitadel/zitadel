@@ -34,7 +34,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyAdded,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -71,7 +70,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyAdded,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -108,7 +106,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -135,7 +132,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -155,7 +151,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -183,7 +178,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -211,7 +205,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -238,7 +231,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(AuthNKeyInstanceIDCol),
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -247,7 +239,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.authn_keys WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -265,7 +257,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -285,7 +276,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -313,7 +303,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -341,7 +330,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -368,7 +356,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -395,7 +382,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -422,7 +408,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -449,7 +434,6 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&authNKeyProjection{}).reduceAuthNKeyRemoved,
 			want: wantReduce{
-				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -476,7 +460,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, AuthNKeyTable, tt.want)
 		})
 	}
 }

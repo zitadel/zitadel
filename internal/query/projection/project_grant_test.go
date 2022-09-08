@@ -34,7 +34,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -61,7 +60,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectGrantColumnInstanceID),
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -70,7 +68,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.project_grants2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -88,7 +86,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -116,7 +113,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantReactivated,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -147,7 +143,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantDeactivated,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -178,7 +173,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -209,7 +203,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantCascadeChanged,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -240,7 +233,6 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantAdded,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -276,7 +268,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectGrantProjectionTable, tt.want)
 		})
 	}
 }

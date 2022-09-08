@@ -32,7 +32,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -59,7 +58,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectRoleColumnInstanceID),
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -68,7 +66,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.project_roles WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -86,7 +84,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleRemoved,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -114,7 +111,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -146,7 +142,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -164,7 +159,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleAdded,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -199,7 +193,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectRoleProjectionTable, tt.want)
 		})
 	}
 }

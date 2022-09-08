@@ -570,7 +570,16 @@ func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Vali
 			if err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
 			}
-			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}, nil
+
+			domainsWriteModel, err := c.getInstanceDomainsWriteModel(ctx, a.ID)
+			if err != nil {
+				return nil, errors.ThrowPreconditionFailed(err, "COMMA-a2m1m3", "Errors.Instance.NotFound")
+			}
+			events := []eventstore.Command{instance.NewInstanceRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}
+			for _, domainName := range domainsWriteModel.Domains {
+				events = append(events, instance.NewDomainRemovedEvent(ctx, &a.Aggregate, domainName))
+			}
+			return events, nil
 		}, nil
 	}
 }

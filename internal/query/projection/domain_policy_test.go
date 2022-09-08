@@ -40,7 +40,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -81,7 +80,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -113,7 +111,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -137,7 +134,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(DomainPolicyInstanceIDCol),
 			want: wantReduce{
-				projection:       DomainPolicyTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -146,7 +142,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.domain_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -171,7 +167,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -212,7 +207,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -241,7 +235,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, DomainPolicyTable, tt.want)
 		})
 	}
 }

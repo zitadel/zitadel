@@ -39,7 +39,6 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -78,7 +77,6 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -109,7 +107,6 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -133,7 +130,6 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(LockoutPolicyInstanceIDCol),
 			want: wantReduce{
-				projection:       LockoutPolicyTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -142,7 +138,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.lockout_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -166,7 +162,6 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -205,7 +200,6 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -233,7 +227,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, LockoutPolicyTable, tt.want)
 		})
 	}
 }

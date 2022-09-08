@@ -38,7 +38,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -74,7 +73,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -102,7 +100,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -129,7 +126,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -153,7 +149,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(UserMetadataColumnInstanceID),
 			want: wantReduce{
-				projection:       UserMetadataProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -162,7 +157,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -180,7 +175,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, UserMetadataProjectionTable, tt.want)
 		})
 	}
 }

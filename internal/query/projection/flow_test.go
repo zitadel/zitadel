@@ -33,7 +33,6 @@ func TestFlowProjection_reduces(t *testing.T) {
 			},
 			reduce: (&flowProjection{}).reduceTriggerActionsSetEventType,
 			want: wantReduce{
-				projection:       FlowTriggerTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -88,7 +87,6 @@ func TestFlowProjection_reduces(t *testing.T) {
 			},
 			reduce: (&flowProjection{}).reduceFlowClearedEventType,
 			want: wantReduce{
-				projection:       FlowTriggerTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -116,7 +114,6 @@ func TestFlowProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(FlowInstanceIDCol),
 			want: wantReduce{
-				projection:       FlowTriggerTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -125,7 +122,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -143,7 +140,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, FlowTriggerTable, tt.want)
 		})
 	}
 }

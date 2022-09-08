@@ -37,7 +37,6 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
 			want: wantReduce{
-				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),
 				sequence:         15,
 				previousSequence: 10,
@@ -94,7 +93,6 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{}).reduceKeyPairAdded,
 			want: wantReduce{
-				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),
 				sequence:         15,
 				previousSequence: 10,
@@ -112,7 +110,6 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(KeyColumnInstanceID),
 			want: wantReduce{
-				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -121,7 +118,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.keys2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -139,7 +136,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, KeyProjectionTable, tt.want)
 		})
 	}
 }

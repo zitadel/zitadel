@@ -34,7 +34,6 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenAdded,
 			want: wantReduce{
-				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -69,7 +68,6 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenRemoved,
 			want: wantReduce{
-				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -96,7 +94,6 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -123,7 +120,6 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(PersonalAccessTokenColumnInstanceID),
 			want: wantReduce{
-				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -132,7 +128,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.personal_access_tokens2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -150,7 +146,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, PersonalAccessTokenProjectionTable, tt.want)
 		})
 	}
 }

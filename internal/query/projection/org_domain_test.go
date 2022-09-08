@@ -33,7 +33,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -68,7 +67,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainVerificationAdded,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -100,7 +98,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainVerified,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -132,7 +129,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -175,7 +171,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -204,7 +199,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(OrgDomainInstanceIDCol),
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -213,7 +207,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.org_domains WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -231,7 +225,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, OrgDomainTable, tt.want)
 		})
 	}
 }

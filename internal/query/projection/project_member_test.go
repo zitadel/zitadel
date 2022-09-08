@@ -41,7 +41,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -78,7 +77,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -111,7 +109,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -141,7 +138,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -169,7 +165,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -196,7 +191,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -220,7 +214,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 			want: wantReduce{
-				projection:       ProjectMemberProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -229,7 +222,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.project_members2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -250,7 +243,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -274,7 +266,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectMemberProjectionTable, tt.want)
 		})
 	}
 }

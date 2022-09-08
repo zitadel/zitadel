@@ -113,7 +113,7 @@ func reduceInstanceRemovedHelper(instanceIDCol string) func(event eventstore.Eve
 		return crdb.NewDeleteStatement(
 			e,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(instanceIDCol, e.Aggregate().ID),
 			},
 		), nil
 	}

@@ -43,7 +43,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -85,7 +84,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -120,7 +118,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -153,7 +150,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -186,7 +182,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -211,7 +206,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: reduceInstanceRemovedHelper(IDPInstanceIDCol),
 			want: wantReduce{
-				projection:       IDPTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -220,7 +214,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "DELETE FROM projections.idps2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
-								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -255,7 +249,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -315,7 +308,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -360,7 +352,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -386,7 +377,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -434,7 +424,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -475,7 +464,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -501,7 +489,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -543,7 +530,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -578,7 +564,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -611,7 +596,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -644,7 +628,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -686,7 +669,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -746,7 +728,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -791,7 +772,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -817,7 +797,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -865,7 +844,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -906,7 +884,6 @@ func TestIDPProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -923,7 +900,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, IDPTable, tt.want)
 		})
 	}
 }
