@@ -39,7 +39,7 @@ describe("machines", () => {
     });
   });
 
-  describe("remove", () => {
+  describe("edit", () => {
     before("ensure it exists", () => {
       apiAuth().then((api) => {
         ensureMachineUserExists(api, testMachineUserNameRemove).then(() => {
@@ -62,5 +62,7 @@ describe("machines", () => {
       cy.wait(200);
       cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
     });
+
+    it("should create a personal access token")
   });
 });

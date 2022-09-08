@@ -34,8 +34,8 @@ describe("applications", () => {
     cy.get('[for="PKCE"]').click();
     cy.get('[data-e2e="continue-button-authmethod"]').click();
     //enter URL
-    cy.get("cnsl-redirect-uris").eq(0).type("https://testurl.org");
-    cy.get("cnsl-redirect-uris").eq(1).type("https://testlogouturl.org");
+    cy.get("cnsl-redirect-uris").eq(0).type("http://localhost:3000/api/auth/callback/zitadel");
+    cy.get("cnsl-redirect-uris").eq(1).type("http://localhost:3000");
     cy.get('[data-e2e="continue-button-redirecturis"]').click();
     cy.get('[data-e2e="create-button"]')
       .click()
@@ -47,4 +47,7 @@ describe("applications", () => {
     cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
     //TODO: check client ID/Secret
   });
+
+  it("should configure an application to enable dev mode")
+  it("should configure an application to put user roles and info inside id token")
 });
