@@ -39,7 +39,7 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 ### GRPC
 
 Endpoint:
-{your_domain}/caos.zitadel.auth.api.v1.AuthService/
+{your_domain}/zitadel.auth.v1.AuthService/
 
 Definition:
 [Auth Proto](/docs/apis/proto/auth)
@@ -75,7 +75,7 @@ To identify the current organization you can send a header `x-zitadel-orgid` or 
 ### GRPC
 
 Endpoint:
-{your_domain}/caos.zitadel.management.api.v1.ManagementService/
+{your_domain}/zitadel.management.v1.ManagementService/
 
 Definition:
 [Management Proto](/docs/apis/proto/management)
@@ -109,7 +109,7 @@ This API is intended to configure and manage one ZITADEL instance itself.
 ### GRPC
 
 Endpoint:
-{your_domain}/caos.zitadel.admin.api.v1.AdminService/
+{your_domain}/zitadel.admin.v1.AdminService/
 
 Definition:
 [Admin Proto](/docs/apis/proto/admin)
@@ -145,7 +145,7 @@ Checkout the guide how to [access the ZITADEL System API](/docs/guides/integrate
 ### GRPC
 
 Endpoint:
-{your_domain}/caos.zitadel.system.api.v1.SystemService/
+{your_domain}/zitadel.system.v1.SystemService/
 
 Definition:
 [System Proto](/docs/apis/proto/system)
@@ -199,7 +199,7 @@ See below for an example with the call **GetMyUser**.
       get: "/users/me"
     };
 
-    option (caos.zitadel.utils.v1.auth_option) = {
+    option (zitadel.v1.auth_option) = {
       permission: "authenticated"
     };
   }
@@ -212,7 +212,7 @@ In the table below you can see the URI of those calls.
 | Service | URI                                                                                                                                            |
 | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
 | REST    | {your_domain}/auth/v1/users/me                                               |
-| GRPC    | {your_domain}/caos.zitadel.auth.api.v1.AuthService/GetMyUser |
+| GRPC    | {your_domain}/zitadel.auth.v1.AuthService/GetMyUser |
 
 ## Domains
 
@@ -224,3 +224,26 @@ Be aware that issuer, api, accounts and console domains do not exist anymore.
 :::
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{your_domain}/ui/console/`.
+
+## ZITADEL Path Prefixes
+
+If you run ZITADEL on a custom domain, you may want to reuse that domain for other applications.
+For easy copying to your reverse proxy configuration, here is a list of URL path prefixes, ZITADEL uses.
+
+```
+/zitadel.auth.v1.AuthService/
+/auth/
+/zitadel.management.v1.ManagementService/
+/management/
+/zitadel.admin.v1.AdminService/
+/admin/
+/zitadel.system.v1.SystemService/
+/system/
+/saml/
+/assets/
+/ui/
+/oauth/v2/
+/oidc/
+/.well-known/openid-configuration
+/openapi/
+```
