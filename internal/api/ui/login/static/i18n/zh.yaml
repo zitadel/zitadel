@@ -205,10 +205,10 @@ RegistrationUser:
   FirstnameLabel: 名
   LastnameLabel: 姓
   LanguageLabel: 语言
-  German: 德语
-  English: 英语
-  Italian: 意大利语
-  French: 法语
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
   GenderLabel: 德语
   Female: 女性
