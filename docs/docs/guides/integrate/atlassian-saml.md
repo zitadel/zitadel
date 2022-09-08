@@ -7,7 +7,7 @@ This guide shows how to enable login with ZITADEL on Atlassian.
 It covers how to:
 
 - create and configure the application in your project
-- create and configure the connection in your Auth0 tenant
+- create and configure the connection in Atlassian Access
 
 Prerequisites:
 
