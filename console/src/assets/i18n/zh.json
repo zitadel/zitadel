@@ -887,10 +887,10 @@
   "SETTING": {
     "DEFAULTLANGUAGE": "默认语言",
     "LANGUAGE": {
-      "de": "德语",
-      "it": "意大利语",
-      "en": "英语",
-      "fr": "法语",
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English",
+      "fr": "Français",
       "zh": "简体中文"
     },
     "SMTP": {
