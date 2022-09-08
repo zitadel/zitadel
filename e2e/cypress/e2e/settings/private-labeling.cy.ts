@@ -3,7 +3,7 @@ import { Policy, resetPolicy } from '../../support/api/policies';
 import { login, User } from '../../support/login/users';
 
 describe('private labeling', () => {
-  const orgPath = `/ui/console/org`;
+  const orgPath = `/org`;
 
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {

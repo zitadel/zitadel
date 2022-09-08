@@ -4,7 +4,7 @@
   [dataSize]="dataSource.totalResult"
   [timestamp]="dataSource.viewTimestamp"
   [selection]="selection"
-  [loading]="dataSource?.loading$ | async"
+  [loading]="dataSource.loading$ | async"
 >
   <ng-container actions *ngIf="selection.hasValue()">
     <ng-content select="[selectactions]"></ng-content>
@@ -139,7 +139,7 @@
     *ngIf="dataSource"
     class="paginator"
     #paginator
-    [timestamp]="dataSource?.viewTimestamp"
+    [timestamp]="dataSource.viewTimestamp"
     [pageSize]="INITIALPAGESIZE"
     [length]="dataSource.totalResult"
     [pageSizeOptions]="[25, 50, 100, 250]"

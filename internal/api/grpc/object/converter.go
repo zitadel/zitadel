@@ -11,19 +11,25 @@ import (
 )
 
 func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      objectDetail.Sequence,
-		ChangeDate:    timestamppb.New(objectDetail.EventDate),
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
+	if !objectDetail.EventDate.IsZero() {
+		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
+	}
+	return details
 }
 
 func DomainToAddDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      objectDetail.Sequence,
-		CreationDate:  timestamppb.New(objectDetail.EventDate),
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
+	if !objectDetail.EventDate.IsZero() {
+		details.CreationDate = timestamppb.New(objectDetail.EventDate)
+	}
+	return details
 }
 
 func ToViewDetailsPb(
@@ -32,12 +38,17 @@ func ToViewDetailsPb(
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		CreationDate:  timestamppb.New(creationDate),
-		ChangeDate:    timestamppb.New(changeDate),
 		ResourceOwner: resourceOwner,
 	}
+	if !creationDate.IsZero() {
+		details.CreationDate = timestamppb.New(creationDate)
+	}
+	if !changeDate.IsZero() {
+		details.ChangeDate = timestamppb.New(changeDate)
+	}
+	return details
 }
 
 func ChangeToDetailsPb(
@@ -45,11 +56,14 @@ func ChangeToDetailsPb(
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		ChangeDate:    timestamppb.New(changeDate),
 		ResourceOwner: resourceOwner,
 	}
+	if !changeDate.IsZero() {
+		details.ChangeDate = timestamppb.New(changeDate)
+	}
+	return details
 }
 
 func AddToDetailsPb(
@@ -57,11 +71,14 @@ func AddToDetailsPb(
 	creationDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		CreationDate:  timestamppb.New(creationDate),
 		ResourceOwner: resourceOwner,
 	}
+	if !creationDate.IsZero() {
+		details.CreationDate = timestamppb.New(creationDate)
+	}
+	return details
 }
 
 func ToListDetails(

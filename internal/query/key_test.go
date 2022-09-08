@@ -31,18 +31,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePublicKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.keys.id,`+
-						` projections.keys.creation_date,`+
-						` projections.keys.change_date,`+
-						` projections.keys.sequence,`+
-						` projections.keys.resource_owner,`+
-						` projections.keys.algorithm,`+
-						` projections.keys.use,`+
-						` projections.keys_public.expiry,`+
-						` projections.keys_public.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys2.id,`+
+						` projections.keys2.creation_date,`+
+						` projections.keys2.change_date,`+
+						` projections.keys2.sequence,`+
+						` projections.keys2.resource_owner,`+
+						` projections.keys2.algorithm,`+
+						` projections.keys2.use,`+
+						` projections.keys2_public.expiry,`+
+						` projections.keys2_public.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys`+
-						` LEFT JOIN projections.keys_public ON projections.keys.id = projections.keys_public.id`),
+						` FROM projections.keys2`+
+						` LEFT JOIN projections.keys2_public ON projections.keys2.id = projections.keys2_public.id`),
 					nil,
 					nil,
 				),
@@ -60,18 +60,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePublicKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.keys.id,`+
-						` projections.keys.creation_date,`+
-						` projections.keys.change_date,`+
-						` projections.keys.sequence,`+
-						` projections.keys.resource_owner,`+
-						` projections.keys.algorithm,`+
-						` projections.keys.use,`+
-						` projections.keys_public.expiry,`+
-						` projections.keys_public.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys2.id,`+
+						` projections.keys2.creation_date,`+
+						` projections.keys2.change_date,`+
+						` projections.keys2.sequence,`+
+						` projections.keys2.resource_owner,`+
+						` projections.keys2.algorithm,`+
+						` projections.keys2.use,`+
+						` projections.keys2_public.expiry,`+
+						` projections.keys2_public.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys`+
-						` LEFT JOIN projections.keys_public ON projections.keys.id = projections.keys_public.id`),
+						` FROM projections.keys2`+
+						` LEFT JOIN projections.keys2_public ON projections.keys2.id = projections.keys2_public.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -128,18 +128,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePublicKeysQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.keys.id,`+
-						` projections.keys.creation_date,`+
-						` projections.keys.change_date,`+
-						` projections.keys.sequence,`+
-						` projections.keys.resource_owner,`+
-						` projections.keys.algorithm,`+
-						` projections.keys.use,`+
-						` projections.keys_public.expiry,`+
-						` projections.keys_public.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys2.id,`+
+						` projections.keys2.creation_date,`+
+						` projections.keys2.change_date,`+
+						` projections.keys2.sequence,`+
+						` projections.keys2.resource_owner,`+
+						` projections.keys2.algorithm,`+
+						` projections.keys2.use,`+
+						` projections.keys2_public.expiry,`+
+						` projections.keys2_public.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys`+
-						` LEFT JOIN projections.keys_public ON projections.keys.id = projections.keys_public.id`),
+						` FROM projections.keys2`+
+						` LEFT JOIN projections.keys2_public ON projections.keys2.id = projections.keys2_public.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -156,18 +156,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePrivateKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.keys.id,`+
-						` projections.keys.creation_date,`+
-						` projections.keys.change_date,`+
-						` projections.keys.sequence,`+
-						` projections.keys.resource_owner,`+
-						` projections.keys.algorithm,`+
-						` projections.keys.use,`+
-						` projections.keys_private.expiry,`+
-						` projections.keys_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys2.id,`+
+						` projections.keys2.creation_date,`+
+						` projections.keys2.change_date,`+
+						` projections.keys2.sequence,`+
+						` projections.keys2.resource_owner,`+
+						` projections.keys2.algorithm,`+
+						` projections.keys2.use,`+
+						` projections.keys2_private.expiry,`+
+						` projections.keys2_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys`+
-						` LEFT JOIN projections.keys_private ON projections.keys.id = projections.keys_private.id`),
+						` FROM projections.keys2`+
+						` LEFT JOIN projections.keys2_private ON projections.keys2.id = projections.keys2_private.id`),
 					nil,
 					nil,
 				),
@@ -185,18 +185,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePrivateKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.keys.id,`+
-						` projections.keys.creation_date,`+
-						` projections.keys.change_date,`+
-						` projections.keys.sequence,`+
-						` projections.keys.resource_owner,`+
-						` projections.keys.algorithm,`+
-						` projections.keys.use,`+
-						` projections.keys_private.expiry,`+
-						` projections.keys_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys2.id,`+
+						` projections.keys2.creation_date,`+
+						` projections.keys2.change_date,`+
+						` projections.keys2.sequence,`+
+						` projections.keys2.resource_owner,`+
+						` projections.keys2.algorithm,`+
+						` projections.keys2.use,`+
+						` projections.keys2_private.expiry,`+
+						` projections.keys2_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys`+
-						` LEFT JOIN projections.keys_private ON projections.keys.id = projections.keys_private.id`),
+						` FROM projections.keys2`+
+						` LEFT JOIN projections.keys2_private ON projections.keys2.id = projections.keys2_private.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -255,18 +255,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePrivateKeysQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.keys.id,`+
-						` projections.keys.creation_date,`+
-						` projections.keys.change_date,`+
-						` projections.keys.sequence,`+
-						` projections.keys.resource_owner,`+
-						` projections.keys.algorithm,`+
-						` projections.keys.use,`+
-						` projections.keys_private.expiry,`+
-						` projections.keys_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys2.id,`+
+						` projections.keys2.creation_date,`+
+						` projections.keys2.change_date,`+
+						` projections.keys2.sequence,`+
+						` projections.keys2.resource_owner,`+
+						` projections.keys2.algorithm,`+
+						` projections.keys2.use,`+
+						` projections.keys2_private.expiry,`+
+						` projections.keys2_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys`+
-						` LEFT JOIN projections.keys_private ON projections.keys.id = projections.keys_private.id`),
+						` FROM projections.keys2`+
+						` LEFT JOIN projections.keys2_private ON projections.keys2.id = projections.keys2_private.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

@@ -81,7 +81,7 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 	if config.IDPConfigID == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-4m9gs", "Errors.IDMissing")
 	}
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, config.IDPConfigID)
+	existingIDP, err := c.instanceIDPConfigWriteModelByID(ctx, config.IDPConfigID)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 }
 
 func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.ObjectDetails, error) {
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+	existingIDP, err := c.instanceIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string)
 }
 
 func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.ObjectDetails, error) {
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+	existingIDP, err := c.instanceIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string)
 }
 
 func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+	existingIDP, err := c.instanceIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 }
 
 func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
-	config, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+	config, err := c.instanceIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, idpID string) (
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }
 
-func (c *Commands) isntanceIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *InstanceIDPConfigWriteModel, err error) {
+func (c *Commands) instanceIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *InstanceIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

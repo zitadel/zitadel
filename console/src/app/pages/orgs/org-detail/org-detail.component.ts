@@ -21,7 +21,7 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./org-detail.component.scss'],
 })
 export class OrgDetailComponent implements OnInit, OnDestroy {
-  public org!: Org.AsObject;
+  public org?: Org.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public OrgState: any = OrgState;
@@ -80,7 +80,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             .reactivateOrg()
             .then(() => {
               this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
-              this.org.state = OrgState.ORG_STATE_ACTIVE;
+              this.org!.state = OrgState.ORG_STATE_ACTIVE;
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -103,7 +103,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             .deactivateOrg()
             .then(() => {
               this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
-              this.org.state = OrgState.ORG_STATE_INACTIVE;
+              this.org!.state = OrgState.ORG_STATE_INACTIVE;
             })
             .catch((error) => {
               this.toast.showError(error);

@@ -23,7 +23,7 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
   styleUrls: ['./auth-user-detail.component.scss'],
 })
 export class AuthUserDetailComponent implements OnDestroy {
-  public user!: User.AsObject;
+  public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
   public languages: string[] = ['de', 'en', 'fr', 'it', 'zh'];
 
@@ -132,13 +132,13 @@ export class AuthUserDetailComponent implements OnDestroy {
         labelKey: 'ACTIONS.NEWVALUE',
         titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
         descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
-        value: this.user.userName,
+        value: this.user?.userName,
       },
       width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((resp: { value: string }) => {
-      if (resp && resp.value && resp.value !== this.user.userName) {
+      if (resp && resp.value && resp.value !== this.user?.userName) {
         this.userService
           .updateMyUserName(resp.value)
           .then(() => {
@@ -153,7 +153,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public saveProfile(profileData: Profile.AsObject): void {
-    if (this.user.human) {
+    if (this.user?.human) {
       this.user.human.profile = profileData;
 
       this.userService
@@ -180,7 +180,7 @@ export class AuthUserDetailComponent implements OnDestroy {
       .setMyEmail(email)
       .then(() => {
         this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-        if (this.user.human) {
+        if (this.user?.human) {
           const mailToSet = new Email();
           mailToSet.setEmail(email);
           this.user.human.email = mailToSet.toObject();
@@ -237,7 +237,7 @@ export class AuthUserDetailComponent implements OnDestroy {
       .removeMyPhone()
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        if (this.user.human?.phone) {
+        if (this.user?.human?.phone) {
           const phone = new Phone();
           this.user.human.phone = phone.toObject();
           this.refreshUser();
@@ -249,12 +249,12 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public savePhone(phone: string): void {
-    if (this.user.human) {
+    if (this.user?.human) {
       this.userService
         .setMyPhone(phone)
         .then(() => {
           this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          if (this.user.human) {
+          if (this.user?.human) {
             const phoneToSet = new Phone();
             phoneToSet.setPhone(phone);
             this.user.human.phone = phoneToSet.toObject();
@@ -277,7 +277,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             labelKey: 'USER.LOGINMETHODS.PHONE.EDITVALUE',
             titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
-            value: this.user.human?.phone?.phone,
+            value: this.user?.human?.phone?.phone,
             type: type,
           },
           width: '400px',
@@ -297,7 +297,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             labelKey: 'ACTIONS.NEWVALUE',
             titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
             descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
-            value: this.user.human?.email?.email,
+            value: this.user?.human?.email?.email,
             type: type,
           },
           width: '400px',

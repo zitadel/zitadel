@@ -16,7 +16,7 @@ const ROUTEPARAM = 'projectid';
   styleUrls: ['./project-grant-create.component.scss'],
 })
 export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
-  public org!: Org.AsObject;
+  public org?: Org.AsObject;
   public projectId: string = '';
   public grantId: string = '';
   public rolesKeyList: string[] = [];
@@ -77,14 +77,16 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
   }
 
   public addGrant(): void {
-    this.mgmtService
-      .addProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
-      .then(() => {
-        this.close();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    if (this.org) {
+      this.mgmtService
+        .addProjectGrant(this.org.id, this.projectId, this.rolesKeyList)
+        .then(() => {
+          this.close();
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
   }
 
   public selectRoles(roles: Role.AsObject[]): void {

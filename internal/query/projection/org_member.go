@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	OrgMemberProjectionTable = "projections.org_members"
+	OrgMemberProjectionTable = "projections.org_members2"
 	OrgMemberOrgIDCol        = "org_id"
 )
 
@@ -28,7 +28,7 @@ func newOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 		crdb.NewTable(
 			append(memberColumns, crdb.NewColumn(OrgMemberOrgIDCol, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, OrgMemberOrgIDCol, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("org_memb_user_idx", []string{MemberUserIDCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

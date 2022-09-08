@@ -28,8 +28,8 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<Membership.AsObject>;
   @Input() public userId: string = '';
-  public dataSource!: MembershipsDataSource;
-  public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
+  public dataSource: MembershipsDataSource = new MembershipsDataSource(this.authService, this.mgmtService);
+  public selection: SelectionModel<Membership.AsObject> = new SelectionModel<Membership.AsObject>(true, []);
 
   @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
   @Output() public deleteMembership: EventEmitter<Membership.AsObject> = new EventEmitter();
@@ -51,8 +51,6 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     private workflowService: OverlayWorkflowService,
     private storageService: StorageService,
   ) {
-    this.dataSource = new MembershipsDataSource(this.authService, this.mgmtService);
-
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
       this.changedSelection.emit(this.selection.selected);
     });

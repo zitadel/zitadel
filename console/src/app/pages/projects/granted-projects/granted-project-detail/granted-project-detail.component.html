@@ -54,7 +54,12 @@
     </ng-template>
 
     <div metainfo>
-      <cnsl-changes *ngIf="project" [changeType]="ChangeType.PROJECT_GRANT" [id]="project.projectId" [secId]="project.grantId"></cnsl-changes>
+      <cnsl-changes
+        *ngIf="project"
+        [changeType]="ChangeType.PROJECT_GRANT"
+        [id]="project.projectId"
+        [secId]="project.grantId"
+      ></cnsl-changes>
     </div>
   </cnsl-meta-layout>
 </div>

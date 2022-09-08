@@ -265,7 +265,7 @@ export class AppComponent implements OnDestroy {
 
   public changedOrg(org: Org.AsObject): void {
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+    this.authService.zitadelPermissions$.pipe(take(1)).subscribe(() => {
       this.router.navigate(['/org'], { fragment: org.id });
     });
   }

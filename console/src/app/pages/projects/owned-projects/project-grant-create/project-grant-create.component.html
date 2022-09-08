@@ -19,7 +19,7 @@
       </button>
     </form>
 
-    <span *ngIf="org"> {{ 'PROJECT.GRANT.CREATE.FOR_ORG' | translate }} {{ org?.name }} </span>
+    <span *ngIf="org"> {{ 'PROJECT.GRANT.CREATE.FOR_ORG' | translate }} {{ org.name }} </span>
   </ng-container>
 
   <ng-container *ngIf="currentCreateStep === 2">

@@ -12,13 +12,13 @@ import (
 )
 
 var (
-	userMetadataQuery = `SELECT projections.user_metadata2.creation_date,` +
-		` projections.user_metadata2.change_date,` +
-		` projections.user_metadata2.resource_owner,` +
-		` projections.user_metadata2.sequence,` +
-		` projections.user_metadata2.key,` +
-		` projections.user_metadata2.value` +
-		` FROM projections.user_metadata2`
+	userMetadataQuery = `SELECT projections.user_metadata3.creation_date,` +
+		` projections.user_metadata3.change_date,` +
+		` projections.user_metadata3.resource_owner,` +
+		` projections.user_metadata3.sequence,` +
+		` projections.user_metadata3.key,` +
+		` projections.user_metadata3.value` +
+		` FROM projections.user_metadata3`
 	userMetadataCols = []string{
 		"creation_date",
 		"change_date",
@@ -27,14 +27,14 @@ var (
 		"key",
 		"value",
 	}
-	userMetadataListQuery = `SELECT projections.user_metadata2.creation_date,` +
-		` projections.user_metadata2.change_date,` +
-		` projections.user_metadata2.resource_owner,` +
-		` projections.user_metadata2.sequence,` +
-		` projections.user_metadata2.key,` +
-		` projections.user_metadata2.value,` +
+	userMetadataListQuery = `SELECT projections.user_metadata3.creation_date,` +
+		` projections.user_metadata3.change_date,` +
+		` projections.user_metadata3.resource_owner,` +
+		` projections.user_metadata3.sequence,` +
+		` projections.user_metadata3.key,` +
+		` projections.user_metadata3.value,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.user_metadata2`
+		` FROM projections.user_metadata3`
 	userMetadataListCols = []string{
 		"creation_date",
 		"change_date",

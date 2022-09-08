@@ -15,7 +15,7 @@
 
     <button
       mat-menu-item
-      [disabled]="isZitadel || (['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
+      [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
       *ngIf="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
       (click)="changeState(ProjectState.PROJECT_STATE_INACTIVE)"
     >
@@ -24,7 +24,7 @@
 
     <button
       mat-menu-item
-      [disabled]="isZitadel || (['project.write$', 'project.write:' + project.id] | hasRole | async) === false"
+      [disabled]="isZitadel || (['project.write$', 'project.write:' + project?.id] | hasRole | async) === false"
       *ngIf="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
       (click)="changeState(ProjectState.PROJECT_STATE_ACTIVE)"
     >

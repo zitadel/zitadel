@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -139,7 +138,7 @@ func (s *TextQuery) comp() sq.Sqlizer {
 	case TextContainsIgnoreCase:
 		return sq.ILike{s.Column.identifier(): "%" + s.Text + "%"}
 	case TextListContains:
-		return &listContains{col: s.Column, args: []interface{}{pq.StringArray{s.Text}}}
+		return &listContains{col: s.Column, args: []interface{}{s.Text}}
 	}
 	return nil
 }
@@ -228,7 +227,7 @@ func (s *NumberQuery) comp() sq.Sqlizer {
 	case NumberGreater:
 		return sq.Gt{s.Column.identifier(): s.Number}
 	case NumberListContains:
-		return &listContains{col: s.Column, args: []interface{}{pq.GenericArray{s.Number}}}
+		return &listContains{col: s.Column, args: []interface{}{s.Number}}
 	}
 	return nil
 }
@@ -379,7 +378,7 @@ func (t table) identifier() string {
 	if t.alias == "" {
 		return t.name
 	}
-	return t.name + " as " + t.alias
+	return t.name + " AS " + t.alias
 }
 
 func (t table) isZero() bool {
@@ -424,9 +423,9 @@ func join(join, from Column) string {
 
 type listContains struct {
 	col  Column
-	args []interface{}
+	args interface{}
 }
 
 func (q *listContains) ToSql() (string, []interface{}, error) {
-	return q.col.identifier() + " @> ? ", q.args, nil
+	return q.col.identifier() + " @> ? ", []interface{}{q.args}, nil
 }
