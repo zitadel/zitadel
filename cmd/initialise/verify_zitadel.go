@@ -12,15 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 )
 
-const (
-	eventstoreSchema       = "eventstore"
-	eventsTable            = "events"
-	uniqueConstraintsTable = "unique_constraints"
-	projectionsSchema      = "projections"
-	systemSchema           = "system"
-	encryptionKeysTable    = "encryption_keys"
-)
-
 func newZitadel() *cobra.Command {
 	return &cobra.Command{
 		Use:   "zitadel",
@@ -28,19 +19,22 @@ func newZitadel() *cobra.Command {
 		Long: `initialize ZITADEL internals.
 
 Prereqesits:
-- cockroachdb with user and database
+- cockroachDB or postgreSQL with user and database
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			config := new(Config)
-			if err := viper.Unmarshal(config); err != nil {
-				return err
-			}
-			return verifyZitadel(config.Database)
+		Run: func(cmd *cobra.Command, args []string) {
+			config := MustNewConfig(viper.GetViper())
+			err := verifyZitadel(config.Database)
+			logging.OnError(err).Fatal("unable to init zitadel")
 		},
 	}
 }
 
 func VerifyZitadel(db *sql.DB, config database.Config) error {
+	err := ReadStmts(config.Type())
+	if err != nil {
+		return err
+	}
+
 	if err := exec(db, fmt.Sprintf(createSystemStmt, config.Username()), nil); err != nil {
 		return err
 	}
@@ -73,12 +67,14 @@ func VerifyZitadel(db *sql.DB, config database.Config) error {
 
 func verifyZitadel(config database.Config) error {
 	logging.WithFields("database", config.Database()).Info("verify zitadel")
+
 	db, err := database.Connect(config, false)
 	if err != nil {
 		return err
 	}
+
 	if err := VerifyZitadel(db, config); err != nil {
-		return nil
+		return err
 	}
 
 	return db.Close()

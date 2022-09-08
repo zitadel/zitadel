@@ -182,13 +182,23 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 		}
 		cancel()
 	}()
+	// flag if projection has been successfully executed at least once since start
+	var succeededOnce bool
+	// get every instance id except empty (system)
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AddQuery().ExcludedInstanceID("")
 	for range h.triggerProjection.C {
-		ids, err := h.Eventstore.InstanceIDs(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).AddQuery().ExcludedInstanceID("").Builder())
+		if succeededOnce {
+			// since we have at least one successful run, we can restrict it to events not older than
+			// twice the requeue time (just to be sure not to miss an event)
+			query = query.CreationDateAfter(time.Now().Add(-2 * h.requeueAfter))
+		}
+		ids, err := h.Eventstore.InstanceIDs(ctx, query.Builder())
 		if err != nil {
 			logging.WithFields("projection", h.ProjectionName).WithError(err).Error("instance ids")
 			h.triggerProjection.Reset(h.requeueAfter)
 			continue
 		}
+		var failed bool
 		for i := 0; i < len(ids); i = i + h.concurrentInstances {
 			max := i + h.concurrentInstances
 			if max > len(ids) {
@@ -201,18 +211,22 @@ func (h *ProjectionHandler) schedule(ctx context.Context) {
 			if err, ok := <-errs; err != nil || !ok {
 				cancelLock()
 				logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
+				failed = true
 				continue
 			}
 			go h.cancelOnErr(lockCtx, errs, cancelLock)
 			err = h.Trigger(lockCtx, instances...)
 			if err != nil {
 				logging.WithFields("projection", h.ProjectionName, "instanceIDs", instances).WithError(err).Error("trigger failed")
+				failed = true
 			}
 
 			cancelLock()
 			unlockErr := h.unlock(instances...)
 			logging.WithFields("projection", h.ProjectionName).OnError(unlockErr).Warn("unable to unlock")
 		}
+		// it succeeded at least once if it has succeeded before or if it has succeeded now - not failed ;-)
+		succeededOnce = succeededOnce || !failed
 		h.triggerProjection.Reset(h.requeueAfter)
 	}
 }

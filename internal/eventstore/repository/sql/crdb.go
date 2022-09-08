@@ -297,6 +297,8 @@ func (db *CRDB) columnName(col repository.Field) string {
 		return "event_type"
 	case repository.FieldEventData:
 		return "event_data"
+	case repository.FieldCreationDate:
+		return "creation_date"
 	default:
 		return ""
 	}

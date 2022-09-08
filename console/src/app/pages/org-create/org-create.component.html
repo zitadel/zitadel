@@ -51,7 +51,7 @@
           <h1>{{ 'ORG.PAGES.ORGDETAILUSER_TITLE' | translate }}</h1>
 
           <div class="user">
-            <form [formGroup]="userForm" class="form">
+            <form [formGroup]="userForm" *ngIf="userForm" class="form">
               <div class="content">
                 <p class="section cnsl-secondary-text">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
                 <cnsl-form-field class="formfield">
@@ -136,7 +136,12 @@
                 <ng-container *ngIf="usePassword && pwdForm">
                   <p class="section cnsl-secondary-text">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
 
-                  <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy" [password]="password">
+                  <cnsl-password-complexity-view
+                    *ngIf="policy"
+                    class="complexity-view"
+                    [policy]="policy"
+                    [password]="password"
+                  >
                   </cnsl-password-complexity-view>
 
                   <form [formGroup]="pwdForm" class="pwd-form">
@@ -177,7 +182,7 @@
                   color="primary"
                   class="big-button"
                   (click)="finish()"
-                  [disabled]="orgForm.invalid || userForm.invalid || (usePassword && pwdForm ? pwdForm?.invalid : false)"
+                  [disabled]="orgForm.invalid || userForm.invalid || (usePassword && pwdForm ? pwdForm.invalid : false)"
                   mat-raised-button
                 >
                   {{ 'ACTIONS.FINISH' | translate }}

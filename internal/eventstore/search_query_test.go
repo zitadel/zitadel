@@ -4,6 +4,7 @@ import (
 	"math"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -83,6 +84,13 @@ func testSetResourceOwner(resourceOwner string) func(*SearchQueryBuilder) *Searc
 	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
 		builder = builder.ResourceOwner(resourceOwner)
 		return builder
+	}
+}
+
+func testSetCreationDateAfter(date time.Time) func(*SearchQuery) *SearchQuery {
+	return func(query *SearchQuery) *SearchQuery {
+		query = query.CreationDateAfter(date)
+		return query
 	}
 }
 
@@ -224,6 +232,7 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 }
 
 func TestSearchQuerybuilderBuild(t *testing.T) {
+	testNow := time.Now()
 	type args struct {
 		columns    Columns
 		setters    []func(*SearchQueryBuilder) *SearchQueryBuilder
@@ -642,6 +651,34 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldInstanceID, "instanceID", repository.OperationEquals),
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "filter aggregate type, instanceID and creation date after",
+			args: args{
+				columns: ColumnsEvent,
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+					testAddQuery(
+						testSetAggregateTypes("user"),
+						testSetCreationDateAfter(testNow),
+					),
+				},
+				instanceID: "instanceID",
+			},
+			res: res{
+				isErr: nil,
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    false,
+					Limit:   0,
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldCreationDate, testNow, repository.OperationGreater),
 							repository.NewFilter(repository.FieldInstanceID, "instanceID", repository.OperationEquals),
 						},
 					},

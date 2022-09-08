@@ -143,7 +143,7 @@ Projections:
   RequeueEvery: 60s
   RetryFailedAfter: 1s
   MaxFailureCount: 5
-  ConcurrentInstances: 10
+  ConcurrentInstances: 1
   BulkLimit: 200
   MaxIterators: 1
   Customizations:
@@ -361,7 +361,7 @@ DefaultInstance:
   DomainPolicy:
     UserLoginMustBeDomain: true
     ValidateOrgDomains: true
-    SMTPSenderAddressMatchesInstanceDomain: true
+    SMTPSenderAddressMatchesInstanceDomain: false
   LoginPolicy:
     AllowUsernamePassword: true
     AllowRegister: true

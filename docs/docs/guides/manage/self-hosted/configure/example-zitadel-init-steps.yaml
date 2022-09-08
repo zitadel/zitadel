@@ -1,4 +1,4 @@
-# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/adminn/setup/steps.yaml
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml
 FirstInstance:
   Org:
     Human:

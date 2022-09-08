@@ -17,7 +17,7 @@ func newUser() *cobra.Command {
 		Long: `Sets up the ZITADEL database user.
 
 Prereqesits:
-- cockroachdb
+- cockroachDB or postreSQL
 
 The user provided by flags needs priviledge to 
 - create the database if it does not exist
@@ -25,7 +25,7 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.GetViper())
 
 			err := initialise(config.Database, VerifyUser(config.Database.Username(), config.Database.Password()))
 			logging.OnError(err).Fatal("unable to init user")

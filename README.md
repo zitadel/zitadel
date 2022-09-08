@@ -27,7 +27,7 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
-You want auth that's quickly set up like Auth0 but open source like Keycloak? Look no further— ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
+You want auth that's quickly set up like Auth0 but open source like Keycloak? Look no further — ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
 
 We provide a wide range of out of the box features like secure login, self-service, OpenID Connect, OAuth2.x, SAML2, branding, Passwordless with FIDO2, OTP, U2F, and an unlimited audit trail to improve the life of developers. Especially noteworthy is that ZITADEL supports not only B2C and B2E scenarios but also B2B. This is super useful for people who build B2B Solutions, as ZITADEL can handle all the delegated user and access management.
 
@@ -63,7 +63,7 @@ It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview)
 - [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code
 - [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience
-- [CockroachDB](https://www.cockroachlabs.com/) is the only dependency
+- [CockroachDB](https://www.cockroachlabs.com/) or a Postgres database is the only dependency
 
 ## Features
 
@@ -81,7 +81,7 @@ It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-
 - [Service Accounts](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
 - [OpenID Connect certified](https://openid.net/certification/#OPs)
 - 🚧 [SAML 2.0](https://github.com/zitadel/zitadel/pull/3618)
-- 🚧 [Postgres](https://github.com/zitadel/zitadel/pull/3998)
+- [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
@@ -152,4 +152,3 @@ See the policy [here](./SECURITY.md)
 See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-

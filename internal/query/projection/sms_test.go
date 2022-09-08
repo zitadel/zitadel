@@ -150,7 +150,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.sms_configs_twilio SET (token) = ($1) WHERE (sms_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs_twilio SET token = $1 WHERE (sms_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
