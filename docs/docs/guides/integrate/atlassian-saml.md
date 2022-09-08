@@ -86,6 +86,8 @@ Then check the box "Enforce single sign-on" and confirm by clicking Update.
 Add members to your policy.
 ![Add Members](/img/saml/atlassian/atlassian-06.png)
 
+## Verify configuration
+
 Now you should be all set to verify your setup:
 
 - Create an user in ZITADEL with the same email address as a member in your authentication policy.
