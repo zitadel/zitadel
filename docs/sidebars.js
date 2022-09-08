@@ -125,6 +125,7 @@ module.exports = {
         "guides/integrate/gitlab-self-hosted",
         "guides/integrate/aws-saml",
         "guides/integrate/pingidentity-saml",
+        "guides/integrate/atlassian-saml",
         "guides/integrate/login-users",
         "guides/integrate/serviceusers",
         "guides/integrate/oauth-recommended-flows",
