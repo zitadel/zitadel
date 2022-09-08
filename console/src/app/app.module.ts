@@ -61,6 +61,8 @@ import { ToastService } from './services/toast.service';
 registerLocaleData(localeDe);
 registerLocaleData(localeZh);
 registerLocaleData(localeFr);
+registerLocaleData(localeIt);
+registerLocaleData(localeEn);
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
