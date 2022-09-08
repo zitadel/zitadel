@@ -122,6 +122,7 @@ module.exports = {
         "guides/integrate/auth0-oidc",
         "guides/integrate/auth0-saml",
         "guides/integrate/azuread-oidc",
+        "guides/integrate/gitlab-saml",
         "guides/integrate/gitlab-self-hosted",
         "guides/integrate/aws-saml",
         "guides/integrate/pingidentity-saml",
