@@ -71,6 +71,10 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceRemoved,
 				},
 				{
+					Event:  org.LoginPolicyRemovedEventType,
+					Reduce: p.reducePolicyRemoved,
+				},
+				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOrgRemoved,
 				},
@@ -203,6 +207,18 @@ func (p *idpLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) 
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *idpLoginPolicyLinkProjection) reducePolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.LoginPolicyRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SF3dg", "reduce.wrong.event.type %s", org.LoginPolicyRemovedEventType)
+	}
+	return crdb.NewDeleteStatement(e,
+		[]handler.Condition{
+			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, e.Aggregate().ID),
 		},
 	), nil
 }
