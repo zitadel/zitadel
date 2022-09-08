@@ -1,5 +1,5 @@
 ---
-title: Connect with Auth0 through SAML
+title: Connect with Auth0 through SAML 2.0
 ---
 
 This guide shows how to enable login with ZITADEL on Auth0.
@@ -41,16 +41,16 @@ This includes:
 All the information is filled out as an example, and to connect with any other environment you only have to change the
 used domain, for example "example.com" with "zitadel.cloud".
 Lastly, upload the certificate used to sign the reponses, provided for you under the
-URL [https://accounts.zitadel.cloud/saml/certificate](https://accounts.zitadel.cloud/saml/certificate).
+URL {your_instance_domain}/saml/v2/certificate.
 
 Then just press the button "Create" and the connection on Auth0 is configured.
 
 ## **ZITADEL**: Create the application
 
-So that ZITADEL also recognises the now created SAML
-connection, [here](https://auth0.com/docs/authenticate/protocols/saml/saml-identity-provider-configuration-settings) are
+You need to upload the SAML metadata to ZITADEL for it to recognize this newly created connection.
+[Under this link](https://auth0.com/docs/authenticate/protocols/saml/saml-identity-provider-configuration-settings) are
 all necessary information to correctly fill out the metadata or download the metadata-file directly under the
-URL https://YOUR_DOMAIN/samlp/metadata?connection=YOUR_CONNECTION_NAME, which in this example would
+URL https://YOUR_AUTH0_DOMAIN/samlp/metadata?connection=YOUR_CONNECTION_NAME, which in this example would
 be https://example.auth0.com/samlp/metadata?connection=SAML-ZITADEL.
 
 In your existing project:

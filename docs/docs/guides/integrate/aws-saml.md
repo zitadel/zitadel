@@ -1,5 +1,5 @@
 ---
-title: Connect with AWS through SAML
+title: Connect with AWS through SAML 2.0
 ---
 
 This guide shows how to enable login with ZITADEL on AWS SSO.
@@ -44,7 +44,7 @@ can connect to ZITADEL as a SAML2 IDP.
 4. Download the ZITADEL-used certificate to sign the responses, so that AWS can validation the signature.
 
    You can download the certificate from following
-   URL: [https://accounts.zitadel.cloud/saml/certificate](https://accounts.zitadel.cloud/saml/certificate)
+   URL: {your_instance_domain}/saml/v2/certificate
 
 5. Then upload the ".crt"-file to AWS and click "next".
 
