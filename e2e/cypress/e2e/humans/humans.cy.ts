@@ -29,7 +29,7 @@ describe("humans", () => {
         .type(loginname("e2ehuman", Cypress.env("ORGANIZATION")));
       //force needed due to the prefilled username prefix
       cy.get('[formcontrolname="userName"]')
-        .type(testHumanUserNameAdd);
+        .type(loginname(testHumanUserNameAdd, Cypress.env("ORGANIZATION")));
       cy.get('[formcontrolname="firstName"]')
         .type("e2ehumanfirstname");
       cy.get('[formcontrolname="lastName"]')
@@ -46,7 +46,7 @@ describe("humans", () => {
   describe("remove", () => {
     before("ensure it exists", () => {
       apiAuth().then((api) => {
-        ensureHumanUserExists(api, testHumanUserNameRemove).then(() => {
+        ensureHumanUserExists(api, loginname(testHumanUserNameRemove, Cypress.env("ORGANIZATION"))).then(() => {
           cy.visit(humansPath);
         });
       });

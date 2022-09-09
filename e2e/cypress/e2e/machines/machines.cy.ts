@@ -56,7 +56,7 @@ describe("machines", () => {
         .click({force: true});
       cy.get('[data-e2e="confirm-dialog-input"]')
         .focus()
-        .type(loginname(testMachineUserNameRemove, Cypress.env("ORGANIZATION")));
+        .type(testMachineUserNameRemove);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get(".data-e2e-success");
       cy.wait(200);
