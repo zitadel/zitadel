@@ -23,7 +23,8 @@ describe("humans", () => {
     it("should add a user", () => {
       cy.get('[data-e2e="create-user-button"]')
         .click();
-      cy.url().should("contain", "users/create");
+      cy.url()
+        .should("contain", "users/create");
       cy.get('[formcontrolname="email"]')
         .type(loginname("e2ehuman", Cypress.env("ORGANIZATION")));
       //force needed due to the prefilled username prefix
@@ -35,10 +36,12 @@ describe("humans", () => {
         .type("e2ehumanlastname");
       cy.get('[formcontrolname="phone"]')
         .type("+41 123456789");
-      cy.get('[data-e2e="create-button"]').click();
+      cy.get('[data-e2e="create-button"]')
+        .click();
       cy.get(".data-e2e-success");
       cy.wait(200);
-      cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
+      cy.get(".data-e2e-failure", { timeout: 0 })
+        .should("not.exist");
     });
   });
 
@@ -57,10 +60,12 @@ describe("humans", () => {
       cy.get('[data-e2e="confirm-dialog-input"]')
         .focus()
         .type(loginname(testHumanUserNameRemove, Cypress.env("ORGANIZATION")));
-      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.get('[data-e2e="confirm-dialog-button"]')
+        .click();
       cy.get(".data-e2e-success");
       cy.wait(200);
-      cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
+      cy.get(".data-e2e-failure", { timeout: 0 })
+        .should("not.exist");
     });
   });
 });
