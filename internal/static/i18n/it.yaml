@@ -756,6 +756,9 @@ EventTypes:
           added: Chiave di applicazione aggiunta
           removed: Chiave di applicazione rimossa
       config:
+        saml:
+          added: Configurazione SAML aggiunta
+          changed: Configurazione SAML modificata
         oidc:
           added: Configurazione OIDC aggiunta
           changed: Configurazione OIDC modificata
