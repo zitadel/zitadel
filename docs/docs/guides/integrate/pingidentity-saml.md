@@ -1,5 +1,5 @@
 ---
-title: Connect with Ping Identity through SAML
+title: Connect with Ping Identity through SAML 2.0
 ---
 
 This guide shows how to enable login with ZITADEL on Auth0.
@@ -7,7 +7,7 @@ This guide shows how to enable login with ZITADEL on Auth0.
 It covers how to:
 
 - create and configure the application in your project
-- create and configure the connection in your Auth0 tenant
+- create and configure the connection in your Ping Identity tenant
 
 Prerequisites:
 

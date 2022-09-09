@@ -35,29 +35,27 @@ For Identity Provider select "Other provider" and enter a Directory Name.
 Follow the wizard.
 Fill in the following information:
 
-- `Identity provider Entity ID`: https://{your_instance_domain}/saml/v2/metadata
-- `Identity provider SSO URL`: https://{your_instance_domain}/saml/v2/SSO
-- `Public x509 certificate`: You need to download and paste the value of the certificate from https://{your_instance_domain}/saml/v2/certificate
+- `Identity provider Entity ID`: {your_instance_domain}/saml/v2/metadata
+- `Identity provider SSO URL`: {your_instance_domain}/saml/v2/SSO
+- `Public x509 certificate`: You need to download and paste the value of the certificate from {your_instance_domain}/saml/v2/certificate
 
 ![Add SAML details](/img/saml/atlassian/atlassian-03.png)
 
 Create a new .xml file with the following minimal SAML metadata contents:
 
 ```xml
-        <?xml version="1.0"?>
+<?xml version="1.0"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${ENTITYID}">
-    <md:SPSSODescriptor
-            protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${ACSURL}"
-                                     index="0"/>
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${ACSURL}" index="0"/>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>
 ```
 
 Set or replace the variables with the values from the next screen as follows:
 
-- `ENTITYID`: Copy the value from "Service provider entity URL"
-- `ACSURL`: Copy the value from "Service provider assertion consumer service URL"
+- `${ENTITYID}`: Copy the value from "Service provider entity URL"
+- `${ACSURL}`: Copy the value from "Service provider assertion consumer service URL"
 
 ![Copy URLs](/img/saml/atlassian/atlassian-04.png)
 
@@ -79,8 +77,8 @@ Check your application, if everything is correct, press "Create".
 
 ## **Atlassian**: Setup authentication policies
 
-Under Authentication policies, select Edit on the directory that you have created.
-Then check the box "Enforce single sign-on" and confirm by clicking Update.
+Under Authentication policies, select "Edit" on the directory that you have created.
+Then check the box "Enforce single sign-on" and confirm by clicking "Update".
 ![Authentication policies](/img/saml/atlassian/atlassian-05.png)
 
 Add members to your policy.

@@ -50,8 +50,8 @@ Check your application, if everything is correct, press "Create".
 
 Complete the configuration as follows:
 
-- `Identity provider single sign-on URL`: https://{your_instance_domain}/saml/v2/SSO
-- `Certificate fingerprint`: You need to download the certificate from https://{your_instance_domain}/saml/v2/certificate and create a SHA1 fingerprint
+- `Identity provider single sign-on URL`: {your_instance_domain}/saml/v2/SSO
+- `Certificate fingerprint`: You need to download the certificate from {your_instance_domain}/saml/v2/certificate and create a SHA1 fingerprint
 
 Save the changes.
 
