@@ -148,6 +148,8 @@ module.exports = {
             "guides/integrate/auth0-saml",
             "guides/integrate/aws-saml",
             "guides/integrate/pingidentity-saml",
+            "guides/integrate/atlassian-saml",
+            "guides/integrate/gitlab-saml",
           ],
         },
       ],
