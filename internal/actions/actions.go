@@ -5,27 +5,23 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/dop251/goja_nodejs/console"
 	"github.com/dop251/goja_nodejs/require"
-	"github.com/zitadel/logging"
 )
 
-var ErrHalt = errors.New("interrupt")
+var (
+	ErrHalt = errors.New("interrupt")
+)
 
 type jsAction func(*Context, *API) error
 
-func Run(ctx *Context, api *API, script, name string, timeout time.Duration, allowedToFail bool) error {
-	if timeout <= 0 || timeout > 20 {
-		timeout = 20 * time.Second
-	}
-	prepareTimeout := timeout
-	if prepareTimeout > 5 {
-		prepareTimeout = 5 * time.Second
-	}
-	vm, err := prepareRun(script, prepareTimeout)
+func Run(ctx *Context, api *API, script, name string, opts ...runOpt) error {
+	config := newRunConfig(opts...)
+
+	vm, err := prepareRun(script, config)
 	if err != nil {
 		return err
 	}
+
 	var fn jsAction
 	jsFn := vm.Get(name)
 	if jsFn == nil {
@@ -35,16 +31,18 @@ func Run(ctx *Context, api *API, script, name string, timeout time.Duration, all
 	if err != nil {
 		return err
 	}
-	t := setInterrupt(vm, timeout)
+
+	t := setInterrupt(vm, config.timeout)
 	defer func() {
 		t.Stop()
 	}()
 	errCh := make(chan error)
 	defer close(errCh)
+
 	go func() {
 		defer func() {
 			r := recover()
-			if r != nil && !allowedToFail {
+			if r != nil && !config.allowedToFail {
 				err, ok := r.(error)
 				if !ok {
 					e, ok := r.(string)
@@ -56,8 +54,9 @@ func Run(ctx *Context, api *API, script, name string, timeout time.Duration, all
 				return
 			}
 		}()
+
 		err = fn(ctx, api)
-		if err != nil && !allowedToFail {
+		if err != nil && !config.allowedToFail {
 			errCh <- err
 			return
 		}
@@ -66,23 +65,22 @@ func Run(ctx *Context, api *API, script, name string, timeout time.Duration, all
 	return <-errCh
 }
 
-func newRuntime() *goja.Runtime {
+func newRuntime(config *runConfig) *goja.Runtime {
 	vm := goja.New()
 
-	printer := console.PrinterFunc(func(s string) {
-		logging.Debug(s)
-	})
 	registry := new(require.Registry)
 	registry.Enable(vm)
-	registry.RegisterNativeModule(console.ModuleName, console.RequireWithPrinter(printer))
-	console.Enable(vm)
+
+	for name, loader := range config.modules {
+		registry.RegisterNativeModule(name, loader)
+	}
 
 	return vm
 }
 
-func prepareRun(script string, timeout time.Duration) (*goja.Runtime, error) {
-	vm := newRuntime()
-	t := setInterrupt(vm, timeout)
+func prepareRun(script string, config *runConfig) (*goja.Runtime, error) {
+	vm := newRuntime(config)
+	t := setInterrupt(vm, config.prepareTimeout)
 	defer func() {
 		t.Stop()
 	}()

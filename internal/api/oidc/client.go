@@ -263,6 +263,9 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
+
+	//TODO: search for action and execute it
+
 	return nil
 }
 

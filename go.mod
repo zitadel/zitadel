@@ -14,8 +14,8 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
-	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51
-	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d
+	github.com/dop251/goja v0.0.0-20220815083517-0c74f9139fd6
+	github.com/dop251/goja_nodejs v0.0.0-20220905124449-678b33ca5009
 	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
 	github.com/envoyproxy/protoc-gen-validate v0.6.2
 	github.com/golang/glog v1.0.0
@@ -91,7 +91,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
-	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
+	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/drone/envsubst v1.0.3
 	github.com/dsoprea/go-exif v0.0.0-20210131231135-d154f10435cc // indirect
 	github.com/dsoprea/go-exif/v2 v2.0.0-20200604193436-ca8584a0e1c4 // indirect
