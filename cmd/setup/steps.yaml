@@ -4,7 +4,10 @@ FirstInstance:
   Org:
     Name: ZITADEL
     Human:
-      UserName: zitadel-admin #will be suffixed by the domain from config (if it's not an email). for example: zitadel-admin -> zitadel-admin@domain.tld
+      # in case that UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email,
+      # it will be suffixed by the org domain (org-name + domain from config).
+      # for example: zitadel-admin in org ZITADEL on domain.tld -> zitadel-admin@zitadel.domain.tld
+      UserName: zitadel-admin
       FirstName: ZITADEL
       LastName: Admin
       NickName:
