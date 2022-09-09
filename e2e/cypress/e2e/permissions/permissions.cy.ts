@@ -103,7 +103,7 @@ describe('permissions', () => {
 
             beforeEach(function () {
                 ensureProjectExists(this.api, testProjectName)
-                    .as("projectId")
+                  .as("projectId")
             })
 
             describe("managers", () => {
@@ -124,7 +124,7 @@ describe('permissions', () => {
                         cy.visit(`/projects/${this.projectId}?id=roles`)
                     })
 
-                    it.only('should add a role',  () => {
+                    it('should add a role',  () => {
                         cy.get('[data-e2e="add-new-role"]')
                             .click()
                         cy.get('[formcontrolname="key"]')

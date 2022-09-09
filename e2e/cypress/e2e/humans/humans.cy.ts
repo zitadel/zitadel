@@ -10,15 +10,14 @@ describe("humans", () => {
   const testHumanUserNameAdd = "e2ehumanusernameadd";
   const testHumanUserNameRemove = "e2ehumanusernameremove";
 
+  beforeEach(() => {
+    apiAuth().as("api")
+  })
+
   describe("add", () => {
-    before(`ensure it doesn't exist already`, () => {
-      apiAuth().then((apiCallProperties) => {
-        ensureUserDoesntExist(apiCallProperties, testHumanUserNameAdd).then(
-          () => {
-            cy.visit(humansPath);
-          }
-        );
-      });
+    before(`ensure it doesn't exist already`, function() {
+      ensureUserDoesntExist(this.api, testHumanUserNameAdd)
+      cy.visit(humansPath);
     });
 
     it("should add a user", () => {
@@ -44,12 +43,9 @@ describe("humans", () => {
   });
 
   describe("remove", () => {
-    before("ensure it exists", () => {
-      apiAuth().then((api) => {
-        ensureHumanUserExists(api, testHumanUserNameRemove).then(() => {
-          cy.visit(humansPath);
-        });
-      });
+    before("ensure it exists", function() {
+      ensureHumanUserExists(this.api, testHumanUserNameRemove)
+      cy.visit(humansPath);
     });
 
     it("should delete a human user", () => {

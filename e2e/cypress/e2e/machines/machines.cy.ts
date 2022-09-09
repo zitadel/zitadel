@@ -6,19 +6,19 @@ import {
 import { loginname } from "../../support/login/users";
 
 describe("machines", () => {
+
+  beforeEach(() => {
+    apiAuth().as("api")
+  })
+
   const machinesPath = `/users?type=machine`;
   const testMachineUserNameAdd = "e2emachineusernameadd";
   const testMachineUserNameRemove = "e2emachineusernameremove";
 
   describe("add", () => {
-    before(`ensure it doesn't exist already`, () => {
-      apiAuth().then((apiCallProperties) => {
-        ensureUserDoesntExist(apiCallProperties, testMachineUserNameAdd).then(
-          () => {
-            cy.visit(machinesPath);
-          }
-        );
-      });
+    before(`ensure it doesn't exist already`, function() {
+      ensureUserDoesntExist(this.api, testMachineUserNameAdd)
+      cy.visit(machinesPath);
     });
 
     it("should add a machine", () => {
@@ -40,12 +40,9 @@ describe("machines", () => {
   });
 
   describe("edit", () => {
-    before("ensure it exists", () => {
-      apiAuth().then((api) => {
-        ensureMachineUserExists(api, testMachineUserNameRemove).then(() => {
-          cy.visit(machinesPath);
-        });
-      });
+    before("ensure it exists", function() {
+      ensureMachineUserExists(this.api, testMachineUserNameRemove)
+      cy.visit(machinesPath);
     });
 
     it("should delete a machine", () => {

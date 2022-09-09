@@ -5,15 +5,18 @@ import {
 } from "../../support/api/projects";
 
 describe("projects", () => {
+
+  beforeEach(() => {
+    apiAuth().as("api")
+  })
+
   const testProjectNameCreate = "e2eprojectcreate";
   const testProjectNameDeleteList = "e2eprojectdeletelist";
   const testProjectNameDeleteGrid = "e2eprojectdeletegrid";
 
   describe("add project", () => {
-    beforeEach(`ensure it doesn't exist already`, () => {
-      apiAuth().then((api) => {
-        ensureProjectDoesntExist(api, testProjectNameCreate);
-      });
+    beforeEach(`ensure it doesn't exist already`, function() {
+      ensureProjectDoesntExist(this.api, testProjectNameCreate);
       cy.visit(`/projects`);
     });
 
@@ -30,19 +33,15 @@ describe("projects", () => {
   });
 
   describe("edit project", () => {
-    beforeEach("ensure it exists", () => {
-      apiAuth().then((api) => {
-        ensureProjectExists(api, testProjectNameDeleteList);
-      });
+    beforeEach("ensure it exists", function() {
+      ensureProjectExists(this.api, testProjectNameDeleteList);
       cy.visit(`/projects`);
     });
 
     describe("remove project", () => {
 
-      beforeEach("ensure it exists", () => {
-        apiAuth().then((api) => {
-          ensureProjectExists(api, testProjectNameDeleteGrid);
-        });
+      beforeEach("ensure it exists", function() {
+        ensureProjectExists(this.api, testProjectNameDeleteGrid);
         cy.visit(`/projects`);
       });
 
