@@ -84,7 +84,7 @@ It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-
 - [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
-http://localhost:3000/docs/apis/openidoauth/endpoints#:~:text=Actions-,OpenID%20Connect%20%26%20OAuth,-Endpoints
+
 ## Client libraries
 
 <!-- TODO: check other libraries -->
