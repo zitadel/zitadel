@@ -97,7 +97,7 @@ export class OrgTableComponent {
   public selectOrg(item: Org.AsObject, event?: any): void {
     this.authService.setActiveOrg(item);
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+    this.authService.zitadelPermissions$.pipe(take(1)).subscribe(() => {
       this.router.navigate(['/org'], { fragment: item.id });
     });
   }
@@ -146,7 +146,7 @@ export class OrgTableComponent {
   public setAndNavigateToOrg(org: Org.AsObject): void {
     this.authService.setActiveOrg(org);
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+    this.authService.zitadelPermissions$.pipe(take(1)).subscribe(() => {
       this.router.navigate(['/org'], { fragment: org.id });
     });
   }

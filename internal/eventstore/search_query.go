@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -30,6 +31,7 @@ type SearchQuery struct {
 	eventSequenceLess    uint64
 	eventTypes           []EventType
 	eventData            map[string]interface{}
+	creationDateAfter    time.Time
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -175,6 +177,12 @@ func (query *SearchQuery) ExcludedInstanceID(instanceIDs ...string) *SearchQuery
 	return query
 }
 
+// CreationDateNewer filters for events which happened after the specified time
+func (query *SearchQuery) CreationDateAfter(time time.Time) *SearchQuery {
+	query.creationDateAfter = time
+	return query
+}
+
 // EventTypes filters for events with the given event types
 func (query *SearchQuery) EventTypes(types ...EventType) *SearchQuery {
 	query.eventTypes = types
@@ -234,6 +242,7 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 			query.eventSequenceLessFilter,
 			query.instanceIDFilter,
 			query.excludedInstanceIDFilter,
+			query.creationDateAfterFilter,
 			query.builder.resourceOwnerFilter,
 			query.builder.instanceIDFilter,
 		} {
@@ -342,6 +351,13 @@ func (builder *SearchQueryBuilder) instanceIDFilter() *repository.Filter {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldInstanceID, builder.instanceID, repository.OperationEquals)
+}
+
+func (query *SearchQuery) creationDateAfterFilter() *repository.Filter {
+	if query.creationDateAfter.IsZero() {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldCreationDate, query.creationDateAfter, repository.OperationGreater)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {

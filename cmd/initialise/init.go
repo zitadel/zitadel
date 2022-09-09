@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/id"
 )
 
 var (
@@ -58,8 +57,6 @@ The user provided by flags needs privileges to
 }
 
 func InitAll(config *Config) {
-	id.Configure(config.Machine)
-
 	err := initialise(config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.Database()),

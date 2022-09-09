@@ -144,4 +144,4 @@ The storage layer of ZITADEL is responsible for multiple things. For example:
 - Backup and restore operation for disaster recovery purpose
 
 ZITADEL currently supports CockroachDB as first choice of storage due to its perfect match for ZITADELs needs.
-Postgresql support is currently in beta.
+PostgreSQL support is currently in beta.

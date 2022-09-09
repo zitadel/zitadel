@@ -21,8 +21,8 @@ export class HeaderComponent implements OnDestroy {
   @ViewChild('input', { static: false }) input!: ElementRef;
 
   @Input() public isDarkTheme: boolean = true;
-  @Input() public user!: User.AsObject;
-  @Input() public labelpolicy!: LabelPolicy.AsObject;
+  @Input() public user?: User.AsObject;
+  @Input() public labelpolicy?: LabelPolicy.AsObject;
   public showOrgContext: boolean = false;
 
   public orgs$: Observable<Org.AsObject[]> = of([]);

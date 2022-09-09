@@ -37,6 +37,7 @@ ZITADEL is available in the following languages
 - German (de)
 - Italian (it)
 - French (fr)
+- 简体中文（zh）
 
 A language is displayed based on your agent's language header. The default language is English.
 
