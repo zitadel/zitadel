@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -56,6 +57,7 @@ type Config struct {
 	AuditLogRetention time.Duration
 	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
 	CustomerPortal    string
+	Machine           *id.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -80,6 +82,8 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err = config.Metrics.NewMeter()
 	logging.OnError(err).Fatal("unable to set meter")
+
+	id.Configure(config.Machine)
 
 	return config
 }
