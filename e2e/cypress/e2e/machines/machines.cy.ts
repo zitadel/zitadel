@@ -16,7 +16,7 @@ describe("machines", () => {
   const testMachineUserNameRemove = "e2emachineusernameremove";
 
   describe("add", () => {
-    before(`ensure it doesn't exist already`, function() {
+    beforeEach(`ensure it doesn't exist already`, function() {
       ensureUserDoesntExist(this.api, testMachineUserNameAdd)
       cy.visit(machinesPath);
     });
@@ -40,7 +40,7 @@ describe("machines", () => {
   });
 
   describe("edit", () => {
-    before("ensure it exists", function() {
+    beforeEach("ensure it exists", function() {
       ensureMachineUserExists(this.api, testMachineUserNameRemove)
       cy.visit(machinesPath);
     });

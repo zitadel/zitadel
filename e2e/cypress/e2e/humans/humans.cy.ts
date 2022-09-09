@@ -15,7 +15,7 @@ describe("humans", () => {
   })
 
   describe("add", () => {
-    before(`ensure it doesn't exist already`, function() {
+    beforeEach(`ensure it doesn't exist already`, function() {
       ensureUserDoesntExist(this.api, testHumanUserNameAdd)
       cy.visit(humansPath);
     });
@@ -43,7 +43,7 @@ describe("humans", () => {
   });
 
   describe("remove", () => {
-    before("ensure it exists", function() {
+    beforeEach("ensure it exists", function() {
       ensureHumanUserExists(this.api, testHumanUserNameRemove)
       cy.visit(humansPath);
     });
