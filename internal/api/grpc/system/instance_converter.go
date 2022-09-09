@@ -19,9 +19,8 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 		defaultInstance.InstanceName = req.InstanceName
 		defaultInstance.Org.Name = req.InstanceName
 	}
-	if req.CustomDomain = strings.TrimSpace(req.CustomDomain); req.CustomDomain != "" {
+	if req.CustomDomain != "" {
 		defaultInstance.CustomDomain = req.CustomDomain
-		externalDomain = req.CustomDomain
 	}
 	if req.FirstOrgName != "" {
 		defaultInstance.Org.Name = req.FirstOrgName
