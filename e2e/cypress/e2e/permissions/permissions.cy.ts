@@ -1,32 +1,109 @@
+import { ensureHumanIsMember, ensureHumanIsNotMember } from "support/api/members";
+import { ensureHumanUserExists } from "support/api/users";
 import { apiAuth } from "../../support/api/apiauth";
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from "../../support/api/projects";
 
+
 describe('permissions', () => {
 
-    describe("management", ()=> {
+    beforeEach(() => {
+        apiAuth().as("api")
+    })
+
+    describe("management", () => {
 
         describe("organizations", () => {
-            it("should add an organization manager")
-            it("should remove an organization manager")
+
+            const testManagerName = "e2ehumanmanager"
+
+            beforeEach(function () {
+                ensureHumanUserExists(this.api, testManagerName)
+            })
+
+            describe("add manager", () => {
+
+                beforeEach(function() {
+                    ensureHumanIsNotMember(this.api, testManagerName)
+                    cy.visit('/orgs')
+                })
+
+                it("should add an organization manager", () => {
+                    cy.contains("tr", Cypress.env("ORGANIZATION"))
+                        .click()
+                    cy.get('[data-e2e="add-member-button"]')
+                        .click()
+                    cy.get('[data-e2e="add-member-input"]')
+                        .type(testManagerName)
+                    cy.get('[data-e2e="user-option"]')
+                        .click()
+                    cy.contains('[data-e2e="role-checkbox"]', "Org Owner")
+                        .click()
+                    cy.get('[data-e2e="confirm-add-member-button"]')
+                        .click()
+                    cy.get(".data-e2e-success");
+                    cy.contains('[data-e2e="member-avatar"]', "ee")
+                    cy.get(".data-e2e-failure", { timeout: 0 })
+                        .should("not.exist");
+                })
+            })
+
+            describe("edit authorizations", () => {
+                beforeEach(function() {
+                    ensureHumanIsMember(this.api, testManagerName, ["ORG_OWNER", "ORG_OWNER_VIEWER"])
+                    cy.visit('/orgs')
+                    cy.contains("tr", Cypress.env("ORGANIZATION"))
+                        .click()
+                    cy.contains('[data-e2e="member-avatar"]', "ee")
+                        .click()
+                    cy.contains("tr", testManagerName)
+                        .as('managerRow')
+                })
+
+                it("should remove a manager", () => {
+                    cy.get('@managerRow')
+                        .find('[data-e2e="remove-member-button"]')
+                        .click({force: true})
+                    cy.get('[data-e2e="confirm-dialog-button"]')
+                        .click();
+                    cy.get(".data-e2e-success");
+                    // https://github.com/NoriSte/cypress-wait-until/issues/75#issuecomment-572685623
+                    cy.waitUntil(() => Cypress.$(`tr:contains('${testManagerName}')`).length === 0)
+                    cy.get(".data-e2e-failure", { timeout: 0 })
+                        .should("not.exist");
+                })
+
+                describe("roles", () => {
+                    it("should remove a managers authorization", () =>{
+                        cy.get('@managerRow')
+                            .find('[data-e2e="role"]')
+                            .should("have.length", 2)
+                        cy.get('@managerRow')
+                            .contains('[data-e2e="role"]', "Org Owner Viewer")
+                            .find('[data-e2e="remove-role-button"]')
+                            .click()
+                        cy.get('[data-e2e="confirm-dialog-button"]')
+                            .click();
+                        cy.get(".data-e2e-success");
+                        cy.get('@managerRow')
+                            .find('[data-e2e="remove-role-button"]')
+                            .should("have.length", 1)
+                        cy.get(".data-e2e-failure", { timeout: 0 })
+                            .should("not.exist");
+                    })
+                })
+            })
         })
 
         describe("projects", () => {
 
             const testProjectName = 'e2eprojectpermission'
-            const testAppName = 'e2eapppermission'
             const testRoleName = 'e2eroleundertestname'
             const testRoleDisplay = 'e2eroleundertestdisplay'
             const testRoleGroup = 'e2eroleundertestgroup'
-            const testGrantName = 'e2egrantundertest'
 
-            var projectId: number
-
-            beforeEach(() => {
-                apiAuth().then(apiCalls => {
-                    ensureProjectExists(apiCalls, testProjectName).then(projId => {
-                        projectId = projId
-                    })
-                })
+            beforeEach(function () {
+                ensureProjectExists(this.api, testProjectName)
+                    .as("projectId")
             })
 
             describe("managers", () => {
@@ -42,15 +119,14 @@ describe('permissions', () => {
             describe("owned projects", () => {
 
                 describe('roles', () => {
-                    beforeEach(()=> {
-                        apiAuth().then((api)=> {
-                            ensureProjectResourceDoesntExist(api, projectId, Roles, testRoleName)
-                            cy.visit(`/projects/${projectId}?id=roles`)
-                        })
+                    beforeEach(function() {
+                        ensureProjectResourceDoesntExist(this.api, this.projectId, Roles, testRoleName)
+                        cy.visit(`/projects/${this.projectId}?id=roles`)
                     })
 
-                    it('should add a role',  () => {
-                        cy.get('[data-e2e="add-new-role"]').click()
+                    it.only('should add a role',  () => {
+                        cy.get('[data-e2e="add-new-role"]')
+                            .click()
                         cy.get('[formcontrolname="key"]')
                             .type(testRoleName)
                         cy.get('[formcontrolname="displayName"]')
@@ -60,8 +136,9 @@ describe('permissions', () => {
                         cy.get('[data-e2e="save-button"]')
                             .click()
                         cy.get('.data-e2e-success')
-                        cy.wait(200)
-                        cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
+                        cy.contains('tr', testRoleName)
+                        cy.get('.data-e2e-failure', { timeout: 0 })
+                            .should('not.exist')
                     })
                     it('should remove a role')
                 })

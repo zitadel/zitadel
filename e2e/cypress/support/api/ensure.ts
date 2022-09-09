@@ -1,24 +1,32 @@
 import { apiCallProperties } from "./apiauth"
 
-export function ensureSomethingExists(api: apiCallProperties, searchPath: string, find: (entity: any) => boolean, createPath: string, body: any): Cypress.Chainable<number> {
+// Entity is an object but not a function
+type Entity =
+    { [k: string]: any }
+    & ({ bind?: never }
+        | { call?: never });
 
+export function ensureSomething(api: apiCallProperties, searchPath: string, find: (entity: Entity) => boolean, apiPath: (entity: Entity) => string, method: string, body: Entity, expectEntity: (entity: Entity) => boolean): Cypress.Chainable<number> {
     return searchSomething(api, searchPath, find).then(sRes => {
-        if (sRes.entity) {
+        if (expectEntity(sRes.entity)) {
             return cy.wrap({
-                id: sRes.entity.id,
+                id: sRes?.entity?.id,
                 initialSequence: 0
             })
         }
-        return cy.request({
-            method: 'POST',
-            url: `${api.mgntBaseURL}${createPath}`,
+
+        const req = {
+            method: method,
+            url: `${api.mgntBaseURL}${apiPath(sRes.entity)}`,
             headers: {
                 Authorization: api.authHeader
             },
             body: body,
             failOnStatusCode: false,
             followRedirect: false,
-        }).then(cRes => {
+        }
+
+        return cy.request(req).then(cRes => {
             expect(cRes.status).to.equal(200)
             return {
                 id: cRes.body.id,
@@ -26,40 +34,26 @@ export function ensureSomethingExists(api: apiCallProperties, searchPath: string
             }
         })
     }).then((data) => {
-        awaitDesired(30, (entity) => !!entity, data.initialSequence, api, searchPath, find)
+        awaitDesired(30, expectEntity, data.initialSequence, api, searchPath, find)
         return cy.wrap<number>(data.id)
     })
 }
 
-export function ensureSomethingDoesntExist(api: apiCallProperties, searchPath: string, find: (entity: any) => boolean, deletePath: (entity: any) => string): Cypress.Chainable<null> {
+export function ensureSomethingExists(api: apiCallProperties, searchPath: string, find: (entity: Entity) => boolean, createPath: string, body: Entity): Cypress.Chainable<number> {
+    return ensureSomething(api, searchPath, find, () => createPath, 'POST', body, entity => !!entity)
+}
 
-    return searchSomething(api, searchPath, find).then(sRes => {
-        if (!sRes.entity) {
-            return cy.wrap(0)
-        }
-        return cy.request({
-            method: 'DELETE',
-            url: `${api.mgntBaseURL}${deletePath(sRes.entity)}`,
-            headers: {
-                Authorization: api.authHeader
-            },
-            failOnStatusCode: false
-        }).then((dRes) => {
-            expect(dRes.status).to.equal(200)
-            return sRes.sequence
-        })
-    }).then((initialSequence) => {
-        awaitDesired(30, (entity) => !entity , initialSequence, api, searchPath, find)
-        return null
-    })
+export function ensureSomethingDoesntExist(api: apiCallProperties, searchPath: string, find: (entity: Entity) => boolean, deletePath: (entity: Entity) => string): Cypress.Chainable<null> {
+    return ensureSomething(api, searchPath, find, deletePath, 'DELETE', null, entity => !entity)
+        .then(() => { return null })
 }
 
 type SearchResult = {
-    entity: any
+    entity: Entity
     sequence: number
 }
 
-function searchSomething(api: apiCallProperties, searchPath: string, find: (entity: any) => boolean): Cypress.Chainable<SearchResult> {
+export function searchSomething(api: apiCallProperties, searchPath: string, find: (entity: Entity) => boolean): Cypress.Chainable<SearchResult> {
 
     return cy.request({
         method: 'POST',
@@ -75,12 +69,12 @@ function searchSomething(api: apiCallProperties, searchPath: string, find: (enti
     })
 }
 
-function awaitDesired(trials: number, expectEntity: (entity: any) => boolean, initialSequence: number, api: apiCallProperties, searchPath: string, find: (entity: any) => boolean) {
+function awaitDesired(trials: number, expectEntity: (entity: Entity) => boolean, initialSequence: number, api: apiCallProperties, searchPath: string, find: (entity: Entity) => boolean) {
     searchSomething(api, searchPath, find).then(resp => {
         if (!expectEntity(resp.entity) || resp.sequence <= initialSequence) {
             expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
             cy.wait(1000)
             awaitDesired(trials - 1, expectEntity, initialSequence, api, searchPath, find)
-        }            
+        }
     })
 }

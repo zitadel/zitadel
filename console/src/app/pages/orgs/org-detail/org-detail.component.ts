@@ -50,7 +50,9 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     breadcrumbService.setBreadcrumb([bread]);
 
     activatedRoute.fragment.pipe(takeUntil(this.destroy$)).subscribe((orgId) => {
-      this.getData();
+      if (this.org && orgId) {
+        this.getData();
+      }
     });
   }
 

@@ -146,9 +146,7 @@ export class OrgTableComponent {
   public setAndNavigateToOrg(org: Org.AsObject): void {
     this.authService.setActiveOrg(org);
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissions$.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/org'], { fragment: org.id });
-    });
+    this.router.navigate(['/org'], { fragment: org.id });
   }
 
   public changePage(): void {

@@ -2,7 +2,7 @@ import { apiCallProperties } from "./apiauth"
 import { ensureSomethingDoesntExist, ensureSomethingExists } from "./ensure"
 
 export function ensureProjectExists(api: apiCallProperties, projectName: string): Cypress.Chainable<number> {
-    
+
     return ensureSomethingExists(
         api,
         `projects/_search`,
@@ -13,7 +13,7 @@ export function ensureProjectExists(api: apiCallProperties, projectName: string)
 }
 
 export function ensureProjectDoesntExist(api: apiCallProperties, projectName: string): Cypress.Chainable<null> {
-    
+
     return ensureSomethingDoesntExist(
         api,
         `projects/_search`,
@@ -70,11 +70,6 @@ export function ensureApplicationExists(api: apiCallProperties, projectId: numbe
             postLogoutRedirectUris: [
                 'https://e2elogoutredirecturl.org'
             ],
-/*            "clientId": "129383004379407963@e2eprojectpermission",
-            "clockSkew": "0s",
-            "allowedOrigins": [
-                "https://testurl.org"
-            ]*/
         },
     )
 }

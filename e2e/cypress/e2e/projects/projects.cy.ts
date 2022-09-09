@@ -38,44 +38,41 @@ describe("projects", () => {
     });
 
     describe("remove project", () => {
-      describe("list view", () => {
-          it("removes the project", () => {
-            cy.get('[data-e2e="toggle-grid"]').click();
-            cy.get('[data-e2e="timestamp"]');
-            cy.contains("tr", testProjectNameDeleteList, { timeout: 1000 })
-              .find('[data-e2e="delete-project-button"]')
-              .click({ force: true });
-            cy.get('[data-e2e="confirm-dialog-input"]')
-              .focus()
-              .type(testProjectNameDeleteList);
-            cy.get('[data-e2e="confirm-dialog-button"]').click();
-            cy.get(".data-e2e-success");
-            cy.wait(200);
-            cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
-          });
-        });
 
-        describe("grid view", () => {
-          beforeEach("ensure it exists", () => {
-            apiAuth().then((api) => {
-              ensureProjectExists(api, testProjectNameDeleteGrid);
-            });
-            cy.visit(`/projects`);
-          });
-
-          it("removes the project", () => {
-            cy.contains('[data-e2e="grid-card"]', testProjectNameDeleteGrid)
-              .find('[data-e2e="delete-project-button"]')
-              .click({force: true});
-            cy.get('[data-e2e="confirm-dialog-input"]')
-              .focus()
-              .type(testProjectNameDeleteGrid);
-            cy.get('[data-e2e="confirm-dialog-button"]').click();
-            cy.get(".data-e2e-success");
-            cy.wait(200);
-            cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
-          });
+      beforeEach("ensure it exists", () => {
+        apiAuth().then((api) => {
+          ensureProjectExists(api, testProjectNameDeleteGrid);
         });
+        cy.visit(`/projects`);
+      });
+
+      it("removes the project from list view", () => {
+        cy.get('[data-e2e="toggle-grid"]').click();
+        cy.get('[data-e2e="timestamp"]');
+        cy.contains("tr", testProjectNameDeleteList, { timeout: 1000 })
+          .find('[data-e2e="delete-project-button"]')
+          .click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]')
+          .focus()
+          .type(testProjectNameDeleteList);
+        cy.get('[data-e2e="confirm-dialog-button"]').click();
+        cy.get(".data-e2e-success");
+        cy.wait(200);
+        cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
+      });
+
+      it("removes the project from grid view", () => {
+        cy.contains('[data-e2e="grid-card"]', testProjectNameDeleteGrid)
+          .find('[data-e2e="delete-project-button"]')
+          .click({force: true});
+        cy.get('[data-e2e="confirm-dialog-input"]')
+          .focus()
+          .type(testProjectNameDeleteGrid);
+        cy.get('[data-e2e="confirm-dialog-button"]').click();
+        cy.get(".data-e2e-success");
+        cy.wait(200);
+        cy.get(".data-e2e-failure", { timeout: 0 }).should("not.exist");
+      });
       });
 
       it("should add a project manager")

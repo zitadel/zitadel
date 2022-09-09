@@ -1,3 +1,5 @@
+import 'cypress-wait-until';
+
 /*
 namespace Cypress {
     interface Chainable {

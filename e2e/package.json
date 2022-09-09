@@ -9,6 +9,7 @@
   },
   "private": true,
   "dependencies": {
+    "cypress-wait-until": "^1.7.2",
     "debug": "^4.3.4",
     "jsonwebtoken": "^8.5.1",
     "mochawesome": "^7.1.3",

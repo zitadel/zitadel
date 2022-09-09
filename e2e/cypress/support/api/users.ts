@@ -14,17 +14,19 @@ export function ensureHumanUserExists(api: apiCallProperties, username: string):
                 first_name: 'e2efirstName',
                 last_name: 'e2elastName',
             },
-            email: { 
+            email: {
                 email: 'e2e@email.ch',
             },
             phone: {
                 phone: '+41 123456789',
+
+            }
         },
-    })
+    )
 }
 
 export function ensureMachineUserExists(api: apiCallProperties, username: string): Cypress.Chainable<number> {
-    
+
     return ensureSomethingExists(
         api,
         'users/_search',
