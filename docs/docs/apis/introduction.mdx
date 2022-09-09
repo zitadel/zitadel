@@ -231,19 +231,19 @@ If you run ZITADEL on a custom domain, you may want to reuse that domain for oth
 For easy copying to your reverse proxy configuration, here is a list of URL path prefixes, ZITADEL uses.
 
 ```
-/zitadel.auth.v1.AuthService/
-/auth/
-/zitadel.management.v1.ManagementService/
-/management/
 /zitadel.admin.v1.AdminService/
-/admin/
+/admin/v1/
+/zitadel.auth.v1.AuthService/
+/auth/v1/
+/zitadel.management.v1.ManagementService/
+/management/v1/
 /zitadel.system.v1.SystemService/
-/system/
-/saml/
-/assets/
+/system/v1/
+/assets/v1/
 /ui/
+/oidc/v1/
+/saml/v2/
 /oauth/v2/
-/oidc/
 /.well-known/openid-configuration
 /openapi/
 ```
