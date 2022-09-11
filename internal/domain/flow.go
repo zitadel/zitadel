@@ -1,5 +1,7 @@
 package domain
 
+import "strconv"
+
 type FlowState int32
 
 const (
@@ -37,6 +39,13 @@ func (s FlowType) HasTrigger(triggerType TriggerType) bool {
 	}
 }
 
+func (s FlowType) String() string {
+	if !s.Valid() {
+		return FlowTypeUnspecified.String()
+	}
+	return strconv.Itoa(int(s))
+}
+
 type TriggerType int32
 
 const (
@@ -49,4 +58,11 @@ const (
 
 func (s TriggerType) Valid() bool {
 	return s >= 0 && s < triggerTypeCount
+}
+
+func (s TriggerType) String() string {
+	if !s.Valid() {
+		return TriggerTypeUnspecified.String()
+	}
+	return strconv.Itoa(int(s))
 }

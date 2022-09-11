@@ -6,8 +6,67 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/errors"
+	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	msg_pb "github.com/zitadel/zitadel/pkg/grpc/message"
 )
+
+func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequest) (*mgmt_pb.ListFlowTypesResponse, error) {
+	return &mgmt_pb.ListFlowTypesResponse{
+		Result: []*action_pb.FlowType{
+			{
+				Id: "1",
+				Name: &msg_pb.LocalizedMessage{
+					Key: "Action.Flow.Type.ExternalAuthentication",
+				},
+			},
+		},
+	}, nil
+}
+
+var (
+	flowTriggerTypes = map[string][]*action_pb.TriggerType{
+		// FLOW_TYPE_EXTERNAL_AUTHENTICATION
+		"1": {
+			{
+				Id: "1",
+				Name: &msg_pb.LocalizedMessage{
+					Key: "Action.TriggerType.PostAuthentication",
+				},
+			},
+			{
+				Id: "2",
+				Name: &msg_pb.LocalizedMessage{
+					Key: "Action.TriggerType.PreCreation",
+				},
+			},
+			{
+				Id: "3",
+				Name: &msg_pb.LocalizedMessage{
+					Key: "Action.TriggerType.PostCreation",
+				},
+			},
+		},
+	}
+)
+
+func (s *Server) ListFlowTriggerTypes(ctx context.Context, req *mgmt_pb.ListFlowTriggerTypesRequest) (*mgmt_pb.ListFlowTriggerTypesResponse, error) {
+	triggerTypes := flowTriggerTypes[req.Type]
+	if len(triggerTypes) == 0 {
+		return nil, errors.ThrowNotFound(nil, "MANAG-P2OBk", "Errors.NotFound")
+	}
+	return &mgmt_pb.ListFlowTriggerTypesResponse{
+		Result: []*action_pb.TriggerType{
+			{
+				Id: "1",
+				Name: &msg_pb.LocalizedMessage{
+					Key: "Flow.Type.External_Authentication",
+				},
+			},
+		},
+	}, nil
+}
 
 func (s *Server) GetFlow(ctx context.Context, req *mgmt_pb.GetFlowRequest) (*mgmt_pb.GetFlowResponse, error) {
 	flow, err := s.query.GetFlow(ctx, action_grpc.FlowTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)

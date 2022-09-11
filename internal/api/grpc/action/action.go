@@ -9,22 +9,24 @@ import (
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 )
 
-func FlowTypeToDomain(flowType action_pb.FlowType) domain.FlowType {
+func FlowTypeToDomain(flowType string) domain.FlowType {
 	switch flowType {
-	case action_pb.FlowType_FLOW_TYPE_EXTERNAL_AUTHENTICATION:
+	case "FLOW_TYPE_EXTERNAL_AUTHENTICATION", "1":
 		return domain.FlowTypeExternalAuthentication
 	default:
 		return domain.FlowTypeUnspecified
 	}
 }
 
-func TriggerTypeToDomain(triggerType action_pb.TriggerType) domain.TriggerType {
+// TriggerTypeToDomain maps the pb type to domain
+// for backward compatability the old enum identifiers are mapped as well
+func TriggerTypeToDomain(triggerType string) domain.TriggerType {
 	switch triggerType {
-	case action_pb.TriggerType_TRIGGER_TYPE_POST_AUTHENTICATION:
+	case "TRIGGER_TYPE_POST_AUTHENTICATION", "1":
 		return domain.TriggerTypePostAuthentication
-	case action_pb.TriggerType_TRIGGER_TYPE_PRE_CREATION:
+	case "TRIGGER_TYPE_PRE_CREATION", "2":
 		return domain.TriggerTypePreCreation
-	case action_pb.TriggerType_TRIGGER_TYPE_POST_CREATION:
+	case "TRIGGER_TYPE_POST_CREATION", "3":
 		return domain.TriggerTypePostCreation
 	default:
 		return domain.TriggerTypeUnspecified
@@ -33,7 +35,7 @@ func TriggerTypeToDomain(triggerType action_pb.TriggerType) domain.TriggerType {
 
 func FlowToPb(flow *query.Flow) *action_pb.Flow {
 	return &action_pb.Flow{
-		Type:           FlowTypeToPb(flow.Type),
+		Type:           flow.Type.String(),
 		Details:        object_grpc.ChangeToDetailsPb(flow.Sequence, flow.ChangeDate, flow.ResourceOwner),
 		State:          action_pb.FlowState_FLOW_STATE_ACTIVE, //TODO: state in next release
 		TriggerActions: TriggerActionsToPb(flow.TriggerActions),
@@ -42,30 +44,8 @@ func FlowToPb(flow *query.Flow) *action_pb.Flow {
 
 func TriggerActionToPb(trigger domain.TriggerType, actions []*query.Action) *action_pb.TriggerAction {
 	return &action_pb.TriggerAction{
-		TriggerType: TriggerTypeToPb(trigger),
+		TriggerType: trigger.String(),
 		Actions:     ActionsToPb(actions),
-	}
-}
-
-func FlowTypeToPb(flowType domain.FlowType) action_pb.FlowType {
-	switch flowType {
-	case domain.FlowTypeExternalAuthentication:
-		return action_pb.FlowType_FLOW_TYPE_EXTERNAL_AUTHENTICATION
-	default:
-		return action_pb.FlowType_FLOW_TYPE_UNSPECIFIED
-	}
-}
-
-func TriggerTypeToPb(triggerType domain.TriggerType) action_pb.TriggerType {
-	switch triggerType {
-	case domain.TriggerTypePostAuthentication:
-		return action_pb.TriggerType_TRIGGER_TYPE_POST_AUTHENTICATION
-	case domain.TriggerTypePreCreation:
-		return action_pb.TriggerType_TRIGGER_TYPE_PRE_CREATION
-	case domain.TriggerTypePostCreation:
-		return action_pb.TriggerType_TRIGGER_TYPE_POST_CREATION
-	default:
-		return action_pb.TriggerType_TRIGGER_TYPE_UNSPECIFIED
 	}
 }
 

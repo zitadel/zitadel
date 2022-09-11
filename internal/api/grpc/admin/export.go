@@ -2,12 +2,14 @@ package admin
 
 import (
 	"context"
+
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -17,7 +19,6 @@ import (
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
@@ -639,8 +640,8 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 			}
 
 			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
-				FlowType:    action_pb.FlowType(flowType),
-				TriggerType: action_pb.TriggerType(triggerType),
+				FlowType:    flowType.String(),
+				TriggerType: triggerType.String(),
 				ActionIds:   actions,
 			})
 		}
