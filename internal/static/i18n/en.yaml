@@ -899,3 +899,14 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token only allowed in combination with Authorization Code.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Unspecified
+      ExternalAuthentication: External Authentication
+  TriggerType:
+    Unspecified: Unspecified
+    PostAuthentication: Post Authentication
+    PreCreation: Pre Creation
+    PostCreation: Post Creation
