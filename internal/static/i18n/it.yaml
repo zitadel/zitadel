@@ -911,3 +911,5 @@ Action:
     PostAuthentication: Post-autenticazione
     PreCreation: Pre-creazione
     PostCreation: Creazione successiva
+    PreUserinfoCreation: Pre userinfo creazione
+    PreAccessTokenCreation: Pre access token creazione

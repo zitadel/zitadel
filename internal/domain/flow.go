@@ -28,15 +28,29 @@ func (s FlowType) Valid() bool {
 }
 
 func (s FlowType) HasTrigger(triggerType TriggerType) bool {
-	switch triggerType {
-	case TriggerTypePostAuthentication:
-		return s == FlowTypeExternalAuthentication
-	case TriggerTypePreCreation:
-		return s == FlowTypeExternalAuthentication
-	case TriggerTypePostCreation:
-		return s == FlowTypeExternalAuthentication
+	for _, trigger := range s.TriggerTypess() {
+		if trigger == triggerType {
+			return true
+		}
+	}
+	return false
+}
+
+func (s FlowType) TriggerTypess() []TriggerType {
+	switch s {
+	case FlowTypeExternalAuthentication:
+		return []TriggerType{
+			TriggerTypePostAuthentication,
+			TriggerTypePreCreation,
+			TriggerTypePostCreation,
+		}
+	case FlowTypeCustomiseToken:
+		return []TriggerType{
+			TriggerTypePreUserinfoCreation,
+			TriggerTypePreAccessTokenCreation,
+		}
 	default:
-		return false
+		return nil
 	}
 }
 
@@ -92,16 +106,16 @@ func (s TriggerType) LocalizationKey() string {
 
 	switch s {
 	case TriggerTypePostAuthentication:
-		return "Action.Flow.Type.ExternalAuthentication"
+		return "Action.TriggerType.ExternalAuthentication"
 	case TriggerTypePreCreation:
-		return "Action.Flow.Type.PreCreation"
+		return "Action.TriggerType.PreCreation"
 	case TriggerTypePostCreation:
-		return "Action.Flow.Type.PostCreation"
+		return "Action.TriggerType.PostCreation"
 	case TriggerTypePreUserinfoCreation:
-		return "Action.Flow.Type.PreUserinfoCreation"
+		return "Action.TriggerType.PreUserinfoCreation"
 	case TriggerTypePreAccessTokenCreation:
-		return "Action.Flow.Type.PreAccessTokenCreation"
+		return "Action.TriggerType.PreAccessTokenCreation"
 	default:
-		return "Action.Flow.Type.Unspecified"
+		return "Action.TriggerType.Unspecified"
 	}
 }

@@ -21,27 +21,13 @@ func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequ
 	}, nil
 }
 
-var (
-	flowTriggerTypes = map[domain.FlowType][]*action_pb.TriggerType{
-		domain.FlowTypeExternalAuthentication: {
-			action_grpc.TriggerTypeToPb(domain.TriggerTypePostAuthentication),
-			action_grpc.TriggerTypeToPb(domain.TriggerTypePreCreation),
-			action_grpc.TriggerTypeToPb(domain.TriggerTypePostCreation),
-		},
-		domain.FlowTypeCustomiseToken: {
-			action_grpc.TriggerTypeToPb(domain.TriggerTypePreUserinfoCreation),
-			action_grpc.TriggerTypeToPb(domain.TriggerTypePreAccessTokenCreation),
-		},
-	}
-)
-
 func (s *Server) ListFlowTriggerTypes(ctx context.Context, req *mgmt_pb.ListFlowTriggerTypesRequest) (*mgmt_pb.ListFlowTriggerTypesResponse, error) {
-	triggerTypes := flowTriggerTypes[action_grpc.FlowTypeToDomain(req.Type)]
+	triggerTypes := action_grpc.FlowTypeToDomain(req.Type).TriggerTypess()
 	if len(triggerTypes) == 0 {
 		return nil, errors.ThrowNotFound(nil, "MANAG-P2OBk", "Errors.NotFound")
 	}
 	return &mgmt_pb.ListFlowTriggerTypesResponse{
-		Result: triggerTypes,
+		Result: action_grpc.TriggerTypesToPb(triggerTypes),
 	}, nil
 }
 

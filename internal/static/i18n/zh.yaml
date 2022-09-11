@@ -910,3 +910,5 @@ Action:
     PostAuthentication: 后期认证
     PreCreation: 创建前
     PostCreation: 创建后
+    PreUserinfoCreation: Pre Userinfo creation
+    PreAccessTokenCreation: Pre access token creation

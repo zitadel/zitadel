@@ -48,6 +48,15 @@ func TriggerTypeToDomain(triggerType string) domain.TriggerType {
 		return domain.TriggerTypeUnspecified
 	}
 }
+
+func TriggerTypesToPb(types []domain.TriggerType) []*action_pb.TriggerType {
+	list := make([]*action_pb.TriggerType, len(types))
+	for i, typ := range types {
+		list[i] = TriggerTypeToPb(typ)
+	}
+	return list
+}
+
 func TriggerTypeToPb(typ domain.TriggerType) *action_pb.TriggerType {
 	return &action_pb.TriggerType{
 		Id: typ.ID(),
